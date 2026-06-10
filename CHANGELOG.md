@@ -15,8 +15,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 - Output adapters: Standard MIDI File (SMF Type-0), Scala `.scl` (bidirectional), MPE, WAV.
 - Curated tuning presets with provenance and cultural context (12-TET, 5-limit JI, Makam Uşşak, Sléndro, Pélog) under CARE/OCAP principles.
 - Single-file web demo UI (tuning → chord → consonance → fingering → audition → export).
+- `edo(divisions, referenceHz?, periodCents?)`: n-tone equal division of the octave (or any period) as a first-class `TuningSystem`.
+- MTS adapter (`src/adapters/mts.ts`): `freqToMtsKey`, `mtsBulkDump` (MIDI Tuning Standard non-real-time bulk dump SysEx, 408 bytes), `tuningToMtsFrequencies` — maps a `TuningSystem` onto all 128 MIDI keys for DAW/synth retuning.
+- `.kbm` adapter (`src/adapters/kbm.ts`): `parseKbm`, `writeKbm`, `kbmNoteToFreq` — Scala keyboard mapping; unmapped keys (`x`) return `null`.
+- npm packaging: `npm run build` emits ESM + `.d.ts` to `dist/` via `tsconfig.build.json` (NodeNext modules); `package.json` exports map (`"."` / `"./core"` / `"./adapters"` / `"./data"`), `types`, `files`, `prepublishOnly` hook; top-level barrel `src/index.ts`.
+
+### Fixed
+- `localMinima`: descending-plateau false positive — plateaus now report once at their first index only when strictly below both differing neighbours; ascending-plateau and end-touching cases are no longer reported.
+- Piano `fingerPianoChord`: single-note guard hardened (behaviour unchanged for callers).
 
 ### Notes
-- Pre-1.0: APIs may change. 120 tests, ~95% coverage, zero runtime dependencies.
+- Pre-1.0: APIs may change. 182 tests, ~96% statement coverage, zero runtime dependencies.
 
 [Unreleased]: https://github.com/shizukutanaka/ruri/commits/main

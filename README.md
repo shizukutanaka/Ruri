@@ -4,16 +4,58 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala/MPE/WAV)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。120テスト、カバレッジ約98%、zero runtime-dep。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。182テスト、カバレッジ約96%、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
 ```
 src/core/        調律・cents/比・生成(MOS/最大均等)・協和(粗さ+harmonicity)・運指・合成
-src/adapters/    出力: SMF(.mid) / Scala(.scl) / MPE / WAV
+src/adapters/    出力: SMF(.mid) / Scala(.scl/.kbm) / MPE / WAV / MTS SysEx
 src/data/        出典付き調律プリセット + provenance/CARE検証ローダ
 shell-web/       単一HTMLデモUI(オフライン)
 docs/            設計・調査記録(Plan / WORKFLOW / research / 競合分析 / データ出典 / 監査)
+```
+
+## 使い方
+
+```ts
+// a) 調律系の生成と周波数取得
+import { edo, equalTemperament12, degreeToFreq } from 'ruri';
+
+const tuning19 = edo(19);                        // 19-EDO, A4=440Hz
+const tuning12 = equalTemperament12(440);        // 12-TET
+const freq = degreeToFreq(tuning19, 3);          // 3度目の音の Hz
+```
+
+```ts
+// b) 和音 → 不協和度評価 → Scala エクスポート
+import {
+  chordFromSemitones, realizeChordFreqs,
+  chordDissonance, harmonicSpectrum,
+} from 'ruri';
+import { sclFromCents, writeScl } from 'ruri/adapters';
+
+const chord = chordFromSemitones('major', [0, 4, 7]);
+const freqs = realizeChordFreqs(chord, 261.63);         // C4 root
+const roughness = chordDissonance(freqs, harmonicSpectrum());
+const scl = sclFromCents('major triad', [400, 700, 1200]);
+const sclText = writeScl(scl);                          // .scl 文字列
+```
+
+```ts
+// c) DAW/シンセ連携: MTS SysEx と .kbm キーボードマッピング
+import { edo } from 'ruri';
+import { tuningToMtsFrequencies, mtsBulkDump } from 'ruri/adapters';
+import { parseKbm, kbmNoteToFreq } from 'ruri/adapters';
+import { parseScl } from 'ruri/adapters';
+
+// 19-EDO を MTS 非リアルタイム一括ダンプ(408 バイト)に変換して DAW へ送信
+const sysex: Uint8Array = mtsBulkDump(tuningToMtsFrequencies(edo(19)), '19-edo');
+
+// .kbm で任意の MIDI ノートを周波数に解決(未マップキーは null)
+const scale = parseScl(sclFileText);
+const mapping = parseKbm(kbmFileText);
+const hz: number | null = kbmNoteToFreq(scale, mapping, 69);  // MIDI 69 → Hz
 ```
 
 ## 設計原則
@@ -48,6 +90,8 @@ npm run coverage
 ```
 
 tsc strict / eslint 警告ゼロ / prettier / vitest(性質テスト + 既知極小オラクル)。
+
+`npm run build` で dist/(ESM + 型定義)を生成、npm 配布可能。
 
 ## ライセンス
 
