@@ -1,0 +1,22 @@
+# NOTICE — Ruri
+
+Ruri code is licensed under the MIT License (see LICENSE).
+
+## Tuning data attribution
+
+Each bundled tuning is ONE documented example, not a canonical or "correct" tuning.
+Non-Western tunings vary by region, ensemble, performer, and school. Values are
+recorded with cultural context out of respect for their origin communities
+(CARE / OCAP principles). Corrections and concerns are welcome via project issues.
+
+| Tuning | Source | License |
+|--------|--------|---------|
+| 12-tone equal temperament | Standard 12-EDO (A=440, ISO 16) | public domain |
+| Just intonation (5-limit major) | Classic 5-limit just intonation | public domain |
+| Makam Uşşak (example) | Bozkurt et al., pitch-histogram analysis (SymbTr corpus), https://github.com/MTG/SymbTr | cited, not redistributed |
+| Sléndro (example) | Kunst / Polansky, "Interval Sizes in Javanese Sléndro" | cited, not redistributed |
+| Pélog (example) | Surjodiningrat et al. (1972), "Tone Measurements of Outstanding Javanese Gamelans" | cited, not redistributed |
+
+"cited, not redistributed": the numeric values shown are a documented example for
+interoperability and study; consult the cited source for authoritative data and
+its terms. We do not claim ownership of, or canonical authority over, these tunings.
