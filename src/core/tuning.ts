@@ -72,3 +72,29 @@ export function equalTemperament12(referenceHz: number): TuningSystem {
     source: 'theoretical',
   });
 }
+
+/** n-tone equal division of the period (default: octave). id = `${n}-edo`. */
+export function edo(
+  divisions: number,
+  referenceHz = 440,
+  periodCents = CENTS_PER_OCTAVE,
+): TuningSystem {
+  if (!Number.isInteger(divisions) || divisions < 1) {
+    throw new RangeError(`edo: divisions must be a positive integer, got ${divisions}`);
+  }
+  if (periodCents <= 0) {
+    throw new RangeError(`edo: periodCents must be > 0, got ${periodCents}`);
+  }
+  const degrees: Pitch[] = Array.from({ length: divisions }, (_, i) => ({
+    kind: 'cents' as const,
+    cents: (i * periodCents) / divisions,
+  }));
+  return defineTuning({
+    id: `${divisions}-edo`,
+    name: `${divisions}-tone equal division of the octave`,
+    referenceHz,
+    periodCents,
+    degrees,
+    source: 'theoretical',
+  });
+}

@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { equalTemperament12, degreeToCents, degreeToFreq, type TuningSystem } from './tuning.js';
+import {
+  equalTemperament12,
+  edo,
+  degreeToCents,
+  degreeToFreq,
+  type TuningSystem,
+} from './tuning.js';
 import { cents, fromRatio } from './cents.js';
 import { ratio } from './ratio.js';
 import { scaleToCents, type Scale } from './scale.js';
@@ -77,5 +83,48 @@ describe('chord', () => {
     const [root, , fifth] = freqs as [number, number, number];
     expect(root).toBeCloseTo(261.63, 6);
     expect(fifth / root).toBeCloseTo(2 ** (7 / 12), 6);
+  });
+});
+
+describe('edo', () => {
+  it('test_edo12_matches_equalTemperament12_degree_for_degree', () => {
+    const et = equalTemperament12(440);
+    const e = edo(12, 440);
+    expect(e.degrees.length).toBe(et.degrees.length);
+    expect(e.periodCents).toBeCloseTo(et.periodCents, 9);
+    for (let i = 0; i < 12; i++) {
+      expect(degreeToCents(e, i)).toBeCloseTo(degreeToCents(et, i), 9);
+    }
+  });
+
+  it('test_edo19_has_19_degrees_with_correct_step', () => {
+    const e = edo(19, 440);
+    expect(e.degrees.length).toBe(19);
+    const step = 1200 / 19;
+    for (let i = 0; i < 19; i++) {
+      expect(degreeToCents(e, i)).toBeCloseTo(step * i, 9);
+    }
+  });
+
+  it('test_edo31_degree18_approx_696_774_cents', () => {
+    const e = edo(31, 440);
+    expect(degreeToCents(e, 18)).toBeCloseTo(696.774, 3);
+  });
+
+  it('test_edo0_throws_RangeError', () => {
+    expect(() => edo(0)).toThrow(RangeError);
+  });
+
+  it('test_edo_non_integer_throws_RangeError', () => {
+    expect(() => edo(2.5)).toThrow(RangeError);
+  });
+
+  it('property_edo_n_degrees_up_one_period_equals_880hz', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 1, max: 72 }), (n) => {
+        const e = edo(n, 440);
+        expect(degreeToFreq(e, n)).toBeCloseTo(880, 6);
+      }),
+    );
   });
 });
