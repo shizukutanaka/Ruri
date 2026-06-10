@@ -31,8 +31,9 @@ export function fingerPianoChord(
 
   // Spread fingers 1..5 across the notes (thumb lowest for right hand).
   const fingers: Finger[] = [1, 2, 3, 4, 5];
+  const denom = notes.length <= 1 ? 1 : notes.length - 1;
   const assignment = notes.map((note, i) => {
-    const idx = notes.length <= 1 ? 0 : Math.round((i / (notes.length - 1)) * 4);
+    const idx = notes.length <= 1 ? 0 : Math.round((i / denom) * 4);
     return { note, finger: fingers[idx] as Finger };
   });
   return { assignment, oneHand };

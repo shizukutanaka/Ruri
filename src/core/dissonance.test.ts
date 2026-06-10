@@ -79,3 +79,66 @@ describe('timbre-dependent consonance (Sethares)', () => {
     expect(bell).not.toEqual(harm);
   });
 });
+
+describe('localMinima regression', () => {
+  it('test_simple_minimum', () => {
+    expect(localMinima([3, 1, 2])).toEqual([1]);
+  });
+
+  it('test_flat_plateau_minimum_reported_at_first_index', () => {
+    expect(localMinima([3, 1, 1, 2])).toEqual([1]);
+  });
+
+  it('test_descending_plateau_to_end_is_not_minimum', () => {
+    expect(localMinima([3, 1, 1, 0])).toEqual([]);
+  });
+
+  it('test_plateau_then_rise_in_middle', () => {
+    expect(localMinima([3, 2, 2, 1, 0, 1])).toEqual([4]);
+  });
+
+  it('test_plateau_touching_end_is_not_minimum', () => {
+    expect(localMinima([3, 1, 1])).toEqual([]);
+  });
+
+  it('property_reported_indices_strictly_below_nearest_differing_neighbours', () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.double({ noNaN: true, noDefaultInfinity: true }), {
+          minLength: 0,
+          maxLength: 30,
+        }),
+        (curve) => {
+          const minima = localMinima(curve);
+          for (const idx of minima) {
+            const cur = curve[idx] as number;
+            // find nearest differing neighbour on left
+            let leftVal: number | undefined;
+            for (let k = idx - 1; k >= 0; k--) {
+              if ((curve[k] as number) !== cur) {
+                leftVal = curve[k] as number;
+                break;
+              }
+            }
+            // find nearest differing neighbour on right
+            let rightVal: number | undefined;
+            for (let k = idx + 1; k < curve.length; k++) {
+              if ((curve[k] as number) !== cur) {
+                rightVal = curve[k] as number;
+                break;
+              }
+            }
+            expect(leftVal).toBeDefined();
+            expect(rightVal).toBeDefined();
+            expect(cur).toBeLessThan(leftVal as number);
+            expect(cur).toBeLessThan(rightVal as number);
+          }
+          // result is strictly increasing
+          for (let k = 1; k < minima.length; k++) {
+            expect(minima[k] as number).toBeGreaterThan(minima[k - 1] as number);
+          }
+        },
+      ),
+    );
+  });
+});

@@ -107,6 +107,29 @@ describe('piano chord fingering', () => {
     expect(fingerPianoChord([60, 60, 64]).assignment.length).toBe(2);
   });
 
+  it('test_duplicate_notes_finger_assignment', () => {
+    // [60, 60, 64] deduped → [60, 64]: 2 notes, fingers should be 1 and 5
+    const fp = fingerPianoChord([60, 60, 64]);
+    expect(fp.assignment[0]!.note).toBe(60);
+    expect(fp.assignment[0]!.finger).toBe(1);
+    expect(fp.assignment[1]!.note).toBe(64);
+    expect(fp.assignment[1]!.finger).toBe(5);
+  });
+
+  it('test_single_note_uses_thumb', () => {
+    const fp = fingerPianoChord([60]);
+    expect(fp.assignment.length).toBe(1);
+    expect(fp.assignment[0]!.note).toBe(60);
+    expect(fp.assignment[0]!.finger).toBe(1);
+    expect(fp.oneHand).toBe(true);
+  });
+
+  it('test_empty_input_returns_empty_assignment', () => {
+    const fp = fingerPianoChord([]);
+    expect(fp.assignment.length).toBe(0);
+    expect(fp.oneHand).toBe(true);
+  });
+
   it('property_fingers_ascend_with_pitch', () => {
     const fp = fingerPianoChord([60, 62, 64, 65, 67]);
     for (let i = 1; i < fp.assignment.length; i++) {
