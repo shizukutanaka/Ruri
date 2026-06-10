@@ -9,7 +9,32 @@
     "url": "https://github.com/shizukutanaka/ruri"
   },
   "type": "module",
-  "main": "src/core/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "default": "./dist/core/index.js"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "default": "./dist/adapters/index.js"
+    },
+    "./data": {
+      "types": "./dist/data/index.d.ts",
+      "default": "./dist/data/index.js"
+    }
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.ts\" --max-warnings 0",
@@ -17,7 +42,9 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run check && npm run build"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
