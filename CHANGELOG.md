@@ -19,12 +19,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 - MTS adapter (`src/adapters/mts.ts`): `freqToMtsKey`, `mtsBulkDump` (MIDI Tuning Standard non-real-time bulk dump SysEx, 408 bytes), `tuningToMtsFrequencies` — maps a `TuningSystem` onto all 128 MIDI keys for DAW/synth retuning.
 - `.kbm` adapter (`src/adapters/kbm.ts`): `parseKbm`, `writeKbm`, `kbmNoteToFreq` — Scala keyboard mapping; unmapped keys (`x`) return `null`.
 - npm packaging: `npm run build` emits ESM + `.d.ts` to `dist/` via `tsconfig.build.json` (NodeNext modules); `package.json` exports map (`"."` / `"./core"` / `"./adapters"` / `"./data"`), `types`, `files`, `prepublishOnly` hook; top-level barrel `src/index.ts`.
+- Regular temperaments (`src/core/temperament.ts`): `regularTemperament` (generator-stacked tunings, non-octave periods supported), `meantoneQuarterComma` (pure 5/4 major third), `pythagorean` (pure 3/2 fifths).
+- Chord discovery (`src/core/chord-search.ts`): `rankChords` enumerates degree subsets of a tuning and ranks them by Sethares roughness + Stolzenburg periodicity (acoustic-only, timbre-dependent).
+- `.tun` adapter (`src/adapters/tun.ts`): `writeTun` — AnaMark TUN text export (`[Tuning]` + `[Exact Tuning]` sections); composes with `tuningToMtsFrequencies`.
 
 ### Fixed
 - `localMinima`: descending-plateau false positive — plateaus now report once at their first index only when strictly below both differing neighbours; ascending-plateau and end-touching cases are no longer reported.
 - Piano `fingerPianoChord`: single-note guard hardened (behaviour unchanged for callers).
 
 ### Notes
-- Pre-1.0: APIs may change. 182 tests, ~96% statement coverage, zero runtime dependencies.
+- Pre-1.0: APIs may change. 246 tests, ~96% statement coverage, zero runtime dependencies.
 
 [Unreleased]: https://github.com/shizukutanaka/ruri/commits/main

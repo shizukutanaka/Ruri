@@ -4,13 +4,13 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。182テスト、カバレッジ約96%、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。246テスト、カバレッジ約96%、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
 ```
 src/core/        調律・cents/比・生成(MOS/最大均等)・協和(粗さ+harmonicity)・運指・合成
-src/adapters/    出力: SMF(.mid) / Scala(.scl/.kbm) / MPE / WAV / MTS SysEx
+src/adapters/    出力: SMF(.mid) / Scala(.scl/.kbm) / MPE / WAV / MTS SysEx / .tun
 src/data/        出典付き調律プリセット + provenance/CARE検証ローダ
 shell-web/       単一HTMLデモUI(オフライン)
 docs/            設計・調査記録(Plan / WORKFLOW / research / 競合分析 / データ出典 / 監査)

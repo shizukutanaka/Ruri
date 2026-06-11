@@ -33,12 +33,12 @@
 | MTS (MIDI Tuning Standard) SysEx バルクダンプ出力 — VST/ハードシンセ連携の事実上の標準 | **実装済** (`src/adapters/mts.ts`) |
 | Scala `.kbm` キーボードマッピング(parse/write/周波数解決) | **実装済** (`src/adapters/kbm.ts`) |
 | トップレベルエントリポイント `src/index.ts` | **実装済** |
-| Regular temperament(生成音程ベース、ミーントーン等) | 未着手(将来) |
-| 和音列挙+協和ランキングの自動化 | 未着手(将来) |
+| Regular temperament(生成音程ベース、ミーントーン・ピタゴラス) | **実装済** (`src/core/temperament.ts`) |
+| 和音列挙+協和ランキングの自動化(`rankChords`) | **実装済** (`src/core/chord-search.ts`) |
 | ボイスリーディング(最小移動)コスト | 未着手(将来) |
 | フレットレス楽器の連続ポジションモデル | 未着手(docs/Plan 既載) |
 | ADSR等の時間エンベロープ | 未着手(将来) |
-| `.tun` (AnaMark) 形式 | 未着手(将来) |
+| `.tun` (AnaMark) 形式 | **実装済** (`src/adapters/tun.ts`) |
 | 調律プリセット拡充(Pythagorean・歴史的調律・Bohlen-Pierce等) | 未着手 — CARE準拠の出典整備が前提 |
 | A11y/i18n(shell-web) | 未着手(GOAL-AUDIT 既載) |
 
