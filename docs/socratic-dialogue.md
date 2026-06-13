@@ -282,3 +282,64 @@ DSP ではよくある近似（別解 `(n+1)/attackEnd` は n=0 から非ゼロ;
 | Q13 scl 検証の非対称            | ⚠️ 軽微                    | 据置(正当用途を壊さない)                   |
 
 第二巡の核心: 「出力が正しいか」は「出力が自分の宣言した契約を満たすか」で問う。.tun は「パーサが読める valid file」を約束しながら、custom basefreq でそれを破っていた。テストの盲点(値は見たが**整合性**は見ていない)が見逃しの温床だった。
+
+---
+
+# 第五巡 (2026-06): 「到達不能コード」を問う
+
+四巡まで「実行時に何が起きるか」を問うてきた。五巡目は**数学的に到達不能なコードパス**と**エクスポートされたが検証されていないAPIの存在**を問う。
+
+## Q22. `adsrEnvelope` の `releaseS === 0` 分岐は本当に実行されるか？ ❌ **デッドコード → 削除**
+
+**問**: `envelope.ts` の else ブランチ(ゲートクローズ後)に `if (releaseS === 0) { env = 0; }` が存在した。この行が実行される入力は存在するか。
+
+**検証**: `totalSamples = Math.ceil((gateS + releaseS) * sampleRate)`。`releaseS = 0` のとき、`totalSamples = ceil(gateS * SR) = ceil(gateEnd)` (ただし `gateEnd = gateS * SR`)。ループ `for (let n = 0; n < totalSamples; n++)` において:
+
+- `gateEnd` が整数の場合: `totalSamples = gateEnd`。ループは `n < gateEnd` を満たす n のみ → ゲート常に開。
+- `gateEnd` が非整数の場合: `totalSamples = floor(gateEnd) + 1`。最大の n は `floor(gateEnd) < gateEnd` → ゲート常に開。
+
+すべての n において `n < gateEnd` が成立 → `else` ブランチ(ゲートクローズ)には**到達しない**。QED。
+
+「インスタントカット」の実装は `releaseS=0` 時のサンプル数削減で表現されており、コード分岐は不要だった。これは意図ではなく見逃し（`if...else` の構造を維持したままデッドブランチが残った）。
+
+**判定**: ❌ デッドコード(数学的証明)。「シナリオが存在しない場合の防御的コードは書かない」哲学と矛盾。
+→ **対応**: `if (releaseS === 0) { env = 0; }` 削除。`else` ブランチのコメントに不変条件を明記: 「`releaseS > 0` guaranteed here: when `releaseS = 0`, `totalSamples = ceil(gateEnd)` and all `n < totalSamples` satisfy `n < gateEnd`」。JSDoc の `releaseS = 0` 説明も「no release samples are allocated; the `totalSamples` formula ensures no loop iteration reaches the release phase」に更新。
+
+## Q23. `stretchedSpectrum` はエクスポートされているが、一度も呼ばれていないのでは？ ❌ **未テスト → テスト追加**
+
+**問**: `spectrum.ts` は `harmonicSpectrum`, `stretchedSpectrum`, `bellSpectrum`, `realizeSpectrum` を公開する。カバレッジは `78.26%`、関数カバレッジは `75%` (3/4)。どれが漏れているか。
+
+**検証**: `grep -r "stretchedSpectrum"` → `spectrum.ts` 定義のみ。テストも、`chord-search`(例示コメント)も呼び出さない。コメントは「Piano-like stretched spectrum (Railsback-style inharmonicity coefficient B)」と述べるが、ライブラリが宣言する「エクスポートした API はテストで検証」を実践できていない。
+
+`bellSpectrum` は `chord-search.ts` の JSDoc コメントに言及されるが、同様にテストから呼ばれていない(bell 音色でランキングを変えると主張するが証明なし)。
+
+**判定**: ❌ エクスポート済み API が未検証。「spectrumHelpers」describe ブロックを generate.test.ts に追加: `stretchedSpectrum` の長さ・第一倍音≈1・第六倍音 > 6(非調和性の確認)、`bellSpectrum` の長さ・第一比≈1。
+
+## Q24. `generatedScale` の `periodCents <= 0` エラーパスは、テストで実際に実行されるか？ ❌ **カバレッジ欠落 → テスト追加**
+
+**問**: `generate.ts:14-16` は `count < 1 || periodCents <= 0` で throw する。既存テストは `maximallyEven(5,7)` → RangeError のみ。`generatedScale` のエラー系は？
+
+**検証**: `generate.test.ts` を検索 → `generatedScale` を呼ぶエラーテストは存在しない。`periodCents = 0` を渡した場合 `wrap(x, 0) = ((x%0)+0)%0 = NaN` が伝搬するはずだが、throw 前にガードされているので実際には throw。このパスは未確認。
+
+**判定**: ❌ エラーパス未実行。`test_zero_period_throws` / `test_negative_period_throws` を追加。
+
+## Q25. `edo` の `periodCents <= 0` チェックはテストされているか？ ❌ **カバレッジ欠落 → テスト追加**
+
+**問**: `tuning.ts:93-95` の `edo` 関数は `periodCents <= 0` を RangeError で弾く。現在の `tuning.ts` カバレッジ `97.01%`、行 94-95 未到達。
+
+**検証**: `edo` は Q4 で追加されたが、そのテストは有効値のみ検証（12-EDO が equalTemperament12 と一致するかなど）。`edo(12, 440, 0)` はテストされていない。
+
+**判定**: ❌ エラーパス未確認。`test_non_positive_period_throws` / `test_negative_period_throws` を追加。
+
+---
+
+## 第五巡サマリ
+
+| 問                                               | 判定                   | 対応                                                                     |
+| ------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------ |
+| Q22 `releaseS=0` の `env=0` 分岐が到達不能      | ❌ デッドコード(数学証明) | 分岐削除 + `totalSamples` 不変条件コメント + JSDoc 更新                  |
+| Q23 `stretchedSpectrum` / `bellSpectrum` 未テスト | ❌ エクスポート未検証  | `spectrum helpers` テスト 4 件追加                                       |
+| Q24 `generatedScale periodCents<=0` 未確認      | ❌ エラーパス未実行    | `test_zero_period_throws` + `test_negative_period_throws` 追加           |
+| Q25 `edo periodCents<=0` 未確認                  | ❌ エラーパス未実行    | `test_non_positive_period_throws` + `test_negative_period_throws` 追加   |
+
+第五巡の核心: 「到達不能」は2種類ある。(1) 数学的証明で到達不能(Q22 — totalSamples 不変条件)と(2) テスト設計の見落としで未到達(Q23-25)。前者は「書かれたコードが誤った前提に立つ」証拠であり削除すべき。後者は「テストが API の表面積を覆えていない」証拠であり補完すべき。いずれも「コードが動く」ことで隠れる欠陥であり、カバレッジを「哲学への忠実度計」として使うことで発見できる。

@@ -264,6 +264,20 @@ describe('adsrEnvelope Socratic boundary tests', () => {
     const env = adsrEnvelope({ ...OPTS_BASE, attackS: 0 }, 0, SR);
     expect(Array.from(env).every((s) => s === 0)).toBe(true);
   });
+
+  it('test_zero_attack_gate_closes_mid_decay_release_starts_from_mid_decay_value', () => {
+    // attackS=0 and gate closes before decay ends (gateS=0.1, decayS=0.3):
+    // valueAtGate = 1 - (1 - sustainLevel) * (gateEnd / (decayS * SR)).
+    const opts = { attackS: 0, decayS: 0.3, sustainLevel: 0.5, releaseS: 0.2 };
+    const env = adsrEnvelope(opts, 0.1, SR);
+    // gateEnd=100, decayS*SR=300. decayPos=1/3. valueAtGate = 1 - 0.5*(1/3) = 5/6.
+    const expected = 1 - 0.5 * (100 / 300);
+    expect(env[100] as number).toBeCloseTo(expected, 5);
+    // Release is non-increasing from that point.
+    for (let i = 101; i < env.length; i++) {
+      expect((env[i] as number) - 1e-9).toBeLessThanOrEqual(env[i - 1] as number);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------

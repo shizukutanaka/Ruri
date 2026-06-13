@@ -48,6 +48,24 @@ describe('freqToMtsKey', () => {
   it('test_invalid_hz_infinity_throws', () => {
     expect(() => freqToMtsKey(Infinity)).toThrow(RangeError);
   });
+
+  it('test_fraction14_carry_increments_semitone', () => {
+    // m = 60 + 16383.5/16384: Math.round(fraction * 16384) = Math.round(16383.5) = 16384 → carry.
+    // After carry: semitone becomes 61, fraction14 resets to 0.
+    const mTarget = 60 + 16383.5 / 16384;
+    const hzTarget = 440 * 2 ** ((mTarget - 69) / 12);
+    const key = freqToMtsKey(hzTarget);
+    expect(key.semitone).toBe(61);
+    expect(key.fraction14).toBe(0);
+  });
+
+  it('test_fraction14_carry_reclamps_at_semitone_127', () => {
+    // m = 127 + 16383.5/16384 → carry pushes semitone to 128 → re-clamped to {127, 16383}.
+    const mHigh = 127 + 16383.5 / 16384;
+    const hzHigh = 440 * 2 ** ((mHigh - 69) / 12);
+    const key = freqToMtsKey(hzHigh);
+    expect(key).toEqual({ semitone: 127, fraction14: 16383 });
+  });
 });
 
 // ---------------------------------------------------------------------------

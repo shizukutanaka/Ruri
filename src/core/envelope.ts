@@ -15,7 +15,9 @@
  *
  * Edge cases:
  *   - attackS  = 0 → jump to 1 at sample 0.
- *   - releaseS = 0 → instant cut at gateS (tail is 0).
+ *   - releaseS = 0 → instant cut at gateS (no release samples are allocated; the
+ *                    `totalSamples` formula ensures no loop iteration reaches the release
+ *                    phase — this is a mathematical invariant, not a runtime check).
  *   - gateS    = 0 → release starts from 0 → all zeros.
  */
 
@@ -89,40 +91,38 @@ export function adsrEnvelope(opts: AdsrOptions, gateS: number, sampleRate: numbe
         env = 1 - (1 - sustainLevel) * decayPos;
       }
     } else {
-      // Gate closed — release phase.
-      if (releaseS === 0) {
-        env = 0;
-      } else {
-        // Determine the value at gate-close (may be in the middle of A or D).
-        let valueAtGate: number;
-        if (gateS === 0) {
-          // Gate never opens: release starts from silence.
-          valueAtGate = 0;
-        } else if (attackS === 0) {
-          if (decayS === 0 || gateEnd >= decayEnd) {
-            valueAtGate = sustainLevel;
-          } else {
-            const decayPos = gateEnd / (decayS * sampleRate);
-            valueAtGate = 1 - (1 - sustainLevel) * decayPos;
-          }
-        } else if (gateEnd < attackEnd) {
-          // Gate closes during attack.
-          valueAtGate = gateEnd / (attackS * sampleRate);
-        } else if (decayS === 0 || gateEnd >= decayEnd) {
+      // Gate closed — release phase. releaseS > 0 is guaranteed here: when releaseS = 0,
+      // totalSamples = ceil(gateS * SR) = ceil(gateEnd) and all n < totalSamples
+      // satisfy n < gateEnd, so this branch is never reached.
+      // Determine the value at gate-close (may be in the middle of A or D).
+      let valueAtGate: number;
+      if (gateS === 0) {
+        // Gate never opens: release starts from silence.
+        valueAtGate = 0;
+      } else if (attackS === 0) {
+        if (decayS === 0 || gateEnd >= decayEnd) {
           valueAtGate = sustainLevel;
         } else {
-          // Gate closes during decay.
-          const decayPos = (gateEnd - attackEnd) / (decayS * sampleRate);
+          const decayPos = gateEnd / (decayS * sampleRate);
           valueAtGate = 1 - (1 - sustainLevel) * decayPos;
         }
+      } else if (gateEnd < attackEnd) {
+        // Gate closes during attack.
+        valueAtGate = gateEnd / (attackS * sampleRate);
+      } else if (decayS === 0 || gateEnd >= decayEnd) {
+        valueAtGate = sustainLevel;
+      } else {
+        // Gate closes during decay.
+        const decayPos = (gateEnd - attackEnd) / (decayS * sampleRate);
+        valueAtGate = 1 - (1 - sustainLevel) * decayPos;
+      }
 
-        // Linear release from valueAtGate → 0 over releaseS.
-        const releasePos = (n - gateEnd) / (releaseS * sampleRate);
-        if (releasePos >= 1) {
-          env = 0;
-        } else {
-          env = valueAtGate * (1 - releasePos);
-        }
+      // Linear release from valueAtGate → 0 over releaseS.
+      const releasePos = (n - gateEnd) / (releaseS * sampleRate);
+      if (releasePos >= 1) {
+        env = 0;
+      } else {
+        env = valueAtGate * (1 - releasePos);
       }
     }
 

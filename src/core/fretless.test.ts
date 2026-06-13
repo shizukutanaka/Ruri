@@ -48,3 +48,59 @@ describe('fretless instruments', () => {
     expect(() => fretlessPositionsFor(v, 0)).toThrow(RangeError);
   });
 });
+
+// ---------------------------------------------------------------------------
+// fretlessPositionsFor – tolerance clamping and validation (coverage gaps)
+// ---------------------------------------------------------------------------
+
+describe('fretlessPositionsFor tolerance', () => {
+  const v = violin(440);
+  // String layout: G3=string 0 (≈196 Hz), D4=1, A4=2 (440 Hz), E5=3.
+
+  it('test_negative_tolerance_throws', () => {
+    expect(() => fretlessPositionsFor(v, 440, -1)).toThrow(RangeError);
+  });
+
+  it('test_tolerance_clamps_freq_below_open_string_to_zero_cents', () => {
+    // G3 string: 10 cents below open → within 15-cent tolerance → clamped to 0 cents.
+    const g3Hz = v.openStringsHz[0] as number;
+    const belowG3 = g3Hz * 2 ** (-10 / 1200);
+    const positions = fretlessPositionsFor(v, belowG3, 15);
+    const g3pos = positions.find((p) => p.string === 0);
+    expect(g3pos).toBeDefined();
+    expect(g3pos?.cents).toBe(0);
+    expect(g3pos?.freqHz).toBeCloseTo(g3Hz, 2);
+  });
+
+  it('test_tolerance_clamps_freq_above_max_cents_to_max', () => {
+    // A4 string (440 Hz): 10 cents past maxCents (2400) → within 15-cent tolerance → clamped to 2400.
+    const a4Hz = v.openStringsHz[2] as number; // index 2
+    const above2400 = a4Hz * 2 ** ((v.maxCents + 10) / 1200);
+    const positions = fretlessPositionsFor(v, above2400, 15);
+    const a4pos = positions.find((p) => p.string === 2);
+    expect(a4pos).toBeDefined();
+    expect(a4pos?.cents).toBe(v.maxCents);
+    expect(a4pos?.freqHz).toBeCloseTo(a4Hz * 2 ** (v.maxCents / 1200), 2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// fingerFretlessChord – validation (coverage gaps)
+// ---------------------------------------------------------------------------
+
+describe('fingerFretlessChord validation', () => {
+  const v = violin(440);
+
+  it('test_empty_freqs_throws', () => {
+    expect(() => fingerFretlessChord(v, [])).toThrow(RangeError);
+  });
+
+  it('test_too_many_freqs_throws', () => {
+    // Violin has 4 strings; 5 notes is too many.
+    expect(() => fingerFretlessChord(v, [200, 250, 300, 350, 400])).toThrow(RangeError);
+  });
+
+  it('test_non_positive_freq_throws', () => {
+    expect(() => fingerFretlessChord(v, [440, -1])).toThrow(RangeError);
+  });
+});

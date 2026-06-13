@@ -2,8 +2,19 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { generatedScale, isWellFormed, maximallyEven } from './generate.js';
 import { approxRatio, relativePeriodicity, chordPeriodicity } from './harmonicity.js';
-import { defineTuning, equalTemperament12 } from './tuning.js';
+import { defineTuning, equalTemperament12, edo } from './tuning.js';
 import { cents } from './cents.js';
+import { stretchedSpectrum, bellSpectrum } from './spectrum.js';
+
+describe('generatedScale validation', () => {
+  it('test_zero_period_throws', () => {
+    expect(() => generatedScale(700, 0, 5)).toThrow(RangeError);
+  });
+
+  it('test_negative_period_throws', () => {
+    expect(() => generatedScale(700, -1200, 5)).toThrow(RangeError);
+  });
+});
 
 describe('generated (MOS) scales', () => {
   it('test_pentatonic_by_fifths_is_well_formed', () => {
@@ -84,6 +95,41 @@ describe('harmonicity (Stolzenburg periodicity)', () => {
         },
       ),
     );
+  });
+});
+
+describe('edo validation', () => {
+  it('test_non_positive_period_throws', () => {
+    expect(() => edo(12, 440, 0)).toThrow(RangeError);
+  });
+
+  it('test_negative_period_throws', () => {
+    expect(() => edo(12, 440, -1200)).toThrow(RangeError);
+  });
+});
+
+describe('spectrum helpers', () => {
+  it('test_stretched_spectrum_length', () => {
+    const s = stretchedSpectrum(6, 0.0004, 0.88);
+    expect(s).toHaveLength(6);
+  });
+
+  it('test_stretched_spectrum_first_partial_near_one', () => {
+    // The first partial (k=1) has ratio ≈ 1 (very slight stretch for k=1).
+    const s = stretchedSpectrum(6, 0.0004, 0.88);
+    expect((s[0] as { ratio: number }).ratio).toBeCloseTo(1, 3);
+  });
+
+  it('test_stretched_spectrum_inharmonic_for_b_nonzero', () => {
+    // For k=6, b=0.0004: ratio = 6 * sqrt(1 + 0.0004*36) ≈ 6 * 1.0072 > 6.
+    const s = stretchedSpectrum(6, 0.0004, 0.88);
+    expect((s[5] as { ratio: number }).ratio).toBeGreaterThan(6);
+  });
+
+  it('test_bell_spectrum_length_and_first_partial', () => {
+    const b = bellSpectrum();
+    expect(b).toHaveLength(6);
+    expect((b[0] as { ratio: number }).ratio).toBeCloseTo(1, 5);
   });
 });
 

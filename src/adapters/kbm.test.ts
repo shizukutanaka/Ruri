@@ -316,4 +316,60 @@ describe('.kbm parse errors', () => {
       parseKbm('12\n100\n50\n60\n69\n440.0\n12\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n'),
     ).toThrow(RangeError);
   });
+
+  it('test_midi_note_above_127_throws', () => {
+    // requireMidiNote rejects values outside [0,127].
+    expect(() =>
+      parseKbm('12\n200\n127\n60\n69\n440.0\n12\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n'),
+    ).toThrow(RangeError);
+  });
+
+  it('test_negative_octave_degree_throws', () => {
+    // octaveDegree must be >= 0; -1 is rejected.
+    expect(() =>
+      parseKbm('12\n0\n127\n60\n69\n440.0\n-1\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n'),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// kbmNoteToFreq – octaveDegree out of range
+// ---------------------------------------------------------------------------
+
+describe('kbmNoteToFreq octaveDegree out of range', () => {
+  it('test_octave_degree_exceeds_scale_length_throws', () => {
+    const m: KbmMapping = {
+      size: 1,
+      firstNote: 0,
+      lastNote: 127,
+      middleNote: 60,
+      referenceNote: 60,
+      referenceHz: 440.0,
+      octaveDegree: 13, // > scale12tet.degrees.length (12)
+      mapping: [0],
+    };
+    expect(() => kbmNoteToFreq(scale12tet, m, 60)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// kbmNoteToFreq – referenceNote maps to unmapped ('x') key
+// ---------------------------------------------------------------------------
+
+describe('kbmNoteToFreq unmapped referenceNote', () => {
+  it('test_reference_note_on_x_entry_throws', () => {
+    // size=3, mapping=[0,null,2], middleNote=60.
+    // referenceNote=61 → off=1 → pos=1 → mapping[1]=null → relCentsForNote returns null → throw.
+    const mRef: KbmMapping = {
+      size: 3,
+      firstNote: 0,
+      lastNote: 127,
+      middleNote: 60,
+      referenceNote: 61, // falls on the 'x' (null) mapping slot
+      referenceHz: 440.0,
+      octaveDegree: 3,
+      mapping: [0, null, 2],
+    };
+    expect(() => kbmNoteToFreq(scale12FromCents, mRef, 60)).toThrow(RangeError);
+  });
 });

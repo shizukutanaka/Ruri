@@ -58,6 +58,11 @@ describe('Scala .scl parse', () => {
   it('test_bad_ratio_throws', () => {
     expect(() => parseScl('Desc\n 1\n 3/0\n')).toThrow(RangeError);
   });
+
+  it('test_degree_count_mismatch_throws', () => {
+    // Header says 3 degrees but only 2 lines are provided.
+    expect(() => parseScl('Desc\n 3\n 200.0\n 400.0\n')).toThrow(RangeError);
+  });
 });
 
 describe('Scala .scl round-trip (interop necessity)', () => {

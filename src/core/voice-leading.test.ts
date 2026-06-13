@@ -279,3 +279,24 @@ describe('minimalVoiceLeading — fast-check properties', () => {
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// Tie-break: equal frequencies → sort by original index (branch coverage)
+// ---------------------------------------------------------------------------
+
+describe('minimalVoiceLeading duplicate-frequency tie-break', () => {
+  it('test_equal_fromFreqs_sorts_by_original_index', () => {
+    // fromFreqs has duplicate 440 Hz: comparator tie-break branch (a - b) is exercised.
+    const result = minimalVoiceLeading([440, 440], [440, 440]);
+    expect(result.assignments).toHaveLength(2);
+    expect(result.totalCents).toBeCloseTo(0, 10);
+    expect(result.maxCents).toBeCloseTo(0, 10);
+  });
+
+  it('test_equal_toFreqs_sorts_by_original_index', () => {
+    // toFreqs has duplicate → tie-break on toOrder sort.
+    const result = minimalVoiceLeading([330, 440], [440, 440]);
+    // Both 440 s in toFreqs are matched; should not throw.
+    expect(result.assignments).toHaveLength(2);
+  });
+});
