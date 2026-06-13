@@ -117,3 +117,25 @@ describe('modal synthesis (inharmonic timbre)', () => {
     expect(() => strike(0, harmonicSpectrum(), SHORT_M)).toThrow(RangeError);
   });
 });
+
+describe('pluck – validation', () => {
+  it('test_frequency_too_high_for_sample_rate_throws', () => {
+    // N = floor(sampleRate / freqHz) < 2 when freqHz > sampleRate/2.
+    expect(() => pluck(25000, { ...DEFAULT_KS, sampleRate: 44100 })).toThrow(RangeError);
+  });
+});
+
+describe('pluck – additional validation', () => {
+  it('test_zero_freq_throws', () => {
+    expect(() => pluck(0, DEFAULT_KS)).toThrow(RangeError);
+  });
+});
+
+describe('strike – Nyquist skip', () => {
+  it('test_partials_above_nyquist_are_skipped', () => {
+    // Fundamental 12000 Hz: 3rd partial (36 kHz) exceeds Nyquist (22050 Hz) → skip branch.
+    const wave = strike(12000, harmonicSpectrum(6), { ...DEFAULT_MODAL, sampleRate: 44100 });
+    expect(wave.length).toBeGreaterThan(0);
+    expect(Array.from(wave).every(Number.isFinite)).toBe(true);
+  });
+});

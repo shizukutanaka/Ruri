@@ -17,6 +17,11 @@ describe('generatedScale validation', () => {
 });
 
 describe('generated (MOS) scales', () => {
+  it('test_single_note_scale_not_well_formed', () => {
+    // isWellFormed requires n >= 2; a 1-note scale returns false.
+    expect(isWellFormed([600], 1200)).toBe(false);
+  });
+
   it('test_pentatonic_by_fifths_is_well_formed', () => {
     const penta = generatedScale(700, 1200, 5);
     expect(penta.length).toBe(5);

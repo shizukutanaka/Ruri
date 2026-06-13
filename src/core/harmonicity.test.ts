@@ -126,3 +126,13 @@ describe('chordPeriodicity', () => {
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// relativePeriodicity – empty input throws (line 64 true branch)
+// ---------------------------------------------------------------------------
+
+describe('relativePeriodicity – validation', () => {
+  it('empty_ratios_throws', () => {
+    expect(() => relativePeriodicity([])).toThrow(RangeError);
+  });
+});
