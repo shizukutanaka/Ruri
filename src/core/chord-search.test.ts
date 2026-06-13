@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { equalTemperament12, edo } from './tuning.js';
-import { harmonicSpectrum } from './spectrum.js';
+import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { rankChords } from './chord-search.js';
 
 describe('rankChords — 12-TET size-3 harmonic spectrum', () => {
@@ -151,5 +151,50 @@ describe('rankChords — determinism', () => {
     const r1 = rankChords(tuning, opts);
     const r2 = rankChords(tuning, opts);
     expect(r1).toEqual(r2);
+  });
+});
+
+// Socratic Q1: the score blends a timbre-DEPENDENT axis (roughness) with a
+// timbre-INDEPENDENT one (periodicity). These tests make that split observable.
+describe('rankChords — timbre dependence of the two score axes', () => {
+  const tuning = equalTemperament12(440);
+
+  it('roughness_axis_is_timbre_dependent_changing_spectrum_changes_ranking', () => {
+    // periodicityWeight: 0 → score is pure roughness, which honours the spectrum.
+    const harmonic = rankChords(tuning, {
+      size: 3,
+      periodicityWeight: 0,
+      spectrum: harmonicSpectrum(),
+      limit: 55,
+    });
+    const bell = rankChords(tuning, {
+      size: 3,
+      periodicityWeight: 0,
+      spectrum: bellSpectrum(),
+      limit: 55,
+    });
+    // Same candidate set, but the smoothest-chord ordering differs by timbre.
+    const harmonicTop = harmonic.map((c) => c.degrees.join('-'));
+    const bellTop = bell.map((c) => c.degrees.join('-'));
+    expect(harmonicTop).not.toEqual(bellTop);
+  });
+
+  it('periodicity_axis_is_timbre_independent_spectrum_is_ignored', () => {
+    // periodicityWeight: 1 → score is pure periodicity, which ignores the spectrum.
+    const harmonic = rankChords(tuning, {
+      size: 3,
+      periodicityWeight: 1,
+      spectrum: harmonicSpectrum(),
+      limit: 55,
+    });
+    const bell = rankChords(tuning, {
+      size: 3,
+      periodicityWeight: 1,
+      spectrum: bellSpectrum(),
+      limit: 55,
+    });
+    // Identical ranking and identical periodicity values regardless of timbre.
+    expect(harmonic.map((c) => c.degrees.join('-'))).toEqual(bell.map((c) => c.degrees.join('-')));
+    expect(harmonic.map((c) => c.periodicity)).toEqual(bell.map((c) => c.periodicity));
   });
 });

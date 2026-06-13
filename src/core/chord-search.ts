@@ -8,11 +8,23 @@ export interface RankedChord {
   /** Degree indices within one period, ascending, starting at the chord's root degree offset 0..n-1 — store absolute degree indices. */
   readonly degrees: readonly number[];
   readonly cents: readonly number[];
-  /** Sethares roughness of the realized chord (lower = smoother). */
+  /**
+   * Sethares roughness of the realized chord (lower = smoother).
+   * TIMBRE-DEPENDENT: computed from the supplied `spectrum`. A bell spectrum
+   * yields different roughness — and therefore a different ranking — than a
+   * harmonic one. This is the library's "consonance is timbre-dependent" axis.
+   */
   readonly roughness: number;
-  /** Stolzenburg relative periodicity (lower = more harmonic), if chordPeriodicity is applicable. */
+  /**
+   * Stolzenburg relative periodicity (lower = more harmonic).
+   * TIMBRE-INDEPENDENT: `chordPeriodicity` reads frequencies only and snaps their
+   * ratios to nearby just intervals — it implicitly assumes a harmonic series and
+   * ignores `spectrum`. Blending it into `score` (via `periodicityWeight`) mixes a
+   * timbre-independent axis with the timbre-dependent roughness; set
+   * `periodicityWeight: 0` for a purely timbre-dependent ranking.
+   */
   readonly periodicity: number;
-  /** Combined rank score, lower is better. */
+  /** Combined rank score, lower is better. See `periodicityWeight` for the timbre caveat. */
   readonly score: number;
 }
 
@@ -21,8 +33,18 @@ export interface ChordSearchOptions {
   readonly size?: number;
   /** Root frequency for realization, default tuning reference (degree 0). */
   readonly rootHz?: number;
+  /**
+   * Instrument spectrum used for the roughness axis. Default `harmonicSpectrum()`.
+   * NOTE: passing a different spectrum (e.g. `bellSpectrum()`) changes only the
+   * roughness term, not the periodicity term — periodicity is timbre-independent.
+   */
   readonly spectrum?: Spectrum;
-  /** Weight of normalized periodicity vs normalized roughness in score, 0..1, default 0.5. */
+  /**
+   * Weight of normalized periodicity vs normalized roughness in score, 0..1, default 0.5.
+   * `0` = purely timbre-dependent (roughness only, honours `spectrum`);
+   * `1` = purely timbre-independent (periodicity only, ignores `spectrum`).
+   * The 0.5 default deliberately blends the two; document this when reporting rankings.
+   */
   readonly periodicityWeight?: number;
   /** Max results, default 10. */
   readonly limit?: number;

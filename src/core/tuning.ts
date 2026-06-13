@@ -73,7 +73,15 @@ export function equalTemperament12(referenceHz: number): TuningSystem {
   });
 }
 
-/** n-tone equal division of the period (default: octave). id = `${n}-edo`. */
+/**
+ * n-tone equal division of the period (default: octave). id = `${n}-edo`.
+ *
+ * CAVEAT: `edo(12)` is pitch-identical to `equalTemperament12()` but its `id` is
+ * `'12-edo'`, NOT `'12-tet'`. Because `scaleToCents` requires `Scale.tuningId` to
+ * match `tuning.id`, a `Scale` authored for `'12-tet'` will NOT bind to `edo(12)`
+ * even though the frequencies are the same. Use `equalTemperament12()` when you
+ * need the `'12-tet'` id, or set your `Scale.tuningId` to `'12-edo'`.
+ */
 export function edo(
   divisions: number,
   referenceHz = 440,
