@@ -63,6 +63,23 @@ describe('Scala .scl parse', () => {
     // Header says 3 degrees but only 2 lines are provided.
     expect(() => parseScl('Desc\n 3\n 200.0\n 400.0\n')).toThrow(RangeError);
   });
+
+  it('test_only_comment_lines_throws', () => {
+    // lines.length < 2 → too few non-comment lines (line 29 true branch).
+    expect(() => parseScl('! only a comment\n! another\n')).toThrow(RangeError);
+  });
+
+  it('test_infinite_cents_value_throws', () => {
+    // '1.0e999' has '.' so parsed as cents; parseFloat = Infinity → !isFinite → throw (line 47).
+    expect(() => parseScl('Desc\n 1\n 1.0e999\n')).toThrow(RangeError);
+  });
+
+  it('test_integer_ratio_no_slash', () => {
+    // '3' has no '/' → [n, d] = ['3', '1'] → valid 3/1 ratio (line 50 false branch).
+    const s = parseScl('Desc\n 1\n 3\n');
+    expect(s.degrees).toHaveLength(1);
+    expect(degreeCents(s.degrees[0]!)).toBeCloseTo(1200 * Math.log2(3), 5);
+  });
 });
 
 describe('Scala .scl round-trip (interop necessity)', () => {
@@ -85,6 +102,23 @@ describe('Scala .scl round-trip (interop necessity)', () => {
     const s = sclFromCents('test', [200, 400, 1200]);
     expect(s.degrees.length).toBe(3);
     expect(writeScl(s)).toContain('1200.000000');
+  });
+
+  it('test_write_empty_description_uses_untitled', () => {
+    // description === '' (falsy) → both `||` branches in writeScl produce 'Untitled' (lines 68,70).
+    const s = sclFromCents('', [1200]);
+    const text = writeScl(s);
+    expect(text).toContain('Untitled');
+  });
+
+  it('test_write_cents_degree_text_without_decimal_uses_toFixed', () => {
+    // Manually craft a cents degree whose text has no '.'; writeScl falls back to toFixed (line 76).
+    const scale = {
+      description: 'manual',
+      degrees: [{ kind: 'cents' as const, cents: 1200, text: '1200' }],
+    };
+    const text = writeScl(scale);
+    expect(text).toContain('1200.000000');
   });
 });
 
