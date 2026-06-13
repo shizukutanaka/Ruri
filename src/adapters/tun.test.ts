@@ -96,6 +96,33 @@ describe('writeTun custom basefreq', () => {
     // A4 = 440 Hz with basefreq = 440 Hz → 0 cents; [Exact Tuning] note 69=0.00000
     expect(out).toContain('note 69=0.00000');
   });
+
+  it('test_custom_basefreq_is_written_to_file_header', () => {
+    // Regression (Socratic): the emitted basefreq line must reflect the ACTUAL
+    // basefreq, otherwise a parser reads every pitch shifted by ~6 octaves.
+    const tet = makeTetFreqs();
+    const out = writeTun(tet, 'x', { basefreqHz: 440 });
+    expect(out).toContain(`basefreq=${(440).toPrecision(20)}`);
+    expect(out).not.toContain('basefreq=8.1757989156437073336');
+  });
+
+  it('test_custom_basefreq_round_trips_to_input_frequencies', () => {
+    // Parse the [Exact Tuning] basefreq + note cents back to Hz and compare.
+    const tet = makeTetFreqs();
+    const custom = 256;
+    const out = writeTun(tet, 'x', { basefreqHz: custom });
+    const lines = out.split('\n');
+    const baseLine = lines.find((l) => l.startsWith('basefreq='));
+    expect(baseLine).toBeDefined();
+    const base = Number.parseFloat((baseLine as string).slice('basefreq='.length));
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    for (let k = 0; k < 128; k++) {
+      const noteLine = lines[exactStart + 2 + k] as string; // +1 basefreq, +1 to first note
+      const cents = Number.parseFloat(noteLine.slice(`note ${k}=`.length));
+      const recovered = base * 2 ** (cents / 1200);
+      expect(recovered).toBeCloseTo(tet[k] as number, 2);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------

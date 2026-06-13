@@ -96,8 +96,11 @@ export function writeTun(
 
   // [Exact Tuning] section — 5-decimal-place cents.
   lines.push('[Exact Tuning]');
-  // Emit basefreq with full stored precision so parsers can verify the reference.
-  lines.push(`basefreq=${TUN_DEFAULT_BASEFREQ_HZ.toPrecision(20)}`);
+  // Emit the ACTUAL basefreq used for the cent computations (not the default),
+  // so the file is internally consistent and a conforming parser recovers the
+  // same pitches. Using the default here for a custom basefreq would shift every
+  // note by log2(basefreqHz / default) octaves.
+  lines.push(`basefreq=${basefreqHz.toPrecision(20)}`);
   for (let k = 0; k < 128; k++) {
     const hz = frequenciesHz[k] as number;
     const c = freqToCents(hz, basefreqHz);

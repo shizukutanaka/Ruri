@@ -42,6 +42,11 @@ export interface MtsKey {
  * Clamps to [0, 127+16383/16384] (i.e. { semitone: 0, fraction14: 0 } at the bottom,
  * { semitone: 127, fraction14: 16383 } at the top).
  *
+ * CAVEAT: the top clamp { 127, 16383 } encodes to bytes 7F 7F 7F, which the MTS
+ * spec reserves elsewhere as the "no change" sentinel; some synths may ignore a
+ * key set to the extreme top. Keep frequencies within the MIDI 0..127 range
+ * (≈ 8.18 Hz .. 12543.85 Hz) to avoid relying on the clamp.
+ *
  * @throws {RangeError} if hz is not finite or not > 0.
  */
 export function freqToMtsKey(hz: number, a4Hz = A4_HZ_DEFAULT): MtsKey {
