@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { fretlessOud, violin, fretlessPositionsFor, fingerFretlessChord } from './fretless.js';
+import {
+  fretlessOud,
+  violin,
+  fretlessPositionsFor,
+  fingerFretlessChord,
+  type FretlessInstrument,
+} from './fretless.js';
 
 describe('fretless instruments', () => {
   it('test_fretless_oud_open_strings', () => {
@@ -102,5 +108,45 @@ describe('fingerFretlessChord validation', () => {
 
   it('test_non_positive_freq_throws', () => {
     expect(() => fingerFretlessChord(v, [440, -1])).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// fingerFretlessChord – branch coverage gaps
+// ---------------------------------------------------------------------------
+
+describe('fingerFretlessChord edge cases', () => {
+  // Custom 2-string instrument: string 0 at 200 Hz, string 1 at 1000 Hz, 1200 cents each.
+  const narrow: FretlessInstrument = {
+    id: 'narrow-test',
+    openStringsHz: [200, 1000],
+    maxCents: 1200,
+  };
+
+  it('test_all_open_strings_span_is_zero_and_result_non_null', () => {
+    // Tiny-range 2-string instrument: each note only fits on its own open string (maxCents=1).
+    // Both assigned positions have cents = 0 → fretted list is empty → true branch of line 104.
+    const tinyInst: FretlessInstrument = {
+      id: 'tiny-open',
+      openStringsHz: [440, 660],
+      maxCents: 1,
+    };
+    const result = fingerFretlessChord(tinyInst, [440, 660]);
+    expect(result).not.toBeNull();
+    expect(result?.every((p) => p.cents === 0)).toBe(true);
+  });
+
+  it('test_unreachable_note_returns_null', () => {
+    // A frequency above both string ranges → candidates[1].length === 0 → return null at line 170.
+    const tooHigh = 5000; // far above narrow string 1 (1000 Hz + 1200 cents = 2000 Hz max)
+    const result = fingerFretlessChord(narrow, [250, tooHigh]);
+    expect(result).toBeNull();
+  });
+
+  it('test_no_injective_assignment_returns_null', () => {
+    // Both 250 and 300 Hz are reachable on string 0 only (below string 1 open=1000 Hz).
+    // No injective (one-note-per-string) assignment can span both → best stays null (line 191).
+    const result = fingerFretlessChord(narrow, [250, 300]);
+    expect(result).toBeNull();
   });
 });

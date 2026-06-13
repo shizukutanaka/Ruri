@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { generatedScale, isWellFormed, maximallyEven } from './generate.js';
 import { approxRatio, relativePeriodicity, chordPeriodicity } from './harmonicity.js';
-import { defineTuning, equalTemperament12, edo } from './tuning.js';
+import { defineTuning, equalTemperament12, edo, degreeToCents } from './tuning.js';
 import { cents } from './cents.js';
 import { stretchedSpectrum, bellSpectrum } from './spectrum.js';
 
@@ -136,6 +136,59 @@ describe('spectrum helpers', () => {
 describe('defineTuning invariants (fail fast)', () => {
   it('test_valid_tuning_passes', () => {
     expect(equalTemperament12(440).degrees.length).toBe(12);
+  });
+
+  it('test_empty_degrees_throws', () => {
+    expect(() =>
+      defineTuning({
+        id: 'x',
+        name: 'x',
+        referenceHz: 440,
+        periodCents: 1200,
+        degrees: [],
+        source: 'theoretical',
+      }),
+    ).toThrow(RangeError);
+  });
+
+  it('test_non_positive_reference_hz_throws', () => {
+    expect(() =>
+      defineTuning({
+        id: 'x',
+        name: 'x',
+        referenceHz: 0,
+        periodCents: 1200,
+        degrees: [cents(600)],
+        source: 'theoretical',
+      }),
+    ).toThrow(RangeError);
+  });
+
+  it('test_non_positive_period_cents_throws', () => {
+    expect(() =>
+      defineTuning({
+        id: 'x',
+        name: 'x',
+        referenceHz: 440,
+        periodCents: 0,
+        degrees: [cents(600)],
+        source: 'theoretical',
+      }),
+    ).toThrow(RangeError);
+  });
+
+  it('test_degree_to_cents_empty_tuning_throws', () => {
+    // degreeToCents guards against empty degree arrays (line 48).
+    // Bypass defineTuning to construct the invalid state directly.
+    const emptyTuning = {
+      id: 'x',
+      name: 'x',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [] as ReturnType<typeof cents>[],
+      source: 'theoretical' as const,
+    };
+    expect(() => degreeToCents(emptyTuning, 0)).toThrow(RangeError);
   });
 
   it('test_descending_degrees_throw', () => {
