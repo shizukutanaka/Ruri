@@ -177,10 +177,19 @@ export function rankChords(tuning: TuningSystem, opts?: ChordSearchOptions): Ran
 
   const w = periodicityWeight;
 
-  // Build RankedChord array with scores
+  // Build RankedChord array with scores.
+  // Periodicity can be Infinity when lcm overflows for chords with very inharmonic ratios
+  // (all denominators in the approxRatio convergents are large and coprime). In that case
+  // assign periodicityNorm = 1 (worst possible) so the chord ranks last on that axis
+  // rather than producing a NaN score from Infinity arithmetic.
   const ranked: RankedChord[] = candidates.map((c) => {
     const roughnessNorm = rangeR === 0 ? 0 : (c.roughness - minR) / rangeR;
-    const periodicityNorm = rangeP === 0 ? 0 : (c.periodicity - minP) / rangeP;
+    const periodicityNorm =
+      rangeP === 0 || !Number.isFinite(c.periodicity)
+        ? !Number.isFinite(c.periodicity)
+          ? 1
+          : 0
+        : (c.periodicity - minP) / rangeP;
     const score = (1 - w) * roughnessNorm + w * periodicityNorm;
     return {
       degrees: c.degrees,

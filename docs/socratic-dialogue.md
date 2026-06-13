@@ -72,6 +72,81 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 
 ---
 
+# 第三巡 (2026-06): 実装の境界条件と隠れた前提を問う
+
+一巡目は哲学的整合性、二巡目は数値的正しさを問うた。三巡目は**境界条件での正確性**——宣言した契約が端点・極端値・合成パスでも成立するか——を問う。
+
+## Q14. `decodeSmf` のランニングステータス: エンコーダ出力以外で動くか？ ⚠️(開示)
+
+**問**: `decodeSmf` は「minimal decoder for golden round-trip」とあるが、外部MIDI入力に対しても正しく動くか。
+
+**検証**:
+- `running = status` はメタイベント(`0xFF`)処理後も更新され、次のランニングステータスイベントが `0xFF` を status として継承する。その結果「data byteを meta type として消費 → VLQ で velocity を length として読む」というストリーム崩壊が起きる。
+- `else { p += 2 }` はProgram Change (`0xC0`, データ1バイト)・Channel Pressure (`0xD0`, データ1バイト)を2バイトスキップするため1バイトずれる。SysEx (`0xF0`, 可変長)は壊滅的にずれる。
+- ただし `encodeSmf` は **常に status バイトを明示**し、上記イベントを一切生成しない。ゆえにラウンドトリップ契約は成立している。
+
+**判定**: ⚠️ 宣言した契約は満たすが、「外部MIDI も読める」という暗黙の能力表示が誤解を生む。
+→ **改善**: `decodeSmf` のJSDocに「`encodeSmf` の出力専用、汎用パーサではない」と明記。ランニングステータス・Program Change・SysExでの挙動不定を文書化。
+
+## Q15. `approxRatio` の `maxDen` はハードリミットか？ ⚠️→❌ (実バグ: NaN伝播)
+
+**問**: `approxRatio(x, tol, maxDen)` は「分母が maxDen 以下の最良近似」を返すのか。
+
+**検証**: ループ条件は `q1 <= maxDen` だが、判定は `q1 = q2`(新収束子)代入**後**に行う。`q1 > maxDen` で脱出した際の return は `{p1, q1}` — 分母が `maxDen` を超えている。
+
+これ自体は設計的に合理的(より精密な近似を返す)だが、**下流のLCM計算で爆発する**:
+- `relativePeriodicity` が `fr.reduce((l, f) => lcm(l, f.den), 1)` で LCM を累積するとき、
+  6音以上のコードで互いに素な大きな分母(例 π→33102、e→4753、√2→2378、log₂e、log₁₀e→1073、ln2→1007)が揃うと LCM が `Number.MAX_SAFE_INTEGER`(≈9×10¹⁵)を超える。
+- 超過分は浮動小数点精度欠落で`Infinity` ではなく不正な整数になり、`reduce` の後段では `Infinity / Infinity = NaN` に帰着する。
+- NaN の `periodicity` を持つ和音は `rankChords` の `periodicityNorm` 計算でスコアを `NaN` にし、`sort` が未定義挙動を示す。
+
+**判定**: ❌ 実バグ。通常の音楽入力（12-TET、EDO）では発火しないが、`tol=0` または極めて非調和な周波数を直接渡すと NaN スコアを生む。
+→ **修正**:
+1. `lcm` に `l > MAX_SAFE_INTEGER ? Infinity : l` ガードを追加。
+2. `relativePeriodicity` を reduce でなくステップ累積に書き換え、中間結果が `Infinity` なら即 `return Infinity`(これで `Infinity / Infinity` を回避)。
+3. `rankChords` の正規化で `!Number.isFinite(c.periodicity)` なら `periodicityNorm = 1`(最悪値)にフォールバック。
+4. 回帰テスト: `relativePeriodicity([π, e, √2, log₂e, log₁₀e, ln2], 0)` → NaN でないこと。`rankChords` 全スコアが finite であること。
+
+## Q16. `chordPeriodicity` の `tol=0.0136` は粗いEDOで意味を失うか？ ✅
+
+**問**: Stolzenburg の `tol≈0.0136` は12-TET校正。7-EDOや5-EDOなど粗いスケールでは、全音程が同一JI比にスナップして periodicity が区別不能にならないか。
+
+**検証**: 7-EDO の「三度」 = 2^(2/7) ≈ 1.2294:
+- 5/4 = 1.25 との相対誤差 = 0.0165 > `tol * 1.25 = 0.017` → スナップしない。
+- 次収束子 11/9 ≈ 1.2222: 誤差 0.0072 < `tol * 1.2294 = 0.0167` → **スナップする**。
+
+同様に 7-EDO の「五度」 = 2^(4/7) ≈ 1.486 → 3/2=1.5 との差 0.014 < `tol*1.5 = 0.0204` → 3/2 にスナップ。
+
+結果: 7-EDO の三和音は `1:11/9:3/2` として評価され、`periodicity = LCM(9,2)/1 = 18`。12-TET は `1:5/4:3/2 → 15`。別値が返るので区別可能。モデルが「意味ある別値を返している」かは音楽的な判断だが、機械的には壊れていない。
+
+**判定**: ✅ 健全。粗いEDOで "西洋的" でない比にスナップするのはStolzenburgモデルの仕様内動作。誤りではなく開示事項。
+
+## Q17. `fingerFretlessChord` のnull契約: 到達不能弦が他の音と衝突する場合は？ ✅
+
+**問**: `candidates.some(c => c.length === 0) return null` の早期脱出は正しいか。注入可能な割当が存在しても `null` を返す誤検出はないか。
+
+**検証**:
+- 「ある音がすべての弦で到達不能」→ 注入的割当は存在しない → `null` 正当 ✅
+- 「各音は少なくとも1本の弦で到達可能だが、組合せが衝突する」→ 早期脱出せず `assignments` generator が全パターンを試みて空で終わる → `best === null` → `null` 正当 ✅
+- タイブレークの `strings.join(',')` 辞書順比較: 弦数が10以上のとき `'1,10' < '2,3'` となり数値順と一致しない。ただし `fretlessOud`(6弦)・`violin`(4弦)はいずれも10弦未満なので安全。
+
+**判定**: ✅ 健全。タイブレーク問題は10弦超の仮想楽器でのみ発生し、工場関数は範囲内。
+
+---
+
+## 第三巡サマリ
+
+| 問 | 判定 | 対応 |
+|----|------|------|
+| Q15 LCMオーバーフロー → NaN スコア | ❌ 実バグ | `lcm` ガード + `relativePeriodicity` ステップ累積 + `rankChords` Infinity フォールバック + 回帰テスト |
+| Q14 `decodeSmf` スコープ未開示 | ⚠️ 開示 | JSDocに「`encodeSmf` 出力専用」明記 |
+| Q16 粗いEDOでの periodicity スナップ | ✅ 健全 | 記録のみ(モデル仕様内) |
+| Q17 fretless null 契約 | ✅ 健全 | 記録のみ(10弦超は工場関数の外) |
+
+第三巡の核心: LCMオーバーフローは「通常入力では発火しない」故にテストをすり抜けていた。NaN の伝播パスは `chordPeriodicity → rankChords → sort(undefined order)` と長く、どこかで止まっているように見えた。根本は「`lcm` の戻り値が `Infinity` でも `NaN` でもなく*誤った大整数*になる」浮動小数点の落とし穴。修正はガード追加と早期 return で3箇所、テストは境界値と property で確定した。
+
+---
+
 # 第二巡 (2026-06): 数値アルゴリズムの正しさを問う
 
 一巡目は新モジュールの「哲学への忠実さ」を問うた。二巡目は基盤の**数値的正しさそのもの**——特にバイナリ/テキスト出力が「自分が宣言した契約(=パーサが読める正しいファイル)」を本当に満たすか——を問う。

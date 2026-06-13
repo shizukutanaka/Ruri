@@ -98,7 +98,21 @@ export function encodeSmf(
   return new Uint8Array([...header, ...trackChunk]);
 }
 
-/** Minimal decoder: extract note-on/off pairs back into NoteEvents (for golden round-trip). */
+/**
+ * Minimal decoder: extract note-on/off pairs back into NoteEvents.
+ *
+ * **Scope**: designed exclusively to round-trip output produced by `encodeSmf` from
+ * this library.  `encodeSmf` always emits explicit status bytes and never emits
+ * Program Change, SysEx, or System Real-Time messages, so this decoder does not need
+ * to handle them.  If fed arbitrary external MIDI files:
+ * - Running status after meta events (`0xFF`) will be misinterpreted (the decoder
+ *   sets `running = 0xFF` after meta events; a subsequent running-status note event
+ *   would be parsed as another meta event, corrupting the stream).
+ * - Program Change / Channel Pressure (1-byte data) and SysEx (variable-length) in
+ *   the else-branch would mis-advance `p` by exactly 2 bytes, misaligning all reads.
+ *
+ * Do **not** use this as a general-purpose SMF parser.
+ */
 export function decodeSmf(bytes: Uint8Array): { ppq: number; notes: NoteEvent[] } {
   const ascii = (o: number, n: number): string =>
     String.fromCharCode(...Array.from(bytes.slice(o, o + n)));

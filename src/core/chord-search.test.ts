@@ -154,6 +154,30 @@ describe('rankChords — determinism', () => {
   });
 });
 
+// Socratic Q15 (round 3 regression): when relativePeriodicity overflows MAX_SAFE_INTEGER and
+// returns Infinity, rankChords must still produce finite, non-NaN scores.
+describe('rankChords — finite scores (Socratic Q15 regression)', () => {
+  it('all_scores_finite_for_12_tet_size_3', () => {
+    const results = rankChords(equalTemperament12(440), { size: 3, limit: 55 });
+    for (const r of results) {
+      expect(Number.isFinite(r.score)).toBe(true);
+      expect(Number.isNaN(r.score)).toBe(false);
+    }
+  });
+
+  it('property_all_scores_finite_for_edo_n_3_to_12', () => {
+    for (let n = 3; n <= 12; n++) {
+      const maxSize = Math.min(4, n);
+      for (let size = 2; size <= maxSize; size++) {
+        const results = rankChords(edo(n), { size, limit: 100 });
+        for (const r of results) {
+          expect(Number.isFinite(r.score)).toBe(true);
+        }
+      }
+    }
+  });
+});
+
 // Socratic Q1: the score blends a timbre-DEPENDENT axis (roughness) with a
 // timbre-INDEPENDENT one (periodicity). These tests make that split observable.
 describe('rankChords — timbre dependence of the two score axes', () => {
