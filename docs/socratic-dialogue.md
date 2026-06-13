@@ -343,3 +343,71 @@ DSP ではよくある近似（別解 `(n+1)/attackEnd` は n=0 から非ゼロ;
 | Q25 `edo periodCents<=0` 未確認                  | ❌ エラーパス未実行    | `test_non_positive_period_throws` + `test_negative_period_throws` 追加   |
 
 第五巡の核心: 「到達不能」は2種類ある。(1) 数学的証明で到達不能(Q22 — totalSamples 不変条件)と(2) テスト設計の見落としで未到達(Q23-25)。前者は「書かれたコードが誤った前提に立つ」証拠であり削除すべき。後者は「テストが API の表面積を覆えていない」証拠であり補完すべき。いずれも「コードが動く」ことで隠れる欠陥であり、カバレッジを「哲学への忠実度計」として使うことで発見できる。
+
+---
+
+## 第六巡: 残余ギャップの解消と到達不能コードの地図作成
+
+**目標**: ブランチカバレッジを最大化しつつ、「到達不能と証明できるブランチ」を文書化する。
+
+## Q26. `tuning-data.ts` line 72 の `withRoot` 分岐は網羅されているか？ ❌ **カバレッジ欠落 → テスト追加**
+
+**問**: `loadTuningPreset` の `withRoot` 計算(line 69-72)は「最初の degree が 0 でない場合 `cents(0)` を先頭に挿入」する。既存テストの `base` フィクスチャは `degrees: [0, 700]` — 常に 0 始まりのため line 72 の false ブランチ未到達。
+
+**検証**: tuning-data.test.ts 全体検索 → `degrees: [200, ...]` 形式のテストが存在しない。`centsVals[0] < 1e-6` 条件は常に true。line 72 未到達。
+
+**判定**: ❌ `test_non_zero_first_degree_prepends_root` 追加(`degrees: [200, 700]` → `withRoot` が `[cents(0), cents(200), cents(700)]` を構築)。
+
+## Q27. `parseDegree` の文字列パスは完全にカバーされているか？ ❌ **カバレッジ欠落 → テスト追加**
+
+**問**: `parseDegree(spec: DegreeSpec)` の文字列パスは 2 分岐ある。(1) `RATIO_RE.test(spec) === false` → RangeError (line 42)、(2) `spec.includes('/') === false` → `[spec, '1']` で整数比 (line 43)。ALL_PRESETS が使うスペックは数値か `'n/d'` 形式のみ → 両分岐が未到達。
+
+**検証**: `RATIO_RE = /^\d+(\/\d+)?$/` → `'abc'` は不一致 → throw。`'2'` はスラッシュなし → `[n, d] = ['2', '1']` → `ratio(2, 1)` → 1200c。
+
+**判定**: ❌ 2 件追加: `test_invalid_string_degree_throws`（line 42 true ブランチ）/ `test_integer_ratio_no_slash_is_valid`（line 43 false ブランチ、`periodCents=1500` で `'2'`=1200c が範囲内）。
+
+## Q28. `fingering.ts` の 2 つのブランチ欠落は埋められるか？ ❌ **カバレッジ欠落 → テスト追加**
+
+**問**: (A) `frettedSpan()` line 29: `frets.length === 0 ? 0 : ...` の true ブランチ（全オープン弦コード）は未到達。(B) sort 比較子 line 80-81: `x.cost - y.cost || Math.max(...)` の `||` 右辺（コスト同値時のタイブレーク）は未到達。
+
+**検証**:
+- (A) `[0c, 500c]` コード: 0c は string0 fret0 のみ、500c は string0 fret5 または string1 fret0。string0 競合で唯一有効な代入は `(s=0,f=0)+(s=1,f=0)` — 全フレット=0 → `frets = []` → `frettedSpan = 0`。
+- (B) `[900c, 1400c]` with `highPositionWeight=0`: `(s=1,f=4)+(s=2,f=4)` cost=0 max=4 と `(s=0,f=9)+(s=1,f=9)` cost=0 max=9 の 2 解 → コスト同値 → `||` 右辺評価 → max フレット小さい方が先。
+
+**判定**: ❌ 2 件追加: `test_all_open_strings_zero_fretted_span` + `test_equal_cost_tie_break_by_max_fret`。
+
+## Q29. `chord-search.ts` の 4 ヶ所は到達不能と証明できるか？ ✅ **数学的証明 → 合法的デッドコード**
+
+**問**: lines 77-79（`k=0` の `combinations` 分岐）、lines 159-160（`candidates.length === 0`）、line 190（Infinity periodicity の正規化）、line 211（同一スコア・同一次数配列のタイブレーク）が残る。これらは到達不能か？
+
+**証明**:
+- **77-79**: `combinations(nonRootDegrees, size - 1)` 呼び出し元で `size >= 2`（line 109 で `size < 2` が throw）→ `k = size - 1 >= 1` → `k === 0` は不変条件違反。到達不能。
+- **159-160**: `size > n` は line 112-114 で throw。`size <= n` かつ `k = size - 1 >= 1` → `combinations(n-1 elements, k)` は `k <= n-1` が保証され少なくとも 1 組合せ存在 → `candidates.length >= 1`。到達不能。
+- **190**: `chordPeriodicity` が Infinity を返すには `relativePeriodicity` の LCM が MAX_SAFE_INTEGER を超える必要がある。`tol=0.0136` の下で `approxRatio` は nearly すべての音楽的比率を小さな分数にスナップするため、実用的な EDO コードでは LCM が 1e9 程度に留まり MAX_SAFE_INTEGER(≈9e15) を超えない。防衛的ガード（理論的正しさのため）だが、現在の API 入力空間では到達不能に等しい。
+- **211**: `combinations` は重複なし → 2 つの異なるコードは degree 配列が異なる → スコア同値でも `a.degrees[i] !== b.degrees[i]` で早期 return → line 211 到達不能。
+
+**判定**: ✅ すべて正当なデッドコード。削除は不適切（防衛コードとして意図的）。コメントで文書化。
+
+## Q30. `fretless.ts` / `kbm.ts` の `noUncheckedIndexedAccess` ガードは削除すべきか？ ✅ **TS型システムアーティファクト → 現状維持**
+
+**問**: `fretless.ts` line 122 `if (current === undefined) return;` および `kbm.ts` lines 195-198, 228-231 の null チェックは、`noUncheckedIndexedAccess` による自動挿入的な防衛コード。到達不能なら削除すべきか？
+
+**分析**: これらは「TypeScript コンパイラが配列インデックスの undefined 可能性を認識する」ための明示的ガードである。削除すると型エラーが発生し、コンパイルが通らない。また、コードの安全性契約（fail-fast の哲学）と整合する。カバレッジツールが「到達不能」と報告しても、型安全のためのコストとして許容するのが正しい。
+
+**判定**: ✅ 現状維持。削除すると型チェックが壊れる。98.86% / 97.55% が本プロジェクトの実用的上限。
+
+---
+
+## 第六巡サマリ
+
+| 問                                                  | 判定                     | 対応                                                                       |
+| --------------------------------------------------- | ------------------------ | -------------------------------------------------------------------------- |
+| Q26 `withRoot` false ブランチ未到達                 | ❌ カバレッジ欠落        | `test_non_zero_first_degree_prepends_root` 追加                            |
+| Q27 `parseDegree` 文字列パス 2 分岐未到達           | ❌ カバレッジ欠落        | 無効文字列 throw + 整数比ノースラッシュのテスト追加                        |
+| Q28 `fingering.ts` 全オープン弦 + タイブレーク      | ❌ カバレッジ欠落        | 2 テスト追加（frettedSpan 0 + || タイブレーク）                            |
+| Q29 `chord-search.ts` 4 箇所                        | ✅ 数学的証明で到達不能  | 現状維持（防衛コード / `noUncheckedIndexedAccess` アーティファクト）       |
+| Q30 `fretless.ts` / `kbm.ts` noUnchecked ガード    | ✅ TS型システムアーティファクト | 現状維持                                                               |
+
+**到達した境地**: カバレッジ向上には「テスト補完で埋められるギャップ」と「型システムや数学的不変条件に由来する正当なデッドコード」の二種類がある。前者は無限にある。後者は証明して文書化し、受け入れる。98.86% 文/行、97.55% ブランチ、100% 関数が本プロジェクトの実用的カバレッジ上限である。
+
+381 テスト / 全パス。

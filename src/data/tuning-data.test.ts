@@ -90,3 +90,37 @@ describe('attribution collection (NOTICE)', () => {
     expect(attributions.every((a) => a.includes('—'))).toBe(true);
   });
 });
+
+describe('degree normalization – withRoot branch', () => {
+  const base: TuningPreset = {
+    id: 'x',
+    name: 'x',
+    referenceHz: 440,
+    periodCents: 1200,
+    degrees: [0, 700],
+    source: 'theoretical',
+    note: 'example',
+    provenance: { citation: 'src', license: 'public-domain' },
+  };
+
+  it('test_non_zero_first_degree_prepends_root', () => {
+    // degrees[0]=200c → centsVals[0]≈200 → withRoot branch prepends cents(0) (line 72)
+    const t = loadTuningPreset({ ...base, degrees: [200, 700] });
+    expect(t.degrees.length).toBe(3); // [0c, 200c, 700c]
+    expect(degreeToCents(t, 0)).toBeCloseTo(0, 10);
+    expect(degreeToCents(t, 1)).toBeCloseTo(200, 10);
+  });
+
+  it('test_invalid_string_degree_throws', () => {
+    // parseDegree: RATIO_RE.test('abc') = false → throw (line 42 true branch)
+    expect(() => loadTuningPreset({ ...base, degrees: ['abc'] })).toThrow(RangeError);
+  });
+
+  it('test_integer_ratio_no_slash_is_valid', () => {
+    // parseDegree('2'): spec.includes('/') = false → [n,d]=['2','1'] (line 43 false branch)
+    // '2' = 2/1 = 1200c; with periodCents=1500 it stays within range.
+    const t = loadTuningPreset({ ...base, periodCents: 1500, degrees: ['2'] });
+    expect(t.degrees.length).toBeGreaterThan(0);
+    expect(degreeToCents(t, 1)).toBeCloseTo(1200, 5);
+  });
+});

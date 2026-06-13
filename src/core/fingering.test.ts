@@ -138,6 +138,38 @@ describe('piano chord fingering', () => {
   });
 });
 
+describe('fingerChord sort tie-break (equal cost, lower max-fret first)', () => {
+  it('test_equal_cost_tie_break_by_max_fret', () => {
+    const g = guitarStandard();
+    // highPositionWeight=0 → cost = span only. Two zero-span solutions for [900c, 1400c]:
+    //   (s=0,f=9)+(s=1,f=9): span=0, max=9  → cost=0
+    //   (s=1,f=4)+(s=2,f=4): span=0, max=4  → cost=0
+    // Equal cost triggers the || tie-break at line 81; lower max fret should sort first.
+    const sols = fingerChord(g, [900, 1400], {
+      maxFretSpan: 4,
+      stretchWeight: 1,
+      highPositionWeight: 0,
+    });
+    expect(sols.length).toBeGreaterThanOrEqual(2);
+    const max0 = Math.max(...sols[0]!.positions.map((p) => p.fret));
+    const max1 = Math.max(...sols[1]!.positions.map((p) => p.fret));
+    expect(sols[0]!.cost).toBeCloseTo(sols[1]!.cost, 10);
+    expect(max0).toBeLessThan(max1);
+  });
+
+  it('test_all_open_strings_zero_fretted_span', () => {
+    const g = guitarStandard();
+    // [0c, 500c]: 0c only on (s=0,f=0), 500c on (s=1,f=0) or (s=0,f=5).
+    // Only valid assignment: (s=0,f=0)+(s=1,f=0) — all open strings.
+    // frettedSpan: frets.filter(f>0) = [] → length===0 → returns 0 (line 29 true branch).
+    const sols = fingerChord(g, [0, 500]);
+    expect(sols.length).toBeGreaterThan(0);
+    const allOpen = sols.find((s) => s.positions.every((p) => p.fret === 0));
+    expect(allOpen).toBeDefined();
+    expect(allOpen!.cost).toBeCloseTo(0, 10);
+  });
+});
+
 // Sanity: chord realization still consistent (cross-module)
 describe('cross-module sanity', () => {
   it('test_major_triad_freqs_then_cents', () => {
