@@ -35,9 +35,9 @@
 | トップレベルエントリポイント `src/index.ts` | **実装済** |
 | Regular temperament(生成音程ベース、ミーントーン・ピタゴラス) | **実装済** (`src/core/temperament.ts`) |
 | 和音列挙+協和ランキングの自動化(`rankChords`) | **実装済** (`src/core/chord-search.ts`) |
-| ボイスリーディング(最小移動)コスト | 未着手(将来) |
-| フレットレス楽器の連続ポジションモデル | 未着手(docs/Plan 既載) |
-| ADSR等の時間エンベロープ | 未着手(将来) |
+| ボイスリーディング(最小移動)コスト | **実装済** (`src/core/voice-leading.ts`) |
+| フレットレス楽器の連続ポジションモデル | **実装済** (`src/core/fretless.ts`) |
+| ADSR等の時間エンベロープ | **実装済** (`src/core/envelope.ts`) |
 | `.tun` (AnaMark) 形式 | **実装済** (`src/adapters/tun.ts`) |
 | 調律プリセット拡充(Pythagorean・歴史的調律・Bohlen-Pierce等) | 未着手 — CARE準拠の出典整備が前提 |
 | A11y/i18n(shell-web) | 未着手(GOAL-AUDIT 既載) |
