@@ -11,6 +11,7 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 **問**: README は「協和は timbre 依存」「acoustic-only、美的判定をしない」と宣言する。`rankChords` はこれを守っているか。
 
 **検証**: `src/core/chord-search.ts:130-131` で各和音のスコアは2項の加重和:
+
 - `roughness = chordDissonance(freqs, spectrum)` — スペクトルを受け取る。**timbre依存** ✅
 - `periodicity = chordPeriodicity(freqs)` — `src/core/harmonicity.ts:53` を見ると **周波数しか受け取らない**。周波数比を純正比にスナップして周期性を測る = 調和級数を暗黙に仮定した**timbre非依存**の尺度。
 
@@ -61,12 +62,12 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 
 ## 改善サマリ
 
-| 問 | 判定 | 対応 |
-|----|------|------|
-| Q1 協和の timbre 依存 | ⚠️ 隠蔽 | JSDoc で2軸の性質を開示 + timbre依存/非依存を証明するテスト |
-| Q3 edo vs 12-tet の id | ⚠️ foot-gun | `edo()` JSDoc に非互換を明記 |
-| Q8 統合テスト欠落 | ❌ ギャップ | 新モジュール連結の統合テスト追加 |
-| Q2,4,5,6,7 | ✅ 健全 | 変更不要(検証で確認) |
+| 問                     | 判定        | 対応                                                        |
+| ---------------------- | ----------- | ----------------------------------------------------------- |
+| Q1 協和の timbre 依存  | ⚠️ 隠蔽     | JSDoc で2軸の性質を開示 + timbre依存/非依存を証明するテスト |
+| Q3 edo vs 12-tet の id | ⚠️ foot-gun | `edo()` JSDoc に非互換を明記                                |
+| Q8 統合テスト欠落      | ❌ ギャップ | 新モジュール連結の統合テスト追加                            |
+| Q2,4,5,6,7             | ✅ 健全     | 変更不要(検証で確認)                                        |
 
 ソクラテス的態度: 5件は「健全」と確認できたこと自体が成果(無批判な追加実装への歯止め)。残3件は**前提を消さず可視化**することで解いた。
 
@@ -81,6 +82,7 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 **問**: `decodeSmf` は「minimal decoder for golden round-trip」とあるが、外部MIDI入力に対しても正しく動くか。
 
 **検証**:
+
 - `running = status` はメタイベント(`0xFF`)処理後も更新され、次のランニングステータスイベントが `0xFF` を status として継承する。その結果「data byteを meta type として消費 → VLQ で velocity を length として読む」というストリーム崩壊が起きる。
 - `else { p += 2 }` はProgram Change (`0xC0`, データ1バイト)・Channel Pressure (`0xD0`, データ1バイト)を2バイトスキップするため1バイトずれる。SysEx (`0xF0`, 可変長)は壊滅的にずれる。
 - ただし `encodeSmf` は **常に status バイトを明示**し、上記イベントを一切生成しない。ゆえにラウンドトリップ契約は成立している。
@@ -95,6 +97,7 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 **検証**: ループ条件は `q1 <= maxDen` だが、判定は `q1 = q2`(新収束子)代入**後**に行う。`q1 > maxDen` で脱出した際の return は `{p1, q1}` — 分母が `maxDen` を超えている。
 
 これ自体は設計的に合理的(より精密な近似を返す)だが、**下流のLCM計算で爆発する**:
+
 - `relativePeriodicity` が `fr.reduce((l, f) => lcm(l, f.den), 1)` で LCM を累積するとき、
   6音以上のコードで互いに素な大きな分母(例 π→33102、e→4753、√2→2378、log₂e、log₁₀e→1073、ln2→1007)が揃うと LCM が `Number.MAX_SAFE_INTEGER`(≈9×10¹⁵)を超える。
 - 超過分は浮動小数点精度欠落で`Infinity` ではなく不正な整数になり、`reduce` の後段では `Infinity / Infinity = NaN` に帰着する。
@@ -102,6 +105,7 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 
 **判定**: ❌ 実バグ。通常の音楽入力（12-TET、EDO）では発火しないが、`tol=0` または極めて非調和な周波数を直接渡すと NaN スコアを生む。
 → **修正**:
+
 1. `lcm` に `l > MAX_SAFE_INTEGER ? Infinity : l` ガードを追加。
 2. `relativePeriodicity` を reduce でなくステップ累積に書き換え、中間結果が `Infinity` なら即 `return Infinity`(これで `Infinity / Infinity` を回避)。
 3. `rankChords` の正規化で `!Number.isFinite(c.periodicity)` なら `periodicityNorm = 1`(最悪値)にフォールバック。
@@ -112,6 +116,7 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 **問**: Stolzenburg の `tol≈0.0136` は12-TET校正。7-EDOや5-EDOなど粗いスケールでは、全音程が同一JI比にスナップして periodicity が区別不能にならないか。
 
 **検証**: 7-EDO の「三度」 = 2^(2/7) ≈ 1.2294:
+
 - 5/4 = 1.25 との相対誤差 = 0.0165 > `tol * 1.25 = 0.017` → スナップしない。
 - 次収束子 11/9 ≈ 1.2222: 誤差 0.0072 < `tol * 1.2294 = 0.0167` → **スナップする**。
 
@@ -126,6 +131,7 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 **問**: `candidates.some(c => c.length === 0) return null` の早期脱出は正しいか。注入可能な割当が存在しても `null` を返す誤検出はないか。
 
 **検証**:
+
 - 「ある音がすべての弦で到達不能」→ 注入的割当は存在しない → `null` 正当 ✅
 - 「各音は少なくとも1本の弦で到達可能だが、組合せが衝突する」→ 早期脱出せず `assignments` generator が全パターンを試みて空で終わる → `best === null` → `null` 正当 ✅
 - タイブレークの `strings.join(',')` 辞書順比較: 弦数が10以上のとき `'1,10' < '2,3'` となり数値順と一致しない。ただし `fretlessOud`(6弦)・`violin`(4弦)はいずれも10弦未満なので安全。
@@ -136,14 +142,94 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 
 ## 第三巡サマリ
 
-| 問 | 判定 | 対応 |
-|----|------|------|
-| Q15 LCMオーバーフロー → NaN スコア | ❌ 実バグ | `lcm` ガード + `relativePeriodicity` ステップ累積 + `rankChords` Infinity フォールバック + 回帰テスト |
-| Q14 `decodeSmf` スコープ未開示 | ⚠️ 開示 | JSDocに「`encodeSmf` 出力専用」明記 |
-| Q16 粗いEDOでの periodicity スナップ | ✅ 健全 | 記録のみ(モデル仕様内) |
-| Q17 fretless null 契約 | ✅ 健全 | 記録のみ(10弦超は工場関数の外) |
+| 問                                   | 判定      | 対応                                                                                                  |
+| ------------------------------------ | --------- | ----------------------------------------------------------------------------------------------------- |
+| Q15 LCMオーバーフロー → NaN スコア   | ❌ 実バグ | `lcm` ガード + `relativePeriodicity` ステップ累積 + `rankChords` Infinity フォールバック + 回帰テスト |
+| Q14 `decodeSmf` スコープ未開示       | ⚠️ 開示   | JSDocに「`encodeSmf` 出力専用」明記                                                                   |
+| Q16 粗いEDOでの periodicity スナップ | ✅ 健全   | 記録のみ(モデル仕様内)                                                                                |
+| Q17 fretless null 契約               | ✅ 健全   | 記録のみ(10弦超は工場関数の外)                                                                        |
 
 第三巡の核心: LCMオーバーフローは「通常入力では発火しない」故にテストをすり抜けていた。NaN の伝播パスは `chordPeriodicity → rankChords → sort(undefined order)` と長く、どこかで止まっているように見えた。根本は「`lcm` の戻り値が `Infinity` でも `NaN` でもなく*誤った大整数*になる」浮動小数点の落とし穴。修正はガード追加と早期 return で3箇所、テストは境界値と property で確定した。
+
+---
+
+# 第四巡 (2026-06): 境界条件と契約の精緻さを問う
+
+三巡の修正を経て残る「ほぼ正しいが前提が隠れている」ケースを問う。バグと呼べる水準は下がるが、**驚く場所がゼロか**を確かめることが四巡目の価値。
+
+## Q18. `adsrEnvelope` の `gateS=0` 分岐に死んだ代入がある ❌(デッドコード → 修正)
+
+**問**: リリース計算における `valueAtGate` の代入は全て生きているか。
+
+**検証** (`envelope.ts:95-99` 旧コード):
+
+```ts
+if (gateS === 0) {
+  valueAtGate = attackS === 0 ? 1 : 0; // ← 代入1
+  // Actually with gateS=0 the gate never opens, so start from 0.
+  valueAtGate = 0; // ← 代入2: 無条件上書き → 代入1は到達不能
+}
+```
+
+コメントで「やっぱり 0 が正しい」と書き直した痕跡が残り、代入1は*永遠に読まれない*。正しい挙動(全ゼロ)は代入2が保証しているが、不正確な代入1は誤解を招く。
+
+**判定**: ❌ デッドコード。正確性には影響しないが「コードとコメントが互いに矛盾した説明をする」状態。
+→ **修正**: 死んだ代入と誤ったコメントを削除し `valueAtGate = 0;` のみに。回帰テスト: `gateS=0` が全ゼロを返すこと、`gateS=0 && attackS=0` でも全ゼロを返すこと。
+
+## Q19. `parseKbm` は `firstNote > lastNote` を受理するか？ ⚠️→❌(実バグ → 修正)
+
+**問**: 逆順の範囲 (`firstNote=100, lastNote=50`) を含む .kbm を `parseKbm` はどう扱うか。
+
+**検証**: `parseKbm` は各フィールドを MIDI 範囲 [0, 127] でのみ検証し、`firstNote <= lastNote` は確認しない。この KBM を `kbmNoteToFreq` に渡すと:
+
+- `midiNote < firstNote` → すべての MIDI ノートが firstNote=100 未満か lastNote=50 超 → **全ノートが `null` を返す**
+- エラーなし、診断なし。「なぜ音が出ないか」が分からない。
+
+**判定**: ❌ バリデーション欠如。KBM 仕様で firstNote ≤ lastNote は暗黙の前提。逆順は「有効な空範囲」でなく「不正な入力」として扱うべき。
+→ **修正**: `parseKbm` に `firstNote > lastNote → throw RangeError` を追加。回帰テスト1件。
+
+## Q20. `adsrEnvelope` のアタック峰は「最終アタックサンプル」に到達するか？ ⚠️(開示)
+
+**問**: ドックストリングは「Attack: 0 → 1 over attackS seconds」と宣言する。最終アタックサンプル(index = `attackEnd - 1`)で本当に `1` になるか。
+
+**検証**: アタック式 = `n / (attackS * sampleRate)`. 最終アタックサンプル `n = attackEnd - 1`:
+
+```
+env = (attackEnd - 1) / attackEnd = 1 - 1/attackEnd
+```
+
+`attackEnd = 0.1s × 1000Hz = 100` → `env[99] = 0.99`, not 1.0.
+
+Peak の `1.0` は `n = attackEnd`(ディケイ初サンプル)でディケイ式 `1 - (1-sustainLevel) × 0 = 1` として初めて現れる。**アタックフェーズ自体は 1 に達しない。**
+
+既存の `test_sample_100_near_one` は「end of attack」と誤ったコメントを付けているが、実際はディケイ初サンプルを測定している。
+
+DSP ではよくある近似（別解 `(n+1)/attackEnd` は n=0 から非ゼロ; `n/(attackEnd-1)` は 1-sample attack で 0/0）ゆえ式変更はしない。
+
+**判定**: ⚠️ 開示事項。式・挙動は変えず、ドックストリングに「アタックフェーズの最終サンプルは `(attackEnd-1)/attackEnd` ≈ 1; 正確に 1 に到達するのはディケイフェーズの初サンプル」と追記。回帰テスト: `env[attackEnd-1] ≈ 0.99`, `env[attackEnd] ≈ 1.0`。
+
+## Q21. `minimalVoiceLeading` の上限エラーメッセージが「factorial guard」と言うが、O(n!) 計算はどこか？ ⚠️(開示)
+
+**問**: `validateFreqs` の `length > 12` ガードに "factorial guard" と書かれている。実際に O(n!) 計算はあるか。
+
+**検証**: `minimalVoiceLeading` は両配列をソートして一対一ペアリングするだけ = O(n log n)。階乗が出てくるのは `fingerFretlessChord` の `assignments` generator（全注入写像列挙 O(n!)）であり、`minimalVoiceLeading` とは無関係。"factorial guard" は誤ったコメント。
+
+音楽的には 12 ボイス上限は妥当（12 音音楽で 12 パートは最大）だが、それはアルゴリズム上の制約ではない。
+
+**判定**: ⚠️ コメント誤り。エラーメッセージを「practical musical limit; voice-leading uses O(n log n) sorting」に訂正。挙動は不変。
+
+---
+
+## 第四巡サマリ
+
+| 問                                     | 判定                  | 対応                                                                |
+| -------------------------------------- | --------------------- | ------------------------------------------------------------------- |
+| Q18 adsrEnvelope gateS=0 デッドコード  | ❌ デッドコード       | 死んだ代入・誤コメント削除 + 回帰テスト                             |
+| Q19 parseKbm firstNote>lastNote 未検証 | ❌ バリデーション欠如 | `firstNote > lastNote → throw` + 回帰テスト                         |
+| Q20 アタック峰 off-by-1                | ⚠️ 開示               | JSDoc に「最終アタックサンプルは 1 - 1/attackEnd」明記 + 境界テスト |
+| Q21 "factorial guard" ラベルの誤り     | ⚠️ 開示               | エラーメッセージ修正(挙動不変)                                      |
+
+第四巡の核心: すべて「動く」。問われるのは「宣言した通りか」。Q18 は正しさへの錯覚(コメントが正しい挙動を説明しているように見えるが、それは上書きされた行)。Q19 は「何も起きないことで壊れる」バグ。Q20/Q21 は「ドックとコードが同じ事実の別の側面を述べているが読み手を惑わす」事例。問い続けることで、正しい動作が偶然ではなく意図に基づくことを確かめた。
 
 ---
 
@@ -169,6 +255,7 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 ## Q12. `writeTun` は計算に使った basefreq をファイルに書くか？ ❌ **バグ → 修正**
 
 **検証**: `tun.ts` は cents を `basefreqHz`(指定値)基準で計算(93,103行)するのに、`basefreq=` ヘッダ行は**常にデフォルト定数**を出力していた(旧100行)。`writeTun(freqs, 'x', {basefreqHz: 440})` を呼ぶと:
+
 - cents は 440Hz 基準(正しい)
 - ファイルは `basefreq=8.175…`(デフォルト)と宣言
 - 準拠パーサは cents を 8.175Hz 基準で解釈 → **全音高が log2(440/8.175)≈5.9 オクターブずれる**。ファイルが内部矛盾し解析不能。
@@ -186,12 +273,12 @@ ruri の新規実装(temperament / chord-search / voice-leading / envelope / fre
 
 ## 第二巡サマリ
 
-| 問 | 判定 | 対応 |
-|----|------|------|
-| Q12 .tun の basefreq 未記載 | ❌ 実バグ(6オクターブずれ) | ヘッダを実 basefreq に修正 + 回帰テスト3件 |
-| Q11 MTS 上端の予約値 7F7F7F | ⚠️ 仕様曖昧 | JSDoc 開示(挙動は不変) |
-| Q9 Sethares 振幅重み(min vs 積) | ✅ 契約満たす | 記録のみ |
-| Q10 MTS チェックサム | ✅ 仕様準拠 | 記録のみ(実機は人的ゲート) |
-| Q13 scl 検証の非対称 | ⚠️ 軽微 | 据置(正当用途を壊さない) |
+| 問                              | 判定                       | 対応                                       |
+| ------------------------------- | -------------------------- | ------------------------------------------ |
+| Q12 .tun の basefreq 未記載     | ❌ 実バグ(6オクターブずれ) | ヘッダを実 basefreq に修正 + 回帰テスト3件 |
+| Q11 MTS 上端の予約値 7F7F7F     | ⚠️ 仕様曖昧                | JSDoc 開示(挙動は不変)                     |
+| Q9 Sethares 振幅重み(min vs 積) | ✅ 契約満たす              | 記録のみ                                   |
+| Q10 MTS チェックサム            | ✅ 仕様準拠                | 記録のみ(実機は人的ゲート)                 |
+| Q13 scl 検証の非対称            | ⚠️ 軽微                    | 据置(正当用途を壊さない)                   |
 
 第二巡の核心: 「出力が正しいか」は「出力が自分の宣言した契約を満たすか」で問う。.tun は「パーサが読める valid file」を約束しながら、custom basefreq でそれを破っていた。テストの盲点(値は見たが**整合性**は見ていない)が見逃しの温床だった。

@@ -235,6 +235,38 @@ describe('adsrEnvelope property', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Socratic Q18/Q20 regression: dead code removal + attack peak timing
+// ---------------------------------------------------------------------------
+
+describe('adsrEnvelope Socratic boundary tests', () => {
+  const SR = 1000;
+
+  it('test_gateS_0_produces_all_zeros_after_dead_code_removal', () => {
+    // Q18 regression: the dead assignment `valueAtGate = attackS===0 ? 1 : 0` was
+    // immediately overwritten. After removing it, gateS=0 still produces all zeros.
+    const env = adsrEnvelope(OPTS_BASE, 0, SR);
+    expect(Array.from(env).every((s) => s === 0)).toBe(true);
+  });
+
+  it('test_attack_last_sample_strictly_less_than_one', () => {
+    // Q20: the linear attack formula `n / (attackS * sampleRate)` gives
+    // (attackEnd-1)/attackEnd at the LAST ATTACK SAMPLE, not 1.
+    // Peak of exactly 1 first appears at sample `attackEnd` (the first decay sample).
+    const env = adsrEnvelope(OPTS_BASE, 0.5, SR); // attackS=0.1 → attackEnd=100
+    // Last attack sample (n=99): 99/100 = 0.99
+    expect(env[99] as number).toBeCloseTo(0.99, 5);
+    // First decay sample (n=100): decay formula at decayPos=0 → 1.0
+    expect(env[100] as number).toBeCloseTo(1.0, 10);
+  });
+
+  it('test_gateS_0_with_zero_attack_also_all_zeros', () => {
+    // Q18: even with attackS=0, gateS=0 means gate never opens → all zeros.
+    const env = adsrEnvelope({ ...OPTS_BASE, attackS: 0 }, 0, SR);
+    expect(Array.from(env).every((s) => s === 0)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // applyEnvelope
 // ---------------------------------------------------------------------------
 

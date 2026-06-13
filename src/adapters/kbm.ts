@@ -72,6 +72,11 @@ export function parseKbm(text: string): KbmMapping {
 
   const firstNote = requireMidiNote(lines[1] as string, 'first MIDI note');
   const lastNote = requireMidiNote(lines[2] as string, 'last MIDI note');
+  if (firstNote > lastNote) {
+    throw new RangeError(
+      `invalid .kbm: firstNote (${firstNote}) must be <= lastNote (${lastNote})`,
+    );
+  }
   const middleNote = requireMidiNote(lines[3] as string, 'middle note');
   const referenceNote = requireMidiNote(lines[4] as string, 'reference note');
 

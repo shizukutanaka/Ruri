@@ -2,7 +2,10 @@
  * ADSR amplitude envelope generation and application.
  *
  * Segment semantics (all transitions are linear):
- *   - Attack:  0 → 1 over attackS seconds.
+ *   - Attack:  0 → 1 over attackS seconds.  The linear formula `n / (attackS * sampleRate)`
+ *              gives `(N-1)/N` at the last attack sample (not exactly 1); the peak of 1.0
+ *              first appears at sample N — the first decay sample.  This 1-sample difference
+ *              is a standard discrete approximation; see Socratic Q20.
  *   - Decay:   1 → sustainLevel over decayS seconds.
  *   - Sustain: hold sustainLevel until the gate closes at gateS.
  *   - Release: current value → 0 over releaseS seconds; everything after is 0.
@@ -93,9 +96,7 @@ export function adsrEnvelope(opts: AdsrOptions, gateS: number, sampleRate: numbe
         // Determine the value at gate-close (may be in the middle of A or D).
         let valueAtGate: number;
         if (gateS === 0) {
-          valueAtGate = attackS === 0 ? 1 : 0;
-          // gateS=0: attackS=0 means we'd instantly hit 1 but gate already closed → 0.
-          // Actually with gateS=0 the gate never opens, so start from 0.
+          // Gate never opens: release starts from silence.
           valueAtGate = 0;
         } else if (attackS === 0) {
           if (decayS === 0 || gateEnd >= decayEnd) {

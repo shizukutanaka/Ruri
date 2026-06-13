@@ -28,7 +28,10 @@ function validateFreqs(freqs: readonly number[], label: string): void {
     throw new RangeError(`${label} must be non-empty`);
   }
   if (freqs.length > 12) {
-    throw new RangeError(`${label} length ${freqs.length} exceeds maximum 12 (factorial guard)`);
+    throw new RangeError(
+      `${label} length ${freqs.length} exceeds maximum 12 (practical musical limit; ` +
+        `voice-leading uses O(n log n) sorting, but 12+ simultaneous voices is uncommon in practice)`,
+    );
   }
   for (let i = 0; i < freqs.length; i++) {
     const f = freqs[i] as number;

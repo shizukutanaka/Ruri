@@ -307,4 +307,13 @@ describe('.kbm parse errors', () => {
     // size 3 but only 2 mapping lines.
     expect(() => parseKbm('3\n0\n127\n60\n69\n440.0\n12\n0\n1\n')).toThrow(RangeError);
   });
+
+  it('test_firstNote_greater_than_lastNote_throws_range_error', () => {
+    // Socratic Q19 regression: firstNote=100 > lastNote=50 is degenerate (no keys in range).
+    // Previously parsed silently; kbmNoteToFreq returned null for every note with no
+    // diagnostic. Now parseKbm fails fast with a clear message.
+    expect(() =>
+      parseKbm('12\n100\n50\n60\n69\n440.0\n12\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n'),
+    ).toThrow(RangeError);
+  });
 });
