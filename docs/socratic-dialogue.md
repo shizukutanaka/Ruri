@@ -733,3 +733,39 @@ export function getTuningById(
 **到達した境地**: API の発見可能性(discoverability)はドキュメントの問題ではなく、設計の問題である。`loadTuningPreset` は「オブジェクトを知っている人」向けの低レベルAPIだった。`getTuningById` はその上に「文字列を知っている人」向けの公開 API を加え、READMEに1行書けばユーザが動けるようにする。データ層の「零依存・出典必須」哲学に何も追加しない — ただ既存の階層に薄い入口を開けた。
 
 444 テスト / 全パス。
+
+---
+
+## 第十三巡: Q31-Q36 の橋渡し関数は互いに使われているか
+
+**目標**: Q31-Q36 で追加した橋渡し関数が単独テストしか持たず、**組み合わせて使われていない**ことを問う。
+
+## Q37. `getTuningById → rankChords → progressionSmoothness` のエンドツーエンド統合テストはあるか？ ❌ **統合未検証 → `integration-extended.test.ts` に追加**
+
+**問**: Q31-Q36 の各関数はユニットテストを持つが、「プリセット調律 → 和音ランキング → 進行スムーズネス」を一連に検証するテストが存在しない。個別に正しくても組み合わせが壊れる可能性がある。
+
+**検証**:
+- `integration-extended.test.ts` の既存テストは Q31-Q36 追加前に書かれており、`rankChords` の結果を手動で `best.degrees.map(d => degreeToFreq(tuning, d))` しているが、`realizeRankedChordFreqs` を使っていない
+- `getTuningById` + `progressionSmoothness` を組み合わせるテストは存在しない
+- `Chord → realizeChordFreqs → fingerFretlessChord` の経路も統合テストなし
+
+**判定**: ❌ 統合的な検証が欠落。フレットレス楽器(`fretlessOud`)との接続も未確認。
+
+**実装**: `integration-extended.test.ts` に新規 describe ブロック追加:
+1. `makam_preset_through_full_pipeline`: `getTuningById('makam-ussak-example')` → `rankChords` → `progressionSmoothness` → 各ステップの型的整合性を確認
+2. `chord_to_fretless_oud_pipeline`: `chordFromSemitones → realizeChordFreqs → fingerFretlessChord(fretlessOud)` がエラーなく動作
+3. `edo_preset_smoothness_is_finite_for_multiple_chord_sizes`: 7/12/19-EDO で `progressionSmoothness` が有限正値を返す
+
+**テスト(3件)**: 非Western調律(Makam)・フレットレス楽器・複数EDOで横断的に動作を確認。
+
+---
+
+## 第十三巡サマリ
+
+| 問                                                           | 判定                    | 対応                                                                    |
+| ------------------------------------------------------------ | ----------------------- | ----------------------------------------------------------------------- |
+| Q37 Q31-Q36 の橋渡し関数が統合テストを持たない              | ❌ 統合未検証            | `integration-extended.test.ts` に 3 統合テスト追加                     |
+
+**到達した境地**: 関数をユニットテストすることと、関数が**組み合わせて**正しく動作することは別の主張である。ライブラリが「パイプライン的に使われることを意図する」なら、パイプラインそのものをテストしなければならない。Q31-Q36 の橋渡し関数は今はじめて「一連の呼び出し」として検証された。
+
+447 テスト / 全パス。

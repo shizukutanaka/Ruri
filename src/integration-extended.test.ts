@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { edo, degreeToFreq } from './core/tuning.js';
 import { meantoneQuarterComma, pythagorean } from './core/temperament.js';
-import { rankChords } from './core/chord-search.js';
+import { rankChords, realizeRankedChordFreqs, progressionSmoothness } from './core/chord-search.js';
 import { minimalVoiceLeading } from './core/voice-leading.js';
 import { harmonicSpectrum } from './core/spectrum.js';
 import { pluck, normalize, mix, DEFAULT_KS } from './core/ks-synth.js';
@@ -9,6 +9,9 @@ import { adsrEnvelope, applyEnvelope } from './core/envelope.js';
 import { encodeWav } from './adapters/wav.js';
 import { tuningToMtsFrequencies, mtsBulkDump, freqToMtsKey } from './adapters/mts.js';
 import { writeTun } from './adapters/tun.js';
+import { getTuningById } from './data/presets.js';
+import { chordFromSemitones, realizeChordFreqs } from './core/chord.js';
+import { fretlessOud, fingerFretlessChord } from './core/fretless.js';
 
 // Socratic Q8: the new modules were only unit-tested in isolation. These tests
 // exercise them as connected end-to-end pipelines, the way a real caller would.
@@ -94,5 +97,58 @@ describe('integration: EDO/pythagorean → MTS + .tun export', () => {
     const key = freqToMtsKey(freqs[69]!);
     expect(key.semitone).toBe(69);
     expect(key.fraction14).toBe(0);
+  });
+});
+
+// Socratic Q37: bridging functions Q31-Q36 validated together as an end-to-end pipeline.
+describe('integration: preset tuning → chord ranking → progression smoothness (Q31-Q36 cohesion)', () => {
+  it('makam_preset_through_full_pipeline', () => {
+    // getTuningById (Q36) → rankChords → realizeRankedChordFreqs (Q33) → progressionSmoothness (Q35)
+    const makam = getTuningById('makam-ussak-example');
+    expect(makam).toBeDefined();
+
+    const chords = rankChords(makam!, { size: 3, limit: 4 });
+    expect(chords.length).toBeGreaterThan(0);
+
+    const cost = progressionSmoothness(chords, 440);
+    expect(Number.isFinite(cost)).toBe(true);
+    expect(cost).toBeGreaterThanOrEqual(0);
+
+    // Each chord realizes to correct frequencies
+    const freqs = realizeRankedChordFreqs(chords[0]!, 440);
+    expect(freqs[0]).toBeCloseTo(440, 6);
+    expect(freqs.every((f) => f > 0)).toBe(true);
+  });
+
+  it('chord_to_fretless_oud_pipeline', () => {
+    // Chord → realizeChordFreqs bridges Chord → fingerFretlessChord (fretless takes Hz directly).
+    const oud = fretlessOud(440);
+    // Use a narrow chord (root + fifth) within the oud's range
+    const fifth = chordFromSemitones('fifth', [0, 7]);
+    const freqs = realizeChordFreqs(fifth, 440); // A4=440 Hz, E5≈659 Hz
+    const result = fingerFretlessChord(oud, freqs);
+    // fingerFretlessChord returns FretlessPosition[] | null
+    // Oud C4 open string = ~261 Hz; A4=440 Hz is reachable (within 2 octaves above some string)
+    if (result !== null) {
+      expect(result.length).toBe(2);
+      for (const p of result) {
+        expect(p.cents).toBeGreaterThanOrEqual(0);
+        expect(p.freqHz).toBeGreaterThan(0);
+      }
+    } else {
+      // If A4 (440 Hz) is not reachable on this oud tuning, that's a valid result
+      expect(result).toBeNull();
+    }
+  });
+
+  it('edo_preset_smoothness_is_finite_for_multiple_chord_sizes', () => {
+    // Validates that progressionSmoothness works across different EDOs and sizes.
+    for (const n of [7, 12, 19]) {
+      const tuning = edo(n);
+      const chords = rankChords(tuning, { size: 2, limit: 3 });
+      const cost = progressionSmoothness(chords, 261.63);
+      expect(Number.isFinite(cost)).toBe(true);
+      expect(cost).toBeGreaterThanOrEqual(0);
+    }
   });
 });

@@ -29,6 +29,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 - `chordToCentOffsets(chord, rootCentsOnInstrument)` (`src/core/chord.ts`): bridge from `Chord` (root-relative intervals) into the instrument coordinate system that `fingerChord` speaks. `StringInstrument` has no Hz anchor by design (instruments are transposable); this helper supplies the root position in instrument-local cents. New dedicated `chord.test.ts`.
 - `progressionSmoothness(chords, rootHz)` (`src/core/chord-search.ts`): total minimal voice-leading cost across a chord progression (3+ chords) as a single call. Aggregates pairwise `voiceLeadingCost` over consecutive pairs, enabling the full DTM workflow: `generatedTuning → rankChords → progressionSmoothness`.
 - `getTuningById(id, presets?)` (`src/data/presets.ts`): look up a curated preset by id string and return a validated `TuningSystem` (or `undefined`). Replaces the two-step `import MAKAM_USSAK; loadTuningPreset(MAKAM_USSAK)` pattern with a single discoverable call. Default pool is `ALL_PRESETS`; a custom pool can be supplied.
+- Integration tests (`src/integration-extended.test.ts`): end-to-end pipeline tests for Q31-Q36 bridging functions used together — Makam preset through full pipeline, Chord → fretless oud fingering, EDO progression smoothness across 7/12/19-EDO.
 
 ### Fixed
 - `localMinima`: descending-plateau false positive — plateaus now report once at their first index only when strictly below both differing neighbours; ascending-plateau and end-touching cases are no longer reported.
