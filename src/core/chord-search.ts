@@ -5,6 +5,7 @@ import { chordPeriodicity } from './harmonicity.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { degreeToCents } from './tuning.js';
 import { voiceLeadingCost } from './voice-leading.js';
+import { type Chord } from './chord.js';
 
 export interface RankedChord {
   /** Degree indices within one period, ascending, starting at the chord's root degree offset 0..n-1 — store absolute degree indices. */
@@ -258,4 +259,22 @@ export function progressionSmoothness(chords: readonly RankedChord[], rootHz: nu
     );
   }
   return total;
+}
+
+/**
+ * Convert a `RankedChord` (tuning-discovery output) to a portable `Chord`
+ * (root-relative interval representation).
+ *
+ * `RankedChord.cents` are already root-relative (cents[0] = 0), so this is
+ * a direct lift — no arithmetic required. The result can be used anywhere a
+ * `Chord` is accepted: `realizeChordFreqs`, `chordToCentOffsets → fingerChord`,
+ * `writeScl`, or storage as a named voicing independent of any specific tuning.
+ *
+ * Closes the round-trip: `rankChords → rankedChordToChord → Chord → ...`
+ */
+export function rankedChordToChord(ranked: RankedChord, name?: string): Chord {
+  return {
+    name: name ?? `chord-${ranked.degrees.join('-')}`,
+    intervals: ranked.cents.map((c) => ({ kind: 'cents' as const, cents: c })),
+  };
 }

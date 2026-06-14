@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。464テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。471テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -118,7 +118,8 @@ const bell = consonantIntervals(bellSpectrum());
 
 ```ts
 // e) ランキング → 進行スムーズネス: 和音探索から進行評価まで一本のパイプライン
-import { generatedTuning, rankChords, realizeRankedChordFreqs, progressionSmoothness, harmonicSpectrum } from 'ruri';
+import { generatedTuning, rankChords, realizeRankedChordFreqs, progressionSmoothness,
+         rankedChordToChord, harmonicSpectrum } from 'ruri';
 
 const tuning = generatedTuning(700, 1200, 7);          // ダイアトニック MOS → TuningSystem
 const chords = rankChords(tuning, { size: 3, limit: 4 });  // 協和度ランキング
@@ -127,6 +128,9 @@ const cost = progressionSmoothness(chords, 261.63);
 
 // 個別ペアの実周波数も取り出せる
 const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);  // RankedChord → Hz
+
+// 発見した和音を再利用可能な Chord として保存 → fingerChord / writeScl / 別調律へ持ち込み可
+const portable = rankedChordToChord(chords[0]!, 'my-triad');  // RankedChord → Chord
 ```
 
 ## 設計原則

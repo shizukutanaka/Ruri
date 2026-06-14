@@ -4,7 +4,13 @@ import { equalTemperament12, edo } from './tuning.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
 import { voiceLeadingCost } from './voice-leading.js';
-import { rankChords, realizeRankedChordFreqs, progressionSmoothness } from './chord-search.js';
+import {
+  rankChords,
+  realizeRankedChordFreqs,
+  progressionSmoothness,
+  rankedChordToChord,
+} from './chord-search.js';
+import { chordToCents, realizeChordFreqs } from './chord.js';
 
 describe('rankChords — 12-TET size-3 harmonic spectrum', () => {
   const tuning = equalTemperament12(440);
@@ -356,5 +362,61 @@ describe('progressionSmoothness — total voice-leading cost across a chord prog
     const triads = rankChords(tuning, { size: 3, spectrum, limit: 1 });
     const dyads = rankChords(tuning, { size: 2, spectrum, limit: 1 });
     expect(() => progressionSmoothness([triads[0]!, dyads[0]!], 261.63)).toThrow(RangeError);
+  });
+});
+
+// Socratic Q40: rankedChordToChord closes the discovery→portable-Chord round-trip.
+describe('rankedChordToChord — RankedChord → portable Chord', () => {
+  const t12 = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('test_cents_are_root_relative_starting_at_zero', () => {
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!);
+    expect(chordToCents(chord)[0]).toBe(0);
+  });
+
+  it('test_chord_cents_match_ranked_cents', () => {
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!);
+    expect(chordToCents(chord)).toEqual([...top!.cents]);
+  });
+
+  it('test_realize_freqs_matches_realizeRankedChordFreqs', () => {
+    const rootHz = 261.63;
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!);
+    const fromChord = realizeChordFreqs(chord, rootHz);
+    const fromRanked = realizeRankedChordFreqs(top!, rootHz);
+    fromChord.forEach((f, i) => expect(f).toBeCloseTo(fromRanked[i] as number, 9));
+  });
+
+  it('test_name_auto_generated_from_degrees', () => {
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!);
+    expect(chord.name).toBe(`chord-${top!.degrees.join('-')}`);
+  });
+
+  it('test_explicit_name_overrides_auto', () => {
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!, 'my-major');
+    expect(chord.name).toBe('my-major');
+  });
+
+  it('test_interval_count_matches_ranked_size', () => {
+    const [top] = rankChords(t12, { size: 4, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!);
+    expect(chord.intervals.length).toBe(4);
+  });
+
+  it('test_round_trip_dissonance_invariant', () => {
+    // Re-scoring the Chord at the same root as rankChords used (referenceHz=440)
+    // must reproduce the original roughness exactly.
+    const rootHz = 440; // matches t12.referenceHz so rankChords computed at this root
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!);
+    const freqs = realizeChordFreqs(chord, rootHz);
+    const roughness = chordDissonance(freqs, spectrum);
+    expect(roughness).toBeCloseTo(top!.roughness, 6);
   });
 });

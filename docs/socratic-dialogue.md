@@ -892,3 +892,46 @@ export function scaleMode(scale: Scale, modeIndex: number, tuning: TuningSystem)
 **到達した境地**: 「一級市民」という主張は操作の完全性で測られる。`Scale` が旋法を表現できても旋法転回を表現できなければ、最も基本的なマカーム操作(ウシャク → ブーセリク → ヒジャズ)が外部ループを要求する。11 個のテストのうち最も重要なのは「ステップ multiset の不変性」 — これがソクラテス式の核心: 「旋法転回とは何か」を問えば「同じ音程集合の別の出発点」という不変条件が現れ、その不変条件がテストになる。
 
 464 テスト / 全パス。
+
+---
+
+## Q40. `rankChords` が返す `RankedChord` を「再利用可能な和音」として保存できるか？ ❌→✅
+
+**問(新視点)**: `rankChords` は調律系上で最適な和音を発見するが、その結果は `RankedChord` 型 — 調律依存の絶対度数インデックスと cents 配列を持つ探索出力形式である。発見した和音をギタータブ・SMF・別の調律システムに持ち込みたい場合、ユーザーは `Chord`(根音相対インターバル)が必要だ。`RankedChord → Chord` の変換が 1 コールで存在するか？
+
+**検証**: `chord-search.ts` を調べると `realizeRankedChordFreqs`(Hz 変換)・`progressionSmoothness`(進行コスト)は存在するが、**`RankedChord → Chord` への持ち上げ**は存在しない。`RankedChord.cents` は既に根音相対(cents[0] = 0)だが、それを `Chord` に変換するには構造体を手動組み立てする必要がある。
+
+**判定**: ❌ ラウンドトリップが不完全 → `rankedChordToChord` を追加して解消。
+
+**実装**:
+```ts
+export function rankedChordToChord(ranked: RankedChord, name?: string): Chord {
+  return {
+    name: name ?? `chord-${ranked.degrees.join('-')}`,
+    intervals: ranked.cents.map((c) => ({ kind: 'cents' as const, cents: c })),
+  };
+}
+```
+
+`RankedChord.cents` は既に根音相対なので変換は「持ち上げ」のみ。`name` を省略すると度数から自動命名。
+
+**テスト(7 件)**:
+- 最初の cents = 0(根音相対保証)
+- `chordToCents(chord)` が `ranked.cents` に一致
+- `realizeChordFreqs(chord, 440)` が `realizeRankedChordFreqs(ranked, 440)` に一致
+- 名前の自動生成(度数インデックスから)
+- 名前の明示指定
+- インターバル数 = ranked のサイズ
+- 粗さ往復不変量: 同じ rootHz で採点すると `roughness` が一致
+
+---
+
+## 第十六巡サマリ
+
+| 問                                                              | 判定              | 対応                                              |
+| --------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Q40 `rankChords` 結果 → 再利用可能 `Chord` への変換が 1 コールで不在 | ❌ ラウンドトリップ欠落 | `rankedChordToChord` 追加 + 7 テスト            |
+
+**到達した境地**: `rankChords` は「発見」であり `Chord` は「記譜・持ち運び」である。この2つは別の存在論的層にあるが、橋がないと発見した音楽はそのセッションにしか存在しない。`rankedChordToChord` は発見から記譜への1行の橋であり、ラウンドトリップ(調律 → 発見 → 和音 → 別の調律/楽器/エクスポート)を完成させる。
+
+471 テスト / 全パス。
