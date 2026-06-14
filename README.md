@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。391テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。406テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -20,11 +20,15 @@ docs/            設計・調査記録(Plan / WORKFLOW / research / 競合分析
 
 ```ts
 // a) 調律系の生成と周波数取得
-import { edo, equalTemperament12, degreeToFreq } from 'ruri';
+import { edo, equalTemperament12, degreeToFreq, generatedTuning, maximallyEvenTuning } from 'ruri';
 
 const tuning19 = edo(19);                        // 19-EDO, A4=440Hz
 const tuning12 = equalTemperament12(440);        // 12-TET
 const freq = degreeToFreq(tuning19, 3);          // 3度目の音の Hz
+
+// MOS(生成音階)と最大均等集合を直接 TuningSystem として取得
+const diatonic = generatedTuning(700, 1200, 7);  // 5度積み上げダイアトニック
+const me7of12 = maximallyEvenTuning(12, 7);      // Clough-Douthett 7-of-12
 ```
 
 ```ts

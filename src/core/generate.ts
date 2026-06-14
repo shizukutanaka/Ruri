@@ -1,5 +1,8 @@
 /** Idiom-independent scale generation: MOS (generated scales) and maximally even sets. */
 
+import { type Pitch } from './cents.js';
+import { type TuningSystem, defineTuning } from './tuning.js';
+
 const wrap = (x: number, period: number): number => ((x % period) + period) % period;
 
 /**
@@ -48,4 +51,64 @@ export function isWellFormed(scaleCents: readonly number[], periodCents: number)
 export function maximallyEven(c: number, d: number, m = 0): number[] {
   if (d < 1 || c < d) throw new RangeError(`require 1 <= d <= c, got d=${d}, c=${c}`);
   return Array.from({ length: d }, (_, k) => Math.floor((c * k + m) / d));
+}
+
+/**
+ * Generated (MOS) scale as a first-class TuningSystem, ready for use with
+ * `rankChords`, `mtsBulkDump`, `fingerChord`, etc.
+ *
+ * Bridges `generatedScale` → `defineTuning` so callers do not have to
+ * manually convert `number[]` to `Pitch[]` and then call `defineTuning`.
+ *
+ * @param id - Tuning id string (default: `mos-${count}`). Must be unique if
+ *   multiple generated tunings coexist (Scale.tuningId must match).
+ */
+export function generatedTuning(
+  generatorCents: number,
+  periodCents: number,
+  count: number,
+  referenceHz = 440,
+  id?: string,
+): TuningSystem {
+  const scaleCents = generatedScale(generatorCents, periodCents, count);
+  const degrees: Pitch[] = scaleCents.map((c) => ({ kind: 'cents' as const, cents: c }));
+  const resolvedId = id ?? `mos-${count}`;
+  return defineTuning({
+    id: resolvedId,
+    name: resolvedId,
+    referenceHz,
+    periodCents,
+    degrees,
+    source: 'theoretical',
+  });
+}
+
+/**
+ * Maximally even set as a first-class TuningSystem.
+ * `d` notes from a `c`-EDO chromatic universe, placed at cents `i * (periodCents / c)`.
+ *
+ * Example: `maximallyEvenTuning(12, 7)` → the familiar diatonic (WWHWWWH) in
+ * 12-TET, but works for any chromatic universe and period.
+ */
+export function maximallyEvenTuning(
+  c: number,
+  d: number,
+  periodCents = 1200,
+  referenceHz = 440,
+): TuningSystem {
+  if (periodCents <= 0) {
+    throw new RangeError(`periodCents must be > 0, got ${periodCents}`);
+  }
+  const indices = maximallyEven(c, d);
+  const stepCents = periodCents / c;
+  const degrees: Pitch[] = indices.map((i) => ({ kind: 'cents' as const, cents: i * stepCents }));
+  const id = `me-${d}-of-${c}`;
+  return defineTuning({
+    id,
+    name: `maximally even ${d}-of-${c}`,
+    referenceHz,
+    periodCents,
+    degrees,
+    source: 'theoretical',
+  });
 }

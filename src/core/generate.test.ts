@@ -1,9 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { generatedScale, isWellFormed, maximallyEven } from './generate.js';
+import {
+  generatedScale,
+  isWellFormed,
+  maximallyEven,
+  generatedTuning,
+  maximallyEvenTuning,
+} from './generate.js';
 import { approxRatio, relativePeriodicity, chordPeriodicity } from './harmonicity.js';
 import { defineTuning, equalTemperament12, edo, degreeToCents } from './tuning.js';
 import { cents } from './cents.js';
+import { rankChords } from './chord-search.js';
 import { stretchedSpectrum, bellSpectrum } from './spectrum.js';
 
 describe('generatedScale validation', () => {
@@ -220,5 +227,110 @@ describe('defineTuning invariants (fail fast)', () => {
         source: 'theoretical',
       }),
     ).toThrow(RangeError);
+  });
+});
+
+describe('generatedTuning — MOS as first-class TuningSystem', () => {
+  it('test_diatonic_by_fifths_has_7_degrees', () => {
+    const t = generatedTuning(700, 1200, 7);
+    expect(t.degrees.length).toBe(7);
+  });
+
+  it('test_degrees_are_ascending_and_in_period', () => {
+    const t = generatedTuning(700, 1200, 7);
+    for (let i = 0; i < t.degrees.length; i++) {
+      const c = degreeToCents(t, i);
+      expect(c).toBeGreaterThanOrEqual(0);
+      expect(c).toBeLessThan(1200);
+    }
+    for (let i = 1; i < t.degrees.length; i++) {
+      expect(degreeToCents(t, i)).toBeGreaterThan(degreeToCents(t, i - 1));
+    }
+  });
+
+  it('test_custom_id_is_respected', () => {
+    const t = generatedTuning(700, 1200, 7, 440, 'diatonic');
+    expect(t.id).toBe('diatonic');
+  });
+
+  it('test_default_id_uses_count', () => {
+    const t = generatedTuning(700, 1200, 7);
+    expect(t.id).toBe('mos-7');
+  });
+
+  it('test_reference_hz_propagated', () => {
+    const t = generatedTuning(700, 1200, 5, 432);
+    expect(t.referenceHz).toBe(432);
+  });
+
+  it('test_pentatonic_matches_generatedScale_cents', () => {
+    const scaleCents = generatedScale(700, 1200, 5);
+    const t = generatedTuning(700, 1200, 5);
+    for (let i = 0; i < 5; i++) {
+      expect(degreeToCents(t, i)).toBeCloseTo(scaleCents[i] as number, 9);
+    }
+  });
+
+  it('test_non_octave_period_supported', () => {
+    const t = generatedTuning(443, 1902, 4);
+    expect(t.periodCents).toBe(1902);
+    expect(t.degrees.length).toBe(4);
+  });
+
+  it('test_compatible_with_rankChords', () => {
+    // Bridge: generatedTuning → rankChords pipeline works end-to-end without
+    // any manual Pitch/TuningSystem construction.
+    const t = generatedTuning(700, 1200, 7);
+    const chords = rankChords(t, { size: 3, limit: 5 });
+    expect(chords.length).toBeGreaterThan(0);
+    expect(chords[0]!.degrees[0]).toBe(0);
+  });
+});
+
+describe('maximallyEvenTuning — ME set as first-class TuningSystem', () => {
+  it('test_diatonic_7_of_12_has_7_degrees', () => {
+    const t = maximallyEvenTuning(12, 7);
+    expect(t.degrees.length).toBe(7);
+  });
+
+  it('test_degree_cents_only_one_and_two_step_gaps', () => {
+    // Clough-Douthett floor formula: indices [0,1,3,5,6,8,10], steps alternating 100/200c.
+    // The ME property guarantees only 2 distinct step sizes (1- and 2-chromatic-unit gaps).
+    const t = maximallyEvenTuning(12, 7);
+    const centsList = Array.from({ length: 7 }, (_, i) => degreeToCents(t, i));
+    const steps = centsList.map(
+      (c, i) =>
+        Math.round(((centsList[(i + 1) % 7] as number) + (i === 6 ? 1200 : 0) - c) * 1e6) / 1e6,
+    );
+    const stepSizes = new Set(steps);
+    expect([...stepSizes].sort((a, b) => a - b)).toEqual([100, 200]);
+  });
+
+  it('test_id_is_me_d_of_c', () => {
+    const t = maximallyEvenTuning(12, 7);
+    expect(t.id).toBe('me-7-of-12');
+  });
+
+  it('test_period_cents_propagated', () => {
+    const t = maximallyEvenTuning(31, 19, 1902);
+    expect(t.periodCents).toBe(1902);
+    expect(t.degrees.length).toBe(19);
+  });
+
+  it('test_non_positive_period_throws', () => {
+    expect(() => maximallyEvenTuning(12, 7, 0)).toThrow(RangeError);
+  });
+
+  it('test_invalid_cardinality_propagates_from_maximallyEven', () => {
+    expect(() => maximallyEvenTuning(5, 7)).toThrow(RangeError);
+  });
+
+  it('test_whole_tone_6_of_12_has_6_degrees', () => {
+    const t = maximallyEvenTuning(12, 6);
+    expect(t.degrees.length).toBe(6);
+    // All steps 200c apart.
+    for (let i = 0; i < 6; i++) {
+      expect(degreeToCents(t, i)).toBeCloseTo(i * 200, 9);
+    }
   });
 });

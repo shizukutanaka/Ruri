@@ -411,3 +411,55 @@ DSP ではよくある近似（別解 `(n+1)/attackEnd` は n=0 から非ゼロ;
 **到達した境地**: カバレッジ向上には「テスト補完で埋められるギャップ」と「型システムや数学的不変条件に由来する正当なデッドコード」の二種類がある。前者は無限にある。後者は証明して文書化し、受け入れる。98.86% 文/行、97.55% ブランチ、100% 関数が本プロジェクトの実用的カバレッジ上限である。
 
 381 テスト / 全パス。
+
+---
+
+## 第七巡: 抽象境界の破れ — generate.ts の出力は残りのパイプラインと接続されているか
+
+**目標**: 「idiom-independent scale generation is first-class」という哲学の実装への忠実度を問う。
+
+## Q31. `generatedScale` / `maximallyEven` の出力は、残りのライブラリから直接利用できるか？ ❌ **抽象境界の破れ → ブリッジ関数を追加**
+
+**問**: ライブラリは「MOS(生成音階)・最大均等(Clough-Douthett)。三度堆積を前提しない」を設計原則とする。しかし `generatedScale(700, 1200, 7)` は `number[]`、`maximallyEven(12, 7)` は `number[]`(インデックス)を返す。`rankChords` / `mtsBulkDump` / `fingerChord` などはすべて `TuningSystem` を要求する。つまりこれらを使おうとすると毎回 3 手順の変換が必要になる。
+
+**現状のコスト例(ダイアトニックスケールを和音ランキングに渡す)**:
+```ts
+const scaleCents = generatedScale(700, 1200, 7);        // step 1
+const degrees = scaleCents.map(c => ({ kind:'cents', cents: c }));  // step 2
+const t = defineTuning({ id:'…', name:'…', referenceHz:440, periodCents:1200, degrees, source:'theoretical' });  // step 3
+const chords = rankChords(t);                           // step 4
+```
+
+**判定**: ❌ 設計原則「生成はイディオム非依存・一級市民」に反する。手順 1-3 を一発で済ませる `generatedTuning` と `maximallyEvenTuning` が必要。
+
+**実装**: `src/core/generate.ts` に追加:
+- `generatedTuning(generatorCents, periodCents, count, referenceHz=440, id?)` → `TuningSystem`
+  - `generatedScale` を内部で呼び、`Pitch[]` に変換し `defineTuning` を経由。
+  - デフォルト id = `mos-${count}`。
+- `maximallyEvenTuning(c, d, periodCents=1200, referenceHz=440)` → `TuningSystem`
+  - `maximallyEven(c, d)` のインデックスを `i * (periodCents / c)` cents に変換し `defineTuning` を経由。
+  - id = `me-${d}-of-${c}`。
+  - `periodCents <= 0` は fail-fast RangeError。
+
+**検証**: `test_compatible_with_rankChords` により `generatedTuning(700,1200,7)` → `rankChords` のパイプラインが 1 コールで動作することを確認。
+
+**使用例(改善後)**:
+```ts
+const chords = rankChords(generatedTuning(700, 1200, 7));
+// Clough-Douthett diatonic in 12-TET → TuningSystem → chord ranking, 2行。
+const diatonic = maximallyEvenTuning(12, 7);
+```
+
+**テスト**: 15 件追加（`generatedTuning` 8 件 + `maximallyEvenTuning` 7 件）。406 テスト / 全パス。
+
+---
+
+## 第七巡サマリ
+
+| 問                                       | 判定                     | 対応                                                        |
+| ---------------------------------------- | ------------------------ | ----------------------------------------------------------- |
+| Q31 `generatedScale`→`TuningSystem` ブリッジ欠落 | ❌ 抽象境界の破れ | `generatedTuning` + `maximallyEvenTuning` 追加              |
+
+**到達した境地**: 「一級市民(first-class)」とは型システムで自然につながることを意味する。`number[]` を返す生成関数と `TuningSystem` を要求するランキング/エクスポート関数の間に手動変換が必要なとき、その型は一級市民ではない。哲学を実装に持ち込むとは、「生成スケールから和音ランキングまで手続きの中断なしに書ける」ことである。
+
+406 テスト / 全パス。generate.ts 100%カバレッジ。
