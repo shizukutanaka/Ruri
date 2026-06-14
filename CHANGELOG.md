@@ -24,6 +24,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 - `.tun` adapter (`src/adapters/tun.ts`): `writeTun` — AnaMark TUN text export (`[Tuning]` + `[Exact Tuning]` sections); composes with `tuningToMtsFrequencies`.
 - `consonantIntervals(spectrum, opts?)` (`src/core/dissonance.ts`): the library's timbre-dependent-consonance thesis as one call — scans the sensory-dissonance curve and returns its local minima as `{ ratio, cents, dissonance }`. A harmonic spectrum yields the just intervals (4/3, 3/2, 5/4…); `bellSpectrum()` yields a different set from the very same scan.
 - `generatedTuning(generatorCents, periodCents, count, referenceHz?, id?)` and `maximallyEvenTuning(c, d, periodCents?, referenceHz?)` (`src/core/generate.ts`): bridge `generatedScale`/`maximallyEven` to a first-class `TuningSystem`, closing the abstraction gap between the MOS/ME generators and the rest of the pipeline (`rankChords`, `mtsBulkDump`, `fingerChord`, etc.).
+- `scaleToFreqs(scale, tuning)` (`src/core/scale.ts`): absolute Hz for each scale step — the bridge from the melodic/modal `Scale` layer into the frequency world (`chordDissonance`, `pluck`, `strike`, MTS/`.tun` export). The `Scale` module also gains a dedicated test suite (`scale.test.ts`).
 
 ### Fixed
 - `localMinima`: descending-plateau false positive — plateaus now report once at their first index only when strictly below both differing neighbours; ascending-plateau and end-touching cases are no longer reported.

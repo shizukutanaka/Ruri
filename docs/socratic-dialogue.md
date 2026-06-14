@@ -463,3 +463,44 @@ const diatonic = maximallyEvenTuning(12, 7);
 **到達した境地**: 「一級市民(first-class)」とは型システムで自然につながることを意味する。`number[]` を返す生成関数と `TuningSystem` を要求するランキング/エクスポート関数の間に手動変換が必要なとき、その型は一級市民ではない。哲学を実装に持ち込むとは、「生成スケールから和音ランキングまで手続きの中断なしに書ける」ことである。
 
 406 テスト / 全パス。generate.ts 100%カバレッジ。
+
+---
+
+## 第八巡: 「一級市民」の Scale 層は、実は frequency 世界へ接続していない
+
+**目標**: docs が「melodic/modal は一級市民」と主張する `Scale` 層が、ライブラリの他層と接続しているかを問う。
+
+## Q32. `Scale`(旋法/jins/raga)は周波数を生成できるか？ ❌ **行き止まりの葉ノード → `scaleToFreqs` を追加**
+
+**問**: `scale.ts` のコメントは「Microtonal cultures are primarily melodic/modal (improvement #3), so this is a first-class layer」と述べる。微分音音楽の*主要*ユースケースが旋律/旋法である、と。ところが `Scale` から得られるのは `scaleToCents` だけ。ライブラリの他層 — `chordDissonance(freqs)` / `pluck(hz)` / `strike(hz)` / MTS・`.tun` エクスポート — はすべて**周波数(Hz)**を話す。`Scale` を実際に鳴らす・採点する・エクスポートするには、ユーザが手動で cents → freq 変換を書く必要がある。
+
+**さらに**: `scale.ts` には専用テストファイルが存在しない(`scaleToCents` は `tuning.test.ts` で間接的にテストされるのみ)。一級市民を名乗る層に専用テストがない。
+
+**検証**: `grep -rn "scaleToFreqs"` → ヒットなし。`degreeToFreq`(tuning.ts)は存在するのに、`Scale` 用のラッパが欠落。`Scale` は cents に変換して**止まる**葉ノードだった。
+
+**判定**: ❌ 「一級市民」の主張に実装が追いついていない。`scaleToFreqs(scale, tuning)` を追加し、旋法層を周波数世界へ接続する。
+
+**実装**: `src/core/scale.ts`:
+- 共有ガード `assertTuningMatch(scale, tuning)` を抽出(`scaleToCents` と `scaleToFreqs` で DRY)。
+- `scaleToFreqs(scale, tuning): number[]` = `degreeIndices.map(d => degreeToFreq(tuning, d))`。周期ラップ・非オクターブ周期は `degreeToFreq` の定義通り。
+- 新規 `src/core/scale.test.ts`(9 件): major mode cents / octave-spanning wrap / 周波数=referenceHz / degreeToFreq との一致 / 非オクターブ(Bohlen-Pierce 13-EDO・周期3/1)/ id不一致 throw(両関数)。
+
+**使用例(改善後)**:
+```ts
+const t = generatedTuning(700, 1200, 7, 261.63, '12-tet');
+const scale = { id:'pent', name:'penta', tuningId:'12-tet', degreeIndices:[0,1,2,3,4] };
+const freqs = scaleToFreqs(scale, t);                  // 旋法 → Hz
+const roughness = chordDissonance(freqs, harmonicSpectrum());  // そのまま採点
+```
+
+---
+
+## 第八巡サマリ
+
+| 問                                          | 判定                       | 対応                                            |
+| ------------------------------------------- | -------------------------- | ----------------------------------------------- |
+| Q32 `Scale` が周波数世界へ接続していない    | ❌ 行き止まりの葉ノード     | `scaleToFreqs` 追加 + 専用 `scale.test.ts` 新設 |
+
+**到達した境地**: Q31(generate)と Q32(scale)は同じ病の二つの症状である — 「一級市民」を名乗る層が、型の上では他層とつながっていない。ライブラリの中核思想(「微分音は旋律/旋法が主」)を本当に一級市民にするとは、`Scale` から音(周波数)・採点(不協和度)・エクスポート(MTS/.scl)へ**手続きの中断なく**到達できることである。docstring の主張は、対応する変換関数があって初めて真になる。
+
+415 テスト / 全パス。
