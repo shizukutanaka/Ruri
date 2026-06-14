@@ -1,4 +1,5 @@
 import { type TuningSystem, degreeToFreq } from './tuning.js';
+import { centsToFreqFactor } from './cents.js';
 import { chordDissonance } from './dissonance.js';
 import { chordPeriodicity } from './harmonicity.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
@@ -212,4 +213,22 @@ export function rankChords(tuning: TuningSystem, opts?: ChordSearchOptions): Ran
   });
 
   return ranked.slice(0, limit);
+}
+
+/**
+ * Realize a `RankedChord` as absolute frequencies (Hz) at the given root.
+ *
+ * `RankedChord.cents` are root-relative intervals (cents[0] is always 0).
+ * This is the bridge from the ranking layer into the frequency world:
+ * feed the result to `voiceLeadingCost`, `chordDissonance`, `pluck`, or any
+ * export that speaks Hz — without manual cents→Hz arithmetic.
+ *
+ * @example
+ * const chords = rankChords(tuning, { size: 3 });
+ * const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);
+ * const freqsB = realizeRankedChordFreqs(chords[1]!, 261.63);
+ * const smoothness = voiceLeadingCost(freqsA, freqsB);
+ */
+export function realizeRankedChordFreqs(chord: RankedChord, rootHz: number): number[] {
+  return chord.cents.map((c) => rootHz * centsToFreqFactor(c));
 }

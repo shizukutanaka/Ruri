@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。415テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。421テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -81,6 +81,17 @@ const harm = consonantIntervals(harmonicSpectrum());
 
 // ベル音色 → 同じ [1,2] 走査でも別の協和音程集合になる(西洋の音程名に依存しない)
 const bell = consonantIntervals(bellSpectrum());
+```
+
+```ts
+// e) ランキング → 実周波数 → ボイスリーディング: 和音探索から最滑進行まで一本のパイプライン
+import { generatedTuning, rankChords, realizeRankedChordFreqs, voiceLeadingCost, harmonicSpectrum } from 'ruri';
+
+const tuning = generatedTuning(700, 1200, 7);          // ダイアトニック MOS → TuningSystem
+const chords = rankChords(tuning, { size: 3 });        // 協和度ランキング
+const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);  // RankedChord → Hz
+const freqsB = realizeRankedChordFreqs(chords[1]!, 261.63);
+const smoothness = voiceLeadingCost(freqsA, freqsB);   // 最小声部進行コスト(cents)
 ```
 
 ## 設計原則

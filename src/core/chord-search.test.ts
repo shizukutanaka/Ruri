@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { equalTemperament12, edo } from './tuning.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
-import { rankChords } from './chord-search.js';
+import { chordDissonance } from './dissonance.js';
+import { voiceLeadingCost } from './voice-leading.js';
+import { rankChords, realizeRankedChordFreqs } from './chord-search.js';
 
 describe('rankChords — 12-TET size-3 harmonic spectrum', () => {
   const tuning = equalTemperament12(440);
@@ -220,5 +222,81 @@ describe('rankChords — timbre dependence of the two score axes', () => {
     // Identical ranking and identical periodicity values regardless of timbre.
     expect(harmonic.map((c) => c.degrees.join('-'))).toEqual(bell.map((c) => c.degrees.join('-')));
     expect(harmonic.map((c) => c.periodicity)).toEqual(bell.map((c) => c.periodicity));
+  });
+});
+
+// Socratic Q33: realizeRankedChordFreqs bridges the ranking layer to the frequency world.
+describe('realizeRankedChordFreqs — bridge from RankedChord to Hz', () => {
+  const tuning = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('test_root_note_equals_rootHz', () => {
+    const chord = rankChords(tuning, { size: 3, spectrum, limit: 1 })[0]!;
+    const freqs = realizeRankedChordFreqs(chord, 261.63);
+    // cents[0] is always 0 (root), so rootHz * 2^(0/1200) = rootHz
+    expect(freqs[0]).toBeCloseTo(261.63, 9);
+  });
+
+  it('test_400c_interval_correct_ratio', () => {
+    // Find major triad [0, 4, 7] in 12-TET (cents [0, 400, 700])
+    const all = rankChords(tuning, { size: 3, spectrum, limit: 55 });
+    const major = all.find((r) => r.degrees[1] === 4 && r.degrees[2] === 7)!;
+    const freqs = realizeRankedChordFreqs(major, 261.63);
+    expect(freqs[1]).toBeCloseTo(261.63 * 2 ** (400 / 1200), 6);
+    expect(freqs[2]).toBeCloseTo(261.63 * 2 ** (700 / 1200), 6);
+  });
+
+  it('test_non_unity_rootHz_scales_all_voices', () => {
+    const chord = rankChords(tuning, { size: 3, spectrum, limit: 1 })[0]!;
+    const freqs261 = realizeRankedChordFreqs(chord, 261.63);
+    const freqs440 = realizeRankedChordFreqs(chord, 440);
+    // All frequency ratios between voices are preserved regardless of rootHz
+    for (let i = 1; i < freqs261.length; i++) {
+      expect((freqs440[i] as number) / (freqs440[0] as number)).toBeCloseTo(
+        (freqs261[i] as number) / (freqs261[0] as number),
+        9,
+      );
+    }
+  });
+
+  it('test_roughness_matches_chordDissonance_at_same_root', () => {
+    // realizeRankedChordFreqs should reproduce the internal roughness computation
+    const all = rankChords(tuning, { size: 3, spectrum, rootHz: 440, limit: 55 });
+    for (const chord of all.slice(0, 5)) {
+      const freqs = realizeRankedChordFreqs(chord, 440);
+      const roughness = chordDissonance(freqs, spectrum);
+      expect(roughness).toBeCloseTo(chord.roughness, 6);
+    }
+  });
+
+  it('test_integration_rankChords_realizeRankedChordFreqs_voiceLeadingCost', () => {
+    // Full pipeline: ranking → realize → voice-leading cost.
+    // The smoothest-ranked chord should NOT necessarily have the lowest voice-leading
+    // cost to the next chord — but the pipeline must work end-to-end without errors.
+    const chords = rankChords(tuning, { size: 3, spectrum, limit: 5 });
+    expect(chords.length).toBeGreaterThanOrEqual(2);
+    const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);
+    const freqsB = realizeRankedChordFreqs(chords[1]!, 261.63);
+    const cost = voiceLeadingCost(freqsA, freqsB);
+    expect(Number.isFinite(cost)).toBe(true);
+    expect(cost).toBeGreaterThanOrEqual(0);
+  });
+
+  it('property_all_freqs_positive_for_any_ranked_chord', () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 3, max: 12 }),
+        fc.double({ min: 110, max: 880, noNaN: true, noDefaultInfinity: true }),
+        (n, root) => {
+          const t = edo(n);
+          const chord = rankChords(t, { size: 2, limit: 1 })[0]!;
+          const freqs = realizeRankedChordFreqs(chord, root);
+          for (const f of freqs) {
+            expect(f).toBeGreaterThan(0);
+            expect(Number.isFinite(f)).toBe(true);
+          }
+        },
+      ),
+    );
   });
 });

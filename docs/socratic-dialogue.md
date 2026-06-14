@@ -504,3 +504,61 @@ const roughness = chordDissonance(freqs, harmonicSpectrum());  // そのまま�
 **到達した境地**: Q31(generate)と Q32(scale)は同じ病の二つの症状である — 「一級市民」を名乗る層が、型の上では他層とつながっていない。ライブラリの中核思想(「微分音は旋律/旋法が主」)を本当に一級市民にするとは、`Scale` から音(周波数)・採点(不協和度)・エクスポート(MTS/.scl)へ**手続きの中断なく**到達できることである。docstring の主張は、対応する変換関数があって初めて真になる。
 
 415 テスト / 全パス。
+
+---
+
+## 第九巡: ランキング層は voice-leading 層と接続されているか
+
+**目標**: `rankChords` が返す `RankedChord` が、ライブラリの他の計算層(voice-leading / 合成 / 協和採点)と型の上で直接つながっているかを問う。
+
+## Q33. `RankedChord` から `voiceLeadingCost` へは何ステップ必要か？ ❌ **行き止まり → `realizeRankedChordFreqs` を追加**
+
+**問**: `rankChords` は「最も協和度の高い和音」を見つける。DTM のユースケースではその次に「見つかった和音間の最も滑らかな進行を選ぶ」が来る。`voiceLeadingCost(fromFreqs, toFreqs)` がその計算をする。では `RankedChord` から `voiceLeadingCost` へは直接届くか？
+
+**検証**: `RankedChord` が持つのは `cents: readonly number[]`(ルート相対セント)と `roughness` / `score` などの数値。`voiceLeadingCost` は `readonly number[]` (Hz)を要求する。変換するには:
+```ts
+const chord = rankedChords[0]!;
+const freqs = chord.cents.map(c => rootHz * 2 ** (c / 1200));  // 手動
+voiceLeadingCost(freqs, ...);
+```
+`2 ** (c / 1200)` は `centsToFreqFactor` と等価だが型的な接続がなく、毎回書き直しになる。`realizeChordFreqs(chord: Chord, rootHz)` は存在するが、`RankedChord` は `Chord` 型ではないため使えない。
+
+**さらに**: `RankedChord.roughness` は内部で特定 `rootHz` と `spectrum` で計算されているが、それと同じ周波数を取り出す方法がない — `roughness` を `chordDissonance` で検証しようとすると手動変換が必要で、内部整合性の確認さえ難しい。
+
+**判定**: ❌ ランキング層の出力が frequency 世界への行き止まりになっている。Q31(generate→TuningSystem)・Q32(Scale→freqs)と同じ病理の第三例。
+
+**実装**: `src/core/chord-search.ts` に追加:
+```ts
+export function realizeRankedChordFreqs(chord: RankedChord, rootHz: number): number[] {
+  return chord.cents.map((c) => rootHz * centsToFreqFactor(c));
+}
+```
+`cents[0]` は常に 0(ルート) → `rootHz * 1 = rootHz`。
+
+**使用例(改善後)**:
+```ts
+const chords = rankChords(tuning, { size: 3 });
+const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);
+const freqsB = realizeRankedChordFreqs(chords[1]!, 261.63);
+const smoothness = voiceLeadingCost(freqsA, freqsB);  // 1コール
+```
+
+**テスト(6件)**:
+- ルート周波数 = `rootHz`(cents[0]=0 → factor 1.0)
+- 400c 音程 → `rootHz * 2^(400/1200)` の精度確認
+- 異なる `rootHz` でもボイス間の比率が保存される(スケール不変性)
+- `roughness` と `chordDissonance(realizeRankedChordFreqs(...), spectrum)` が一致(内部整合性)
+- Integration: `rankChords → realizeRankedChordFreqs → voiceLeadingCost` end-to-end パイプライン
+- fast-check プロパティ: 任意 EDO・任意 rootHz で全周波数が有限正値
+
+---
+
+## 第九巡サマリ
+
+| 問                                                              | 判定                     | 対応                                                                      |
+| --------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------- |
+| Q33 `RankedChord` → `voiceLeadingCost` に手動変換が必要        | ❌ 行き止まりの葉ノード   | `realizeRankedChordFreqs(chord, rootHz)` 追加 + 6 テスト                  |
+
+**到達した境地**: Q31(generate)・Q32(scale)・Q33(ranking)は同じパターンの三例 — 計算を生産する層が、それを消費する次の層と型の上でつながっていない。「一級市民」の連鎖が完成するとは、`generatedTuning → rankChords → realizeRankedChordFreqs → voiceLeadingCost` が**すべて直接呼び出せる**ことである。ライブラリの設計原則「zero runtime-dep / 単一真実源」は実装に追いついたが、「レイヤ間の型的連続性」はQ31-33で補完されて初めて実現した。
+
+421 テスト / 全パス。
