@@ -1,4 +1,6 @@
 import { type TuningSystem, defineTuning, degreeToCents, degreeToFreq } from './tuning.js';
+import { type Spectrum } from './spectrum.js';
+import { chordDissonance } from './dissonance.js';
 
 /**
  * A scale / mode / jins / raga: an ordered selection of degrees over a tuning.
@@ -118,4 +120,44 @@ export function scaleMode(scale: Scale, modeIndex: number, tuning: TuningSystem)
     tuningId: scale.tuningId,
     degreeIndices: newIndices,
   };
+}
+
+/**
+ * Sensory dissonance of all scale degrees sounding simultaneously.
+ *
+ * Treats the scale as a chord and applies Sethares roughness via the
+ * supplied spectrum. Timbre-dependent: a harmonic spectrum yields
+ * different rankings than a bell spectrum.
+ *
+ * Bridge from the modal layer to the acoustic evaluation layer —
+ * use with `scaleMode` to compare modal consonance:
+ * `scale.degreeIndices.map((_, i) => scaleDissonance(scaleMode(s,i,t), t, sp))`
+ */
+export function scaleDissonance(scale: Scale, tuning: TuningSystem, spectrum: Spectrum): number {
+  assertTuningMatch(scale, tuning);
+  return chordDissonance(scaleToFreqs(scale, tuning), spectrum);
+}
+
+/** Result entry from `rankModes`. */
+export interface RankedMode {
+  readonly modeIndex: number;
+  readonly scale: Scale;
+  readonly dissonance: number;
+}
+
+/**
+ * Rank all modes of a scale by their sensory dissonance (ascending).
+ *
+ * Answers: "which mode of this maqam / MOS is most consonant for this spectrum?"
+ * Each mode is obtained by `scaleMode(scale, i, tuning)` and scored by
+ * `scaleDissonance`. Timbre-dependent: swap `spectrum` to change the ranking.
+ */
+export function rankModes(scale: Scale, tuning: TuningSystem, spectrum: Spectrum): RankedMode[] {
+  assertTuningMatch(scale, tuning);
+  return scale.degreeIndices
+    .map((_, i) => {
+      const mode = scaleMode(scale, i, tuning);
+      return { modeIndex: i, scale: mode, dissonance: scaleDissonance(mode, tuning, spectrum) };
+    })
+    .sort((a, b) => a.dissonance - b.dissonance);
 }

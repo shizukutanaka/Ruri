@@ -1044,3 +1044,66 @@ generatedTuning(700, 1200, 7)
 **到達した境地**: 本ライブラリには「一級市民」と宣言された層が複数存在する: `TuningSystem`・`Scale`・`Chord`・`RankedChord`・`StringInstrument`。問題は一級市民「同士」の橋が体系的に欠けていることだ。Q39-Q42 の4問は同じ構造的欠陥の4つの現れであり、それぞれ 1-4 行のブリッジ関数で解消できた。これはソクラテス式問答の核心: 「なぜ A と B をつなぐ関数がないのか」は「A も B も一級市民だという主張が一貫しているか」を問う。
 
 487 テスト / 全パス。
+
+---
+
+## Q43. スケールの「旋法ごとの協和度」を 1 コールで得られるか？ ❌→✅
+
+**問(新視点 — ソクラテス式)**: ライブラリは「協和は timbre 依存」と宣言し、`consonantIntervals(spectrum)` で「この音色に最も協和する音程」を返す。一方 `Scale` は旋法中心文化の一級市民だ。では「このマカーム Uşşak の 7 つの旋法のうち、調和音色に対して最も協和するのはどれか」という問いに、既存 API で答えられるか？
+
+**検証**: 
+```ts
+// 現在の手順 — 7ステップ×7旋法 = 49行:
+for (let i = 0; i < 7; i++) {
+  const mode = scaleMode(major, i, t12);
+  const freqs = scaleToFreqs(mode, t12);
+  const dissonance = chordDissonance(freqs, harmonicSpectrum());
+  // 手動でソート...
+}
+```
+`scaleDissonance` も `rankModes` も存在しない。旋法層(Scale)と音響評価層(chordDissonance)の間に橋がない。
+
+**判定**: ❌ モーダル音響分析のエントリーポイントが欠落 → `scaleDissonance` + `rankModes` を追加。
+
+**実装**:
+```ts
+export function scaleDissonance(scale: Scale, tuning: TuningSystem, spectrum: Spectrum): number {
+  assertTuningMatch(scale, tuning);
+  return chordDissonance(scaleToFreqs(scale, tuning), spectrum);
+}
+
+export function rankModes(scale: Scale, tuning: TuningSystem, spectrum: Spectrum): RankedMode[] {
+  assertTuningMatch(scale, tuning);
+  return scale.degreeIndices
+    .map((_, i) => {
+      const mode = scaleMode(scale, i, tuning);
+      return { modeIndex: i, scale: mode, dissonance: scaleDissonance(mode, tuning, spectrum) };
+    })
+    .sort((a, b) => a.dissonance - b.dissonance);
+}
+```
+
+`scaleDissonance` は `chordDissonance(scaleToFreqs(...))` の 1 行ブリッジ。`rankModes` は全旋法を走査してソート — 旋法解析の一般的な問い(「この音律のどの旋法が最も響くか」)が 1 コールで答えられる。
+
+**テスト(9 件)**:
+- `scaleDissonance` が非負
+- `scaleDissonance` が `chordDissonance(scaleToFreqs(...))` と完全一致
+- tuning 不一致 → RangeError (scaleDissonance)
+- `rankModes` が全 7 旋法を返す
+- 昇順ソート保証
+- modeIndex が 0-6 を網羅
+- 各エントリの scale.id と先頭 cents=0 を確認
+- 異なる音色で異なる dissonance 値(timbre 依存性の証明)
+- tuning 不一致 → RangeError (rankModes)
+
+---
+
+## 第十九巡サマリ
+
+| 問                                                              | 判定              | 対応                                              |
+| --------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Q43 旋法層 → 音響評価層の橋(scaleDissonance/rankModes)が欠落   | ❌ 橋の欠落       | `scaleDissonance` + `RankedMode` + `rankModes` 追加 + 9 テスト |
+
+**到達した境地**: ライブラリは「timbre 依存の協和評価」を核心命題とし、`consonantIntervals(bellSpectrum())` でベル音色の協和音程を返す。しかし同じ評価を「旋法」という単位で行う道がなかった。`scaleDissonance` + `rankModes` は「旋法と音色の相互作用」を 1 コールで問える窓口であり、マカーム・ラーガの学術的分析(音色別旋法順位)が初めて可能になる。
+
+496 テスト / 全パス。

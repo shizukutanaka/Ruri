@@ -6,11 +6,14 @@ import {
   scaleMode,
   scaleToTuning,
   tuningToScale,
+  scaleDissonance,
+  rankModes,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
 import { rankChords } from './chord-search.js';
-import { harmonicSpectrum } from './spectrum.js';
+import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
+import { chordDissonance } from './dissonance.js';
 
 const t12 = equalTemperament12(440);
 
@@ -277,5 +280,64 @@ describe('tuningToScale — TuningSystem → Scale bridge', () => {
     const originalCents = t7.degrees.map((p) => (p.kind === 'cents' ? p.cents : 0));
     const recoveredCents = recovered.degrees.map((p) => (p.kind === 'cents' ? p.cents : 0));
     expect(recoveredCents).toEqual(originalCents);
+  });
+});
+
+// Socratic Q43: scaleDissonance and rankModes close the modal→acoustic evaluation gap.
+describe('scaleDissonance + rankModes — modal acoustic analysis', () => {
+  const spectrum = harmonicSpectrum();
+
+  it('test_scaleDissonance_returns_non_negative', () => {
+    expect(scaleDissonance(major, t12, spectrum)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_scaleDissonance_equals_chordDissonance_of_scaleToFreqs', () => {
+    const freqs = scaleToFreqs(major, t12);
+    expect(scaleDissonance(major, t12, spectrum)).toBeCloseTo(chordDissonance(freqs, spectrum), 9);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2] };
+    expect(() => scaleDissonance(wrong, t12, spectrum)).toThrow(RangeError);
+  });
+
+  it('test_rankModes_returns_all_7_modes', () => {
+    const ranked = rankModes(major, t12, spectrum);
+    expect(ranked.length).toBe(7);
+  });
+
+  it('test_rankModes_sorted_ascending_by_dissonance', () => {
+    const ranked = rankModes(major, t12, spectrum);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.dissonance).toBeGreaterThanOrEqual(ranked[i - 1]!.dissonance);
+    }
+  });
+
+  it('test_rankModes_modeIndex_covers_0_to_n_minus_1', () => {
+    const ranked = rankModes(major, t12, spectrum);
+    const indices = ranked.map((r) => r.modeIndex).sort((a, b) => a - b);
+    expect(indices).toEqual([0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  it('test_rankModes_scale_is_valid_mode_rotation', () => {
+    const ranked = rankModes(major, t12, spectrum);
+    for (const { modeIndex, scale } of ranked) {
+      expect(scale.id).toBe(`major-mode-${modeIndex + 1}`);
+      expect(scaleToCents(scale, t12)[0]).toBe(0);
+    }
+  });
+
+  it('test_rankModes_timbre_affects_ranking', () => {
+    // bell spectrum → different dissonance values than harmonic (timbre-dependent)
+    const harmRanked = rankModes(major, t12, spectrum);
+    const bellRanked = rankModes(major, t12, bellSpectrum());
+    const harmDissonances = harmRanked.map((r) => r.dissonance);
+    const bellDissonances = bellRanked.map((r) => r.dissonance);
+    expect(harmDissonances).not.toEqual(bellDissonances);
+  });
+
+  it('test_tuning_mismatch_throws_rankModes', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2] };
+    expect(() => rankModes(wrong, t12, spectrum)).toThrow(RangeError);
   });
 });

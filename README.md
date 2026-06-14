@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。487テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。496テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -32,8 +32,9 @@ const me7of12 = maximallyEvenTuning(12, 7);      // Clough-Douthett 7-of-12
 ```
 
 ```ts
-// 旋法/jins/raga(Scale層)を周波数へ — 採点・合成・エクスポートの入口
-import { equalTemperament12, scaleToFreqs, scaleMode } from 'ruri';
+// 旋法/jins/raga(Scale層)を周波数へ / 旋法ランキング — 採点・合成・エクスポートの入口
+import { equalTemperament12, scaleToFreqs, scaleMode, rankModes } from 'ruri';
+import { harmonicSpectrum, bellSpectrum } from 'ruri';
 
 const tuning = equalTemperament12(261.63);       // C4 基準
 const ionian = { id: 'ionian', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
@@ -41,6 +42,11 @@ const freqs = scaleToFreqs(ionian, tuning);      // 旋法 → Hz(chordDissonanc
 
 // 旋法転回: Ionian の第2旋法 = Dorian (マカーム・ラーガで基本操作)
 const dorian = scaleMode(ionian, 1, tuning);     // degreeIndices: [0,2,3,5,7,9,10]
+
+// 旋法ランキング: 「この調律のどの旋法が最も響くか」を音色別に評価
+const ranked = rankModes(ionian, tuning, harmonicSpectrum()); // 調和音色で評価
+const ranked2 = rankModes(ionian, tuning, bellSpectrum());    // ベル音色では別順位に
+// ranked[0].scale → 最も協和する旋法 / ranked[0].modeIndex → その旋法番号
 
 // Scale → TuningSystem: ダイアトニック和音探索の入口
 import { scaleToTuning, tuningToScale } from 'ruri';
