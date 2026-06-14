@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { pluck, mix, normalize, DEFAULT_KS } from './ks-synth.js';
-import { strike, DEFAULT_MODAL } from './modal-synth.js';
+import { pluck, mix, normalize, DEFAULT_KS, pluckChord } from './ks-synth.js';
+import { strike, DEFAULT_MODAL, strikeChord } from './modal-synth.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 
 /** Naive DFT magnitude at a target frequency (Goertzel-style single bin). */
@@ -137,5 +137,74 @@ describe('strike – Nyquist skip', () => {
     const wave = strike(12000, harmonicSpectrum(6), { ...DEFAULT_MODAL, sampleRate: 44100 });
     expect(wave.length).toBeGreaterThan(0);
     expect(Array.from(wave).every(Number.isFinite)).toBe(true);
+  });
+});
+
+// Q47: 和音合成は1コールか？ — pluckChord / strikeChord が閉じるパイプライン
+describe('pluckChord — chord synthesis in one call (Q47)', () => {
+  const SHORT = { ...DEFAULT_KS, seconds: 0.2 };
+
+  it('test_pluck_chord_output_within_unit_range', () => {
+    const wave = pluckChord([220, 277, 330], SHORT);
+    expect(wave.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+  });
+
+  it('test_pluck_chord_length_matches_opts_seconds', () => {
+    const wave = pluckChord([220, 330], SHORT);
+    expect(wave.length).toBe(Math.floor(SHORT.sampleRate * SHORT.seconds));
+  });
+
+  it('test_pluck_chord_single_note_is_normalized', () => {
+    const chord = pluckChord([220], SHORT);
+    const single = normalize(pluck(220, SHORT));
+    // Both should be peak-normalized (peak ≈ 1); waveform content is the same.
+    let peakChord = 0;
+    for (const s of chord) peakChord = Math.max(peakChord, Math.abs(s));
+    expect(peakChord).toBeCloseTo(1, 2);
+    expect(single.length).toBe(chord.length);
+  });
+
+  it('test_pluck_chord_empty_freqs_throws', () => {
+    expect(() => pluckChord([], SHORT)).toThrow(RangeError);
+  });
+
+  it('test_pluck_chord_microtonal_pitch_accepted', () => {
+    // 220 * 2^(50/1200) ≈ 226.4 Hz (quarter-tone-ish microtonal interval)
+    const f1 = 220;
+    const f2 = 220 * 2 ** (50 / 1200);
+    expect(() => pluckChord([f1, f2], SHORT)).not.toThrow();
+    const wave = pluckChord([f1, f2], SHORT);
+    expect(wave.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+  });
+});
+
+describe('strikeChord — modal chord synthesis in one call (Q47)', () => {
+  const SHORT_M = { ...DEFAULT_MODAL, seconds: 0.2 };
+
+  it('test_strike_chord_output_within_unit_range', () => {
+    const wave = strikeChord([220, 330, 440], harmonicSpectrum(4), SHORT_M);
+    expect(wave.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+  });
+
+  it('test_strike_chord_length_matches_opts_seconds', () => {
+    const wave = strikeChord([220, 330], harmonicSpectrum(), SHORT_M);
+    expect(wave.length).toBe(Math.floor(SHORT_M.sampleRate * SHORT_M.seconds));
+  });
+
+  it('test_strike_chord_empty_freqs_throws', () => {
+    expect(() => strikeChord([], harmonicSpectrum(), SHORT_M)).toThrow(RangeError);
+  });
+
+  it('test_strike_chord_bell_timbre_works', () => {
+    const wave = strikeChord([220, 330], bellSpectrum(), SHORT_M);
+    expect(wave.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+    expect(Array.from(wave).every(Number.isFinite)).toBe(true);
+  });
+
+  it('test_strike_chord_single_note_is_finite_and_normalized', () => {
+    const wave = strikeChord([440], harmonicSpectrum(3), SHORT_M);
+    let peak = 0;
+    for (const s of wave) peak = Math.max(peak, Math.abs(s));
+    expect(peak).toBeCloseTo(1, 2);
   });
 });

@@ -6,6 +6,7 @@ import {
   maximallyEven,
   generatedTuning,
   maximallyEvenTuning,
+  isTuningWellFormed,
 } from './generate.js';
 import { approxRatio, relativePeriodicity, chordPeriodicity } from './harmonicity.js';
 import { defineTuning, equalTemperament12, edo, degreeToCents } from './tuning.js';
@@ -332,5 +333,39 @@ describe('maximallyEvenTuning — ME set as first-class TuningSystem', () => {
     for (let i = 0; i < 6; i++) {
       expect(degreeToCents(t, i)).toBeCloseTo(i * 200, 9);
     }
+  });
+});
+
+// Q48: `TuningSystem` が MOS かどうかを直接問えるか？
+describe('isTuningWellFormed — MOS detection on TuningSystem (Q48)', () => {
+  it('test_generated_diatonic_tuning_is_well_formed', () => {
+    expect(isTuningWellFormed(generatedTuning(700, 1200, 7))).toBe(true);
+  });
+
+  it('test_generated_pentatonic_tuning_is_well_formed', () => {
+    expect(isTuningWellFormed(generatedTuning(700, 1200, 5))).toBe(true);
+  });
+
+  it('test_maximally_even_7_of_12_is_well_formed', () => {
+    // gcd(12, 7) = 1 → ME set is also well-formed.
+    expect(isTuningWellFormed(maximallyEvenTuning(12, 7))).toBe(true);
+  });
+
+  it('test_whole_tone_tuning_is_not_well_formed', () => {
+    // gcd(12, 6) = 6 ≠ 1 → whole-tone scale has only 1 step size, not well-formed.
+    expect(isTuningWellFormed(maximallyEvenTuning(12, 6))).toBe(false);
+  });
+
+  it('test_non_octave_mos_tuning_is_well_formed', () => {
+    // Bohlen-Pierce-like period; well-formed MOS works for any period.
+    const bp = generatedTuning(443, 1902, 4);
+    expect(isTuningWellFormed(bp)).toBe(true);
+  });
+
+  it('test_12_tet_is_not_well_formed_as_12_note_scale', () => {
+    // 12-EDO chromatic scale has only 1 step size (100c), so every generic interval
+    // spans exactly 1 specific size → isWellFormed requires exactly 2, returns false.
+    const t = maximallyEvenTuning(12, 12);
+    expect(isTuningWellFormed(t)).toBe(false);
   });
 });

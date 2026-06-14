@@ -9,6 +9,7 @@ import {
   realizeRankedChordFreqs,
   progressionSmoothness,
   rankedChordToChord,
+  chordProgressionSmoothness,
 } from './chord-search.js';
 import { chordToCents, realizeChordFreqs } from './chord.js';
 
@@ -418,5 +419,52 @@ describe('rankedChordToChord — RankedChord → portable Chord', () => {
     const freqs = realizeChordFreqs(chord, rootHz);
     const roughness = chordDissonance(freqs, spectrum);
     expect(roughness).toBeCloseTo(top!.roughness, 6);
+  });
+});
+
+// Q49: ポータブル Chord[] から進行スムーズネスを直接測れるか？
+describe('chordProgressionSmoothness — portable Chord[] progression (Q49)', () => {
+  const t12 = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+  const rootHz = 261.63;
+
+  it('test_portable_progression_matches_ranked_progression', () => {
+    // rankedChordToChord lifts RankedChord → Chord;
+    // chordProgressionSmoothness must match progressionSmoothness on the same data.
+    const ranked = rankChords(t12, { size: 3, spectrum, limit: 4 });
+    const portable = ranked.map((r) => rankedChordToChord(r));
+    const fromRanked = progressionSmoothness(ranked, rootHz);
+    const fromPortable = chordProgressionSmoothness(portable, rootHz);
+    expect(fromPortable).toBeCloseTo(fromRanked, 6);
+  });
+
+  it('test_single_chord_returns_zero', () => {
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    expect(chordProgressionSmoothness([rankedChordToChord(top!)], rootHz)).toBe(0);
+  });
+
+  it('test_empty_returns_zero', () => {
+    expect(chordProgressionSmoothness([], rootHz)).toBe(0);
+  });
+
+  it('test_identical_chord_twice_is_zero_cost', () => {
+    const [top] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const chord = rankedChordToChord(top!);
+    // Same chord → no voice motion → cost = 0.
+    expect(chordProgressionSmoothness([chord, chord], rootHz)).toBeCloseTo(0, 9);
+  });
+
+  it('test_result_is_non_negative', () => {
+    const ranked = rankChords(t12, { size: 3, spectrum, limit: 4 });
+    const portable = ranked.map((r) => rankedChordToChord(r));
+    expect(chordProgressionSmoothness(portable, rootHz)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_mismatched_size_throws', () => {
+    const [triad] = rankChords(t12, { size: 3, spectrum, limit: 1 });
+    const [tetrad] = rankChords(t12, { size: 4, spectrum, limit: 1 });
+    expect(() =>
+      chordProgressionSmoothness([rankedChordToChord(triad!), rankedChordToChord(tetrad!)], rootHz),
+    ).toThrow(RangeError);
   });
 });

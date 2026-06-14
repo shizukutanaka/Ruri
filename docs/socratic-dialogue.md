@@ -1277,3 +1277,157 @@ export function spectrumToTuning(spectrum: Spectrum, opts?: SpectrumToTuningOpti
 **到達した境地**: Q1 でライブラリの核心命題「協和は timbre 依存」を検証し、Q46 でその最終帰結を実装した。`chordFromSemitones` は 12-TET の世界(Q45 で改善)、`rankChords` は調律に縛られた評価、`consonantIntervals` は音程の発見 — しかし「音色から最適調律を生成する」という一段深い抽象が欠けていた。`spectrumToTuning` はその欠落を埋め、**「音色 → 協和音程 → 調律系 → 和音探索 → 運指 → DAW 出力」という完全な非西洋音楽パイプライン**が 1 コールのチェーンで実現できるようになる。
 
 518 テスト / 全パス。
+
+---
+
+## Q47. 「和音合成は1コールで実現できるか？」 ❌→✅
+
+**問**: `pluck(freqHz)` は単音の Karplus-Strong 合成 primitive。`realizeRankedChordFreqs` は和音の Hz 配列を返す。では次のパイプライン:
+
+```
+rankChords → realizeRankedChordFreqs → [???] → WAV
+```
+
+の `[???]` が 1 コールで完結するか？
+
+**検証**: 現状は 2 ステップ必要:
+```ts
+const freqs = realizeRankedChordFreqs(chord, rootHz);
+const wav = encodeWav(mix(freqs.map(f => pluck(f, opts)))); // ← 2ステップ
+```
+
+`mix(freqs.map(f => pluck(f)))` は意図が明確だが、「和音の合成」という概念レベルの操作が 1 コールにならない。同様に `strike` (モーダル合成) にも同じ欠落がある。
+
+**判定**: ❌ 和音合成が1コールで完結しない → `pluckChord` / `strikeChord` を追加。
+
+**実装** (`ks-synth.ts`, `modal-synth.ts`):
+```ts
+// ks-synth.ts
+export function pluckChord(freqs: readonly number[], opts: KsOptions = DEFAULT_KS): Float32Array {
+  if (freqs.length === 0) throw new RangeError('freqs must be non-empty');
+  return mix(freqs.map((f) => pluck(f, opts)));
+}
+
+// modal-synth.ts
+export function strikeChord(
+  freqs: readonly number[],
+  spectrum: Spectrum,
+  opts: ModalOptions = DEFAULT_MODAL,
+): Float32Array {
+  if (freqs.length === 0) throw new RangeError('freqs must be non-empty');
+  return mix(freqs.map((f) => strike(f, spectrum, opts)));
+}
+```
+
+パイプラインが完結:
+```ts
+const freqs = realizeRankedChordFreqs(chord, rootHz);
+const samples = pluckChord(freqs, opts);   // 1コール
+const wav = encodeWav(samples);
+```
+
+**テスト(10 件)**:
+- `pluckChord([220, 277, 330])` が `[-1, 1]` 内の Float32Array を返す
+- length = `opts.seconds * sampleRate`
+- 単音の場合 peak ≈ 1(正規化済み)
+- 空配列 → RangeError
+- マイクロトーナル音程も受け付ける
+- `strikeChord([220, 330], bellSpectrum())` が有効な Float32Array を返す
+- `strikeChord([])` → RangeError
+- ベル音色・単音も正規化済み
+
+---
+
+## Q48. 「`TuningSystem` が MOS かどうかを直接問えるか？」 ❌→✅
+
+**問**: `generatedTuning(700, 1200, 7)` はダイアトニック MOS を TuningSystem として返す。しかし `isWellFormed` は `number[]` を引数に取る。TuningSystem が MOS(Myhill's property を持つ)かどうかを直接問えるか？
+
+**検証**: 現状は 2 ステップ必要:
+```ts
+const tuning = generatedTuning(700, 1200, 7);
+const cents = tuning.degrees.map(d => d.kind === 'cents' ? d.cents : 1200 * Math.log2(d.ratio.num / d.ratio.den));
+isWellFormed(cents, tuning.periodCents); // ← cents 抽出が必要
+```
+
+`TuningSystem` が first-class なら、その MOS 性も直接問えるべき。型を跨いだ手動変換は abstraction gap。
+
+**判定**: ❌ `isWellFormed(tuning)` が直接使えない → `isTuningWellFormed` ブリッジを追加。
+
+**実装** (`generate.ts`):
+```ts
+export function isTuningWellFormed(tuning: TuningSystem): boolean {
+  return isWellFormed(
+    tuning.degrees.map((d) => pitchToCents(d)),
+    tuning.periodCents,
+  );
+}
+```
+
+**哲学的含意**: `generatedTuning` で生成した全ての調律が well-formed であることを直接検証できる。`maximallyEvenTuning(12, 7)` → `true`、`maximallyEvenTuning(12, 6)` (全音音階) → `false` — gcd(c, d) = 1 が well-formed の必要条件という数学的事実がコードとして表現できる。
+
+**テスト(6 件)**:
+- `generatedTuning(700, 1200, 7)` → true(ダイアトニック MOS)
+- `generatedTuning(700, 1200, 5)` → true(ペンタトニック MOS)
+- `maximallyEvenTuning(12, 7)` → true(gcd = 1)
+- `maximallyEvenTuning(12, 6)` → false(全音音階、gcd = 6 ≠ 1)
+- 非オクターブ周期の MOS → true
+- 12音クロマティック(12-of-12) → false(ステップサイズが1種類のみ)
+
+---
+
+## Q49. 「`Chord[]`(ポータブル表現)から進行スムーズネスを直接測れるか？」 ❌→✅
+
+**問**: `progressionSmoothness` は `RankedChord[]` を要求する。`rankedChordToChord` で `Chord` (ポータブル表現)にリフトした後は、その和音列を進行評価に使えなくなる。ポータブルな `Chord[]` から直接スムーズネスを測れるか？
+
+**検証**:
+```ts
+const ranked = rankChords(tuning, { size: 3, limit: 4 });
+const smooth1 = progressionSmoothness(ranked, rootHz);   // ✅ 動く
+
+const portable = ranked.map(r => rankedChordToChord(r)); // Chord[]
+const smooth2 = progressionSmoothness(portable, rootHz); // ❌ TypeScript: Chord[] ≠ RankedChord[]
+```
+
+`rankedChordToChord` は「再利用可能な表現への昇格」を目的としているが、その昇格後の和音列が進行評価の外に出てしまう。持ち運べるが使えない表現になっている。
+
+**判定**: ❌ `Chord[]` が `progressionSmoothness` から排除されている → `chordProgressionSmoothness` を追加。
+
+**実装** (`chord-search.ts`):
+```ts
+export function chordProgressionSmoothness(
+  chords: readonly Chord[],
+  rootHz: number,
+): number {
+  if (chords.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < chords.length; i++) {
+    total += voiceLeadingCost(
+      realizeChordFreqs(chords[i - 1]!, rootHz),
+      realizeChordFreqs(chords[i]!, rootHz),
+    );
+  }
+  return total;
+}
+```
+
+**テスト(6 件)**:
+- `chordProgressionSmoothness(portable, rootHz)` ≈ `progressionSmoothness(ranked, rootHz)` (ラウンドトリップ整合)
+- 単一和音 → 0
+- 空配列 → 0
+- 同一和音 × 2 → コスト 0
+- 結果は非負
+- サイズ不一致 → RangeError
+
+---
+
+## 第二十三巡サマリ
+
+| 問                                                                            | 判定              | 対応                                              |
+| ----------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Q47 「`pluck` があるのに和音合成が2ステップ必要」                             | ❌ 和音合成が1コールで完結しない | `pluckChord` + `strikeChord` + 10 テスト |
+| Q48 「`isWellFormed` は `number[]` を取り `TuningSystem` を取らない」         | ❌ 抽象境界の不整合 | `isTuningWellFormed` ブリッジ + 6 テスト |
+| Q49 「`rankedChordToChord` 後の `Chord[]` が進行評価から締め出される」        | ❌ ポータブル表現の進行評価が欠落 | `chordProgressionSmoothness` + 6 テスト |
+
+**到達した境地**: 3問とも「first-class を謳う型が、隣接する操作から切り離されている」という同じ構造的欠落。Q47 は合成パイプラインの完結、Q48 は生成層と判定層の橋渡し、Q49 はポータブル表現の完全な再利用性。いずれも 1〜5 行の実装で解消できる thin な gap であり、これこそ Socratic 問答が狙う「哲学の一貫性がコードの形を決める」の典型例。
+
+540 テスト / 全パス。

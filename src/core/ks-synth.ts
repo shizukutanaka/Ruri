@@ -81,3 +81,12 @@ export function mix(waves: readonly Float32Array[]): Float32Array {
     for (let i = 0; i < w.length; i++) out[i] = (out[i] as number) + (w[i] as number);
   return normalize(out);
 }
+
+/**
+ * Synthesize a chord: pluck each frequency with the same options and mix.
+ * Closes the pipeline: `realizeRankedChordFreqs → pluckChord → encodeWav`.
+ */
+export function pluckChord(freqs: readonly number[], opts: KsOptions = DEFAULT_KS): Float32Array {
+  if (freqs.length === 0) throw new RangeError('freqs must be non-empty');
+  return mix(freqs.map((f) => pluck(f, opts)));
+}

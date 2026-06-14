@@ -1,6 +1,7 @@
 /** Modal (additive) synthesis from a Spectrum: inharmonic timbres (gamelan, bells). Pure samples. */
 
 import { type Spectrum } from './spectrum.js';
+import { mix } from './ks-synth.js';
 
 export interface ModalOptions {
   readonly sampleRate: number;
@@ -47,4 +48,17 @@ export function strike(
   for (const s of out) peak = Math.max(peak, Math.abs(s));
   if (peak > 0) for (let i = 0; i < total; i++) out[i] = (out[i] as number) / peak;
   return out;
+}
+
+/**
+ * Synthesize a chord: strike each frequency with the same spectrum and options, then mix.
+ * Closes the pipeline: `realizeRankedChordFreqs → strikeChord → encodeWav`.
+ */
+export function strikeChord(
+  freqs: readonly number[],
+  spectrum: Spectrum,
+  opts: ModalOptions = DEFAULT_MODAL,
+): Float32Array {
+  if (freqs.length === 0) throw new RangeError('freqs must be non-empty');
+  return mix(freqs.map((f) => strike(f, spectrum, opts)));
 }

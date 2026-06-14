@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。518テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。540テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -146,7 +146,7 @@ const bellTuning = spectrumToTuning(bellSpectrum());     // ベル音色固有�
 ```ts
 // e) ランキング → 進行スムーズネス: 和音探索から進行評価まで一本のパイプライン
 import { generatedTuning, rankChords, realizeRankedChordFreqs, progressionSmoothness,
-         rankedChordToChord, harmonicSpectrum } from 'ruri';
+         rankedChordToChord, chordProgressionSmoothness, harmonicSpectrum } from 'ruri';
 
 const tuning = generatedTuning(700, 1200, 7);          // ダイアトニック MOS → TuningSystem
 const chords = rankChords(tuning, { size: 3, limit: 4 });  // 協和度ランキング
@@ -157,7 +157,36 @@ const cost = progressionSmoothness(chords, 261.63);
 const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);  // RankedChord → Hz
 
 // 発見した和音を再利用可能な Chord として保存 → fingerChord / writeScl / 別調律へ持ち込み可
-const portable = rankedChordToChord(chords[0]!, 'my-triad');  // RankedChord → Chord
+const portable = chords.map(c => rankedChordToChord(c));      // RankedChord[] → Chord[]
+const cost2 = chordProgressionSmoothness(portable, 261.63);  // Chord[] でも同じ進行評価が可能
+```
+
+```ts
+// f) 和音合成 → WAV: rankChords → 1コール合成 → エクスポート
+import { generatedTuning, rankChords, realizeRankedChordFreqs } from 'ruri';
+import { pluckChord, strikeChord, harmonicSpectrum, bellSpectrum } from 'ruri';
+import { encodeWav } from 'ruri/adapters';
+
+const tuning = generatedTuning(700, 1200, 7);
+const chords = rankChords(tuning, { size: 3, limit: 1 });
+const freqs = realizeRankedChordFreqs(chords[0]!, 261.63);
+
+// Karplus-Strong ギター和音 → WAV (1コール)
+const ksWave = pluckChord(freqs);
+const wavBytes = encodeWav(ksWave);
+
+// ベル音色モーダル和音 → WAV (音色をそのまま協和評価と共有)
+const bellWave = strikeChord(freqs, bellSpectrum());
+```
+
+```ts
+// g) MOS 判定: TuningSystem が Myhill's property を持つか直接確認
+import { generatedTuning, maximallyEvenTuning, isTuningWellFormed } from 'ruri';
+
+isTuningWellFormed(generatedTuning(700, 1200, 7));   // true (ダイアトニック MOS)
+isTuningWellFormed(generatedTuning(700, 1200, 5));   // true (ペンタトニック MOS)
+isTuningWellFormed(maximallyEvenTuning(12, 7));      // true (gcd(12,7)=1)
+isTuningWellFormed(maximallyEvenTuning(12, 6));      // false (全音音階、gcd=6)
 ```
 
 ## 設計原則

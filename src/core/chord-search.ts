@@ -5,7 +5,7 @@ import { chordPeriodicity } from './harmonicity.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { degreeToCents } from './tuning.js';
 import { voiceLeadingCost } from './voice-leading.js';
-import { type Chord } from './chord.js';
+import { type Chord, realizeChordFreqs } from './chord.js';
 
 export interface RankedChord {
   /** Degree indices within one period, ascending, starting at the chord's root degree offset 0..n-1 — store absolute degree indices. */
@@ -256,6 +256,33 @@ export function progressionSmoothness(chords: readonly RankedChord[], rootHz: nu
     total += voiceLeadingCost(
       realizeRankedChordFreqs(chords[i - 1]!, rootHz),
       realizeRankedChordFreqs(chords[i]!, rootHz),
+    );
+  }
+  return total;
+}
+
+/**
+ * Total minimal voice-leading cost (in cents) across a progression of portable `Chord` objects.
+ *
+ * Mirrors `progressionSmoothness` but accepts `Chord[]` (the portable representation
+ * returned by `rankedChordToChord`) rather than `RankedChord[]`. This closes the
+ * abstraction gap: after lifting `RankedChord → Chord`, the chord sequence should
+ * remain usable for progression evaluation without re-converting back.
+ *
+ * All chords must have the same interval count; mismatched sizes throw via `voiceLeadingCost`.
+ *
+ * @example
+ * const ranked = rankChords(tuning, { size: 3, limit: 4 });
+ * const portable = ranked.map(r => rankedChordToChord(r));
+ * const cost = chordProgressionSmoothness(portable, 261.63);
+ */
+export function chordProgressionSmoothness(chords: readonly Chord[], rootHz: number): number {
+  if (chords.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < chords.length; i++) {
+    total += voiceLeadingCost(
+      realizeChordFreqs(chords[i - 1]!, rootHz),
+      realizeChordFreqs(chords[i]!, rootHz),
     );
   }
   return total;

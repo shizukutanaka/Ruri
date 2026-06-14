@@ -1,6 +1,6 @@
 /** Idiom-independent scale generation: MOS (generated scales) and maximally even sets. */
 
-import { type Pitch } from './cents.js';
+import { type Pitch, pitchToCents } from './cents.js';
 import { type TuningSystem, defineTuning } from './tuning.js';
 
 const wrap = (x: number, period: number): number => ((x % period) + period) % period;
@@ -81,6 +81,23 @@ export function generatedTuning(
     degrees,
     source: 'theoretical',
   });
+}
+
+/**
+ * Test whether a `TuningSystem` is well-formed (has Myhill's property).
+ *
+ * Bridges `isWellFormed` (which takes a raw `number[]`) to the `TuningSystem` type.
+ * A `TuningSystem` produced by `generatedTuning` with a non-degenerate generator is
+ * always well-formed; `maximallyEvenTuning` is well-formed only when `gcd(c, d) = 1`.
+ *
+ * Closes the abstraction gap: if `TuningSystem` is first-class, MOS-ness should be
+ * queryable on the type directly, not via a separate cents-extraction step.
+ */
+export function isTuningWellFormed(tuning: TuningSystem): boolean {
+  return isWellFormed(
+    tuning.degrees.map((d) => pitchToCents(d)),
+    tuning.periodCents,
+  );
 }
 
 /**
