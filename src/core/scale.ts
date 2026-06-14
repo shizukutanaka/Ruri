@@ -17,6 +17,25 @@ export interface Scale {
 }
 
 /**
+ * Return whether a `Scale` is compatible with a `TuningSystem` — i.e. the tuning
+ * id matches and the scale's degree indices fall within the tuning's degree count.
+ *
+ * This is the public, non-throwing predicate form of the internal `assertTuningMatch`
+ * guard. Use it to validate dynamically constructed `Scale` objects before passing
+ * them to functions that will throw on mismatch.
+ *
+ * @example
+ * if (!isScaleCompatible(scale, tuning)) {
+ *   console.warn('Scale does not belong to this tuning');
+ * }
+ */
+export function isScaleCompatible(scale: Scale, tuning: TuningSystem): boolean {
+  if (scale.tuningId !== tuning.id) return false;
+  const n = tuning.degrees.length;
+  return scale.degreeIndices.every((d) => Number.isInteger(d) && d >= 0 && d < n);
+}
+
+/**
  * Guard: a Scale is only meaningful against the tuning it was authored for.
  * `Scale.tuningId` must equal `tuning.id` (note `edo(12)` is `'12-edo'`, NOT
  * `'12-tet'` — see `edo`'s caveat).

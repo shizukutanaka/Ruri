@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。540テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。556テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -159,6 +159,13 @@ const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);  // RankedChord → 
 // 発見した和音を再利用可能な Chord として保存 → fingerChord / writeScl / 別調律へ持ち込み可
 const portable = chords.map(c => rankedChordToChord(c));      // RankedChord[] → Chord[]
 const cost2 = chordProgressionSmoothness(portable, 261.63);  // Chord[] でも同じ進行評価が可能
+
+// 最適順序を求める: rankChords の返却順序は協和度順であり、声部導線コストは最適でない
+import { optimalChordOrder } from 'ruri';
+const optimal = optimalChordOrder(portable, 261.63);
+// optimal.chords → 最小ボイスリーディングコストの順番に並んだ Chord[]
+// optimal.order  → 元配列へのインデックス (例: [2, 0, 3, 1])
+// optimal.totalCents → 進行全体のコスト (cents)
 ```
 
 ```ts
@@ -187,6 +194,13 @@ isTuningWellFormed(generatedTuning(700, 1200, 7));   // true (ダイアトニッ
 isTuningWellFormed(generatedTuning(700, 1200, 5));   // true (ペンタトニック MOS)
 isTuningWellFormed(maximallyEvenTuning(12, 7));      // true (gcd(12,7)=1)
 isTuningWellFormed(maximallyEvenTuning(12, 6));      // false (全音音階、gcd=6)
+
+// Scale と TuningSystem の整合性を事前確認 (assertTuningMatch の公開版)
+import { isScaleCompatible } from 'ruri';
+const myScale = { id: 'my', name: 'my', tuningId: '12-tet', degreeIndices: [0, 2, 4, 7] };
+if (isScaleCompatible(myScale, tuning)) {
+  const freqs = scaleToFreqs(myScale, tuning);  // 安全に呼べる
+}
 ```
 
 ## 設計原則

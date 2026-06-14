@@ -305,3 +305,149 @@ export function rankedChordToChord(ranked: RankedChord, name?: string): Chord {
     intervals: ranked.cents.map((c) => ({ kind: 'cents' as const, cents: c })),
   };
 }
+
+/** Result of `optimalChordOrder`. */
+export interface OptimalProgressionResult {
+  /** The chords in the optimal (minimal voice-leading cost) order. */
+  readonly chords: readonly Chord[];
+  /** Indices into the original input array that define the optimal order. */
+  readonly order: readonly number[];
+  /** Total voice-leading cost in cents across the optimized progression. */
+  readonly totalCents: number;
+}
+
+/**
+ * Enumerate all permutations of an index array (used for brute-force n ≤ 8).
+ * Heap's algorithm avoids allocating new arrays per recursive call.
+ */
+function* allPermutations(pool: number[]): Generator<readonly number[]> {
+  const n = pool.length;
+  const c = new Array<number>(n).fill(0);
+  yield pool;
+  let i = 0;
+  while (i < n) {
+    if ((c[i] as number) < i) {
+      if (i % 2 === 0) {
+        const t = pool[0] as number;
+        pool[0] = pool[i] as number;
+        pool[i] = t;
+      } else {
+        const t = pool[c[i] as number] as number;
+        pool[c[i] as number] = pool[i] as number;
+        pool[i] = t;
+      }
+      yield pool;
+      (c[i] as number)++;
+      i = 0;
+    } else {
+      c[i] = 0;
+      i++;
+    }
+  }
+}
+
+/**
+ * Nearest-neighbour heuristic for n > 8. Tries every starting chord and keeps
+ * the shortest greedy tour. O(n³) but n > 8 chord progressions are unusual.
+ */
+function nearestNeighborOrder(
+  freqsList: ReadonlyArray<readonly number[]>,
+  startIdx: number,
+): number[] {
+  const n = freqsList.length;
+  const visited = new Set<number>([startIdx]);
+  const order = [startIdx];
+  let current = startIdx;
+  while (visited.size < n) {
+    let bestNext = -1;
+    let bestCost = Infinity;
+    for (let j = 0; j < n; j++) {
+      if (!visited.has(j)) {
+        const cost = voiceLeadingCost(freqsList[current] as number[], freqsList[j] as number[]);
+        if (cost < bestCost) {
+          bestCost = cost;
+          bestNext = j;
+        }
+      }
+    }
+    if (bestNext < 0) break;
+    visited.add(bestNext);
+    order.push(bestNext);
+    current = bestNext;
+  }
+  return order;
+}
+
+const BRUTE_FORCE_LIMIT = 8;
+
+/**
+ * Find the permutation of `chords` that minimises total voice-leading cost.
+ *
+ * Socratic Q50: `progressionSmoothness` can *measure* the smoothness of a given
+ * sequence, but the input order is arbitrary (determined by `rankChords` scoring,
+ * not by voice-leading between consecutive pairs). The library should be able to
+ * *optimise* that order once it can measure it.
+ *
+ * Algorithm:
+ * - n ≤ 8 chords: exhaustive search over all n! orderings (Heap's algorithm).
+ *   40320 max iterations, negligible cost.
+ * - n > 8 chords: nearest-neighbour greedy from every starting point; keeps
+ *   the best tour found. Heuristic, not guaranteed optimal, but O(n³).
+ *
+ * Voice-leading cost between any pair is symmetric (`|A→B| = |B→A|`), so the
+ * result is the globally optimal *path* (open tour), not a cycle.
+ */
+export function optimalChordOrder(
+  chords: readonly Chord[],
+  rootHz: number,
+): OptimalProgressionResult {
+  if (chords.length === 0) return { chords: [], order: [], totalCents: 0 };
+  if (chords.length === 1) {
+    return { chords: [chords[0]!], order: [0], totalCents: 0 };
+  }
+
+  const freqsList = chords.map((c) => realizeChordFreqs(c, rootHz));
+  const n = chords.length;
+
+  let bestOrder: readonly number[] = Array.from({ length: n }, (_, i) => i);
+  let bestCost = Infinity;
+
+  if (n <= BRUTE_FORCE_LIMIT) {
+    const pool = Array.from({ length: n }, (_, i) => i);
+    for (const perm of allPermutations(pool)) {
+      let cost = 0;
+      for (let i = 1; i < perm.length; i++) {
+        cost += voiceLeadingCost(
+          freqsList[perm[i - 1] as number] as number[],
+          freqsList[perm[i] as number] as number[],
+        );
+        if (cost >= bestCost) break; // prune: already worse than current best
+      }
+      if (cost < bestCost) {
+        bestCost = cost;
+        bestOrder = perm.slice();
+      }
+    }
+  } else {
+    for (let start = 0; start < n; start++) {
+      const order = nearestNeighborOrder(freqsList, start);
+      let cost = 0;
+      for (let i = 1; i < order.length; i++) {
+        cost += voiceLeadingCost(
+          freqsList[order[i - 1] as number] as number[],
+          freqsList[order[i] as number] as number[],
+        );
+      }
+      if (cost < bestCost) {
+        bestCost = cost;
+        bestOrder = order;
+      }
+    }
+  }
+
+  return {
+    chords: bestOrder.map((i) => chords[i]!),
+    order: bestOrder,
+    totalCents: bestCost,
+  };
+}

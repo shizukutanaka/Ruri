@@ -10,8 +10,9 @@ import {
   progressionSmoothness,
   rankedChordToChord,
   chordProgressionSmoothness,
+  optimalChordOrder,
 } from './chord-search.js';
-import { chordToCents, realizeChordFreqs } from './chord.js';
+import { chordToCents, realizeChordFreqs, chordFromSemitones } from './chord.js';
 
 describe('rankChords — 12-TET size-3 harmonic spectrum', () => {
   const tuning = equalTemperament12(440);
@@ -466,5 +467,86 @@ describe('chordProgressionSmoothness — portable Chord[] progression (Q49)', ()
     expect(() =>
       chordProgressionSmoothness([rankedChordToChord(triad!), rankedChordToChord(tetrad!)], rootHz),
     ).toThrow(RangeError);
+  });
+});
+
+// Q50: コード進行の最適順序 — progressionSmoothness は測れるが最適化できるか？
+describe('optimalChordOrder — minimum voice-leading permutation (Q50)', () => {
+  const rootHz = 261.63;
+
+  // Three dyads where the close pair (c1↔c2) has cost ~50c, the far pair has ~700c.
+  // Putting the far chord in the middle (c1→c3→c2) wastes 700+700=1400c vs
+  // the optimal (c1→c2→c3 or reverse) = 50+700 = 750c.
+  const c1 = chordFromSemitones('c1', [0, 2]); // 0c, 200c
+  const c2 = chordFromSemitones('c2', [0, 3]); // 0c, 300c  (close to c1)
+  const c3 = chordFromSemitones('c3', [0, 9]); // 0c, 900c  (far from c1 and c2)
+
+  it('test_empty_returns_empty', () => {
+    const result = optimalChordOrder([], rootHz);
+    expect(result.chords).toHaveLength(0);
+    expect(result.order).toHaveLength(0);
+    expect(result.totalCents).toBe(0);
+  });
+
+  it('test_single_chord_returns_unchanged', () => {
+    const result = optimalChordOrder([c1], rootHz);
+    expect(result.chords).toHaveLength(1);
+    expect(result.order).toEqual([0]);
+    expect(result.totalCents).toBe(0);
+  });
+
+  it('test_optimal_order_has_lower_or_equal_cost_than_input', () => {
+    const input = [c1, c3, c2]; // suboptimal: c3 in the middle
+    const result = optimalChordOrder(input, rootHz);
+    const inputCost = chordProgressionSmoothness(input, rootHz);
+    expect(result.totalCents).toBeLessThanOrEqual(inputCost + 1e-9);
+  });
+
+  it('test_optimal_cost_strictly_less_than_suboptimal_for_3_chords', () => {
+    // [c1, c3, c2]: cost = VL(c1,c3) + VL(c3,c2) >> optimal
+    const suboptimalCost = chordProgressionSmoothness([c1, c3, c2], rootHz);
+    const result = optimalChordOrder([c1, c3, c2], rootHz);
+    // Optimal should find [c1,c2,c3] or [c3,c2,c1] which is cheaper
+    expect(result.totalCents).toBeLessThan(suboptimalCost);
+  });
+
+  it('test_order_is_valid_permutation', () => {
+    const chords = [c1, c2, c3];
+    const result = optimalChordOrder(chords, rootHz);
+    const sorted = [...result.order].sort((a, b) => a - b);
+    expect(sorted).toEqual([0, 1, 2]);
+  });
+
+  it('test_chords_match_order_indices', () => {
+    const chords = [c1, c2, c3];
+    const result = optimalChordOrder(chords, rootHz);
+    for (let i = 0; i < result.order.length; i++) {
+      expect(result.chords[i]).toBe(chords[result.order[i] as number]);
+    }
+  });
+
+  it('test_identical_chords_always_zero_cost', () => {
+    const result = optimalChordOrder([c1, c1, c1], rootHz);
+    expect(result.totalCents).toBeCloseTo(0, 6);
+  });
+
+  it('test_result_matches_chordProgressionSmoothness', () => {
+    const chords = [c1, c2, c3];
+    const result = optimalChordOrder(chords, rootHz);
+    // The totalCents field must equal chordProgressionSmoothness of the reordered list.
+    const verify = chordProgressionSmoothness(Array.from(result.chords), rootHz);
+    expect(result.totalCents).toBeCloseTo(verify, 6);
+  });
+
+  it('test_four_chords_from_12tet_finds_optimal', () => {
+    // Use top-4 ranked chords from 12-TET; optimalChordOrder should return
+    // a permutation whose cost ≤ the original order's cost.
+    const tuning = equalTemperament12(440);
+    const ranked = rankChords(tuning, { size: 3, spectrum: harmonicSpectrum(), limit: 4 });
+    const portable = ranked.map((r) => rankedChordToChord(r));
+    const inputCost = chordProgressionSmoothness(portable, rootHz);
+    const result = optimalChordOrder(portable, rootHz);
+    expect(result.totalCents).toBeLessThanOrEqual(inputCost + 1e-9);
+    expect(result.order).toHaveLength(4);
   });
 });

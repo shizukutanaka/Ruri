@@ -1431,3 +1431,104 @@ export function chordProgressionSmoothness(
 **到達した境地**: 3問とも「first-class を謳う型が、隣接する操作から切り離されている」という同じ構造的欠落。Q47 は合成パイプラインの完結、Q48 は生成層と判定層の橋渡し、Q49 はポータブル表現の完全な再利用性。いずれも 1〜5 行の実装で解消できる thin な gap であり、これこそ Socratic 問答が狙う「哲学の一貫性がコードの形を決める」の典型例。
 
 540 テスト / 全パス。
+
+---
+
+## Q50. 「`progressionSmoothness` は測れるが最適化できるか？」 ❌→✅
+
+**問**: `progressionSmoothness` は任意の順序での進行コストを測る。しかし `rankChords` が和音を発見したとき、その返却順序は「各和音の協和度」によるものであり、「前後の和音間の声部導線コスト」に基づかない。ライブラリはコストを測れるのに、最小コストの順序を発見できないのはなぜか？
+
+**検証**:
+```ts
+const chords = rankChords(tuning, { size: 3, limit: 4 });
+const portable = chords.map(r => rankedChordToChord(r));
+
+// 任意順序のコストは測れる:
+const cost = chordProgressionSmoothness(portable, rootHz); // ✅
+
+// しかし最適順序の発見はできない:
+const optimal = /* ??? */;  // ❌ 欠落
+```
+
+声部導線コスト `voiceLeadingCost(A, B) = voiceLeadingCost(B, A)` (対称性 — 対数周波数線上の絶対距離の和は順序不変)。したがって「最小コストパス」は無向グラフの最短ハミルトンパス問題。n ≤ 8 では全置換の全探索が現実的 (8! = 40320)。
+
+**判定**: ❌ 測定はできるが最適化ができない → `optimalChordOrder` を追加。
+
+**実装** (`chord-search.ts`):
+```ts
+export function optimalChordOrder(
+  chords: readonly Chord[],
+  rootHz: number,
+): OptimalProgressionResult {
+  // n ≤ 8: Heap のアルゴリズムで全置換を列挙 + 枝刈り
+  // n > 8: 全始点から最近傍法 (nearest-neighbour), 最良結果を保持
+  ...
+}
+```
+
+**アルゴリズム選択の哲学**: ライブラリは「楽器製作者の道具」であり、最悪ケース保証よりも「小規模では正確、大規模では合理的」な実用的設計を採用。n ≤ 8 = 正確最適、n > 8 = 近傍法ヒューリスティック。DTM の実用上、8 和音を超える選択肢から最適進行を探すケースは稀。
+
+**テスト (9 件)**:
+- 空 → 空、コスト 0
+- 単一和音 → そのまま、コスト 0
+- 最適順のコスト ≤ 入力順のコスト (不変条件)
+- 亜最適な入力 [c1, c3, c2] → 厳密に改善 (c3 が中間で高コスト)
+- `order` が [0..n-1] の正当な置換
+- `chords[i] === input[order[i]]` (インデックス整合)
+- 同一和音の繰り返し → コスト 0
+- `totalCents` が `chordProgressionSmoothness(result.chords)` と一致
+- 12-TET 上位4和音での統合テスト
+
+---
+
+## Q51. 「`assertTuningMatch` は内部ガードだが、呼び出し元が事前に検証できるか？」 ❌→✅
+
+**問**: `scale.ts` の `assertTuningMatch` は Scale と TuningSystem の整合性を確認し、不一致時に `RangeError` をスローする。しかしこれは内部関数であり、外部から try-catch を使わずに事前検証する手段がない。`Scale` を動的に構築するコードは、例外を使ってバリデーションを行わざるを得ない。
+
+**検証**:
+```ts
+const scale = { id: 'x', tuningId: 'other', ... };
+// 現状: 例外でしか確認できない
+try { scaleToCents(scale, tuning); }
+catch (e) { /* not compatible */ }
+
+// 期待: 事前にboolean で確認
+isScaleCompatible(scale, tuning); // ❌ 存在しない
+```
+
+fail-fast の哲学は「境界でのみバリデーション」だが、Scale を動的に生成する場合(例: `generatedTuning` の id を元に Scale を構築する)、`tuningId` の一致確認は正当な事前チェック。
+
+**判定**: ❌ 内部ガードが公開されていない → `isScaleCompatible` を追加。
+
+**実装** (`scale.ts`):
+```ts
+export function isScaleCompatible(scale: Scale, tuning: TuningSystem): boolean {
+  if (scale.tuningId !== tuning.id) return false;
+  const n = tuning.degrees.length;
+  return scale.degreeIndices.every((d) => Number.isInteger(d) && d >= 0 && d < n);
+}
+```
+
+`tuningId` の一致 + 全インデックスが `[0, n)` 内 — `assertTuningMatch` が確認する id 一致に加え、インデックス範囲まで検証する。`scaleMode` や `tuningToScale` が生成する Scale は常に互換だが、手書きの Scale オブジェクトは検証が必要。
+
+**テスト (7 件)**:
+- 正当な Scale → true
+- id 不一致 → false
+- インデックス越境 → false
+- 負インデックス → false
+- `scaleMode` の出力 → true (正当な生成物)
+- `tuningToScale` の出力 → true
+- false の予測が `scaleToCents` の例外と一致 (予測力の検証)
+
+---
+
+## 第二十四巡サマリ
+
+| 問                                                                            | 判定              | 対応                                              |
+| ----------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Q50 「`progressionSmoothness` は測れるが最適順序を発見できない」              | ❌ 計測はあるが最適化がない | `optimalChordOrder` + `OptimalProgressionResult` + 9 テスト |
+| Q51 「`assertTuningMatch` が内部にのみあり、事前バリデーションができない」    | ❌ 内部ガードが公開されていない | `isScaleCompatible` + 7 テスト |
+
+**到達した境地**: Q50 は「発見 (rankChords) → 測定 (progressionSmoothness) → 最適化 (optimalChordOrder)」という DTM ワークフローの三段目を完成させた。Q51 は「内部の fail-fast 哲学」と「外部からの防御的コーディング」の境界を明確化した。どちらも「ライブラリが自分の哲学 (fail-fast / first-class) に対して整合的か」という Socratic 問い。
+
+556 テスト / 全パス。

@@ -8,6 +8,7 @@ import {
   tuningToScale,
   scaleDissonance,
   rankModes,
+  isScaleCompatible,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -339,5 +340,59 @@ describe('scaleDissonance + rankModes — modal acoustic analysis', () => {
   it('test_tuning_mismatch_throws_rankModes', () => {
     const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2] };
     expect(() => rankModes(wrong, t12, spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q51: `assertTuningMatch` は内部にのみあるが、外部から Scale の整合性を確認できるか？
+describe('isScaleCompatible — public guard predicate (Q51)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_matching_tuning_id_and_valid_indices_is_compatible', () => {
+    const scale: Scale = {
+      id: 'major',
+      name: 'Major',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+    };
+    expect(isScaleCompatible(scale, t12)).toBe(true);
+  });
+
+  it('test_wrong_tuning_id_is_not_compatible', () => {
+    const scale: Scale = { id: 'x', name: 'x', tuningId: 'other-id', degreeIndices: [0, 1] };
+    expect(isScaleCompatible(scale, t12)).toBe(false);
+  });
+
+  it('test_out_of_range_degree_index_is_not_compatible', () => {
+    // 12-TET has degrees [0..11]; index 12 is out of range.
+    const scale: Scale = { id: 'bad', name: 'bad', tuningId: '12-tet', degreeIndices: [0, 12] };
+    expect(isScaleCompatible(scale, t12)).toBe(false);
+  });
+
+  it('test_negative_degree_index_is_not_compatible', () => {
+    const scale: Scale = { id: 'neg', name: 'neg', tuningId: '12-tet', degreeIndices: [0, -1] };
+    expect(isScaleCompatible(scale, t12)).toBe(false);
+  });
+
+  it('test_scaleMode_output_is_compatible_with_same_tuning', () => {
+    const base: Scale = {
+      id: 'major',
+      name: 'Major',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+    };
+    const dorian = scaleMode(base, 1, t12);
+    expect(isScaleCompatible(dorian, t12)).toBe(true);
+  });
+
+  it('test_tuningToScale_output_is_compatible', () => {
+    const scale = tuningToScale(t12);
+    expect(isScaleCompatible(scale, t12)).toBe(true);
+  });
+
+  it('test_result_predicts_whether_scale_ops_will_throw', () => {
+    const incompatible: Scale = { id: 'x', name: 'x', tuningId: 'wrong', degreeIndices: [0, 1] };
+    expect(isScaleCompatible(incompatible, t12)).toBe(false);
+    // Confirms the predicate correctly predicts that scaleToCents would throw.
+    expect(() => scaleToCents(incompatible, t12)).toThrow(RangeError);
   });
 });
