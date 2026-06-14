@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
-import { dissonancePair, chordDissonance, dissonanceCurve, localMinima } from './dissonance.js';
+import {
+  dissonancePair,
+  chordDissonance,
+  dissonanceCurve,
+  localMinima,
+  consonantIntervals,
+} from './dissonance.js';
 
 const partial = fc.record({
   freq: fc.double({ min: 50, max: 8000, noNaN: true, noDefaultInfinity: true }),
@@ -77,6 +83,74 @@ describe('timbre-dependent consonance (Sethares)', () => {
     const harm = localMinima(dissonanceCurve(harmonicSpectrum(6), 440, ratios));
     const bell = localMinima(dissonanceCurve(bellSpectrum(), 440, ratios));
     expect(bell).not.toEqual(harm);
+  });
+});
+
+// The library's central thesis as a one-liner: consonance is a property of the
+// TIMBRE's spectrum, not of Western interval names.
+describe('consonantIntervals — timbre-dependent consonance helper', () => {
+  it('test_harmonic_spectrum_finds_just_fifth_and_fourth', () => {
+    const cons = consonantIntervals(harmonicSpectrum(6));
+    const hasNear = (target: number, tol = 0.01): boolean =>
+      cons.some((c) => Math.abs(c.ratio - target) < tol);
+    expect(hasNear(1.5)).toBe(true); // perfect fifth 3/2
+    expect(hasNear(4 / 3)).toBe(true); // perfect fourth 4/3
+  });
+
+  it('test_cents_field_matches_ratio', () => {
+    const cons = consonantIntervals(harmonicSpectrum(6));
+    expect(cons.length).toBeGreaterThan(0);
+    for (const c of cons) {
+      expect(c.cents).toBeCloseTo(1200 * Math.log2(c.ratio), 9);
+    }
+  });
+
+  it('test_results_ascending_by_ratio', () => {
+    const cons = consonantIntervals(harmonicSpectrum(6));
+    for (let i = 1; i < cons.length; i++) {
+      expect(cons[i]!.ratio).toBeGreaterThan(cons[i - 1]!.ratio);
+    }
+  });
+
+  it('test_bell_consonances_differ_from_harmonic', () => {
+    // Same scan window, different timbre → different consonant set (the thesis).
+    const harm = consonantIntervals(harmonicSpectrum(6), { steps: 501 });
+    const bell = consonantIntervals(bellSpectrum(), { steps: 501 });
+    expect(bell.map((c) => c.ratio)).not.toEqual(harm.map((c) => c.ratio));
+  });
+
+  it('test_dissonance_values_are_non_negative', () => {
+    const cons = consonantIntervals(harmonicSpectrum(6));
+    expect(cons.every((c) => c.dissonance >= 0)).toBe(true);
+  });
+
+  it('test_custom_scan_window_respected', () => {
+    // Narrow window around the fifth; every returned ratio is inside the window.
+    const cons = consonantIntervals(harmonicSpectrum(6), {
+      minRatio: 1.4,
+      maxRatio: 1.6,
+      steps: 401,
+    });
+    expect(cons.every((c) => c.ratio >= 1.4 && c.ratio <= 1.6)).toBe(true);
+    expect(cons.some((c) => Math.abs(c.ratio - 1.5) < 0.01)).toBe(true);
+  });
+
+  it('test_invalid_min_ratio_throws', () => {
+    expect(() => consonantIntervals(harmonicSpectrum(6), { minRatio: 0 })).toThrow(RangeError);
+  });
+
+  it('test_max_ratio_not_above_min_throws', () => {
+    expect(() => consonantIntervals(harmonicSpectrum(6), { minRatio: 2, maxRatio: 1.5 })).toThrow(
+      RangeError,
+    );
+  });
+
+  it('test_too_few_steps_throws', () => {
+    expect(() => consonantIntervals(harmonicSpectrum(6), { steps: 2 })).toThrow(RangeError);
+  });
+
+  it('test_non_positive_fundamental_throws', () => {
+    expect(() => consonantIntervals(harmonicSpectrum(6), { fundamentalHz: 0 })).toThrow(RangeError);
   });
 });
 

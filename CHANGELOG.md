@@ -22,6 +22,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 - Regular temperaments (`src/core/temperament.ts`): `regularTemperament` (generator-stacked tunings, non-octave periods supported), `meantoneQuarterComma` (pure 5/4 major third), `pythagorean` (pure 3/2 fifths).
 - Chord discovery (`src/core/chord-search.ts`): `rankChords` enumerates degree subsets of a tuning and ranks them by Sethares roughness + Stolzenburg periodicity (acoustic-only, timbre-dependent).
 - `.tun` adapter (`src/adapters/tun.ts`): `writeTun` — AnaMark TUN text export (`[Tuning]` + `[Exact Tuning]` sections); composes with `tuningToMtsFrequencies`.
+- `consonantIntervals(spectrum, opts?)` (`src/core/dissonance.ts`): the library's timbre-dependent-consonance thesis as one call — scans the sensory-dissonance curve and returns its local minima as `{ ratio, cents, dissonance }`. A harmonic spectrum yields the just intervals (4/3, 3/2, 5/4…); `bellSpectrum()` yields a different set from the very same scan.
 
 ### Fixed
 - `localMinima`: descending-plateau false positive — plateaus now report once at their first index only when strictly below both differing neighbours; ascending-plateau and end-touching cases are no longer reported.

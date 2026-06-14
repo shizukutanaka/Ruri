@@ -1,4 +1,5 @@
 import { type Spectrum, type RealizedPartial, realizeSpectrum } from './spectrum.js';
+import { freqToCents } from './cents.js';
 
 // Sethares sensory-dissonance model constants (Plomp-Levelt based).
 const DSTAR = 0.24;
@@ -68,4 +69,73 @@ export function localMinima(curve: readonly number[]): number[] {
     }
   }
   return out;
+}
+
+/** A consonant interval discovered from a timbre's dissonance curve. */
+export interface ConsonantInterval {
+  /** Frequency ratio relative to the fundamental (e.g. 1.5 ≈ a perfect fifth). */
+  readonly ratio: number;
+  /** The same interval in cents: 1200·log2(ratio). */
+  readonly cents: number;
+  /** Sensory dissonance at this interval (lower = more consonant). */
+  readonly dissonance: number;
+}
+
+export interface ConsonantIntervalsOptions {
+  /** Lowest ratio to scan, exclusive of unison artifacts (default 1.0 = unison). */
+  readonly minRatio?: number;
+  /** Highest ratio to scan (default 2.0 = octave). */
+  readonly maxRatio?: number;
+  /** Number of samples across [minRatio, maxRatio] (default 1001; >= 3). */
+  readonly steps?: number;
+  /** Fundamental frequency used to realize the spectrum (default 261.63 Hz ≈ C4). */
+  readonly fundamentalHz?: number;
+}
+
+/**
+ * Consonant intervals FOR A GIVEN TIMBRE — the library's central thesis as one call.
+ *
+ * Consonance is not a fixed list of Western interval names; it is a property of the
+ * instrument's SPECTRUM. This scans the sensory-dissonance curve over
+ * [minRatio, maxRatio] and returns its local minima as (ratio, cents, dissonance),
+ * ascending by ratio. A harmonic spectrum yields the just intervals (4/3, 3/2, 5/4…);
+ * a `bellSpectrum()` yields a DIFFERENT set from the very same scan. Same algorithm,
+ * different timbre, different consonances.
+ *
+ * Reuses `dissonanceCurve` + `localMinima`; the result is a thin, documented mapping
+ * back to musical units. For finer resolution near a target interval, raise `steps`
+ * or narrow [minRatio, maxRatio].
+ */
+export function consonantIntervals(
+  spectrum: Spectrum,
+  opts?: ConsonantIntervalsOptions,
+): ConsonantInterval[] {
+  const minRatio = opts?.minRatio ?? 1.0;
+  const maxRatio = opts?.maxRatio ?? 2.0;
+  const steps = opts?.steps ?? 1001;
+  const fundamentalHz = opts?.fundamentalHz ?? 261.63;
+
+  // Fail fast (I7): a malformed scan window silently yields empty/garbage minima.
+  if (!Number.isFinite(minRatio) || minRatio <= 0) {
+    throw new RangeError(`minRatio must be a finite number > 0, got ${minRatio}`);
+  }
+  if (!Number.isFinite(maxRatio) || maxRatio <= minRatio) {
+    throw new RangeError(`maxRatio (${maxRatio}) must be a finite number > minRatio (${minRatio})`);
+  }
+  if (!Number.isInteger(steps) || steps < 3) {
+    throw new RangeError(`steps must be an integer >= 3, got ${steps}`);
+  }
+  if (!Number.isFinite(fundamentalHz) || fundamentalHz <= 0) {
+    throw new RangeError(`fundamentalHz must be a finite number > 0, got ${fundamentalHz}`);
+  }
+
+  const ratios = Array.from(
+    { length: steps },
+    (_, i) => minRatio + ((maxRatio - minRatio) * i) / (steps - 1),
+  );
+  const curve = dissonanceCurve(spectrum, fundamentalHz, ratios);
+  return localMinima(curve).map((i) => {
+    const ratio = ratios[i] as number;
+    return { ratio, cents: freqToCents(ratio, 1), dissonance: curve[i] as number };
+  });
 }
