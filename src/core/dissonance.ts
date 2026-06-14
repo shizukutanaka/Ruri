@@ -1,5 +1,6 @@
 import { type Spectrum, type RealizedPartial, realizeSpectrum } from './spectrum.js';
 import { freqToCents } from './cents.js';
+import { type TuningSystem, defineTuning } from './tuning.js';
 
 // Sethares sensory-dissonance model constants (Plomp-Levelt based).
 const DSTAR = 0.24;
@@ -137,5 +138,52 @@ export function consonantIntervals(
   return localMinima(curve).map((i) => {
     const ratio = ratios[i] as number;
     return { ratio, cents: freqToCents(ratio, 1), dissonance: curve[i] as number };
+  });
+}
+
+/**
+ * Options for `spectrumToTuning`. Extends `ConsonantIntervalsOptions` with
+ * tuning identity fields.
+ */
+export interface SpectrumToTuningOptions extends ConsonantIntervalsOptions {
+  /** `TuningSystem.id` for the derived tuning (default `'spectrum-derived'`). */
+  readonly id?: string;
+  /** Reference frequency in Hz (default 440). */
+  readonly referenceHz?: number;
+  /** Period in cents (default 1200 — octave). */
+  readonly periodCents?: number;
+}
+
+/**
+ * Derive a `TuningSystem` from the consonant intervals of a timbre.
+ *
+ * This is the capstone of the library's central thesis:
+ * **"Consonance is timbre-dependent, therefore the optimal tuning is also
+ * timbre-dependent."**
+ *
+ * `consonantIntervals(harmonic)` → the just intervals (5/4, 4/3, 3/2…) →
+ * `spectrumToTuning(harmonic)` yields a tuning built on those just intervals.
+ * `spectrumToTuning(bell)` yields an entirely different tuning — not 12-TET,
+ * not just intonation, but the tuning that is acoustically optimal for bell
+ * resonance.
+ *
+ * The returned `TuningSystem` is immediately usable with the full pipeline:
+ * `rankChords`, `mtsBulkDump`, `tuningToScl`, `fingerChord`, etc.
+ */
+export function spectrumToTuning(spectrum: Spectrum, opts?: SpectrumToTuningOptions): TuningSystem {
+  const periodCents = opts?.periodCents ?? 1200;
+  const intervals = consonantIntervals(spectrum, opts);
+  const aboveRoot = intervals.filter((iv) => iv.cents > 0 && iv.cents < periodCents);
+  const degrees = [
+    { kind: 'cents' as const, cents: 0 },
+    ...aboveRoot.map((iv) => ({ kind: 'cents' as const, cents: iv.cents })),
+  ];
+  return defineTuning({
+    id: opts?.id ?? 'spectrum-derived',
+    name: opts?.id ?? 'Spectrum-derived tuning',
+    referenceHz: opts?.referenceHz ?? 440,
+    periodCents,
+    degrees,
+    source: 'theoretical' as const,
   });
 }

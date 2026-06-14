@@ -7,6 +7,7 @@ import {
   dissonanceCurve,
   localMinima,
   consonantIntervals,
+  spectrumToTuning,
 } from './dissonance.js';
 
 const partial = fc.record({
@@ -214,5 +215,58 @@ describe('localMinima regression', () => {
         },
       ),
     );
+  });
+});
+
+// Socratic Q46: spectrumToTuning — the capstone of "consonance is timbre-dependent."
+describe('spectrumToTuning — timbre-derived TuningSystem', () => {
+  it('test_harmonic_spectrum_gives_valid_tuning', () => {
+    const tuning = spectrumToTuning(harmonicSpectrum());
+    expect(tuning.degrees.length).toBeGreaterThan(1);
+    expect(tuning.periodCents).toBe(1200);
+    expect(tuning.referenceHz).toBe(440);
+  });
+
+  it('test_first_degree_is_unison', () => {
+    const tuning = spectrumToTuning(harmonicSpectrum());
+    const firstCents = tuning.degrees[0]?.kind === 'cents' ? tuning.degrees[0].cents : -1;
+    expect(firstCents).toBe(0);
+  });
+
+  it('test_all_degrees_within_period', () => {
+    const tuning = spectrumToTuning(harmonicSpectrum());
+    for (const deg of tuning.degrees) {
+      const c = deg.kind === 'cents' ? deg.cents : 0;
+      expect(c).toBeGreaterThanOrEqual(0);
+      expect(c).toBeLessThan(1200);
+    }
+  });
+
+  it('test_harmonic_tuning_contains_approx_702c_fifth', () => {
+    const tuning = spectrumToTuning(harmonicSpectrum());
+    const cents = tuning.degrees.map((d) => (d.kind === 'cents' ? d.cents : 0));
+    const hasFifth = cents.some((c) => Math.abs(c - 702) < 20);
+    expect(hasFifth).toBe(true);
+  });
+
+  it('test_bell_vs_harmonic_give_different_tunings', () => {
+    const harmTuning = spectrumToTuning(harmonicSpectrum());
+    const bellTuning = spectrumToTuning(bellSpectrum());
+    const harmCents = harmTuning.degrees.map((d) => (d.kind === 'cents' ? d.cents : 0));
+    const bellCents = bellTuning.degrees.map((d) => (d.kind === 'cents' ? d.cents : 0));
+    expect(harmCents).not.toEqual(bellCents);
+  });
+
+  it('test_id_and_referenceHz_opts_respected', () => {
+    const tuning = spectrumToTuning(harmonicSpectrum(), { id: 'my-tuning', referenceHz: 261.63 });
+    expect(tuning.id).toBe('my-tuning');
+    expect(tuning.referenceHz).toBeCloseTo(261.63, 9);
+  });
+
+  it('test_result_usable_as_TuningSystem', () => {
+    const tuning = spectrumToTuning(harmonicSpectrum());
+    // A valid TuningSystem must pass defineTuning — it was constructed by defineTuning.
+    expect(tuning.source).toBe('theoretical');
+    expect(typeof tuning.id).toBe('string');
   });
 });

@@ -1216,3 +1216,64 @@ export function chordFromDegrees(
 **到達した境地**: `chordFromSemitones([0,4,7])` という API は「4セミトーン = 長三度」という 12-TET 固定の知識をライブラリ内部に埋め込む。微分音ライブラリでこれが唯一の和音工場であることは自己矛盾だ。`chordFromDegrees(tuning, [0, 6, 11])` は同じ意図を調律非依存で表現し、すべての EDO・MOS・マカーム調律で機能する。「セミトーン」ではなく「度数インデックス」を使うことで調律系が意味論を担う。
 
 511 テスト / 全パス。
+
+---
+
+## Q46. ライブラリの核心命題「協和は timbre 依存」は調律生成まで貫かれているか？ ❌→✅
+
+**問(最深視点)**: 「協和は timbre 依存」という命題を信じるなら、その論理的帰結は「**最適な調律も timbre 依存**」のはずだ。`consonantIntervals(bellSpectrum())` はベル音色に最も協和する音程を返す。では「ベル音色に最適な調律系」を 1 コールで得られるか？
+
+**検証**: `consonantIntervals` は `ConsonantInterval[]` を返すが、`TuningSystem` を返さない。ユーザーは手動で:
+1. `intervals.map(iv => iv.cents)` で cents 配列取得
+2. ユニゾン 0c を先頭に追加
+3. `defineTuning({ ..., degrees, periodCents })` で `TuningSystem` 構築
+
+この3ステップが欠ける。「協和は timbre 依存 → 調律も timbre 依存」という命題の論理的連鎖がコードに現れていない。
+
+**判定**: ❌ 命題の最終帰結が実装に欠落 → `spectrumToTuning(spectrum, opts?): TuningSystem` を `dissonance.ts` に追加。
+
+**実装**:
+```ts
+export function spectrumToTuning(spectrum: Spectrum, opts?: SpectrumToTuningOptions): TuningSystem {
+  const periodCents = opts?.periodCents ?? 1200;
+  const intervals = consonantIntervals(spectrum, opts);
+  const aboveRoot = intervals.filter(iv => iv.cents > 0 && iv.cents < periodCents);
+  const degrees = [
+    { kind: 'cents' as const, cents: 0 },
+    ...aboveRoot.map(iv => ({ kind: 'cents' as const, cents: iv.cents })),
+  ];
+  return defineTuning({
+    id: opts?.id ?? 'spectrum-derived',
+    name: opts?.id ?? 'Spectrum-derived tuning',
+    referenceHz: opts?.referenceHz ?? 440,
+    periodCents,
+    degrees,
+    source: 'theoretical',
+  });
+}
+```
+
+返り値の `TuningSystem` は既存のあらゆるパイプラインに即座に使える: `rankChords` / `mtsBulkDump` / `tuningToScl` / `fingerChord` / `progressionSmoothness`。
+
+**哲学的意義**: `spectrumToTuning(harmonicSpectrum())` は純正律(5/4, 4/3, 3/2…)を含む調律系を返す。`spectrumToTuning(bellSpectrum())` は全く別の調律系を返す — 西洋音楽理論に依存しない、音響的に純粋な調律生成。これがライブラリの命題の完全な実装。
+
+**テスト(7 件)**:
+- 有効な TuningSystem が返る(degree > 1, period = 1200c)
+- 最初の degree = 0c(ユニゾン)
+- 全 degree が `[0, periodCents)` 内
+- 調和音色の調律に 702c 付近の完全五度が含まれる
+- 調和音色 vs ベル音色で異なる調律(命題の証明)
+- id / referenceHz オプション尊重
+- source = 'theoretical'(有効な TuningSystem として構築済み)
+
+---
+
+## 第二十二巡サマリ
+
+| 問                                                                            | 判定              | 対応                                              |
+| ----------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Q46 「協和は timbre 依存 → 調律も timbre 依存」の論理的帰結が実装に欠落       | ❌ 命題の最深帰結の欠落 | `spectrumToTuning` + `SpectrumToTuningOptions` 追加 + 7 テスト |
+
+**到達した境地**: Q1 でライブラリの核心命題「協和は timbre 依存」を検証し、Q46 でその最終帰結を実装した。`chordFromSemitones` は 12-TET の世界(Q45 で改善)、`rankChords` は調律に縛られた評価、`consonantIntervals` は音程の発見 — しかし「音色から最適調律を生成する」という一段深い抽象が欠けていた。`spectrumToTuning` はその欠落を埋め、**「音色 → 協和音程 → 調律系 → 和音探索 → 運指 → DAW 出力」という完全な非西洋音楽パイプライン**が 1 コールのチェーンで実現できるようになる。
+
+518 テスト / 全パス。

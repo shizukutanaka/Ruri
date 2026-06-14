@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。511テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。518テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -129,7 +129,7 @@ const hz: number | null = kbmNoteToFreq(scale, mapping, 69);  // MIDI 69 → Hz
 
 ```ts
 // d) 協和は音色依存: 同じ走査でも音色が変われば協和音程が変わる(本ライブラリの核心)
-import { consonantIntervals, harmonicSpectrum, bellSpectrum } from 'ruri';
+import { consonantIntervals, harmonicSpectrum, bellSpectrum, spectrumToTuning } from 'ruri';
 
 // 倍音音色 → 純正律の協和音程(3/2, 4/3, 5/4…)が極小として現れる
 const harm = consonantIntervals(harmonicSpectrum());
@@ -137,6 +137,10 @@ const harm = consonantIntervals(harmonicSpectrum());
 
 // ベル音色 → 同じ [1,2] 走査でも別の協和音程集合になる(西洋の音程名に依存しない)
 const bell = consonantIntervals(bellSpectrum());
+
+// 命題の帰結: 音色から最適調律を直接生成 → 全パイプライン(rankChords/mtsBulkDump/etc.)に直結
+const harmTuning = spectrumToTuning(harmonicSpectrum()); // 純正律系の TuningSystem
+const bellTuning = spectrumToTuning(bellSpectrum());     // ベル音色固有の TuningSystem
 ```
 
 ```ts
