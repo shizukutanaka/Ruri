@@ -987,3 +987,60 @@ export function scaleToTuning(scale: Scale, tuning: TuningSystem): TuningSystem 
 **到達した境地**: `Scale` は「選択の記述子」(どの度数を使うか)であり `TuningSystem` は「音律の完全な仕様」だ。この2つは別の存在だが、`scaleToTuning` によって選択記述子が音律仕様に「昇格」できる。この昇格を経ることで、スケールの選択は `rankChords`・`mtsBulkDump`・`fingerChord` などあらゆる音律ベースのパイプラインへの入口になる。「旋法が第一級」とは、旋法が処理パイプラインの起点になれることを意味する。
 
 479 テスト / 全パス。
+
+---
+
+## Q42. `generatedTuning` の出力を `scaleMode` に渡せるか？ ❌→✅
+
+**問**: `generatedTuning(700, 1200, 7)` は MOS(Moment of Symmetry)調律系を一級市民の `TuningSystem` として返す。しかし `scaleMode` は `Scale` を受け取る — `TuningSystem` ではない。これら2つの一級市民が連携するには手動で `{ id, name, tuningId, degreeIndices: [0,1,...,n-1] }` を構築しなければならない。生成層 → 旋法層のパイプラインが欠落している。
+
+**検証**: `scale.ts` に `TuningSystem → Scale` の変換は存在しない。ユーザーは `generatedTuning` の `id`・`degrees.length` を知った上で `Scale` オブジェクトを手動組み立てする必要があり、`Scale` の構造知識(tuningId, degreeIndices の意味)が必要になる。
+
+**判定**: ❌ 生成層から旋法層への橋が欠落 → `tuningToScale(tuning, name?): Scale` を追加。
+
+**実装**:
+```ts
+export function tuningToScale(tuning: TuningSystem, name?: string): Scale {
+  return {
+    id: `${tuning.id}-scale`,
+    name: name ?? tuning.name,
+    tuningId: tuning.id,
+    degreeIndices: tuning.degrees.map((_, i) => i),
+  };
+}
+```
+
+これにより以下の完全パイプラインが 1 行ずつ連鎖できる:
+```
+generatedTuning(700, 1200, 7)
+→ tuningToScale(...)
+→ scaleMode(..., 1, t7)   // 第2旋法
+→ scaleToTuning(..., t7)   // 再度TuningSystemに
+→ rankChords(...)           // ダイアトニック和音探索
+→ rankedChordToChord(...)   // 再利用可能Chord
+→ fingerChord(guitar, ...)  // 運指
+```
+
+恒等性不変量: `tuningToScale(t) → scaleToTuning(…, t)` で元の cents が復元される(テストで保証)。
+
+**テスト(8 件)**:
+- `degreeIndices` が全度数を網羅
+- `tuningId` が調律 id と一致
+- id は `${tuning.id}-scale`
+- name はデフォルトで tuning.name
+- name の明示上書き
+- `scaleToCents` が正しい cents を返す
+- `generatedTuning → tuningToScale → scaleMode` パイプラインが動作
+- `tuningToScale → scaleToTuning` 恒等性
+
+---
+
+## 第十八巡サマリ
+
+| 問                                                                | 判定              | 対応                                              |
+| ----------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Q42 `generatedTuning` 出力 → `scaleMode` の橋がない              | ❌ 生成層→旋法層の断絶 | `tuningToScale` 追加 + 8 テスト                |
+
+**到達した境地**: 本ライブラリには「一級市民」と宣言された層が複数存在する: `TuningSystem`・`Scale`・`Chord`・`RankedChord`・`StringInstrument`。問題は一級市民「同士」の橋が体系的に欠けていることだ。Q39-Q42 の4問は同じ構造的欠陥の4つの現れであり、それぞれ 1-4 行のブリッジ関数で解消できた。これはソクラテス式問答の核心: 「なぜ A と B をつなぐ関数がないのか」は「A も B も一級市民だという主張が一貫しているか」を問う。
+
+487 テスト / 全パス。

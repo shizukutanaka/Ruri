@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。479テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。487テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -43,10 +43,18 @@ const freqs = scaleToFreqs(ionian, tuning);      // 旋法 → Hz(chordDissonanc
 const dorian = scaleMode(ionian, 1, tuning);     // degreeIndices: [0,2,3,5,7,9,10]
 
 // Scale → TuningSystem: ダイアトニック和音探索の入口
-import { scaleToTuning } from 'ruri';
-import { rankChords } from 'ruri';
+import { scaleToTuning, tuningToScale } from 'ruri';
+import { rankChords, rankedChordToChord } from 'ruri';
 const dorianTuning = scaleToTuning(dorian, tuning);    // 7音の sub-TuningSystem
 const dorianChords = rankChords(dorianTuning, { size: 3 }); // ダイアトニック3和音のみ
+
+// 生成層 → 旋法層 → 発見 → 再利用: 完全パイプライン
+import { generatedTuning } from 'ruri';
+const mosTuning = generatedTuning(700, 1200, 7);       // 5度積み上げ MOS
+const mosScale = tuningToScale(mosTuning);             // TuningSystem → Scale
+const mode2 = scaleMode(mosScale, 1, mosTuning);       // 第2旋法
+const mode2Triads = rankChords(scaleToTuning(mode2, mosTuning), { size: 3 });
+const portable = rankedChordToChord(mode2Triads[0]!);  // 再利用可能 Chord
 ```
 
 ```ts

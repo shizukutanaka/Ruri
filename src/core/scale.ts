@@ -47,6 +47,23 @@ export function scaleToFreqs(scale: Scale, tuning: TuningSystem): number[] {
 }
 
 /**
+ * Create a `Scale` that spans all degrees of a `TuningSystem`.
+ *
+ * This is the bridge from the generation layer to the modal layer:
+ * `tuningToScale(generatedTuning(700, 1200, 7))` returns a Scale that can
+ * be passed to `scaleMode`, `scaleToTuning`, or `scaleToCents` directly,
+ * without manually constructing `degreeIndices: [0, 1, 2, …, n-1]`.
+ */
+export function tuningToScale(tuning: TuningSystem, name?: string): Scale {
+  return {
+    id: `${tuning.id}-scale`,
+    name: name ?? tuning.name,
+    tuningId: tuning.id,
+    degreeIndices: tuning.degrees.map((_, i) => i),
+  };
+}
+
+/**
  * Extract the `Scale`'s selected degrees as a new `TuningSystem`.
  *
  * This is the bridge from the modal/Scale layer to the full pipeline:

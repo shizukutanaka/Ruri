@@ -1,6 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { type Scale, scaleToCents, scaleToFreqs, scaleMode, scaleToTuning } from './scale.js';
+import {
+  type Scale,
+  scaleToCents,
+  scaleToFreqs,
+  scaleMode,
+  scaleToTuning,
+  tuningToScale,
+} from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
+import { generatedTuning } from './generate.js';
 import { rankChords } from './chord-search.js';
 import { harmonicSpectrum } from './spectrum.js';
 
@@ -214,5 +222,60 @@ describe('scaleToTuning — modal layer → TuningSystem bridge', () => {
     expect(JSON.stringify(ionianChords[0]!.cents)).not.toEqual(
       JSON.stringify(dorianChords[0]!.cents),
     );
+  });
+});
+
+// Socratic Q42: tuningToScale bridges TuningSystem → Scale (generation → modal layer).
+describe('tuningToScale — TuningSystem → Scale bridge', () => {
+  it('test_degree_indices_span_all_degrees', () => {
+    const scale = tuningToScale(t12);
+    expect(scale.degreeIndices).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  });
+
+  it('test_tuningId_matches_tuning_id', () => {
+    const scale = tuningToScale(t12);
+    expect(scale.tuningId).toBe(t12.id);
+  });
+
+  it('test_id_is_tuning_id_scale', () => {
+    const scale = tuningToScale(t12);
+    expect(scale.id).toBe('12-tet-scale');
+  });
+
+  it('test_name_defaults_to_tuning_name', () => {
+    const scale = tuningToScale(t12);
+    expect(scale.name).toBe(t12.name);
+  });
+
+  it('test_name_override', () => {
+    const scale = tuningToScale(t12, 'chromatic');
+    expect(scale.name).toBe('chromatic');
+  });
+
+  it('test_scaleToCents_matches_all_tuning_degrees', () => {
+    const t7 = generatedTuning(700, 1200, 7);
+    const scale = tuningToScale(t7);
+    const cents = scaleToCents(scale, t7);
+    expect(cents.length).toBe(7);
+    expect(cents[0]).toBeCloseTo(0, 9);
+  });
+
+  it('test_pipeline_generatedTuning_scaleMode_works', () => {
+    // generatedTuning → tuningToScale → scaleMode: full modal pipeline from generation layer.
+    const t7 = generatedTuning(700, 1200, 7);
+    const scale = tuningToScale(t7);
+    const mode2 = scaleMode(scale, 1, t7);
+    // Mode 2 of 5th-stacked diatonic starts at 0c (re-zeroed).
+    expect(scaleToCents(mode2, t7)[0]).toBeCloseTo(0, 9);
+    expect(mode2.degreeIndices.length).toBe(7);
+  });
+
+  it('test_pipeline_tuningToScale_scaleToTuning_is_identity', () => {
+    // tuningToScale(t) → scaleToTuning(…, t) should recover original cents.
+    const t7 = generatedTuning(700, 1200, 7);
+    const recovered = scaleToTuning(tuningToScale(t7), t7);
+    const originalCents = t7.degrees.map((p) => (p.kind === 'cents' ? p.cents : 0));
+    const recoveredCents = recovered.degrees.map((p) => (p.kind === 'cents' ? p.cents : 0));
+    expect(recoveredCents).toEqual(originalCents);
   });
 });
