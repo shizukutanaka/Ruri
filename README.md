@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。421テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。431テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -53,6 +53,18 @@ const freqs = realizeChordFreqs(chord, 261.63);         // C4 root
 const roughness = chordDissonance(freqs, harmonicSpectrum());
 const scl = sclFromCents('major triad', [400, 700, 1200]);
 const sclText = writeScl(scl);                          // .scl 文字列
+```
+
+```ts
+// b-2) 和音 → 運指: Chord から guitarStandard() へ直接橋渡し
+import { chordFromSemitones, chordToCentOffsets } from 'ruri';
+import { guitarStandard } from 'ruri';
+import { fingerChord } from 'ruri';
+
+const guitar = guitarStandard();
+const major = chordFromSemitones('major', [0, 4, 7]);
+// ギター 5 弦開放 A2 = openStringsCents[1] = 500c をルートに
+const fingerings = fingerChord(guitar, chordToCentOffsets(major, 500));
 ```
 
 ```ts

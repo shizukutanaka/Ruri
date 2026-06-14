@@ -562,3 +562,54 @@ const smoothness = voiceLeadingCost(freqsA, freqsB);  // 1コール
 **到達した境地**: Q31(generate)・Q32(scale)・Q33(ranking)は同じパターンの三例 — 計算を生産する層が、それを消費する次の層と型の上でつながっていない。「一級市民」の連鎖が完成するとは、`generatedTuning → rankChords → realizeRankedChordFreqs → voiceLeadingCost` が**すべて直接呼び出せる**ことである。ライブラリの設計原則「zero runtime-dep / 単一真実源」は実装に追いついたが、「レイヤ間の型的連続性」はQ31-33で補完されて初めて実現した。
 
 421 テスト / 全パス。
+
+---
+
+## 第十巡: `Chord` 型は運指エンジンと接続されているか
+
+**目標**: `Chord`(ルート相対音程)が `fingerChord`(絶対セント)と直接つながっているかを問う。
+
+## Q34. `Chord → fingerChord` へは直接届くか？ ❌ **行き止まり → `chordToCentOffsets` を追加**
+
+**問**: `fingerChord(inst, chordCentsAbs)` は「楽器座標系での絶対セント」を要求する。`guitarStandard()` は最低弦開放 = 0c として他弦・フレットを相対表現する。一方 `chordToCents(chord)` は「ルート相対セント」([0, 400, 700])を返す。間を埋める関数はあるか？
+
+**検証**: `chord.ts`・`fingering.ts`・`instrument.ts` に橋渡し関数は存在しない。`realizeChordFreqs(chord, rootHz)` は Hz を返すが、Hz → 楽器セントには別途 `freqToCents(hz, lowestStringHz)` が必要。しかも `StringInstrument` には `referenceHz` フィールドがない — 楽器は移調可能な抽象モデルであり、Hz 基準を持たない設計。
+
+**ユーザが今日必要な手順**:
+1. `realizeChordFreqs(chord, rootHz)` → Hz 配列
+2. 最低弦の Hz を別途把握
+3. `freqToCents(hz, lowestStringHz)` で楽器セントへ変換
+4. `fingerChord(inst, abscentsList)` を呼ぶ
+
+**なぜ設計選択か**: `StringInstrument` は「同じ運指パターンが異なるキーに移調できる」モデルのため Hz アンカーを持たない。これは正しい。しかしその代償として、ルート位置を「楽器セント」で指定する薄いラッパが必要になる。
+
+**判定**: ❌ `Chord → fingerChord` の橋渡し欠落。最小修正: `chordToCentOffsets(chord, rootCentsOnInstrument)` — ルート相対セントに定数を加算するだけ。
+
+**実装**: `src/core/chord.ts` に追加:
+```ts
+export function chordToCentOffsets(chord: Chord, rootCentsOnInstrument: number): number[] {
+  return chordToCents(chord).map((c) => c + rootCentsOnInstrument);
+}
+```
+
+**使用例(改善後)**:
+```ts
+const guitar = guitarStandard();
+const major = chordFromSemitones('major', [0, 4, 7]);
+// ギター 5 弦開放 A2 = openStringsCents[1] = 500c
+const fingerings = fingerChord(guitar, chordToCentOffsets(major, 500));
+```
+
+**テスト(10件)**: 専用 `src/core/chord.test.ts` を新設。`chordFromSemitones` の cents 値・`realizeChordFreqs` の rootHz 一致・`chordToCentOffsets` の ゼロオフセット≡chordToCents / rootが正確にrootCentsOnInstrument / 音程保存 / minor7th / integration fingerChord / 任意Chord。
+
+---
+
+## 第十巡サマリ
+
+| 問                                                   | 判定                    | 対応                                                           |
+| ---------------------------------------------------- | ----------------------- | -------------------------------------------------------------- |
+| Q34 `Chord` → `fingerChord` の橋渡し欠落            | ❌ 行き止まりの葉ノード  | `chordToCentOffsets(chord, rootCentsOnInstrument)` 追加 + 10テスト / 専用 `chord.test.ts` 新設 |
+
+**到達した境地**: Q31(generate)・Q32(scale)・Q33(ranking)・Q34(chord→fingering)は同一パターンの四例。「変換を生産する層」と「それを消費する層」の間に常に手動変換が必要だった。今回の修正で `Chord → chordToCentOffsets → fingerChord` がワンライナーになる。`StringInstrument` の「Hz なし移調可能モデル」は設計上正しい — ただしその抽象の境界に橋渡し関数が必要だった。これは音楽ライブラリ特有の「座標系が複数ある」問題(Hz / セント / 楽器セント / MIDI ノート番号)の具体例である。
+
+431 テスト / 全パス。
