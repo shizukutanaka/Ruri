@@ -935,3 +935,55 @@ export function rankedChordToChord(ranked: RankedChord, name?: string): Chord {
 **到達した境地**: `rankChords` は「発見」であり `Chord` は「記譜・持ち運び」である。この2つは別の存在論的層にあるが、橋がないと発見した音楽はそのセッションにしか存在しない。`rankedChordToChord` は発見から記譜への1行の橋であり、ラウンドトリップ(調律 → 発見 → 和音 → 別の調律/楽器/エクスポート)を完成させる。
 
 471 テスト / 全パス。
+
+---
+
+## Q41. `Scale` から `rankChords` で「ダイアトニック和音」を発見できるか？ ❌→✅
+
+**問**: `rankChords(tuning, opts)` は調律系の全度数を探索する。マカームやラーガの実践者は「この旋法の中だけで最も協和する和音は何か」(ダイアトニック和音探索)を知りたい。`Scale` から直接 `rankChords` に渡す道があるか？
+
+**検証**: `rankChords` は `TuningSystem` を受け取る。`Scale.degreeIndices` は親調律の一部の度数を指す。この橋が欠けているため、ユーザーは親調律の全度数を受け取り、手動でフィルタリングする必要がある — `Scale` が「第一級市民」である主張と矛盾。
+
+**判定**: ❌ `Scale → TuningSystem` の橋が欠落 → `scaleToTuning(scale, tuning): TuningSystem` を追加して解消。
+
+**実装**:
+```ts
+export function scaleToTuning(scale: Scale, tuning: TuningSystem): TuningSystem {
+  assertTuningMatch(scale, tuning);
+  return defineTuning({
+    id: `${scale.id}-tuning`,
+    name: `${scale.name} (tuning)`,
+    referenceHz: tuning.referenceHz,
+    periodCents: tuning.periodCents,
+    degrees: scale.degreeIndices.map((d) => ({
+      kind: 'cents' as const,
+      cents: degreeToCents(tuning, d),
+    })),
+    source: tuning.source,
+    region: tuning.region,
+  });
+}
+```
+
+これにより `rankChords(scaleToTuning(dorian, t12))` は12音中のダイアトニック和音のみを探索する。`scaleMode` と組み合わせると `scaleMode → scaleToTuning → rankChords` で「旋法ごとの協和和音」パイプラインが完成。
+
+**テスト(8 件)**:
+- 度数数 = スケール長
+- cents が `scaleToCents` に一致
+- `referenceHz`・`periodCents` の保存
+- id は `${scale.id}-tuning`
+- tuning 不一致 → RangeError
+- C(6,2)=15 ダイアトニック3和音 < C(11,2)=55 全12音3和音(スケール制約の証明)
+- Ionian と Dorian の `scaleToTuning` → `rankChords` が異なるトップ和音を返す
+
+---
+
+## 第十七巡サマリ
+
+| 問                                                              | 判定              | 対応                                              |
+| --------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| Q41 `Scale → rankChords` のダイアトニック探索路がない           | ❌ 橋の欠落       | `scaleToTuning` 追加 + 8 テスト                   |
+
+**到達した境地**: `Scale` は「選択の記述子」(どの度数を使うか)であり `TuningSystem` は「音律の完全な仕様」だ。この2つは別の存在だが、`scaleToTuning` によって選択記述子が音律仕様に「昇格」できる。この昇格を経ることで、スケールの選択は `rankChords`・`mtsBulkDump`・`fingerChord` などあらゆる音律ベースのパイプラインへの入口になる。「旋法が第一級」とは、旋法が処理パイプラインの起点になれることを意味する。
+
+479 テスト / 全パス。

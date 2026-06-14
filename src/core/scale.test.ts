@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { type Scale, scaleToCents, scaleToFreqs, scaleMode } from './scale.js';
+import { type Scale, scaleToCents, scaleToFreqs, scaleMode, scaleToTuning } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
+import { rankChords } from './chord-search.js';
+import { harmonicSpectrum } from './spectrum.js';
 
 const t12 = equalTemperament12(440);
 
@@ -148,5 +150,69 @@ describe('scaleMode — modal rotation', () => {
     const mode1 = scaleMode(bpScale, 1, bp);
     expect(scaleToCents(mode1, bp)[0]).toBeCloseTo(0, 9);
     expect(mode1.degreeIndices.length).toBe(4);
+  });
+});
+
+// Socratic Q41: scaleToTuning bridges Scale → TuningSystem for rankChords / pipeline.
+describe('scaleToTuning — modal layer → TuningSystem bridge', () => {
+  it('test_degree_count_matches_scale_length', () => {
+    const sub = scaleToTuning(major, t12);
+    expect(sub.degrees.length).toBe(major.degreeIndices.length); // 7
+  });
+
+  it('test_cents_match_scaleToCents', () => {
+    const sub = scaleToTuning(major, t12);
+    const subCents = sub.degrees.map((p) =>
+      p.kind === 'cents'
+        ? p.cents
+        : 1200 *
+          Math.log2(
+            (p as { ratio: { num: number; den: number } }).ratio.num /
+              (p as { ratio: { num: number; den: number } }).ratio.den,
+          ),
+    );
+    expect(subCents).toEqual(scaleToCents(major, t12));
+  });
+
+  it('test_referenceHz_preserved', () => {
+    const sub = scaleToTuning(major, t12);
+    expect(sub.referenceHz).toBe(t12.referenceHz);
+  });
+
+  it('test_periodCents_preserved', () => {
+    const sub = scaleToTuning(major, t12);
+    expect(sub.periodCents).toBe(t12.periodCents);
+  });
+
+  it('test_id_is_scale_id_tuning', () => {
+    const sub = scaleToTuning(major, t12);
+    expect(sub.id).toBe('major-tuning');
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2] };
+    expect(() => scaleToTuning(wrong, t12)).toThrow(RangeError);
+  });
+
+  it('test_rankChords_on_sub_tuning_discovers_diatonic_chords', () => {
+    // Diatonic triads from major scale: C(6,2)=15 vs chromatic C(11,2)=55.
+    const sub = scaleToTuning(major, t12);
+    const spectrum = harmonicSpectrum();
+    const diatonicTriads = rankChords(sub, { size: 3, spectrum, limit: 100 });
+    const fullTriads = rankChords(t12, { size: 3, spectrum, limit: 100 });
+    expect(diatonicTriads.length).toBeLessThan(fullTriads.length);
+    expect(diatonicTriads.length).toBeGreaterThan(0);
+  });
+
+  it('test_modal_rotation_then_scaleToTuning_gives_distinct_chord_set', () => {
+    // Ionian and Dorian have different interval sets → different diatonic chords.
+    const dorian = scaleMode(major, 1, t12);
+    const spectrum = harmonicSpectrum();
+    const ionianChords = rankChords(scaleToTuning(major, t12), { size: 3, spectrum, limit: 3 });
+    const dorianChords = rankChords(scaleToTuning(dorian, t12), { size: 3, spectrum, limit: 3 });
+    // The top chord cents patterns should differ (different interval sets).
+    expect(JSON.stringify(ionianChords[0]!.cents)).not.toEqual(
+      JSON.stringify(dorianChords[0]!.cents),
+    );
   });
 });

@@ -1,4 +1,4 @@
-import { type TuningSystem, degreeToCents, degreeToFreq } from './tuning.js';
+import { type TuningSystem, defineTuning, degreeToCents, degreeToFreq } from './tuning.js';
 
 /**
  * A scale / mode / jins / raga: an ordered selection of degrees over a tuning.
@@ -44,6 +44,33 @@ export function scaleToCents(scale: Scale, tuning: TuningSystem): number[] {
 export function scaleToFreqs(scale: Scale, tuning: TuningSystem): number[] {
   assertTuningMatch(scale, tuning);
   return scale.degreeIndices.map((d) => degreeToFreq(tuning, d));
+}
+
+/**
+ * Extract the `Scale`'s selected degrees as a new `TuningSystem`.
+ *
+ * This is the bridge from the modal/Scale layer to the full pipeline:
+ * `rankChords(scaleToTuning(scale, tuning), opts)` discovers chords built
+ * exclusively from the scale's degrees (diatonic chords), rather than
+ * searching the entire parent tuning.
+ *
+ * The resulting sub-tuning inherits `referenceHz`, `periodCents`, `source`,
+ * and `region` from the parent; its id is `<scale.id>-tuning`.
+ */
+export function scaleToTuning(scale: Scale, tuning: TuningSystem): TuningSystem {
+  assertTuningMatch(scale, tuning);
+  return defineTuning({
+    id: `${scale.id}-tuning`,
+    name: `${scale.name} (tuning)`,
+    referenceHz: tuning.referenceHz,
+    periodCents: tuning.periodCents,
+    degrees: scale.degreeIndices.map((d) => ({
+      kind: 'cents' as const,
+      cents: degreeToCents(tuning, d),
+    })),
+    source: tuning.source,
+    ...(tuning.region !== undefined ? { region: tuning.region } : {}),
+  });
 }
 
 /**
