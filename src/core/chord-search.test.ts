@@ -4,7 +4,7 @@ import { equalTemperament12, edo } from './tuning.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
 import { voiceLeadingCost } from './voice-leading.js';
-import { rankChords, realizeRankedChordFreqs } from './chord-search.js';
+import { rankChords, realizeRankedChordFreqs, progressionSmoothness } from './chord-search.js';
 
 describe('rankChords — 12-TET size-3 harmonic spectrum', () => {
   const tuning = equalTemperament12(440);
@@ -298,5 +298,63 @@ describe('realizeRankedChordFreqs — bridge from RankedChord to Hz', () => {
         },
       ),
     );
+  });
+});
+
+// Socratic Q35: progressionSmoothness aggregates pairwise voice-leading across a chord sequence.
+describe('progressionSmoothness — total voice-leading cost across a chord progression', () => {
+  const tuning = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('test_empty_sequence_returns_zero', () => {
+    expect(progressionSmoothness([], 261.63)).toBe(0);
+  });
+
+  it('test_single_chord_returns_zero', () => {
+    const chord = rankChords(tuning, { size: 3, spectrum, limit: 1 })[0]!;
+    expect(progressionSmoothness([chord], 261.63)).toBe(0);
+  });
+
+  it('test_two_chords_equals_pairwise_voiceLeadingCost', () => {
+    const chords = rankChords(tuning, { size: 3, spectrum, limit: 2 });
+    const expected = voiceLeadingCost(
+      realizeRankedChordFreqs(chords[0]!, 261.63),
+      realizeRankedChordFreqs(chords[1]!, 261.63),
+    );
+    expect(progressionSmoothness(chords, 261.63)).toBeCloseTo(expected, 9);
+  });
+
+  it('test_three_chords_is_sum_of_two_adjacent_costs', () => {
+    const chords = rankChords(tuning, { size: 3, spectrum, limit: 3 });
+    const ab = voiceLeadingCost(
+      realizeRankedChordFreqs(chords[0]!, 440),
+      realizeRankedChordFreqs(chords[1]!, 440),
+    );
+    const bc = voiceLeadingCost(
+      realizeRankedChordFreqs(chords[1]!, 440),
+      realizeRankedChordFreqs(chords[2]!, 440),
+    );
+    expect(progressionSmoothness(chords, 440)).toBeCloseTo(ab + bc, 9);
+  });
+
+  it('test_result_is_non_negative', () => {
+    const chords = rankChords(tuning, { size: 3, spectrum, limit: 5 });
+    expect(progressionSmoothness(chords, 261.63)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_inserting_distant_chord_increases_cost', () => {
+    // Top two consonant chords (close together) vs a progression through a dissonant middle chord.
+    const all = rankChords(tuning, { size: 3, spectrum, limit: 55 });
+    const smooth = [all[0]!, all[1]!]; // top two: close neighbours
+    const rough = [all[0]!, all[54]!, all[1]!]; // worst chord in the middle
+    expect(progressionSmoothness(rough, 261.63)).toBeGreaterThan(
+      progressionSmoothness(smooth, 261.63),
+    );
+  });
+
+  it('test_mismatched_chord_sizes_throw', () => {
+    const triads = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const dyads = rankChords(tuning, { size: 2, spectrum, limit: 1 });
+    expect(() => progressionSmoothness([triads[0]!, dyads[0]!], 261.63)).toThrow(RangeError);
   });
 });

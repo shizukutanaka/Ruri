@@ -613,3 +613,71 @@ const fingerings = fingerChord(guitar, chordToCentOffsets(major, 500));
 **到達した境地**: Q31(generate)・Q32(scale)・Q33(ranking)・Q34(chord→fingering)は同一パターンの四例。「変換を生産する層」と「それを消費する層」の間に常に手動変換が必要だった。今回の修正で `Chord → chordToCentOffsets → fingerChord` がワンライナーになる。`StringInstrument` の「Hz なし移調可能モデル」は設計上正しい — ただしその抽象の境界に橋渡し関数が必要だった。これは音楽ライブラリ特有の「座標系が複数ある」問題(Hz / セント / 楽器セント / MIDI ノート番号)の具体例である。
 
 431 テスト / 全パス。
+
+---
+
+## 第十一巡: DTM 出力は「進行」を一級市民として扱えるか
+
+**目標**: 「DTM へ出力する」を掲げるライブラリが、単独和音の採点を超えて**和音進行**をスコアリングできるかを問う。
+
+## Q35. `voiceLeadingCost` は2和音間のコストを返す。3和音以上の進行のコストは計算できるか？ ❌ **集計関数なし → `progressionSmoothness` を追加**
+
+**問**: ユーザが「Imaj7→IIm7→V7→Imaj7」のような4和音進行を評価したい場合、今日できることは何か？
+
+**検証**: `voiceLeadingCost(fromFreqs, toFreqs)` は**ペア**に対してのみ動く。進行を評価するには:
+```ts
+const chords = rankChords(tuning, { limit: 4 });
+const ab = voiceLeadingCost(realizeRankedChordFreqs(chords[0]!, r), realizeRankedChordFreqs(chords[1]!, r));
+const bc = voiceLeadingCost(realizeRankedChordFreqs(chords[1]!, r), realizeRankedChordFreqs(chords[2]!, r));
+const cd = voiceLeadingCost(realizeRankedChordFreqs(chords[2]!, r), realizeRankedChordFreqs(chords[3]!, r));
+const total = ab + bc + cd;  // 6行手動
+```
+
+`progressionSmoothness` は存在しないため、毎コードペアを手動でループする必要がある。これは「DTM 出力」を掲げるライブラリが最も基本的な「進行評価」を直接サポートしていないことを意味する。
+
+**判定**: ❌ 進行全体のスムーズネス計算が1コールで行えない。Q31-Q34 と同じ「集計すべき関数がない」パターン。
+
+**実装**: `src/core/chord-search.ts` に追加:
+```ts
+export function progressionSmoothness(
+  chords: readonly RankedChord[],
+  rootHz: number,
+): number {
+  if (chords.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < chords.length; i++) {
+    total += voiceLeadingCost(
+      realizeRankedChordFreqs(chords[i - 1]!, rootHz),
+      realizeRankedChordFreqs(chords[i]!, rootHz),
+    );
+  }
+  return total;
+}
+```
+
+**使用例(改善後)**:
+```ts
+const chords = rankChords(tuning, { size: 3, limit: 4 });
+const cost = progressionSmoothness(chords, 261.63);  // 1コール
+```
+
+**テスト(7件)**:
+- 空配列 → 0
+- 単一和音 → 0
+- 2和音 → `voiceLeadingCost` の結果と一致
+- 3和音 → A→B + B→C の和(中間経路を含む)
+- 結果は非負
+- 途中に遠い和音を挿入するとコスト増加(単調性の例示)
+- 異なるサイズの和音を混在させると `voiceLeadingCost` がスローする
+
+---
+
+## 第十一巡サマリ
+
+| 問                                                            | 判定                     | 対応                                                                    |
+| ------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------- |
+| Q35 和音進行のスムーズネスを1コールで計算できない             | ❌ 集計関数なし           | `progressionSmoothness(chords, rootHz)` 追加 + 7 テスト                |
+
+**到達した境地**: Q31-Q35 は「生産と消費の接続」の系譜を完成させた。`generatedTuning`(Q31)が TuningSystem を生産し、`rankChords` が候補を生産し、`realizeRankedChordFreqs`(Q33)が Hz を生産し、`progressionSmoothness`(Q35)が進行全体のコストを生産する。これで「微分音スケールを生成して最も協和する4和音進行を探す」ワークフローが**すべて1コールの連鎖**で表現できる。
+
+438 テスト / 全パス。

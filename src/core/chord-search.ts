@@ -4,6 +4,7 @@ import { chordDissonance } from './dissonance.js';
 import { chordPeriodicity } from './harmonicity.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { degreeToCents } from './tuning.js';
+import { voiceLeadingCost } from './voice-leading.js';
 
 export interface RankedChord {
   /** Degree indices within one period, ascending, starting at the chord's root degree offset 0..n-1 — store absolute degree indices. */
@@ -231,4 +232,30 @@ export function rankChords(tuning: TuningSystem, opts?: ChordSearchOptions): Ran
  */
 export function realizeRankedChordFreqs(chord: RankedChord, rootHz: number): number[] {
   return chord.cents.map((c) => rootHz * centsToFreqFactor(c));
+}
+
+/**
+ * Total minimal voice-leading cost (in cents) across a chord progression.
+ *
+ * Sums pairwise `voiceLeadingCost` for consecutive chord pairs in the sequence.
+ * Lower is smoother. Returns 0 for sequences shorter than 2 chords.
+ *
+ * All chords must have the same voice count (same `cents` length); mismatched
+ * sizes throw a `RangeError` via `voiceLeadingCost`.
+ *
+ * @example
+ * const chords = rankChords(tuning, { size: 3, limit: 4 });
+ * const cost = progressionSmoothness(chords, 261.63);
+ * // chords[0]→[1]→[2]→[3] total voice-leading cost — pick the ordering with lowest cost
+ */
+export function progressionSmoothness(chords: readonly RankedChord[], rootHz: number): number {
+  if (chords.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < chords.length; i++) {
+    total += voiceLeadingCost(
+      realizeRankedChordFreqs(chords[i - 1]!, rootHz),
+      realizeRankedChordFreqs(chords[i]!, rootHz),
+    );
+  }
+  return total;
 }
