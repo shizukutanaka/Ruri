@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { type Scale, scaleToCents, scaleToFreqs } from './scale.js';
+import { type Scale, scaleToCents, scaleToFreqs, scaleMode } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 
 const t12 = equalTemperament12(440);
@@ -66,5 +66,87 @@ describe('scaleToFreqs — bridge to the frequency world', () => {
   it('test_tuning_id_mismatch_throws', () => {
     const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0] };
     expect(() => scaleToFreqs(wrong, t12)).toThrow(RangeError);
+  });
+});
+
+// Socratic Q39: modal rotation is a first-class Scale operation.
+describe('scaleMode — modal rotation', () => {
+  it('test_mode_0_is_identity', () => {
+    // Mode 0 of major = major: indices start at degree 0, same intervals.
+    const mode0 = scaleMode(major, 0, t12);
+    expect(scaleToCents(mode0, t12)).toEqual(scaleToCents(major, t12));
+  });
+
+  it('test_mode_2_of_major_is_dorian', () => {
+    // Major mode 2 (0-indexed) = Phrygian ... wait:
+    // Ionian [0,2,4,5,7,9,11] → mode index 1 (D) = Dorian.
+    // W-H-W-W-W-H-W → [0,2,3,5,7,9,10] in cents [0,200,300,500,700,900,1000]
+    const dorian = scaleMode(major, 1, t12);
+    expect(scaleToCents(dorian, t12)).toEqual([0, 200, 300, 500, 700, 900, 1000]);
+  });
+
+  it('test_mode_6_of_major_is_locrian', () => {
+    // Mode index 6 (B) = Locrian: H-W-H-W-W-W-W → [0,1,3,5,6,8,10]c*100
+    const locrian = scaleMode(major, 6, t12);
+    expect(scaleToCents(locrian, t12)).toEqual([0, 100, 300, 500, 600, 800, 1000]);
+  });
+
+  it('test_mode_id_and_name_are_updated', () => {
+    const mode = scaleMode(major, 1, t12);
+    expect(mode.id).toBe('major-mode-2');
+    expect(mode.name).toBe('Ionian mode 2');
+    expect(mode.tuningId).toBe('12-tet');
+  });
+
+  it('test_all_7_modes_start_at_zero_cents', () => {
+    for (let i = 0; i < 7; i++) {
+      const mode = scaleMode(major, i, t12);
+      expect(scaleToCents(mode, t12)[0]).toBe(0);
+    }
+  });
+
+  it('test_mode_rotation_preserves_interval_multiset', () => {
+    // The set of step sizes is invariant under rotation.
+    const steps = (cents: number[]): number[] => {
+      const s: number[] = [];
+      for (let i = 1; i < cents.length; i++)
+        s.push((cents[i] as number) - (cents[i - 1] as number));
+      // wrap-around step:
+      s.push(1200 - (cents[cents.length - 1] as number));
+      return s.sort((a, b) => a - b);
+    };
+    const originalSteps = steps(scaleToCents(major, t12));
+    for (let i = 0; i < 7; i++) {
+      const mode = scaleMode(major, i, t12);
+      expect(steps(scaleToCents(mode, t12))).toEqual(originalSteps);
+    }
+  });
+
+  it('test_out_of_range_modeIndex_throws', () => {
+    expect(() => scaleMode(major, 7, t12)).toThrow(RangeError);
+    expect(() => scaleMode(major, -1, t12)).toThrow(RangeError);
+  });
+
+  it('test_non_integer_modeIndex_throws', () => {
+    expect(() => scaleMode(major, 1.5, t12)).toThrow(RangeError);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2] };
+    expect(() => scaleMode(wrong, 0, t12)).toThrow(RangeError);
+  });
+
+  it('test_non_octave_tuning_mode_rotation', () => {
+    // 13-EDO Bohlen-Pierce: period = 1902c. Rotation should use periodDegrees=13.
+    const bp = edo(13, 440, 1200 * Math.log2(3));
+    const bpScale: Scale = {
+      id: 'bp',
+      name: 'bp',
+      tuningId: '13-edo',
+      degreeIndices: [0, 2, 4, 6],
+    };
+    const mode1 = scaleMode(bpScale, 1, bp);
+    expect(scaleToCents(mode1, bp)[0]).toBeCloseTo(0, 9);
+    expect(mode1.degreeIndices.length).toBe(4);
   });
 });

@@ -45,3 +45,33 @@ export function scaleToFreqs(scale: Scale, tuning: TuningSystem): number[] {
   assertTuningMatch(scale, tuning);
   return scale.degreeIndices.map((d) => degreeToFreq(tuning, d));
 }
+
+/**
+ * Modal rotation: return the scale starting from `modeIndex` (0-based).
+ *
+ * Fundamental in maqam / raga traditions — e.g. Dorian is Ionian mode 2.
+ * The rotated indices are re-zeroed so that the new root's position in the
+ * tuning is `degreeIndices[modeIndex]`; higher-octave predecessors are
+ * shifted up by one period (`tuning.degrees.length` steps).
+ *
+ * Invariant: `scaleMode(scale, 0, tuning)` returns an equivalent scale.
+ */
+export function scaleMode(scale: Scale, modeIndex: number, tuning: TuningSystem): Scale {
+  assertTuningMatch(scale, tuning);
+  const n = scale.degreeIndices.length;
+  if (!Number.isInteger(modeIndex) || modeIndex < 0 || modeIndex >= n) {
+    throw new RangeError(`modeIndex must be in [0, ${n - 1}], got ${modeIndex}`);
+  }
+  const periodDegrees = tuning.degrees.length;
+  const rootDegree = scale.degreeIndices[modeIndex] as number;
+  const newIndices = [
+    ...scale.degreeIndices.slice(modeIndex).map((d) => d - rootDegree),
+    ...scale.degreeIndices.slice(0, modeIndex).map((d) => d - rootDegree + periodDegrees),
+  ];
+  return {
+    id: `${scale.id}-mode-${modeIndex + 1}`,
+    name: `${scale.name} mode ${modeIndex + 1}`,
+    tuningId: scale.tuningId,
+    degreeIndices: newIndices,
+  };
+}

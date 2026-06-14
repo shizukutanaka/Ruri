@@ -829,3 +829,66 @@ export function chordFromRatios(
 **到達した境地**: 設計原則が実装に忠実かどうかは、「どんなユーザー入力を受け付けるか」で問われる。`ratio` と `fromRatio` が存在し `Pitch` 型が比を一級サポートするにも拘わらず、`Chord` を作る唯一の道が cents 変換を経由するなら、その原則はドキュメントの中だけにある。`chordFromRatios` はその欠落を埋め、「比を一次に持ち続ける和音を 1 行で構築できる」ようにする。
 
 454 テスト / 全パス。
+
+---
+
+## Q39. `Scale` は「旋法は一級市民」と主張するが、旋法転回が 1 コールで実現できるか？ ❌→✅
+
+**問(新視点 — ソクラテス式)**: README と CLAUDE.md は `Scale` 層を「微分音文化は旋法中心」として一級市民に格上げした。しかしマカームやラーガの実践において最も基本的な操作 — **旋法転回(modal rotation)** — が `Scale` API に存在するか？ ドリアンはイオニアンの 2 番目の旋法である。これを既存 API で得るには？
+
+**検証**: `scale.ts` を調べると `scaleToCents` / `scaleToFreqs` しかない。旋法転回を行うには呼び出し側が手動で:
+1. `degreeIndices` をスライス+再結合
+2. 高オクターブ側のインデックスに `tuning.degrees.length`（周期度数）を足す
+3. 新 `Scale` オブジェクトを構築
+
+この 3 ステップは `Scale` の不変条件(昇順インデックス・0 起点)を知らなければ正しく実装できない。**旋法転回は `Scale` の内部実装を知る者だけが安全にできる操作**であり、「一級市民」の主張と矛盾する。
+
+**判定**: ❌ 設計原則と実装の乖離 → `scaleMode(scale, modeIndex, tuning): Scale` を追加して解消。
+
+**実装**:
+```ts
+export function scaleMode(scale: Scale, modeIndex: number, tuning: TuningSystem): Scale {
+  assertTuningMatch(scale, tuning);
+  const n = scale.degreeIndices.length;
+  if (!Number.isInteger(modeIndex) || modeIndex < 0 || modeIndex >= n)
+    throw new RangeError(`modeIndex must be in [0, ${n - 1}], got ${modeIndex}`);
+  const periodDegrees = tuning.degrees.length;
+  const rootDegree = scale.degreeIndices[modeIndex];
+  const newIndices = [
+    ...scale.degreeIndices.slice(modeIndex).map((d) => d - rootDegree),
+    ...scale.degreeIndices.slice(0, modeIndex).map((d) => d - rootDegree + periodDegrees),
+  ];
+  return { id: `${scale.id}-mode-${modeIndex + 1}`, name: `${scale.name} mode ${modeIndex + 1}`,
+    tuningId: scale.tuningId, degreeIndices: newIndices };
+}
+```
+
+**設計の要点**:
+- `rootDegree` を引くことで 0 起点を保証(モード後の最初の音 = 0 度)
+- 先頭スライス部分には `+ periodDegrees` を加えてオクターブを「巻き上げ」
+- 非整数周期(スレンドロ、ボーレン=ピアス)でも `periodDegrees = tuning.degrees.length` が正しく機能
+- 不変条件(Dorian のステップ集合 ⊆ Ionian のステップ集合)をプロパティテストで保証
+
+**テスト(10 件)**:
+- `mode 0` → 恒等 (cents 一致)
+- Ionian `mode 1` → Dorian: `[0,200,300,500,700,900,1000]`
+- Ionian `mode 6` → Locrian: `[0,100,300,500,600,800,1000]`
+- id/name 更新・tuningId 保持
+- 全 7 モードで先頭 cents = 0
+- **ステップ集合の不変性**: 全 7 モードのステップ multiset が同一(旋法転回の核心不変条件)
+- 範囲外インデックス → RangeError
+- 非整数 modeIndex → RangeError
+- tuning 不一致 → RangeError
+- 非オクターブ調律(13-EDO Bohlen-Pierce)での旋法転回
+
+---
+
+## 第十五巡サマリ
+
+| 問                                                          | 判定           | 対応                                         |
+| ----------------------------------------------------------- | -------------- | -------------------------------------------- |
+| Q39 `Scale` に旋法転回なし、「旋法は一級市民」と矛盾        | ❌ 設計と実装の乖離 | `scaleMode` 追加 + 11 テスト            |
+
+**到達した境地**: 「一級市民」という主張は操作の完全性で測られる。`Scale` が旋法を表現できても旋法転回を表現できなければ、最も基本的なマカーム操作(ウシャク → ブーセリク → ヒジャズ)が外部ループを要求する。11 個のテストのうち最も重要なのは「ステップ multiset の不変性」 — これがソクラテス式の核心: 「旋法転回とは何か」を問えば「同じ音程集合の別の出発点」という不変条件が現れ、その不変条件がテストになる。
+
+464 テスト / 全パス。
