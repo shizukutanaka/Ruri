@@ -1107,3 +1107,53 @@ export function rankModes(scale: Scale, tuning: TuningSystem, spectrum: Spectrum
 **到達した境地**: ライブラリは「timbre 依存の協和評価」を核心命題とし、`consonantIntervals(bellSpectrum())` でベル音色の協和音程を返す。しかし同じ評価を「旋法」という単位で行う道がなかった。`scaleDissonance` + `rankModes` は「旋法と音色の相互作用」を 1 コールで問える窓口であり、マカーム・ラーガの学術的分析(音色別旋法順位)が初めて可能になる。
 
 496 テスト / 全パス。
+
+---
+
+## Q44. `TuningSystem` を Scala `.scl` に 1 コールで変換できるか？ ❌→✅
+
+**問**: Scala `.scl` は微分音ソフトウェアの事実上の標準フォーマットであり、ruri のアダプタ層にも `parseScl`/`writeScl` が存在する。しかし `TuningSystem → ScalaScale` の変換が欠落している。現在の手順:
+1. `tuning.degrees.map(pitchToCents)` で cents 配列取得
+2. index 0 (ユニゾン = 0c) をスキップ
+3. `tuning.periodCents` を末尾に追加
+4. `sclFromCents(...)` で ScalaScale 構築
+
+これは4ステップ。「`TuningSystem` は一級市民、Scala は微分音エコシステムへの窓口」という主張と矛盾する。
+
+**判定**: ❌ アダプタ橋の欠落 → `tuningToScl(tuning): ScalaScale` を `src/adapters/scala.ts` に追加。
+
+**実装**:
+```ts
+export function tuningToScl(tuning: TuningSystem): ScalaScale {
+  const aboveRoot: ScalaDegree[] = tuning.degrees.slice(1).map((p) => {
+    if (p.kind === 'ratio') return { kind: 'ratio', num: p.ratio.num, den: p.ratio.den };
+    const c = pitchToCents(p);
+    return { kind: 'cents', cents: c, text: c.toFixed(6) };
+  });
+  const period: ScalaDegree = { kind: 'cents', cents: tuning.periodCents, text: tuning.periodCents.toFixed(6) };
+  return { description: tuning.id, degrees: [...aboveRoot, period] };
+}
+```
+
+JI ratio の degree は ratio として保持(cents 変換しない) — `writeScl → parseScl` ラウンドトリップで精度が失われない。非オクターブ周期(Bohlen-Pierce の 1902c)も正しく `periodCents` として最終エントリに出力される。
+
+**テスト(7 件)**:
+- 12-TET の degree 数 = 12(ユニゾン除外 + 周期追加)
+- 最初のエントリ = 100c
+- 最後のエントリ = `periodCents`
+- description が tuning.id
+- `writeScl → parseScl` ラウンドトリップで全 degree 一致
+- Bohlen-Pierce(非オクターブ) の period 保存
+- 19-EDO: 19エントリ
+
+---
+
+## 第二十巡サマリ
+
+| 問                                                     | 判定         | 対応                                           |
+| ------------------------------------------------------ | ------------ | ---------------------------------------------- |
+| Q44 `TuningSystem → Scala .scl` の直接変換が欠落      | ❌ アダプタ橋の欠落 | `tuningToScl` 追加 + 7 テスト             |
+
+**到達した境地**: アダプタ層は「変換の最終段」であり、コア層が生成した音律を外部フォーマットに出力する責務を持つ。`TuningSystem → MTS SysEx`(`tuningToMtsFrequencies → mtsBulkDump`)と `TuningSystem → .tun`(`writeTun`)は既存だったが `TuningSystem → .scl` が欠けていた。微分音エコシステムにおいて `.scl` は最も普及したフォーマットであり、`tuningToScl` はこの欠落を 1 コールで埋める。
+
+503 テスト / 全パス。

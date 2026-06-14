@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。496テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。503テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -116,6 +116,10 @@ import { parseScl } from 'ruri/adapters';
 
 // 19-EDO を MTS 非リアルタイム一括ダンプ(408 バイト)に変換して DAW へ送信
 const sysex: Uint8Array = mtsBulkDump(tuningToMtsFrequencies(edo(19)), '19-edo');
+
+// TuningSystem → Scala .scl: 微分音エコシステムへの直接エクスポート
+import { tuningToScl, writeScl } from 'ruri/adapters';
+const sclText: string = writeScl(tuningToScl(edo(19)));   // 19-EDO を .scl テキストへ
 
 // .kbm で任意の MIDI ノートを周波数に解決(未マップキーは null)
 const scale = parseScl(sclFileText);

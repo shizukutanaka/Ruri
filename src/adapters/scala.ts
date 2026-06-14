@@ -1,4 +1,6 @@
 /** Scala .scl import/export. Preserves original ratio-vs-cents representation for lossless round-trip. */
+import { type TuningSystem } from '../core/tuning.js';
+import { pitchToCents } from '../core/cents.js';
 
 /** One scale degree, tagged by its original textual form. */
 export type ScalaDegree =
@@ -91,4 +93,31 @@ export function sclFromCents(description: string, centsAscending: readonly numbe
       text: c.toFixed(6),
     })),
   };
+}
+
+/**
+ * Export a `TuningSystem` directly to a Scala `.scl` `ScalaScale`.
+ *
+ * Bridges the core tuning layer to the Scala ecosystem in one call.
+ * Preserves JI ratio degrees as ratio text (`5/4`) rather than lossy
+ * cents conversion — a `TuningSystem` built from `chordFromRatios`-derived
+ * degrees round-trips through `writeScl → parseScl` without precision loss.
+ *
+ * Scala convention: the first degree (root = 0c) is implicit; only pitches
+ * *above* the root are listed, with the period appended as the final entry.
+ */
+export function tuningToScl(tuning: TuningSystem): ScalaScale {
+  const aboveRoot: ScalaDegree[] = tuning.degrees.slice(1).map((p) => {
+    if (p.kind === 'ratio') {
+      return { kind: 'ratio' as const, num: p.ratio.num, den: p.ratio.den };
+    }
+    const c = pitchToCents(p);
+    return { kind: 'cents' as const, cents: c, text: c.toFixed(6) };
+  });
+  const period: ScalaDegree = {
+    kind: 'cents' as const,
+    cents: tuning.periodCents,
+    text: tuning.periodCents.toFixed(6),
+  };
+  return { description: tuning.id, degrees: [...aboveRoot, period] };
 }

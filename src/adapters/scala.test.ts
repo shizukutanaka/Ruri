@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parseScl, writeScl, sclFromCents, degreeCents } from './scala.js';
+import { parseScl, writeScl, sclFromCents, degreeCents, tuningToScl } from './scala.js';
+import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
 import { mpeToFreq } from '../core/midi.js';
 import { freqToCents } from '../core/cents.js';
@@ -153,5 +154,55 @@ describe('MPE chord export', () => {
       DEFAULT_MPE.bendRangeSemitones,
     );
     expect(Math.abs(freqToCents(recovered, targetHz))).toBeLessThan(0.5);
+  });
+});
+
+// Socratic Q44: tuningToScl bridges TuningSystem → Scala .scl without manual steps.
+describe('tuningToScl — TuningSystem → ScalaScale adapter', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_degree_count_is_n_degrees_plus_period', () => {
+    // 12-TET has 12 degrees (0..11); Scala omits unison + adds period = 12 entries.
+    const scl = tuningToScl(t12);
+    expect(scl.degrees.length).toBe(12); // 11 above-root + 1 period
+  });
+
+  it('test_first_degree_is_100c_for_12tet', () => {
+    const scl = tuningToScl(t12);
+    expect(degreeCents(scl.degrees[0]!)).toBeCloseTo(100, 9);
+  });
+
+  it('test_last_degree_is_periodCents', () => {
+    const scl = tuningToScl(t12);
+    expect(degreeCents(scl.degrees[scl.degrees.length - 1]!)).toBeCloseTo(1200, 9);
+  });
+
+  it('test_description_is_tuning_id', () => {
+    const scl = tuningToScl(t12);
+    expect(scl.description).toBe(t12.id);
+  });
+
+  it('test_round_trip_writeScl_parseScl', () => {
+    const scl = tuningToScl(t12);
+    const text = writeScl(scl);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBe(scl.degrees.length);
+    parsed.degrees.forEach((d, i) => {
+      expect(degreeCents(d)).toBeCloseTo(degreeCents(scl.degrees[i]!), 4);
+    });
+  });
+
+  it('test_non_octave_tuning_period_preserved', () => {
+    // 13-EDO of 3/1 period (Bohlen-Pierce): period = 1902c.
+    const bp = edo(13, 440, 1200 * Math.log2(3));
+    const scl = tuningToScl(bp);
+    const periodEntry = scl.degrees[scl.degrees.length - 1]!;
+    expect(degreeCents(periodEntry)).toBeCloseTo(1200 * Math.log2(3), 6);
+  });
+
+  it('test_19edo_has_19_scala_degrees', () => {
+    const t19 = edo(19);
+    const scl = tuningToScl(t19);
+    expect(scl.degrees.length).toBe(19);
   });
 });
