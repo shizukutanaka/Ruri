@@ -1,6 +1,7 @@
 /** Curated tuning presets. Each is ONE documented example with provenance — never "the" tuning. */
 
-import { type TuningPreset } from './tuning-data.js';
+import { type TuningSystem } from '../core/tuning.js';
+import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 
 const SEMI = 100;
 
@@ -90,3 +91,24 @@ export const ALL_PRESETS: readonly TuningPreset[] = [
   SLENDRO_EXAMPLE,
   PELOG_EXAMPLE,
 ];
+
+/**
+ * Look up a preset by id and return a validated `TuningSystem`, or `undefined` if not found.
+ *
+ * This is the user-facing entry point into the curated tuning data — no need to import
+ * named preset constants or iterate `ALL_PRESETS` manually.
+ *
+ * Available ids: `'12-tet'`, `'just-5-limit'`, `'makam-ussak-example'`,
+ * `'slendro-example'`, `'pelog-example'`.
+ *
+ * @example
+ * const makam = getTuningById('makam-ussak-example');
+ * if (makam) rankChords(makam, { size: 3 });
+ */
+export function getTuningById(
+  id: string,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): TuningSystem | undefined {
+  const preset = presets.find((p) => p.id === id);
+  return preset !== undefined ? loadTuningPreset(preset) : undefined;
+}

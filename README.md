@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。438テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。444テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -65,6 +65,18 @@ const guitar = guitarStandard();
 const major = chordFromSemitones('major', [0, 4, 7]);
 // ギター 5 弦開放 A2 = openStringsCents[1] = 500c をルートに
 const fingerings = fingerChord(guitar, chordToCentOffsets(major, 500));
+```
+
+```ts
+// c-0) 文化的調律プリセット: ID で直接取得
+import { getTuningById } from 'ruri/data';
+
+const makam = getTuningById('makam-ussak-example');  // Makam Uşşak → TuningSystem
+const slendro = getTuningById('slendro-example');    // ガムランスレンドロ(伸張オクターブ)
+// 利用可能 id: '12-tet' | 'just-5-limit' | 'makam-ussak-example' | 'slendro-example' | 'pelog-example'
+if (makam) {
+  const chords = rankChords(makam, { size: 3 });     // そのまま和音ランキングへ
+}
 ```
 
 ```ts

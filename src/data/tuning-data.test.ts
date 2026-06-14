@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { loadTuningPreset, loadAll, type TuningPreset } from './tuning-data.js';
-import { ALL_PRESETS, MAKAM_USSAK, SLENDRO_EXAMPLE, JUST_INTONATION_5L } from './presets.js';
+import {
+  ALL_PRESETS,
+  MAKAM_USSAK,
+  SLENDRO_EXAMPLE,
+  JUST_INTONATION_5L,
+  getTuningById,
+} from './presets.js';
 import { degreeToCents } from '../core/tuning.js';
 
 describe('all presets load and validate', () => {
@@ -122,5 +128,48 @@ describe('degree normalization – withRoot branch', () => {
     const t = loadTuningPreset({ ...base, periodCents: 1500, degrees: ['2'] });
     expect(t.degrees.length).toBeGreaterThan(0);
     expect(degreeToCents(t, 1)).toBeCloseTo(1200, 5);
+  });
+});
+
+// Socratic Q36: getTuningById is the user-facing entry point — no named-constant import needed.
+describe('getTuningById — discoverable preset lookup', () => {
+  it('test_known_id_returns_tuning_system', () => {
+    const t = getTuningById('12-tet');
+    expect(t).toBeDefined();
+    expect(t!.id).toBe('12-tet');
+    expect(t!.degrees.length).toBe(12);
+  });
+
+  it('test_makam_ussak_accessible_by_id', () => {
+    const t = getTuningById('makam-ussak-example');
+    expect(t).toBeDefined();
+    expect(degreeToCents(t!, 1)).toBeCloseTo(181, 0); // neutral second
+  });
+
+  it('test_slendro_accessible_by_id', () => {
+    const t = getTuningById('slendro-example');
+    expect(t).toBeDefined();
+    expect(t!.periodCents).toBeGreaterThan(1200); // stretched pseudo-octave
+  });
+
+  it('test_unknown_id_returns_undefined', () => {
+    expect(getTuningById('does-not-exist')).toBeUndefined();
+  });
+
+  it('test_all_preset_ids_are_discoverable', () => {
+    // Every id in ALL_PRESETS resolves via getTuningById
+    for (const preset of ALL_PRESETS) {
+      const t = getTuningById(preset.id);
+      expect(t).toBeDefined();
+      expect(t!.id).toBe(preset.id);
+    }
+  });
+
+  it('test_custom_preset_pool_can_be_supplied', () => {
+    const custom = [MAKAM_USSAK];
+    const found = getTuningById('makam-ussak-example', custom);
+    expect(found).toBeDefined();
+    const notFound = getTuningById('12-tet', custom);
+    expect(notFound).toBeUndefined();
   });
 });

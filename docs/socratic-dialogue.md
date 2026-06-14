@@ -681,3 +681,55 @@ const cost = progressionSmoothness(chords, 261.63);  // 1コール
 **到達した境地**: Q31-Q35 は「生産と消費の接続」の系譜を完成させた。`generatedTuning`(Q31)が TuningSystem を生産し、`rankChords` が候補を生産し、`realizeRankedChordFreqs`(Q33)が Hz を生産し、`progressionSmoothness`(Q35)が進行全体のコストを生産する。これで「微分音スケールを生成して最も協和する4和音進行を探す」ワークフローが**すべて1コールの連鎖**で表現できる。
 
 438 テスト / 全パス。
+
+---
+
+## 第十二巡: データ層の発見可能性 — ユーザはどうやってプリセットに辿り着くか
+
+**目標**: `src/data` が宣言する「出典付き調律プリセット」が、ソースを読まずにアクセス可能かを問う。
+
+## Q36. `loadTuningPreset` は `TuningPreset` オブジェクトを要求する。IDで引けるか？ ❌ **発見不能 → `getTuningById` を追加**
+
+**問**: ユーザが「Makam Uşşak の調律が欲しい」と思ったとき、何をすべきか。
+
+**検証**: `loadTuningPreset(preset: TuningPreset)` はプリセットオブジェクトを直接受け取る。利用するには:
+```ts
+import { MAKAM_USSAK } from 'ruri/data';  // ← 名前定数を知っている必要がある
+const t = loadTuningPreset(MAKAM_USSAK); // ← 2ステップ
+```
+`ALL_PRESETS` は配列として公開されているが、ID で引く関数がない。ID(`'makam-ussak-example'`)はソースを読まないと分からない。
+
+さらに: `getTuningById('makam-ussak-example')` のような **1コール・文字列ベースのルックアップ** がなければ、IDのオートコンプリートも使えず、ユーザは実装の詳細を知る必要がある。
+
+**判定**: ❌ データ層の発見可能性が低い。ユーザが `getTuningById('makam-ussak-example')` で直接 `TuningSystem` を取得できる関数が必要。
+
+**実装**: `src/data/presets.ts` に追加(`ALL_PRESETS` と同じファイルで、循環参照を回避):
+```ts
+export function getTuningById(
+  id: string,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): TuningSystem | undefined {
+  const preset = presets.find(p => p.id === id);
+  return preset !== undefined ? loadTuningPreset(preset) : undefined;
+}
+```
+
+**テスト(6件)**:
+- `'12-tet'` → 12度の `TuningSystem`
+- `'makam-ussak-example'` → 中立二度 181c 確認
+- `'slendro-example'` → stretched pseudo-octave > 1200c
+- `'does-not-exist'` → `undefined`
+- ALL_PRESETS の全 ID が getTuningById で解決される
+- カスタムプリセットプール指定: 別のリストを渡すと別の結果
+
+---
+
+## 第十二巡サマリ
+
+| 問                                                  | 判定                       | 対応                                                    |
+| --------------------------------------------------- | -------------------------- | ------------------------------------------------------- |
+| Q36 データ層へのID引きルックアップが存在しない      | ❌ 発見可能性の欠如         | `getTuningById(id, presets?)` 追加 + 6テスト            |
+
+**到達した境地**: API の発見可能性(discoverability)はドキュメントの問題ではなく、設計の問題である。`loadTuningPreset` は「オブジェクトを知っている人」向けの低レベルAPIだった。`getTuningById` はその上に「文字列を知っている人」向けの公開 API を加え、READMEに1行書けばユーザが動けるようにする。データ層の「零依存・出典必須」哲学に何も追加しない — ただ既存の階層に薄い入口を開けた。
+
+444 テスト / 全パス。
