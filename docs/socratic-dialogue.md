@@ -1157,3 +1157,62 @@ JI ratio の degree は ratio として保持(cents 変換しない) — `writeS
 **到達した境地**: アダプタ層は「変換の最終段」であり、コア層が生成した音律を外部フォーマットに出力する責務を持つ。`TuningSystem → MTS SysEx`(`tuningToMtsFrequencies → mtsBulkDump`)と `TuningSystem → .tun`(`writeTun`)は既存だったが `TuningSystem → .scl` が欠けていた。微分音エコシステムにおいて `.scl` は最も普及したフォーマットであり、`tuningToScl` はこの欠落を 1 コールで埋める。
 
 503 テスト / 全パス。
+
+---
+
+## Q45. 微分音調律系からの和音作成が 1 コールでできるか？ ❌→✅
+
+**問**: `chordFromSemitones('major', [0, 4, 7])` は 12-TET を暗黙に仮定する(セミトーン = 100c)。19-EDO や Makam の和音を作るにはどうするか？ 現在の手順:
+```ts
+const step = 1200 / 19;  // 19-EDO のステップ
+const chord: Chord = {
+  name: 'major-19edo',
+  intervals: [0, 6, 11].map(d => ({ kind: 'cents', cents: d * step }))
+};
+```
+これは 19-EDO の内部知識(ステップ幅)を知る者だけが書ける。`TuningSystem` があれば内部知識は不要なはずだ。
+
+**判定**: ❌ 微分音和音工場の欠落 → `chordFromDegrees(tuning, degreeIndices, name?): Chord` を追加。
+
+**実装**:
+```ts
+export function chordFromDegrees(
+  tuning: TuningSystem,
+  degreeIndices: readonly number[],
+  name?: string,
+): Chord {
+  if (degreeIndices.length === 0) throw new RangeError('degreeIndices must be non-empty');
+  const rootCents = degreeToCents(tuning, degreeIndices[0]);
+  return {
+    name: name ?? `chord-${degreeIndices.join('-')}`,
+    intervals: degreeIndices.map((d) => ({
+      kind: 'cents' as const,
+      cents: degreeToCents(tuning, d) - rootCents,
+    })),
+  };
+}
+```
+
+根音を自動引算するのでどの度数から始まる和音でも root-relative になる。`chordFromDegrees(edo(12), [0,4,7])` は `chordFromSemitones` と同値(12-TET での等価性をテストで保証)。
+
+**テスト(8 件)**:
+- 12-TET での `chordFromDegrees` ≡ `chordFromSemitones`
+- 根音は常に 0c
+- 非ゼロ開始度数で根音相対化
+- 19-EDO 和音の正確なインターバル
+- 名前の自動生成
+- 名前の明示指定
+- 空配列 → RangeError
+- 単一度数 → ユニゾン和音
+
+---
+
+## 第二十一巡サマリ
+
+| 問                                                           | 判定           | 対応                                             |
+| ------------------------------------------------------------ | -------------- | ------------------------------------------------ |
+| Q45 `chordFromSemitones` は 12-TET 専用。微分音和音工場なし | ❌ 調律依存の欠陥 | `chordFromDegrees` 追加 + 8 テスト             |
+
+**到達した境地**: `chordFromSemitones([0,4,7])` という API は「4セミトーン = 長三度」という 12-TET 固定の知識をライブラリ内部に埋め込む。微分音ライブラリでこれが唯一の和音工場であることは自己矛盾だ。`chordFromDegrees(tuning, [0, 6, 11])` は同じ意図を調律非依存で表現し、すべての EDO・MOS・マカーム調律で機能する。「セミトーン」ではなく「度数インデックス」を使うことで調律系が意味論を担う。
+
+511 テスト / 全パス。

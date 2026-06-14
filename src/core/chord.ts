@@ -1,5 +1,6 @@
 import { CENTS_PER_OCTAVE, ratio } from './ratio.js';
 import { type Pitch, centsToFreqFactor, pitchToCents, fromRatio } from './cents.js';
+import { type TuningSystem, degreeToCents } from './tuning.js';
 
 /** A chord as root-relative intervals (instrument-independent). */
 export interface Chord {
@@ -70,5 +71,33 @@ export function chordFromRatios(
   return {
     name,
     intervals: ratios.map(([n, d]) => fromRatio(ratio(n as number, d as number))),
+  };
+}
+
+/**
+ * Build a chord from degree indices into a `TuningSystem`.
+ *
+ * `chordFromSemitones` only makes sense for 12-TET (1 semitone = 100c).
+ * For 19-EDO, Makam, or any other tuning, use this factory: the intervals
+ * are computed from the tuning's exact degree positions and made root-relative
+ * (the first degree's cents are subtracted from all entries).
+ *
+ * @example
+ * // Major-ish triad in 19-EDO (steps 0, 6, 11)
+ * const chord = chordFromDegrees(edo(19), [0, 6, 11], 'major-19edo');
+ */
+export function chordFromDegrees(
+  tuning: TuningSystem,
+  degreeIndices: readonly number[],
+  name?: string,
+): Chord {
+  if (degreeIndices.length === 0) throw new RangeError('degreeIndices must be non-empty');
+  const rootCents = degreeToCents(tuning, degreeIndices[0] as number);
+  return {
+    name: name ?? `chord-${degreeIndices.join('-')}`,
+    intervals: degreeIndices.map((d) => ({
+      kind: 'cents' as const,
+      cents: degreeToCents(tuning, d) - rootCents,
+    })),
   };
 }

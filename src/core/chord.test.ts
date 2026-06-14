@@ -3,10 +3,12 @@ import {
   type Chord,
   chordFromSemitones,
   chordFromRatios,
+  chordFromDegrees,
   chordToCents,
   chordToCentOffsets,
   realizeChordFreqs,
 } from './chord.js';
+import { equalTemperament12, edo } from './tuning.js';
 import { guitarStandard } from './instrument.js';
 import { fingerChord } from './fingering.js';
 
@@ -153,5 +155,56 @@ describe('chordFromRatios — just-intonation chord factory', () => {
 
   it('test_zero_numerator_throws', () => {
     expect(() => chordFromRatios('bad', [[0, 1]])).toThrow(RangeError);
+  });
+});
+
+// Socratic Q45: chordFromDegrees bridges TuningSystem degree indices → Chord.
+describe('chordFromDegrees — microtonal chord factory from tuning degrees', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_12tet_major_matches_chordFromSemitones', () => {
+    const fromDeg = chordFromDegrees(t12, [0, 4, 7], 'major');
+    const fromSem = chordFromSemitones('major', [0, 4, 7]);
+    expect(chordToCents(fromDeg)).toEqual(chordToCents(fromSem));
+  });
+
+  it('test_root_is_always_zero_cents', () => {
+    const chord = chordFromDegrees(t12, [0, 4, 7]);
+    expect(chordToCents(chord)[0]).toBe(0);
+  });
+
+  it('test_non_zero_start_degree_gives_root_relative_intervals', () => {
+    // Degrees [3, 7, 10] in 12-TET: root = 300c, 700c, 1000c → offsets: 0, 400, 700
+    const chord = chordFromDegrees(t12, [3, 7, 10]);
+    expect(chordToCents(chord)).toEqual([0, 400, 700]);
+  });
+
+  it('test_19edo_chord_intervals_are_correct', () => {
+    // 19-EDO: step = 1200/19 ≈ 63.16c. Steps [0,6,11] ≈ [0, 379, 695]c (major-ish)
+    const t19 = edo(19);
+    const step = 1200 / 19;
+    const chord = chordFromDegrees(t19, [0, 6, 11]);
+    expect(chordToCents(chord)[0]).toBeCloseTo(0, 9);
+    expect(chordToCents(chord)[1]).toBeCloseTo(6 * step, 6);
+    expect(chordToCents(chord)[2]).toBeCloseTo(11 * step, 6);
+  });
+
+  it('test_auto_name_from_degrees', () => {
+    const chord = chordFromDegrees(t12, [0, 4, 7]);
+    expect(chord.name).toBe('chord-0-4-7');
+  });
+
+  it('test_explicit_name_overrides', () => {
+    const chord = chordFromDegrees(t12, [0, 4, 7], 'major');
+    expect(chord.name).toBe('major');
+  });
+
+  it('test_empty_degrees_throws', () => {
+    expect(() => chordFromDegrees(t12, [])).toThrow(RangeError);
+  });
+
+  it('test_single_degree_gives_unison_chord', () => {
+    const chord = chordFromDegrees(t12, [5]);
+    expect(chordToCents(chord)).toEqual([0]);
   });
 });
