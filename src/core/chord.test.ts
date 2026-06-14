@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   type Chord,
   chordFromSemitones,
+  chordFromRatios,
   chordToCents,
   chordToCentOffsets,
   realizeChordFreqs,
@@ -86,5 +87,71 @@ describe('chordToCentOffsets — bridge from Chord to instrument coordinate syst
     };
     const abs = chordToCentOffsets(chord, 1000);
     expect(abs).toEqual([1000, 1500]);
+  });
+});
+
+// Socratic Q38: chordFromRatios preserves JI ratios as primary representation.
+describe('chordFromRatios — just-intonation chord factory', () => {
+  it('test_just_major_triad_cents_distinct_from_12tet', () => {
+    // 5-limit JI major: 1/1, 5/4, 3/2
+    const just = chordFromRatios('just-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    const cents = chordToCents(just);
+    // JI major third = 1200*log2(5/4) ≈ 386.31c; 12-TET major third = 400c
+    expect(cents[1]).toBeCloseTo(1200 * Math.log2(5 / 4), 6);
+    expect(cents[1]).not.toBeCloseTo(400, 1); // measurably different from 12-TET
+  });
+
+  it('test_root_is_unison', () => {
+    const chord = chordFromRatios('x', [
+      [1, 1],
+      [3, 2],
+    ]);
+    expect(chordToCents(chord)[0]).toBeCloseTo(0, 10);
+  });
+
+  it('test_ratio_intervals_stored_as_ratio_kind', () => {
+    const chord = chordFromRatios('just-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    const iv = chord.intervals[1]!;
+    expect(iv.kind).toBe('ratio');
+    expect(iv.kind === 'ratio' && iv.ratio.num).toBe(5);
+  });
+
+  it('test_realize_freqs_produces_exact_ratios', () => {
+    const chord = chordFromRatios('just-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    const freqs = realizeChordFreqs(chord, 261.63);
+    expect(freqs[1]).toBeCloseTo(261.63 * (5 / 4), 9); // exact 5/4
+    expect(freqs[2]).toBeCloseTo(261.63 * (3 / 2), 9); // exact 3/2
+  });
+
+  it('test_just_vs_12tet_major_third_precision', () => {
+    const just = chordFromRatios('just-major', [
+      [1, 1],
+      [5, 4],
+    ]);
+    const tet = chordFromSemitones('tet-major', [0, 4]);
+    const justFreqs = realizeChordFreqs(just, 261.63);
+    const tetFreqs = realizeChordFreqs(tet, 261.63);
+    // JI 5/4 ≈ 326.8 Hz; 12-TET 400c ≈ 329.6 Hz — ~13.7c (≈3 Hz) apart
+    expect(Math.abs((justFreqs[1] as number) - (tetFreqs[1] as number))).toBeGreaterThan(2);
+  });
+
+  it('test_zero_denominator_throws', () => {
+    expect(() => chordFromRatios('bad', [[1, 0]])).toThrow(RangeError);
+  });
+
+  it('test_zero_numerator_throws', () => {
+    expect(() => chordFromRatios('bad', [[0, 1]])).toThrow(RangeError);
   });
 });

@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。447テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。454テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -53,6 +53,11 @@ const freqs = realizeChordFreqs(chord, 261.63);         // C4 root
 const roughness = chordDissonance(freqs, harmonicSpectrum());
 const scl = sclFromCents('major triad', [400, 700, 1200]);
 const sclText = writeScl(scl);                          // .scl 文字列
+
+// 純正律(JI)は比を一次保持 — 比工場で精度保全
+import { chordFromRatios } from 'ruri';
+const justMajor = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+// chordToCents(justMajor)[1] ≈ 386.31c (vs 12-TET 400c: 13.7c差)
 ```
 
 ```ts

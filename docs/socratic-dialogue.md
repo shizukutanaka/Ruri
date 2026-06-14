@@ -769,3 +769,63 @@ export function getTuningById(
 **到達した境地**: 関数をユニットテストすることと、関数が**組み合わせて**正しく動作することは別の主張である。ライブラリが「パイプライン的に使われることを意図する」なら、パイプラインそのものをテストしなければならない。Q31-Q36 の橋渡し関数は今はじめて「一連の呼び出し」として検証された。
 
 447 テスト / 全パス。
+
+---
+
+## 第十四巡: 「比が一次、centsは導出」は `Chord` 工場関数でも実現されているか
+
+**目標**: 設計原則「純正律は比を一次保持」が、`Chord` を生成するファクトリ関数でも体現されているかを問う。
+
+## Q38. `chordFromSemitones` しか存在しない — JI 和音を一次精度で作れるか？ ❌ **比の工場関数なし → `chordFromRatios` を追加**
+
+**問**: ライブラリは「比が一次、centsは導出(精度保全)」を設計原則とする。`Pitch` 型は `{kind:'ratio'}` を一級サポートし、`fromRatio(ratio(5,4))` は `{kind:'ratio', ratio:{num:5,den:4}}` を保持する。しかし `Chord` を作れる工場関数は `chordFromSemitones` だけ — これは常に cents ベースの `Pitch` を生成する。
+
+純正律の長三和音(1/1, 5/4, 3/2)を作るには:
+```ts
+const justMajor: Chord = {
+  name: 'just-major',
+  intervals: [
+    fromRatio(ratio(1,1)),
+    fromRatio(ratio(5,4)),
+    fromRatio(ratio(3,2)),
+  ]
+};
+```
+と手動構築が必要。設計原則「比を一次保持」をライブラリ自身が実践していない。
+
+**判定**: ❌ JI 和音の比一次表現に工場関数がなく、原則と実装が乖離している。
+
+**実装**: `src/core/chord.ts` に追加:
+```ts
+export function chordFromRatios(
+  name: string,
+  ratios: ReadonlyArray<readonly [number, number]>,
+): Chord {
+  return {
+    name,
+    intervals: ratios.map(([n, d]) => fromRatio(ratio(n, d))),
+  };
+}
+```
+`ratio(0,1)` や `ratio(1,0)` は既存の fail-fast で RangeError。
+
+**テスト(7件)**:
+- JI 長三度 = `1200*log2(5/4) ≈ 386.31c` ≠ 12-TET 400c (実装精度確認)
+- ルートは 0c
+- `intervals[1].kind === 'ratio'`(比が一次保存)
+- `realizeChordFreqs` が正確な `5/4` 比を復元
+- JI と 12-TET で周波数差 >2 Hz
+- ゼロ分母 → RangeError
+- ゼロ分子 → RangeError
+
+---
+
+## 第十四巡サマリ
+
+| 問                                                     | 判定                    | 対応                                                     |
+| ------------------------------------------------------ | ----------------------- | -------------------------------------------------------- |
+| Q38 JI 和音工場関数なし、設計原則「比を一次」と乖離   | ❌ 原則と実装の乖離      | `chordFromRatios` 追加 + 7 テスト                        |
+
+**到達した境地**: 設計原則が実装に忠実かどうかは、「どんなユーザー入力を受け付けるか」で問われる。`ratio` と `fromRatio` が存在し `Pitch` 型が比を一級サポートするにも拘わらず、`Chord` を作る唯一の道が cents 変換を経由するなら、その原則はドキュメントの中だけにある。`chordFromRatios` はその欠落を埋め、「比を一次に持ち続ける和音を 1 行で構築できる」ようにする。
+
+454 テスト / 全パス。

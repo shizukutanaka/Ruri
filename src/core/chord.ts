@@ -1,5 +1,5 @@
-import { CENTS_PER_OCTAVE } from './ratio.js';
-import { type Pitch, centsToFreqFactor, pitchToCents } from './cents.js';
+import { CENTS_PER_OCTAVE, ratio } from './ratio.js';
+import { type Pitch, centsToFreqFactor, pitchToCents, fromRatio } from './cents.js';
 
 /** A chord as root-relative intervals (instrument-independent). */
 export interface Chord {
@@ -46,5 +46,29 @@ export function chordFromSemitones(name: string, semitones: readonly number[]): 
   return {
     name,
     intervals: semitones.map((s) => ({ kind: 'cents' as const, cents: s * SEMITONE })),
+  };
+}
+
+/**
+ * Build a just-intonation chord from exact integer ratios.
+ *
+ * Ratios are stored as primary representation (not converted to cents), preserving
+ * the precision guarantee stated in the design principles: "比が一次、centsは導出".
+ *
+ * The first ratio should be `[1, 1]` (the unison root). `realizeChordFreqs` and
+ * `chordToCents` both work from ratios without loss of precision.
+ *
+ * @example
+ * // Pure 5-limit major triad: 1/1, 5/4, 3/2
+ * const justMajor = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+ * // chordToCents(justMajor)[1] ≈ 386.31c  (vs. 400c in 12-TET)
+ */
+export function chordFromRatios(
+  name: string,
+  ratios: ReadonlyArray<readonly [number, number]>,
+): Chord {
+  return {
+    name,
+    intervals: ratios.map(([n, d]) => fromRatio(ratio(n as number, d as number))),
   };
 }
