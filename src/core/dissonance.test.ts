@@ -9,6 +9,7 @@ import {
   consonantIntervals,
   spectrumToTuning,
   tuningSuitability,
+  rankTuningsByFit,
 } from './dissonance.js';
 import { edo } from './tuning.js';
 
@@ -328,5 +329,63 @@ describe('tuningSuitability — how well does a tuning fit a timbre? (Q53)', () 
     const h12 = tuningSuitability(edo(12), harmonicSpectrum());
     const h31 = tuningSuitability(edo(31), harmonicSpectrum());
     expect(h31.avgErrorCents).toBeLessThanOrEqual(h12.avgErrorCents);
+  });
+});
+
+// Q56: tuningSuitability measures one tuning — can we rank a list of candidates in one call?
+describe('rankTuningsByFit — tuning leaderboard for a given timbre (Q56)', () => {
+  it('test_returns_array_same_length_as_input', () => {
+    const tunings = [edo(12), edo(19), edo(31)];
+    const ranked = rankTuningsByFit(tunings, harmonicSpectrum());
+    expect(ranked.length).toBe(3);
+  });
+
+  it('test_self_derived_tuning_ranks_first', () => {
+    const spectrum = harmonicSpectrum();
+    const derived = spectrumToTuning(spectrum);
+    const ranked = rankTuningsByFit([edo(12), edo(19), derived], spectrum);
+    expect(ranked[0]!.tuning.id).toBe(derived.id);
+    expect(ranked[0]!.suitability.coverage).toBeCloseTo(1, 5);
+  });
+
+  it('test_coverage_descending_order', () => {
+    const ranked = rankTuningsByFit([edo(12), edo(19), edo(31)], harmonicSpectrum());
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.suitability.coverage).toBeLessThanOrEqual(
+        ranked[i - 1]!.suitability.coverage,
+      );
+    }
+  });
+
+  it('test_index_field_tracks_original_position', () => {
+    const tunings = [edo(31), edo(12), edo(19)];
+    const ranked = rankTuningsByFit(tunings, harmonicSpectrum());
+    for (const entry of ranked) {
+      expect(tunings[entry.index]).toBe(entry.tuning);
+    }
+  });
+
+  it('test_suitability_matches_individual_call', () => {
+    const spectrum = harmonicSpectrum();
+    const tunings = [edo(12), edo(19)];
+    const ranked = rankTuningsByFit(tunings, spectrum);
+    for (const entry of ranked) {
+      const individual = tuningSuitability(entry.tuning, spectrum);
+      expect(entry.suitability.coverage).toBeCloseTo(individual.coverage, 9);
+      expect(entry.suitability.avgErrorCents).toBeCloseTo(individual.avgErrorCents, 9);
+    }
+  });
+
+  it('test_empty_input_returns_empty_array', () => {
+    const ranked = rankTuningsByFit([], harmonicSpectrum());
+    expect(ranked).toHaveLength(0);
+  });
+
+  it('test_31edo_ranks_above_12edo_for_harmonic_timbre', () => {
+    // 31-EDO approximates just intervals more accurately than 12-EDO.
+    const ranked = rankTuningsByFit([edo(12), edo(31)], harmonicSpectrum());
+    const idx12 = ranked.findIndex((r) => r.tuning.id === '12-edo');
+    const idx31 = ranked.findIndex((r) => r.tuning.id === '31-edo');
+    expect(idx31).toBeLessThanOrEqual(idx12);
   });
 });

@@ -3,6 +3,7 @@ import fc from 'fast-check';
 import { equalTemperament12, edo } from './tuning.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
+import { strikeChord } from './modal-synth.js';
 import { voiceLeadingCost } from './voice-leading.js';
 import {
   rankChords,
@@ -11,6 +12,7 @@ import {
   rankedChordToChord,
   chordProgressionSmoothness,
   optimalChordOrder,
+  strikeRankedChord,
 } from './chord-search.js';
 import { chordToCents, realizeChordFreqs, chordFromSemitones } from './chord.js';
 
@@ -548,5 +550,42 @@ describe('optimalChordOrder — minimum voice-leading permutation (Q50)', () => 
     const result = optimalChordOrder(portable, rootHz);
     expect(result.totalCents).toBeLessThanOrEqual(inputCost + 1e-9);
     expect(result.order).toHaveLength(4);
+  });
+});
+
+// Q55: RankedChord is the first-class output of rankChords — can it be auditioned in one call?
+describe('strikeRankedChord — RankedChord → audio in one call (Q55)', () => {
+  const rootHz = 261.63;
+  const tuning = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('test_output_is_finite_float32array', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const audio = strikeRankedChord(best!, rootHz, spectrum);
+    expect(audio).toBeInstanceOf(Float32Array);
+    expect(Array.from(audio).every(Number.isFinite)).toBe(true);
+  });
+
+  it('test_output_within_unit_range', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const audio = strikeRankedChord(best!, rootHz, spectrum);
+    expect(audio.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+  });
+
+  it('test_output_length_matches_opts_seconds', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const opts = { sampleRate: 44100, seconds: 0.2, decay: 3 };
+    const audio = strikeRankedChord(best!, rootHz, spectrum, opts);
+    expect(audio.length).toBe(Math.floor(opts.sampleRate * opts.seconds));
+  });
+
+  it('test_matches_manual_pipeline_realizeRankedChordFreqs_then_strikeChord', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const opts = { sampleRate: 44100, seconds: 0.15, decay: 3 };
+    const fromRanked = strikeRankedChord(best!, rootHz, spectrum, opts);
+    const freqs = realizeRankedChordFreqs(best!, rootHz);
+    const fromManual = strikeChord(freqs, spectrum, opts);
+    expect(fromRanked.length).toBe(fromManual.length);
+    expect(fromRanked[0]).toBeCloseTo(fromManual[0] as number, 6);
   });
 });

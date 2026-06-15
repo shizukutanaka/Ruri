@@ -249,3 +249,47 @@ export function tuningSuitability(
     matchedCount,
   };
 }
+
+/** One entry in the ranked-tunings leaderboard returned by `rankTuningsByFit`. */
+export interface RankedTuning {
+  /** The tuning system. */
+  readonly tuning: TuningSystem;
+  /** Index into the original `tunings` input array. */
+  readonly index: number;
+  /** Full suitability result for this tuning against the spectrum. */
+  readonly suitability: TuningSuitabilityResult;
+}
+
+/**
+ * Rank a list of tuning systems by how well they fit a given timbre, best first.
+ *
+ * Socratic Q56: `tuningSuitability(tuning, spectrum)` measures how well one tuning
+ * fits a timbre, but comparing multiple candidates (e.g. `[edo(12), edo(19), edo(31),
+ * spectrumToTuning(spectrum)]`) still requires a manual loop and sort. If suitability
+ * measurement is first-class, so is ranking a leaderboard of candidates.
+ *
+ * Primary sort: coverage descending (more consonant intervals captured = better).
+ * Tie-break: avgErrorCents ascending (smaller tuning error = better).
+ *
+ * @example
+ * const ranked = rankTuningsByFit([edo(12), edo(19), edo(31)], bellSpectrum());
+ * // ranked[0] is the EDO that best covers bell-spectrum consonances
+ * console.log(ranked.map(r => `${r.tuning.id}: coverage=${r.suitability.coverage}`));
+ */
+export function rankTuningsByFit(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  opts?: ConsonantIntervalsOptions & { readonly toleranceCents?: number },
+): RankedTuning[] {
+  return tunings
+    .map((tuning, index) => ({
+      tuning,
+      index,
+      suitability: tuningSuitability(tuning, spectrum, opts),
+    }))
+    .sort((a, b) => {
+      const covDiff = b.suitability.coverage - a.suitability.coverage;
+      if (covDiff !== 0) return covDiff;
+      return a.suitability.avgErrorCents - b.suitability.avgErrorCents;
+    });
+}

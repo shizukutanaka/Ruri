@@ -6,6 +6,7 @@ import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { degreeToCents } from './tuning.js';
 import { voiceLeadingCost } from './voice-leading.js';
 import { type Chord, realizeChordFreqs } from './chord.js';
+import { strikeChord, type ModalOptions, DEFAULT_MODAL } from './modal-synth.js';
 
 export interface RankedChord {
   /** Degree indices within one period, ascending, starting at the chord's root degree offset 0..n-1 — store absolute degree indices. */
@@ -450,4 +451,28 @@ export function optimalChordOrder(
     order: bestOrder,
     totalCents: bestCost,
   };
+}
+
+/**
+ * Synthesize a `RankedChord` directly to audio in one call.
+ *
+ * Socratic Q55: `rankChords` produces `RankedChord[]`, which is the library's
+ * first-class chord-discovery output. Going from a `RankedChord` to audio requires
+ * two steps today: `realizeRankedChordFreqs(chord, rootHz)` → `strikeChord(freqs, spectrum)`.
+ * If `RankedChord` is truly first-class, it should be auditionable in one call.
+ *
+ * Closes the pipeline: `rankChords → strikeRankedChord → encodeWav` (or direct playback).
+ *
+ * @example
+ * const [best] = rankChords(tuning, { size: 3 });
+ * const audio = strikeRankedChord(best!, 261.63, harmonicSpectrum());
+ * const wav = encodeWav(audio); // fully ready in 2 lines from discovery to file
+ */
+export function strikeRankedChord(
+  chord: RankedChord,
+  rootHz: number,
+  spectrum: Spectrum,
+  opts: ModalOptions = DEFAULT_MODAL,
+): Float32Array {
+  return strikeChord(realizeRankedChordFreqs(chord, rootHz), spectrum, opts);
 }

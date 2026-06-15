@@ -1,5 +1,8 @@
 /** 16-bit PCM mono WAV encoder. Zero-dep, byte-exact. */
 
+import { strikeChord, type ModalOptions, DEFAULT_MODAL } from '../core/modal-synth.js';
+import { type Spectrum } from '../core/spectrum.js';
+
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
 };
@@ -29,4 +32,30 @@ export function encodeWav(samples: Float32Array, sampleRate = 44100): Uint8Array
     view.setInt16(44 + i * 2, Math.round(s * 32767), true);
   }
   return new Uint8Array(buffer);
+}
+
+/**
+ * Synthesize a chord and encode it to a 16-bit PCM WAV in one call.
+ *
+ * Socratic Q54: `strikeChord` produces a `Float32Array`; `encodeWav` accepts one.
+ * If "chord synthesis" is truly one call (`strikeChord`) and "WAV encoding" is
+ * truly one call (`encodeWav`), then "chord → ready-to-write WAV bytes" should
+ * also be one call — yet today it requires two. This bridges that gap.
+ *
+ * The `sampleRate` for `encodeWav` is taken from `modalOpts.sampleRate` (or the
+ * `DEFAULT_MODAL` default) so the header and the audio agree on the same rate
+ * without the caller needing to thread it through manually.
+ *
+ * @example
+ * const wav = strikeChordToWav([261.63, 329.63, 392.0], harmonicSpectrum());
+ * await fs.writeFile('chord.wav', wav); // ready to play
+ */
+export function strikeChordToWav(
+  freqs: readonly number[],
+  spectrum: Spectrum,
+  modalOpts?: ModalOptions,
+): Uint8Array {
+  const opts = modalOpts ?? DEFAULT_MODAL;
+  const samples = strikeChord(freqs, spectrum, opts);
+  return encodeWav(samples, opts.sampleRate);
 }
