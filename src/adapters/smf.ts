@@ -9,10 +9,11 @@ import {
   scaleToFreqs,
   type ChordProgressionStep,
   type ScaleChordMapEntry,
+  chordMapAnalysis,
 } from '../core/scale.js';
 import { type TuningSystem } from '../core/tuning.js';
 import { type ChordSearchOptions } from '../core/chord-search.js';
-import { type Spectrum } from '../core/spectrum.js';
+import { type Spectrum, harmonicSpectrum } from '../core/spectrum.js';
 import { presetChordProgression } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
 
@@ -570,4 +571,53 @@ export function presetProgressionSmf(
   const chords = presetChordProgression(presetId, pattern, rootHz, undefined, undefined, presets);
   if (chords === undefined) return undefined;
   return progressionToSmf(chords, rootHz, opts);
+}
+
+export type BestChordMapSmfOptions = ChordToSmfOptions;
+
+/**
+ * Build the complete chord map analysis for a scale, take the best entry, and export it as SMF.
+ *
+ * Socratic Q141: `chordMapAnalysis(scale, tuning, spectrum)` scores every diatonic chord and
+ * returns them sorted by dissonance — so `result[0]` is the most consonant. `chordToSmf` then
+ * encodes a single `Chord` to MIDI. But going from "I have a scale → give me the best chord
+ * as a MIDI file" still requires two calls and pulling the `.chord` field manually. If the
+ * chord map analysis is first-class, exporting its best result as SMF should be one call.
+ *
+ * Algorithm:
+ * 1. `chordMapAnalysis(scale, tuning, spectrum ?? harmonicSpectrum())` → sorted entries.
+ * 2. Take `entries[0]` (most consonant).
+ * 3. `chordToSmf(entry.chord, tuning.referenceHz, opts)` → Uint8Array.
+ *
+ * @param scale   - The parent scale.
+ * @param tuning  - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts    - Optional SMF encoding options.
+ * @returns A Type-0 SMF `Uint8Array` of the best diatonic chord, ready to write to a `.mid` file.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if no chords are found (scale too small for requested size).
+ * @throws {RangeError} if any realized frequency maps to a MIDI note outside [0, 127].
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const midi = bestChordMapSmf(major, t12);
+ * await fs.writeFile('best-chord.mid', midi);
+ */
+export function bestChordMapSmf(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts?: BestChordMapSmfOptions,
+): Uint8Array {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const analysis = chordMapAnalysis(scale, tuning, effectiveSpectrum);
+  const best = analysis[0];
+  if (best === undefined) {
+    throw new RangeError(
+      `bestChordMapSmf: no chords found for scale '${scale.id}' — scale may be too small`,
+    );
+  }
+  return chordToSmf(best.chord, tuning.referenceHz, opts);
 }

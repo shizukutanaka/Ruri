@@ -18,6 +18,8 @@ import {
   bestScaleChordWav,
   chordMapToWav,
   bestModeWav,
+  bestChordWav,
+  topNChordMapWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -914,5 +916,118 @@ describe('bestModeWav (Q134)', () => {
     const sameLengthAndContent =
       wav12.length === wav19.length && wav12.every((b, i) => b === wav19[i]);
     expect(sameLengthAndContent).toBe(false);
+  });
+});
+
+// Q138 — bestChordWav: find the best chord for a MIDI note and synthesize to WAV in one call
+describe('bestChordWav (Q138)', () => {
+  const t12 = equalTemperament12(440);
+  const fastOpts = { ...DEFAULT_CHORD_PROGRESSION_WAV, sampleRate: 8000, seconds: 0.05 };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const wav = bestChordWav(60, t12, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const wav = bestChordWav(60, t12, undefined, fastOpts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(8000);
+  });
+
+  it('test_different_midi_notes_produce_different_audio', () => {
+    const wavC4 = bestChordWav(60, t12, undefined, fastOpts); // C4
+    const wavA4 = bestChordWav(69, t12, undefined, fastOpts); // A4
+    let differs = false;
+    for (let i = 44; i < Math.min(wavC4.length, wavA4.length); i++) {
+      if (wavC4[i] !== wavA4[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_with_harmonic_spectrum_returns_valid_wav', () => {
+    const spectrum = harmonicSpectrum();
+    const wav = bestChordWav(60, t12, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_tuning_with_no_degrees_throws', () => {
+    const emptyTuning = equalTemperament12(440);
+    const modifiedTuning = { ...emptyTuning, degrees: [] };
+    expect(() => bestChordWav(60, modifiedTuning, undefined, fastOpts)).toThrow();
+  });
+
+  it('test_different_tunings_produce_different_audio', () => {
+    const t19 = edo(19);
+    const wav12 = bestChordWav(60, t12, undefined, fastOpts);
+    const wav19 = bestChordWav(60, t19, undefined, fastOpts);
+    const sameLengthAndContent =
+      wav12.length === wav19.length && wav12.every((b, i) => b === wav19[i]);
+    expect(sameLengthAndContent).toBe(false);
+  });
+});
+
+// Q142 — topNChordMapWav: top-N most harmonic chords from a chord map synthesized to WAV
+describe('topNChordMapWav (Q142)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.05,
+  };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = topNChordMapWav(chordMap, 3, rootHz, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_n_less_than_1_throws_range_error', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    expect(() => topNChordMapWav(chordMap, 0, rootHz, spectrum, fastOpts)).toThrow(RangeError);
+    expect(() => topNChordMapWav(chordMap, -1, rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_empty_chord_map_throws_range_error', () => {
+    expect(() => topNChordMapWav([], 3, rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_n_1_produces_shorter_wav_than_n_3', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav1 = topNChordMapWav(chordMap, 1, rootHz, spectrum, fastOpts);
+    const wav3 = topNChordMapWav(chordMap, 3, rootHz, spectrum, fastOpts);
+    expect(wav3.length).toBeGreaterThan(wav1.length);
+  });
+
+  it('test_n_larger_than_chord_map_uses_all_entries', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wavAll = topNChordMapWav(chordMap, chordMap.length, rootHz, spectrum, fastOpts);
+    const wavMore = topNChordMapWav(chordMap, chordMap.length + 10, rootHz, spectrum, fastOpts);
+    expect(wavAll.length).toBe(wavMore.length);
+  });
+
+  it('test_default_spectrum_produces_valid_output', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = topNChordMapWav(chordMap, 3, rootHz, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
   });
 });

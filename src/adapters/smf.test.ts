@@ -14,6 +14,7 @@ import {
   progressionAnalysisToSmf,
   chordMapToSmf,
   presetProgressionSmf,
+  bestChordMapSmf,
 } from './smf.js';
 import { chordFromSemitones, chordFromRatios } from '../core/chord.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -579,5 +580,53 @@ describe('presetProgressionSmf (Q135)', () => {
     const midi = presetProgressionSmf('12-tet', [0, 3], rootHz, undefined, { velocity: 70 });
     const { notes } = decodeSmf(midi!);
     for (const n of notes) expect(n.velocity).toBe(70);
+  });
+});
+
+// Q141: bestChordMapSmf — chordMapAnalysis → best entry → SMF in one call
+describe('bestChordMapSmf (Q141)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_uint8array_with_mthd_header', () => {
+    const midi = bestChordMapSmf(major, t12, spectrum);
+    expect(midi).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(midi[0]!, midi[1]!, midi[2]!, midi[3]!)).toBe('MThd');
+  });
+
+  it('test_decoded_smf_has_exactly_one_chord', () => {
+    const midi = bestChordMapSmf(major, t12, spectrum);
+    const { notes } = decodeSmf(midi);
+    const byTick = new Map<number, number>();
+    for (const n of notes) byTick.set(n.startTicks, (byTick.get(n.startTicks) ?? 0) + 1);
+    expect(byTick.size).toBe(1); // just one chord (at tick 0)
+  });
+
+  it('test_decoded_chord_has_triad_voices', () => {
+    const midi = bestChordMapSmf(major, t12, spectrum);
+    const { notes } = decodeSmf(midi);
+    expect(notes.length).toBe(3); // triad = 3 notes
+  });
+
+  it('test_default_spectrum_produces_valid_output', () => {
+    const midi = bestChordMapSmf(major, t12);
+    expect(midi).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(midi[0]!, midi[1]!, midi[2]!, midi[3]!)).toBe('MThd');
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => bestChordMapSmf(major, edo(19), spectrum)).toThrow(RangeError);
+  });
+
+  it('test_custom_velocity_applied', () => {
+    const midi = bestChordMapSmf(major, t12, spectrum, { velocity: 75 });
+    const { notes } = decodeSmf(midi);
+    for (const n of notes) expect(n.velocity).toBe(75);
   });
 });

@@ -21,6 +21,8 @@ import {
   bestProgressionForScale,
   rankScaleChords,
   bestModeForTuning,
+  bestChordForMidiNote,
+  rankChordMapByHarmonicity,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -644,4 +646,89 @@ export function bestModeWav(
   void rootHz; // accepted for API forward-compat; tuning.referenceHz anchors frequencies
   const bestMode = bestModeForTuning(tuning, spectrum);
   return pluckScaleWav(bestMode, tuning, opts);
+}
+
+/**
+ * Find the best chord for a MIDI note in a tuning and synthesize it to WAV in one call.
+ *
+ * Socratic Q138: `bestChordForMidiNote(midiNote, tuning)` returns the most consonant
+ * diatonic chord for a MIDI note root — but realizing its frequencies and synthesizing
+ * to WAV still requires: extract chord, `realizeChordFreqs`, `strikeChord`, `encodeWav`.
+ * If finding the best chord for a MIDI note is first-class, hearing it should be one call.
+ *
+ * Algorithm:
+ * 1. `bestChordForMidiNote(midiNote, tuning, spectrum)` → `{ chord, rootHz }`.
+ * 2. `realizeChordFreqs(chord.chord, rootHz)` → Hz array.
+ * 3. `strikeChord(freqs, spectrum, opts)` → Float32Array.
+ * 4. `encodeWav(samples)` → Uint8Array.
+ *
+ * @param midiNote - MIDI note number (0..127) used as the chord root.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional modal synthesis options.
+ * @returns WAV bytes of the best chord for this MIDI note.
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const wav = bestChordWav(60, t12); // best chord rooted at C4
+ * await fs.writeFile('best-chord-c4.wav', wav);
+ */
+export function bestChordWav(
+  midiNote: number,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts: ModalOptions = DEFAULT_MODAL,
+): Uint8Array {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const { chord, rootHz } = bestChordForMidiNote(midiNote, tuning, effectiveSpectrum);
+  const freqs = realizeChordFreqs(chord.chord, rootHz);
+  const samples = strikeChord(freqs, effectiveSpectrum, opts);
+  return encodeWav(samples, opts.sampleRate);
+}
+
+/**
+ * Synthesize the top-N most harmonic chords from a chord map and encode as a single WAV.
+ *
+ * Socratic Q142: `rankChordMapByHarmonicity(chordMap)` ranks all diatonic chords by
+ * Stolzenburg harmonicity, and `chordMapToWav` synthesizes a full chord map to WAV.
+ * But hearing only the top-N most harmonic chords — the typical use case — still
+ * requires slicing the ranked map and calling `chordMapToWav` manually. If ranking and
+ * synthesis are first-class, "top-N most harmonic chords as audio" should be one call.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param n        - Number of top-ranked chords to include (must be ≥ 1).
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Optional instrument spectrum for synthesis. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns WAV bytes of the top-N most harmonic chords, concatenated sequentially.
+ *
+ * @throws {RangeError} if `n` < 1.
+ * @throws {RangeError} if `chordMap` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const wav = topNChordMapWav(chordMap, 3, 261.63);
+ * await fs.writeFile('top3-chords.wav', wav);
+ */
+export function topNChordMapWav(
+  chordMap: readonly ScaleChordMapEntry[],
+  n: number,
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  if (!Number.isInteger(n) || n < 1) {
+    throw new RangeError(`topNChordMapWav: n must be an integer >= 1, got ${n}`);
+  }
+  if (chordMap.length === 0) {
+    throw new RangeError('topNChordMapWav: chordMap must be non-empty');
+  }
+  const ranked = rankChordMapByHarmonicity(chordMap, rootHz);
+  const topN = ranked.slice(0, n);
+  return chordMapToWav(topN, rootHz, spectrum, opts);
 }
