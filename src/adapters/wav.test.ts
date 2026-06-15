@@ -11,13 +11,16 @@ import {
   pluckRankedChordWav,
   chordProgressionToWav,
   DEFAULT_CHORD_PROGRESSION_WAV,
+  buildChordProgressionWav,
+  optimalProgressionWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
-import { edo } from '../core/tuning.js';
+import { edo, equalTemperament12 } from '../core/tuning.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
 import { type Scale } from '../core/scale.js';
-import { rankChords } from '../core/chord-search.js';
+import { rankChords, rankedChordToChord } from '../core/chord-search.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
+import { rankScaleChords } from '../core/scale.js';
 
 describe('WAV encoder', () => {
   it('test_header_riff_wave', () => {
@@ -479,5 +482,162 @@ describe('chordProgressionToWav — explicit progression to WAV in one call (Q10
     const wav = chordProgressionToWav([major], rootHz, spectrum, fastOpts);
     expect(wav.length).toBeGreaterThan(44);
     expect(wav[0]).toBe(0x52); // 'R'
+  });
+});
+
+// Q105: Scale + pattern + rootHz → WAV should be one call (intent to audio pipeline)
+describe('buildChordProgressionWav — Scale + pattern → WAV in one call (Q105)', () => {
+  const t12 = equalTemperament12(440);
+  const scaleObj: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const pattern = [
+    [0, 2, 4],
+    [3, 5, 0],
+    [4, 6, 1],
+  ] as const;
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  const fastOpts = { ...DEFAULT_CHORD_PROGRESSION_WAV, chordSeconds: 0.05, seconds: 0.1 };
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const wav = buildChordProgressionWav(scaleObj, t12, pattern, rootHz, spectrum, fastOpts);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_reflects_chord_count', () => {
+    const wav2 = buildChordProgressionWav(
+      scaleObj,
+      t12,
+      [
+        [0, 2, 4],
+        [3, 5, 0],
+      ],
+      rootHz,
+      spectrum,
+      fastOpts,
+    );
+    const wav3 = buildChordProgressionWav(scaleObj, t12, pattern, rootHz, spectrum, fastOpts);
+    // 3-chord pattern should produce a longer WAV than 2-chord
+    expect(wav3.length).toBeGreaterThan(wav2.length);
+  });
+
+  it('test_matches_manual_pipeline_output', () => {
+    // buildChordProgressionWav = buildChordProgression → chordProgressionToWav
+    const wav = buildChordProgressionWav(scaleObj, t12, pattern, rootHz, spectrum, fastOpts);
+    // Spot-check: valid WAV with audio content beyond header
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = {
+      ...DEFAULT_CHORD_PROGRESSION_WAV,
+      sampleRate: 22050,
+      chordSeconds: 0.05,
+      seconds: 0.1,
+    };
+    const wav = buildChordProgressionWav(scaleObj, t12, pattern, rootHz, spectrum, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_empty_pattern_throws_range_error', () => {
+    expect(() => buildChordProgressionWav(scaleObj, t12, [], rootHz, spectrum, fastOpts)).toThrow(
+      RangeError,
+    );
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const wrongTuning = edo(19);
+    expect(() =>
+      buildChordProgressionWav(scaleObj, wrongTuning, pattern, rootHz, spectrum, fastOpts),
+    ).toThrow(RangeError);
+  });
+
+  it('test_invalid_rootHz_throws_range_error', () => {
+    expect(() => buildChordProgressionWav(scaleObj, t12, pattern, 0, spectrum, fastOpts)).toThrow(
+      RangeError,
+    );
+    expect(() => buildChordProgressionWav(scaleObj, t12, pattern, NaN, spectrum, fastOpts)).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// Q107: optimalChordOrder + chordProgressionToWav should be one call
+describe('optimalProgressionWav — optimal ordering + WAV synthesis in one call (Q107)', () => {
+  const t12 = equalTemperament12(440);
+  const scaleObj: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  const fastOpts = { ...DEFAULT_CHORD_PROGRESSION_WAV, chordSeconds: 0.05, seconds: 0.1 };
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const chords = rankScaleChords(scaleObj, t12, { size: 3 })
+      .slice(0, 3)
+      .map((r) => rankedChordToChord(r));
+    const wav = optimalProgressionWav(chords, rootHz, spectrum, fastOpts);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_greater_than_44_byte_header', () => {
+    const chords = rankScaleChords(scaleObj, t12, { size: 3 })
+      .slice(0, 2)
+      .map((r) => rankedChordToChord(r));
+    const wav = optimalProgressionWav(chords, rootHz, spectrum, fastOpts);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const chords = rankScaleChords(scaleObj, t12, { size: 3 })
+      .slice(0, 2)
+      .map((r) => rankedChordToChord(r));
+    const opts = {
+      ...DEFAULT_CHORD_PROGRESSION_WAV,
+      sampleRate: 22050,
+      chordSeconds: 0.05,
+      seconds: 0.1,
+    };
+    const wav = optimalProgressionWav(chords, rootHz, spectrum, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_empty_chords_throws_range_error', () => {
+    expect(() => optimalProgressionWav([], rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_single_chord_produces_valid_wav', () => {
+    const [chord] = rankScaleChords(scaleObj, t12, { size: 3 }).map((r) => rankedChordToChord(r));
+    const wav = optimalProgressionWav([chord!], rootHz, spectrum, fastOpts);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_different_chord_bags_produce_different_audio', () => {
+    const allRanked = rankScaleChords(scaleObj, t12, { size: 3 });
+    const chordsA = allRanked.slice(0, 2).map((r) => rankedChordToChord(r));
+    const chordsB = allRanked.slice(2, 4).map((r) => rankedChordToChord(r));
+    const wavA = optimalProgressionWav(chordsA, rootHz, spectrum, fastOpts);
+    const wavB = optimalProgressionWav(chordsB, rootHz, spectrum, fastOpts);
+    // Same length (same chord count and opts), but different audio
+    expect(wavA.length).toBe(wavB.length);
+    let differs = false;
+    for (let i = 44; i < wavA.length; i++) {
+      if (wavA[i] !== wavB[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
   });
 });

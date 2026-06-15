@@ -21,6 +21,7 @@ import {
   scaleHarmonicity,
   scaleProgressionHarmonicity,
   buildChordProgression,
+  scaleModeSeries,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -1268,5 +1269,53 @@ describe('buildChordProgression (Q103)', () => {
         expect(hasRatio || hasCents).toBe(true);
       }
     }
+  });
+});
+
+// Q106: Scale is first-class — "all modes at once" should be one call, not a manual loop
+describe('scaleModeSeries — all modal rotations as Scale[] in one call (Q106)', () => {
+  it('test_returns_n_modes_for_n_degree_scale', () => {
+    const modes = scaleModeSeries(major, t12);
+    expect(modes.length).toBe(major.degreeIndices.length); // 7 modes for a 7-note scale
+  });
+
+  it('test_first_mode_matches_original_scale_degrees', () => {
+    const modes = scaleModeSeries(major, t12);
+    // Mode 0 is the identity rotation — degree 0 remains degree 0
+    expect(modes[0]!.degreeIndices[0]).toBe(0);
+    // And it matches scaleMode(major, 0, t12) directly
+    expect(modes[0]!.degreeIndices).toEqual(scaleMode(major, 0, t12).degreeIndices);
+  });
+
+  it('test_each_mode_matches_scaleMode_call', () => {
+    const modes = scaleModeSeries(major, t12);
+    for (let i = 0; i < major.degreeIndices.length; i++) {
+      const expected = scaleMode(major, i, t12);
+      expect(modes[i]!.degreeIndices).toEqual(expected.degreeIndices);
+      expect(modes[i]!.tuningId).toBe(expected.tuningId);
+    }
+  });
+
+  it('test_all_modes_share_same_tuningId', () => {
+    const modes = scaleModeSeries(major, t12);
+    for (const mode of modes) {
+      expect(mode.tuningId).toBe(major.tuningId);
+    }
+  });
+
+  it('test_pentatonic_returns_five_modes', () => {
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'Pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const modes = scaleModeSeries(pentatonic, t12);
+    expect(modes.length).toBe(5);
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const wrongTuning = edo(19);
+    expect(() => scaleModeSeries(major, wrongTuning)).toThrow(RangeError);
   });
 });

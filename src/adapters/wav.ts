@@ -11,8 +11,18 @@ import {
   type SynthScaleOptions,
   synthScale,
 } from '../core/ks-synth.js';
-import { type Scale, scaleToFreqs, synthScaleFromScale } from '../core/scale.js';
-import { type RankedChord, strikeRankedChord, pluckRankedChord } from '../core/chord-search.js';
+import {
+  type Scale,
+  scaleToFreqs,
+  synthScaleFromScale,
+  buildChordProgression,
+} from '../core/scale.js';
+import {
+  type RankedChord,
+  strikeRankedChord,
+  pluckRankedChord,
+  optimalChordOrder,
+} from '../core/chord-search.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
@@ -353,4 +363,69 @@ export function chordProgressionToWav(
   // Normalize the full concatenated progression
   const outMixed = mix([out]);
   return encodeWav(outMixed, sampleRate);
+}
+
+/**
+ * Full pipeline: Scale + tuning + degree-offset pattern → WAV bytes of the chord progression.
+ *
+ * Socratic Q105: `buildChordProgression(scale, tuning, pattern)` produces a `Chord[]`;
+ * `chordProgressionToWav(chords, rootHz, spectrum, opts)` synthesizes it to WAV. If a
+ * Scale-based progression is truly first-class (the library has `buildChordProgression`,
+ * `chordProgressionToWav`, `progressionToSmf`, etc.), then going from musical intent
+ * (Scale + pattern) all the way to ready-to-write audio bytes should be one call — yet
+ * today it requires two. This bridges that gap.
+ *
+ * The `pattern` is an array of diatonic-offset arrays (0-indexed within the scale), each
+ * defining one chord in the progression. See `buildChordProgression` for details.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `pattern` is empty or any offset is out of range.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * // Classic I–IV–V triad progression
+ * const wav = buildChordProgressionWav(major, t12, [[0,2,4],[3,5,0],[4,6,1]], 261.63, harmonicSpectrum());
+ * await fs.writeFile('ivi.wav', wav);
+ */
+export function buildChordProgressionWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  pattern: ReadonlyArray<readonly number[]>,
+  rootHz: number,
+  spectrum: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  const chords = buildChordProgression(scale, tuning, pattern);
+  return chordProgressionToWav(chords, rootHz, spectrum, opts);
+}
+
+/**
+ * Find the voice-leading–optimal ordering of a `Chord[]`, then synthesize to WAV in one call.
+ *
+ * Socratic Q107: `optimalChordOrder(chords, rootHz)` finds the ordering that minimises
+ * voice-leading cost across a `Chord[]`; `chordProgressionToWav` synthesizes a `Chord[]`
+ * to WAV. Going from "I have a bag of chords" to "I have an optimally ordered WAV" still
+ * requires two explicit calls. If optimal ordering is first-class (there is already
+ * `optimalProgressionSmf` for MIDI), its WAV counterpart should be one call too.
+ *
+ * The `chords` array is reordered by `optimalChordOrder` (nearest-neighbour / brute-force
+ * TSP over voice-leading cost), then synthesized chord-by-chord to a single WAV file.
+ *
+ * @throws {RangeError} if `chords` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const chords = rankScaleChords(major, t12).map(rankedChordToChord);
+ * const wav = optimalProgressionWav(chords, 261.63, harmonicSpectrum());
+ * await fs.writeFile('optimal-progression.wav', wav);
+ */
+export function optimalProgressionWav(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  const { chords: ordered } = optimalChordOrder(chords, rootHz);
+  return chordProgressionToWav(ordered, rootHz, spectrum, opts);
 }

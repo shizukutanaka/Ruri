@@ -197,6 +197,33 @@ export function rankModes(scale: Scale, tuning: TuningSystem, spectrum: Spectrum
 }
 
 /**
+ * Return all modal rotations of a scale as a `Scale[]` in one call.
+ *
+ * Socratic Q106: `scaleMode(scale, i, tuning)` returns one modal rotation at index `i`.
+ * Getting all modes requires the caller to write `Array.from({ length: n }, (_, i) => scaleMode(s, i, t))`.
+ * If modes are truly first-class — and `rankModes` already computes all of them internally
+ * anyway — then "all modal rotations of this scale" should be one call, not a manual
+ * comprehension. `scaleModeSeries` closes this gap: call it when you need the full mode
+ * series for iteration, display, or bulk comparison without the `RankedMode` wrapper.
+ *
+ * The returned array is in rotation order (index 0 = original scale, 1 = starting from
+ * the second degree, … n−1 = starting from the last degree), matching the indexing of
+ * `scaleMode`. Use `rankModes` when you want the modes sorted by dissonance.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const modes = scaleModeSeries(major, equalTemperament12(440));
+ * // modes[0] = Ionian, modes[1] = Dorian, modes[2] = Phrygian, ...
+ * console.log(modes.map(m => m.name));
+ */
+export function scaleModeSeries(scale: Scale, tuning: TuningSystem): Scale[] {
+  assertTuningMatch(scale, tuning);
+  return Array.from({ length: scale.degreeIndices.length }, (_, i) => scaleMode(scale, i, tuning));
+}
+
+/**
  * Rank all chord sub-subsets of a `Scale` by timbre-weighted dissonance/periodicity score.
  *
  * Socratic Q57: `rankChords(tuning, opts)` discovers chords from the full tuning's degree
