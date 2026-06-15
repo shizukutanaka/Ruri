@@ -12,7 +12,10 @@ import {
   bestModeForTuning,
   scaleHarmonicity,
   tuningHarmonicityProfile,
+  tuningReport,
+  rankModesByStability,
   type Scale,
+  type TuningReportType,
 } from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
 import { type Spectrum } from '../core/spectrum.js';
@@ -619,4 +622,82 @@ export function mostConsistentPreset(
   presets: readonly TuningPreset[] = ALL_PRESETS,
 ): TuningPreset | undefined {
   return rankPresetsByHarmonicitySpread(presets)[0]?.preset;
+}
+
+/**
+ * Compute tuning reports for all presets in one call.
+ *
+ * Socratic Q207: "If we can compute a tuning report, computing reports for ALL presets
+ * should be one call — can it?" Today: iterate `ALL_PRESETS` → `loadTuningPreset` →
+ * `tuningReport` for each — three manual steps. If preset reports are first-class,
+ * computing them all at once should be one call.
+ *
+ * Algorithm:
+ * 1. For each preset: `loadTuningPreset(preset)` → `TuningSystem`.
+ * 2. `tuningReport(tuning, rootHz, spectrum)` → `TuningReportType`.
+ * 3. Return `Array<{ preset, report }>`.
+ *
+ * @param rootHz   - Absolute frequency of the root in Hz.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ preset, report }` in the same order as the preset pool.
+ *
+ * @example
+ * const reports = allPresetReports(261.63);
+ * // reports[0].preset is TWELVE_TET; reports[0].report contains full analysis
+ */
+export function allPresetReports(
+  rootHz: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Array<{ preset: TuningPreset; report: TuningReportType }> {
+  return presets.map((preset) => {
+    const tuning = loadTuningPreset(preset);
+    const report = tuningReport(tuning, rootHz, spectrum);
+    return { preset, report };
+  });
+}
+
+/**
+ * Find the preset with the globally best (lowest) stability score in one call.
+ *
+ * Socratic Q208: "If we can find the most consistent preset and the most stable modes,
+ * finding the preset with the globally BEST stability score should be one call — can it?"
+ * Today: iterate presets → `loadTuningPreset` → `rankModesByStability` → take best score →
+ * argmin — four manual steps. If preset stability is first-class, finding the best-scoring
+ * preset should be one call.
+ *
+ * Algorithm:
+ * 1. For each preset: `loadTuningPreset(preset)` → `TuningSystem`.
+ * 2. `rankModesByStability(tuning, rootHz)` → ranked modes, best first.
+ * 3. Take `result[0].score` as the preset's best stability score.
+ * 4. Return the preset with the lowest best-mode score.
+ *
+ * @param rootHz   - Absolute frequency of the root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ preset, score }` for the preset with the lowest best-mode stability score,
+ *          or `undefined` if the preset pool is empty.
+ *
+ * @example
+ * const best = bestStabilityPreset(261.63);
+ * if (best) console.log(best.preset.name, best.score);
+ */
+export function bestStabilityPreset(
+  rootHz: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): { preset: TuningPreset; score: number } | undefined {
+  if (presets.length === 0) return undefined;
+  let bestEntry: { preset: TuningPreset; score: number } | undefined;
+  for (const preset of presets) {
+    const tuning = loadTuningPreset(preset);
+    const ranked = rankModesByStability(tuning, rootHz, spectrum);
+    const topScore = ranked[0]?.score;
+    if (topScore === undefined) continue;
+    if (bestEntry === undefined || topScore < bestEntry.score) {
+      bestEntry = { preset, score: topScore };
+    }
+  }
+  return bestEntry;
 }
