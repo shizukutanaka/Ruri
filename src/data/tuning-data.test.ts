@@ -17,6 +17,7 @@ import {
   rankPresetsByBestMode,
   rankPresetsByDistance,
   closestPresetTuning,
+  presetsComparisonWav,
 } from './presets.js';
 import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
@@ -646,5 +647,41 @@ describe('closestPresetTuning (Q173)', () => {
     expect(result).toBeDefined();
     expect(typeof result!.referenceHz).toBe('number');
     expect(typeof result!.periodCents).toBe('number');
+  });
+});
+
+// Q179 — presetsComparisonWav: export multiple preset tunings as a comparative WAV
+describe('presetsComparisonWav (Q179)', () => {
+  it('test_returns_uint8array_for_known_presets', () => {
+    const wav = presetsComparisonWav(['12-tet', 'just-5-limit']);
+    expect(wav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_returns_undefined_for_all_unknown_presets', () => {
+    const wav = presetsComparisonWav(['no-such-preset', 'another-unknown']);
+    expect(wav).toBeUndefined();
+  });
+
+  it('test_riff_header_in_output', () => {
+    const wav = presetsComparisonWav(['12-tet']);
+    expect(wav).toBeDefined();
+    expect(String.fromCharCode(wav![0]!, wav![1]!, wav![2]!, wav![3]!)).toBe('RIFF');
+  });
+
+  it('test_unknown_ids_silently_skipped', () => {
+    const wav = presetsComparisonWav(['no-such-preset', '12-tet', 'also-unknown']);
+    expect(wav).toBeDefined();
+    expect(wav!.length).toBeGreaterThan(44);
+  });
+
+  it('test_empty_array_returns_undefined', () => {
+    const wav = presetsComparisonWav([]);
+    expect(wav).toBeUndefined();
+  });
+
+  it('test_two_presets_longer_than_one', () => {
+    const one = presetsComparisonWav(['12-tet'])!;
+    const two = presetsComparisonWav(['12-tet', 'just-5-limit'])!;
+    expect(two.length).toBeGreaterThan(one.length);
   });
 });

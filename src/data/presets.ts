@@ -15,6 +15,7 @@ import {
 } from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
 import { type Spectrum } from '../core/spectrum.js';
+import { tuningToScaleWav, encodeWav, type TuningScaleWavOptions } from '../adapters/wav.js';
 
 const SEMI = 100;
 
@@ -495,4 +496,65 @@ export function closestPresetTuning(
   const top = ranked[0];
   if (top === undefined) return undefined;
   return loadTuningPreset(top.preset);
+}
+
+/**
+ * Synthesize multiple preset tunings as a single comparative WAV in one call.
+ *
+ * Socratic Q179: "If we can export individual WAV files, exporting multiple preset tunings
+ * as a comparative WAV (each tuning's scale played sequentially) should be one call — can it?"
+ * Today: iterate preset ids → `getTuningById` → `tuningToScaleWav` → concatenate → `encodeWav`
+ * — five manual steps. If preset tunings are first-class, comparing them as audio should be
+ * one call.
+ *
+ * Algorithm:
+ * 1. For each presetId: `getTuningById(id)` → skip if not found (silently).
+ * 2. `tuningToScaleWav(tuning, opts)` → decode WAV bytes back to Float32 samples.
+ * 3. Concatenate all sample arrays.
+ * 4. `encodeWav(combined, sampleRate)` → final WAV bytes.
+ *
+ * @param presetIds - Array of preset id strings. Unknown ids are skipped silently.
+ * @param spectrum  - Unused (accepted for API forward-compatibility).
+ * @param opts      - Optional WAV synthesis options forwarded to `tuningToScaleWav`.
+ * @returns `Uint8Array` WAV bytes of all found presets concatenated, or `undefined` if none found.
+ *
+ * @example
+ * const wav = presetsComparisonWav(['12-tet', 'just-5-limit', 'slendro-example']);
+ * if (wav) await fs.writeFile('comparison.wav', wav);
+ */
+export function presetsComparisonWav(
+  presetIds: readonly string[],
+  spectrum?: Spectrum,
+  opts?: TuningScaleWavOptions,
+): Uint8Array | undefined {
+  void spectrum; // accepted for API forward-compatibility
+  const sampleRate = opts?.sampleRate ?? 44100;
+  const allSamples: Float32Array[] = [];
+
+  for (const id of presetIds) {
+    const tuning = getTuningById(id);
+    if (tuning === undefined) continue;
+    const wav = tuningToScaleWav(tuning, opts);
+    // Decode the WAV PCM bytes back to Float32 samples
+    const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+    const dataOffset = 44; // standard WAV header size
+    const numSamples = (wav.byteLength - dataOffset) / 2;
+    const samples = new Float32Array(numSamples);
+    for (let i = 0; i < numSamples; i++) {
+      samples[i] = view.getInt16(dataOffset + i * 2, true) / 32767;
+    }
+    allSamples.push(samples);
+  }
+
+  if (allSamples.length === 0) return undefined;
+
+  const totalLength = allSamples.reduce((sum, s) => sum + s.length, 0);
+  const combined = new Float32Array(totalLength);
+  let offset = 0;
+  for (const samples of allSamples) {
+    combined.set(samples, offset);
+    offset += samples.length;
+  }
+
+  return encodeWav(combined, sampleRate);
 }
