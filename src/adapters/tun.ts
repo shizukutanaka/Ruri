@@ -34,9 +34,12 @@ import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
 import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import { type Scale, scaleToFreqs, tuningToScale } from '../core/scale.js';
+import { type Spectrum } from '../core/spectrum.js';
 import { getTuningById } from '../data/presets.js';
 import { scaleChordProgressionSmf, scaleToSmf } from './smf.js';
-import { type ScalaScale, tuningToScl } from './scala.js';
+import { type ScalaScale, tuningToScl, writeScl } from './scala.js';
+import { bestModeWav } from './wav.js';
+import { tuningToMts } from './mts.js';
 
 /** Default base frequency: MIDI note 0 at A4 = 440 Hz (440 × 2^(−69/12)). */
 export const TUN_DEFAULT_BASEFREQ_HZ = 440 * 2 ** (-69 / 12);
@@ -417,4 +420,51 @@ export function tuningBundle(
   const scale = tuningToScale(tuning);
   const smf = scaleToSmf(scale, tuning, tuning.referenceHz);
   return { smf, tun, scl };
+}
+
+/**
+ * Export a `TuningSystem` as WAV + SMF + SCL text + TUN + MTS in one call.
+ *
+ * Socratic Q240: "If a TuningSystem is truly first-class, exporting it as
+ * WAV + SMF + SCL + TUN + MTS should be one call — can it?"
+ * `tuningBundle` already bundles SMF + TUN + SCL but has no WAV or MTS.
+ * If a tuning is truly first-class across all output formats, a five-format
+ * export bundle should be one call.
+ *
+ * Algorithm:
+ * 1. `tuningBundle(tuning, opts)` → `{ smf, tun, scl: ScalaScale }`.
+ * 2. `writeScl(scl)` → `.scl` text string.
+ * 3. `bestModeWav(tuning, rootHz ?? tuning.referenceHz, spectrum)` → WAV bytes.
+ * 4. `tuningToMts(tuning)` → MTS SysEx bytes.
+ *
+ * @param tuning   - The tuning system to export.
+ * @param rootHz   - Root frequency in Hz for WAV rendering. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for WAV synthesis.
+ * @param opts     - Optional TUN encoding options (name, anchor MIDI note, basefreq).
+ * @returns `{ wav, smf, scl, tun, mts }` — all five formats simultaneously.
+ *
+ * @throws {RangeError} if tuning has no degrees.
+ *
+ * @example
+ * const { wav, smf, scl, tun, mts } = tuningToFullBundle(edo(19));
+ * fs.writeFileSync('19edo.wav', wav);
+ * fs.writeFileSync('19edo.mid', smf);
+ * fs.writeFileSync('19edo.scl', scl);
+ * fs.writeFileSync('19edo.tun', tun);
+ * port.send(mts);
+ */
+export function tuningToFullBundle(
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  opts?: { name?: string },
+): { wav: Uint8Array; smf: Uint8Array; scl: string; tun: string; mts: Uint8Array } {
+  const tunOpts: TuningToTunOptions | undefined =
+    opts?.name !== undefined ? { anchorMidiNote: 69 } : undefined;
+  const { smf, tun, scl: sclObj } = tuningBundle(tuning, tunOpts);
+  const scl = writeScl(sclObj);
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const wav = bestModeWav(tuning, effectiveRootHz, spectrum);
+  const mts = tuningToMts(tuning, opts?.name);
+  return { wav, smf, scl, tun, mts };
 }
