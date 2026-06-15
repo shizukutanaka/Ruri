@@ -63,6 +63,10 @@ import {
   chordMapDyads,
   areTuningsSimilar,
   tuningReport,
+  compareTuningReports,
+  modeStabilityScores,
+  singleBestChord,
+  chordMapDyadTriadRatio,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -3442,5 +3446,162 @@ describe('tuningReport (Q203)', () => {
   it('test_empty_tuning_throws', () => {
     const emptyTuning = { ...t12, degrees: [] };
     expect(() => tuningReport(emptyTuning, 261.63)).toThrow(RangeError);
+  });
+});
+
+// Q204 — compareTuningReports
+describe('compareTuningReports (Q204)', () => {
+  const t5 = edo(5);
+  const t7 = edo(7);
+
+  it('test_returns_both_reports', () => {
+    const cmp = compareTuningReports(t5, t7, 261.63);
+    expect(cmp.a.id).toBe(t5.id);
+    expect(cmp.b.id).toBe(t7.id);
+  });
+
+  it('test_correlation_is_number', () => {
+    const cmp = compareTuningReports(t5, t7, 261.63);
+    expect(typeof cmp.correlation).toBe('number');
+  });
+
+  it('test_harmonicity_distance_diff_is_non_negative', () => {
+    const cmp = compareTuningReports(t5, t7, 261.63);
+    expect(cmp.harmonicityDistanceDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_harmonicity_diffs_are_equal', () => {
+    const cmp = compareTuningReports(t5, t7, 261.63);
+    expect(cmp.harmonicityDistanceDiff).toBe(cmp.bestModeHarmonicityDiff);
+  });
+
+  it('test_same_tuning_gives_zero_diff', () => {
+    const cmp = compareTuningReports(t5, t5, 261.63);
+    expect(cmp.harmonicityDistanceDiff).toBeCloseTo(0, 10);
+  });
+
+  it('test_reports_contain_expected_fields', () => {
+    const cmp = compareTuningReports(t5, t7, 261.63);
+    expect(cmp.a).toHaveProperty('degreeCount');
+    expect(cmp.b).toHaveProperty('degreeCount');
+    expect(cmp.a.degreeCount).toBe(t5.degrees.length);
+    expect(cmp.b.degreeCount).toBe(t7.degrees.length);
+  });
+});
+
+// Q205 — modeStabilityScores
+describe('modeStabilityScores (Q205)', () => {
+  const t5 = edo(5);
+  const t7 = edo(7);
+
+  it('test_returns_number_array', () => {
+    const scores = modeStabilityScores(t5, 261.63);
+    expect(Array.isArray(scores)).toBe(true);
+    for (const s of scores) expect(typeof s).toBe('number');
+  });
+
+  it('test_length_matches_degree_count', () => {
+    const scores = modeStabilityScores(t5, 261.63);
+    expect(scores.length).toBe(t5.degrees.length);
+  });
+
+  it('test_sorted_ascending', () => {
+    const scores = modeStabilityScores(t5, 261.63);
+    for (let i = 1; i < scores.length; i++) {
+      expect(scores[i] as number).toBeGreaterThanOrEqual(scores[i - 1] as number);
+    }
+  });
+
+  it('test_scores_for_7edo', () => {
+    const scores = modeStabilityScores(t7, 261.63);
+    expect(scores.length).toBe(t7.degrees.length);
+  });
+
+  it('test_first_score_is_minimum', () => {
+    const scores = modeStabilityScores(t5, 261.63);
+    const min = Math.min(...scores);
+    expect(scores[0]).toBeCloseTo(min, 10);
+  });
+});
+
+// Q206 — singleBestChord
+describe('singleBestChord (Q206)', () => {
+  const t5 = edo(5);
+  const scale5 = tuningToScale(t5);
+
+  it('test_returns_chord_map_analysis_entry', () => {
+    const entry = singleBestChord(scale5, t5);
+    expect(entry).toHaveProperty('chord');
+    expect(entry).toHaveProperty('dissonance');
+    expect(entry).toHaveProperty('harmonicity');
+    expect(entry).toHaveProperty('degreeOffset');
+  });
+
+  it('test_dissonance_is_non_negative', () => {
+    const entry = singleBestChord(scale5, t5);
+    expect(entry.dissonance).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_harmonicity_is_positive', () => {
+    const entry = singleBestChord(scale5, t5);
+    expect(entry.harmonicity).toBeGreaterThan(0);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const entry = singleBestChord(scale5, t5, harmonicSpectrum());
+    expect(entry).toHaveProperty('chord');
+  });
+
+  it('test_empty_scale_throws', () => {
+    const emptyScale: Scale = { id: 'empty', name: 'empty', tuningId: t5.id, degreeIndices: [] };
+    expect(() => singleBestChord(emptyScale, t5)).toThrow(RangeError);
+  });
+
+  it('test_best_entry_has_lowest_or_equal_dissonance', () => {
+    const entry = singleBestChord(scale5, t5);
+    const allEntries = chordMapAnalysis(scale5, t5, harmonicSpectrum());
+    for (const e of allEntries) {
+      expect(entry.dissonance).toBeLessThanOrEqual(e.dissonance + 1e-10);
+    }
+  });
+});
+
+// Q209 — chordMapDyadTriadRatio
+describe('chordMapDyadTriadRatio (Q209)', () => {
+  const t5 = edo(5);
+  const scale5 = tuningToScale(t5);
+
+  it('test_returns_number', () => {
+    const map = scaleToChordMap(scale5, t5, 2);
+    const ratio = chordMapDyadTriadRatio(map);
+    expect(typeof ratio).toBe('number');
+  });
+
+  it('test_dyad_only_map_returns_dyad_count', () => {
+    const map = scaleToChordMap(scale5, t5, 2);
+    const dyads = chordMapDyads(map);
+    const ratio = chordMapDyadTriadRatio(map);
+    expect(ratio).toBe(dyads.length / 1);
+  });
+
+  it('test_empty_map_returns_zero', () => {
+    const ratio = chordMapDyadTriadRatio([]);
+    expect(ratio).toBe(0);
+  });
+
+  it('test_guards_division_by_zero_via_max_1', () => {
+    const map = scaleToChordMap(scale5, t5, 2);
+    const triads = chordMapTriads(map);
+    const dyads = chordMapDyads(map);
+    const ratio = chordMapDyadTriadRatio(map);
+    expect(ratio).toBe(dyads.length / Math.max(1, triads.length));
+  });
+
+  it('test_mixed_map_with_triads_gives_correct_ratio', () => {
+    const map3 = scaleToChordMap(scale5, t5, 3);
+    const ratio = chordMapDyadTriadRatio(map3);
+    const triads = chordMapTriads(map3);
+    const dyads = chordMapDyads(map3);
+    expect(ratio).toBeCloseTo(dyads.length / Math.max(1, triads.length), 10);
   });
 });

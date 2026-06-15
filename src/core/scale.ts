@@ -2699,11 +2699,7 @@ export function areTuningsSimilar(
  * const report = tuningReport(t12, 261.63);
  * console.log(JSON.stringify(report));
  */
-export function tuningReport(
-  tuning: TuningSystem,
-  rootHz: number,
-  spectrum?: Spectrum,
-): {
+export type TuningReportType = {
   id: string;
   name: string;
   degreeCount: number;
@@ -2711,7 +2707,13 @@ export function tuningReport(
   stabilityRanking: Array<{ modeId: string; score: number }>;
   chordMapSummary: ReturnType<typeof chordMapSummary>;
   harmonicityProfile: number[];
-} {
+};
+
+export function tuningReport(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+): TuningReportType {
   const bestMode = bestModeForTuning(tuning, spectrum);
   const bestHarmonicity = scaleHarmonicity(bestMode, tuning);
   const stabilityRanked = rankModesByStability(tuning, rootHz, spectrum);
@@ -2726,4 +2728,142 @@ export function tuningReport(
     chordMapSummary: summary,
     harmonicityProfile: profile,
   };
+}
+
+/**
+ * Compare two tuning systems side-by-side via their full reports in one call.
+ *
+ * Socratic Q204: "If a tuning report captures all key metrics, comparing two tuning reports
+ * side-by-side should be one call — can it?" Today: `tuningReport(tuning1, rootHz, spectrum)`
+ * and `tuningReport(tuning2, rootHz, spectrum)` plus `tuningHarmonicityCorrelation` — three
+ * explicit steps. If tuning reports are first-class, comparing them should be one call.
+ *
+ * Algorithm:
+ * 1. `tuningReport(tuning1, rootHz, spectrum)` → `a`.
+ * 2. `tuningReport(tuning2, rootHz, spectrum)` → `b`.
+ * 3. `tuningHarmonicityCorrelation(tuning1, tuning2)` → `correlation`.
+ * 4. Compute absolute harmonicity differences from best modes.
+ *
+ * @param tuning1  - First tuning system.
+ * @param tuning2  - Second tuning system.
+ * @param rootHz   - Absolute frequency of the root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns Comparison object with both reports, correlation, and harmonicity diffs.
+ *
+ * @throws {RangeError} if either tuning has no degrees.
+ *
+ * @example
+ * const t5 = edo(5);
+ * const t7 = edo(7);
+ * const cmp = compareTuningReports(t5, t7, 261.63);
+ * console.log(cmp.correlation, cmp.harmonicityDistanceDiff);
+ */
+export function compareTuningReports(
+  tuning1: TuningSystem,
+  tuning2: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+): {
+  a: TuningReportType;
+  b: TuningReportType;
+  correlation: number;
+  harmonicityDistanceDiff: number;
+  bestModeHarmonicityDiff: number;
+} {
+  const a = tuningReport(tuning1, rootHz, spectrum);
+  const b = tuningReport(tuning2, rootHz, spectrum);
+  const correlation = tuningHarmonicityCorrelation(tuning1, tuning2);
+  const harmonicityDistanceDiff = Math.abs(a.bestMode.harmonicity - b.bestMode.harmonicity);
+  const bestModeHarmonicityDiff = harmonicityDistanceDiff;
+  return { a, b, correlation, harmonicityDistanceDiff, bestModeHarmonicityDiff };
+}
+
+/**
+ * Extract mode stability scores as a plain number array in one call.
+ *
+ * Socratic Q205: "If we can rank modes by stability, the stability SCORES should be
+ * extractable as a plain number array in one call — can it?" Today:
+ * `rankModesByStability(tuning, rootHz, spectrum)` → `result.map(r => r.score)` — two steps.
+ * If ranked scores are first-class, extracting them should be one call.
+ *
+ * @param tuning   - The parent `TuningSystem`. Must be non-empty.
+ * @param rootHz   - Absolute frequency of the root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `number[]` of stability scores in ascending order (best / lowest first).
+ *
+ * @throws {RangeError} if tuning has no degrees.
+ *
+ * @example
+ * const scores = modeStabilityScores(edo(5), 261.63);
+ * // scores[0] is the lowest (best) stability score across all modes of 5-EDO
+ */
+export function modeStabilityScores(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+): number[] {
+  return rankModesByStability(tuning, rootHz, spectrum).map((r) => r.score);
+}
+
+/**
+ * Return the single best chord from a scale's chord map with full acoustic scores in one call.
+ *
+ * Socratic Q206: "If we can filter a chord map by criteria, filtering to only THE BEST chord
+ * (single entry with lowest combined score from chordMapAnalysis) should be one call — can it?"
+ * Today: `chordMapAnalysis(scale, tuning, spectrum)` → `analysis[0]` — two steps.
+ * If the best chord is a meaningful concept, fetching it with full scores should be one call.
+ *
+ * Returns a `ChordMapAnalysisEntry` (unlike `bestChordMapEntry` which also uses this under
+ * the hood — this function makes the spectrum default explicit).
+ *
+ * @param scale    - The parent scale.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns The `ChordMapAnalysisEntry` with the lowest dissonance (most consonant).
+ *
+ * @throws {RangeError} if no chord entries are found.
+ *
+ * @example
+ * const t5 = edo(5);
+ * const scale = tuningToScale(t5);
+ * const best = singleBestChord(scale, t5);
+ * console.log(best.dissonance, best.harmonicity);
+ */
+export function singleBestChord(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+): ChordMapAnalysisEntry {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const entries = chordMapAnalysis(scale, tuning, effectiveSpectrum);
+  const best = entries[0];
+  if (best === undefined) {
+    throw new RangeError(
+      `singleBestChord: no chord entries found for scale '${scale.id}' — scale may be too small`,
+    );
+  }
+  return best;
+}
+
+/**
+ * Compute the ratio of dyads to triads in a chord map in one call.
+ *
+ * Socratic Q209: "If we have chord map dyads and triads, computing the DIAD-TO-TRIAD ratio
+ * (how many interval pairs vs triads are in a chord map) should be one call — can it?" Today:
+ * `chordMapDyads(chordMap).length / chordMapTriads(chordMap).length` — multiple steps plus
+ * manual guard against division by zero. If both counts are first-class, the ratio should
+ * be one call.
+ *
+ * Guards division by zero with `Math.max(1, triadCount)`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @returns The ratio `dyads.length / max(1, triads.length)`.
+ *
+ * @example
+ * const chordMap = scaleToChordMap(scale, tuning, 2);
+ * const ratio = chordMapDyadTriadRatio(chordMap);
+ * // 0 dyads + 7 triads → 0;  7 dyads + 0 triads → 7
+ */
+export function chordMapDyadTriadRatio(chordMap: readonly ScaleChordMapEntry[]): number {
+  return chordMapDyads(chordMap).length / Math.max(1, chordMapTriads(chordMap).length);
 }
