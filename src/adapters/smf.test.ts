@@ -13,6 +13,7 @@ import {
   scaleToSmf,
   progressionAnalysisToSmf,
   chordMapToSmf,
+  presetProgressionSmf,
 } from './smf.js';
 import { chordFromSemitones, chordFromRatios } from '../core/chord.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -535,5 +536,48 @@ describe('chordMapToSmf (Q123)', () => {
       rootHz,
     );
     expect(fromMap).toEqual(fromDirect);
+  });
+});
+
+// Q135: presetProgressionSmf — named preset + pattern → MIDI SMF in one call
+describe('presetProgressionSmf (Q135)', () => {
+  const rootHz = 261.63;
+
+  it('test_known_preset_returns_uint8array', () => {
+    const midi = presetProgressionSmf('12-tet', [0, 3, 4, 0], rootHz);
+    expect(midi).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_output_has_mthd_header', () => {
+    const midi = presetProgressionSmf('12-tet', [0, 3, 4, 0], rootHz);
+    expect(midi).not.toBeUndefined();
+    expect(String.fromCharCode(midi![0]!, midi![1]!, midi![2]!, midi![3]!)).toBe('MThd');
+  });
+
+  it('test_unknown_preset_returns_undefined', () => {
+    const midi = presetProgressionSmf('nonexistent-preset', [0, 1, 2], rootHz);
+    expect(midi).toBeUndefined();
+  });
+
+  it('test_decoded_smf_has_correct_chord_count', () => {
+    // Pattern [0, 3, 4, 0] → 4 chords (triads by default) → each chord has 3 notes
+    const midi = presetProgressionSmf('12-tet', [0, 3, 4, 0], rootHz);
+    const { notes } = decodeSmf(midi!);
+    const byTick = new Map<number, number>();
+    for (const n of notes) byTick.set(n.startTicks, (byTick.get(n.startTicks) ?? 0) + 1);
+    // 4 chords in sequence
+    expect(byTick.size).toBe(4);
+  });
+
+  it('test_just_5_limit_preset_works', () => {
+    const midi = presetProgressionSmf('just-5-limit', [0, 2, 4], rootHz);
+    expect(midi).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(midi![0]!, midi![1]!, midi![2]!, midi![3]!)).toBe('MThd');
+  });
+
+  it('test_custom_velocity_applied', () => {
+    const midi = presetProgressionSmf('12-tet', [0, 3], rootHz, undefined, { velocity: 70 });
+    const { notes } = decodeSmf(midi!);
+    for (const n of notes) expect(n.velocity).toBe(70);
   });
 });

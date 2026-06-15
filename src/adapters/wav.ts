@@ -20,6 +20,7 @@ import {
   scaleModeSeries,
   bestProgressionForScale,
   rankScaleChords,
+  bestModeForTuning,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -599,4 +600,48 @@ export function chordMapToWav(
     spectrum ?? harmonicSpectrum(),
     opts,
   );
+}
+
+/**
+ * Synthesize the most harmonically optimal mode of a tuning system as a WAV scale run.
+ *
+ * Socratic Q134: `bestModeForTuning(tuning)` returns the best modal Scale in one call,
+ * and `pluckScaleWav(mode, tuning, opts)` encodes it to WAV bytes — but there is no
+ * single-call path from a TuningSystem directly to WAV audio of its best mode.
+ * If a tuning's best mode is a first-class concept, hearing it should require one call.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → get the most harmonically optimal Scale.
+ * 2. `pluckScaleWav(bestMode, tuning, opts)` → WAV bytes via Karplus-Strong synthesis.
+ *
+ * Note: `rootHz` is accepted for API forward-compatibility but is not currently used;
+ * the tuning's own `referenceHz` anchors frequencies.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz (accepted for API consistency; currently unused).
+ * @param spectrum - Optional instrument spectrum. When provided, uses timbre-aware mode
+ *                   ranking via `rankAllModesForTimbre`. When omitted, uses harmonicity only.
+ * @param opts     - Optional Karplus-Strong + per-note duration options.
+ * @returns WAV bytes of the best mode played as a melodic ascending sequence.
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const wav = bestModeWav(t12, 440);
+ * await fs.writeFile('best-mode.wav', wav);
+ *
+ * @example
+ * // With timbre-aware mode selection:
+ * const wav = bestModeWav(t12, 440, harmonicSpectrum(), { ...DEFAULT_KS, noteSeconds: 0.3 });
+ */
+export function bestModeWav(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: PluckScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
+): Uint8Array {
+  void rootHz; // accepted for API forward-compat; tuning.referenceHz anchors frequencies
+  const bestMode = bestModeForTuning(tuning, spectrum);
+  return pluckScaleWav(bestMode, tuning, opts);
 }

@@ -17,6 +17,7 @@ import {
   bestProgressionWav,
   bestScaleChordWav,
   chordMapToWav,
+  bestModeWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -867,5 +868,51 @@ describe('chordMapToWav (Q130)', () => {
     const chordMap = scaleToChordMap(major, t12);
     expect(() => chordMapToWav(chordMap, -1, spectrum, fastOpts)).toThrow(RangeError);
     expect(() => chordMapToWav(chordMap, 0, spectrum, fastOpts)).toThrow(RangeError);
+  });
+});
+
+// Q134: bestModeWav — best modal rotation of a tuning as a melodic WAV in one call
+describe('bestModeWav (Q134)', () => {
+  const t12 = equalTemperament12(440);
+  const fastOpts = { ...DEFAULT_KS, noteSeconds: 0.05, sampleRate: 8000 };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const wav = bestModeWav(t12, 440, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const wav = bestModeWav(t12, 440, undefined, fastOpts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(fastOpts.sampleRate);
+  });
+
+  it('test_with_spectrum_also_returns_valid_wav', () => {
+    const spectrum = harmonicSpectrum();
+    const wav = bestModeWav(t12, 440, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_root_hz_does_not_affect_output', () => {
+    // rootHz is unused; both calls should produce the same audio
+    const wav1 = bestModeWav(t12, 261.63, undefined, fastOpts);
+    const wav2 = bestModeWav(t12, 440, undefined, fastOpts);
+    expect(wav1).toEqual(wav2);
+  });
+
+  it('test_different_tunings_produce_different_audio', () => {
+    const t19 = edo(19);
+    const wav12 = bestModeWav(t12, 440, undefined, fastOpts);
+    const wav19 = bestModeWav(t19, 440, undefined, fastOpts);
+    // Different tunings → different scales → different audio (lengths may differ too)
+    // At minimum the lengths or content should differ
+    const sameLengthAndContent =
+      wav12.length === wav19.length && wav12.every((b, i) => b === wav19[i]);
+    expect(sameLengthAndContent).toBe(false);
   });
 });

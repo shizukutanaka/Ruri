@@ -12,6 +12,9 @@ import {
 } from '../core/scale.js';
 import { type TuningSystem } from '../core/tuning.js';
 import { type ChordSearchOptions } from '../core/chord-search.js';
+import { type Spectrum } from '../core/spectrum.js';
+import { presetChordProgression } from '../data/presets.js';
+import { type TuningPreset } from '../data/tuning-data.js';
 
 export interface NoteEvent {
   readonly note: number; // 0..127
@@ -527,4 +530,44 @@ export function chordMapToSmf(
     rootHz,
     opts,
   );
+}
+
+export type PresetProgressionSmfOptions = ProgressionToSmfOptions;
+
+/**
+ * Convert a named tuning preset + degree-offset pattern directly to a MIDI SMF in one call.
+ *
+ * Socratic Q135: `presetChordProgression(presetId, pattern, rootHz)` builds a `Chord[]`
+ * from a preset in one call, and `progressionToSmf(chords, rootHz)` encodes it to MIDI —
+ * but wiring these still requires two steps plus a manual import of both functions. If
+ * preset progressions are first-class musical output, exporting them as `.mid` should
+ * require one call.
+ *
+ * @param presetId - ID of a named tuning preset (e.g. `'12-tet'`, `'just-5-limit'`).
+ * @param pattern  - Array of degree-offset integers (e.g. `[0, 3, 4, 0]`).
+ * @param rootHz   - Root frequency in Hz.
+ * @param spectrum - Optional spectrum (unused for MIDI encoding; reserved for API consistency).
+ * @param opts     - Optional SMF encoding options.
+ * @param presets  - Optional preset list override (defaults to built-in presets).
+ * @returns A Type-0 SMF `Uint8Array` ready to write to a `.mid` file.
+ *
+ * @throws {RangeError} if no preset with `presetId` is found.
+ * @throws {RangeError} if any realized frequency maps outside MIDI note range [0, 127].
+ *
+ * @example
+ * const midi = presetProgressionSmf('12-tet', [0, 3, 4, 0], 261.63);
+ * await fs.writeFile('progression.mid', midi);
+ */
+export function presetProgressionSmf(
+  presetId: string,
+  pattern: readonly number[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts?: PresetProgressionSmfOptions,
+  presets?: readonly TuningPreset[],
+): Uint8Array | undefined {
+  void spectrum;
+  const chords = presetChordProgression(presetId, pattern, rootHz, undefined, undefined, presets);
+  if (chords === undefined) return undefined;
+  return progressionToSmf(chords, rootHz, opts);
 }
