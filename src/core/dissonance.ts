@@ -1,6 +1,6 @@
 import { type Spectrum, type RealizedPartial, realizeSpectrum } from './spectrum.js';
 import { freqToCents, pitchToCents } from './cents.js';
-import { type TuningSystem, defineTuning } from './tuning.js';
+import { type TuningSystem, defineTuning, tuningDistance } from './tuning.js';
 import { type Chord, realizeChordFreqs } from './chord.js';
 
 /** A chord with its computed dissonance score, as returned by `rankChordsByDissonance`. */
@@ -415,4 +415,64 @@ export function chordDissonanceBySpectrum(
   return spectra
     .map((spectrum) => ({ spectrum, dissonance: chordObjectDissonance(chord, rootHz, spectrum) }))
     .sort((a, b) => a.dissonance - b.dissonance);
+}
+
+/** Options for {@link tuningQuality}. */
+export type TuningQualityOptions = ConsonantIntervalsOptions & {
+  /** Max distance in cents to count a tuning degree as covering a consonant interval. Default 25. */
+  readonly toleranceCents?: number;
+  /**
+   * Weight of the distance-penalty term (0–1). At 0, quality = coverage only.
+   * At 1, the distance term can reduce quality by up to 1 when the tuning is maximally
+   * far from the spectrum-derived ideal. Default 0.5.
+   */
+  readonly distanceWeight?: number;
+};
+
+/**
+ * Compute a blended quality scalar in [0, 1] measuring how well a `TuningSystem`
+ * fits a given timbre.
+ *
+ * Socratic Q113: `tuningSuitability(tuning, spectrum)` gives a rich result object
+ * (coverage, avgErrorCents, …) and `tuningDistance(a, b)` measures the interval-vector
+ * distance between two tuning systems. But combining both into a single "how good is
+ * this tuning for this timbre?" number still requires: call `tuningSuitability`,
+ * call `spectrumToTuning`, call `tuningDistance`, then blend manually.
+ * If tuning fitness is first-class, a blended quality scalar should be one call.
+ *
+ * Algorithm:
+ * 1. Compute `coverage = tuningSuitability(tuning, spectrum, opts).coverage` — fraction
+ *    of consonant intervals captured by the tuning (primary quality signal).
+ * 2. Compute `ideal = spectrumToTuning(spectrum, opts)` — the theoretical best tuning.
+ * 3. Compute `dist = tuningDistance(tuning, ideal)` — cent-RMS deviation from ideal.
+ *    Normalize: `penalty = Math.min(1, dist / 1200)` (1200c = one octave span = max useful dist).
+ * 4. `quality = coverage - distanceWeight * penalty * coverage`.
+ *    Interpretation: coverage sets the ceiling; distance penalizes proportionally.
+ *
+ * Returns a value in `[0, 1]` where 1 = perfect fit, 0 = no consonant intervals matched.
+ *
+ * @param tuning   - The tuning system to evaluate.
+ * @param spectrum - The timbre to evaluate against.
+ * @param opts     - Optional: `toleranceCents` (default 25), `distanceWeight` (default 0.5),
+ *   and any `ConsonantIntervalsOptions` forwarded to both `tuningSuitability` and
+ *   `spectrumToTuning`.
+ * @returns Quality scalar in [0, 1].
+ *
+ * @example
+ * const q12 = tuningQuality(equalTemperament12(440), harmonicSpectrum());
+ * const qBell = tuningQuality(equalTemperament12(440), bellSpectrum());
+ * // q12 > qBell — 12-TET is better suited to harmonic timbres than to bells
+ */
+export function tuningQuality(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  opts?: TuningQualityOptions,
+): number {
+  const distanceWeight = opts?.distanceWeight ?? 0.5;
+  const { coverage } = tuningSuitability(tuning, spectrum, opts);
+  if (coverage === 0) return 0;
+  const ideal = spectrumToTuning(spectrum, opts);
+  const dist = tuningDistance(tuning, ideal);
+  const penalty = Math.min(1, dist / 1200);
+  return Math.max(0, coverage - distanceWeight * penalty * coverage);
 }

@@ -13,6 +13,7 @@ import {
   DEFAULT_CHORD_PROGRESSION_WAV,
   buildChordProgressionWav,
   optimalProgressionWav,
+  scaleModeSeriesWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -639,5 +640,67 @@ describe('optimalProgressionWav — optimal ordering + WAV synthesis in one call
       }
     }
     expect(differs).toBe(true);
+  });
+});
+
+// Q112 — scaleModeSeriesWav: all modal rotations of a scale as WAV Uint8Arrays in one call
+describe('scaleModeSeriesWav (Q112)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const fastOpts = { ...DEFAULT_KS, noteSeconds: 0.05, sampleRate: 8000 };
+
+  it('test_returns_one_wav_per_mode', () => {
+    const wavs = scaleModeSeriesWav(major, t12, fastOpts);
+    expect(wavs.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_each_element_is_uint8array_with_wav_header', () => {
+    const wavs = scaleModeSeriesWav(major, t12, fastOpts);
+    for (const wav of wavs) {
+      expect(wav).toBeInstanceOf(Uint8Array);
+      expect(wav.length).toBeGreaterThan(44);
+      // RIFF header
+      expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    }
+  });
+
+  it('test_different_modes_produce_different_audio', () => {
+    const wavs = scaleModeSeriesWav(major, t12, fastOpts);
+    // At least one pair of mode WAVs must differ (modes have different pitches)
+    let found = false;
+    outer: for (let i = 0; i < wavs.length; i++) {
+      for (let j = i + 1; j < wavs.length; j++) {
+        const a = wavs[i]!;
+        const b = wavs[j]!;
+        for (let k = 44; k < a.length && k < b.length; k++) {
+          if (a[k] !== b[k]) {
+            found = true;
+            break outer;
+          }
+        }
+      }
+    }
+    expect(found).toBe(true);
+  });
+
+  it('test_pentatonic_five_modes', () => {
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'Pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const wavs = scaleModeSeriesWav(pentatonic, t12, fastOpts);
+    expect(wavs.length).toBe(5);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    const wrongTuning = edo(19);
+    expect(() => scaleModeSeriesWav(major, wrongTuning, fastOpts)).toThrow(RangeError);
   });
 });

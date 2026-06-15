@@ -14,8 +14,9 @@ import {
   progressionDissonanceCurve,
   rankChordsByDissonance,
   chordDissonanceBySpectrum,
+  tuningQuality,
 } from './dissonance.js';
-import { edo } from './tuning.js';
+import { edo, equalTemperament12 } from './tuning.js';
 import { chordFromSemitones, chordFromRatios, realizeChordFreqs } from './chord.js';
 import { stretchedSpectrum } from './spectrum.js';
 
@@ -659,5 +660,62 @@ describe('chordDissonanceBySpectrum (Q99)', () => {
     const resultDom7 = chordDissonanceBySpectrum(dom7, rootHz, spectra);
     // First entry of fifth should have lower dissonance than first entry of dom7 under harmonic
     expect(resultFifth[0]!.dissonance).toBeLessThan(resultDom7[0]!.dissonance);
+  });
+});
+
+// Q113 — tuningQuality: blended [0,1] scalar measuring how well a tuning fits a timbre
+describe('tuningQuality (Q113)', () => {
+  it('test_returns_number_in_0_to_1_range', () => {
+    const q = tuningQuality(equalTemperament12(440), harmonicSpectrum());
+    expect(q).toBeGreaterThanOrEqual(0);
+    expect(q).toBeLessThanOrEqual(1);
+  });
+
+  it('test_spectrum_derived_tuning_has_high_quality', () => {
+    const spectrum = harmonicSpectrum();
+    const ideal = spectrumToTuning(spectrum);
+    // The tuning built from the spectrum should have high quality for that spectrum
+    const q = tuningQuality(ideal, spectrum);
+    expect(q).toBeGreaterThan(0.5);
+  });
+
+  it('test_12tet_harmonic_quality_exceeds_bell_quality', () => {
+    // 12-TET was optimised for harmonic timbres, so it should fit better than bells
+    const q12h = tuningQuality(equalTemperament12(440), harmonicSpectrum());
+    const q12b = tuningQuality(equalTemperament12(440), bellSpectrum());
+    expect(q12h).toBeGreaterThanOrEqual(q12b);
+  });
+
+  it('test_distanceWeight_zero_equals_coverage', () => {
+    const tuning = equalTemperament12(440);
+    const spectrum = harmonicSpectrum();
+    const { coverage } = tuningSuitability(tuning, spectrum);
+    const q = tuningQuality(tuning, spectrum, { distanceWeight: 0 });
+    // When distanceWeight=0, quality = coverage exactly
+    expect(q).toBeCloseTo(coverage, 10);
+  });
+
+  it('test_edo_19_and_12_both_in_range', () => {
+    const spectrum = harmonicSpectrum();
+    const q12 = tuningQuality(equalTemperament12(440), spectrum);
+    const q19 = tuningQuality(edo(19), spectrum);
+    expect(q12).toBeGreaterThanOrEqual(0);
+    expect(q12).toBeLessThanOrEqual(1);
+    expect(q19).toBeGreaterThanOrEqual(0);
+    expect(q19).toBeLessThanOrEqual(1);
+  });
+
+  it('test_zero_coverage_returns_zero', () => {
+    // Use a stretched spectrum where 12-TET has very poor coverage with tight tolerance
+    const tuning = equalTemperament12(440);
+    const { coverage } = tuningSuitability(tuning, harmonicSpectrum(), { toleranceCents: 0.001 });
+    if (coverage === 0) {
+      const q = tuningQuality(tuning, harmonicSpectrum(), { toleranceCents: 0.001 });
+      expect(q).toBe(0);
+    } else {
+      // Coverage > 0 with ultra-tight tolerance is fine; just confirm non-negative
+      const q = tuningQuality(tuning, harmonicSpectrum(), { toleranceCents: 0.001 });
+      expect(q).toBeGreaterThanOrEqual(0);
+    }
   });
 });

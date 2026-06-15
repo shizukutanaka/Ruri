@@ -16,6 +16,7 @@ import {
   scaleToFreqs,
   synthScaleFromScale,
   buildChordProgression,
+  scaleModeSeries,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -428,4 +429,40 @@ export function optimalProgressionWav(
 ): Uint8Array {
   const { chords: ordered } = optimalChordOrder(chords, rootHz);
   return chordProgressionToWav(ordered, rootHz, spectrum, opts);
+}
+
+/**
+ * Synthesize every modal rotation of a scale as a melodic WAV in one call.
+ *
+ * Socratic Q112: `scaleModeSeries(scale, tuning)` returns all modal rotations as
+ * `Scale[]`, and `pluckScaleWav(mode, tuning, opts)` encodes one mode to WAV bytes.
+ * Producing audio for every modal flavor — e.g. to audition all 7 diatonic modes
+ * before composing — still requires a `.map(…)` the caller writes every time.
+ * If modal series are first-class, "all modes as audio" should be one call.
+ *
+ * Returns one `Uint8Array` WAV per modal rotation, in rotation order (index 0 =
+ * original scale, 1 = starting from second degree, … n−1 = starting from last
+ * degree). Encoding uses Karplus-Strong pluck synthesis via `pluckScaleWav`.
+ *
+ * @param scale  - The parent scale to rotate.
+ * @param tuning - The parent `TuningSystem` the scale belongs to.
+ * @param opts   - Optional Karplus-Strong + per-note duration options (forwarded to
+ *   `pluckScaleWav`).
+ * @returns `Uint8Array[]` — one WAV buffer per mode in rotation order.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const wavs = scaleModeSeriesWav(major, equalTemperament12(440));
+ * // wavs[0] = Ionian, wavs[1] = Dorian, wavs[2] = Phrygian, ...
+ * wavs.forEach((w, i) => fs.writeFileSync(`mode-${i}.wav`, w));
+ */
+export function scaleModeSeriesWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  opts: PluckScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
+): Uint8Array[] {
+  return scaleModeSeries(scale, tuning).map((mode) => pluckScaleWav(mode, tuning, opts));
 }

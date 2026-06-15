@@ -1,6 +1,7 @@
 /** Scala .scl import/export. Preserves original ratio-vs-cents representation for lossless round-trip. */
 import { type TuningSystem } from '../core/tuning.js';
-import { pitchToCents } from '../core/cents.js';
+import { pitchToCents, freqToCents } from '../core/cents.js';
+import { type Chord, chordToFreqRatios } from '../core/chord.js';
 
 /** One scale degree, tagged by its original textual form. */
 export type ScalaDegree =
@@ -120,4 +121,40 @@ export function tuningToScl(tuning: TuningSystem): ScalaScale {
     text: tuning.periodCents.toFixed(6),
   };
   return { description: tuning.id, degrees: [...aboveRoot, period] };
+}
+
+/**
+ * Export a microtonal `Chord` as a Scala `.scl` `ScalaScale` in one call.
+ *
+ * Socratic Q111: `chordToFreqRatios(chord, rootHz)` gives the just-interval ratios,
+ * but converting those ratios to cents and then packaging them into a `.scl` file
+ * requires `freqToCents` + `sclFromCents` + `writeScl` — four manual steps.
+ * If `Chord` is first-class, "chord → Scala file" should be one call.
+ *
+ * The `.scl` captures all chord tones as cents relative to the root (the first
+ * interval is always 0.000000c for the root itself; subsequent entries are the
+ * interval above the root). This lets Scala-compatible tools load the chord
+ * as a scale and retune synths to its exact just frequencies.
+ *
+ * Scala convention: the root 1/1 is implicit; only pitches *above* the root are
+ * listed. The root (0c) is therefore excluded from the output degrees.
+ *
+ * @param chord  - Root-relative interval chord (see `realizeChordFreqs`).
+ * @param rootHz - Absolute frequency (Hz) of the chord root.
+ * @param name   - Optional description for the `.scl` header (defaults to `chord.name`).
+ * @returns A `ScalaScale` capturing the chord's intervals as cents above the root.
+ *
+ * @throws {RangeError} if `chord.intervals` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const justMajor = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+ * const scl = chordToScl(justMajor, 261.63);
+ * fs.writeFileSync('just-major.scl', writeScl(scl));
+ */
+export function chordToScl(chord: Chord, rootHz: number, name?: string): ScalaScale {
+  const ratios = chordToFreqRatios(chord, rootHz); // throws if invalid
+  // Convert each ratio to cents relative to root; skip the root itself (ratio=1 → 0c)
+  const centsAboveRoot = ratios.map((r) => freqToCents(r * rootHz, rootHz)).filter((c) => c > 0);
+  return sclFromCents(name ?? chord.name, centsAboveRoot);
 }

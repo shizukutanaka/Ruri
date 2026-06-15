@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { parseScl, writeScl, sclFromCents, degreeCents, tuningToScl } from './scala.js';
+import { parseScl, writeScl, sclFromCents, degreeCents, tuningToScl, chordToScl } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
 import { mpeToFreq } from '../core/midi.js';
 import { freqToCents } from '../core/cents.js';
+import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
 
 const SCL_12TET = `! meanquar.scl
 !
@@ -204,5 +205,66 @@ describe('tuningToScl — TuningSystem → ScalaScale adapter', () => {
     const t19 = edo(19);
     const scl = tuningToScl(t19);
     expect(scl.degrees.length).toBe(19);
+  });
+});
+
+// Q111 — chordToScl: chord + rootHz → ScalaScale capturing chord intervals as cents
+describe('chordToScl (Q111)', () => {
+  const justMajor = chordFromRatios('just-major', [
+    [1, 1],
+    [5, 4],
+    [3, 2],
+  ]);
+
+  it('test_just_major_triad_has_two_degrees_above_root', () => {
+    // Root is implicit in Scala; only intervals above root are listed
+    const scl = chordToScl(justMajor, 261.63);
+    expect(scl.degrees.length).toBe(2);
+  });
+
+  it('test_just_major_third_is_correct_cents', () => {
+    const scl = chordToScl(justMajor, 261.63);
+    // 5/4 = 386.314c
+    expect(degreeCents(scl.degrees[0]!)).toBeCloseTo(1200 * Math.log2(5 / 4), 3);
+  });
+
+  it('test_just_fifth_is_correct_cents', () => {
+    const scl = chordToScl(justMajor, 261.63);
+    // 3/2 = 701.955c
+    expect(degreeCents(scl.degrees[1]!)).toBeCloseTo(1200 * Math.log2(3 / 2), 3);
+  });
+
+  it('test_custom_name_used_as_description', () => {
+    const scl = chordToScl(justMajor, 440, 'my-chord');
+    expect(scl.description).toBe('my-chord');
+  });
+
+  it('test_default_name_is_chord_name', () => {
+    const scl = chordToScl(justMajor, 440);
+    expect(scl.description).toBe('just-major');
+  });
+
+  it('test_scl_round_trips_through_writeScl_parseScl', () => {
+    const scl = chordToScl(justMajor, 261.63);
+    const text = writeScl(scl);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBe(scl.degrees.length);
+    for (let i = 0; i < scl.degrees.length; i++) {
+      expect(degreeCents(parsed.degrees[i]!)).toBeCloseTo(degreeCents(scl.degrees[i]!), 3);
+    }
+  });
+
+  it('test_invalid_rootHz_throws', () => {
+    expect(() => chordToScl(justMajor, -1)).toThrow(RangeError);
+    expect(() => chordToScl(justMajor, 0)).toThrow(RangeError);
+  });
+
+  it('test_12tet_major_triad_intervals_in_cents', () => {
+    const tet = chordFromSemitones('tet-major', [0, 4, 7]);
+    const scl = chordToScl(tet, 261.63);
+    expect(scl.degrees.length).toBe(2);
+    // 12-TET major third = 400c, perfect fifth = 700c
+    expect(degreeCents(scl.degrees[0]!)).toBeCloseTo(400, 2);
+    expect(degreeCents(scl.degrees[1]!)).toBeCloseTo(700, 2);
   });
 });
