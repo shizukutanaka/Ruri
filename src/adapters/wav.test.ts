@@ -9,12 +9,15 @@ import {
   DEFAULT_STRIKE_SCALE,
   strikeRankedChordWav,
   pluckRankedChordWav,
+  chordProgressionToWav,
+  DEFAULT_CHORD_PROGRESSION_WAV,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo } from '../core/tuning.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
 import { type Scale } from '../core/scale.js';
 import { rankChords } from '../core/chord-search.js';
+import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
 
 describe('WAV encoder', () => {
   it('test_header_riff_wave', () => {
@@ -397,5 +400,84 @@ describe('pluckRankedChordWav — RankedChord Karplus-Strong to WAV in one call 
       }
     }
     expect(differs).toBe(true);
+  });
+});
+
+// Q100: chordProgressionToWav — explicit Chord[] → single WAV in one call?
+describe('chordProgressionToWav — explicit progression to WAV in one call (Q100)', () => {
+  const major = chordFromRatios('major', [
+    [1, 1],
+    [5, 4],
+    [3, 2],
+  ]);
+  const dom7 = chordFromSemitones('dom7', [0, 4, 7, 10]);
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  const fastOpts = { ...DEFAULT_CHORD_PROGRESSION_WAV, chordSeconds: 0.05, seconds: 0.1 };
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const wav = chordProgressionToWav([major, dom7], rootHz, spectrum, fastOpts);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_reflects_chord_count', () => {
+    const chordSeconds = 0.05;
+    const opts = { ...DEFAULT_CHORD_PROGRESSION_WAV, chordSeconds, seconds: 0.1 };
+    const wav2 = chordProgressionToWav([major, dom7], rootHz, spectrum, opts);
+    const wav3 = chordProgressionToWav([major, dom7, major], rootHz, spectrum, opts);
+    // 3-chord progression should produce a longer WAV than 2-chord
+    expect(wav3.length).toBeGreaterThan(wav2.length);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = {
+      ...DEFAULT_CHORD_PROGRESSION_WAV,
+      sampleRate: 22050,
+      chordSeconds: 0.05,
+      seconds: 0.1,
+    };
+    const wav = chordProgressionToWav([major], rootHz, spectrum, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_empty_chords_throws_range_error', () => {
+    expect(() => chordProgressionToWav([], rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_invalid_rootHz_throws_range_error', () => {
+    expect(() => chordProgressionToWav([major], 0, spectrum, fastOpts)).toThrow(RangeError);
+    expect(() => chordProgressionToWav([major], -440, spectrum, fastOpts)).toThrow(RangeError);
+    expect(() => chordProgressionToWav([major], NaN, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_different_spectra_produce_different_audio', () => {
+    const wavHarmonic = chordProgressionToWav([major, dom7], rootHz, harmonicSpectrum(), fastOpts);
+    const wavBell = chordProgressionToWav([major, dom7], rootHz, bellSpectrum(), fastOpts);
+    expect(wavHarmonic.length).toBe(wavBell.length);
+    let differs = false;
+    for (let i = 44; i < wavHarmonic.length; i++) {
+      if (wavHarmonic[i] !== wavBell[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_chordSeconds_clamped_to_seconds_when_larger', () => {
+    // chordSeconds > seconds → clamped to seconds
+    const opts = { ...DEFAULT_CHORD_PROGRESSION_WAV, chordSeconds: 10, seconds: 0.1 };
+    const wav = chordProgressionToWav([major, dom7], rootHz, spectrum, opts);
+    const samplesPerChord = Math.floor(DEFAULT_CHORD_PROGRESSION_WAV.sampleRate * 0.1); // clamped
+    const expectedSamples = samplesPerChord * 2;
+    expect(wav.length).toBe(44 + expectedSamples * 2);
+  });
+
+  it('test_single_chord_progression_produces_valid_wav', () => {
+    const wav = chordProgressionToWav([major], rootHz, spectrum, fastOpts);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(wav[0]).toBe(0x52); // 'R'
   });
 });

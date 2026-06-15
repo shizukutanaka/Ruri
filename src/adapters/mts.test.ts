@@ -3,6 +3,7 @@ import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordFromRatios, chordFromSemitones, realizeChordFreqs } from '../core/chord.js';
+import { type Scale, scaleToFreqs } from '../core/scale.js';
 import {
   freqToMtsKey,
   mtsBulkDump,
@@ -10,6 +11,7 @@ import {
   chordToMts,
   tuningToMts,
   chordProgressionToMts,
+  scaleToMts,
 } from './mts.js';
 
 // ---------------------------------------------------------------------------
@@ -504,5 +506,124 @@ describe('chordProgressionToMts — chord progression to MTS SysEx array in one 
       expect(buf[2]).toBe(3); // deviceId
       expect(buf[5]).toBe(7); // program
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// scaleToMts — Scale → MTS SysEx in one call (Q101)
+// ---------------------------------------------------------------------------
+
+describe('scaleToMts — Scale to MTS SysEx in one call (Q101)', () => {
+  const tuning = edo(12);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-edo',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_output_length_is_408', () => {
+    expect(scaleToMts(major, tuning).length).toBe(408);
+  });
+
+  it('test_first_byte_is_sysex_start', () => {
+    expect(scaleToMts(major, tuning)[0]).toBe(0xf0);
+  });
+
+  it('test_last_byte_is_sysex_end', () => {
+    const mts = scaleToMts(major, tuning);
+    expect(mts[mts.length - 1]).toBe(0xf7);
+  });
+
+  it('test_scale_id_used_as_name_by_default', () => {
+    const mts = scaleToMts(major, tuning);
+    const name = String.fromCharCode(...Array.from(mts.slice(6, 22)));
+    expect(name.trimEnd()).toBe('major');
+  });
+
+  it('test_custom_name_overrides_scale_id', () => {
+    const mts = scaleToMts(major, tuning, 'my-scale');
+    const name = String.fromCharCode(...Array.from(mts.slice(6, 22)));
+    expect(name.trimEnd()).toBe('my-scale');
+  });
+
+  it('test_scale_degrees_encoded_at_contiguous_midi_keys_from_middleNote', () => {
+    // With default middleNote=60, degree 0 → key 60, degree 1 → key 61, etc.
+    // A major scale on 12-EDO at middle C: degrees [0,2,4,5,7,9,11] → Hz values
+    const mts = scaleToMts(major, tuning);
+    const scaleFreqs = scaleToFreqs(major, tuning);
+    for (let i = 0; i < scaleFreqs.length; i++) {
+      const key = 60 + i;
+      const offset = 22 + key * 3;
+      const xx = mts[offset] as number;
+      const yy = mts[offset + 1] as number;
+      const zz = mts[offset + 2] as number;
+      const fraction14 = (yy << 7) | zz;
+      const recoveredMidi = xx + fraction14 / 16384;
+      const recoveredHz = 440 * 2 ** ((recoveredMidi - 69) / 12);
+      const centsDiff = Math.abs(1200 * Math.log2(recoveredHz / (scaleFreqs[i] as number)));
+      expect(centsDiff).toBeLessThan(0.007);
+    }
+  });
+
+  it('test_non_scale_keys_retain_standard_12tet', () => {
+    const mts = scaleToMts(major, tuning);
+    // Key 0 (MIDI 0) is well below the scale range; should be standard 12-TET
+    const testKey = 0;
+    const offset = 22 + testKey * 3;
+    const xx = mts[offset] as number;
+    const yy = mts[offset + 1] as number;
+    const zz = mts[offset + 2] as number;
+    const fraction14 = (yy << 7) | zz;
+    const recoveredMidi = xx + fraction14 / 16384;
+    const standardHz = midiToFreq(testKey, 440);
+    const recoveredHz = 440 * 2 ** ((recoveredMidi - 69) / 12);
+    expect(Math.abs(recoveredHz - standardHz) / standardHz).toBeLessThan(0.0001);
+  });
+
+  it('test_custom_middleNote_shifts_mapping', () => {
+    // With middleNote=48, first scale degree maps to key 48
+    const mts = scaleToMts(major, tuning, undefined, { middleNote: 48 });
+    // Key 48 should hold the first scale degree frequency (tuning.referenceHz at degree 0
+    // is edo(12).referenceHz = 440 shifted by -9 semitones = 261.63 Hz approx)
+    const offset = 22 + 48 * 3;
+    const xx = mts[offset] as number;
+    const yy = mts[offset + 1] as number;
+    const zz = mts[offset + 2] as number;
+    const fraction14 = (yy << 7) | zz;
+    const recoveredMidi = xx + fraction14 / 16384;
+    const recoveredHz = 440 * 2 ** ((recoveredMidi - 69) / 12);
+    // Degree 0 of 12-EDO at referenceHz=440 (A4). Key 48 should now hold that Hz.
+    expect(recoveredHz).toBeCloseTo(440, 1);
+  });
+
+  it('test_custom_device_id_and_program_reflected', () => {
+    const mts = scaleToMts(major, tuning, undefined, { deviceId: 5, program: 2 });
+    expect(mts[2]).toBe(5);
+    expect(mts[5]).toBe(2);
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const wrongTuning = edo(19);
+    expect(() => scaleToMts(major, wrongTuning)).toThrow(RangeError);
+  });
+
+  it('test_12tet_major_vs_pentatonic_produce_different_mts', () => {
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'Pentatonic',
+      tuningId: '12-edo',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const mtsMajor = scaleToMts(major, tuning);
+    const mtsPenta = scaleToMts(pentatonic, tuning);
+    let differs = false;
+    for (let i = 22; i < 406; i++) {
+      if (mtsMajor[i] !== mtsPenta[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
   });
 });

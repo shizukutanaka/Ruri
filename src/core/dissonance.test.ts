@@ -13,9 +13,11 @@ import {
   rankTuningsByFit,
   progressionDissonanceCurve,
   rankChordsByDissonance,
+  chordDissonanceBySpectrum,
 } from './dissonance.js';
 import { edo } from './tuning.js';
 import { chordFromSemitones, chordFromRatios, realizeChordFreqs } from './chord.js';
+import { stretchedSpectrum } from './spectrum.js';
 
 const partial = fc.record({
   freq: fc.double({ min: 50, max: 8000, noNaN: true, noDefaultInfinity: true }),
@@ -573,5 +575,89 @@ describe('rankChordsByDissonance (Q91)', () => {
     for (const entry of ranked) {
       expect(entry.dissonance).toBeGreaterThanOrEqual(0);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q99 — chordDissonanceBySpectrum
+// ---------------------------------------------------------------------------
+
+describe('chordDissonanceBySpectrum (Q99)', () => {
+  const rootHz = 261.63;
+  const justFifth = chordFromRatios('fifth', [
+    [1, 1],
+    [3, 2],
+  ]);
+  const dom7 = chordFromSemitones('dom7', [0, 4, 7, 10]);
+
+  it('test_returns_same_length_as_spectra_input', () => {
+    const spectra = [harmonicSpectrum(), bellSpectrum(), stretchedSpectrum()];
+    const result = chordDissonanceBySpectrum(justFifth, rootHz, spectra);
+    expect(result).toHaveLength(3);
+  });
+
+  it('test_sorted_ascending_by_dissonance', () => {
+    const spectra = [harmonicSpectrum(), bellSpectrum(), stretchedSpectrum()];
+    const result = chordDissonanceBySpectrum(justFifth, rootHz, spectra);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i]!.dissonance).toBeGreaterThanOrEqual(result[i - 1]!.dissonance);
+    }
+  });
+
+  it('test_dissonance_field_matches_chordObjectDissonance', () => {
+    const spectra = [harmonicSpectrum(), bellSpectrum()];
+    const result = chordDissonanceBySpectrum(justFifth, rootHz, spectra);
+    for (const entry of result) {
+      expect(entry.dissonance).toBeCloseTo(
+        chordObjectDissonance(justFifth, rootHz, entry.spectrum),
+        9,
+      );
+    }
+  });
+
+  it('test_spectrum_field_is_one_of_the_inputs', () => {
+    const h = harmonicSpectrum();
+    const b = bellSpectrum();
+    const spectra = [h, b];
+    const result = chordDissonanceBySpectrum(justFifth, rootHz, spectra);
+    const resultSpectra = result.map((r) => r.spectrum);
+    expect(resultSpectra).toContain(h);
+    expect(resultSpectra).toContain(b);
+  });
+
+  it('test_all_dissonance_values_non_negative', () => {
+    const spectra = [harmonicSpectrum(), bellSpectrum(), stretchedSpectrum()];
+    const result = chordDissonanceBySpectrum(dom7, rootHz, spectra);
+    for (const entry of result) {
+      expect(entry.dissonance).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('test_empty_spectra_returns_empty_array', () => {
+    expect(chordDissonanceBySpectrum(justFifth, rootHz, [])).toEqual([]);
+  });
+
+  it('test_original_spectra_array_not_mutated', () => {
+    const spectra = [harmonicSpectrum(), bellSpectrum()];
+    const original = [...spectra];
+    chordDissonanceBySpectrum(justFifth, rootHz, spectra);
+    expect(spectra).toEqual(original);
+  });
+
+  it('test_single_spectrum_returns_single_entry', () => {
+    const h = harmonicSpectrum();
+    const result = chordDissonanceBySpectrum(justFifth, rootHz, [h]);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.spectrum).toBe(h);
+  });
+
+  it('test_harmonic_timbre_ranks_just_fifth_most_consonant', () => {
+    // A just fifth (3/2) should be most consonant under a harmonic spectrum
+    // and the most consonant entry should be first.
+    const spectra = [harmonicSpectrum(), bellSpectrum()];
+    const resultFifth = chordDissonanceBySpectrum(justFifth, rootHz, spectra);
+    const resultDom7 = chordDissonanceBySpectrum(dom7, rootHz, spectra);
+    // First entry of fifth should have lower dissonance than first entry of dom7 under harmonic
+    expect(resultFifth[0]!.dissonance).toBeLessThan(resultDom7[0]!.dissonance);
   });
 });

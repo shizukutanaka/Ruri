@@ -28,6 +28,7 @@
 import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
 import { degreeToFreq, type TuningSystem } from '../core/tuning.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
+import { type Scale, scaleToFreqs } from '../core/scale.js';
 
 /** A single MTS key entry: semitone + 14-bit fractional offset above it. */
 export interface MtsKey {
@@ -321,4 +322,83 @@ export function chordToMts(chord: Chord, rootHz: number, opts: ChordToMtsOptions
   const { a4Hz: _a4Hz, ...bulkOpts } = opts;
   void _a4Hz; // consumed above; exclude from MtsBulkDumpOptions
   return mtsBulkDump(frequencies, chord.name, bulkOpts);
+}
+
+/** Options for {@link scaleToMts}. */
+export interface ScaleToMtsOptions extends MtsBulkDumpOptions {
+  /**
+   * MIDI note number for the first scale degree (lowest pitch in the scale).
+   * Scale degrees are mapped onto contiguous MIDI keys starting here.
+   * Default: 60 (middle C).
+   */
+  readonly middleNote?: number;
+  /**
+   * A4 reference frequency in Hz used to fill non-scale MIDI keys with standard 12-TET.
+   * Default: 440.
+   */
+  readonly a4Hz?: number;
+}
+
+/**
+ * Export a microtonal `Scale` directly as a 408-byte MTS bulk tuning dump SysEx message.
+ *
+ * Socratic Q101: `scaleToFreqs(scale, tuning)` returns the Hz values of a scale's
+ * degrees; `chordToMts` maps a chord's frequencies onto nearby MIDI keys with exact
+ * fractional tuning — but going from a `Scale` object all the way to a ready-to-send
+ * MTS SysEx message still requires the caller to bridge from the scale layer into the
+ * MTS layer manually. If `Scale` is truly first-class (with `pluckScaleWav`,
+ * `strikeScaleWav`, `scaleToSmf`…), exporting it as MTS should also be one call.
+ *
+ * Algorithm:
+ * 1. Realize scale frequencies: `scaleToFreqs(scale, tuning)`.
+ * 2. Fill a 128-entry array with standard 12-TET frequencies (via `midiToFreq`).
+ * 3. Map scale degrees onto contiguous MIDI keys starting at `middleNote`, overwriting
+ *    those keys with the exact scale Hz values.
+ * 4. Encode with `mtsBulkDump` and return the 408-byte SysEx message.
+ *
+ * Non-scale MIDI keys retain standard 12-TET so that an unrelated synth part is not
+ * detuned. If the scale has more degrees than fit from `middleNote` to 127, excess
+ * degrees are silently clamped to key 127.
+ *
+ * @param scale   - The scale to export (must be compatible with `tuning`).
+ * @param tuning  - The tuning system that owns this scale.
+ * @param name    - Optional SysEx name override; defaults to `scale.id` (truncated to 16 chars).
+ * @param opts    - Optional device ID, program, middleNote, and A4 reference Hz.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` (id mismatch or out-of-range degrees).
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-edo',
+ *                         degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const mts = scaleToMts(major, edo(12));
+ * port.send(mts); // retune synth to play the scale starting at middle C
+ */
+export function scaleToMts(
+  scale: Scale,
+  tuning: TuningSystem,
+  name?: string,
+  opts: ScaleToMtsOptions = {},
+): Uint8Array {
+  const middleNote = opts.middleNote ?? 60;
+  const a4Hz = opts.a4Hz ?? A4_HZ_DEFAULT;
+
+  const scaleFreqs = scaleToFreqs(scale, tuning); // throws if incompatible
+  if (scaleFreqs.length === 0) {
+    throw new RangeError('scaleToMts: scale has no degrees');
+  }
+
+  // Start with a standard 12-TET tuning for all 128 MIDI keys
+  const frequencies: number[] = Array.from({ length: 128 }, (_, k) => midiToFreq(k, a4Hz));
+
+  // Map each scale degree onto a contiguous MIDI key starting at middleNote
+  for (let i = 0; i < scaleFreqs.length; i++) {
+    const key = Math.min(127, middleNote + i);
+    (frequencies as number[])[key] = scaleFreqs[i] as number;
+  }
+
+  const { middleNote: _mn, a4Hz: _a4, ...bulkOpts } = opts;
+  void _mn;
+  void _a4;
+  return mtsBulkDump(frequencies, name ?? scale.id, bulkOpts);
 }

@@ -6,12 +6,14 @@ import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import {
   DEFAULT_KS,
   type KsOptions,
+  mix,
   pluckChord,
   type SynthScaleOptions,
   synthScale,
 } from '../core/ks-synth.js';
 import { type Scale, scaleToFreqs, synthScaleFromScale } from '../core/scale.js';
 import { type RankedChord, strikeRankedChord, pluckRankedChord } from '../core/chord-search.js';
+import { type Chord, realizeChordFreqs } from '../core/chord.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
@@ -282,4 +284,73 @@ export function pluckRankedChordWav(
 ): Uint8Array {
   const samples = pluckRankedChord(chord, rootHz, opts);
   return encodeWav(samples, opts.sampleRate);
+}
+
+/** Options for {@link chordProgressionToWav}. */
+export interface ChordProgressionToWavOptions extends ModalOptions {
+  /**
+   * How many seconds of each struck chord to include in the output.
+   * Must be ≤ `seconds`; values larger than `seconds` are clamped to `seconds`. Default: 0.5.
+   */
+  readonly chordSeconds: number;
+}
+
+export const DEFAULT_CHORD_PROGRESSION_WAV: ChordProgressionToWavOptions = {
+  ...DEFAULT_MODAL,
+  chordSeconds: 0.5,
+};
+
+/**
+ * Synthesize an explicit chord progression and encode it as a single WAV file.
+ *
+ * Socratic Q100: `strikeChordToWav` renders one chord at a time. A chord progression
+ * (an explicit `Chord[]`) still requires a manual loop: realize each chord's frequencies,
+ * strike it, slice to the desired duration, concatenate, and encode. If chord progressions
+ * are first-class (there are `chordProgressionToMts`, `progressionToSmf` etc.), then
+ * "progression → ready-to-write WAV bytes" should also be one call.
+ *
+ * Unlike `scaleToChordsWav` (which operates on Scale → auto-ranked chords), this accepts
+ * an explicit `Chord[]` — useful when you have specific harmonies from chord search,
+ * composition, or manual selection.
+ *
+ * Each chord is synthesized via modal additive synthesis (`strikeChord`), truncated to
+ * `chordSeconds`, and concatenated sequentially. The result is a 16-bit PCM mono WAV
+ * byte sequence ready to write to a `.wav` file.
+ *
+ * @throws {RangeError} if `chords` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const major = chordFromRatios('major', [[1,1],[5,4],[3,2]]);
+ * const dom7  = chordFromSemitones('dom7', [0, 4, 7, 10]);
+ * const wav = chordProgressionToWav([major, dom7, major], 261.63, harmonicSpectrum());
+ * await fs.writeFile('progression.wav', wav);
+ */
+export function chordProgressionToWav(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  if (chords.length === 0) throw new RangeError('chordProgressionToWav: chords must be non-empty');
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(`chordProgressionToWav: rootHz must be finite and > 0, got ${rootHz}`);
+  }
+  const { chordSeconds, sampleRate, ...modalOpts } = opts;
+  const fullModalOpts: ModalOptions = { sampleRate, ...modalOpts };
+  const samplesPerChord = Math.floor(sampleRate * Math.min(chordSeconds, opts.seconds));
+  const total = samplesPerChord * chords.length;
+  const out = new Float32Array(total);
+  for (let i = 0; i < chords.length; i++) {
+    const chord = chords[i] as Chord;
+    const freqs = realizeChordFreqs(chord, rootHz);
+    const wave = strikeChord(freqs, spectrum, fullModalOpts);
+    const offset = i * samplesPerChord;
+    for (let j = 0; j < samplesPerChord && j < wave.length; j++) {
+      out[offset + j] = wave[j] as number;
+    }
+  }
+  // Normalize the full concatenated progression
+  const outMixed = mix([out]);
+  return encodeWav(outMixed, sampleRate);
 }

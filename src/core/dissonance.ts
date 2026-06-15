@@ -376,3 +376,43 @@ export function rankChordsByDissonance(
     .map((chord) => ({ chord, dissonance: chordObjectDissonance(chord, rootHz, spectrum) }))
     .sort((a, b) => a.dissonance - b.dissonance);
 }
+
+/** One entry in the result of `chordDissonanceBySpectrum`: a spectrum paired with its dissonance score. */
+export interface ChordDissonanceBySpectrumEntry {
+  /** The spectrum that was evaluated. */
+  readonly spectrum: Spectrum;
+  /** Sensory dissonance of the chord rendered with this spectrum (lower = more consonant). */
+  readonly dissonance: number;
+}
+
+/**
+ * Rank spectra by how consonant a given chord sounds with each timbre.
+ *
+ * Socratic Q99: `chordObjectDissonance(chord, rootHz, spectrum)` scores one
+ * chord against one timbre — but answering "which timbre makes this chord most
+ * consonant?" still requires a manual map + sort over a list of candidate
+ * spectra. If `Chord` and `Spectrum` are both first-class, comparing multiple
+ * timbres for a fixed chord should be one call.
+ *
+ * Returns one entry per input spectrum, sorted by `dissonance` ascending
+ * (most consonant first). The original `spectra` array is not mutated.
+ *
+ * @param chord   - The chord to evaluate (root-relative intervals).
+ * @param rootHz  - Absolute frequency (Hz) of the chord root.
+ * @param spectra - Candidate timbres to compare.
+ *
+ * @example
+ * const results = chordDissonanceBySpectrum(justMajor, 261.63, [
+ *   harmonicSpectrum(), bellSpectrum(), stretchedSpectrum(),
+ * ]);
+ * // results[0].spectrum is the timbre that makes the just major triad most consonant
+ */
+export function chordDissonanceBySpectrum(
+  chord: Chord,
+  rootHz: number,
+  spectra: readonly Spectrum[],
+): ChordDissonanceBySpectrumEntry[] {
+  return spectra
+    .map((spectrum) => ({ spectrum, dissonance: chordObjectDissonance(chord, rootHz, spectrum) }))
+    .sort((a, b) => a.dissonance - b.dissonance);
+}
