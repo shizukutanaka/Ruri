@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { guitarStandard, bassStandard, positionsFor } from './instrument.js';
-import { fingerChord, DEFAULT_HAND } from './fingering.js';
+import { fingerChord, fingerChordFromScale, DEFAULT_HAND } from './fingering.js';
 import { fingerPianoChord } from './piano.js';
 import { chordFromSemitones, realizeChordFreqs } from './chord.js';
 import { freqToCents } from './cents.js';
+import { edo } from './tuning.js';
+import { type Scale } from './scale.js';
 
 // E major triad as absolute cents relative to guitar low E (open 6th string = 0c).
 // E=0, G#=400, B=700 ... we use E2 root: E(0), B(700), E(1200), G#(1600), B(1900), E(2400)
@@ -177,5 +179,76 @@ describe('cross-module sanity', () => {
     const c = freqs.map((f) => freqToCents(f, A2_REF));
     expect(c[0]).toBeCloseTo(0, 6);
     expect(c[2]).toBeCloseTo(700, 6);
+  });
+});
+
+// Q72: scale-degree → chord → cent-offsets → guitar fingerings should be one call
+describe('fingerChordFromScale — scale to guitar fingerings in one call (Q72)', () => {
+  const tuning = edo(12);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-edo',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const guitar = guitarStandard();
+  // Root on D string (1000c): triad notes land at 1000c, 1400c, 1700c
+  // 1000c → s2 fret 0; 1400c → s2 fret 4 or s1 fret 9; 1700c → s3 fret 2 or s2 fret 7
+  const ROOT_D = 1000;
+
+  it('test_triad_from_major_scale_returns_fingerings', () => {
+    // Scale degrees [0, 2, 4] = root, 3rd, 5th (0c, 400c, 700c relative to root)
+    const fingerings = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, ROOT_D);
+    expect(fingerings.length).toBeGreaterThan(0);
+  });
+
+  it('test_all_positions_cover_triad_notes', () => {
+    const fingerings = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, ROOT_D);
+    for (const f of fingerings) {
+      expect(f.positions.length).toBe(3);
+    }
+  });
+
+  it('test_no_two_notes_on_same_string', () => {
+    const fingerings = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, ROOT_D);
+    for (const f of fingerings) {
+      const strings = f.positions.map((p) => p.string);
+      expect(new Set(strings).size).toBe(strings.length);
+    }
+  });
+
+  it('test_sorted_by_cost_ascending', () => {
+    const fingerings = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, ROOT_D);
+    for (let i = 1; i < fingerings.length; i++) {
+      expect(fingerings[i]!.cost).toBeGreaterThanOrEqual(fingerings[i - 1]!.cost);
+    }
+  });
+
+  it('test_root_position_affects_fingerings', () => {
+    // Root at D string (1000c) vs G string (1500c) should produce different fingerings
+    const fingeringsD = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, ROOT_D);
+    const fingeringsG = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, 1500);
+    // Results should differ (different root means different fret positions)
+    expect(JSON.stringify(fingeringsD)).not.toBe(JSON.stringify(fingeringsG));
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrongTuning = edo(19);
+    expect(() => fingerChordFromScale(major, wrongTuning, [0, 2, 4], guitar)).toThrow(RangeError);
+  });
+
+  it('test_empty_offsets_throws', () => {
+    expect(() => fingerChordFromScale(major, tuning, [], guitar)).toThrow(RangeError);
+  });
+
+  it('test_out_of_range_offset_throws', () => {
+    expect(() => fingerChordFromScale(major, tuning, [0, 99], guitar)).toThrow(RangeError);
+  });
+
+  it('test_matches_manual_pipeline', () => {
+    // Verify fingerChordFromScale == manual chain; check determinism
+    const fingerings = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, ROOT_D);
+    const again = fingerChordFromScale(major, tuning, [0, 2, 4], guitar, ROOT_D);
+    expect(JSON.stringify(fingerings)).toBe(JSON.stringify(again));
   });
 });

@@ -5,8 +5,10 @@ import {
   tuningToScaleWav,
   pluckScaleWav,
   pluckChordToWav,
+  strikeScaleWav,
+  DEFAULT_STRIKE_SCALE,
 } from './wav.js';
-import { harmonicSpectrum } from '../core/spectrum.js';
+import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo } from '../core/tuning.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
 import { type Scale } from '../core/scale.js';
@@ -219,5 +221,80 @@ describe('pluckChordToWav — Karplus-Strong chord to WAV in one call (Q69)', ()
 
   it('test_empty_freqs_throws_range_error', () => {
     expect(() => pluckChordToWav([])).toThrow(RangeError);
+  });
+});
+
+// Q74: Scale is first-class — should modal synthesis → melodic WAV be one call?
+describe('strikeScaleWav — modal synthesis melodic WAV in one call (Q74)', () => {
+  const tuning = edo(12);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-edo',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = bellSpectrum();
+  const fastOpts = { ...DEFAULT_STRIKE_SCALE, noteSeconds: 0.05, seconds: 0.1 };
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const wav = strikeScaleWav(major, tuning, spectrum, fastOpts);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_reflects_scale_degree_count', () => {
+    const noteSeconds = 0.05;
+    const opts = { ...DEFAULT_STRIKE_SCALE, noteSeconds, seconds: 0.1 };
+    const wav = strikeScaleWav(major, tuning, spectrum, opts);
+    const samplesPerNote = Math.floor(DEFAULT_STRIKE_SCALE.sampleRate * noteSeconds);
+    const expectedSamples = samplesPerNote * major.degreeIndices.length;
+    expect(wav.length).toBe(44 + expectedSamples * 2);
+  });
+
+  it('test_7_note_scale_longer_than_5_note_scale', () => {
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'Pentatonic',
+      tuningId: '12-edo',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const wavMajor = strikeScaleWav(major, tuning, spectrum, fastOpts);
+    const wavPenta = strikeScaleWav(pentatonic, tuning, spectrum, fastOpts);
+    expect(wavMajor.length).toBeGreaterThan(wavPenta.length);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = { ...DEFAULT_STRIKE_SCALE, sampleRate: 22050, noteSeconds: 0.05, seconds: 0.1 };
+    const wav = strikeScaleWav(major, tuning, spectrum, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_different_spectra_produce_different_audio', () => {
+    const wavHarmonic = strikeScaleWav(major, tuning, harmonicSpectrum(), fastOpts);
+    const wavBell = strikeScaleWav(major, tuning, bellSpectrum(), fastOpts);
+    expect(wavHarmonic.length).toBe(wavBell.length);
+    let differs = false;
+    for (let i = 44; i < wavHarmonic.length; i++) {
+      if (wavHarmonic[i] !== wavBell[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const wrongTuning = edo(19);
+    expect(() => strikeScaleWav(major, wrongTuning, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_noteSeconds_clamped_to_seconds_when_larger', () => {
+    // noteSeconds > seconds → clamped to seconds
+    const opts = { ...DEFAULT_STRIKE_SCALE, noteSeconds: 10, seconds: 0.1 };
+    const wav = strikeScaleWav(major, tuning, spectrum, opts);
+    const samplesPerNote = Math.floor(DEFAULT_STRIKE_SCALE.sampleRate * 0.1); // clamped
+    const expectedSamples = samplesPerNote * major.degreeIndices.length;
+    expect(wav.length).toBe(44 + expectedSamples * 2);
   });
 });

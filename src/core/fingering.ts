@@ -1,6 +1,9 @@
 /** Chord fingering for fretted instruments: assign one position per target, minimize cost. */
 
 import { type StringInstrument, type StringPosition, positionsFor } from './instrument.js';
+import { type Scale, chordFromScale } from './scale.js';
+import { type TuningSystem } from './tuning.js';
+import { chordToCentOffsets } from './chord.js';
 
 /** Player-specific biomechanics (no single correct fingering; weights are per-player). */
 export interface HandProfile {
@@ -81,4 +84,47 @@ export function fingerChord(
       Math.max(...x.positions.map((p) => p.fret)) - Math.max(...y.positions.map((p) => p.fret)),
   );
   return solutions.slice(0, k);
+}
+
+/**
+ * Collapse the scale-degree → chord → cent-offsets → fingering pipeline into one call.
+ *
+ * Socratic Q72: `chordFromScale(scale, tuning, offsets)` builds a `Chord` from
+ * scale-local degree indices; `chordToCentOffsets(chord, rootCents)` converts that
+ * chord to absolute cent positions on the instrument; `fingerChord(inst, offsets)`
+ * returns the physical fingerings.  These three steps — all deterministic given the
+ * same inputs — require the caller to thread intermediate values manually.
+ * `fingerChordFromScale` closes the pipeline: "given a scale, a tuning, which degrees
+ * to voice, an instrument, and where the root sits on that instrument, give me the
+ * fingerings in one call."
+ *
+ * `rootCentsOnInstrument` is the position of the chord root in the instrument's
+ * internal cents coordinate system (e.g. 0c = low-E open on a standard guitar;
+ * 500c = A string open).  Defaults to 0 (root at the lowest open string).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if any offset is outside `[0, scale.degreeIndices.length)`.
+ * @throws {RangeError} if `offsets` is empty.
+ *
+ * @example
+ * const guitar = guitarStandard();
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-edo',
+ *                         degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * // Triad on scale degrees 1, 3, 5 with the root at A string (500c)
+ * const fingerings = fingerChordFromScale(major, edo(12), [0, 2, 4], guitar, 500);
+ */
+export function fingerChordFromScale(
+  scale: Scale,
+  tuning: TuningSystem,
+  offsets: readonly number[],
+  inst: StringInstrument,
+  rootCentsOnInstrument = 0,
+  hand: HandProfile = DEFAULT_HAND,
+  k = 3,
+  toleranceCents = 1,
+  name?: string,
+): ChordFingering[] {
+  const chord = chordFromScale(scale, tuning, offsets, name);
+  const centOffsets = chordToCentOffsets(chord, rootCentsOnInstrument);
+  return fingerChord(inst, centOffsets, hand, k, toleranceCents);
 }

@@ -1,9 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
-import { equalTemperament12 } from '../core/tuning.js';
+import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordFromRatios, chordFromSemitones, realizeChordFreqs } from '../core/chord.js';
-import { freqToMtsKey, mtsBulkDump, tuningToMtsFrequencies, chordToMts } from './mts.js';
+import {
+  freqToMtsKey,
+  mtsBulkDump,
+  tuningToMtsFrequencies,
+  chordToMts,
+  tuningToMts,
+} from './mts.js';
 
 // ---------------------------------------------------------------------------
 // freqToMtsKey
@@ -338,5 +344,79 @@ describe('chordToMts — microtonal chord to MTS SysEx in one call (Q71)', () =>
   it('test_empty_chord_throws', () => {
     const empty = { name: 'empty', intervals: [] };
     expect(() => chordToMts(empty, 440)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningToMts — TuningSystem → MTS SysEx in one call (Q73)
+// ---------------------------------------------------------------------------
+
+describe('tuningToMts — TuningSystem to MTS SysEx in one call (Q73)', () => {
+  const et12 = equalTemperament12(440);
+
+  it('test_output_length_is_408', () => {
+    expect(tuningToMts(et12).length).toBe(408);
+  });
+
+  it('test_first_byte_is_sysex_start', () => {
+    expect(tuningToMts(et12)[0]).toBe(0xf0);
+  });
+
+  it('test_last_byte_is_sysex_end', () => {
+    const mts = tuningToMts(et12);
+    expect(mts[mts.length - 1]).toBe(0xf7);
+  });
+
+  it('test_matches_manual_pipeline_for_12tet', () => {
+    const manual = mtsBulkDump(tuningToMtsFrequencies(et12), et12.id);
+    const oneCall = tuningToMts(et12);
+    expect(oneCall).toEqual(manual);
+  });
+
+  it('test_tuning_id_used_as_name_by_default', () => {
+    const mts = tuningToMts(et12);
+    // Name field is bytes 6..21; et12.id = '12-tet' (6 chars), rest padded with 0x20
+    const name = String.fromCharCode(...Array.from(mts.slice(6, 22)));
+    expect(name.trimEnd()).toBe('12-tet');
+  });
+
+  it('test_custom_name_overrides_tuning_id', () => {
+    const mts = tuningToMts(et12, 'my-tuning');
+    const name = String.fromCharCode(...Array.from(mts.slice(6, 22)));
+    expect(name.trimEnd()).toBe('my-tuning');
+  });
+
+  it('test_anchor_midi_note_option_shifts_mapping', () => {
+    // Default: key 69 → 440 Hz. With anchorMidiNote=60, key 60 → referenceHz (440).
+    const mts60 = tuningToMts(et12, undefined, { anchorMidiNote: 60 });
+    const offset = 22 + 60 * 3;
+    const xx = mts60[offset] as number;
+    const yy = mts60[offset + 1] as number;
+    const zz = mts60[offset + 2] as number;
+    const fraction14 = (yy << 7) | zz;
+    const recoveredMidi = xx + fraction14 / 16384;
+    const recoveredHz = 440 * 2 ** ((recoveredMidi - 69) / 12);
+    expect(recoveredHz).toBeCloseTo(440, 2);
+  });
+
+  it('test_19edo_produces_non_12tet_tuning', () => {
+    const t19 = edo(19);
+    const mts12 = tuningToMts(et12);
+    const mts19 = tuningToMts(t19);
+    // The two messages should differ in key data
+    let differs = false;
+    for (let i = 22; i < 22 + 384; i++) {
+      if (mts12[i] !== mts19[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_custom_device_id_and_program_reflected', () => {
+    const mts = tuningToMts(et12, undefined, { deviceId: 7, program: 2 });
+    expect(mts[2]).toBe(7);
+    expect(mts[5]).toBe(2);
   });
 });

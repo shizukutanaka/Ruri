@@ -1,6 +1,6 @@
 /** 16-bit PCM mono WAV encoder. Zero-dep, byte-exact. */
 
-import { strikeChord, type ModalOptions, DEFAULT_MODAL } from '../core/modal-synth.js';
+import { strike, strikeChord, type ModalOptions, DEFAULT_MODAL } from '../core/modal-synth.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import {
@@ -10,7 +10,7 @@ import {
   type SynthScaleOptions,
   synthScale,
 } from '../core/ks-synth.js';
-import { type Scale, synthScaleFromScale } from '../core/scale.js';
+import { type Scale, scaleToFreqs, synthScaleFromScale } from '../core/scale.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
@@ -163,4 +163,68 @@ export function pluckScaleWav(
 ): Uint8Array {
   const samples = synthScaleFromScale(scale, tuning, opts);
   return encodeWav(samples, opts.sampleRate);
+}
+
+/** Options for {@link strikeScaleWav}: modal synthesis settings plus a per-note duration. */
+export interface StrikeScaleWavOptions extends ModalOptions {
+  /**
+   * How many seconds of each struck tone to include in the melodic sequence.
+   * Must be ≤ `seconds` (the full decay envelope length); values larger than
+   * `seconds` are clamped to `seconds`. Default: 0.5.
+   */
+  readonly noteSeconds: number;
+}
+
+export const DEFAULT_STRIKE_SCALE: StrikeScaleWavOptions = {
+  ...DEFAULT_MODAL,
+  noteSeconds: 0.5,
+};
+
+/**
+ * Synthesize a `Scale` as a melodic WAV using modal (additive) synthesis in one call.
+ *
+ * Socratic Q74: `pluckScaleWav` uses Karplus-Strong to play a `Scale` as a melody —
+ * but the modal synthesis analog (struck tones rather than plucked strings, faithful
+ * to inharmonic spectra like bells and gamelan) has no equivalent one-liner.
+ * Going from `Scale` → modal audio → WAV requires: `scaleToFreqs` → loop over
+ * `strike(freq, spectrum, opts)` per degree → concatenate slices → `encodeWav`.
+ * `strikeScaleWav` closes this gap: if `pluckScaleWav` is one call, so should its
+ * modal-synthesis counterpart be.
+ *
+ * Each degree is synthesized via `strike(freq, spectrum, opts)` and the first
+ * `noteSeconds` of the resulting decay is included in the output, producing a
+ * sequential melodic stream. The same `spectrum` used for dissonance scoring
+ * drives the synthesis (single source of truth).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-edo',
+ *                         degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const wav = strikeScaleWav(major, edo(12), bellSpectrum());
+ * await fs.writeFile('major-bells.wav', wav);
+ */
+export function strikeScaleWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  opts: StrikeScaleWavOptions = DEFAULT_STRIKE_SCALE,
+): Uint8Array {
+  const freqs = scaleToFreqs(scale, tuning);
+  if (freqs.length === 0) throw new RangeError('strikeScaleWav: scale has no degrees');
+  const { sampleRate, noteSeconds, ...modalOpts } = opts;
+  const fullModalOpts: ModalOptions = { sampleRate, ...modalOpts };
+  const samplesPerNote = Math.floor(sampleRate * Math.min(noteSeconds, opts.seconds));
+  const total = samplesPerNote * freqs.length;
+  const out = new Float32Array(total);
+  for (let i = 0; i < freqs.length; i++) {
+    const freq = freqs[i] as number;
+    const wave = strike(freq, spectrum, fullModalOpts);
+    const offset = i * samplesPerNote;
+    for (let j = 0; j < samplesPerNote && j < wave.length; j++) {
+      out[offset + j] = wave[j] as number;
+    }
+  }
+  return encodeWav(out, sampleRate);
 }

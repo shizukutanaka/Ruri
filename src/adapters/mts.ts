@@ -189,6 +189,44 @@ export interface ChordToMtsOptions extends MtsBulkDumpOptions {
   readonly a4Hz?: number;
 }
 
+/** Options for {@link tuningToMts}. */
+export type TuningToMtsOptions = MtsBulkDumpOptions & {
+  /** MIDI key number that maps to `tuning.referenceHz`. Default 69 (A4). */
+  readonly anchorMidiNote?: number;
+};
+
+/**
+ * Export a `TuningSystem` directly as a 408-byte MTS bulk tuning dump SysEx message.
+ *
+ * Socratic Q73: `tuningToMtsFrequencies(tuning)` maps all 128 MIDI keys onto the
+ * tuning's Hz values; `mtsBulkDump(freqs, name, opts)` encodes those into a SysEx
+ * message. The full pipeline — "tuning → ready-to-send MTS SysEx" — requires two
+ * explicit calls with an intermediate 128-element array that has no use elsewhere.
+ * `tuningToMts` closes this gap: if a `TuningSystem` is truly first-class, retuning
+ * a synth to it should be one call.
+ *
+ * The `name` is taken from `tuning.id` unless overridden. Key 69 (A4) maps to
+ * `tuning.referenceHz` by default; adjust via `opts.anchorMidiNote`.
+ *
+ * @param tuning - The tuning system to export.
+ * @param name - Optional SysEx name override; defaults to `tuning.id` (truncated to 16 chars).
+ * @param opts - Optional device ID, program number, and anchor MIDI note.
+ *
+ * @example
+ * const mts = tuningToMts(edo(19));
+ * // Write mts (Uint8Array, 408 bytes) to a .syx file or send via Web MIDI
+ * port.send(mts);
+ */
+export function tuningToMts(
+  tuning: TuningSystem,
+  name?: string,
+  opts: TuningToMtsOptions = {},
+): Uint8Array {
+  const { anchorMidiNote, ...bulkOpts } = opts;
+  const freqs = tuningToMtsFrequencies(tuning, anchorMidiNote);
+  return mtsBulkDump(freqs, name ?? tuning.id, bulkOpts);
+}
+
 /**
  * Export a microtonal `Chord` as a 408-byte MTS bulk tuning dump SysEx message.
  *
