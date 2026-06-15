@@ -3,7 +3,7 @@
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat } from '../core/midi.js';
 import { optimalChordOrder, rankedChordToChord } from '../core/chord-search.js';
-import { type Scale, rankScaleChords } from '../core/scale.js';
+import { type Scale, rankScaleChords, scaleToFreqs } from '../core/scale.js';
 import { type TuningSystem } from '../core/tuning.js';
 import { type ChordSearchOptions } from '../core/chord-search.js';
 
@@ -372,4 +372,68 @@ export function scaleChordProgressionSmf(
   const chords = ranked.map((r) => rankedChordToChord(r));
   const { chords: ordered } = optimalChordOrder(chords, rootHz);
   return progressionToSmf(ordered, rootHz, opts);
+}
+
+export interface ScaleToSmfOptions extends ChordToSmfOptions {
+  /** Gap between successive notes in ticks. Default 0 (legato). */
+  readonly gapTicks?: number;
+}
+
+/**
+ * Export a `Scale` as a sequential melodic MIDI file (one note per degree).
+ *
+ * Socratic Q83: `scaleToFreqs(scale, tuning)` → Hz[]; `freqToMidiFloat` → MIDI
+ * note numbers; `encodeSmf` → bytes — but going from a `Scale` to a playable
+ * melodic MIDI file requires three manual steps and two intermediate arrays.
+ * If `Scale` is truly first-class, writing it to MIDI should be one call.
+ *
+ * Each degree is placed sequentially: degree 0 starts at tick 0, degree 1 at
+ * tick `durationTicks`, etc. The root octave transposition is handled by
+ * `rootHz`: pass `261.63` to start on C4, `523.25` for C5, etc.
+ *
+ * Hz → MIDI pitch rounds to the nearest integer semitone (same caveat as
+ * `chordToSmf` — use MPE for microtonal precision).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if any scale degree maps to a MIDI note outside [0, 127].
+ *
+ * @example
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-edo',
+ *                         degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const midi = scaleToSmf(major, edo(12), 261.63);
+ * await fs.writeFile('major-scale.mid', midi);
+ */
+export function scaleToSmf(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  opts?: ScaleToSmfOptions,
+): Uint8Array {
+  const ppq = opts?.ppq ?? DEFAULT_PPQ;
+  const durationTicks = opts?.durationTicks ?? ppq;
+  const gapTicks = opts?.gapTicks ?? 0;
+  const velocity = opts?.velocity ?? 90;
+  const channel = opts?.channel ?? 0;
+  const a4Hz = opts?.a4Hz ?? 440;
+
+  // scaleToFreqs returns Hz values anchored to tuning.referenceHz.
+  // Transpose so that the first scale degree lands on rootHz.
+  const rawFreqs = scaleToFreqs(scale, tuning);
+  const firstFreq = rawFreqs[0] ?? tuning.referenceHz;
+  const transpose = rootHz / firstFreq;
+  const stepTicks = durationTicks + gapTicks;
+
+  const notes: NoteEvent[] = rawFreqs.map((hz, i) => {
+    const transposedHz = hz * transpose;
+    const midiFloat = freqToMidiFloat(transposedHz, a4Hz);
+    const note = Math.round(midiFloat);
+    if (note < 0 || note > 127) {
+      throw new RangeError(
+        `scale degree ${i} frequency ${transposedHz.toFixed(2)} Hz maps to MIDI note ${note}, which is outside [0, 127]`,
+      );
+    }
+    return { note, velocity, startTicks: i * stepTicks, durationTicks, channel };
+  });
+
+  return encodeSmf(notes, { ppq });
 }

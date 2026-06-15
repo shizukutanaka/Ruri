@@ -10,6 +10,7 @@ import {
   progressionToSmf,
   optimalProgressionSmf,
   scaleChordProgressionSmf,
+  scaleToSmf,
 } from './smf.js';
 import { chordFromSemitones } from '../core/chord.js';
 import { edo } from '../core/tuning.js';
@@ -338,5 +339,72 @@ describe('scaleChordProgressionSmf — scale to MIDI progression in one call (Q7
       byTick.set(n.startTicks, (byTick.get(n.startTicks) ?? 0) + 1);
     }
     for (const count of byTick.values()) expect(count).toBe(4);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q83 — scaleToSmf
+// ---------------------------------------------------------------------------
+
+describe('scaleToSmf (Q83)', () => {
+  const tuning = edo(12, 440);
+  // 12-edo major scale
+  const major: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: '12-edo',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const rootHz = 261.63; // C4
+
+  it('test_scale_to_smf_starts_with_mthd_header', () => {
+    const midi = scaleToSmf(major, tuning, rootHz);
+    expect(String.fromCharCode(midi[0]!, midi[1]!, midi[2]!, midi[3]!)).toBe('MThd');
+  });
+
+  it('test_scale_to_smf_produces_7_notes_for_major_scale', () => {
+    const { notes } = decodeSmf(scaleToSmf(major, tuning, rootHz));
+    expect(notes.length).toBe(7);
+  });
+
+  it('test_scale_to_smf_notes_are_sequential_in_time', () => {
+    const { notes } = decodeSmf(scaleToSmf(major, tuning, rootHz));
+    const sorted = [...notes].sort((a, b) => a.startTicks - b.startTicks);
+    for (let i = 1; i < sorted.length; i++) {
+      expect(sorted[i]!.startTicks).toBeGreaterThan(sorted[i - 1]!.startTicks);
+    }
+  });
+
+  it('test_scale_to_smf_first_note_is_at_tick_zero', () => {
+    const { notes } = decodeSmf(scaleToSmf(major, tuning, rootHz));
+    const sorted = [...notes].sort((a, b) => a.startTicks - b.startTicks);
+    expect(sorted[0]!.startTicks).toBe(0);
+  });
+
+  it('test_scale_to_smf_ascending_midi_pitches', () => {
+    const { notes } = decodeSmf(scaleToSmf(major, tuning, rootHz));
+    const sorted = [...notes].sort((a, b) => a.startTicks - b.startTicks);
+    for (let i = 1; i < sorted.length; i++) {
+      expect(sorted[i]!.note).toBeGreaterThan(sorted[i - 1]!.note);
+    }
+  });
+
+  it('test_scale_to_smf_velocity_option_applied', () => {
+    const { notes } = decodeSmf(scaleToSmf(major, tuning, rootHz, { velocity: 64 }));
+    for (const n of notes) expect(n.velocity).toBe(64);
+  });
+
+  it('test_scale_to_smf_gap_ticks_separates_notes', () => {
+    const { notes } = decodeSmf(
+      scaleToSmf(major, tuning, rootHz, { durationTicks: 480, gapTicks: 120 }),
+    );
+    const sorted = [...notes].sort((a, b) => a.startTicks - b.startTicks);
+    // Step = 480 + 120 = 600; second note starts at 600
+    expect(sorted[1]!.startTicks).toBe(600);
+  });
+
+  it('test_scale_to_smf_mismatched_tuning_throws', () => {
+    const wrongTuning = edo(19);
+    expect(() => scaleToSmf(major, wrongTuning, rootHz)).toThrow(RangeError);
   });
 });

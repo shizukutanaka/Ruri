@@ -106,3 +106,32 @@ export function edo(
     source: 'theoretical',
   });
 }
+
+/**
+ * Pairwise interval matrix in cents for all degree pairs in a tuning.
+ *
+ * Socratic Q82: Given a `TuningSystem`, the pairwise interval in cents between
+ * every pair of degrees is fundamental for analysis (identifying consonant
+ * intervals, detecting symmetry, comparing tunings) but requires a manual
+ * double-loop. If `TuningSystem` is truly first-class, retrieving `matrix[i][j]`
+ * — the interval in cents from degree i to degree j — should be one call.
+ *
+ * `matrix[i][j]` = cents from degree `i` up to degree `j`, computed as
+ * `degreeToCents(t, j) - degreeToCents(t, i)`. When `j < i` the value is
+ * negative (the interval is a descending step within the period).
+ *
+ * @throws {RangeError} if `tuning` has no degrees (propagated from `defineTuning`).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const m = tuningIntervalMatrix(t12);
+ * // m[0][7] ≈ 700 cents (perfect fifth from degree 0 to degree 7)
+ * // m[7][0] ≈ -700 cents
+ */
+export function tuningIntervalMatrix(tuning: TuningSystem): number[][] {
+  const n = tuning.degrees.length;
+  const centsArr = tuning.degrees.map((_, i) => degreeToCents(tuning, i));
+  return Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => (centsArr[j] as number) - (centsArr[i] as number)),
+  );
+}

@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。751テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。773テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -93,6 +93,45 @@ const guitar = guitarStandard();
 const major = chordFromSemitones('major', [0, 4, 7]);
 // ギター 5 弦開放 A2 = openStringsCents[1] = 500c をルートに
 const fingerings = fingerChord(guitar, chordToCentOffsets(major, 500));
+```
+
+```ts
+// b-3) Scale → フレットレス運指 (Q81): oud/violin など連続ポジション楽器への橋渡し
+import { edo } from 'ruri';
+import { fretlessOud, violin, fretlessChordFromScale } from 'ruri';
+
+const oud = fretlessOud(440);  // oud-arabic: D2 G2 A2 D3 G3 C4 開放弦
+const t12 = edo(12, 440);
+const ionianScale = { id: 'ionian', name: 'Ionian', tuningId: '12-edo',
+                      degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+// Scale + スケール内オフセット [0,2,4] → トライアド → フレットレスポジション
+const positions = fretlessChordFromScale(ionianScale, t12, [0, 2, 4], oud, 261.63);
+// positions[i] = { string, cents, freqHz } — ハンドスパン最小の音列
+```
+
+```ts
+// b-4) 調律の全音程ペア行列 (Q82): 分析・比較の基礎
+import { equalTemperament12, tuningIntervalMatrix } from 'ruri';
+
+const t12 = equalTemperament12(440);
+const m = tuningIntervalMatrix(t12);
+// m[i][j] = degree i から degree j までの音程 (cents)
+// m[0][7] ≈ 700  (完全5度)
+// m[7][0] ≈ -700 (下行)
+// m[i][i] === 0  (対角は常にゼロ)
+```
+
+```ts
+// b-5) Scale → SMF メロディ MIDI (Q83): 音階を順次 MIDI ファイルに書き出す
+import { edo } from 'ruri';
+import { scaleToSmf } from 'ruri/adapters';
+import { writeFile } from 'node:fs/promises';
+
+const major = { id: 'major', name: 'Major', tuningId: '12-edo',
+                degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+const midi = scaleToSmf(major, edo(12, 440), 261.63); // C4 起点で7音を順次発音
+await writeFile('major-scale.mid', midi);
+// opts: durationTicks / gapTicks / velocity / channel / a4Hz
 ```
 
 ```ts

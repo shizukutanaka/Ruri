@@ -5,6 +5,7 @@ import {
   edo,
   degreeToCents,
   degreeToFreq,
+  tuningIntervalMatrix,
   type TuningSystem,
 } from './tuning.js';
 import { cents, fromRatio } from './cents.js';
@@ -126,5 +127,70 @@ describe('edo', () => {
         expect(degreeToFreq(e, n)).toBeCloseTo(880, 6);
       }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q82 — tuningIntervalMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningIntervalMatrix (Q82)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_matrix_is_n_by_n', () => {
+    const m = tuningIntervalMatrix(t12);
+    expect(m.length).toBe(12);
+    expect(m.every((row) => row.length === 12)).toBe(true);
+  });
+
+  it('test_diagonal_is_zero', () => {
+    const m = tuningIntervalMatrix(t12);
+    for (let i = 0; i < 12; i++) {
+      expect(m[i]![i]).toBeCloseTo(0, 9);
+    }
+  });
+
+  it('test_perfect_fifth_degree_0_to_7_is_700_cents', () => {
+    const m = tuningIntervalMatrix(t12);
+    // degree 7 - degree 0 = 700 cents in 12-TET
+    expect(m[0]![7]).toBeCloseTo(700, 9);
+  });
+
+  it('test_antisymmetry_mij_equals_neg_mji', () => {
+    const m = tuningIntervalMatrix(t12);
+    for (let i = 0; i < 12; i++) {
+      for (let j = 0; j < 12; j++) {
+        expect(m[i]![j]).toBeCloseTo(-(m[j]![i] as number), 9);
+      }
+    }
+  });
+
+  it('test_19edo_matrix_step_size_correct', () => {
+    const t19 = edo(19, 440);
+    const m = tuningIntervalMatrix(t19);
+    // Each step in 19-EDO is 1200/19 cents
+    const step = 1200 / 19;
+    expect(m[0]![1]).toBeCloseTo(step, 9);
+  });
+
+  it('test_matrix_rows_are_shifting_offsets', () => {
+    // m[i][j] = degreeToCents(t, j) - degreeToCents(t, i)
+    const t = equalTemperament12(440);
+    const m = tuningIntervalMatrix(t);
+    for (let i = 0; i < 12; i++) {
+      for (let j = 0; j < 12; j++) {
+        const expected = degreeToCents(t, j) - degreeToCents(t, i);
+        expect(m[i]![j]).toBeCloseTo(expected, 9);
+      }
+    }
+  });
+
+  it('test_non_octave_tuning_matrix_uses_period_correctly', () => {
+    // 5-EDO stretched to 1210-cent period
+    const t5 = edo(5, 440, 1210);
+    const m = tuningIntervalMatrix(t5);
+    expect(m.length).toBe(5);
+    // Step from degree 0 to degree 1 = 1210/5 = 242 cents
+    expect(m[0]![1]).toBeCloseTo(242, 9);
   });
 });

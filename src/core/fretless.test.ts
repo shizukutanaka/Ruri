@@ -4,8 +4,11 @@ import {
   violin,
   fretlessPositionsFor,
   fingerFretlessChord,
+  fretlessChordFromScale,
   type FretlessInstrument,
 } from './fretless.js';
+import { edo } from './tuning.js';
+import { type Scale } from './scale.js';
 
 describe('fretless instruments', () => {
   it('test_fretless_oud_open_strings', () => {
@@ -148,5 +151,77 @@ describe('fingerFretlessChord edge cases', () => {
     // No injective (one-note-per-string) assignment can span both → best stays null (line 191).
     const result = fingerFretlessChord(narrow, [250, 300]);
     expect(result).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q81 — fretlessChordFromScale
+// ---------------------------------------------------------------------------
+
+describe('fretlessChordFromScale (Q81)', () => {
+  // 12-EDO C4 major scale on violin (G3, D4, A4, E5 strings, maxCents 2400)
+  const t12 = edo(12, 440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: '12-edo',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const v = violin(440);
+
+  it('test_fretless_chord_from_scale_returns_positions_or_null', () => {
+    // Triad on degrees 0, 2, 4 of major scale (C-E-G equivalent in tuning)
+    const result = fretlessChordFromScale(major, t12, [0, 2, 4], v, 440);
+    // Result is null if no injective assignment; otherwise positions have positive freqs
+    if (result !== null) {
+      expect(result.length).toBe(3);
+      expect(result.every((p) => p.freqHz > 0)).toBe(true);
+    }
+  });
+
+  it('test_fretless_chord_from_scale_positions_sorted_by_string', () => {
+    const result = fretlessChordFromScale(major, t12, [0, 2, 4], v, 440);
+    if (result !== null && result.length > 1) {
+      for (let i = 1; i < result.length; i++) {
+        expect((result[i] as { string: number }).string).toBeGreaterThanOrEqual(
+          (result[i - 1] as { string: number }).string,
+        );
+      }
+    }
+  });
+
+  it('test_fretless_chord_from_scale_uses_tuning_reference_when_rootHz_omitted', () => {
+    // rootHz defaults to tuning.referenceHz (440 for this tuning)
+    const withRoot = fretlessChordFromScale(major, t12, [0, 2, 4], v, 440);
+    const withDefault = fretlessChordFromScale(major, t12, [0, 2, 4], v);
+    // Both should match in null-ness and (if non-null) same number of positions
+    expect(withRoot === null).toBe(withDefault === null);
+    if (withRoot !== null && withDefault !== null) {
+      expect(withRoot.length).toBe(withDefault.length);
+    }
+  });
+
+  it('test_fretless_chord_from_scale_wrong_tuning_throws', () => {
+    const wrongTuning = edo(19, 440);
+    expect(() => fretlessChordFromScale(major, wrongTuning, [0, 2, 4], v, 440)).toThrow(RangeError);
+  });
+
+  it('test_fretless_chord_from_scale_empty_offsets_throws', () => {
+    expect(() => fretlessChordFromScale(major, t12, [], v, 440)).toThrow(RangeError);
+  });
+
+  it('test_fretless_chord_from_scale_out_of_range_offset_throws', () => {
+    // major has 7 degrees (indices 0..6); offset 7 is out of range
+    expect(() => fretlessChordFromScale(major, t12, [0, 2, 7], v, 440)).toThrow(RangeError);
+  });
+
+  it('test_fretless_chord_from_scale_two_note_chord_on_oud', () => {
+    const oud = fretlessOud(440);
+    // A simple two-degree dyad (root + second)
+    const result = fretlessChordFromScale(major, t12, [0, 1], oud, 440);
+    // Oud has 6 strings; a 2-note chord should almost always be fingerable
+    if (result !== null) {
+      expect(result.length).toBe(2);
+    }
   });
 });

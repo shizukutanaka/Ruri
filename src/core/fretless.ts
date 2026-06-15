@@ -6,6 +6,9 @@
  */
 
 import { midiToFreq } from './midi.js';
+import { type Scale, chordFromScale } from './scale.js';
+import { type TuningSystem } from './tuning.js';
+import { realizeChordFreqs } from './chord.js';
 
 // ---------------------------------------------------------------------------
 // Data types
@@ -232,4 +235,43 @@ export function violin(referenceHz = 440): FretlessInstrument {
     openStringsHz: midiNumbers.map((n) => midiToFreq(n, referenceHz)),
     maxCents: 2400,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Scale → fretless chord bridge
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a chord from scale degree offsets, then find the best fretless fingering.
+ *
+ * Socratic Q81: `chordFromScale` → `realizeChordFreqs` → `fingerFretlessChord`
+ * is a three-step pipeline. If fretless instruments are truly first-class, a
+ * single call should go from a `Scale` to playable positions on a fretless
+ * instrument. This bridge closes that gap.
+ *
+ * `rootHz` is the absolute frequency of the scale root (degree index 0 of the
+ * tuning). If omitted it defaults to `tuning.referenceHz`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `offsets` is empty or any offset is out of range.
+ * @throws {RangeError} if `offsets` has more notes than the instrument has strings.
+ *
+ * @example
+ * const oud = fretlessOud();
+ * const bayati: Scale = { id: 'bayati', name: 'Bayati', tuningId: '24-edo',
+ *                          degreeIndices: [0, 3, 6, 10, 14, 17, 21] };
+ * const positions = fretlessChordFromScale(bayati, edo(24), [0, 2, 4], oud);
+ */
+export function fretlessChordFromScale(
+  scale: Scale,
+  tuning: TuningSystem,
+  offsets: readonly number[],
+  inst: FretlessInstrument,
+  rootHz?: number,
+  name?: string,
+): FretlessPosition[] | null {
+  const chord = chordFromScale(scale, tuning, offsets, name);
+  const root = rootHz ?? tuning.referenceHz;
+  const freqsHz = realizeChordFreqs(chord, root);
+  return fingerFretlessChord(inst, freqsHz);
 }
