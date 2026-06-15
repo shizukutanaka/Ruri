@@ -67,6 +67,9 @@ import {
   modeStabilityScores,
   singleBestChord,
   chordMapDyadTriadRatio,
+  chordMapDescription,
+  tuningReportSimilarity,
+  annotateProgression,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -74,7 +77,7 @@ import { rankChords } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance, chordObjectDissonance } from './dissonance.js';
 import { DEFAULT_SYNTH_SCALE } from './ks-synth.js';
-import { chordToCents, chordFromDegrees, chordFromRatios } from './chord.js';
+import { chordToCents, chordFromDegrees, chordFromRatios, chordFromSemitones } from './chord.js';
 
 const t12 = equalTemperament12(440);
 
@@ -3603,5 +3606,120 @@ describe('chordMapDyadTriadRatio (Q209)', () => {
     const triads = chordMapTriads(map3);
     const dyads = chordMapDyads(map3);
     expect(ratio).toBeCloseTo(dyads.length / Math.max(1, triads.length), 10);
+  });
+});
+
+// Q213 — chordMapDescription
+describe('chordMapDescription (Q213)', () => {
+  it('test_returns_string', () => {
+    const map = scaleToChordMap(major, t12, 3);
+    const desc = chordMapDescription(map);
+    expect(typeof desc).toBe('string');
+  });
+
+  it('test_starts_with_total_count', () => {
+    const map = scaleToChordMap(major, t12, 3);
+    const desc = chordMapDescription(map);
+    expect(desc.startsWith(`${map.length} chords:`)).toBe(true);
+  });
+
+  it('test_triad_only_map_format', () => {
+    const map = scaleToChordMap(major, t12, 3);
+    const desc = chordMapDescription(map);
+    expect(desc).toMatch(/\d+ chords: \d+ triad/);
+  });
+
+  it('test_empty_map_shows_zero', () => {
+    const desc = chordMapDescription([]);
+    expect(desc.startsWith('0 chords:')).toBe(true);
+  });
+
+  it('test_description_contains_label_and_count', () => {
+    const map = scaleToChordMap(major, t12, 3);
+    const counts = chordMapLabelCounts(map);
+    const desc = chordMapDescription(map);
+    for (const [label, count] of Object.entries(counts)) {
+      expect(desc).toContain(`${count} ${label}`);
+    }
+  });
+});
+
+// Q214 — tuningReportSimilarity
+describe('tuningReportSimilarity (Q214)', () => {
+  it('test_identical_reports_give_score_1', () => {
+    const r = tuningReport(t12, 261.63);
+    expect(tuningReportSimilarity(r, r)).toBe(1);
+  });
+
+  it('test_score_in_range_0_to_1', () => {
+    const t5 = edo(5);
+    const r1 = tuningReport(t12, 261.63);
+    const r2 = tuningReport(t5, 261.63);
+    const score = tuningReportSimilarity(r1, r2);
+    expect(score).toBeGreaterThan(0);
+    expect(score).toBeLessThanOrEqual(1);
+  });
+
+  it('test_symmetric', () => {
+    const t5 = edo(5);
+    const r1 = tuningReport(t12, 261.63);
+    const r2 = tuningReport(t5, 261.63);
+    expect(tuningReportSimilarity(r1, r2)).toBeCloseTo(tuningReportSimilarity(r2, r1), 10);
+  });
+
+  it('test_formula_matches_manual_calculation', () => {
+    const t5 = edo(5);
+    const r1 = tuningReport(t12, 261.63);
+    const r2 = tuningReport(t5, 261.63);
+    const expected = 1 / (1 + Math.abs(r1.bestMode.harmonicity - r2.bestMode.harmonicity));
+    expect(tuningReportSimilarity(r1, r2)).toBeCloseTo(expected, 10);
+  });
+
+  it('test_more_similar_tunings_have_higher_score', () => {
+    const t12b = equalTemperament12(440);
+    const t5 = edo(5);
+    const r1 = tuningReport(t12, 261.63);
+    const r2 = tuningReport(t12b, 261.63);
+    const r3 = tuningReport(t5, 261.63);
+    const sameScore = tuningReportSimilarity(r1, r2);
+    const diffScore = tuningReportSimilarity(r1, r3);
+    expect(sameScore).toBeGreaterThanOrEqual(diffScore);
+  });
+});
+
+// Q215 — annotateProgression
+describe('annotateProgression (Q215)', () => {
+  const triad = chordFromSemitones('triad', [0, 4, 7]);
+  const dyad = chordFromSemitones('dyad', [0, 7]);
+
+  it('test_empty_input_returns_empty_array', () => {
+    expect(annotateProgression([], 261.63)).toEqual([]);
+  });
+
+  it('test_returns_one_entry_per_chord', () => {
+    const result = annotateProgression([triad, dyad], 261.63);
+    expect(result.length).toBe(2);
+  });
+
+  it('test_triad_label', () => {
+    const result = annotateProgression([triad], 261.63);
+    expect(result[0]?.label).toBe('triad');
+  });
+
+  it('test_dyad_label', () => {
+    const result = annotateProgression([dyad], 261.63);
+    expect(result[0]?.label).toBe('dyad');
+  });
+
+  it('test_dissonance_and_harmonicity_are_numbers', () => {
+    const result = annotateProgression([triad], 261.63, harmonicSpectrum());
+    const entry = result[0];
+    expect(typeof entry?.dissonance).toBe('number');
+    expect(typeof entry?.harmonicity).toBe('number');
+  });
+
+  it('test_chord_reference_preserved', () => {
+    const result = annotateProgression([triad], 261.63);
+    expect(result[0]?.chord).toBe(triad);
   });
 });

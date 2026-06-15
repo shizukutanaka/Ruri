@@ -2867,3 +2867,105 @@ export function singleBestChord(
 export function chordMapDyadTriadRatio(chordMap: readonly ScaleChordMapEntry[]): number {
   return chordMapDyads(chordMap).length / Math.max(1, chordMapTriads(chordMap).length);
 }
+
+/**
+ * Produce a human-readable summary sentence describing a chord map in one call.
+ *
+ * Socratic Q213: "If we can label chord map entries, producing a SUMMARY SENTENCE describing
+ * the chord map should be one call — can it?" Today: `chordMapLabelCounts(chordMap)` → build
+ * string manually — two steps. If the label counts are first-class, summarizing them as a
+ * sentence should be one call.
+ *
+ * Format: `'${total} chords: ${label count pairs}'`
+ * e.g. `'7 chords: 7 triads'` or `'10 chords: 2 dyads, 7 triads, 1 tetrad'`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @returns A human-readable summary string.
+ *
+ * @example
+ * const desc = chordMapDescription(scaleToChordMap(major, t12));
+ * // '7 chords: 7 triads'
+ */
+export function chordMapDescription(chordMap: readonly ScaleChordMapEntry[]): string {
+  const total = chordMap.length;
+  const counts = chordMapLabelCounts(chordMap);
+  const pairs = Object.entries(counts)
+    .map(([label, count]) => `${count} ${label}`)
+    .join(', ');
+  return `${total} chords: ${pairs}`;
+}
+
+/**
+ * Compute a similarity score between two tuning reports in one call.
+ *
+ * Socratic Q214: "If we can rank presets by harmonicity, scoring two tunings' similarity
+ * from their reports without computing profiles explicitly should be one call — can it?"
+ * Today: extract `bestMode.harmonicity` from both, compute abs difference, invert — three
+ * steps. If report-based comparison is first-class, a similarity score should be one call.
+ *
+ * Returns `1 / (1 + |reportA.bestMode.harmonicity - reportB.bestMode.harmonicity|)`.
+ * Range: (0, 1] where 1 = identical best-mode harmonicity. Pure function, no throws.
+ *
+ * @param reportA - First tuning report.
+ * @param reportB - Second tuning report.
+ * @returns Similarity score in the range (0, 1].
+ *
+ * @example
+ * const r1 = tuningReport(t12, 261.63);
+ * const r2 = tuningReport(t12, 261.63);
+ * const sim = tuningReportSimilarity(r1, r2);
+ * // sim === 1 (identical reports)
+ */
+export function tuningReportSimilarity(
+  reportA: TuningReportType,
+  reportB: TuningReportType,
+): number {
+  return 1 / (1 + Math.abs(reportA.bestMode.harmonicity - reportB.bestMode.harmonicity));
+}
+
+/**
+ * Annotate a chord progression with chord descriptions at each step in one call.
+ *
+ * Socratic Q215: "If we can get a chord map description, annotating a progression with chord
+ * descriptions at each step should be one call — can it?" Today: for each chord, call
+ * `chordObjectDissonance` + `harmonicityForChord` + label by size — many manual steps.
+ * If chord analysis is first-class, annotating a whole progression should be one call.
+ *
+ * For each chord in `chords[]`: computes `chordObjectDissonance`, `harmonicityForChord`,
+ * and a size-based label ('unison'/'dyad'/'triad'/'tetrad'/'pentad'/etc.).
+ * Returns `[]` for empty input (does not throw).
+ *
+ * @param chords   - Array of `Chord` objects to annotate.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns Array of `{ chord, label, dissonance, harmonicity }` in progression order.
+ *
+ * @example
+ * const annotated = annotateProgression(chords, 261.63, harmonicSpectrum());
+ * // annotated[0].label === 'triad' for a 3-note chord
+ */
+export function annotateProgression(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): Array<{ chord: Chord; label: string; dissonance: number; harmonicity: number }> {
+  if (chords.length === 0) return [];
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const LABELS: readonly string[] = [
+    'unison',
+    'unison',
+    'dyad',
+    'triad',
+    'tetrad',
+    'pentad',
+    'hexad',
+    'heptad',
+  ];
+  return chords.map((chord) => {
+    const dissonance = chordObjectDissonance(chord, rootHz, effectiveSpectrum);
+    const harmonicity = harmonicityForChord(chord, rootHz);
+    const size = chord.intervals.length;
+    const label = size < LABELS.length ? (LABELS[size] as string) : `${size}-note chord`;
+    return { chord, label, dissonance, harmonicity };
+  });
+}
