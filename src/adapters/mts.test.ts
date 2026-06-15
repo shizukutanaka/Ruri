@@ -3,7 +3,7 @@ import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordFromRatios, chordFromSemitones, realizeChordFreqs } from '../core/chord.js';
-import { type Scale, scaleToFreqs } from '../core/scale.js';
+import { type Scale, scaleToFreqs, scaleToChordMap } from '../core/scale.js';
 import {
   freqToMtsKey,
   mtsBulkDump,
@@ -12,6 +12,7 @@ import {
   tuningToMts,
   chordProgressionToMts,
   scaleToMts,
+  chordMapToMts,
 } from './mts.js';
 
 // ---------------------------------------------------------------------------
@@ -620,6 +621,61 @@ describe('scaleToMts — Scale to MTS SysEx in one call (Q101)', () => {
     let differs = false;
     for (let i = 22; i < 406; i++) {
       if (mtsMajor[i] !== mtsPenta[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// chordMapToMts — ScaleChordMapEntry[] → MTS bulk dump in one call (Q139)
+// ---------------------------------------------------------------------------
+
+describe('chordMapToMts — chord map to MTS bulk dump in one call (Q139)', () => {
+  const tuning = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_output_length_is_408', () => {
+    const chordMap = scaleToChordMap(major, tuning);
+    expect(chordMapToMts(chordMap).length).toBe(408);
+  });
+
+  it('test_first_byte_is_sysex_start', () => {
+    const chordMap = scaleToChordMap(major, tuning);
+    expect(chordMapToMts(chordMap)[0]).toBe(0xf0);
+  });
+
+  it('test_last_byte_is_sysex_end', () => {
+    const chordMap = scaleToChordMap(major, tuning);
+    const mts = chordMapToMts(chordMap);
+    expect(mts[mts.length - 1]).toBe(0xf7);
+  });
+
+  it('test_empty_chord_map_throws_range_error', () => {
+    expect(() => chordMapToMts([])).toThrow(RangeError);
+  });
+
+  it('test_custom_device_id_and_program_reflected', () => {
+    const chordMap = scaleToChordMap(major, tuning);
+    const mts = chordMapToMts(chordMap, 'test', { deviceId: 4, program: 2 });
+    expect(mts[2]).toBe(4); // deviceId
+    expect(mts[5]).toBe(2); // program
+  });
+
+  it('test_different_root_hz_produces_different_mts', () => {
+    const chordMap = scaleToChordMap(major, tuning);
+    const mts261 = chordMapToMts(chordMap, 'test', { rootHz: 261.63 });
+    const mts440 = chordMapToMts(chordMap, 'test', { rootHz: 440 });
+    let differs = false;
+    for (let i = 22; i < 406; i++) {
+      if (mts261[i] !== mts440[i]) {
         differs = true;
         break;
       }

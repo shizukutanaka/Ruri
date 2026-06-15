@@ -28,7 +28,7 @@
 import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
 import { degreeToFreq, type TuningSystem } from '../core/tuning.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
-import { type Scale, scaleToFreqs } from '../core/scale.js';
+import { type Scale, scaleToFreqs, type ScaleChordMapEntry } from '../core/scale.js';
 
 /** A single MTS key entry: semitone + 14-bit fractional offset above it. */
 export interface MtsKey {
@@ -401,4 +401,81 @@ export function scaleToMts(
   void _mn;
   void _a4;
   return mtsBulkDump(frequencies, name ?? scale.id, bulkOpts);
+}
+
+/** Options for {@link chordMapToMts}. */
+export interface ChordMapToMtsOptions extends MtsBulkDumpOptions {
+  /**
+   * Root frequency in Hz for realizing chord intervals.
+   * Default: 440 Hz (A4).
+   */
+  readonly rootHz?: number;
+  /**
+   * A4 reference frequency in Hz used to fill non-chord MIDI keys with standard 12-TET.
+   * Default: 440.
+   */
+  readonly a4Hz?: number;
+}
+
+/**
+ * Export all unique pitch classes in a chord map as a 408-byte MTS bulk tuning dump SysEx.
+ *
+ * Socratic Q139: `chordMapAnalysis` produces a full chord map with dissonance and harmonicity
+ * scores — but encoding all its unique pitch frequencies as a single MTS SysEx message (so a
+ * synth can play any chord from the map without re-tuning per chord) still requires manual
+ * frequency extraction and a `mtsBulkDump` call. If a chord map is first-class, exporting its
+ * pitch universe as MTS should be one call.
+ *
+ * Algorithm:
+ * 1. Collect all unique intervals across all chords in the chord map.
+ * 2. Realize each unique interval as a frequency at `rootHz`.
+ * 3. Assign each frequency to the nearest MIDI key (12-TET baseline for unassigned keys).
+ * 4. Encode with `mtsBulkDump` and return the 408-byte SysEx message.
+ *
+ * If two intervals map to the same MIDI key, the last one (in chord-map order) wins —
+ * deterministic but callers should prefer chord maps with well-separated intervals.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`). Must be non-empty.
+ * @param name     - Optional SysEx name string (truncated to 16 ASCII bytes).
+ * @param opts     - Optional device ID, program number, root Hz, and A4 reference Hz.
+ * @returns A 408-byte `Uint8Array` MTS SysEx message.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const mts = chordMapToMts(chordMap, 'major-map');
+ * port.send(mts); // retune synth with all diatonic pitches
+ */
+export function chordMapToMts(
+  chordMap: readonly ScaleChordMapEntry[],
+  name = 'chord-map',
+  opts: ChordMapToMtsOptions = {},
+): Uint8Array {
+  if (chordMap.length === 0) {
+    throw new RangeError('chordMapToMts: chordMap must be non-empty');
+  }
+
+  const rootHz = opts.rootHz ?? A4_HZ_DEFAULT;
+  const a4Hz = opts.a4Hz ?? A4_HZ_DEFAULT;
+
+  // Start with standard 12-TET for all 128 MIDI keys
+  const frequencies: number[] = Array.from({ length: 128 }, (_, k) => midiToFreq(k, a4Hz));
+
+  // Collect all unique pitch frequencies from all chords and assign to nearest MIDI keys
+  for (const entry of chordMap) {
+    const freqs = realizeChordFreqs(entry.chord, rootHz);
+    for (const hz of freqs) {
+      const midiFloat = freqToMidiFloat(hz, a4Hz);
+      const key = Math.max(0, Math.min(127, Math.round(midiFloat)));
+      (frequencies as number[])[key] = hz;
+    }
+  }
+
+  const { rootHz: _rHz, a4Hz: _a4, ...bulkOpts } = opts;
+  void _rHz;
+  void _a4;
+  return mtsBulkDump(frequencies, name, bulkOpts);
 }

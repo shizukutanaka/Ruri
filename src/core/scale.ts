@@ -1629,3 +1629,41 @@ export function bestChordForMidiNote(
   const analysis = chordMapAnalysis(scale, tuning, effectiveSpectrum, 3);
   return { chord: analysis[0] as ChordMapAnalysisEntry, rootHz };
 }
+
+/**
+ * Sort a `ScaleChordMapEntry[]` by Sethares roughness (ascending), using the provided spectrum.
+ *
+ * Socratic Q140: `rankChordMapByHarmonicity` sorts by Stolzenburg harmonicity (timbre-
+ * independent). `rankChordMapCombined` blends harmonicity and roughness. But sorting purely
+ * by Sethares roughness — the sensory dissonance axis alone — has no dedicated one-call path.
+ * If ranking by dissonance is a first-class operation (there is `rankModes` which sorts modes
+ * by dissonance), sorting a *chord map* by roughness should also be one call.
+ *
+ * Returns a new array sorted ascending by Sethares roughness (lowest = most consonant = first).
+ * Does not mutate the input array. When no spectrum is provided, uses `harmonicSpectrum()`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum for roughness computation.
+ *                   Defaults to `harmonicSpectrum()` (harmonic timbre).
+ * @param rootHz   - Reference frequency for chord realization (default 440 Hz).
+ * @returns New array sorted by Sethares roughness ascending (most consonant first).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const ranked = rankChordMapByDissonance(chordMap, harmonicSpectrum(), 261.63);
+ * // ranked[0] is the smoothest-sounding diatonic chord for this timbre
+ */
+export function rankChordMapByDissonance(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): ScaleChordMapEntry[] {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  return [...chordMap].sort(
+    (a, b) =>
+      chordObjectDissonance(a.chord, rootHz, effectiveSpectrum) -
+      chordObjectDissonance(b.chord, rootHz, effectiveSpectrum),
+  );
+}
