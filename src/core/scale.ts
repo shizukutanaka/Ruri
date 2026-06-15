@@ -2086,3 +2086,39 @@ export function filterChordMapByCriteria(
     return true;
   });
 }
+
+/**
+ * Compute the progression score summary for the best mode of a tuning in one call.
+ *
+ * Socratic Q170: "If we can find a progression score summary, finding the summary for
+ * the BEST mode of a tuning should be one call — can it?" Today: `bestModeForTuning(tuning)`
+ * → `progressionScoreSummary(mode, tuning, rootHz)` — two explicit steps. If best-mode
+ * selection and progression analysis are first-class, combining them should be one call.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → most harmonically optimal `Scale`.
+ * 2. `progressionScoreSummary(mode, tuning, rootHz, spectrum)` → `ProgressionScoreSummary`.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Absolute frequency of the root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `ProgressionScoreSummary` for the best mode's diatonic chord progression.
+ *
+ * @throws {RangeError} if `tuning` has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const summary = bestModeProgressionSummary(t12, 261.63);
+ * console.log(summary.meanSmoothness);
+ */
+export function bestModeProgressionSummary(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+): ProgressionScoreSummary {
+  if (tuning.degrees.length === 0) {
+    throw new RangeError('bestModeProgressionSummary: tuning has no degrees');
+  }
+  const mode = bestModeForTuning(tuning, spectrum);
+  return progressionScoreSummary(mode, tuning, rootHz, spectrum);
+}

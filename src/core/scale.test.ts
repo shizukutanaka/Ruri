@@ -46,6 +46,7 @@ import {
   progressionScoreSummary,
   chordMapSummary,
   filterChordMapByCriteria,
+  bestModeProgressionSummary,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -2651,5 +2652,52 @@ describe('filterChordMapByCriteria (Q166)', () => {
     for (const entry of filtered) {
       expect(chordMap).toContainEqual(entry);
     }
+  });
+});
+
+// Q170 — bestModeProgressionSummary
+describe('bestModeProgressionSummary (Q170)', () => {
+  it('test_returns_progression_score_summary_shape', () => {
+    const summary = bestModeProgressionSummary(t12, 261.63);
+    expect(typeof summary.chordCount).toBe('number');
+    expect(typeof summary.totalSmoothness).toBe('number');
+    expect(typeof summary.meanSmoothness).toBe('number');
+    expect(typeof summary.bestChordIndex).toBe('number');
+    expect(typeof summary.worstChordIndex).toBe('number');
+  });
+
+  it('test_chord_count_is_positive', () => {
+    const summary = bestModeProgressionSummary(t12, 440);
+    expect(summary.chordCount).toBeGreaterThan(0);
+  });
+
+  it('test_best_and_worst_indices_in_range', () => {
+    const summary = bestModeProgressionSummary(t12, 261.63);
+    expect(summary.bestChordIndex).toBeGreaterThanOrEqual(0);
+    expect(summary.bestChordIndex).toBeLessThan(summary.chordCount);
+    expect(summary.worstChordIndex).toBeGreaterThanOrEqual(0);
+    expect(summary.worstChordIndex).toBeLessThan(summary.chordCount);
+  });
+
+  it('test_mean_smoothness_between_best_and_worst', () => {
+    const summary = bestModeProgressionSummary(t12, 261.63, harmonicSpectrum());
+    expect(Number.isFinite(summary.meanSmoothness)).toBe(true);
+  });
+
+  it('test_with_spectrum_returns_valid_summary', () => {
+    const summary = bestModeProgressionSummary(t12, 261.63, harmonicSpectrum());
+    expect(summary.chordCount).toBeGreaterThan(0);
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const emptyTuning = {
+      id: 'empty',
+      name: 'empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(() => bestModeProgressionSummary(emptyTuning, 261.63)).toThrow(RangeError);
   });
 });
