@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { encodeWav, strikeChordToWav } from './wav.js';
+import { encodeWav, strikeChordToWav, tuningToScaleWav } from './wav.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
+import { edo } from '../core/tuning.js';
+import { DEFAULT_KS } from '../core/ks-synth.js';
 
 describe('WAV encoder', () => {
   it('test_header_riff_wave', () => {
@@ -68,5 +70,41 @@ describe('strikeChordToWav — chord synthesis to WAV in one call (Q54)', () => 
 
   it('test_empty_freqs_throws', () => {
     expect(() => strikeChordToWav([], harmonicSpectrum())).toThrow(RangeError);
+  });
+});
+
+// Q59: TuningSystem is first-class — should playing its degrees as audio be one call?
+describe('tuningToScaleWav — TuningSystem sonification in one call (Q59)', () => {
+  it('test_output_is_valid_wav_riff_header', () => {
+    const wav = tuningToScaleWav(edo(7), { ...DEFAULT_KS, noteSeconds: 0.05 });
+    expect(wav[0]).toBe(0x52); // 'R'
+    expect(wav[1]).toBe(0x49); // 'I'
+    expect(wav[2]).toBe(0x46); // 'F'
+    expect(wav[3]).toBe(0x46); // 'F'
+  });
+
+  it('test_output_length_reflects_degree_count', () => {
+    const tuning = edo(12);
+    const noteSeconds = 0.1;
+    const opts = { ...DEFAULT_KS, noteSeconds };
+    const wav = tuningToScaleWav(tuning, opts);
+    const samplesPerNote = Math.floor(DEFAULT_KS.sampleRate * noteSeconds);
+    const expectedSamples = samplesPerNote * tuning.degrees.length;
+    // WAV = 44 byte header + 2 bytes per sample (16-bit PCM)
+    expect(wav.length).toBe(44 + expectedSamples * 2);
+  });
+
+  it('test_12edo_and_7edo_produce_different_lengths', () => {
+    const opts = { ...DEFAULT_KS, noteSeconds: 0.1 };
+    const wav12 = tuningToScaleWav(edo(12), opts);
+    const wav7 = tuningToScaleWav(edo(7), opts);
+    expect(wav12.length).toBeGreaterThan(wav7.length);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = { ...DEFAULT_KS, sampleRate: 22050, noteSeconds: 0.05 };
+    const wav = tuningToScaleWav(edo(5), opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
   });
 });

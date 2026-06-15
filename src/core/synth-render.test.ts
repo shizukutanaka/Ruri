@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { pluck, mix, normalize, DEFAULT_KS, pluckChord } from './ks-synth.js';
+import {
+  pluck,
+  mix,
+  normalize,
+  DEFAULT_KS,
+  pluckChord,
+  synthScale,
+  DEFAULT_SYNTH_SCALE,
+} from './ks-synth.js';
 import { strike, DEFAULT_MODAL, strikeChord } from './modal-synth.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 
@@ -265,5 +273,50 @@ describe('voicesForChordObject — Chord → Web Audio voices (Q52)', () => {
     const tetrad = chordFromSemitones('dom7', [0, 4, 7, 10]);
     const voices = voicesForChordObject(tetrad, rootHz, harmonicSpectrum(6));
     expect(voices.length).toBe(4 * 6);
+  });
+});
+
+// Q57: scaleToFreqs gives Hz per degree — can a melodic scale sequence be synthesized in one call?
+describe('synthScale — scale as melodic sequence (Q57)', () => {
+  const scale = [220, 247, 277, 294, 330, 370, 415, 440]; // A major approx
+
+  it('test_output_length_equals_notes_times_samples_per_note', () => {
+    const opts = { ...DEFAULT_SYNTH_SCALE, noteSeconds: 0.1 };
+    const audio = synthScale(scale, opts);
+    const samplesPerNote = Math.floor(opts.sampleRate * opts.noteSeconds);
+    expect(audio.length).toBe(samplesPerNote * scale.length);
+  });
+
+  it('test_output_is_finite_float32array', () => {
+    const audio = synthScale(scale, { ...DEFAULT_SYNTH_SCALE, noteSeconds: 0.05 });
+    expect(audio).toBeInstanceOf(Float32Array);
+    expect(Array.from(audio).every(Number.isFinite)).toBe(true);
+  });
+
+  it('test_output_within_unit_range', () => {
+    const audio = synthScale(scale, { ...DEFAULT_SYNTH_SCALE, noteSeconds: 0.1 });
+    expect(audio.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+  });
+
+  it('test_single_note_matches_pluck', () => {
+    const opts = { ...DEFAULT_SYNTH_SCALE, noteSeconds: 0.2, seconds: 0.2 };
+    const audio = synthScale([440], opts);
+    const single = pluck(440, opts);
+    const samplesPerNote = Math.floor(opts.sampleRate * opts.noteSeconds);
+    expect(audio.length).toBe(samplesPerNote);
+    // First sample should match (same seed, same freq)
+    expect(audio[0]).toBeCloseTo(single[0] as number, 6);
+  });
+
+  it('test_empty_freqs_throws', () => {
+    expect(() => synthScale([], DEFAULT_SYNTH_SCALE)).toThrow(RangeError);
+  });
+
+  it('test_note_seconds_clamped_to_seconds', () => {
+    // noteSeconds > seconds: output per note should be clamped to seconds
+    const opts = { ...DEFAULT_SYNTH_SCALE, seconds: 0.1, noteSeconds: 1.0 };
+    const audio = synthScale([440, 550], opts);
+    const samplesPerNote = Math.floor(opts.sampleRate * opts.seconds); // clamped
+    expect(audio.length).toBe(samplesPerNote * 2);
   });
 });

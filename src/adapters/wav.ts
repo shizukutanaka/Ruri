@@ -2,6 +2,8 @@
 
 import { strikeChord, type ModalOptions, DEFAULT_MODAL } from '../core/modal-synth.js';
 import { type Spectrum } from '../core/spectrum.js';
+import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
+import { DEFAULT_KS, type SynthScaleOptions, synthScale } from '../core/ks-synth.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
@@ -57,5 +59,42 @@ export function strikeChordToWav(
 ): Uint8Array {
   const opts = modalOpts ?? DEFAULT_MODAL;
   const samples = strikeChord(freqs, spectrum, opts);
+  return encodeWav(samples, opts.sampleRate);
+}
+
+export type TuningScaleWavOptions = SynthScaleOptions;
+
+/**
+ * Sonify a `TuningSystem` as an ascending scale WAV in one call.
+ *
+ * Socratic Q59: `edo(12)` (or any `TuningSystem`) expresses a full pitch
+ * vocabulary — but turning it into an audio demonstration requires four manual
+ * steps: iterate degrees → `degreeToFreq` for each → `pluck` each note →
+ * concatenate → `encodeWav`. This is an obvious gap: if a tuning system is
+ * truly first-class, it should be auditionable in one call.
+ *
+ * Each degree of the tuning is played in ascending order using Karplus-Strong
+ * synthesis. All degrees within one period (0 to `tuning.degrees.length - 1`)
+ * are included. The result is a 16-bit PCM mono WAV byte sequence ready to
+ * write to a `.wav` file.
+ *
+ * @example
+ * const wav = tuningToScaleWav(edo(19));
+ * await fs.writeFile('19edo.wav', wav);
+ *
+ * @example
+ * // Custom duration and sample rate
+ * const wav = tuningToScaleWav(spectrumToTuning(bellSpectrum()), {
+ *   ...DEFAULT_SYNTH_SCALE,
+ *   noteSeconds: 0.3,
+ *   sampleRate: 22050,
+ * });
+ */
+export function tuningToScaleWav(
+  tuning: TuningSystem,
+  opts: TuningScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
+): Uint8Array {
+  const freqs = Array.from({ length: tuning.degrees.length }, (_, i) => degreeToFreq(tuning, i));
+  const samples = synthScale(freqs, opts);
   return encodeWav(samples, opts.sampleRate);
 }

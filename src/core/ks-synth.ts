@@ -90,3 +90,57 @@ export function pluckChord(freqs: readonly number[], opts: KsOptions = DEFAULT_K
   if (freqs.length === 0) throw new RangeError('freqs must be non-empty');
   return mix(freqs.map((f) => pluck(f, opts)));
 }
+
+export interface SynthScaleOptions extends KsOptions {
+  /** Duration of each individual note in the melodic sequence, in seconds. Default: 0.5 */
+  readonly noteSeconds: number;
+}
+
+export const DEFAULT_SYNTH_SCALE: SynthScaleOptions = {
+  ...DEFAULT_KS,
+  noteSeconds: 0.5,
+};
+
+/**
+ * Synthesize a scale as a melodic sequence: each degree is plucked in order,
+ * one note at a time, and concatenated into a single `Float32Array`.
+ *
+ * Socratic Q57: `scaleToFreqs(scale, tuning)` gives Hz per degree, and `pluck`
+ * synthesizes a single note — but playing the scale as a melody (not a chord)
+ * requires manual looping, concatenation, and sample-rate alignment. This
+ * closes the gap: `scaleToFreqs → synthScale → encodeWav`.
+ *
+ * Each note is synthesized with Karplus-Strong at `noteSeconds` duration.
+ * The `seconds` field in `opts` controls each individual note's synthesis
+ * buffer length (via `pluck`); `noteSeconds` controls how much of that buffer
+ * is included in the output (if `noteSeconds > opts.seconds`, it is clamped to
+ * `opts.seconds`). This lets notes overlap or decay naturally.
+ *
+ * @throws {RangeError} if `freqs` is empty.
+ *
+ * @example
+ * import { scaleToFreqs } from './scale.js';
+ * const freqs = scaleToFreqs(myScale, myTuning);
+ * const audio = synthScale(freqs);
+ * const wav = encodeWav(audio); // 8-note melodic scale in one pipeline
+ */
+export function synthScale(
+  freqs: readonly number[],
+  opts: SynthScaleOptions = DEFAULT_SYNTH_SCALE,
+): Float32Array {
+  if (freqs.length === 0) throw new RangeError('freqs must be non-empty');
+  const { sampleRate, noteSeconds } = opts;
+  // Each note contributes exactly noteSeconds (clamped to opts.seconds) of audio.
+  const samplesPerNote = Math.floor(sampleRate * Math.min(noteSeconds, opts.seconds));
+  const total = samplesPerNote * freqs.length;
+  const out = new Float32Array(total);
+  for (let i = 0; i < freqs.length; i++) {
+    const freq = freqs[i] as number;
+    const wave = pluck(freq, opts);
+    const offset = i * samplesPerNote;
+    for (let j = 0; j < samplesPerNote && j < wave.length; j++) {
+      out[offset + j] = wave[j] as number;
+    }
+  }
+  return out;
+}

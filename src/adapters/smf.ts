@@ -1,5 +1,8 @@
 /** Standard MIDI File (SMF Type 0) encoder + minimal decoder. Zero-dep, byte-exact. */
 
+import { type Chord, realizeChordFreqs } from '../core/chord.js';
+import { freqToMidiFloat } from '../core/midi.js';
+
 export interface NoteEvent {
   readonly note: number; // 0..127
   readonly velocity: number; // 1..127
@@ -164,4 +167,60 @@ export function decodeSmf(bytes: Uint8Array): { ppq: number; notes: NoteEvent[] 
   }
   notes.sort((a, b) => a.startTicks - b.startTicks || a.note - b.note);
   return { ppq, notes };
+}
+
+export interface ChordToSmfOptions {
+  /** Ticks per quarter note. Default 480. */
+  readonly ppq?: number;
+  /** Duration of the chord in ticks. Default 480 (one quarter note). */
+  readonly durationTicks?: number;
+  /** MIDI velocity (1..127). Default 90. */
+  readonly velocity?: number;
+  /** MIDI channel (0..15). Default 0. */
+  readonly channel?: number;
+  /** Reference frequency for A4 (Hz). Default 440. */
+  readonly a4Hz?: number;
+}
+
+/**
+ * Convert a `Chord` directly to a SMF Type-0 MIDI file byte sequence.
+ *
+ * Socratic Q58: `chordFromSemitones` creates a `Chord`; `realizeChordFreqs`
+ * gives Hz; `encodeSmf` turns note events into a MIDI file — but the bridge
+ * from a `Chord` object to a `.mid` file requires three manual steps: realize
+ * freqs → convert Hz to MIDI pitch → build NoteEvent list → encodeSmf.
+ * A single `chordToSmf(chord, rootHz)` closes this pipeline.
+ *
+ * Hz → MIDI pitch conversion rounds to the nearest integer note number, so
+ * microtonal frequencies are mapped to the closest 12-TET semitone (information
+ * loss is expected — MIDI pitch is inherently 12-TET). For microtonal precision,
+ * use MPE (pitch bend per channel) via `freqToMpe` instead.
+ *
+ * @throws {RangeError} if any realized frequency maps to a MIDI note outside [0, 127].
+ *
+ * @example
+ * const chord = chordFromSemitones('major', [0, 4, 7]);
+ * const midi = chordToSmf(chord, 261.63);
+ * await fs.writeFile('major.mid', midi);
+ */
+export function chordToSmf(chord: Chord, rootHz: number, opts?: ChordToSmfOptions): Uint8Array {
+  const ppq = opts?.ppq ?? DEFAULT_PPQ;
+  const durationTicks = opts?.durationTicks ?? ppq;
+  const velocity = opts?.velocity ?? 90;
+  const channel = opts?.channel ?? 0;
+  const a4Hz = opts?.a4Hz ?? 440;
+
+  const freqs = realizeChordFreqs(chord, rootHz);
+  const notes: NoteEvent[] = freqs.map((hz) => {
+    const midiFloat = freqToMidiFloat(hz, a4Hz);
+    const note = Math.round(midiFloat);
+    if (note < 0 || note > 127) {
+      throw new RangeError(
+        `chord frequency ${hz.toFixed(2)} Hz maps to MIDI note ${note}, which is outside [0, 127]`,
+      );
+    }
+    return { note, velocity, startTicks: 0, durationTicks, channel };
+  });
+
+  return encodeSmf(notes, { ppq });
 }

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { encodeVlq, decodeVlq, encodeSmf, decodeSmf, type NoteEvent } from './smf.js';
+import { encodeVlq, decodeVlq, encodeSmf, decodeSmf, type NoteEvent, chordToSmf } from './smf.js';
+import { chordFromSemitones } from '../core/chord.js';
 
 describe('VLQ (I7 high-risk)', () => {
   it('test_known_vlq_values', () => {
@@ -111,5 +112,46 @@ describe('SMF range validation', () => {
     expect(() =>
       encodeSmf([{ note: 60, velocity: 1, startTicks: 0, durationTicks: 1, channel: 99 }]),
     ).toThrow(RangeError);
+  });
+});
+
+// Q58: Chord is first-class — should Chord → MIDI file be one call?
+describe('chordToSmf — Chord to SMF MIDI in one call (Q58)', () => {
+  it('test_output_starts_with_mthd_header', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const midi = chordToSmf(chord, 261.63);
+    // 'MThd' = 0x4D 0x54 0x68 0x64
+    expect(midi[0]).toBe(0x4d);
+    expect(midi[1]).toBe(0x54);
+    expect(midi[2]).toBe(0x68);
+    expect(midi[3]).toBe(0x64);
+  });
+
+  it('test_round_trips_via_decodeSmf', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const midi = chordToSmf(chord, 261.63);
+    const { notes } = decodeSmf(midi);
+    // Major triad rooted at C4 (261.63 Hz ≈ MIDI 60): degrees 60, 64, 67
+    expect(notes.length).toBe(3);
+    const pitches = notes.map((n) => n.note).sort((a, b) => a - b);
+    expect(pitches).toEqual([60, 64, 67]);
+  });
+
+  it('test_all_notes_have_same_startTick_zero', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const { notes } = decodeSmf(chordToSmf(chord, 261.63));
+    for (const n of notes) expect(n.startTicks).toBe(0);
+  });
+
+  it('test_velocity_option_respected', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const { notes } = decodeSmf(chordToSmf(chord, 261.63, { velocity: 64 }));
+    for (const n of notes) expect(n.velocity).toBe(64);
+  });
+
+  it('test_out_of_range_freq_throws', () => {
+    // 0.01 Hz maps to a large negative MIDI note — should throw RangeError
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    expect(() => chordToSmf(chord, 0.01)).toThrow(RangeError);
   });
 });
