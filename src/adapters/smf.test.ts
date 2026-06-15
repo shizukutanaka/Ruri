@@ -9,8 +9,11 @@ import {
   chordToSmf,
   progressionToSmf,
   optimalProgressionSmf,
+  scaleChordProgressionSmf,
 } from './smf.js';
 import { chordFromSemitones } from '../core/chord.js';
+import { edo } from '../core/tuning.js';
+import { type Scale } from '../core/scale.js';
 
 describe('VLQ (I7 high-risk)', () => {
   it('test_known_vlq_values', () => {
@@ -278,5 +281,62 @@ describe('optimalProgressionSmf — optimised Chord[] to SMF MIDI in one call (Q
   it('test_options_are_forwarded_to_progressionToSmf', () => {
     const { notes } = decodeSmf(optimalProgressionSmf([major, minor], rootHz, { velocity: 42 }));
     for (const n of notes) expect(n.velocity).toBe(42);
+  });
+});
+
+// Q75: Scale is first-class — should scale → diatonic chord progression → MIDI be one call?
+describe('scaleChordProgressionSmf — scale to MIDI progression in one call (Q75)', () => {
+  const tuning = edo(12);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-edo',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const rootHz = 261.63; // C4
+
+  it('test_output_starts_with_mthd_header', () => {
+    const midi = scaleChordProgressionSmf(major, tuning, rootHz);
+    expect(midi[0]).toBe(0x4d); // 'M'
+    expect(midi[1]).toBe(0x54); // 'T'
+    expect(midi[2]).toBe(0x68); // 'h'
+    expect(midi[3]).toBe(0x64); // 'd'
+  });
+
+  it('test_output_is_decodable_and_has_notes', () => {
+    const midi = scaleChordProgressionSmf(major, tuning, rootHz);
+    const { ppq, notes } = decodeSmf(midi);
+    expect(ppq).toBe(480);
+    expect(notes.length).toBeGreaterThan(0);
+  });
+
+  it('test_chords_are_sequential_in_time', () => {
+    const midi = scaleChordProgressionSmf(major, tuning, rootHz, { searchOpts: { size: 3 } });
+    const { notes } = decodeSmf(midi);
+    // Notes should span multiple tick offsets (multiple chords in sequence)
+    const startTicks = [...new Set(notes.map((n) => n.startTicks))].sort((a, b) => a - b);
+    expect(startTicks.length).toBeGreaterThan(1);
+  });
+
+  it('test_velocity_option_forwarded', () => {
+    const midi = scaleChordProgressionSmf(major, tuning, rootHz, { velocity: 55 });
+    const { notes } = decodeSmf(midi);
+    for (const n of notes) expect(n.velocity).toBe(55);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    const wrongTuning = edo(19);
+    expect(() => scaleChordProgressionSmf(major, wrongTuning, rootHz)).toThrow(RangeError);
+  });
+
+  it('test_size_option_controls_chord_voice_count', () => {
+    const midi = scaleChordProgressionSmf(major, tuning, rootHz, { searchOpts: { size: 4 } });
+    const { notes } = decodeSmf(midi);
+    // All notes should belong to 4-voice chords; each startTick group has 4 notes
+    const byTick = new Map<number, number>();
+    for (const n of notes) {
+      byTick.set(n.startTicks, (byTick.get(n.startTicks) ?? 0) + 1);
+    }
+    for (const count of byTick.values()) expect(count).toBe(4);
   });
 });

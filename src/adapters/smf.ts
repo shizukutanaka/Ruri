@@ -2,7 +2,10 @@
 
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat } from '../core/midi.js';
-import { optimalChordOrder } from '../core/chord-search.js';
+import { optimalChordOrder, rankedChordToChord } from '../core/chord-search.js';
+import { type Scale, rankScaleChords } from '../core/scale.js';
+import { type TuningSystem } from '../core/tuning.js';
+import { type ChordSearchOptions } from '../core/chord-search.js';
 
 export interface NoteEvent {
   readonly note: number; // 0..127
@@ -317,6 +320,56 @@ export function optimalProgressionSmf(
   opts?: OptimalProgressionSmfOptions,
 ): Uint8Array {
   if (chords.length === 0) throw new RangeError('chords must be non-empty');
+  const { chords: ordered } = optimalChordOrder(chords, rootHz);
+  return progressionToSmf(ordered, rootHz, opts);
+}
+
+export interface ScaleChordProgressionSmfOptions extends OptimalProgressionSmfOptions {
+  /** Chord search options (size, limit, spectrum). */
+  readonly searchOpts?: ChordSearchOptions;
+}
+
+/**
+ * Discover the best diatonic chords from a scale and write them to a MIDI file in one call.
+ *
+ * Socratic Q75: `rankScaleChords(scale, tuning, opts)` finds consonant chords within
+ * a scale; `rankedChordToChord` lifts each to a portable `Chord`; `optimalChordOrder`
+ * minimises voice-leading cost across the progression; `progressionToSmf` encodes to
+ * MIDI bytes. Going from "I have a scale" to "I have a playable MIDI chord progression"
+ * requires four explicit calls and two intermediate arrays. If scale-based chord
+ * discovery is truly first-class, the entire pipeline — scale → optimal MIDI
+ * progression — should be one call.
+ *
+ * @param scale   - The melodic scale whose diatonic chords to explore.
+ * @param tuning  - The tuning system the scale belongs to.
+ * @param rootHz  - Absolute frequency (Hz) of the chord root (used for voice-leading
+ *                  optimisation and MIDI pitch mapping).
+ * @param opts    - Optional chord search parameters (size, limit, spectrum) and SMF
+ *                  encoding parameters (ppq, durationTicks, velocity, channel, a4Hz).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if no chords are found (scale too small for the requested size).
+ * @throws {RangeError} if any realized frequency maps to a MIDI note outside [0, 127].
+ *
+ * @example
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-edo',
+ *                         degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const midi = scaleChordProgressionSmf(major, edo(12), 261.63);
+ * await fs.writeFile('progression.mid', midi);
+ */
+export function scaleChordProgressionSmf(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  opts?: ScaleChordProgressionSmfOptions,
+): Uint8Array {
+  const ranked = rankScaleChords(scale, tuning, opts?.searchOpts);
+  if (ranked.length === 0) {
+    throw new RangeError(
+      `scaleChordProgressionSmf: no chords found for scale '${scale.id}' — scale may be too small for the requested size`,
+    );
+  }
+  const chords = ranked.map((r) => rankedChordToChord(r));
   const { chords: ordered } = optimalChordOrder(chords, rootHz);
   return progressionToSmf(ordered, rootHz, opts);
 }

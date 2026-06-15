@@ -261,6 +261,41 @@ export function tuningToMts(
  * const mts = chordToMts(justMajor, 261.63);
  * // mts is 408 bytes — send to a synth via SysEx or write to a .syx file
  */
+/**
+ * Convert a sequence of chords to an array of MTS bulk tuning dump SysEx messages.
+ *
+ * Socratic Q76: `chordToMts(chord, rootHz)` encodes a single chord as a 408-byte
+ * MTS SysEx message. A DAW that plays chords in sequence needs to retune the synth
+ * before each chord change — that means one `chordToMts` call per chord, collected
+ * into an array the DAW can send one-by-one as the progression advances. If
+ * `chordToMts` is truly first-class, "progression → ready-to-send SysEx array"
+ * should be one call rather than a `map` the caller writes by hand every time.
+ *
+ * Returns one 408-byte `Uint8Array` per chord, in the same order as the input.
+ * The DAW should send `result[i]` before playing chord `i`.
+ *
+ * @param chords  - Sequence of chords to retune to (root-relative interval chords).
+ * @param rootHz  - Absolute frequency (Hz) of the chord root (same for all chords).
+ * @param opts    - Optional device ID, program number, and A4 reference Hz.
+ *
+ * @throws {RangeError} if `chords` is empty.
+ * @throws {RangeError} if any chord has no intervals, or if `rootHz` is invalid.
+ *
+ * @example
+ * const chords = [justMajor, justMinor, suspended4];
+ * const sysexMessages = chordProgressionToMts(chords, 261.63);
+ * // Send sysexMessages[i] before playing chord i
+ * for (const msg of sysexMessages) port.send(msg);
+ */
+export function chordProgressionToMts(
+  chords: readonly Chord[],
+  rootHz: number,
+  opts: ChordToMtsOptions = {},
+): Uint8Array[] {
+  if (chords.length === 0) throw new RangeError('chordProgressionToMts: chords must be non-empty');
+  return chords.map((chord) => chordToMts(chord, rootHz, opts));
+}
+
 export function chordToMts(chord: Chord, rootHz: number, opts: ChordToMtsOptions = {}): Uint8Array {
   if (chord.intervals.length === 0) {
     throw new RangeError('chordToMts: chord must have at least one interval');

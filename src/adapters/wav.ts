@@ -11,6 +11,7 @@ import {
   synthScale,
 } from '../core/ks-synth.js';
 import { type Scale, scaleToFreqs, synthScaleFromScale } from '../core/scale.js';
+import { type RankedChord, strikeRankedChord, pluckRankedChord } from '../core/chord-search.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
@@ -227,4 +228,58 @@ export function strikeScaleWav(
     }
   }
   return encodeWav(out, sampleRate);
+}
+
+/**
+ * Synthesize a `RankedChord` via modal additive synthesis and encode it as a WAV in one call.
+ *
+ * Socratic Q77: `strikeRankedChord(chord, rootHz, spectrum)` produces a `Float32Array`;
+ * `encodeWav(samples)` turns that into ready-to-write WAV bytes. If `RankedChord` is
+ * truly first-class (it's the library's primary chord-discovery output), then
+ * "ranked chord → ready-to-write WAV bytes" should be one call — yet today it requires
+ * two. This bridges the final step of the `rankChords → strikeRankedChord → encodeWav`
+ * pipeline, matching the pattern established by `strikeChordToWav`.
+ *
+ * The `sampleRate` for `encodeWav` is taken from `opts.sampleRate` (or `DEFAULT_MODAL`)
+ * so the WAV header and the audio data agree without the caller threading it through.
+ *
+ * @example
+ * const [best] = rankChords(edo(19), { size: 3 });
+ * const wav = strikeRankedChordWav(best!, 261.63, harmonicSpectrum());
+ * await fs.writeFile('best-chord.wav', wav);
+ */
+export function strikeRankedChordWav(
+  chord: RankedChord,
+  rootHz: number,
+  spectrum: Spectrum,
+  opts: ModalOptions = DEFAULT_MODAL,
+): Uint8Array {
+  const samples = strikeRankedChord(chord, rootHz, spectrum, opts);
+  return encodeWav(samples, opts.sampleRate);
+}
+
+/**
+ * Synthesize a `RankedChord` via Karplus-Strong plucking and encode it as a WAV in one call.
+ *
+ * Socratic Q77 (pair): `pluckRankedChord(chord, rootHz)` produces a `Float32Array`;
+ * `encodeWav(samples)` turns that into ready-to-write WAV bytes. The KS analog of
+ * `strikeRankedChordWav`: both close the same pipeline gap for their respective
+ * synthesis engines. If `pluckChordToWav` and `strikeChordToWav` exist, so should
+ * their `RankedChord`-native equivalents.
+ *
+ * The `sampleRate` for `encodeWav` is taken from `opts.sampleRate` (or `DEFAULT_KS`)
+ * so the WAV header and the audio data agree without the caller threading it through.
+ *
+ * @example
+ * const [best] = rankChords(edo(19), { size: 3 });
+ * const wav = pluckRankedChordWav(best!, 261.63);
+ * await fs.writeFile('best-chord.wav', wav);
+ */
+export function pluckRankedChordWav(
+  chord: RankedChord,
+  rootHz: number,
+  opts: KsOptions = DEFAULT_KS,
+): Uint8Array {
+  const samples = pluckRankedChord(chord, rootHz, opts);
+  return encodeWav(samples, opts.sampleRate);
 }

@@ -9,6 +9,7 @@ import {
   tuningToMtsFrequencies,
   chordToMts,
   tuningToMts,
+  chordProgressionToMts,
 } from './mts.js';
 
 // ---------------------------------------------------------------------------
@@ -418,5 +419,90 @@ describe('tuningToMts — TuningSystem to MTS SysEx in one call (Q73)', () => {
     const mts = tuningToMts(et12, undefined, { deviceId: 7, program: 2 });
     expect(mts[2]).toBe(7);
     expect(mts[5]).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// chordProgressionToMts — Chord[] → array of MTS SysEx buffers (Q76)
+// ---------------------------------------------------------------------------
+
+describe('chordProgressionToMts — chord progression to MTS SysEx array in one call (Q76)', () => {
+  const justMajor = chordFromRatios('just-major', [
+    [1, 1],
+    [5, 4],
+    [3, 2],
+  ]);
+  const justMinor = chordFromRatios('just-minor', [
+    [1, 1],
+    [6, 5],
+    [3, 2],
+  ]);
+  const rootHz = 261.63;
+
+  it('test_returns_one_buffer_per_chord', () => {
+    const result = chordProgressionToMts([justMajor, justMinor], rootHz);
+    expect(result).toHaveLength(2);
+  });
+
+  it('test_each_buffer_is_408_bytes', () => {
+    const result = chordProgressionToMts([justMajor, justMinor], rootHz);
+    for (const buf of result) {
+      expect(buf.length).toBe(408);
+    }
+  });
+
+  it('test_each_buffer_starts_with_sysex_start', () => {
+    const result = chordProgressionToMts([justMajor, justMinor], rootHz);
+    for (const buf of result) {
+      expect(buf[0]).toBe(0xf0);
+    }
+  });
+
+  it('test_each_buffer_ends_with_sysex_end', () => {
+    const result = chordProgressionToMts([justMajor, justMinor], rootHz);
+    for (const buf of result) {
+      expect(buf[buf.length - 1]).toBe(0xf7);
+    }
+  });
+
+  it('test_matches_individual_chordToMts_calls', () => {
+    const result = chordProgressionToMts([justMajor, justMinor], rootHz);
+    const manual0 = chordToMts(justMajor, rootHz);
+    const manual1 = chordToMts(justMinor, rootHz);
+    expect(result[0]).toEqual(manual0);
+    expect(result[1]).toEqual(manual1);
+  });
+
+  it('test_major_and_minor_produce_different_buffers', () => {
+    const result = chordProgressionToMts([justMajor, justMinor], rootHz);
+    let differs = false;
+    for (let i = 0; i < 408; i++) {
+      if (result[0]![i] !== result[1]![i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_single_chord_returns_array_of_one', () => {
+    const result = chordProgressionToMts([justMajor], rootHz);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual(chordToMts(justMajor, rootHz));
+  });
+
+  it('test_empty_chords_throws_range_error', () => {
+    expect(() => chordProgressionToMts([], rootHz)).toThrow(RangeError);
+  });
+
+  it('test_opts_forwarded_to_each_chordToMts', () => {
+    const result = chordProgressionToMts([justMajor, justMinor], rootHz, {
+      deviceId: 3,
+      program: 7,
+    });
+    for (const buf of result) {
+      expect(buf[2]).toBe(3); // deviceId
+      expect(buf[5]).toBe(7); // program
+    }
   });
 });

@@ -7,11 +7,14 @@ import {
   pluckChordToWav,
   strikeScaleWav,
   DEFAULT_STRIKE_SCALE,
+  strikeRankedChordWav,
+  pluckRankedChordWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo } from '../core/tuning.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
 import { type Scale } from '../core/scale.js';
+import { rankChords } from '../core/chord-search.js';
 
 describe('WAV encoder', () => {
   it('test_header_riff_wave', () => {
@@ -296,5 +299,103 @@ describe('strikeScaleWav — modal synthesis melodic WAV in one call (Q74)', () 
     const samplesPerNote = Math.floor(DEFAULT_STRIKE_SCALE.sampleRate * 0.1); // clamped
     const expectedSamples = samplesPerNote * major.degreeIndices.length;
     expect(wav.length).toBe(44 + expectedSamples * 2);
+  });
+});
+
+// Q77: RankedChord is first-class — should RankedChord → WAV be one call?
+describe('strikeRankedChordWav — RankedChord modal synthesis to WAV in one call (Q77)', () => {
+  const tuning = edo(12);
+  const spectrum = harmonicSpectrum();
+  const rootHz = 261.63;
+  const fastOpts = { ...DEFAULT_STRIKE_SCALE, seconds: 0.1 };
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wav = strikeRankedChordWav(best!, rootHz, spectrum, fastOpts);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_greater_than_44_byte_header', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wav = strikeRankedChordWav(best!, rootHz, spectrum, fastOpts);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const opts = { ...DEFAULT_STRIKE_SCALE, seconds: 0.1, sampleRate: 22050 };
+    const wav = strikeRankedChordWav(best!, rootHz, spectrum, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_two_calls_same_inputs_produce_identical_output', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wav1 = strikeRankedChordWav(best!, rootHz, spectrum, fastOpts);
+    const wav2 = strikeRankedChordWav(best!, rootHz, spectrum, fastOpts);
+    expect([...wav1]).toEqual([...wav2]);
+  });
+
+  it('test_different_spectra_produce_different_audio', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wavHarmonic = strikeRankedChordWav(best!, rootHz, harmonicSpectrum(), fastOpts);
+    const wavBell = strikeRankedChordWav(best!, rootHz, bellSpectrum(), fastOpts);
+    let differs = false;
+    for (let i = 44; i < wavHarmonic.length; i++) {
+      if (wavHarmonic[i] !== wavBell[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+});
+
+// Q77 (pair): RankedChord is first-class — should RankedChord → plucked WAV be one call?
+describe('pluckRankedChordWav — RankedChord Karplus-Strong to WAV in one call (Q77)', () => {
+  const tuning = edo(12);
+  const rootHz = 261.63;
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wav = pluckRankedChordWav(best!, rootHz);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_greater_than_44_byte_header', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wav = pluckRankedChordWav(best!, rootHz);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const opts = { ...DEFAULT_KS, sampleRate: 22050 };
+    const wav = pluckRankedChordWav(best!, rootHz, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_default_sample_rate_matches_DEFAULT_KS', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wav = pluckRankedChordWav(best!, rootHz);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(DEFAULT_KS.sampleRate);
+  });
+
+  it('test_different_roots_produce_different_audio', () => {
+    const [best] = rankChords(tuning, { size: 3 });
+    const wav1 = pluckRankedChordWav(best!, 261.63);
+    const wav2 = pluckRankedChordWav(best!, 440.0);
+    let differs = false;
+    for (let i = 44; i < wav1.length; i++) {
+      if (wav1[i] !== wav2[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
   });
 });
