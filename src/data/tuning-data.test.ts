@@ -9,8 +9,10 @@ import {
   rankChordsFromPreset,
   presetToScl,
   presetToMts,
+  presetChordProgression,
 } from './presets.js';
 import { degreeToCents } from '../core/tuning.js';
+import { harmonicSpectrum } from '../core/spectrum.js';
 
 describe('all presets load and validate', () => {
   it('test_every_preset_builds_a_valid_tuning', () => {
@@ -333,6 +335,60 @@ describe('presetToMts (Q109)', () => {
     const found = presetToMts('makam-ussak-example', undefined, undefined, custom);
     expect(found).toBeDefined();
     const notFound = presetToMts('12-tet', undefined, undefined, custom);
+    expect(notFound).toBeUndefined();
+  });
+});
+
+// Q126 — presetChordProgression: preset id → Chord[] in one call
+describe('presetChordProgression (Q126)', () => {
+  it('test_known_id_returns_chord_array', () => {
+    const chords = presetChordProgression('12-tet', [0, 3, 4, 0], 440);
+    expect(chords).toBeDefined();
+    expect(Array.isArray(chords)).toBe(true);
+    expect(chords!.length).toBe(4);
+  });
+
+  it('test_unknown_id_returns_undefined', () => {
+    expect(presetChordProgression('does-not-exist', [0, 1, 2], 440)).toBeUndefined();
+  });
+
+  it('test_chord_count_matches_pattern_length', () => {
+    const pattern = [0, 2, 4, 1, 3];
+    const chords = presetChordProgression('just-5-limit', pattern, 261.63);
+    expect(chords).toBeDefined();
+    expect(chords!.length).toBe(pattern.length);
+  });
+
+  it('test_opts_size_controls_notes_per_chord', () => {
+    // 12-tet has 12 degrees so size=4 tetrad is valid
+    const chords = presetChordProgression('12-tet', [0, 3], 440, undefined, { size: 4 });
+    expect(chords).toBeDefined();
+    // Each chord has `size` intervals
+    for (const chord of chords!) {
+      expect(chord.intervals.length).toBe(4);
+    }
+  });
+
+  it('test_spectrum_param_is_accepted_and_result_is_still_returned', () => {
+    // spectrum is reserved; function must not throw and must still return chords
+    const spectrum = harmonicSpectrum();
+    const chords = presetChordProgression('12-tet', [0, 1, 2], 440, spectrum);
+    expect(chords).toBeDefined();
+    expect(chords!.length).toBe(3);
+  });
+
+  it('test_custom_preset_pool_can_be_supplied', () => {
+    const custom = [JUST_INTONATION_5L];
+    const found = presetChordProgression(
+      'just-5-limit',
+      [0, 2, 4],
+      440,
+      undefined,
+      undefined,
+      custom,
+    );
+    expect(found).toBeDefined();
+    const notFound = presetChordProgression('12-tet', [0, 2, 4], 440, undefined, undefined, custom);
     expect(notFound).toBeUndefined();
   });
 });

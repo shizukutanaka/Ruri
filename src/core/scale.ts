@@ -1238,6 +1238,146 @@ export function rankScaleChordsByHarmonicity(
   return limit !== undefined ? entries.slice(0, limit) : entries;
 }
 
+/**
+ * One entry returned by `chordMapAnalysis`.
+ *
+ * Combines a `ScaleChordMapEntry` with its Sethares sensory dissonance and Stolzenburg
+ * harmonicity scores, enabling simultaneous ranking by both acoustic dimensions.
+ */
+export interface ChordMapAnalysisEntry {
+  /** The root degree offset (0-indexed within `scale.degreeIndices`). */
+  readonly degreeOffset: number;
+  /** The diatonic chord built from this root. */
+  readonly chord: Chord;
+  /** Sethares sensory dissonance (lower = more consonant, timbre-dependent). */
+  readonly dissonance: number;
+  /** Stolzenburg relative periodicity (lower = more harmonic / simpler ratios). */
+  readonly harmonicity: number;
+}
+
+/**
+ * Score every diatonic chord of a scale with both dissonance and harmonicity.
+ *
+ * Socratic Q127: `scaleToChordMap(scale, tuning)` gives all diatonic chords but no
+ * acoustic scores. Getting dissonance + harmonicity for each requires two separate
+ * mapping passes. If a diatonic chord map is first-class, annotating it with both
+ * acoustic scores should be one call.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning, size)` — build all diatonic chords.
+ * 2. For each entry: `chordObjectDissonance(chord, rootHz, spectrum)` where
+ *    `rootHz = tuning.referenceHz`.
+ * 3. For each entry: `harmonicityForChord(chord, rootHz, tol)`.
+ * 4. Sort result by dissonance ascending (most consonant first).
+ *
+ * @param scale   - The parent scale (must be compatible with `tuning`).
+ * @param tuning  - The parent `TuningSystem`.
+ * @param spectrum - Instrument spectrum for the dissonance computation.
+ * @param size    - Notes per chord (default 3, i.e. triads).
+ * @param tol     - Continued-fraction tolerance for harmonicity (default 0.0136).
+ * @returns Array of entries sorted by dissonance ascending.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `size` < 2.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const analysis = chordMapAnalysis(major, t12, harmonicSpectrum());
+ * // analysis[0] is the most consonant diatonic triad with its dissonance and harmonicity
+ */
+export function chordMapAnalysis(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  size?: number,
+  tol = 0.0136,
+): ChordMapAnalysisEntry[] {
+  const chordMap = scaleToChordMap(scale, tuning, size ?? 3);
+  const rootHz = tuning.referenceHz;
+  const entries: ChordMapAnalysisEntry[] = chordMap.map(({ degreeOffset, chord }) => ({
+    degreeOffset,
+    chord,
+    dissonance: chordObjectDissonance(chord, rootHz, spectrum),
+    harmonicity: harmonicityForChord(chord, rootHz, tol),
+  }));
+  return entries.sort((a, b) => a.dissonance - b.dissonance);
+}
+
+/**
+ * Return the single most consonant diatonic chord entry for a scale.
+ *
+ * Socratic Q128: `chordMapAnalysis(scale, tuning, spectrum)[0]` gives the most
+ * consonant diatonic chord — but it still requires constructing the full analysis
+ * and indexing into it. If discovering the best chord from a diatonic map is the
+ * most common use-case, it should be one call with a clear error on failure.
+ *
+ * @param scale   - The parent scale.
+ * @param tuning  - The parent `TuningSystem`.
+ * @param spectrum - Instrument spectrum for the dissonance computation.
+ * @param size    - Notes per chord (default 3).
+ * @param tol     - Continued-fraction tolerance for harmonicity (default 0.0136).
+ * @returns The single `ChordMapAnalysisEntry` with the lowest dissonance.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or the scale is too small.
+ * @throws {RangeError} if no chords are found (scale too small for requested size).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const best = bestChordMapEntry(major, t12, harmonicSpectrum());
+ * // best.chord is the most consonant diatonic triad; best.degreeOffset is its scale root
+ */
+export function bestChordMapEntry(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  size?: number,
+  tol?: number,
+): ChordMapAnalysisEntry {
+  const analysis = chordMapAnalysis(scale, tuning, spectrum, size, tol ?? 0.0136);
+  const best = analysis[0];
+  if (best === undefined) {
+    throw new RangeError(
+      `bestChordMapEntry: no chords found for scale '${scale.id}' — scale may be too small`,
+    );
+  }
+  return best;
+}
+
+/**
+ * Sort a `ScaleChordMapEntry[]` by Stolzenburg harmonicity (timbre-independent).
+ *
+ * Socratic Q131: `scaleToChordMap(scale, tuning)` returns all diatonic chords but
+ * ranks by nothing. Sorting by harmonicity requires a manual `.map → .sort` loop.
+ * If a chord map is first-class, reordering it by harmonicity should be one call.
+ *
+ * Returns a new array (does not mutate the input). Sorted ascending — most harmonic
+ * (lowest Stolzenburg periodicity = simplest integer ratios) first.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param rootHz   - Reference frequency for harmonicity computation. If omitted,
+ *                   defaults to 440 Hz (no tuning reference available in this call).
+ * @param tol      - Continued-fraction tolerance (default 0.0136).
+ * @returns New array sorted by harmonicity ascending.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const ranked = rankChordMapByHarmonicity(chordMap, t12.referenceHz);
+ * // ranked[0] is the diatonic chord with the simplest integer-ratio structure
+ */
+export function rankChordMapByHarmonicity(
+  chordMap: readonly ScaleChordMapEntry[],
+  rootHz = 440,
+  tol = 0.0136,
+): ScaleChordMapEntry[] {
+  return [...chordMap].sort(
+    (a, b) => harmonicityForChord(a.chord, rootHz, tol) - harmonicityForChord(b.chord, rootHz, tol),
+  );
+}
+
 /** One entry in the comprehensive per-mode report returned by `scaleModalAnalysis`. */
 export interface ScaleModalAnalysisEntry {
   /** The modal rotation index (0 = original scale). */

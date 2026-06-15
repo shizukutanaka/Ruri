@@ -5,6 +5,9 @@ import { rankChords, type RankedChord, type ChordSearchOptions } from '../core/c
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { tuningToScl, writeScl } from '../adapters/scala.js';
 import { tuningToMts, type TuningToMtsOptions } from '../adapters/mts.js';
+import { tuningToScale, progressionFromPattern } from '../core/scale.js';
+import { type Chord } from '../core/chord.js';
+import { type Spectrum } from '../core/spectrum.js';
 
 const SEMI = 100;
 
@@ -180,6 +183,50 @@ export function presetToScl(
   const tuning = getTuningById(presetId, presets);
   if (tuning === undefined) return undefined;
   return writeScl(tuningToScl(tuning));
+}
+
+/**
+ * Look up a preset by id and return a diatonic chord progression in one call.
+ *
+ * Socratic Q126: `getTuningById(id)` gives a `TuningSystem`; `tuningToScale(tuning)`
+ * wraps it as a `Scale`; `progressionFromPattern(scale, tuning, pattern)` builds the
+ * progression. Going from a preset id to a ready-to-play `Chord[]` still requires
+ * three explicit steps. If presets are truly first-class entry points, building a chord
+ * progression from a named tuning should be one call.
+ *
+ * Returns `undefined` if the preset id is not found (same semantics as `getTuningById`).
+ * The `spectrum` parameter is accepted for API consistency (reserved for future
+ * dissonance-based ranking) but is not used in the current implementation.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param pattern  - Sequence of 0-based root degree indices (e.g. `[0, 3, 4, 0]`
+ *                   for I–IV–V–I). Forwarded to `progressionFromPattern`.
+ * @param rootHz   - Absolute frequency of the shared root note in Hz (accepted for API
+ *                   consistency; not used in the current chord-building pipeline).
+ * @param spectrum - Optional instrument spectrum (reserved; not used currently).
+ * @param opts     - Optional `size` (notes per chord) and `name` (base chord name),
+ *                   forwarded to `progressionFromPattern`.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `Chord[]` with one entry per pattern step, or `undefined` if not found.
+ *
+ * @example
+ * const chords = presetChordProgression('just-5-limit', [0, 3, 4, 0], 261.63);
+ * if (chords) chordProgressionToWav(chords, 261.63, harmonicSpectrum());
+ */
+export function presetChordProgression(
+  presetId: string,
+  pattern: readonly number[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts?: { size?: number; name?: string },
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Chord[] | undefined {
+  void rootHz; // accepted for API consistency; pipeline uses tuning.referenceHz
+  void spectrum; // reserved for future dissonance-based ranking
+  const tuning = getTuningById(presetId, presets);
+  if (tuning === undefined) return undefined;
+  const scale = tuningToScale(tuning);
+  return progressionFromPattern(scale, tuning, pattern, opts?.size, opts?.name);
 }
 
 /**
