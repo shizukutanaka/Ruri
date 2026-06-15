@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { encodeWav, strikeChordToWav, tuningToScaleWav, pluckScaleWav } from './wav.js';
+import {
+  encodeWav,
+  strikeChordToWav,
+  tuningToScaleWav,
+  pluckScaleWav,
+  pluckChordToWav,
+} from './wav.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 import { edo } from '../core/tuning.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
@@ -164,5 +170,54 @@ describe('pluckScaleWav — Scale melodic WAV in one call (Q63)', () => {
     expect(() => pluckScaleWav(major, wrongTuning, { ...DEFAULT_KS, noteSeconds: 0.05 })).toThrow(
       RangeError,
     );
+  });
+});
+
+// Q69: pluckChord produces Float32Array; encodeWav accepts one — should plucked chord → WAV be one call?
+describe('pluckChordToWav — Karplus-Strong chord to WAV in one call (Q69)', () => {
+  it('test_output_is_valid_wav_with_riff_header', () => {
+    const wav = pluckChordToWav([261.63, 329.63, 392.0]);
+    expect(wav[0]).toBe(0x52); // 'R'
+    expect(wav[1]).toBe(0x49); // 'I'
+    expect(wav[2]).toBe(0x46); // 'F'
+    expect(wav[3]).toBe(0x46); // 'F'
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_greater_than_header', () => {
+    const wav = pluckChordToWav([440, 550, 660]);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = { ...DEFAULT_KS, sampleRate: 22050 };
+    const wav = pluckChordToWav([440], opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_default_sample_rate_matches_DEFAULT_KS', () => {
+    const wav = pluckChordToWav([440]);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(DEFAULT_KS.sampleRate);
+  });
+
+  it('test_different_freqs_produce_different_audio', () => {
+    const wav1 = pluckChordToWav([261.63, 329.63, 392.0]);
+    const wav2 = pluckChordToWav([220.0, 277.18, 330.0]);
+    // Same length (same default KS duration), but different audio content
+    expect(wav1.length).toBe(wav2.length);
+    let differs = false;
+    for (let i = 44; i < wav1.length; i++) {
+      if (wav1[i] !== wav2[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_empty_freqs_throws_range_error', () => {
+    expect(() => pluckChordToWav([])).toThrow(RangeError);
   });
 });

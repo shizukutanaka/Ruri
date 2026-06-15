@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
 import { equalTemperament12 } from '../core/tuning.js';
-import { freqToMtsKey, mtsBulkDump, tuningToMtsFrequencies } from './mts.js';
+import { chordFromRatios, chordFromSemitones, realizeChordFreqs } from '../core/chord.js';
+import { freqToMtsKey, mtsBulkDump, tuningToMtsFrequencies, chordToMts } from './mts.js';
 
 // ---------------------------------------------------------------------------
 // freqToMtsKey
@@ -217,5 +218,125 @@ describe('tuningToMtsFrequencies', () => {
       const key = freqToMtsKey(hz);
       expect(key.fraction14).toBe(0);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// chordToMts — microtonal chord export to MTS SysEx (Q71)
+// ---------------------------------------------------------------------------
+
+describe('chordToMts — microtonal chord to MTS SysEx in one call (Q71)', () => {
+  // Just major triad: 1/1, 5/4, 3/2 (C4 root ≈ 261.63 Hz)
+  const justMajor = chordFromRatios('just-major', [
+    [1, 1],
+    [5, 4],
+    [3, 2],
+  ]);
+  const rootHz = 261.63;
+
+  it('test_output_length_is_408', () => {
+    expect(chordToMts(justMajor, rootHz).length).toBe(408);
+  });
+
+  it('test_first_byte_is_sysex_start', () => {
+    expect(chordToMts(justMajor, rootHz)[0]).toBe(0xf0);
+  });
+
+  it('test_last_byte_is_sysex_end', () => {
+    const mts = chordToMts(justMajor, rootHz);
+    expect(mts[mts.length - 1]).toBe(0xf7);
+  });
+
+  it('test_chord_frequencies_encoded_at_nearest_midi_key', () => {
+    // The just-major chord root ≈ C4 (MIDI 60), 5/4 root ≈ E4 (MIDI 64), 3/2 root ≈ G4 (MIDI 67)
+    const mts = chordToMts(justMajor, rootHz);
+    const chordFreqs = realizeChordFreqs(justMajor, rootHz);
+    for (const hz of chordFreqs) {
+      // Determine which MIDI key this should map to
+      const midiFloat = 69 + 12 * Math.log2(hz / 440);
+      const key = Math.max(0, Math.min(127, Math.round(midiFloat)));
+      // Read back the encoded frequency from the MTS message
+      const offset = 22 + key * 3;
+      const xx = mts[offset] as number;
+      const yy = mts[offset + 1] as number;
+      const zz = mts[offset + 2] as number;
+      const fraction14 = (yy << 7) | zz;
+      const recoveredMidi = xx + fraction14 / 16384;
+      const recoveredHz = 440 * 2 ** ((recoveredMidi - 69) / 12);
+      // Recovered frequency should be within 0.007 cents of the input
+      const centsDiff = Math.abs(1200 * Math.log2(recoveredHz / hz));
+      expect(centsDiff).toBeLessThan(0.007);
+    }
+  });
+
+  it('test_non_chord_keys_encode_standard_12tet', () => {
+    const mts = chordToMts(justMajor, rootHz);
+    const chordFreqs = realizeChordFreqs(justMajor, rootHz);
+    // Collect keys used by the chord
+    const chordKeys = new Set(
+      chordFreqs.map((hz) => {
+        const m = 69 + 12 * Math.log2(hz / 440);
+        return Math.max(0, Math.min(127, Math.round(m)));
+      }),
+    );
+    // Check a non-chord key (MIDI 0 — well below any chord note) stays at standard 12-TET
+    const testKey = 0;
+    if (!chordKeys.has(testKey)) {
+      const offset = 22 + testKey * 3;
+      const xx = mts[offset] as number;
+      const yy = mts[offset + 1] as number;
+      const zz = mts[offset + 2] as number;
+      const fraction14 = (yy << 7) | zz;
+      const recoveredMidi = xx + fraction14 / 16384;
+      const standardHz = midiToFreq(testKey, 440);
+      const recoveredHz = 440 * 2 ** ((recoveredMidi - 69) / 12);
+      expect(Math.abs(recoveredHz - standardHz) / standardHz).toBeLessThan(0.0001);
+    }
+  });
+
+  it('test_custom_opts_device_id_and_program_reflected', () => {
+    const mts = chordToMts(justMajor, rootHz, { deviceId: 5, program: 3 });
+    expect(mts[2]).toBe(5); // deviceId
+    expect(mts[5]).toBe(3); // program
+  });
+
+  it('test_chord_name_in_mts_name_field', () => {
+    const mts = chordToMts(justMajor, rootHz);
+    // 'just-major' is 10 chars; bytes 6..15 should spell it out, 16..21 padded with 0x20
+    const name = String.fromCharCode(...Array.from(mts.slice(6, 22)));
+    expect(name.trimEnd()).toBe('just-major');
+  });
+
+  it('test_12tet_triad_encodes_near_standard_pitches', () => {
+    // 12-TET major triad: semitones [0,4,7] → MIDI keys near C4, E4, G4
+    const triad = chordFromSemitones('major', [0, 4, 7]);
+    const mts = chordToMts(triad, 261.626); // C4
+    // Chord keys 60, 64, 67 should have essentially zero fractional offset
+    for (const key of [60, 64, 67]) {
+      const offset = 22 + key * 3;
+      const xx = mts[offset] as number;
+      const yy = mts[offset + 1] as number;
+      const zz = mts[offset + 2] as number;
+      const fraction14 = (yy << 7) | zz;
+      expect(xx).toBe(key);
+      expect(fraction14).toBeLessThan(5); // essentially zero offset (< 0.002 cents)
+    }
+  });
+
+  it('test_invalid_rootHz_zero_throws', () => {
+    expect(() => chordToMts(justMajor, 0)).toThrow(RangeError);
+  });
+
+  it('test_invalid_rootHz_negative_throws', () => {
+    expect(() => chordToMts(justMajor, -440)).toThrow(RangeError);
+  });
+
+  it('test_invalid_rootHz_nan_throws', () => {
+    expect(() => chordToMts(justMajor, NaN)).toThrow(RangeError);
+  });
+
+  it('test_empty_chord_throws', () => {
+    const empty = { name: 'empty', intervals: [] };
+    expect(() => chordToMts(empty, 440)).toThrow(RangeError);
   });
 });

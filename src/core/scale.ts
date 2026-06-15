@@ -391,3 +391,68 @@ export function chordFromScale(
   const mappedIndices = offsets.map((o) => scale.degreeIndices[o] as number);
   return chordFromDegrees(tuning, mappedIndices, name);
 }
+
+/** Result entry from {@link rankScalesForTimbre}. */
+export interface RankedScale {
+  readonly scale: Scale;
+  readonly dissonance: number;
+}
+
+/**
+ * Rank an array of pre-built `Scale` objects by their sensory dissonance for a
+ * given timbre (ascending — most consonant first).
+ *
+ * Socratic Q70: `rankModes` ranks *rotations of one scale* by dissonance, but
+ * if you already have multiple *different* Scale objects (e.g. [ionian, dorian,
+ * phrygian, lydian] as pre-built Scale objects with the same tuningId), picking
+ * the most consonant one requires a manual `map → sort` loop. A single
+ * `rankScalesForTimbre` call closes that gap: if `Scale[]` is truly first-class,
+ * sorting them by consonance should be one call.
+ *
+ * Each scale is scored via `scaleDissonance(scale, tuning, spectrum)`. Scales
+ * from different tunings are not comparable and will throw via the internal
+ * `assertTuningMatch` guard.
+ *
+ * @returns A new array sorted by dissonance ascending (most consonant first).
+ *
+ * @throws {RangeError} if any `Scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `scales` is empty.
+ *
+ * @example
+ * // Which diatonic mode of 12-TET is most consonant for a harmonic spectrum?
+ * const modes = [0,1,2,3,4,5,6].map((i) => scaleMode(major, i, t12));
+ * const ranked = rankScalesForTimbre(modes, t12, harmonicSpectrum());
+ * // ranked[0].scale is the most consonant mode
+ */
+export function rankScalesForTimbre(
+  scales: readonly Scale[],
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+): RankedScale[] {
+  if (scales.length === 0) throw new RangeError('rankScalesForTimbre: scales must be non-empty');
+  return scales
+    .map((scale) => ({ scale, dissonance: scaleDissonance(scale, tuning, spectrum) }))
+    .sort((a, b) => a.dissonance - b.dissonance);
+}
+
+/**
+ * Return the `Scale` with the lowest sensory dissonance for the given timbre.
+ *
+ * Socratic Q70 (convenience form): `rankScalesForTimbre(scales, tuning, spectrum)[0].scale`
+ * in one call. If you have multiple pre-built Scale objects and want the single
+ * most consonant one without building the full ranked list, this is the entry point.
+ *
+ * @throws {RangeError} if `scales` is empty, or if any scale is incompatible with `tuning`.
+ *
+ * @example
+ * const modes = [0,1,2,3,4,5,6].map((i) => scaleMode(major, i, t12));
+ * const best = bestScaleForTimbre(modes, t12, harmonicSpectrum());
+ * // best is the most consonant modal rotation
+ */
+export function bestScaleForTimbre(
+  scales: readonly Scale[],
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+): Scale {
+  return (rankScalesForTimbre(scales, tuning, spectrum)[0] as RankedScale).scale;
+}

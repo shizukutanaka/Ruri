@@ -3,7 +3,13 @@
 import { strikeChord, type ModalOptions, DEFAULT_MODAL } from '../core/modal-synth.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
-import { DEFAULT_KS, type SynthScaleOptions, synthScale } from '../core/ks-synth.js';
+import {
+  DEFAULT_KS,
+  type KsOptions,
+  pluckChord,
+  type SynthScaleOptions,
+  synthScale,
+} from '../core/ks-synth.js';
 import { type Scale, synthScaleFromScale } from '../core/scale.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
@@ -60,6 +66,31 @@ export function strikeChordToWav(
 ): Uint8Array {
   const opts = modalOpts ?? DEFAULT_MODAL;
   const samples = strikeChord(freqs, spectrum, opts);
+  return encodeWav(samples, opts.sampleRate);
+}
+
+/**
+ * Synthesize a chord via Karplus-Strong plucking and encode it to a 16-bit PCM WAV in one call.
+ *
+ * Socratic Q69: `strikeChordToWav` closes the modal-synthesis → WAV gap. The
+ * Karplus-Strong analog — `pluckChord(freqs, opts)` followed by `encodeWav` —
+ * is a separate pipeline step today. If plucked chord synthesis is truly
+ * first-class, "plucked chord → ready-to-write WAV bytes" should also be one
+ * call. This bridges that gap.
+ *
+ * The `sampleRate` for `encodeWav` is taken from `ksOpts.sampleRate` (or the
+ * `DEFAULT_KS` default), ensuring the WAV header and the audio agree on the
+ * same rate without the caller threading it through manually.
+ *
+ * @throws {RangeError} if `freqs` is empty.
+ *
+ * @example
+ * const wav = pluckChordToWav([261.63, 329.63, 392.0]);
+ * await fs.writeFile('chord.wav', wav); // ready to play
+ */
+export function pluckChordToWav(freqs: readonly number[], ksOpts?: KsOptions): Uint8Array {
+  const opts = ksOpts ?? DEFAULT_KS;
+  const samples = pluckChord(freqs, opts);
   return encodeWav(samples, opts.sampleRate);
 }
 

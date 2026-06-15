@@ -14,6 +14,8 @@ import {
   chordFromScale,
   rankModeChords,
   chordFromBestMode,
+  rankScalesForTimbre,
+  bestScaleForTimbre,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -698,5 +700,110 @@ describe('chordFromBestMode — best chord from most consonant mode (Q68)', () =
   it('test_tuning_mismatch_throws', () => {
     const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2, 4] };
     expect(() => chordFromBestMode(wrong, t12)).toThrow(RangeError);
+  });
+});
+
+// Q70: Scale[] is first-class — should ranking multiple pre-built Scales by consonance be one call?
+describe('rankScalesForTimbre — rank Scale[] by sensory dissonance (Q70)', () => {
+  const spectrum = harmonicSpectrum();
+  // Build all 7 modal rotations of the major scale as pre-built Scale objects
+  const modes = [0, 1, 2, 3, 4, 5, 6].map((i) => scaleMode(major, i, t12));
+
+  it('test_returns_same_count_as_input', () => {
+    const ranked = rankScalesForTimbre(modes, t12, spectrum);
+    expect(ranked.length).toBe(modes.length);
+  });
+
+  it('test_sorted_ascending_by_dissonance', () => {
+    const ranked = rankScalesForTimbre(modes, t12, spectrum);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.dissonance).toBeGreaterThanOrEqual(ranked[i - 1]!.dissonance);
+    }
+  });
+
+  it('test_dissonance_matches_scaleDissonance_per_scale', () => {
+    const ranked = rankScalesForTimbre(modes, t12, spectrum);
+    for (const { scale, dissonance } of ranked) {
+      expect(dissonance).toBeCloseTo(scaleDissonance(scale, t12, spectrum), 10);
+    }
+  });
+
+  it('test_all_input_scales_appear_in_output', () => {
+    const ranked = rankScalesForTimbre(modes, t12, spectrum);
+    const resultIds = new Set(ranked.map((r) => r.scale.id));
+    for (const mode of modes) {
+      expect(resultIds.has(mode.id)).toBe(true);
+    }
+  });
+
+  it('test_does_not_mutate_input_array_order', () => {
+    const inputCopy = [...modes];
+    rankScalesForTimbre(modes, t12, spectrum);
+    // modes array order should be unchanged
+    for (let i = 0; i < modes.length; i++) {
+      expect(modes[i]!.id).toBe(inputCopy[i]!.id);
+    }
+  });
+
+  it('test_timbre_affects_ranking', () => {
+    const harmRanked = rankScalesForTimbre(modes, t12, spectrum);
+    const bellRanked = rankScalesForTimbre(modes, t12, bellSpectrum());
+    const harmIds = harmRanked.map((r) => r.scale.id);
+    const bellIds = bellRanked.map((r) => r.scale.id);
+    // Bell vs harmonic spectrum should yield a different ranking order
+    expect(harmIds).not.toEqual(bellIds);
+  });
+
+  it('test_single_scale_array_returns_that_scale', () => {
+    const ranked = rankScalesForTimbre([major], t12, spectrum);
+    expect(ranked.length).toBe(1);
+    expect(ranked[0]!.scale.id).toBe(major.id);
+  });
+
+  it('test_empty_scales_throws_range_error', () => {
+    expect(() => rankScalesForTimbre([], t12, spectrum)).toThrow(RangeError);
+  });
+
+  it('test_tuning_mismatch_throws_range_error', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2, 4] };
+    expect(() => rankScalesForTimbre([wrong], t12, spectrum)).toThrow(RangeError);
+  });
+
+  it('test_result_first_matches_rankModes_first_for_same_rotations', () => {
+    // rankModes ranks the same rotations of one parent scale
+    const modeRanked = rankModes(major, t12, spectrum);
+    const scaleRanked = rankScalesForTimbre(modes, t12, spectrum);
+    // Both should pick the same most-consonant mode
+    expect(scaleRanked[0]!.scale.id).toBe(modeRanked[0]!.scale.id);
+  });
+});
+
+// Q70 (convenience): bestScaleForTimbre — the single most consonant Scale
+describe('bestScaleForTimbre — most consonant Scale for a timbre (Q70)', () => {
+  const spectrum = harmonicSpectrum();
+  const modes = [0, 1, 2, 3, 4, 5, 6].map((i) => scaleMode(major, i, t12));
+
+  it('test_returns_a_scale', () => {
+    const best = bestScaleForTimbre(modes, t12, spectrum);
+    expect(best).toHaveProperty('id');
+    expect(best).toHaveProperty('degreeIndices');
+  });
+
+  it('test_matches_rankScalesForTimbre_first_result', () => {
+    const best = bestScaleForTimbre(modes, t12, spectrum);
+    const ranked = rankScalesForTimbre(modes, t12, spectrum);
+    expect(best.id).toBe(ranked[0]!.scale.id);
+  });
+
+  it('test_has_lower_dissonance_than_all_others', () => {
+    const best = bestScaleForTimbre(modes, t12, spectrum);
+    const bestDis = scaleDissonance(best, t12, spectrum);
+    for (const mode of modes) {
+      expect(bestDis).toBeLessThanOrEqual(scaleDissonance(mode, t12, spectrum));
+    }
+  });
+
+  it('test_empty_scales_throws_range_error', () => {
+    expect(() => bestScaleForTimbre([], t12, spectrum)).toThrow(RangeError);
   });
 });

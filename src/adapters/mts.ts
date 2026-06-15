@@ -25,8 +25,9 @@
  * Expanded: 0x7E ^ deviceId ^ 0x08 ^ 0x01 ^ program ^ (16 name bytes) ^ (384 key bytes).
  */
 
-import { freqToMidiFloat, A4_HZ_DEFAULT } from '../core/midi.js';
+import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
 import { degreeToFreq, type TuningSystem } from '../core/tuning.js';
+import { type Chord, realizeChordFreqs } from '../core/chord.js';
 
 /** A single MTS key entry: semitone + 14-bit fractional offset above it. */
 export interface MtsKey {
@@ -177,4 +178,74 @@ export function mtsBulkDump(
  */
 export function tuningToMtsFrequencies(t: TuningSystem, anchorMidiNote = 69): number[] {
   return Array.from({ length: 128 }, (_, k) => degreeToFreq(t, k - anchorMidiNote));
+}
+
+/** Options for {@link chordToMts}. */
+export interface ChordToMtsOptions extends MtsBulkDumpOptions {
+  /**
+   * A4 reference frequency in Hz. Default 440.
+   * Used to map chord frequencies to fractional MIDI note numbers.
+   */
+  readonly a4Hz?: number;
+}
+
+/**
+ * Export a microtonal `Chord` as a 408-byte MTS bulk tuning dump SysEx message.
+ *
+ * Socratic Q71: `chordToSmf` exports a `Chord` as MIDI (12-TET pitch-quantised),
+ * losing microtonal precision. For exact microtonal fidelity, each chord note's
+ * realized frequency should be mapped to a nearby MIDI key with a fractional
+ * tuning offset, and the remaining 128 keys should stay at standard 12-TET so
+ * an unrelated synth part is not detuned. `chordToMts` closes this gap in one
+ * call: "chord + root Hz → ready-to-send MTS SysEx bytes."
+ *
+ * Algorithm:
+ * 1. Realize chord frequencies: `realizeChordFreqs(chord, rootHz)`.
+ * 2. For each realized frequency, find the nearest MIDI key (round to integer).
+ * 3. Build a 128-entry frequency array where chord keys hold exact Hz and all
+ *    other keys hold their standard 12-TET frequencies (via `midiToFreq`).
+ * 4. Call `mtsBulkDump(frequencies, name, opts)` and return the 408-byte result.
+ *
+ * If two chord notes map to the same MIDI key, the higher-priority note (last
+ * in the interval array) overwrites the earlier one — behaviour is deterministic
+ * but callers should ensure intervals are distinct enough to occupy different keys.
+ *
+ * @param chord - Root-relative interval chord (see `realizeChordFreqs`).
+ * @param rootHz - Absolute frequency (Hz) of the chord root.
+ * @param opts   - Optional device ID, program number, and A4 reference Hz.
+ *
+ * @throws {RangeError} if `chord.intervals` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * import { chordFromRatios } from '../core/chord.js';
+ * const justMajor = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+ * const mts = chordToMts(justMajor, 261.63);
+ * // mts is 408 bytes — send to a synth via SysEx or write to a .syx file
+ */
+export function chordToMts(chord: Chord, rootHz: number, opts: ChordToMtsOptions = {}): Uint8Array {
+  if (chord.intervals.length === 0) {
+    throw new RangeError('chordToMts: chord must have at least one interval');
+  }
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(`chordToMts: rootHz must be finite and > 0, got ${rootHz}`);
+  }
+
+  const a4Hz = opts.a4Hz ?? A4_HZ_DEFAULT;
+
+  // Start with a standard 12-TET tuning for all 128 MIDI keys
+  const frequencies: number[] = Array.from({ length: 128 }, (_, k) => midiToFreq(k, a4Hz));
+
+  // Realize exact chord frequencies and assign each to the nearest MIDI key
+  const chordFreqs = realizeChordFreqs(chord, rootHz);
+  for (const hz of chordFreqs) {
+    const midiFloat = freqToMidiFloat(hz, a4Hz);
+    // Clamp to valid MIDI range [0, 127]
+    const key = Math.max(0, Math.min(127, Math.round(midiFloat)));
+    (frequencies as number[])[key] = hz;
+  }
+
+  const { a4Hz: _a4Hz, ...bulkOpts } = opts;
+  void _a4Hz; // consumed above; exclude from MtsBulkDumpOptions
+  return mtsBulkDump(frequencies, chord.name, bulkOpts);
 }
