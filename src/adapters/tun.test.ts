@@ -1,7 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
-import { writeTun, TUN_DEFAULT_BASEFREQ_HZ, chordToTun, scaleToTunText } from './tun.js';
+import {
+  writeTun,
+  TUN_DEFAULT_BASEFREQ_HZ,
+  chordToTun,
+  scaleToTunText,
+  tuningToTun,
+  presetProgressionTun,
+  scaleProgressionBundle,
+} from './tun.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { type Scale } from '../core/scale.js';
@@ -389,5 +397,126 @@ describe('scaleToTunText (Q129)', () => {
 
   it('test_mismatched_tuning_throws', () => {
     expect(() => scaleToTunText(major, edo(19))).toThrow(RangeError);
+  });
+});
+
+// Q151 (prerequisite) — tuningToTun: TuningSystem → .tun string in one call
+describe('tuningToTun', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_valid_tun_structure', () => {
+    const out = tuningToTun(t12);
+    expect(out).toContain('[Tuning]');
+    expect(out).toContain('[Exact Tuning]');
+    expect(out.endsWith('\n')).toBe(true);
+  });
+
+  it('test_default_name_is_tuning_id', () => {
+    const out = tuningToTun(t12);
+    expect(out.split('\n')[0]).toBe(`; ${t12.id}`);
+  });
+
+  it('test_explicit_name_overrides_tuning_id', () => {
+    const out = tuningToTun(t12, 'My Tuning');
+    expect(out.split('\n')[0]).toBe('; My Tuning');
+  });
+
+  it('test_has_128_note_lines_in_tuning_section', () => {
+    const out = tuningToTun(t12);
+    const lines = out.split('\n');
+    const tunStart = lines.indexOf('[Tuning]');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const noteLines = lines.slice(tunStart + 1, exactStart).filter((l) => l.startsWith('note '));
+    expect(noteLines).toHaveLength(128);
+  });
+
+  it('test_anchor_midi_note_maps_to_reference_hz', () => {
+    const out = tuningToTun(t12);
+    const lines = out.split('\n');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const key69Line = lines.slice(exactStart + 1).find((l) => l.startsWith('note 69='));
+    expect(key69Line).toBeDefined();
+    const cents = Number.parseFloat((key69Line as string).slice('note 69='.length));
+    const recovered = TUN_DEFAULT_BASEFREQ_HZ * 2 ** (cents / 1200);
+    expect(recovered).toBeCloseTo(440, 1);
+  });
+
+  it('test_custom_anchor_midi_note_option', () => {
+    const out = tuningToTun(t12, undefined, { anchorMidiNote: 60 });
+    const lines = out.split('\n');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const key60Line = lines.slice(exactStart + 1).find((l) => l.startsWith('note 60='));
+    expect(key60Line).toBeDefined();
+    const cents = Number.parseFloat((key60Line as string).slice('note 60='.length));
+    const recovered = TUN_DEFAULT_BASEFREQ_HZ * 2 ** (cents / 1200);
+    expect(recovered).toBeCloseTo(440, 1);
+  });
+});
+
+// Q151 — presetProgressionTun: preset id → .tun string in one call
+describe('presetProgressionTun (Q151)', () => {
+  it('test_returns_tun_string_for_known_preset', () => {
+    const result = presetProgressionTun('12-tet', [0, 3, 4], 261.63);
+    expect(result).toBeDefined();
+    expect(result).toContain('[Tuning]');
+    expect(result).toContain('[Exact Tuning]');
+  });
+
+  it('test_returns_undefined_for_unknown_preset', () => {
+    const result = presetProgressionTun('no-such-preset', [0, 3, 4], 261.63);
+    expect(result).toBeUndefined();
+  });
+
+  it('test_returns_string_for_just_intonation_preset', () => {
+    const result = presetProgressionTun('just-5-limit', [0, 2, 4], 440);
+    expect(typeof result).toBe('string');
+    expect(result).toContain('[Exact Tuning]');
+  });
+
+  it('test_result_ends_with_newline', () => {
+    const result = presetProgressionTun('makam-ussak-example', [0, 1, 2], 261.63);
+    expect(result?.endsWith('\n')).toBe(true);
+  });
+});
+
+// Q154 — scaleProgressionBundle: scale + tuning → { smf, tun } in one call
+describe('scaleProgressionBundle (Q154)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_smf_uint8array_and_tun_string', () => {
+    const { smf, tun } = scaleProgressionBundle(major, t12, 261.63);
+    expect(smf).toBeInstanceOf(Uint8Array);
+    expect(typeof tun).toBe('string');
+  });
+
+  it('test_smf_starts_with_midi_header', () => {
+    const { smf } = scaleProgressionBundle(major, t12, 261.63);
+    // MThd header bytes: 0x4D, 0x54, 0x68, 0x64
+    expect(smf[0]).toBe(0x4d);
+    expect(smf[1]).toBe(0x54);
+    expect(smf[2]).toBe(0x68);
+    expect(smf[3]).toBe(0x64);
+  });
+
+  it('test_tun_contains_valid_structure', () => {
+    const { tun } = scaleProgressionBundle(major, t12, 261.63);
+    expect(tun).toContain('[Tuning]');
+    expect(tun).toContain('[Exact Tuning]');
+    expect(tun.endsWith('\n')).toBe(true);
+  });
+
+  it('test_custom_name_appears_in_tun_header', () => {
+    const { tun } = scaleProgressionBundle(major, t12, 261.63, 'My Major');
+    expect(tun.split('\n')[0]).toBe('; My Major');
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => scaleProgressionBundle(major, edo(19), 261.63)).toThrow(RangeError);
   });
 });

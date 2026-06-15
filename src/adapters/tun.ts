@@ -32,8 +32,10 @@
 import { freqToCents } from '../core/cents.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
-import { type TuningSystem } from '../core/tuning.js';
+import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import { type Scale, scaleToFreqs } from '../core/scale.js';
+import { getTuningById } from '../data/presets.js';
+import { scaleChordProgressionSmf } from './smf.js';
 
 /** Default base frequency: MIDI note 0 at A4 = 440 Hz (440 × 2^(−69/12)). */
 export const TUN_DEFAULT_BASEFREQ_HZ = 440 * 2 ** (-69 / 12);
@@ -263,4 +265,118 @@ export function scaleToTunText(
   void _mn;
   void _a4Hz;
   return writeTun(frequencies, tunName, Object.keys(tunOpts).length > 0 ? tunOpts : undefined);
+}
+
+/** Options for {@link tuningToTun}. */
+export interface TuningToTunOptions extends TunOptions {
+  /** MIDI key number that maps to `tuning.referenceHz`. Default 69 (A4). */
+  readonly anchorMidiNote?: number;
+}
+
+/**
+ * Export a `TuningSystem` directly as an AnaMark `.tun` string in one call.
+ *
+ * Socratic Q151 (prerequisite): `tuningToMts` exports a `TuningSystem` as MTS SysEx
+ * in one call — but there is no `.tun` equivalent. Going from a tuning to a `.tun`
+ * string requires: `tuningToMtsFrequencies` → `writeTun` — two steps. If a tuning is
+ * truly first-class across output formats, exporting it as `.tun` should also be one call.
+ *
+ * Maps all 128 MIDI keys to frequencies via `degreeToFreq(tuning, k - anchorMidiNote)`,
+ * then encodes with `writeTun`. Key `anchorMidiNote` (default 69, A4) produces
+ * `tuning.referenceHz`.
+ *
+ * @param tuning - The tuning system to export.
+ * @param name   - Optional name for the `.tun` comment header. Defaults to `tuning.id`.
+ * @param opts   - Optional anchor MIDI note and basefreq override.
+ * @returns A `.tun` text string ready to write to a file.
+ *
+ * @example
+ * const tun = tuningToTun(edo(19));
+ * fs.writeFileSync('19edo.tun', tun);
+ */
+export function tuningToTun(
+  tuning: TuningSystem,
+  name?: string,
+  opts?: TuningToTunOptions,
+): string {
+  const anchorMidiNote = opts?.anchorMidiNote ?? 69;
+  const { anchorMidiNote: _anchor, ...tunOpts } = opts ?? {};
+  void _anchor;
+  const frequencies = Array.from({ length: 128 }, (_, k) =>
+    degreeToFreq(tuning, k - anchorMidiNote),
+  );
+  return writeTun(
+    frequencies,
+    name ?? tuning.id,
+    Object.keys(tunOpts).length > 0 ? tunOpts : undefined,
+  );
+}
+
+/**
+ * Export a tuning preset as a `.tun` string in one call.
+ *
+ * Socratic Q151: "If we can build a chord progression from a preset, the same progression
+ * converted to TUN format should be one call — can it?" `getTuningById(presetId)` →
+ * `tuningToTun(tuning, name, opts)` exports the tuning itself as TUN. The `pattern` and
+ * `rootHz` parameters are accepted for API consistency but the TUN export covers the full
+ * tuning (not just the progression notes).
+ *
+ * Returns `undefined` if the preset id is not found.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param pattern  - Degree-offset pattern (accepted for API consistency; not used in TUN export).
+ * @param rootHz   - Root frequency in Hz (accepted for API consistency; not used in TUN export).
+ * @param opts     - Optional TUN encoding options forwarded to `tuningToTun`.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns A `.tun` text string, or `undefined` if preset not found.
+ *
+ * @example
+ * const tun = presetProgressionTun('just-5-limit', [0, 3, 4, 0], 261.63);
+ * if (tun) fs.writeFileSync('just5.tun', tun);
+ */
+export function presetProgressionTun(
+  presetId: string,
+  pattern: readonly number[],
+  rootHz: number,
+  opts?: TuningToTunOptions,
+): string | undefined {
+  void pattern; // accepted for API consistency; TUN covers the full tuning
+  void rootHz; // accepted for API consistency
+  const tuning = getTuningById(presetId);
+  if (tuning === undefined) return undefined;
+  return tuningToTun(tuning, undefined, opts);
+}
+
+/**
+ * Export a scale's chord progression as both SMF (MIDI) and TUN simultaneously.
+ *
+ * Socratic Q154: "If we can export a scale progression to SMF, exporting the same
+ * progression as both SMF and TUN simultaneously should be one call — can it?"
+ * `scaleChordProgressionSmf(scale, tuning, rootHz)` exports to MIDI;
+ * `scaleToTunText(scale, tuning, name)` exports to TUN — but both together requires
+ * two separate calls. If these exports are first-class, bundling them should be one call.
+ *
+ * @param scale   - The parent scale whose diatonic chords to export.
+ * @param tuning  - The parent `TuningSystem`.
+ * @param rootHz  - Root frequency for the SMF MIDI pitch mapping.
+ * @param name    - Optional name for the `.tun` file header. Defaults to `scale.id`.
+ * @returns `{ smf: Uint8Array, tun: string }` — SMF bytes and TUN text.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const { smf, tun } = scaleProgressionBundle(major, t12, 261.63, 'major');
+ * fs.writeFileSync('major.mid', smf);
+ * fs.writeFileSync('major.tun', tun);
+ */
+export function scaleProgressionBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  name?: string,
+): { smf: Uint8Array; tun: string } {
+  const smf = scaleChordProgressionSmf(scale, tuning, rootHz);
+  const tun = scaleToTunText(scale, tuning, name);
+  return { smf, tun };
 }
