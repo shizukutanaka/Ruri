@@ -923,3 +923,68 @@ export function topKModesWav(
 
   return encodeWav(combined, opts.sampleRate);
 }
+
+/**
+ * Synthesize a complete timbre-analysis WAV of all modes sorted by combined score.
+ *
+ * Socratic Q167: "If we can synthesize any WAV from a tuning, the complete timbre-analysis
+ * WAV (all modes sorted by combinedScore, played in sequence) should be one call — can it?"
+ * Today: `tuningToScale` → `rankAllModesForTimbre` → take first k → map through
+ * `synthScaleFromScale` → concatenate → `encodeWav` — five explicit steps. This is similar
+ * to `topKModesWav` but (a) defaults k to ALL modes, and (b) uses combined timbre score
+ * (roughness + harmonicity) not just harmonicity for ordering.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale spanning all degrees.
+ * 2. `rankAllModesForTimbre(fullScale, tuning, spectrum ?? harmonicSpectrum())` → ranked modes.
+ * 3. Take first `k` entries (default: all modes).
+ * 4. For each mode: `synthScaleFromScale(mode.scale, tuning, opts)` → samples.
+ * 5. Concatenate all sample arrays → `encodeWav`.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for mode ranking. Defaults to `harmonicSpectrum()`.
+ * @param k        - Number of top modes to include (default: all modes). Must be ≥ 1 if provided.
+ * @param opts     - Optional Karplus-Strong + per-note duration options.
+ * @returns WAV bytes of modes sorted by combined timbre score, concatenated as a medley.
+ *
+ * @throws {RangeError} if `tuning` has no degrees.
+ * @throws {RangeError} if `k` is provided and < 1.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const wav = tuningTimbreAnalysisWav(t12, harmonicSpectrum());
+ * await fs.writeFile('timbre-analysis.wav', wav);
+ *
+ * @example
+ * // Limit to top 3 modes:
+ * const wav = tuningTimbreAnalysisWav(t12, harmonicSpectrum(), 3);
+ */
+export function tuningTimbreAnalysisWav(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  k?: number,
+  opts: PluckScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
+): Uint8Array {
+  if (tuning.degrees.length === 0) {
+    throw new RangeError('tuningTimbreAnalysisWav: tuning has no degrees');
+  }
+  if (k !== undefined && (!Number.isInteger(k) || k < 1)) {
+    throw new RangeError(`tuningTimbreAnalysisWav: k must be an integer >= 1, got ${k}`);
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const fullScale = tuningToScale(tuning);
+  const ranked = rankAllModesForTimbre(fullScale, tuning, effectiveSpectrum);
+  const selected = k !== undefined ? ranked.slice(0, k) : ranked;
+
+  const allSamples = selected.map((entry) => synthScaleFromScale(entry.scale, tuning, opts));
+
+  const totalLength = allSamples.reduce((sum, s) => sum + s.length, 0);
+  const combined = new Float32Array(totalLength);
+  let writeOffset = 0;
+  for (const samples of allSamples) {
+    combined.set(samples, writeOffset);
+    writeOffset += samples.length;
+  }
+
+  return encodeWav(combined, opts.sampleRate);
+}

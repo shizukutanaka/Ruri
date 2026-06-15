@@ -24,6 +24,7 @@ import {
   worstNChordMapWav,
   optimalProgressionWavFromScale,
   topKModesWav,
+  tuningTimbreAnalysisWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1261,5 +1262,52 @@ describe('topKModesWav (Q155)', () => {
     const wav = topKModesWav(t12, 2, spectrum, { ...fastOpts, sampleRate: 22050 });
     const dv = new DataView(wav.buffer);
     expect(dv.getUint32(24, true)).toBe(22050);
+  });
+});
+
+// Q167 — tuningTimbreAnalysisWav: all modes sorted by combined score → WAV medley
+describe('tuningTimbreAnalysisWav (Q167)', () => {
+  const t12 = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+  const fastOpts = { ...DEFAULT_KS, noteSeconds: 0.05, sampleRate: 8000 };
+
+  it('test_returns_valid_wav_bytes', () => {
+    const wav = tuningTimbreAnalysisWav(t12, spectrum, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_k_limits_number_of_modes', () => {
+    const wavAll = tuningTimbreAnalysisWav(t12, spectrum, undefined, fastOpts);
+    const wavTop3 = tuningTimbreAnalysisWav(t12, spectrum, 3, fastOpts);
+    expect(wavTop3.length).toBeLessThan(wavAll.length);
+  });
+
+  it('test_k_1_produces_shorter_wav_than_k_2', () => {
+    const wav1 = tuningTimbreAnalysisWav(t12, spectrum, 1, fastOpts);
+    const wav2 = tuningTimbreAnalysisWav(t12, spectrum, 2, fastOpts);
+    expect(wav2.length).toBeGreaterThan(wav1.length);
+  });
+
+  it('test_no_spectrum_uses_harmonic_default', () => {
+    const wav = tuningTimbreAnalysisWav(t12, undefined, 2, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const emptyTuning = {
+      id: 'empty',
+      name: 'empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(() => tuningTimbreAnalysisWav(emptyTuning)).toThrow(RangeError);
+  });
+
+  it('test_k_less_than_1_throws', () => {
+    expect(() => tuningTimbreAnalysisWav(t12, spectrum, 0, fastOpts)).toThrow(RangeError);
   });
 });
