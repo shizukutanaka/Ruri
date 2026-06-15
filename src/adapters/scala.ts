@@ -7,6 +7,7 @@ import {
   type Scale,
   scaleToChordMap,
   chordMapSummary,
+  scaleToMinimalTuning,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -367,4 +368,37 @@ export function sclDistance(textA: string, textB: string): number {
     dist += Math.abs(a - b);
   }
   return dist;
+}
+
+/**
+ * Export only the scale's degree pitch classes as a Scala `.scl` file in one call.
+ *
+ * Socratic Q188: "If we can export any tuning as .scl, we should be able to export a scale
+ * as a subset .scl — meaning only the scale's degree pitch classes appear in the file —
+ * can it?" Today: `scaleToMinimalTuning(scale, tuning)` → `tuningToScl(minimal)` → override
+ * description — three steps. If a scale's pitch-class subset is first-class, exporting it
+ * should be one call.
+ *
+ * Algorithm:
+ * 1. `scaleToMinimalTuning(scale, tuning)` → minimal `TuningSystem` with only scale degrees.
+ * 2. `tuningToScl(minimal)` → `ScalaScale` from that minimal tuning.
+ * 3. Override description with `name ?? scale.name`.
+ *
+ * @param scale  - The scale to export. Must be compatible with `tuning`.
+ * @param tuning - The parent `TuningSystem` to pick degrees from.
+ * @param name   - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns A `ScalaScale` containing only the scale's selected degree pitch classes.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const scl = scaleToSubsetScl(major, t12);
+ * fs.writeFileSync('major-subset.scl', writeScl(scl));
+ */
+export function scaleToSubsetScl(scale: Scale, tuning: TuningSystem, name?: string): ScalaScale {
+  const minimal = scaleToMinimalTuning(scale, tuning);
+  const scl = tuningToScl(minimal);
+  return { ...scl, description: name ?? scale.name };
 }
