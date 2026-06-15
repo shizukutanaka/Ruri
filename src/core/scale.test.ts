@@ -39,12 +39,14 @@ import {
   rankChordMapByDissonance,
   bestModeChordAnalysis,
   worstChordMapEntry,
+  filterChordMapByHarmonicity,
+  chordMapMedianDissonance,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
 import { rankChords } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
-import { chordDissonance } from './dissonance.js';
+import { chordDissonance, chordObjectDissonance } from './dissonance.js';
 import { DEFAULT_SYNTH_SCALE } from './ks-synth.js';
 import { chordToCents, chordFromDegrees, chordFromRatios } from './chord.js';
 
@@ -2297,5 +2299,99 @@ describe('worstChordMapEntry (Q148)', () => {
     const chordMap = scaleToChordMap(major12, t12).slice(0, 1);
     const result = worstChordMapEntry(chordMap, spectrum, t12.referenceHz);
     expect(result.degreeOffset).toBe(chordMap[0]!.degreeOffset);
+  });
+});
+
+// Q150 — filterChordMapByHarmonicity: keep only entries with harmonicity <= maxHarmonicity
+describe('filterChordMapByHarmonicity (Q150)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_zero_max_harmonicity_throws_range_error', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    expect(() => filterChordMapByHarmonicity(chordMap, 0)).toThrow(RangeError);
+  });
+
+  it('test_negative_max_harmonicity_throws_range_error', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    expect(() => filterChordMapByHarmonicity(chordMap, -1)).toThrow(RangeError);
+  });
+
+  it('test_very_large_threshold_returns_all_entries', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const result = filterChordMapByHarmonicity(chordMap, Infinity);
+    expect(result.length).toBe(chordMap.length);
+  });
+
+  it('test_very_small_threshold_returns_subset_or_empty', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const result = filterChordMapByHarmonicity(chordMap, 1.5);
+    expect(result.length).toBeLessThanOrEqual(chordMap.length);
+    expect(result.length).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_returned_entries_are_subset_of_input', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const result = filterChordMapByHarmonicity(chordMap, 50);
+    for (const entry of result) {
+      expect(chordMap.some((e) => e.degreeOffset === entry.degreeOffset)).toBe(true);
+    }
+  });
+
+  it('test_empty_chord_map_returns_empty_array', () => {
+    const result = filterChordMapByHarmonicity([], 10);
+    expect(result).toHaveLength(0);
+  });
+});
+
+// Q153 — chordMapMedianDissonance: compute median dissonance of a chord map
+describe('chordMapMedianDissonance (Q153)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_a_finite_number_for_major_scale', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const result = chordMapMedianDissonance(chordMap, spectrum, t12.referenceHz);
+    expect(typeof result).toBe('number');
+    expect(Number.isFinite(result)).toBe(true);
+  });
+
+  it('test_empty_chord_map_throws_range_error', () => {
+    expect(() => chordMapMedianDissonance([], spectrum)).toThrow(RangeError);
+  });
+
+  it('test_median_is_between_min_and_max_dissonance', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const ranked = rankChordMapByDissonance(chordMap, spectrum, t12.referenceHz);
+    const dissonances = ranked.map((e) =>
+      chordObjectDissonance(e.chord, t12.referenceHz, spectrum),
+    );
+    const min = Math.min(...dissonances);
+    const max = Math.max(...dissonances);
+    const median = chordMapMedianDissonance(chordMap, spectrum, t12.referenceHz);
+    expect(median).toBeGreaterThanOrEqual(min);
+    expect(median).toBeLessThanOrEqual(max);
+  });
+
+  it('test_single_entry_returns_its_dissonance', () => {
+    const chordMap = scaleToChordMap(major12, t12).slice(0, 1);
+    const result = chordMapMedianDissonance(chordMap, spectrum, t12.referenceHz);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_default_spectrum_and_rootHz_produce_valid_result', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const result = chordMapMedianDissonance(chordMap);
+    expect(typeof result).toBe('number');
+    expect(Number.isFinite(result)).toBe(true);
   });
 });

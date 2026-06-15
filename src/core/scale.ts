@@ -1730,3 +1730,89 @@ export function worstChordMapEntry(
   const ranked = rankChordMapByDissonance(chordMap, spectrum, rootHz);
   return ranked[ranked.length - 1] as ScaleChordMapEntry;
 }
+
+/**
+ * Filter a `ScaleChordMapEntry[]` to only entries whose harmonicity is at or below a threshold.
+ *
+ * Socratic Q150: "If a chord map can be synthesized as WAV, a chord map filtered to only
+ * harmonically valid entries should also be one call — can it?" Today, the caller must
+ * iterate the map, call `harmonicityForChord` on each entry, and assemble a filtered array
+ * manually. If filtering a chord map by acoustic quality is first-class (there is already
+ * `rankChordMapByHarmonicity`, `rankChordMapByDissonance`, etc.), keeping only entries below
+ * a harmonicity threshold should also be one call.
+ *
+ * Returns only entries where `harmonicityForChord(entry.chord, rootHz, tol) <= maxHarmonicity`.
+ *
+ * @param chordMap       - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param maxHarmonicity - Maximum Stolzenburg relative periodicity to keep (exclusive upper bound).
+ *                         Must be > 0.
+ * @param rootHz         - Reference frequency for harmonicity computation (default 440 Hz).
+ * @param tol            - Continued-fraction tolerance (default 0.0136).
+ * @returns New array containing only entries with harmonicity ≤ maxHarmonicity.
+ *
+ * @throws {RangeError} if `maxHarmonicity` <= 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const harmonic = filterChordMapByHarmonicity(chordMap, 10);
+ * // harmonic contains only diatonic triads with Stolzenburg periodicity ≤ 10
+ */
+export function filterChordMapByHarmonicity(
+  chordMap: readonly ScaleChordMapEntry[],
+  maxHarmonicity: number,
+  rootHz = 440,
+  tol = 0.0136,
+): ScaleChordMapEntry[] {
+  if (maxHarmonicity <= 0) {
+    throw new RangeError(
+      `filterChordMapByHarmonicity: maxHarmonicity must be > 0, got ${maxHarmonicity}`,
+    );
+  }
+  return chordMap.filter(
+    (entry) => harmonicityForChord(entry.chord, rootHz, tol) <= maxHarmonicity,
+  );
+}
+
+/**
+ * Compute the median Sethares dissonance of all entries in a chord map.
+ *
+ * Socratic Q153: "If we can analyze a chord map, the median dissonance of the chord map
+ * should be one call — can it?" Today: `rankChordMapByDissonance(chordMap, spectrum, rootHz)`
+ * → extract dissonance values → sort → take median — four steps. If a chord map is
+ * first-class, summarising its central dissonance should be one call.
+ *
+ * Algorithm: `rankChordMapByDissonance(chordMap, spectrum, rootHz)` → dissonance values
+ * → sorted → median (average of two middle values for even length).
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Reference frequency for dissonance computation (default 440 Hz).
+ * @returns Median Sethares roughness value.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const median = chordMapMedianDissonance(chordMap, harmonicSpectrum(), 261.63);
+ */
+export function chordMapMedianDissonance(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): number {
+  if (chordMap.length === 0) {
+    throw new RangeError('chordMapMedianDissonance: chordMap must be non-empty');
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const sorted = rankChordMapByDissonance(chordMap, effectiveSpectrum, rootHz);
+  const values = sorted.map((e) => chordObjectDissonance(e.chord, rootHz, effectiveSpectrum));
+  const mid = Math.floor(values.length / 2);
+  if (values.length % 2 === 1) {
+    return values[mid] as number;
+  }
+  return ((values[mid - 1] as number) + (values[mid] as number)) / 2;
+}
