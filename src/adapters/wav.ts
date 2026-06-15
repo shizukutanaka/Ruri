@@ -1,7 +1,7 @@
 /** 16-bit PCM mono WAV encoder. Zero-dep, byte-exact. */
 
 import { strike, strikeChord, type ModalOptions, DEFAULT_MODAL } from '../core/modal-synth.js';
-import { type Spectrum } from '../core/spectrum.js';
+import { type Spectrum, harmonicSpectrum } from '../core/spectrum.js';
 import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import {
   DEFAULT_KS,
@@ -13,6 +13,7 @@ import {
 } from '../core/ks-synth.js';
 import {
   type Scale,
+  type ScaleChordMapEntry,
   scaleToFreqs,
   synthScaleFromScale,
   buildChordProgression,
@@ -556,4 +557,46 @@ export function bestScaleChordWav(
     );
   }
   return pluckRankedChordWav(best, rootHz, opts);
+}
+
+/**
+ * Synthesize every chord in a diatonic chord map and encode it as a single WAV in one call.
+ *
+ * Socratic Q130: `chordMapToSmf` exports a `ScaleChordMapEntry[]` as MIDI — but there
+ * is no WAV equivalent. Hearing every diatonic chord of a scale in sequence still
+ * requires extracting `.chord` fields, calling `chordProgressionToWav`, and wiring
+ * a spectrum. If a chord map is first-class (with `scaleToChordMap`, `rankChordMapByHarmonicity`,
+ * etc.), synthesizing it to audio should also be one call — paralleling `chordMapToSmf`.
+ *
+ * Delegates to `chordProgressionToWav(chordMap.map(e => e.chord), rootHz, spectrum, opts)`.
+ * Uses `harmonicSpectrum()` as the default when no spectrum is provided.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Optional instrument spectrum for synthesis. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns WAV bytes of every chord in the map, concatenated sequentially.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const wav = chordMapToWav(chordMap, t12.referenceHz);
+ * await fs.writeFile('diatonic-chords.wav', wav);
+ */
+export function chordMapToWav(
+  chordMap: readonly ScaleChordMapEntry[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  return chordProgressionToWav(
+    chordMap.map((e) => e.chord),
+    rootHz,
+    spectrum ?? harmonicSpectrum(),
+    opts,
+  );
 }

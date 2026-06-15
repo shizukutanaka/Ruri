@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
-import { writeTun, TUN_DEFAULT_BASEFREQ_HZ, chordToTun } from './tun.js';
+import { writeTun, TUN_DEFAULT_BASEFREQ_HZ, chordToTun, scaleToTunText } from './tun.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
+import { equalTemperament12, edo } from '../core/tuning.js';
+import { type Scale } from '../core/scale.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -324,5 +326,68 @@ describe('chordToTun', () => {
     expect(key69Line).toBeDefined();
     const cents = Number.parseFloat((key69Line as string).slice('note 69='.length));
     expect(cents).toBeCloseTo(6900, 1);
+  });
+});
+
+// Q129 — scaleToTunText: Scale + TuningSystem → .tun string in one call
+describe('scaleToTunText (Q129)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_valid_tun_string_structure', () => {
+    const out = scaleToTunText(major, t12);
+    expect(out).toContain('[Tuning]');
+    expect(out).toContain('[Exact Tuning]');
+    expect(out.endsWith('\n')).toBe(true);
+  });
+
+  it('test_has_exactly_128_note_lines', () => {
+    const out = scaleToTunText(major, t12);
+    const lines = out.split('\n');
+    const noteLines = lines.filter((l) => l.startsWith('note '));
+    expect(noteLines).toHaveLength(256); // 128 in [Tuning] + 128 in [Exact Tuning]
+  });
+
+  it('test_default_name_is_scale_id', () => {
+    const out = scaleToTunText(major, t12);
+    expect(out.split('\n')[0]).toBe('; major');
+  });
+
+  it('test_explicit_name_used_in_comment_header', () => {
+    const out = scaleToTunText(major, t12, 'My Scale');
+    expect(out.split('\n')[0]).toBe('; My Scale');
+  });
+
+  it('test_scale_frequencies_written_to_middle_note_slots', () => {
+    // Default middleNote=60; scale degree 0 (440 Hz) should appear at key 60
+    const out = scaleToTunText(major, t12);
+    const lines = out.split('\n');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const key60Line = lines.slice(exactStart + 1).find((l) => l.startsWith('note 60='));
+    expect(key60Line).toBeDefined();
+    const cents = Number.parseFloat((key60Line as string).slice('note 60='.length));
+    // 440 Hz above basefreq ≈ 6900 cents
+    const recovered = TUN_DEFAULT_BASEFREQ_HZ * 2 ** (cents / 1200);
+    expect(recovered).toBeCloseTo(440, 1);
+  });
+
+  it('test_custom_middle_note_shifts_scale_slot', () => {
+    const out = scaleToTunText(major, t12, undefined, { middleNote: 48 });
+    const lines = out.split('\n');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const key48Line = lines.slice(exactStart + 1).find((l) => l.startsWith('note 48='));
+    expect(key48Line).toBeDefined();
+    const cents = Number.parseFloat((key48Line as string).slice('note 48='.length));
+    const recovered = TUN_DEFAULT_BASEFREQ_HZ * 2 ** (cents / 1200);
+    expect(recovered).toBeCloseTo(440, 1);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => scaleToTunText(major, edo(19))).toThrow(RangeError);
   });
 });

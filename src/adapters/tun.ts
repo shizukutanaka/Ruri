@@ -32,6 +32,8 @@
 import { freqToCents } from '../core/cents.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
+import { type TuningSystem } from '../core/tuning.js';
+import { type Scale, scaleToFreqs } from '../core/scale.js';
 
 /** Default base frequency: MIDI note 0 at A4 = 440 Hz (440 × 2^(−69/12)). */
 export const TUN_DEFAULT_BASEFREQ_HZ = 440 * 2 ** (-69 / 12);
@@ -183,6 +185,82 @@ export function chordToTun(
   }
 
   const { a4Hz: _a4Hz, ...tunOpts } = opts ?? {};
+  void _a4Hz;
+  return writeTun(frequencies, tunName, Object.keys(tunOpts).length > 0 ? tunOpts : undefined);
+}
+
+/** Options for {@link scaleToTunText}. */
+export interface ScaleToTunOptions extends TunOptions {
+  /**
+   * MIDI note number for the first scale degree.
+   * The scale frequencies are written into slots `middleNote..middleNote+n-1`.
+   * Default: 60 (middle C).
+   */
+  readonly middleNote?: number;
+  /**
+   * A4 reference frequency in Hz used to fill non-scale MIDI keys with standard 12-TET.
+   * Default: 440.
+   */
+  readonly a4Hz?: number;
+}
+
+/**
+ * Export a `Scale` as an AnaMark `.tun` text file in one call.
+ *
+ * Socratic Q129: `scaleToMts(scale, tuning)` exports a `Scale` as MIDI Tuning
+ * Standard SysEx — but there is no `.tun` equivalent. Going from a `Scale` to a
+ * `.tun` string requires: `scaleToFreqs → fill 128-key array → writeTun`, three
+ * explicit steps. If `Scale` is truly first-class across output formats (as shown
+ * by `scaleToMts`, `scaleToScl`, etc.), exporting it as `.tun` should also be
+ * one call.
+ *
+ * Algorithm:
+ * 1. `scaleToFreqs(scale, tuning)` — absolute Hz for each scale degree.
+ * 2. Fill a 128-entry array with standard 12-TET frequencies (via `midiToFreq`).
+ * 3. Overwrite slots `middleNote..middleNote+n-1` with the scale's Hz values.
+ * 4. Encode with `writeTun(frequencies, name ?? scale.id, opts)`.
+ *
+ * Non-scale MIDI keys retain standard 12-TET so that an unrelated synth part is
+ * not detuned.
+ *
+ * @param scale  - The scale to export.
+ * @param tuning - The parent `TuningSystem` the scale belongs to.
+ * @param name   - Human-readable name for the `.tun` file comment header.
+ *                 Defaults to `scale.id`.
+ * @param opts   - Optional middle-note anchor, A4 Hz, and basefreq override.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `scale` has no degrees.
+ *
+ * @example
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const tun = scaleToTunText(major, equalTemperament12(440));
+ * fs.writeFileSync('major.tun', tun, 'utf8');
+ */
+export function scaleToTunText(
+  scale: Scale,
+  tuning: TuningSystem,
+  name?: string,
+  opts?: ScaleToTunOptions,
+): string {
+  const middleNote = opts?.middleNote ?? 60;
+  const a4Hz = opts?.a4Hz ?? A4_HZ_DEFAULT;
+  const tunName = name ?? scale.id;
+
+  // Start with standard 12-TET for all 128 MIDI keys.
+  const frequencies: number[] = Array.from({ length: 128 }, (_, k) => midiToFreq(k, a4Hz));
+
+  // Overwrite scale degree slots with the scale's exact frequencies.
+  const scaleFreqs = scaleToFreqs(scale, tuning);
+  for (let i = 0; i < scaleFreqs.length; i++) {
+    const key = middleNote + i;
+    if (key >= 0 && key < 128) {
+      (frequencies as number[])[key] = scaleFreqs[i] as number;
+    }
+  }
+
+  const { middleNote: _mn, a4Hz: _a4Hz, ...tunOpts } = opts ?? {};
+  void _mn;
   void _a4Hz;
   return writeTun(frequencies, tunName, Object.keys(tunOpts).length > 0 ? tunOpts : undefined);
 }

@@ -16,6 +16,7 @@ import {
   scaleModeSeriesWav,
   bestProgressionWav,
   bestScaleChordWav,
+  chordMapToWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -23,7 +24,7 @@ import { DEFAULT_KS } from '../core/ks-synth.js';
 import { type Scale } from '../core/scale.js';
 import { rankChords, rankedChordToChord } from '../core/chord-search.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
-import { rankScaleChords } from '../core/scale.js';
+import { rankScaleChords, scaleToChordMap } from '../core/scale.js';
 
 describe('WAV encoder', () => {
   it('test_header_riff_wave', () => {
@@ -809,5 +810,62 @@ describe('bestScaleChordWav (Q125)', () => {
 
   it('test_mismatched_tuning_throws', () => {
     expect(() => bestScaleChordWav(major, edo(19), rootHz, spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q130 — chordMapToWav: ScaleChordMapEntry[] → WAV bytes in one call
+describe('chordMapToWav (Q130)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  // Fast options to keep tests quick
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.05,
+  };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = chordMapToWav(chordMap, rootHz, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_wav_contains_all_chords_in_map', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = chordMapToWav(chordMap, rootHz, spectrum, fastOpts);
+    // WAV data size should increase with more chords
+    // 7 chords × samplesPerChord × 2 bytes + 44 header
+    const sampleRate = fastOpts.sampleRate;
+    const samplesPerChord = Math.floor(sampleRate * fastOpts.chordSeconds);
+    const expectedDataBytes = chordMap.length * samplesPerChord * 2;
+    expect(wav.length).toBeGreaterThanOrEqual(44 + expectedDataBytes - 100); // small tolerance
+  });
+
+  it('test_default_spectrum_used_when_none_provided', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    // Should not throw even without spectrum
+    expect(() => chordMapToWav(chordMap, rootHz, undefined, fastOpts)).not.toThrow();
+    const wav = chordMapToWav(chordMap, rootHz, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => chordMapToWav([], rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_invalid_root_hz_throws', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    expect(() => chordMapToWav(chordMap, -1, spectrum, fastOpts)).toThrow(RangeError);
+    expect(() => chordMapToWav(chordMap, 0, spectrum, fastOpts)).toThrow(RangeError);
   });
 });
