@@ -19,6 +19,7 @@ import {
   closestPresetTuning,
   presetsComparisonWav,
   rankPresetsByHarmonicitySpread,
+  mostConsistentPreset,
 } from './presets.js';
 import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
@@ -726,5 +727,36 @@ describe('rankPresetsByHarmonicitySpread (Q181)', () => {
   it('test_empty_pool_returns_empty', () => {
     const ranked = rankPresetsByHarmonicitySpread([]);
     expect(ranked).toEqual([]);
+  });
+});
+
+// Q194 — mostConsistentPreset
+describe('mostConsistentPreset (Q194)', () => {
+  it('test_returns_a_tuning_preset', () => {
+    const preset = mostConsistentPreset();
+    expect(preset).toBeDefined();
+    expect(preset).toHaveProperty('id');
+    expect(preset).toHaveProperty('degrees');
+  });
+
+  it('test_returns_first_entry_from_harmonicity_spread_ranking', () => {
+    const ranked = rankPresetsByHarmonicitySpread();
+    const preset = mostConsistentPreset();
+    expect(preset?.id).toBe(ranked[0]?.preset.id);
+  });
+
+  it('test_returns_undefined_for_empty_pool', () => {
+    expect(mostConsistentPreset([])).toBeUndefined();
+  });
+
+  it('test_custom_pool_of_one_returns_that_preset', () => {
+    const preset = mostConsistentPreset([TWELVE_TET]);
+    expect(preset?.id).toBe(TWELVE_TET.id);
+  });
+
+  it('test_result_is_in_all_presets', () => {
+    const preset = mostConsistentPreset();
+    const found = ALL_PRESETS.some((p) => p.id === preset?.id);
+    expect(found).toBe(true);
   });
 });

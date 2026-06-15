@@ -595,3 +595,28 @@ export function rankPresetsByHarmonicitySpread(
   });
   return entries.sort((a, b) => a.variance - b.variance);
 }
+
+/**
+ * Find the single preset with the lowest harmonicity profile variance (most consistent modes).
+ *
+ * Socratic Q194: "If we can rank presets by best-mode harmonicity, we should also be able to
+ * find the single preset with the LOWEST mode variance (most consistent modes) in one call —
+ * can it?" Today: `rankPresetsByHarmonicitySpread(presets)` → `result[0].preset` — two steps.
+ * If the most consistent preset is a meaningful concept, finding it should be one call.
+ *
+ * Algorithm:
+ * 1. `rankPresetsByHarmonicitySpread(presets)` → ranked array, ascending by variance.
+ * 2. Return the first entry's preset, or `undefined` if the pool is empty.
+ *
+ * @param presets - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns The `TuningPreset` whose modes have the most uniform harmonicity, or `undefined` if empty.
+ *
+ * @example
+ * const preset = mostConsistentPreset();
+ * // preset is the preset whose modal harmonicity values vary the least
+ */
+export function mostConsistentPreset(
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): TuningPreset | undefined {
+  return rankPresetsByHarmonicitySpread(presets)[0]?.preset;
+}
