@@ -2122,3 +2122,70 @@ export function bestModeProgressionSummary(
   const mode = bestModeForTuning(tuning, spectrum);
   return progressionScoreSummary(mode, tuning, rootHz, spectrum);
 }
+
+/**
+ * Harmonicity profile of every modal rotation of a tuning, in mode-index order.
+ *
+ * Socratic Q176: "If we can rank modes by harmonicity, we should also be able to compute
+ * the harmonicity profile (one value per mode rotation) as an array — can it?" Today:
+ * `rankModeSeriesByHarmonicity` returns entries sorted by score; recovering the original
+ * rotation-order array requires re-sorting by `modeIndex`. If harmonicity is a first-class
+ * property of each mode, getting all values in rotation order should be one call.
+ *
+ * @param tuning - The tuning system to analyse.
+ * @param tol    - Stolzenburg tolerance forwarded to `rankModeSeriesByHarmonicity`. Default 0.0136.
+ * @returns `number[]` where `result[i]` is the harmonicity of the i-th rotation (lower = more harmonic).
+ *
+ * @throws {RangeError} if `tuning` has no degrees.
+ *
+ * @example
+ * const profile = tuningHarmonicityProfile(equalTemperament12(440));
+ * const bestIdx = profile.indexOf(Math.min(...profile));
+ */
+export function tuningHarmonicityProfile(tuning: TuningSystem, tol = 0.0136): number[] {
+  if (tuning.degrees.length === 0) {
+    throw new RangeError('tuningHarmonicityProfile: tuning has no degrees');
+  }
+  const fullScale = tuningToScale(tuning);
+  const ranked = rankModeSeriesByHarmonicity(fullScale, tuning, tol);
+  const profile: number[] = new Array(ranked.length) as number[];
+  for (const entry of ranked) {
+    (profile as number[])[entry.modeIndex] = entry.harmonicity;
+  }
+  return profile;
+}
+
+/**
+ * Annotate every entry in a diatonic chord map with a human-readable interval name.
+ *
+ * Socratic Q178: "If we have a chord map analysis, producing a sorted list of
+ * { chord, intervalName } pairs where intervalName describes the chord should be one call
+ * — can it?" Today: inspecting `entry.chord.intervals.length` and mapping it to a label
+ * requires a manual `.map(…)`. If a chord map is first-class, labelling it should be one call.
+ *
+ * Labels by interval count: 1='unison', 2='dyad', 3='triad', 4='tetrad', 5='pentad',
+ * else `${n}-chord`.
+ *
+ * @param chordMap - Diatonic chord map entries (e.g. from `scaleToChordMap`).
+ * @returns Array of `{ entry: ScaleChordMapEntry, label: string }` in the original map order.
+ *
+ * @example
+ * const labelled = chordMapWithLabels(scaleToChordMap(major, t12));
+ * // labelled[0].label === 'triad' for a 3-note chord
+ */
+export function chordMapWithLabels(
+  chordMap: readonly ScaleChordMapEntry[],
+): Array<{ entry: ScaleChordMapEntry; label: string }> {
+  const labelFor = (n: number): string => {
+    if (n === 1) return 'unison';
+    if (n === 2) return 'dyad';
+    if (n === 3) return 'triad';
+    if (n === 4) return 'tetrad';
+    if (n === 5) return 'pentad';
+    return `${n}-chord`;
+  };
+  return chordMap.map((entry) => ({
+    entry,
+    label: labelFor(entry.chord.intervals.length),
+  }));
+}

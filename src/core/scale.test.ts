@@ -47,6 +47,8 @@ import {
   chordMapSummary,
   filterChordMapByCriteria,
   bestModeProgressionSummary,
+  tuningHarmonicityProfile,
+  chordMapWithLabels,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -2699,5 +2701,97 @@ describe('bestModeProgressionSummary (Q170)', () => {
       source: 'theoretical' as const,
     };
     expect(() => bestModeProgressionSummary(emptyTuning, 261.63)).toThrow(RangeError);
+  });
+});
+
+// Q176 — tuningHarmonicityProfile: harmonicity per mode-index in rotation order
+describe('tuningHarmonicityProfile (Q176)', () => {
+  it('test_returns_array_with_one_value_per_degree', () => {
+    const profile = tuningHarmonicityProfile(t12);
+    expect(profile.length).toBe(t12.degrees.length);
+  });
+
+  it('test_all_values_are_finite_and_positive', () => {
+    const profile = tuningHarmonicityProfile(t12);
+    for (const h of profile) {
+      expect(Number.isFinite(h)).toBe(true);
+      expect(h).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_best_mode_index_matches_rankModeSeriesByHarmonicity', () => {
+    const profile = tuningHarmonicityProfile(t12);
+    const minH = Math.min(...profile);
+    const bestIdx = profile.indexOf(minH);
+    const scale = tuningToScale(t12);
+    const ranked = rankModeSeriesByHarmonicity(scale, t12);
+    expect(bestIdx).toBe((ranked[0] as (typeof ranked)[0]).modeIndex);
+  });
+
+  it('test_index_order_preserved', () => {
+    const profile = tuningHarmonicityProfile(t12);
+    const scale = tuningToScale(t12);
+    const ranked = rankModeSeriesByHarmonicity(scale, t12);
+    for (const entry of ranked) {
+      expect(profile[entry.modeIndex]).toBeCloseTo(entry.harmonicity, 10);
+    }
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const empty = {
+      id: 'e',
+      name: 'e',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(() => tuningHarmonicityProfile(empty)).toThrow(RangeError);
+  });
+});
+
+// Q178 — chordMapWithLabels: annotate chord map entries with interval name labels
+describe('chordMapWithLabels (Q178)', () => {
+  it('test_returns_same_length_as_chord_map', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const labelled = chordMapWithLabels(chordMap);
+    expect(labelled.length).toBe(chordMap.length);
+  });
+
+  it('test_entry_reference_is_preserved', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const labelled = chordMapWithLabels(chordMap);
+    for (let i = 0; i < labelled.length; i++) {
+      expect((labelled[i] as (typeof labelled)[0]).entry).toBe(chordMap[i]);
+    }
+  });
+
+  it('test_triad_label_for_3note_chord', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const labelled = chordMapWithLabels(chordMap);
+    for (const { label } of labelled) {
+      expect(label).toBe('triad');
+    }
+  });
+
+  it('test_dyad_label_for_2note_chord', () => {
+    const chordMap = scaleToChordMap(major, t12, 2);
+    const labelled = chordMapWithLabels(chordMap);
+    for (const { label } of labelled) {
+      expect(label).toBe('dyad');
+    }
+  });
+
+  it('test_tetrad_label_for_4note_chord', () => {
+    const chordMap = scaleToChordMap(major, t12, 4);
+    const labelled = chordMapWithLabels(chordMap);
+    for (const { label } of labelled) {
+      expect(label).toBe('tetrad');
+    }
+  });
+
+  it('test_empty_map_returns_empty_array', () => {
+    const labelled = chordMapWithLabels([]);
+    expect(labelled).toEqual([]);
   });
 });
