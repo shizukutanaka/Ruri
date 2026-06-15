@@ -3,7 +3,13 @@
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat } from '../core/midi.js';
 import { optimalChordOrder, rankedChordToChord } from '../core/chord-search.js';
-import { type Scale, rankScaleChords, scaleToFreqs } from '../core/scale.js';
+import {
+  type Scale,
+  rankScaleChords,
+  scaleToFreqs,
+  type ChordProgressionStep,
+  type ScaleChordMapEntry,
+} from '../core/scale.js';
 import { type TuningSystem } from '../core/tuning.js';
 import { type ChordSearchOptions } from '../core/chord-search.js';
 
@@ -436,4 +442,89 @@ export function scaleToSmf(
   });
 
   return encodeSmf(notes, { ppq });
+}
+
+export type ProgressionAnalysisToSmfOptions = ProgressionToSmfOptions;
+
+/**
+ * Export a `ChordProgressionStep[]` (from `chordProgressionAnalysis`) to a SMF MIDI file.
+ *
+ * Socratic Q122: `chordProgressionAnalysis(chords, rootHz, spectrum)` returns rich
+ * per-step analysis (dissonance, harmonicity, voice-leading cost). But converting that
+ * analysis back to a playable MIDI file still requires extracting `.chord` from each
+ * step and calling `progressionToSmf` manually. If `ChordProgressionStep[]` is a
+ * first-class type, exporting it to MIDI should be one call.
+ *
+ * Internally equivalent to
+ * `progressionToSmf(analysis.map(s => s.chord), rootHz, opts)` — the full analysis
+ * metadata (dissonance, harmonicity, voice-leading cost) is discarded; only the chord
+ * sequence is encoded.
+ *
+ * @param analysis - Output of `chordProgressionAnalysis` (at least one step).
+ * @param rootHz   - Absolute frequency of the chord root (Hz).
+ * @param opts     - Optional SMF encoding options (ppq, durationTicks, velocity, etc.).
+ * @returns A Type-0 SMF `Uint8Array` ready to write to a `.mid` file.
+ *
+ * @throws {RangeError} if `analysis` is empty.
+ * @throws {RangeError} if any realized frequency maps to a MIDI note outside [0, 127].
+ *
+ * @example
+ * const analysis = chordProgressionAnalysis([I, IV, V], 261.63, harmonicSpectrum());
+ * const midi = progressionAnalysisToSmf(analysis, 261.63);
+ * await fs.writeFile('analysis.mid', midi);
+ */
+export function progressionAnalysisToSmf(
+  analysis: readonly ChordProgressionStep[],
+  rootHz: number,
+  opts?: ProgressionAnalysisToSmfOptions,
+): Uint8Array {
+  if (analysis.length === 0)
+    throw new RangeError('progressionAnalysisToSmf: analysis must be non-empty');
+  return progressionToSmf(
+    analysis.map((s) => s.chord),
+    rootHz,
+    opts,
+  );
+}
+
+export type ChordMapToSmfOptions = ProgressionToSmfOptions;
+
+/**
+ * Convert a `ScaleChordMapEntry[]` (from `scaleToChordMap`) to a SMF MIDI file.
+ *
+ * Socratic Q123: `scaleToChordMap(scale, tuning)` returns the complete diatonic chord
+ * map — all Roman-numeral chords. But playing through every diatonic chord in sequence
+ * as a MIDI file still requires extracting `.chord` from each entry and calling
+ * `progressionToSmf` manually. If the scale chord map is first-class, encoding it to
+ * MIDI should be one call.
+ *
+ * Chords are played in `degreeOffset` order (ascending, as returned by `scaleToChordMap`).
+ * Internally equivalent to `progressionToSmf(chordMap.map(e => e.chord), rootHz, opts)`.
+ *
+ * @param chordMap - Output of `scaleToChordMap` (at least one entry).
+ * @param rootHz   - Absolute frequency of the chord root (Hz).
+ * @param opts     - Optional SMF encoding options (ppq, durationTicks, velocity, etc.).
+ * @returns A Type-0 SMF `Uint8Array` ready to write to a `.mid` file.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ * @throws {RangeError} if any realized frequency maps to a MIDI note outside [0, 127].
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const midi = chordMapToSmf(chordMap, 261.63);
+ * await fs.writeFile('diatonic.mid', midi);
+ */
+export function chordMapToSmf(
+  chordMap: readonly ScaleChordMapEntry[],
+  rootHz: number,
+  opts?: ChordMapToSmfOptions,
+): Uint8Array {
+  if (chordMap.length === 0) throw new RangeError('chordMapToSmf: chordMap must be non-empty');
+  return progressionToSmf(
+    chordMap.map((e) => e.chord),
+    rootHz,
+    opts,
+  );
 }

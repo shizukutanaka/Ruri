@@ -28,6 +28,8 @@ import {
   scaleToChordMap,
   progressionFromPattern,
   bestProgressionForScale,
+  rankScaleChordsByHarmonicity,
+  scaleModalAnalysis,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -1698,5 +1700,124 @@ describe('bestProgressionForScale (Q119)', () => {
 
   it('test_mismatched_tuning_throws', () => {
     expect(() => bestProgressionForScale(major12, edo(19), spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q120 — rankScaleChordsByHarmonicity: diatonic chords ranked by Stolzenburg periodicity
+describe('rankScaleChordsByHarmonicity (Q120)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_one_entry_per_scale_degree_by_default', () => {
+    const ranked = rankScaleChordsByHarmonicity(major12, t12);
+    expect(ranked.length).toBe(major12.degreeIndices.length);
+  });
+
+  it('test_each_entry_has_chord_and_harmonicity', () => {
+    const ranked = rankScaleChordsByHarmonicity(major12, t12);
+    for (const entry of ranked) {
+      expect(entry.chord).toBeDefined();
+      expect(entry.chord.intervals.length).toBeGreaterThan(0);
+      expect(typeof entry.harmonicity).toBe('number');
+      expect(entry.harmonicity).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('test_sorted_ascending_by_harmonicity', () => {
+    const ranked = rankScaleChordsByHarmonicity(major12, t12);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.harmonicity).toBeGreaterThanOrEqual(ranked[i - 1]!.harmonicity);
+    }
+  });
+
+  it('test_limit_option_reduces_output', () => {
+    const ranked = rankScaleChordsByHarmonicity(major12, t12, { limit: 3 });
+    expect(ranked.length).toBe(3);
+  });
+
+  it('test_custom_size_4_produces_seventh_chords', () => {
+    const ranked = rankScaleChordsByHarmonicity(major12, t12, { size: 4 });
+    for (const entry of ranked) {
+      expect(entry.chord.intervals.length).toBe(4);
+    }
+  });
+
+  it('test_best_chord_is_most_harmonic', () => {
+    const ranked = rankScaleChordsByHarmonicity(major12, t12);
+    // The first entry must have the lowest (or equal) harmonicity
+    expect(ranked[0]!.harmonicity).toBeLessThanOrEqual(ranked[ranked.length - 1]!.harmonicity);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => rankScaleChordsByHarmonicity(major12, edo(19))).toThrow(RangeError);
+  });
+});
+
+// Q121 — scaleModalAnalysis: comprehensive per-mode report
+describe('scaleModalAnalysis (Q121)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_one_entry_per_mode', () => {
+    const report = scaleModalAnalysis(major12, t12, spectrum);
+    expect(report.length).toBe(major12.degreeIndices.length);
+  });
+
+  it('test_each_entry_has_all_required_fields', () => {
+    const report = scaleModalAnalysis(major12, t12, spectrum);
+    for (const entry of report) {
+      expect(typeof entry.modeIndex).toBe('number');
+      expect(entry.scale).toBeDefined();
+      expect(typeof entry.dissonance).toBe('number');
+      expect(typeof entry.harmonicity).toBe('number');
+      expect(typeof entry.quality).toBe('number');
+      expect(Array.isArray(entry.chords)).toBe(true);
+    }
+  });
+
+  it('test_sorted_by_quality_ascending', () => {
+    const report = scaleModalAnalysis(major12, t12, spectrum);
+    for (let i = 1; i < report.length; i++) {
+      expect(report[i]!.quality).toBeGreaterThanOrEqual(report[i - 1]!.quality);
+    }
+  });
+
+  it('test_default_chord_limit_is_3', () => {
+    const report = scaleModalAnalysis(major12, t12, spectrum);
+    for (const entry of report) {
+      expect(entry.chords.length).toBeLessThanOrEqual(3);
+    }
+  });
+
+  it('test_custom_chord_limit_is_respected', () => {
+    const report = scaleModalAnalysis(major12, t12, spectrum, 5);
+    for (const entry of report) {
+      expect(entry.chords.length).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it('test_mode_indices_cover_all_rotations', () => {
+    const report = scaleModalAnalysis(major12, t12, spectrum);
+    const indices = new Set(report.map((e) => e.modeIndex));
+    for (let i = 0; i < major12.degreeIndices.length; i++) {
+      expect(indices.has(i)).toBe(true);
+    }
+  });
+
+  it('test_chord_limit_0_throws_range_error', () => {
+    expect(() => scaleModalAnalysis(major12, t12, spectrum, 0)).toThrow(RangeError);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => scaleModalAnalysis(major12, edo(19), spectrum)).toThrow(RangeError);
   });
 });

@@ -1176,3 +1176,164 @@ export function bestProgressionForScale(
   const chords = ranked.slice(0, numChords).map((r) => rankedChordToChord(r));
   return [...optimalChordOrder(chords, effectiveRootHz).chords];
 }
+
+/** One entry returned by `rankScaleChordsByHarmonicity`. */
+export interface RankedChordByHarmonicity {
+  /** The diatonic chord drawn from the scale. */
+  readonly chord: Chord;
+  /** Stolzenburg relative periodicity (lower = more harmonic / simpler integer ratios). */
+  readonly harmonicity: number;
+}
+
+/**
+ * Rank the diatonic chords of a scale by Stolzenburg harmonicity (timbre-independent).
+ *
+ * Socratic Q120: `rankScaleChords(scale, tuning, opts)` ranks by a blend of Sethares
+ * roughness + Stolzenburg periodicity — both timbre-dependent (spectrum required).
+ * Ranking purely by harmonicity (Stolzenburg periodicity, timbre-independent) requires
+ * no spectrum parameter and sorts differently: it reveals which diatonic chords have
+ * the simplest integer-ratio relationships regardless of instrument colour.
+ *
+ * Returns `{ chord, harmonicity }[]` sorted ascending by `harmonicity` (most harmonic
+ * = lowest value = simplest ratios first). All diatonic chords of the given `size` are
+ * included unless `limit` is provided.
+ *
+ * @param scale  - The parent scale (must be compatible with `tuning`).
+ * @param tuning - The parent `TuningSystem`.
+ * @param opts   - Optional: `size` (notes per chord, default 3), `limit` (max results),
+ *                 `rootHz` (frequency anchor for ratio computation, default
+ *                 `tuning.referenceHz`), `tol` (continued-fraction tolerance, default 0.0136).
+ * @returns Entries sorted ascending by `harmonicity` (most harmonic first).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `size` < 2 (forwarded from `rankScaleChords`).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const ranked = rankScaleChordsByHarmonicity(major, t12);
+ * // ranked[0] is the diatonic triad with the simplest integer-ratio structure
+ */
+export function rankScaleChordsByHarmonicity(
+  scale: Scale,
+  tuning: TuningSystem,
+  opts?: { size?: number; limit?: number; rootHz?: number; tol?: number },
+): RankedChordByHarmonicity[] {
+  assertTuningMatch(scale, tuning);
+  const size = opts?.size ?? 3;
+  const limit = opts?.limit;
+  const rootHz = opts?.rootHz ?? tuning.referenceHz;
+  const tol = opts?.tol ?? 0.0136;
+
+  // Build all diatonic chords via scaleToChordMap (size chords)
+  const chordMap = scaleToChordMap(scale, tuning, size);
+
+  const entries: RankedChordByHarmonicity[] = chordMap.map(({ chord }) => ({
+    chord,
+    harmonicity: harmonicityForChord(chord, rootHz, tol),
+  }));
+
+  entries.sort((a, b) => a.harmonicity - b.harmonicity);
+
+  return limit !== undefined ? entries.slice(0, limit) : entries;
+}
+
+/** One entry in the comprehensive per-mode report returned by `scaleModalAnalysis`. */
+export interface ScaleModalAnalysisEntry {
+  /** The modal rotation index (0 = original scale). */
+  readonly modeIndex: number;
+  /** The modal rotation (result of `scaleMode(scale, modeIndex, tuning)`). */
+  readonly scale: Scale;
+  /** Sethares sensory dissonance of this mode's degree-set (timbre-dependent). */
+  readonly dissonance: number;
+  /** Stolzenburg relative periodicity of this mode's degree-set (timbre-independent). */
+  readonly harmonicity: number;
+  /**
+   * Combined quality score: arithmetic mean of min-max normalised dissonance and
+   * harmonicity over the full result set. Lower = better across both dimensions.
+   * (Same normalisation as `rankAllModesForTimbre`.)
+   */
+  readonly quality: number;
+  /**
+   * Top-N diatonic chords for this mode, ranked by `rankScaleChords` (roughness +
+   * periodicity blend). The number of chords is controlled by `chordLimit` (default 3).
+   */
+  readonly chords: RankedChord[];
+}
+
+/**
+ * Comprehensive per-mode analysis report: dissonance, harmonicity, quality score,
+ * and the top diatonic chords — all in one call.
+ *
+ * Socratic Q121: `rankAllModesForTimbre(scale, tuning, spectrum)` returns per-mode
+ * roughness + harmonicity + combined score but omits the chord palette for each mode.
+ * `rankModeChords(scale, tuning, opts)` returns the chord palette per mode but omits
+ * the scalar quality metrics. Getting the complete picture — all three metrics plus
+ * the diatonic chord pool for every modal rotation — still requires combining two
+ * functions and correlating by `modeIndex`. If modes are truly first-class,
+ * "complete modal analysis report" should be one call.
+ *
+ * Returns one `ScaleModalAnalysisEntry` per modal rotation, sorted by `quality`
+ * ascending (best mode first). Each entry includes:
+ * - `modeIndex`    — rotation index
+ * - `scale`        — the modal rotation
+ * - `dissonance`   — Sethares roughness
+ * - `harmonicity`  — Stolzenburg periodicity
+ * - `quality`      — combined score (equal-weighted mean of normalised roughness + harmonicity)
+ * - `chords`       — top `chordLimit` diatonic chords (from `rankScaleChords`)
+ *
+ * @param scale      - The parent scale to rotate.
+ * @param tuning     - The parent `TuningSystem`.
+ * @param spectrum   - Instrument spectrum (for roughness + chord ranking).
+ * @param chordLimit - Max chords to include per mode (default 3).
+ * @param tol        - Continued-fraction tolerance for harmonicity (default 0.0136).
+ * @returns Array of `ScaleModalAnalysisEntry`, sorted by `quality` ascending.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `chordLimit` < 1.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const report = scaleModalAnalysis(major, t12, harmonicSpectrum());
+ * // report[0] is the best mode with its quality metrics and top 3 chords
+ * // report[0].chords[0] is the best diatonic chord in that mode
+ */
+export function scaleModalAnalysis(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  chordLimit = 3,
+  tol = 0.0136,
+): ScaleModalAnalysisEntry[] {
+  assertTuningMatch(scale, tuning);
+  if (!Number.isInteger(chordLimit) || chordLimit < 1) {
+    throw new RangeError(`scaleModalAnalysis: chordLimit must be >= 1, got ${chordLimit}`);
+  }
+
+  const modes = scaleModeSeries(scale, tuning);
+
+  // Compute raw metrics for each mode
+  const raw = modes.map((mode, modeIndex) => ({
+    modeIndex,
+    scale: mode,
+    dissonance: scaleDissonance(mode, tuning, spectrum),
+    harmonicity: scaleHarmonicity(mode, tuning, tol),
+    chords: rankScaleChords(mode, tuning, { spectrum, limit: chordLimit }),
+  }));
+
+  // Min-max normalise dissonance and harmonicity independently
+  const minD = Math.min(...raw.map((e) => e.dissonance));
+  const maxD = Math.max(...raw.map((e) => e.dissonance));
+  const minH = Math.min(...raw.map((e) => e.harmonicity));
+  const maxH = Math.max(...raw.map((e) => e.harmonicity));
+  const eps = 1e-12;
+
+  const entries: ScaleModalAnalysisEntry[] = raw.map((e) => {
+    const normD = (e.dissonance - minD) / Math.max(maxD - minD, eps);
+    const normH = (e.harmonicity - minH) / Math.max(maxH - minH, eps);
+    return { ...e, quality: (normD + normH) / 2 };
+  });
+
+  return entries.sort((a, b) => a.quality - b.quality);
+}
