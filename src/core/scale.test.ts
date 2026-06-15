@@ -37,6 +37,8 @@ import {
   rankChordMapCombined,
   bestChordForMidiNote,
   rankChordMapByDissonance,
+  bestModeChordAnalysis,
+  worstChordMapEntry,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -2201,5 +2203,99 @@ describe('rankChordMapByDissonance (Q140)', () => {
   it('test_empty_array_produces_empty_result', () => {
     const ranked = rankChordMapByDissonance([], spectrum);
     expect(ranked).toEqual([]);
+  });
+});
+
+// Q146 — bestModeChordAnalysis: tuning → best mode → chordMapAnalysis in one call
+describe('bestModeChordAnalysis (Q146)', () => {
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_chord_map_analysis_entries_array', () => {
+    const result = bestModeChordAnalysis(t12, spectrum);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('test_entries_have_required_fields', () => {
+    const result = bestModeChordAnalysis(t12, spectrum);
+    const entry = result[0]!;
+    expect(typeof entry.degreeOffset).toBe('number');
+    expect(entry.chord).toBeDefined();
+    expect(typeof entry.dissonance).toBe('number');
+    expect(typeof entry.harmonicity).toBe('number');
+  });
+
+  it('test_sorted_ascending_by_dissonance', () => {
+    const result = bestModeChordAnalysis(t12, spectrum);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i]!.dissonance).toBeGreaterThanOrEqual(result[i - 1]!.dissonance);
+    }
+  });
+
+  it('test_without_spectrum_uses_harmonicity_ranking', () => {
+    const result = bestModeChordAnalysis(t12);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result[0]).toBeDefined();
+  });
+
+  it('test_tuning_with_no_degrees_throws_range_error', () => {
+    const empty = {
+      id: 'empty',
+      name: 'Empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(() => bestModeChordAnalysis(empty, spectrum)).toThrow(RangeError);
+  });
+
+  it('test_result_matches_manual_pipeline', () => {
+    const bestMode = bestModeForTuning(t12, spectrum);
+    const manual = chordMapAnalysis(bestMode, t12, spectrum);
+    const result = bestModeChordAnalysis(t12, spectrum);
+    expect(result.length).toBe(manual.length);
+    expect(result[0]!.degreeOffset).toBe(manual[0]!.degreeOffset);
+  });
+});
+
+// Q148 — worstChordMapEntry: return the most dissonant ScaleChordMapEntry in one call
+describe('worstChordMapEntry (Q148)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_a_scale_chord_map_entry', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const result = worstChordMapEntry(chordMap, spectrum, t12.referenceHz);
+    expect(typeof result.degreeOffset).toBe('number');
+    expect(result.chord).toBeDefined();
+  });
+
+  it('test_empty_chord_map_throws_range_error', () => {
+    expect(() => worstChordMapEntry([], spectrum)).toThrow(RangeError);
+  });
+
+  it('test_result_is_last_entry_from_rankChordMapByDissonance', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const ranked = rankChordMapByDissonance(chordMap, spectrum, t12.referenceHz);
+    const worst = worstChordMapEntry(chordMap, spectrum, t12.referenceHz);
+    expect(worst.degreeOffset).toBe(ranked[ranked.length - 1]!.degreeOffset);
+  });
+
+  it('test_default_rootHz_produces_valid_result', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const result = worstChordMapEntry(chordMap, spectrum);
+    expect(result).toBeDefined();
+  });
+
+  it('test_single_entry_returns_that_entry', () => {
+    const chordMap = scaleToChordMap(major12, t12).slice(0, 1);
+    const result = worstChordMapEntry(chordMap, spectrum, t12.referenceHz);
+    expect(result.degreeOffset).toBe(chordMap[0]!.degreeOffset);
   });
 });

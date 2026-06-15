@@ -1667,3 +1667,66 @@ export function rankChordMapByDissonance(
       chordObjectDissonance(b.chord, rootHz, effectiveSpectrum),
   );
 }
+
+/**
+ * Complete chord-map analysis of the best mode in a tuning, in one call.
+ *
+ * Socratic Q146: "If a tuning can produce a best mode and the mode can produce a chord map,
+ * the complete analysis of the best mode should be one call — can it?" Today it requires:
+ * `bestModeForTuning(tuning)` → `chordMapAnalysis(mode, tuning, spectrum)` — two explicit
+ * steps. This bridges that gap.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `ChordMapAnalysisEntry[]` sorted by dissonance ascending (most consonant first).
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const analysis = bestModeChordAnalysis(t12);
+ * // analysis[0] is the most consonant diatonic chord in t12's best mode
+ */
+export function bestModeChordAnalysis(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+): ChordMapAnalysisEntry[] {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const bestMode = bestModeForTuning(tuning, spectrum);
+  return chordMapAnalysis(bestMode, tuning, effectiveSpectrum);
+}
+
+/**
+ * Return the single most dissonant (worst) entry in a `ScaleChordMapEntry[]`.
+ *
+ * Socratic Q148: "If we have a ScaleChordMapEntry array and we want the entry with the
+ * worst (highest) dissonance for comparison, that should be one call — can it?"
+ * `rankChordMapByDissonance(chordMap)[last]` gives it, but requires knowing the length
+ * and indexing manually. If the best-entry shortcut (`bestChordMapEntry`) is first-class,
+ * so should the worst-entry shortcut be.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Reference frequency for chord realization (default 440 Hz).
+ * @returns The `ScaleChordMapEntry` with the highest Sethares roughness.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const worst = worstChordMapEntry(chordMap, harmonicSpectrum(), 261.63);
+ * // worst is the most dissonant diatonic triad in the major scale
+ */
+export function worstChordMapEntry(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): ScaleChordMapEntry {
+  if (chordMap.length === 0) {
+    throw new RangeError('worstChordMapEntry: chordMap must be non-empty');
+  }
+  const ranked = rankChordMapByDissonance(chordMap, spectrum, rootHz);
+  return ranked[ranked.length - 1] as ScaleChordMapEntry;
+}
