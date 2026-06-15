@@ -33,6 +33,9 @@ import {
   chordMapAnalysis,
   bestChordMapEntry,
   rankChordMapByHarmonicity,
+  bestModeForTuning,
+  rankChordMapCombined,
+  bestChordForMidiNote,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -1982,5 +1985,166 @@ describe('rankChordMapByHarmonicity (Q131)', () => {
   it('test_tol_param_is_accepted', () => {
     const chordMap = scaleToChordMap(major12, t12);
     expect(() => rankChordMapByHarmonicity(chordMap, 440, 0.05)).not.toThrow();
+  });
+});
+
+// Q133 — bestModeForTuning: find the most harmonically optimal modal rotation
+describe('bestModeForTuning (Q133)', () => {
+  it('test_returns_a_scale', () => {
+    const mode = bestModeForTuning(t12);
+    expect(mode).toBeDefined();
+    expect(typeof mode.id).toBe('string');
+    expect(mode.degreeIndices.length).toBeGreaterThan(0);
+  });
+
+  it('test_returned_scale_has_tuning_id_of_input', () => {
+    const mode = bestModeForTuning(t12);
+    expect(mode.tuningId).toBe(t12.id);
+  });
+
+  it('test_with_spectrum_returns_a_scale', () => {
+    const spectrum = harmonicSpectrum();
+    const mode = bestModeForTuning(t12, spectrum);
+    expect(mode).toBeDefined();
+    expect(mode.degreeIndices.length).toBeGreaterThan(0);
+  });
+
+  it('test_with_spectrum_tuning_id_matches', () => {
+    const spectrum = harmonicSpectrum();
+    const mode = bestModeForTuning(t12, spectrum);
+    expect(mode.tuningId).toBe(t12.id);
+  });
+
+  it('test_max_degrees_filter_applied', () => {
+    // Use a tuning with exactly 12 degrees; maxDegrees=12 should pass
+    const mode = bestModeForTuning(t12, undefined, 12);
+    expect(mode.degreeIndices.length).toBeLessThanOrEqual(12);
+  });
+
+  it('test_max_degrees_zero_throws', () => {
+    // maxDegrees=0 means no mode (all modes have at least 1 degree) → throws
+    expect(() => bestModeForTuning(t12, undefined, 0)).toThrow(RangeError);
+  });
+
+  it('test_all_degree_indices_are_in_tuning_range', () => {
+    const mode = bestModeForTuning(t12);
+    const n = t12.degrees.length;
+    for (const idx of mode.degreeIndices) {
+      expect(idx).toBeGreaterThanOrEqual(0);
+      expect(idx).toBeLessThan(n);
+    }
+  });
+});
+
+// Q136 — rankChordMapCombined: rank chord map by weighted dissonance + harmonicity
+describe('rankChordMapCombined (Q136)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_same_length_as_input', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const ranked = rankChordMapCombined(chordMap);
+    expect(ranked.length).toBe(chordMap.length);
+  });
+
+  it('test_does_not_mutate_input', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const originalOffsets = chordMap.map((e) => e.degreeOffset);
+    rankChordMapCombined(chordMap);
+    expect(chordMap.map((e) => e.degreeOffset)).toEqual(originalOffsets);
+  });
+
+  it('test_all_input_entries_present_in_output', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    const ranked = rankChordMapCombined(chordMap);
+    const inputOffsets = new Set(chordMap.map((e) => e.degreeOffset));
+    const outputOffsets = new Set(ranked.map((e) => e.degreeOffset));
+    for (const o of inputOffsets) {
+      expect(outputOffsets.has(o)).toBe(true);
+    }
+  });
+
+  it('test_dissonance_weight_0_sorts_by_harmonicity_only', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    // weight=0 → score = 1 * harmonicity → same as rankChordMapByHarmonicity
+    const ranked = rankChordMapCombined(chordMap, 0);
+    const byHarmonicity = rankChordMapByHarmonicity(chordMap, t12.referenceHz);
+    // Both should produce the same ordering
+    expect(ranked.map((e) => e.degreeOffset)).toEqual(byHarmonicity.map((e) => e.degreeOffset));
+  });
+
+  it('test_dissonance_weight_1_produces_all_zero_scores_no_order_enforced', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    // weight=1 → score = 0 * harmonicity = 0 for all; sort is stable-equivalent
+    const ranked = rankChordMapCombined(chordMap, 1);
+    expect(ranked.length).toBe(chordMap.length);
+  });
+
+  it('test_accepts_custom_rootHz', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    expect(() => rankChordMapCombined(chordMap, 0.5, 261.63)).not.toThrow();
+  });
+
+  it('test_accepts_custom_tol', () => {
+    const chordMap = scaleToChordMap(major12, t12);
+    expect(() => rankChordMapCombined(chordMap, 0.5, 440, 0.05)).not.toThrow();
+  });
+});
+
+// Q137 — bestChordForMidiNote: best chord for a MIDI note number
+describe('bestChordForMidiNote (Q137)', () => {
+  it('test_returns_chord_and_root_hz', () => {
+    const result = bestChordForMidiNote(60, t12); // C4 = 261.63 Hz
+    expect(result).toBeDefined();
+    expect(result.chord).toBeDefined();
+    expect(result.rootHz).toBeGreaterThan(0);
+  });
+
+  it('test_root_hz_for_midi_69_is_440', () => {
+    // MIDI 69 = A4 = 440 Hz
+    const { rootHz } = bestChordForMidiNote(69, t12);
+    expect(rootHz).toBeCloseTo(440, 6);
+  });
+
+  it('test_root_hz_for_midi_60_is_middle_c', () => {
+    // MIDI 60 = C4 ≈ 261.626 Hz
+    const { rootHz } = bestChordForMidiNote(60, t12);
+    expect(rootHz).toBeCloseTo(261.626, 2);
+  });
+
+  it('test_chord_has_valid_intervals', () => {
+    const { chord } = bestChordForMidiNote(60, t12);
+    expect(chord.chord.intervals.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('test_chord_has_dissonance_and_harmonicity', () => {
+    const { chord } = bestChordForMidiNote(60, t12);
+    expect(typeof chord.dissonance).toBe('number');
+    expect(typeof chord.harmonicity).toBe('number');
+    expect(chord.dissonance).toBeGreaterThanOrEqual(0);
+    expect(chord.harmonicity).toBeGreaterThanOrEqual(1);
+  });
+
+  it('test_custom_a4hz_shifts_root', () => {
+    // A4 = 432 Hz alternative standard
+    const { rootHz } = bestChordForMidiNote(69, t12, undefined, 432);
+    expect(rootHz).toBeCloseTo(432, 6);
+  });
+
+  it('test_with_spectrum_returns_valid_result', () => {
+    const spectrum = harmonicSpectrum();
+    const result = bestChordForMidiNote(60, t12, spectrum);
+    expect(result.chord).toBeDefined();
+    expect(result.rootHz).toBeGreaterThan(0);
+  });
+
+  it('test_different_midi_notes_give_different_root_hz', () => {
+    const r60 = bestChordForMidiNote(60, t12);
+    const r72 = bestChordForMidiNote(72, t12); // one octave up
+    expect(r72.rootHz).toBeCloseTo(r60.rootHz * 2, 3);
   });
 });

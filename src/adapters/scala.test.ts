@@ -1,10 +1,19 @@
 import { describe, it, expect } from 'vitest';
-import { parseScl, writeScl, sclFromCents, degreeCents, tuningToScl, chordToScl } from './scala.js';
+import {
+  parseScl,
+  writeScl,
+  sclFromCents,
+  degreeCents,
+  tuningToScl,
+  chordToScl,
+  chordMapToScl,
+} from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
 import { mpeToFreq } from '../core/midi.js';
 import { freqToCents } from '../core/cents.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
+import { type Scale, scaleToChordMap } from '../core/scale.js';
 
 const SCL_12TET = `! meanquar.scl
 !
@@ -266,5 +275,70 @@ describe('chordToScl (Q111)', () => {
     // 12-TET major third = 400c, perfect fifth = 700c
     expect(degreeCents(scl.degrees[0]!)).toBeCloseTo(400, 2);
     expect(degreeCents(scl.degrees[1]!)).toBeCloseTo(700, 2);
+  });
+});
+
+// Q132 — chordMapToScl: chord map → Scala .scl
+describe('chordMapToScl (Q132)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_non_empty_degrees_returned', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const scl = chordMapToScl(chordMap, t12);
+    expect(scl.degrees.length).toBeGreaterThan(0);
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => chordMapToScl([], t12)).toThrow(RangeError);
+  });
+
+  it('test_all_unique_pitch_classes_from_major', () => {
+    // 7-note major scale: diatonic triads collectively reference all non-root scale degrees
+    const chordMap = scaleToChordMap(major, t12);
+    const scl = chordMapToScl(chordMap, t12);
+    // At least some pitch classes above root are collected
+    expect(scl.degrees.length).toBeGreaterThan(0);
+    // All degrees are within the octave (0c < c < 1200c)
+    for (const d of scl.degrees) {
+      expect(degreeCents(d)).toBeGreaterThan(0);
+      expect(degreeCents(d)).toBeLessThan(1200);
+    }
+  });
+
+  it('test_custom_name_used_as_description', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const scl = chordMapToScl(chordMap, t12, 'my-scale');
+    expect(scl.description).toBe('my-scale');
+  });
+
+  it('test_default_name_is_tuning_id', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const scl = chordMapToScl(chordMap, t12);
+    expect(scl.description).toBe(t12.id);
+  });
+
+  it('test_round_trips_through_writeScl_parseScl', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const scl = chordMapToScl(chordMap, t12);
+    const text = writeScl(scl);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBe(scl.degrees.length);
+    for (let i = 0; i < scl.degrees.length; i++) {
+      expect(degreeCents(parsed.degrees[i]!)).toBeCloseTo(degreeCents(scl.degrees[i]!), 3);
+    }
+  });
+
+  it('test_degrees_sorted_ascending', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const scl = chordMapToScl(chordMap, t12);
+    for (let i = 1; i < scl.degrees.length; i++) {
+      expect(degreeCents(scl.degrees[i]!)).toBeGreaterThan(degreeCents(scl.degrees[i - 1]!));
+    }
   });
 });

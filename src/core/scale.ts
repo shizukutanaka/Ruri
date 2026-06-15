@@ -5,7 +5,8 @@ import {
   degreeToFreq,
   tuningToIntervalVector,
 } from './tuning.js';
-import { type Spectrum } from './spectrum.js';
+import { type Spectrum, harmonicSpectrum } from './spectrum.js';
+import { midiToFreq } from './midi.js';
 import { chordDissonance, chordObjectDissonance } from './dissonance.js';
 import {
   rankChords,
@@ -1476,4 +1477,155 @@ export function scaleModalAnalysis(
   });
 
   return entries.sort((a, b) => a.quality - b.quality);
+}
+
+/**
+ * Find the modal rotation of a tuning's full scale that is most harmonically optimal.
+ *
+ * Socratic Q133: `rankModeSeriesByHarmonicity(scale, tuning)` ranks all modes by
+ * Stolzenburg periodicity, and `rankAllModesForTimbre(scale, tuning, spectrum)` adds
+ * Sethares roughness — but neither provides a one-call path from a raw `TuningSystem`
+ * to its single best mode. The caller must first call `tuningToScale`, then pick a
+ * ranking function. `bestModeForTuning` closes this gap: from a tuning, return the
+ * Scale corresponding to the most harmonic (or timbre-optimal) mode in one call.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale spanning all degrees.
+ * 2a. If no `spectrum`: `rankModeSeriesByHarmonicity(scale, tuning)` → sort by harmonicity;
+ *     return the first entry's Scale.
+ * 2b. If `spectrum` provided: `rankAllModesForTimbre(scale, tuning, spectrum)` → sort by
+ *     combinedScore (roughness + harmonicity); return the first entry's Scale.
+ * 3. `maxDegrees`: if provided, only consider modes with `degreeIndices.length <= maxDegrees`.
+ *
+ * @param tuning     - The parent `TuningSystem`.
+ * @param spectrum   - Optional instrument spectrum. When provided, combines roughness and
+ *                     harmonicity via `rankAllModesForTimbre`. When omitted, uses harmonicity only.
+ * @param maxDegrees - Optional filter: only modes with this many or fewer degrees are
+ *                     considered. Useful for large tunings to limit search space.
+ * @returns The `Scale` of the most harmonically optimal mode.
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bestMode = bestModeForTuning(t12);
+ * // bestMode is the modal rotation of the full 12-TET scale with the simplest ratios
+ *
+ * @example
+ * // With timbre:
+ * const bestMode = bestModeForTuning(t12, harmonicSpectrum());
+ */
+export function bestModeForTuning(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  maxDegrees?: number,
+): Scale {
+  const fullScale = tuningToScale(tuning);
+
+  if (spectrum !== undefined) {
+    let ranked = rankAllModesForTimbre(fullScale, tuning, spectrum);
+    if (maxDegrees !== undefined) {
+      ranked = ranked.filter((e) => e.scale.degreeIndices.length <= maxDegrees);
+    }
+    if (ranked.length === 0) {
+      throw new RangeError('bestModeForTuning: no modes satisfy the maxDegrees constraint');
+    }
+    return (ranked[0] as RankedModeForTimbre).scale;
+  }
+
+  let ranked = rankModeSeriesByHarmonicity(fullScale, tuning);
+  if (maxDegrees !== undefined) {
+    ranked = ranked.filter((e) => e.scale.degreeIndices.length <= maxDegrees);
+  }
+  if (ranked.length === 0) {
+    throw new RangeError('bestModeForTuning: no modes satisfy the maxDegrees constraint');
+  }
+  return (ranked[0] as RankedModeByHarmonicity).scale;
+}
+
+/**
+ * Rank all entries in a `ScaleChordMapEntry[]` by a weighted combination of dissonance
+ * and harmonicity, returning entries sorted by combined score ascending (best first).
+ *
+ * Socratic Q136: If a chord map has both dissonance and harmonicity scores, we can rank
+ * by a combined score — can it? `chordMapAnalysis` provides both scores but sorts only
+ * by dissonance. `rankChordMapByHarmonicity` sorts only by harmonicity. A single combined-
+ * weight sort requires computing both scores per entry and blending them. If a chord map
+ * is first-class, combining both axes should be one call.
+ *
+ * Score formula: `score = dissonanceWeight * roughness + (1 - dissonanceWeight) * harmonicity`.
+ * Since no spectrum is available here (unlike `chordMapAnalysis`), roughness = 0, so:
+ * `score = (1 - dissonanceWeight) * harmonicity`. Sorting ascending puts most harmonic
+ * (lowest harmonicity) entries first when `dissonanceWeight < 1`.
+ *
+ * @param chordMap         - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param dissonanceWeight - Weight for the roughness axis (0..1, default 0.5).
+ *                           0 = pure harmonicity ranking; 1 = all entries score 0 (unsorted).
+ * @param rootHz           - Root frequency for harmonicity computation (default 440 Hz).
+ * @param tol              - Continued-fraction tolerance for harmonicity (default 0.0136).
+ * @returns New array sorted by combined score ascending (most harmonic first).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const ranked = rankChordMapCombined(chordMap);
+ * // ranked[0] is the diatonic chord with the best combined harmonicity score
+ */
+export function rankChordMapCombined(
+  chordMap: readonly ScaleChordMapEntry[],
+  dissonanceWeight = 0.5,
+  rootHz = 440,
+  tol = 0.0136,
+): ScaleChordMapEntry[] {
+  return [...chordMap].sort((a, b) => {
+    const hA = harmonicityForChord(a.chord, rootHz, tol);
+    const hB = harmonicityForChord(b.chord, rootHz, tol);
+    // roughness = 0 (no spectrum available), so score = (1 - dissonanceWeight) * harmonicity
+    const scoreA = (1 - dissonanceWeight) * hA;
+    const scoreB = (1 - dissonanceWeight) * hB;
+    return scoreA - scoreB;
+  });
+}
+
+/**
+ * Find the best-scoring chord from a chord map analysis for a given MIDI note.
+ *
+ * Socratic Q137: Converting a MIDI note number to a frequency and then finding the most
+ * consonant diatonic chord at that root requires: `midiToFreq` → `tuningToScale` →
+ * `chordMapAnalysis` → index into result. If MIDI note numbers are valid musical input,
+ * "give me the best chord for this MIDI note in this tuning" should be one call.
+ *
+ * Algorithm:
+ * 1. `midiToFreq(midiNote, a4Hz ?? 440)` → rootHz.
+ * 2. `tuningToScale(tuning)` → full scale.
+ * 3. `chordMapAnalysis(scale, tuning, spectrum ?? harmonicSpectrum(), 3)` → scored chord map.
+ * 4. Return `{ chord: analysis[0]!, rootHz }`.
+ *
+ * @param midiNote - MIDI note number (0..127) to use as the root.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for dissonance computation. Defaults to
+ *                   `harmonicSpectrum()`.
+ * @param a4Hz     - Reference frequency for A4 (default 440 Hz).
+ * @returns `{ chord: ChordMapAnalysisEntry; rootHz: number }` — the best chord entry and
+ *          the computed root frequency.
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { chord, rootHz } = bestChordForMidiNote(60, t12); // C4
+ * // chord.chord is the most consonant diatonic triad rooted at middle C
+ */
+export function bestChordForMidiNote(
+  midiNote: number,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  a4Hz?: number,
+): { chord: ChordMapAnalysisEntry; rootHz: number } {
+  const rootHz = midiToFreq(midiNote, a4Hz ?? 440);
+  const scale = tuningToScale(tuning);
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const analysis = chordMapAnalysis(scale, tuning, effectiveSpectrum, 3);
+  return { chord: analysis[0] as ChordMapAnalysisEntry, rootHz };
 }

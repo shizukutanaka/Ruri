@@ -2,6 +2,7 @@
 import { type TuningSystem } from '../core/tuning.js';
 import { pitchToCents, freqToCents } from '../core/cents.js';
 import { type Chord, chordToFreqRatios } from '../core/chord.js';
+import { type ScaleChordMapEntry } from '../core/scale.js';
 
 /** One scale degree, tagged by its original textual form. */
 export type ScalaDegree =
@@ -157,4 +158,58 @@ export function chordToScl(chord: Chord, rootHz: number, name?: string): ScalaSc
   // Convert each ratio to cents relative to root; skip the root itself (ratio=1 → 0c)
   const centsAboveRoot = ratios.map((r) => freqToCents(r * rootHz, rootHz)).filter((c) => c > 0);
   return sclFromCents(name ?? chord.name, centsAboveRoot);
+}
+
+/**
+ * Export all pitch classes referenced by a diatonic chord map as a Scala `.scl` scale.
+ *
+ * Socratic Q132: If a chord map tells us which chords are consonant, the Scala file should
+ * show them all — can it? A `ScaleChordMapEntry[]` contains every diatonic chord, but
+ * converting that map to a `.scl` file for use in Scala-compatible synths requires collecting
+ * unique pitch classes, deduplicating by cents proximity, and writing the `.scl` file manually.
+ * If a chord map is first-class, exporting it as a Scala scale should be one call.
+ *
+ * Collects all interval cents from every chord in the map (relative to the root), deduplicates
+ * pitches within `tolCents` of each other, sorts ascending, and emits a `ScalaScale`.
+ * The root 1/1 (0 cents) is implicit in Scala and excluded from the degree list.
+ *
+ * @param chordMap  - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param tuning    - The parent `TuningSystem` (used for `referenceHz` as the default root).
+ * @param name      - Optional description for the `.scl` header. Defaults to `tuning.id`.
+ * @param rootHz    - Root frequency in Hz for interval computation (defaults to `tuning.referenceHz`).
+ * @param tolCents  - Deduplication tolerance in cents (default 0.5).
+ * @returns A `ScalaScale` whose degrees are the unique pitch classes across all chords.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const scl = chordMapToScl(chordMap, t12, 'major-diatonic');
+ * fs.writeFileSync('major-diatonic.scl', writeScl(scl));
+ */
+export function chordMapToScl(
+  chordMap: readonly ScaleChordMapEntry[],
+  tuning: TuningSystem,
+  name?: string,
+  rootHz?: number,
+  tolCents = 0.5,
+): ScalaScale {
+  if (chordMap.length === 0) throw new RangeError('chordMapToScl: chordMap must be non-empty');
+  const root = rootHz ?? tuning.referenceHz;
+
+  // Collect unique pitch-class cents across all chords (skip 0c = root)
+  const allCents: number[] = [];
+  for (const entry of chordMap) {
+    const ratios = chordToFreqRatios(entry.chord, root);
+    for (const r of ratios) {
+      const c = freqToCents(r * root, root);
+      if (c <= 0) continue;
+      const isDuplicate = allCents.some((existing) => Math.abs(existing - c) < tolCents);
+      if (!isDuplicate) allCents.push(c);
+    }
+  }
+  allCents.sort((a, b) => a - b);
+  return sclFromCents(name ?? tuning.id, allCents);
 }
