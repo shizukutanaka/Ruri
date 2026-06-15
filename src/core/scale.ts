@@ -2484,3 +2484,100 @@ export function tuningHarmonicityCorrelation(
   if (stdA === 0 || stdB === 0) return NaN;
   return cov / (stdA * stdB);
 }
+
+/**
+ * Produce an ASCII bar-chart of a tuning's harmonicity profile in one call.
+ *
+ * Socratic Q193: "If we can compare tuning harmonicity profiles, producing a visual ASCII
+ * bar-chart of the profile should be one call — can it?" Today: `tuningHarmonicityProfile`
+ * → iterate values → build bar strings — two explicit steps. If the profile is first-class,
+ * visualising it should also be one call.
+ *
+ * Each line has the form: `'mode {i}: {bar} ({value.toFixed(3)})'` where `bar` is a
+ * string of '#' characters proportional to the value relative to the maximum in the
+ * profile (default width 40). If all values are zero, all bars are empty.
+ *
+ * @param tuning - The tuning system.
+ * @param tol    - Stolzenburg tolerance forwarded to `tuningHarmonicityProfile`. Default 0.0136.
+ * @param width  - Maximum bar width in '#' characters. Default 40.
+ * @returns Multi-line string with one line per mode rotation.
+ *
+ * @throws {RangeError} if tuning has no degrees.
+ *
+ * @example
+ * console.log(harmonicityProfileChart(edo(12)));
+ */
+export function harmonicityProfileChart(tuning: TuningSystem, tol = 0.0136, width = 40): string {
+  const profile = tuningHarmonicityProfile(tuning, tol);
+  const max = Math.max(...profile);
+  return profile
+    .map((v, i) => {
+      const barLen = max === 0 ? 0 : Math.round((v / max) * width);
+      const bar = '#'.repeat(barLen);
+      return `mode ${i}: ${bar} (${v.toFixed(3)})`;
+    })
+    .join('\n');
+}
+
+/**
+ * Extract only the triads from a chord map in one call.
+ *
+ * Socratic Q196: "If we can group chord map entries by label, we should be able to extract
+ * only the triads from a chord map in one call — can it?" Today: `groupChordMapByLabel(chordMap)`
+ * → `.get('triad') ?? []` — two explicit steps. If grouping is first-class, extracting triads
+ * should be one call.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @returns All `ScaleChordMapEntry` items whose chord has exactly 3 intervals (triads).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12, 3);
+ * const triads = chordMapTriads(chordMap);
+ */
+export function chordMapTriads(chordMap: readonly ScaleChordMapEntry[]): ScaleChordMapEntry[] {
+  return groupChordMapByLabel(chordMap).get('triad') ?? [];
+}
+
+/**
+ * Rank all scales (modes of a tuning) by a combined smoothness + dissonance score in one call.
+ *
+ * Socratic Q197: "If we can check whether a scale is stable, we should be able to rank ALL
+ * scales (modes of a tuning) by their stability score in one call — can it?" Today:
+ * `tuningToScale` → `scaleModeSeries` → per-mode `progressionScoreSummary` +
+ * `chordMapMeanDissonance` → sort — four explicit steps. If mode ranking is first-class,
+ * ranking all modes by stability should be one call.
+ *
+ * Combined score = `meanSmoothness + dissonance * 1000`. Lower score = more stable.
+ * Result is sorted ascending by combined score.
+ *
+ * @param tuning      - The parent `TuningSystem`.
+ * @param rootHz      - Absolute frequency of the root in Hz.
+ * @param spectrum    - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param thresholds  - Unused; accepted for API forward-compatibility.
+ * @returns Array of `{ scale, smoothness, dissonance, score }` sorted ascending by score.
+ *
+ * @example
+ * const ranked = rankModesByStability(edo(5), 261.63);
+ * // ranked[0].scale is the most stable mode of 5-EDO
+ */
+export function rankModesByStability(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+  thresholds?: { smoothness: number; dissonance: number },
+): Array<{ scale: Scale; smoothness: number; dissonance: number; score: number }> {
+  void thresholds;
+  const fullScale = tuningToScale(tuning);
+  const modes = scaleModeSeries(fullScale, tuning);
+  const entries = modes.map((mode) => {
+    const summary = progressionScoreSummary(mode, tuning, rootHz, spectrum);
+    const chordMap = scaleToChordMap(mode, tuning);
+    const dissonance = chordMapMeanDissonance(chordMap, spectrum, rootHz);
+    const smoothness = summary.meanSmoothness;
+    const score = smoothness + dissonance * 1000;
+    return { scale: mode, smoothness, dissonance, score };
+  });
+  return entries.sort((a, b) => a.score - b.score);
+}
