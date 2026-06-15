@@ -1,6 +1,7 @@
 /** Synthesis parameters for audition. Pure (no Web Audio dependency) so it is unit-testable. */
 
 import { type Spectrum } from './spectrum.js';
+import { type Chord, realizeChordFreqs } from './chord.js';
 
 const A4_HZ = 440;
 const A4_MIDI = 69;
@@ -23,6 +24,28 @@ export function voicesForPitch(freq: number, spectrum: Spectrum, gain = 0.2): Vo
 /** All voices for a chord (member fundamentals) under one timbre. */
 export function voicesForChord(freqs: readonly number[], spectrum: Spectrum, gain = 0.2): Voice[] {
   return freqs.flatMap((f) => voicesForPitch(f, spectrum, gain));
+}
+
+/**
+ * All Web Audio voices for a `Chord`, realized at the given root frequency.
+ *
+ * Bridges the portable `Chord` type directly into the Web Audio layer.
+ * Equivalent to `voicesForChord(realizeChordFreqs(chord, rootHz), spectrum, gain)`,
+ * closing the gap: currently the Web Audio path requires two steps when starting
+ * from a `Chord` object rather than a raw Hz array.
+ *
+ * @example
+ * const chord = chordFromSemitones('major', [0, 4, 7]);
+ * const voices = voicesForChordObject(chord, 261.63, harmonicSpectrum());
+ * // → schedule voices on Web Audio OscillatorNodes
+ */
+export function voicesForChordObject(
+  chord: Chord,
+  rootHz: number,
+  spectrum: Spectrum,
+  gain = 0.2,
+): Voice[] {
+  return voicesForChord(realizeChordFreqs(chord, rootHz), spectrum, gain);
 }
 
 /**

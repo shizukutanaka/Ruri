@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。556テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。569テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -141,6 +141,28 @@ const bell = consonantIntervals(bellSpectrum());
 // 命題の帰結: 音色から最適調律を直接生成 → 全パイプライン(rankChords/mtsBulkDump/etc.)に直結
 const harmTuning = spectrumToTuning(harmonicSpectrum()); // 純正律系の TuningSystem
 const bellTuning = spectrumToTuning(bellSpectrum());     // ベル音色固有の TuningSystem
+
+// d-2) 既存調律の音色適合度を評価: 「12-TETはどのくらい倍音音色に最適か？」
+import { tuningSuitability } from 'ruri';
+import { edo } from 'ruri';
+
+const fit12 = tuningSuitability(edo(12), harmonicSpectrum()); // coverage ~0.7–1.0
+const fitBell = tuningSuitability(edo(12), bellSpectrum());   // coverage < fit12.coverage
+// 倍音音色の自己導出調律 → 定義上 coverage = 1.0（上限基準として使用）
+const ceiling = tuningSuitability(spectrumToTuning(harmonicSpectrum()), harmonicSpectrum());
+// → { coverage: 1, avgErrorCents: 0, ... }
+```
+
+```ts
+// d-3) Chord オブジェクト → Web Audio ボイス: 2ステップを1コールに統合
+import { chordFromSemitones } from 'ruri';
+import { voicesForChordObject, voicesForChord } from 'ruri';
+
+const chord = chordFromSemitones('major', [0, 4, 7]);
+// Before (2 steps): realizeChordFreqs → voicesForChord
+// After (1 call): Chord + rootHz + spectrum → Voice[]
+const voices = voicesForChordObject(chord, 261.63, harmonicSpectrum());
+// voices[i] = { freq: Hz, gain: amplitude } → schedule on OscillatorNode
 ```
 
 ```ts

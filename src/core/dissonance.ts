@@ -1,5 +1,5 @@
 import { type Spectrum, type RealizedPartial, realizeSpectrum } from './spectrum.js';
-import { freqToCents } from './cents.js';
+import { freqToCents, pitchToCents } from './cents.js';
 import { type TuningSystem, defineTuning } from './tuning.js';
 
 // Sethares sensory-dissonance model constants (Plomp-Levelt based).
@@ -186,4 +186,66 @@ export function spectrumToTuning(spectrum: Spectrum, opts?: SpectrumToTuningOpti
     degrees,
     source: 'theoretical' as const,
   });
+}
+
+/** Result of `tuningSuitability`. */
+export interface TuningSuitabilityResult {
+  /** Fraction of consonant intervals captured within `toleranceCents` (0–1). */
+  readonly coverage: number;
+  /** Average distance in cents from each consonant interval to its nearest tuning degree. */
+  readonly avgErrorCents: number;
+  /** Total number of consonant intervals discovered in the spectrum scan. */
+  readonly totalConsonantIntervals: number;
+  /** Number matched within `toleranceCents` of a tuning degree. */
+  readonly matchedCount: number;
+}
+
+/**
+ * Measure how well an existing `TuningSystem` covers the consonant intervals of a timbre.
+ *
+ * This is the **inverse** of `spectrumToTuning`: instead of *building* the optimal tuning
+ * for a timbre, this *evaluates* how close an existing tuning already is.
+ *
+ * Core thesis application: `tuningSuitability(edo(12), harmonicSpectrum())` shows that
+ * 12-TET approximates the just intervals well; `tuningSuitability(edo(12), bellSpectrum())`
+ * shows poorer fit — confirming that 12-TET was optimised for harmonic timbres, not bells.
+ * `tuningSuitability(spectrumToTuning(bellSpectrum()), bellSpectrum())` gives coverage = 1
+ * by construction, providing a reference ceiling.
+ *
+ * @param toleranceCents - Max distance (in cents) from a tuning degree to count as a match.
+ *   Default 25 (≈ a quarter-tone), matching the coarse resolution of the scan.
+ */
+export function tuningSuitability(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  opts?: ConsonantIntervalsOptions & { readonly toleranceCents?: number },
+): TuningSuitabilityResult {
+  const toleranceCents = opts?.toleranceCents ?? 25;
+  const intervals = consonantIntervals(spectrum, opts);
+
+  if (intervals.length === 0) {
+    return { coverage: 1, avgErrorCents: 0, totalConsonantIntervals: 0, matchedCount: 0 };
+  }
+
+  const tuningCents = tuning.degrees.map((d) => pitchToCents(d));
+
+  let totalError = 0;
+  let matchedCount = 0;
+
+  for (const iv of intervals) {
+    let minError = Infinity;
+    for (const tc of tuningCents) {
+      const err = Math.abs(iv.cents - tc);
+      if (err < minError) minError = err;
+    }
+    totalError += minError;
+    if (minError <= toleranceCents) matchedCount++;
+  }
+
+  return {
+    coverage: matchedCount / intervals.length,
+    avgErrorCents: totalError / intervals.length,
+    totalConsonantIntervals: intervals.length,
+    matchedCount,
+  };
 }

@@ -1532,3 +1532,49 @@ export function isScaleCompatible(scale: Scale, tuning: TuningSystem): boolean {
 **到達した境地**: Q50 は「発見 (rankChords) → 測定 (progressionSmoothness) → 最適化 (optimalChordOrder)」という DTM ワークフローの三段目を完成させた。Q51 は「内部の fail-fast 哲学」と「外部からの防御的コーディング」の境界を明確化した。どちらも「ライブラリが自分の哲学 (fail-fast / first-class) に対して整合的か」という Socratic 問い。
 
 556 テスト / 全パス。
+
+---
+
+## 第二十五巡サマリ
+
+| 問                                                                                          | 判定                     | 対応                                                         |
+| ------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------ |
+| Q52 「`Chord` が一級市民なら、Web Audio ボイス取得は1コールで済むべきでは？」              | ❌ 2ステップ必要だった    | `voicesForChordObject(chord, rootHz, spectrum, gain?)` + 5 テスト |
+| Q53 「`spectrumToTuning` が最適調律を導出するなら、逆問題: 既存調律の音色適合度を測れるか？」 | ❌ 測定手段がなかった     | `tuningSuitability(tuning, spectrum, opts?)` + `TuningSuitabilityResult` + 8 テスト |
+
+### Q52 詳細
+
+**問**: `Chord` は一級市民として `realizeChordFreqs` で Hz 配列に変換できる。`voicesForChord` は Hz 配列を受け取る。なぜ `Chord` → `Voice[]` に2ステップかかるのか？
+
+**実装**: `src/core/synth.ts` に `voicesForChordObject(chord, rootHz, spectrum, gain = 0.2): Voice[]` を追加。内部は `voicesForChord(realizeChordFreqs(chord, rootHz), spectrum, gain)` の1行。
+
+**テスト (5 件)**:
+- `voicesForChordObject` の出力が `voicesForChord(realizeChordFreqs(...))` と等しい
+- 全ボイスの freq > 0 かつ gain > 0
+- 単音和音が `voicesForPitch` と一致
+- gain パラメータが全ボイスを等倍スケール
+- 4和音 × 6 部分音 = 24 ボイス (構造検証)
+
+### Q53 詳細
+
+**問**: `spectrumToTuning(spectrum)` は「音色から最適調律を導出」する。では **逆問題**「既存の調律 X は、音色 Y にどれだけ合っているか？」を測る手段はあるか？
+
+**答**: `tuningSuitability(tuning, spectrum, opts?)` を `src/core/dissonance.ts` に追加。
+- `consonantIntervals(spectrum)` でその音色の協和音程集合を取得
+- 各協和音程について調律の各度との距離(cents)を計算し、最小値を記録
+- `coverage` = `toleranceCents`(デフォルト25c)以内に収まった比率
+- `avgErrorCents` = 全協和音程の平均最近傍距離
+
+**テスト (8 件)**:
+- 自己導出調律 (`spectrumToTuning(spec)`) は coverage = 1.0
+- 12-TET は倍音音色より bell 音色で coverage が低い (本ライブラリの核心テーゼの数値的検証)
+- coverage は [0, 1] 範囲内
+- avgErrorCents ≥ 0
+- matchedCount ≤ totalConsonantIntervals
+- 厳しい tolerance では coverage が低下
+- bell 音色の自己導出調律も coverage = 1.0 (定義上)
+- 31-EDO は 12-EDO より倍音音色で avgErrorCents が低い
+
+**到達した境地**: Q52 は「層を越えた1コールブリッジ」という Socratic パターンの最後の未完成例。Q53 は「順問題 (spectrumToTuning) の逆問題を閉じる」という対称性。どちらも「ライブラリが自分の中心命題 (協和は音色依存) に対して自己整合的か」という問い。
+
+569 テスト / 全パス。

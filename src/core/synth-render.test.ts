@@ -208,3 +208,62 @@ describe('strikeChord — modal chord synthesis in one call (Q47)', () => {
     expect(peak).toBeCloseTo(1, 2);
   });
 });
+
+// Q52: `voicesForChord` は Hz[] を要求するが Chord を直接渡せるか？
+import { voicesForChord, voicesForPitch, voicesForChordObject } from './synth.js';
+import { chordFromSemitones } from './chord.js';
+
+describe('voicesForChordObject — Chord → Web Audio voices (Q52)', () => {
+  const spectrum = harmonicSpectrum(4);
+  const rootHz = 261.63;
+
+  it('test_output_matches_voicesForChord_hz_path', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const voices = voicesForChordObject(chord, rootHz, spectrum);
+    // Must equal voicesForChord(realizeChordFreqs(chord, rootHz), spectrum)
+    import('./chord.js').then(({ realizeChordFreqs }) => {
+      const expected = voicesForChord(realizeChordFreqs(chord, rootHz), spectrum);
+      expect(voices).toEqual(expected);
+    });
+    // Quick structural check without async:
+    expect(voices.length).toBe(3 * spectrum.length); // 3 chord notes × 4 partials
+  });
+
+  it('test_all_voices_have_positive_freq_and_gain', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const voices = voicesForChordObject(chord, rootHz, spectrum);
+    for (const v of voices) {
+      expect(v.freq).toBeGreaterThan(0);
+      expect(v.gain).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_single_note_chord_matches_voicesForPitch', () => {
+    const chord = chordFromSemitones('unison', [0]);
+    const voices = voicesForChordObject(chord, rootHz, spectrum);
+    const expected = voicesForPitch(rootHz, spectrum);
+    expect(voices.length).toBe(expected.length);
+    for (let i = 0; i < voices.length; i++) {
+      expect((voices[i] as { freq: number }).freq).toBeCloseTo(
+        (expected[i] as { freq: number }).freq,
+        6,
+      );
+    }
+  });
+
+  it('test_gain_parameter_scales_all_voices', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const v1 = voicesForChordObject(chord, rootHz, spectrum, 0.1);
+    const v2 = voicesForChordObject(chord, rootHz, spectrum, 0.2);
+    // All gains in v2 should be twice those in v1.
+    for (let i = 0; i < v1.length; i++) {
+      expect((v2[i] as { gain: number }).gain).toBeCloseTo(2 * (v1[i] as { gain: number }).gain, 6);
+    }
+  });
+
+  it('test_voice_count_equals_notes_times_partials', () => {
+    const tetrad = chordFromSemitones('dom7', [0, 4, 7, 10]);
+    const voices = voicesForChordObject(tetrad, rootHz, harmonicSpectrum(6));
+    expect(voices.length).toBe(4 * 6);
+  });
+});

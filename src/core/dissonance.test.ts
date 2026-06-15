@@ -8,7 +8,9 @@ import {
   localMinima,
   consonantIntervals,
   spectrumToTuning,
+  tuningSuitability,
 } from './dissonance.js';
+import { edo } from './tuning.js';
 
 const partial = fc.record({
   freq: fc.double({ min: 50, max: 8000, noNaN: true, noDefaultInfinity: true }),
@@ -268,5 +270,63 @@ describe('spectrumToTuning — timbre-derived TuningSystem', () => {
     // A valid TuningSystem must pass defineTuning — it was constructed by defineTuning.
     expect(tuning.source).toBe('theoretical');
     expect(typeof tuning.id).toBe('string');
+  });
+});
+
+// Q53: spectrumToTuning が最適な調律を生成するなら、既存調律の音色適合度を測れるか？
+describe('tuningSuitability — how well does a tuning fit a timbre? (Q53)', () => {
+  it('test_self_derived_tuning_has_full_coverage', () => {
+    // By construction: spectrumToTuning(spectrum) should cover all consonant intervals.
+    const spectrum = harmonicSpectrum();
+    const tuning = spectrumToTuning(spectrum);
+    const result = tuningSuitability(tuning, spectrum);
+    expect(result.coverage).toBeCloseTo(1, 5);
+  });
+
+  it('test_12tet_fits_harmonic_better_than_bell', () => {
+    // 12-TET was optimised for harmonic timbres — its coverage should be higher
+    // for harmonicSpectrum than for bellSpectrum.
+    const tuning12 = edo(12);
+    const harmResult = tuningSuitability(tuning12, harmonicSpectrum());
+    const bellResult = tuningSuitability(tuning12, bellSpectrum());
+    expect(harmResult.coverage).toBeGreaterThan(bellResult.coverage);
+  });
+
+  it('test_coverage_is_between_0_and_1', () => {
+    const result = tuningSuitability(edo(12), harmonicSpectrum());
+    expect(result.coverage).toBeGreaterThanOrEqual(0);
+    expect(result.coverage).toBeLessThanOrEqual(1);
+  });
+
+  it('test_avg_error_cents_is_non_negative', () => {
+    const result = tuningSuitability(edo(12), harmonicSpectrum());
+    expect(result.avgErrorCents).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_matched_count_consistent_with_total', () => {
+    const result = tuningSuitability(edo(12), harmonicSpectrum());
+    expect(result.matchedCount).toBeLessThanOrEqual(result.totalConsonantIntervals);
+    expect(result.matchedCount).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_tight_tolerance_lowers_coverage', () => {
+    // With a very tight tolerance, fewer intervals match.
+    const wide = tuningSuitability(edo(12), harmonicSpectrum(), { toleranceCents: 50 });
+    const tight = tuningSuitability(edo(12), harmonicSpectrum(), { toleranceCents: 1 });
+    expect(wide.coverage).toBeGreaterThanOrEqual(tight.coverage);
+  });
+
+  it('test_bell_self_derived_tuning_has_full_coverage', () => {
+    const spectrum = bellSpectrum();
+    const tuning = spectrumToTuning(spectrum);
+    const result = tuningSuitability(tuning, spectrum);
+    expect(result.coverage).toBeCloseTo(1, 5);
+  });
+
+  it('test_denser_edo_fits_harmonic_at_least_as_well', () => {
+    // 31-EDO approximates just intervals better than 12-EDO for harmonic timbres.
+    const h12 = tuningSuitability(edo(12), harmonicSpectrum());
+    const h31 = tuningSuitability(edo(31), harmonicSpectrum());
+    expect(h31.avgErrorCents).toBeLessThanOrEqual(h12.avgErrorCents);
   });
 });
