@@ -32,7 +32,10 @@ import {
   rankModeSeriesByHarmonicity,
   chordMapAnalysis,
   rankModesByStability,
+  progressionNarrative,
 } from '../core/scale.js';
+import { ALL_PRESETS, getTuningById } from '../data/presets.js';
+import { type TuningPreset } from '../data/tuning-data.js';
 import {
   type RankedChord,
   strikeRankedChord,
