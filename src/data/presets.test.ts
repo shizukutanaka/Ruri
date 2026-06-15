@@ -12,6 +12,7 @@ import {
   isPresetTopN,
   presetBestChord,
   rankPresetsByReportSimilarity,
+  comparePresets,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -323,5 +324,41 @@ describe('rankPresetsByReportSimilarity (Q220)', () => {
     expect(ranked[0]).toHaveProperty('preset');
     expect(ranked[0]).toHaveProperty('similarity');
     expect(typeof ranked[0]?.similarity).toBe('number');
+  });
+});
+
+// Q222 — comparePresets
+describe('comparePresets (Q222)', () => {
+  it('test_returns_result_with_a_b_comparison', () => {
+    const result = comparePresets('12-tet', 'just-5-limit');
+    expect(result).not.toBeUndefined();
+    expect(result).toHaveProperty('a');
+    expect(result).toHaveProperty('b');
+    expect(result).toHaveProperty('comparison');
+  });
+
+  it('test_a_and_b_preset_ids_match_inputs', () => {
+    const result = comparePresets('12-tet', 'just-5-limit');
+    expect(result?.a.id).toBe('12-tet');
+    expect(result?.b.id).toBe('just-5-limit');
+  });
+
+  it('test_comparison_has_correlation_field', () => {
+    const result = comparePresets('12-tet', 'just-5-limit');
+    expect(typeof result?.comparison.correlation).toBe('number');
+  });
+
+  it('test_unknown_preset_a_returns_undefined', () => {
+    expect(comparePresets('nonexistent', 'just-5-limit')).toBeUndefined();
+  });
+
+  it('test_unknown_preset_b_returns_undefined', () => {
+    expect(comparePresets('12-tet', 'nonexistent')).toBeUndefined();
+  });
+
+  it('test_accepts_custom_rootHz', () => {
+    const result = comparePresets('12-tet', 'just-5-limit', 261.63);
+    expect(result).not.toBeUndefined();
+    expect(typeof result?.comparison.harmonicityDistanceDiff).toBe('number');
   });
 });

@@ -16,6 +16,7 @@ import {
   rankModesByStability,
   singleBestChord,
   tuningReportSimilarity,
+  compareTuningReports,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -927,4 +928,47 @@ export function allPresetsDemoWav(
   }
 
   return encodeWav(combined, sampleRate);
+}
+
+/**
+ * Compare two presets by id, producing a full tuning-report comparison in one call.
+ *
+ * Socratic Q222: "If we can compare tuning reports, producing a text report comparing two
+ * presets by ID should be one call — can it?" Today: `getTuningById(idA)` +
+ * `getTuningById(idB)` → `compareTuningReports(tuningA, tuningB, rootHz, spectrum)` —
+ * three steps. If presets are first-class, comparing them should be one call.
+ *
+ * Returns `undefined` if either preset id is not found.
+ *
+ * @param idA      - Id of the first preset to compare.
+ * @param idB      - Id of the second preset to compare.
+ * @param rootHz   - Absolute frequency of the root in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ a: TuningPreset, b: TuningPreset, comparison }` or `undefined` if either not found.
+ *
+ * @example
+ * const result = comparePresets('12-tet', 'just-5-limit');
+ * if (result) console.log(result.comparison.correlation);
+ */
+export function comparePresets(
+  idA: string,
+  idB: string,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+):
+  | {
+      a: TuningPreset;
+      b: TuningPreset;
+      comparison: ReturnType<typeof compareTuningReports>;
+    }
+  | undefined {
+  const presetA = presets.find((p) => p.id === idA);
+  const presetB = presets.find((p) => p.id === idB);
+  if (presetA === undefined || presetB === undefined) return undefined;
+  const tuningA = loadTuningPreset(presetA);
+  const tuningB = loadTuningPreset(presetB);
+  const comparison = compareTuningReports(tuningA, tuningB, rootHz ?? 440, spectrum);
+  return { a: presetA, b: presetB, comparison };
 }
