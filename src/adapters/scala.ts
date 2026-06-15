@@ -8,6 +8,7 @@ import {
   scaleToChordMap,
   chordMapSummary,
   scaleToMinimalTuning,
+  scaleModeSeries,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -430,4 +431,34 @@ export function scaleToSubsetScl(scale: Scale, tuning: TuningSystem, name?: stri
  */
 export function scaleToSubsetSclText(scale: Scale, tuning: TuningSystem, name?: string): string {
   return writeScl(scaleToSubsetScl(scale, tuning, name));
+}
+
+/**
+ * Produce ALL modal rotations of a scale as Scala `.scl` text strings simultaneously in one call.
+ *
+ * Socratic Q202: "If we can produce a subset .scl from a scale, producing ALL modal rotations
+ * as .scl texts simultaneously should be one call — can it?" Today: `scaleModeSeries(scale, tuning)`
+ * → for each mode: `scaleToSubsetSclText(mode, tuning, mode.name)` — two explicit steps.
+ * If modal rotation and .scl export are first-class, producing all modal .scl texts should
+ * be one call.
+ *
+ * Algorithm:
+ * 1. `scaleModeSeries(scale, tuning)` → all modal rotations of the scale.
+ * 2. For each mode: `scaleToSubsetSclText(mode, tuning, mode.name)` → `.scl` text.
+ *
+ * @param scale  - The parent scale. Must be compatible with `tuning`.
+ * @param tuning - The parent `TuningSystem` to pick degrees from.
+ * @returns Array of `.scl` text strings, one per modal rotation (same length as `scaleModeSeries`).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const texts = scaleModeScls(major, t12);
+ * // texts[0] = Ionian .scl, texts[1] = Dorian .scl, ...
+ */
+export function scaleModeScls(scale: Scale, tuning: TuningSystem): string[] {
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => scaleToSubsetSclText(mode, tuning, mode.name));
 }

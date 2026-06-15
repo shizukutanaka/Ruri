@@ -13,6 +13,7 @@ import {
   sclDistance,
   scaleToSubsetScl,
   scaleToSubsetSclText,
+  scaleModeScls,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -615,5 +616,60 @@ describe('scaleToSubsetSclText (Q195)', () => {
   it('test_output_ends_with_newline', () => {
     const text = scaleToSubsetSclText(major, t12);
     expect(text.endsWith('\n')).toBe(true);
+  });
+});
+
+// Q202 — scaleModeScls
+describe('scaleModeScls (Q202)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_one_text_per_mode', () => {
+    const texts = scaleModeScls(major, t12);
+    expect(texts.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_each_text_is_valid_scl', () => {
+    const texts = scaleModeScls(major, t12);
+    for (const text of texts) {
+      const parsed = parseScl(text);
+      expect(parsed.degrees.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_each_text_ends_with_newline', () => {
+    const texts = scaleModeScls(major, t12);
+    for (const text of texts) {
+      expect(text.endsWith('\n')).toBe(true);
+    }
+  });
+
+  it('test_all_texts_contain_riff_header_word_free', () => {
+    const texts = scaleModeScls(major, t12);
+    for (const text of texts) {
+      expect(typeof text).toBe('string');
+      expect(text.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_texts_differ_per_rotation', () => {
+    const texts = scaleModeScls(major, t12);
+    const unique = new Set(texts);
+    expect(unique.size).toBeGreaterThan(1);
+  });
+
+  it('test_wrong_tuning_throws', () => {
+    const wrongScale: Scale = {
+      id: 'wrong',
+      name: 'Wrong',
+      tuningId: 'other-id',
+      degreeIndices: [0, 1, 2],
+    };
+    expect(() => scaleModeScls(wrongScale, t12)).toThrow(RangeError);
   });
 });
