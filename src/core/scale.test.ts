@@ -25,6 +25,9 @@ import {
   rankModeSeriesByHarmonicity,
   rankAllModesForTimbre,
   chordProgressionAnalysis,
+  scaleToChordMap,
+  progressionFromPattern,
+  bestProgressionForScale,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -1518,5 +1521,182 @@ describe('chordProgressionAnalysis (Q116)', () => {
 
   it('test_negative_rootHz_throws_range_error', () => {
     expect(() => chordProgressionAnalysis([I], -261.63, spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q117 — scaleToChordMap: all diatonic chords at each scale degree
+describe('scaleToChordMap (Q117)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_one_entry_per_scale_degree', () => {
+    const map = scaleToChordMap(major12, t12);
+    expect(map.length).toBe(major12.degreeIndices.length);
+  });
+
+  it('test_sorted_by_degree_offset_ascending', () => {
+    const map = scaleToChordMap(major12, t12);
+    for (let i = 0; i < map.length; i++) {
+      expect(map[i]!.degreeOffset).toBe(i);
+    }
+  });
+
+  it('test_first_entry_is_tonic_triad', () => {
+    const map = scaleToChordMap(major12, t12);
+    // Degree 0 stacks [0,2,4] → tuning indices [0,4,7] → 0c, 400c (major 3rd), 700c (fifth)
+    expect(map[0]!.degreeOffset).toBe(0);
+    const centsArr = chordToCents(map[0]!.chord);
+    // First interval is 0 (root); second ≈ 400 cents (major third); third ≈ 700 cents
+    expect(centsArr[0]).toBeCloseTo(0, 6);
+    expect(centsArr[1]).toBeCloseTo(400, 6);
+    expect(centsArr[2]).toBeCloseTo(700, 6);
+  });
+
+  it('test_default_size_3_produces_triads', () => {
+    const map = scaleToChordMap(major12, t12);
+    for (const entry of map) {
+      expect(entry.chord.intervals.length).toBe(3);
+      expect(entry.offsets.length).toBe(3);
+    }
+  });
+
+  it('test_custom_size_4_produces_seventh_chords', () => {
+    const map = scaleToChordMap(major12, t12, 4);
+    for (const entry of map) {
+      expect(entry.chord.intervals.length).toBe(4);
+      expect(entry.offsets.length).toBe(4);
+    }
+  });
+
+  it('test_offsets_wrap_within_scale_degree_count', () => {
+    const map = scaleToChordMap(major12, t12);
+    const n = major12.degreeIndices.length;
+    for (const entry of map) {
+      for (const offset of entry.offsets) {
+        expect(offset).toBeGreaterThanOrEqual(0);
+        expect(offset).toBeLessThan(n);
+      }
+    }
+  });
+
+  it('test_size_1_throws_range_error', () => {
+    expect(() => scaleToChordMap(major12, t12, 1)).toThrow(RangeError);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => scaleToChordMap(major12, edo(19))).toThrow(RangeError);
+  });
+});
+
+// Q118 — progressionFromPattern: Roman-numeral root pattern → Chord progression
+describe('progressionFromPattern (Q118)', () => {
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_one_chord_per_pattern_step', () => {
+    const chords = progressionFromPattern(major12, t12, [0, 3, 4, 0]);
+    expect(chords.length).toBe(4);
+  });
+
+  it('test_chord_names_use_step_index', () => {
+    const chords = progressionFromPattern(major12, t12, [0, 3, 4], 3, 'myProg');
+    expect(chords[0]!.name).toBe('myProg-1');
+    expect(chords[1]!.name).toBe('myProg-2');
+    expect(chords[2]!.name).toBe('myProg-3');
+  });
+
+  it('test_same_root_produces_same_chord', () => {
+    const chords = progressionFromPattern(major12, t12, [0, 3, 4, 0]);
+    // First and last (both root 0) should produce identical interval patterns in cents
+    const firstCents = chordToCents(chords[0]!);
+    const lastCents = chordToCents(chords[3]!);
+    expect(firstCents).toEqual(lastCents);
+  });
+
+  it('test_root_0_matches_chordFromScale_0_2_4', () => {
+    const chords = progressionFromPattern(major12, t12, [0]);
+    const expected0 = chordFromScale(major12, t12, [0, 2, 4]);
+    // For root=0 there is no wrap, so the output must be identical to chordFromScale([0,2,4])
+    const c0 = chordToCents(chords[0]!);
+    const e0 = chordToCents(expected0);
+    c0.forEach((v, i) => expect(v).toBeCloseTo(e0[i]!, 6));
+  });
+
+  it('test_empty_pattern_throws_range_error', () => {
+    expect(() => progressionFromPattern(major12, t12, [])).toThrow(RangeError);
+  });
+
+  it('test_out_of_range_root_throws_range_error', () => {
+    expect(() => progressionFromPattern(major12, t12, [7])).toThrow(RangeError);
+  });
+
+  it('test_negative_root_throws_range_error', () => {
+    expect(() => progressionFromPattern(major12, t12, [-1])).toThrow(RangeError);
+  });
+
+  it('test_size_1_throws_range_error', () => {
+    expect(() => progressionFromPattern(major12, t12, [0], 1)).toThrow(RangeError);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => progressionFromPattern(major12, edo(19), [0])).toThrow(RangeError);
+  });
+});
+
+// Q119 — bestProgressionForScale: most consonant N-chord progression in one call
+describe('bestProgressionForScale (Q119)', () => {
+  const spectrum = harmonicSpectrum();
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_numChords_chords_by_default', () => {
+    const prog = bestProgressionForScale(major12, t12, spectrum, 4);
+    expect(prog.length).toBe(4);
+  });
+
+  it('test_returns_3_chords_when_requested', () => {
+    const prog = bestProgressionForScale(major12, t12, spectrum, 3);
+    expect(prog.length).toBe(3);
+  });
+
+  it('test_each_chord_has_intervals', () => {
+    const prog = bestProgressionForScale(major12, t12, spectrum, 3);
+    for (const chord of prog) {
+      expect(chord.intervals.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_all_chords_are_triads_by_default', () => {
+    const prog = bestProgressionForScale(major12, t12, spectrum, 3);
+    for (const chord of prog) {
+      expect(chord.intervals.length).toBe(3);
+    }
+  });
+
+  it('test_custom_size_4_produces_seventh_chords', () => {
+    const prog = bestProgressionForScale(major12, t12, spectrum, 3, 4);
+    for (const chord of prog) {
+      expect(chord.intervals.length).toBe(4);
+    }
+  });
+
+  it('test_numChords_0_throws_range_error', () => {
+    expect(() => bestProgressionForScale(major12, t12, spectrum, 0)).toThrow(RangeError);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => bestProgressionForScale(major12, edo(19), spectrum)).toThrow(RangeError);
   });
 });

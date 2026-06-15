@@ -12,6 +12,7 @@ import {
   type RankedChord,
   type ChordSearchOptions,
   rankedChordToChord,
+  optimalChordOrder,
 } from './chord-search.js';
 import { synthScale, type SynthScaleOptions, DEFAULT_SYNTH_SCALE } from './ks-synth.js';
 import { type Chord, chordFromDegrees, realizeChordFreqs } from './chord.js';
@@ -951,4 +952,227 @@ export function chordProgressionAnalysis(
 
     return { chord, freqs, dissonance, harmonicity, voiceLeadingCostToNext: vlCost };
   });
+}
+
+/** One entry returned by `scaleToChordMap`. */
+export interface ScaleChordMapEntry {
+  /**
+   * The root degree offset (0-indexed within `scale.degreeIndices`).
+   * Scale degree 0 = first degree, 1 = second degree, etc.
+   */
+  readonly degreeOffset: number;
+  /** The diatonic chord built from this root. */
+  readonly chord: Chord;
+  /**
+   * Scale-local offsets used to build this chord.
+   * E.g. for a triad rooted at degree 1: `[1, 3, 5]`.
+   */
+  readonly offsets: readonly number[];
+}
+
+/**
+ * Build every diatonic chord of a given size rooted at each scale degree.
+ *
+ * Socratic Q117: `chordFromScale(scale, tuning, [0,2,4])` builds one triad from
+ * scale degrees 1–3–5. But "all diatonic triads in the major scale" — the Roman-
+ * numeral I–ii–iii–IV–V–vi–vii° map — still requires an outer loop over all root
+ * positions plus manual offset arithmetic. If `Scale` is truly first-class, producing
+ * the complete diatonic chord map should be one call.
+ *
+ * Stacking rule: degrees wrap modulo `scale.degreeIndices.length` — degree `k` maps
+ * to `scale.degreeIndices[k % n]`, advancing by one octave (one `periodDegrees` step
+ * in the parent tuning) for each wrap. This is the standard diatonic stacking used
+ * for Roman-numeral analysis, without cultural naming.
+ *
+ * @param scale  - The parent scale (must be compatible with `tuning`).
+ * @param tuning - The parent `TuningSystem`.
+ * @param size   - Number of notes per chord (default 3, i.e. triads).
+ * @returns One entry per root degree (length = `scale.degreeIndices.length`),
+ *   sorted by `degreeOffset` ascending (degree 0 first).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `size` < 2.
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * // chordMap[0] = I triad (degrees 0,2,4 → tuning notes 0,4,7)
+ * // chordMap[3] = IV triad (degrees 3,5,0 → tuning notes 5,9,0+12)
+ * // chordMap.length === 7
+ */
+export function scaleToChordMap(
+  scale: Scale,
+  tuning: TuningSystem,
+  size = 3,
+): ScaleChordMapEntry[] {
+  assertTuningMatch(scale, tuning);
+  if (scale.degreeIndices.length === 0) {
+    throw new RangeError('scaleToChordMap: scale must have at least one degree');
+  }
+  if (!Number.isInteger(size) || size < 2) {
+    throw new RangeError(`scaleToChordMap: size must be an integer >= 2, got ${size}`);
+  }
+
+  const n = scale.degreeIndices.length;
+  const periodDegrees = tuning.degrees.length;
+
+  return Array.from({ length: n }, (_, rootOffset) => {
+    // Build `size` stacked scale-step offsets, wrapping modulo n.
+    const offsets: number[] = Array.from(
+      { length: size },
+      (__, step) => (rootOffset + step * 2) % n,
+    );
+
+    // Map each scale offset to a tuning degree index, advancing by one period per wrap.
+    const tuningIndices = Array.from({ length: size }, (__, step) => {
+      const rawOffset = rootOffset + step * 2;
+      const wraps = Math.floor(rawOffset / n);
+      const scaleIdx = rawOffset % n;
+      return (scale.degreeIndices[scaleIdx] as number) + wraps * periodDegrees;
+    });
+
+    const chord = chordFromDegrees(tuning, tuningIndices, `chord-deg-${rootOffset}`);
+    return { degreeOffset: rootOffset, chord, offsets };
+  });
+}
+
+/**
+ * Generate a chord progression from a Roman-numeral root pattern applied to a scale.
+ *
+ * Socratic Q118: `buildChordProgression(scale, tuning, [[0,2,4],[3,5,0],[4,6,1]])` builds
+ * a diatonic I–IV–V progression — but it requires the caller to pre-compute the full
+ * offset arrays for each chord. The common compositional thought is "play I, then IV,
+ * then V", i.e. just the root degree indices `[0, 3, 4]`. If the library can generate
+ * diatonic stacked chords from a single root offset (via `scaleToChordMap`), mapping a
+ * root-index pattern to a progression should also be one call.
+ *
+ * Distinct from `buildChordProgression`: `buildChordProgression` accepts explicit
+ * offset arrays per step; `progressionFromPattern` accepts a flat list of root-degree
+ * indices and auto-derives the stacked offsets from `size`, so the caller never
+ * constructs offset arrays manually.
+ *
+ * @param scale        - The parent scale.
+ * @param tuning       - The parent `TuningSystem`.
+ * @param romanPattern - Sequence of 0-based root degree indices (e.g. `[0, 3, 4, 0]`
+ *                       for I–IV–V–I). Out-of-range indices throw.
+ * @param size         - Notes per chord (default 3, i.e. triads).
+ * @param name         - Optional base name; each chord is named `${name}-${stepIndex+1}`.
+ *                       Defaults to `'prog'`.
+ * @returns `Chord[]` with one entry per pattern step.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `romanPattern` is empty.
+ * @throws {RangeError} if any root index is outside `[0, scale.degreeIndices.length)`.
+ * @throws {RangeError} if `size` < 2.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * // I–IV–V–I progression using 0-based degree indices
+ * const chords = progressionFromPattern(major, t12, [0, 3, 4, 0]);
+ * // chords[0] = I triad, chords[1] = IV triad, chords[2] = V triad, chords[3] = I triad
+ */
+export function progressionFromPattern(
+  scale: Scale,
+  tuning: TuningSystem,
+  romanPattern: readonly number[],
+  size = 3,
+  name = 'prog',
+): Chord[] {
+  assertTuningMatch(scale, tuning);
+  if (romanPattern.length === 0) {
+    throw new RangeError('progressionFromPattern: romanPattern must be non-empty');
+  }
+  if (!Number.isInteger(size) || size < 2) {
+    throw new RangeError(`progressionFromPattern: size must be an integer >= 2, got ${size}`);
+  }
+
+  const n = scale.degreeIndices.length;
+  const periodDegrees = tuning.degrees.length;
+
+  return romanPattern.map((rootOffset, stepIdx) => {
+    if (!Number.isInteger(rootOffset) || rootOffset < 0 || rootOffset >= n) {
+      throw new RangeError(
+        `progressionFromPattern: rootOffset ${rootOffset} is out of range [0, ${n - 1}]`,
+      );
+    }
+
+    const tuningIndices = Array.from({ length: size }, (_, step) => {
+      const rawOffset = rootOffset + step * 2;
+      const wraps = Math.floor(rawOffset / n);
+      const scaleIdx = rawOffset % n;
+      return (scale.degreeIndices[scaleIdx] as number) + wraps * periodDegrees;
+    });
+
+    return chordFromDegrees(tuning, tuningIndices, `${name}-${stepIdx + 1}`);
+  });
+}
+
+/**
+ * Find the most consonant N-chord progression within a scale in one call.
+ *
+ * Socratic Q119: Discovering the most consonant chords in a scale is
+ * `rankScaleChords(scale, tuning, { size, limit: N })`. Ordering them for
+ * smoothest voice-leading is `optimalChordOrder(chords, rootHz)`. But combining
+ * these into "the best N-chord progression for this scale and timbre" still
+ * requires two explicit calls and lifting `RankedChord[]` to `Chord[]`.
+ * If `Scale` is truly first-class, discovering and ordering the best chord
+ * progression should be one call.
+ *
+ * Algorithm:
+ * 1. `rankScaleChords(scale, tuning, { size, spectrum, limit: numChords })` — top `numChords` diatonic chords.
+ * 2. Lift each to `Chord` via `rankedChordToChord`.
+ * 3. `optimalChordOrder(chords, rootHz)` — find the ordering with smoothest voice-leading.
+ * 4. Return the ordered `Chord[]`.
+ *
+ * @param scale     - The parent scale.
+ * @param tuning    - The parent `TuningSystem`.
+ * @param spectrum  - Instrument spectrum for chord ranking.
+ * @param numChords - Number of chords to include (default 4). Must be ≥ 1.
+ * @param size      - Notes per chord (default 3).
+ * @param rootHz    - Root frequency for voice-leading optimization (default tuning reference).
+ * @returns Ordered `Chord[]` (best voice-leading path through the top-ranked chords).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `numChords` < 1.
+ * @throws {RangeError} if the scale has fewer chords of the requested size than `numChords`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const prog = bestProgressionForScale(major, t12, harmonicSpectrum());
+ * // prog is the 4 most consonant diatonic triads in voice-leading order
+ */
+export function bestProgressionForScale(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  numChords = 4,
+  size = 3,
+  rootHz?: number,
+): Chord[] {
+  assertTuningMatch(scale, tuning);
+  if (!Number.isInteger(numChords) || numChords < 1) {
+    throw new RangeError(`bestProgressionForScale: numChords must be >= 1, got ${numChords}`);
+  }
+
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+
+  const ranked = rankScaleChords(scale, tuning, {
+    size,
+    spectrum,
+    limit: numChords,
+    rootHz: effectiveRootHz,
+  });
+
+  if (ranked.length < numChords) {
+    throw new RangeError(
+      `bestProgressionForScale: requested ${numChords} chords but only ${ranked.length} available for size ${size} in scale '${scale.id}'`,
+    );
+  }
+
+  const chords = ranked.slice(0, numChords).map((r) => rankedChordToChord(r));
+  return [...optimalChordOrder(chords, effectiveRootHz).chords];
 }
