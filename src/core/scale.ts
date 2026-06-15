@@ -3218,3 +3218,152 @@ export function progressionEnergyShape(
 
   return 'irregular';
 }
+
+/**
+ * Produce a human-readable narrative of a chord progression in one call.
+ *
+ * Socratic Q228: "If I can annotate, get energy shape, find climax and resolution chords —
+ * producing a human-readable narrative should be one call — can it?" → No → implement.
+ *
+ * @param chords   - Ordered list of chords.
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns A single descriptive string summarising the progression.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chords = progressionFromPattern(major, t12, [0, 3, 4, 0]);
+ * const narrative = progressionNarrative(chords, 261.63);
+ * // "Progression of 4 chords; energy shape: descending. ..."
+ */
+export function progressionNarrative(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): string {
+  if (chords.length === 0) return 'Empty progression.';
+
+  const annotations = annotateProgression(chords, rootHz, spectrum);
+  const labels = annotations.map((a) => a.label);
+
+  if (chords.length === 1) {
+    const entry = annotations[0] as (typeof annotations)[0];
+    return `Progression of 1 chord; energy shape: flat. Chord: ${entry.label}.`;
+  }
+
+  const shape = progressionEnergyShape(chords, rootHz, spectrum);
+  const climax = progressionClimaxChord(chords, rootHz, spectrum);
+  const resolution = progressionResolutionChord(chords, rootHz, spectrum);
+
+  // Get descriptions for climax and resolution chords
+  const climaxDesc = climax !== undefined ? chordDescription(climax.chord, rootHz, spectrum) : null;
+  const resolutionDesc =
+    resolution !== undefined ? chordDescription(resolution.chord, rootHz, spectrum) : null;
+
+  const climaxPart =
+    climaxDesc !== null
+      ? `Climax: ${climaxDesc.label} (dissonance ${climaxDesc.dissonance.toFixed(2)}).`
+      : '';
+  const resolutionPart =
+    resolutionDesc !== null
+      ? `Resolution: ${resolutionDesc.label} (harmonicity ${resolutionDesc.harmonicity.toFixed(3)}).`
+      : '';
+  const chordList = labels.join(', ');
+
+  const parts = [
+    `Progression of ${chords.length} chords; energy shape: ${shape}.`,
+    climaxPart,
+    resolutionPart,
+    `Chords: ${chordList}.`,
+  ].filter((p) => p.length > 0);
+
+  return parts.join(' ');
+}
+
+/**
+ * Return both the best and worst `ChordMapAnalysisEntry` from a chord map in one call.
+ *
+ * Socratic Q231: "If I can get best and worst ChordMapAnalysisEntry separately, can I get
+ * both bundled in one call?" → No → implement.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`). Must be non-empty.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Reference frequency for chord realization (default 440 Hz).
+ * @returns `{ best, worst }` where `best` has the lowest dissonance and `worst` has the highest.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const { best, worst } = chordMapBestWorstBundle(chordMap);
+ */
+export function chordMapBestWorstBundle(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { best: ChordMapAnalysisEntry; worst: ChordMapAnalysisEntry } {
+  if (chordMap.length === 0) {
+    throw new RangeError('chordMapBestWorstBundle: chordMap must be non-empty');
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+
+  // Score every entry with dissonance + harmonicity
+  const scored: ChordMapAnalysisEntry[] = chordMap.map((entry) => ({
+    degreeOffset: entry.degreeOffset,
+    chord: entry.chord,
+    dissonance: chordObjectDissonance(entry.chord, rootHz, effectiveSpectrum),
+    harmonicity: harmonicityForChord(entry.chord, rootHz),
+  }));
+
+  // Find best (lowest dissonance) and worst (highest dissonance)
+  let bestEntry = scored[0] as ChordMapAnalysisEntry;
+  let worstEntry = scored[0] as ChordMapAnalysisEntry;
+  for (let i = 1; i < scored.length; i++) {
+    const e = scored[i] as ChordMapAnalysisEntry;
+    if (e.dissonance < bestEntry.dissonance) bestEntry = e;
+    if (e.dissonance > worstEntry.dissonance) worstEntry = e;
+  }
+
+  return { best: bestEntry, worst: worstEntry };
+}
+
+/**
+ * Build a histogram of a tuning's degree intervals across the period in one call.
+ *
+ * Socratic Q233: "If I have all the degrees in cents, can I get a histogram of their
+ * distribution across the period in one call?" → No → implement.
+ *
+ * @param tuning   - The `TuningSystem` whose degrees to bin.
+ * @param binCount - Number of equal-width bins across `tuning.periodCents` (default 12).
+ * @returns Array of `{ bin, centsMid, count }` for each bin index.
+ *
+ * @throws {RangeError} if `binCount` <= 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const hist = tuningIntervalHistogram(t12);
+ * // hist[0] covers 0–100c; hist[0].centsMid === 50; hist[0].count === 1
+ */
+export function tuningIntervalHistogram(
+  tuning: TuningSystem,
+  binCount = 12,
+): { bin: number; centsMid: number; count: number }[] {
+  if (binCount <= 0) {
+    throw new RangeError('tuningIntervalHistogram: binCount must be positive');
+  }
+  const binSize = tuning.periodCents / binCount;
+  const counts = Array.from({ length: binCount }, () => 0);
+  for (const degree of tuning.degrees) {
+    const cents = pitchToCents(degree);
+    const idx = Math.min(Math.floor(cents / binSize), binCount - 1);
+    counts[idx] = (counts[idx] as number) + 1;
+  }
+  return counts.map((count, i) => ({
+    bin: i,
+    centsMid: (i + 0.5) * binSize,
+    count,
+  }));
+}

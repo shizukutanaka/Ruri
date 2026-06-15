@@ -76,6 +76,9 @@ import {
   progressionResolutionChord,
   chordDescription,
   progressionEnergyShape,
+  progressionNarrative,
+  chordMapBestWorstBundle,
+  tuningIntervalHistogram,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -3946,5 +3949,95 @@ describe('progressionEnergyShape (Q227)', () => {
     const validLabels = ['flat', 'ascending', 'descending', 'arch', 'valley', 'irregular'];
     const shape = progressionEnergyShape([fifth, tritone], 261.63, harmonicSpectrum());
     expect(validLabels).toContain(shape);
+  });
+});
+
+// Q228 — progressionNarrative
+describe('progressionNarrative (Q228)', () => {
+  const t12Local = equalTemperament12(440);
+  const majorScale: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const chordMap = scaleToChordMap(majorScale, t12Local);
+  const topChords = chordMap.slice(0, 4).map((e) => e.chord);
+
+  it('returns a non-empty string for a 4-chord progression', () => {
+    const text = progressionNarrative(topChords, 261.63);
+    expect(text).toBeTruthy();
+    expect(typeof text).toBe('string');
+    expect(text.length).toBeGreaterThan(10);
+  });
+
+  it('contains shape label', () => {
+    const text = progressionNarrative(topChords, 261.63);
+    const shape = progressionEnergyShape(topChords, 261.63);
+    expect(text).toContain(shape);
+  });
+
+  it('handles empty progression', () => {
+    expect(progressionNarrative([], 261.63)).toBe('Empty progression.');
+  });
+
+  it('handles single chord', () => {
+    const text = progressionNarrative([topChords[0]!], 261.63);
+    expect(text).toBeTruthy();
+  });
+});
+
+// Q231 — chordMapBestWorstBundle
+describe('chordMapBestWorstBundle (Q231)', () => {
+  const t12Local = equalTemperament12(440);
+  const majorScale: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const chordMap = scaleToChordMap(majorScale, t12Local);
+
+  it('returns best and worst entries', () => {
+    const bundle = chordMapBestWorstBundle(chordMap);
+    expect(bundle.best).toBeDefined();
+    expect(bundle.worst).toBeDefined();
+    expect(bundle.best.harmonicity).toBeGreaterThanOrEqual(0);
+    expect(bundle.worst.harmonicity).toBeGreaterThanOrEqual(0);
+  });
+
+  it('best has lower or equal dissonance than worst', () => {
+    const bundle = chordMapBestWorstBundle(chordMap);
+    expect(bundle.best.dissonance).toBeLessThanOrEqual(bundle.worst.dissonance);
+  });
+});
+
+// Q233 — tuningIntervalHistogram
+describe('tuningIntervalHistogram (Q233)', () => {
+  const t12Local = equalTemperament12(440);
+
+  it('returns binCount bins', () => {
+    const hist = tuningIntervalHistogram(t12Local);
+    expect(hist).toHaveLength(12);
+  });
+
+  it('total count equals degree count', () => {
+    const hist = tuningIntervalHistogram(t12Local);
+    const total = hist.reduce((s, b) => s + b.count, 0);
+    expect(total).toBe(t12Local.degrees.length);
+  });
+
+  it('bin 0 has centsMid of binSize/2', () => {
+    const hist = tuningIntervalHistogram(t12Local);
+    expect(hist[0]!.centsMid).toBeCloseTo(50, 1); // 1200/12/2 = 50
+  });
+
+  it('throws for binCount <= 0', () => {
+    expect(() => tuningIntervalHistogram(t12Local, 0)).toThrow(RangeError);
+  });
+
+  it('custom binCount', () => {
+    const hist = tuningIntervalHistogram(t12Local, 6);
+    expect(hist).toHaveLength(6);
   });
 });
