@@ -2,6 +2,7 @@
 
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat } from '../core/midi.js';
+import { optimalChordOrder } from '../core/chord-search.js';
 
 export interface NoteEvent {
   readonly note: number; // 0..127
@@ -283,4 +284,39 @@ export function progressionToSmf(
   }
 
   return encodeSmf(notes, { ppq });
+}
+
+export type OptimalProgressionSmfOptions = ProgressionToSmfOptions;
+
+/**
+ * Optimize a chord progression's order and encode it as a SMF Type-0 MIDI file
+ * in one call.
+ *
+ * Socratic Q65: `optimalChordOrder(chords, rootHz)` finds the voice-leading-minimal
+ * permutation of a `Chord[]`; `progressionToSmf(chords, rootHz)` converts a `Chord[]`
+ * to MIDI. But going from "Chord[] → optimal order → MIDI" still requires two calls.
+ * An `optimalProgressionSmf(chords, rootHz, opts?)` closes this pipeline: internally
+ * calls `optimalChordOrder` to reorder, then `progressionToSmf` on the result.
+ *
+ * The reordering minimises total voice-leading cost across the progression (brute-force
+ * for n ≤ 8 chords; nearest-neighbour heuristic for n > 8).
+ *
+ * @throws {RangeError} if `chords` is empty.
+ * @throws {RangeError} if any realized frequency maps to a MIDI note outside [0, 127].
+ *
+ * @example
+ * const ranked = rankChords(edo(12), { size: 3, limit: 5 });
+ * const portable = ranked.map(r => rankedChordToChord(r));
+ * // One call: optimise order AND write MIDI
+ * const midi = optimalProgressionSmf(portable, 261.63);
+ * await fs.writeFile('progression.mid', midi);
+ */
+export function optimalProgressionSmf(
+  chords: readonly Chord[],
+  rootHz: number,
+  opts?: OptimalProgressionSmfOptions,
+): Uint8Array {
+  if (chords.length === 0) throw new RangeError('chords must be non-empty');
+  const { chords: ordered } = optimalChordOrder(chords, rootHz);
+  return progressionToSmf(ordered, rootHz, opts);
 }

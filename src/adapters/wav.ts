@@ -4,6 +4,7 @@ import { strikeChord, type ModalOptions, DEFAULT_MODAL } from '../core/modal-syn
 import { type Spectrum } from '../core/spectrum.js';
 import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import { DEFAULT_KS, type SynthScaleOptions, synthScale } from '../core/ks-synth.js';
+import { type Scale, synthScaleFromScale } from '../core/scale.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
@@ -96,5 +97,39 @@ export function tuningToScaleWav(
 ): Uint8Array {
   const freqs = Array.from({ length: tuning.degrees.length }, (_, i) => degreeToFreq(tuning, i));
   const samples = synthScale(freqs, opts);
+  return encodeWav(samples, opts.sampleRate);
+}
+
+export type PluckScaleWavOptions = SynthScaleOptions;
+
+/**
+ * Synthesize a `Scale` as a melodic WAV file in one call.
+ *
+ * Socratic Q63: `synthScaleFromScale(scale, tuning)` converts a `Scale` to a
+ * melodic `Float32Array`; `encodeWav(samples)` turns that into ready-to-write
+ * WAV bytes. If `Scale` → audio is one call, then `Scale` → WAV file bytes
+ * should also be one call — yet today it requires two. This is the
+ * Karplus-Strong analog of `tuningToScaleWav` but for a curated `Scale` subset
+ * rather than all degrees of a `TuningSystem`.
+ *
+ * Each scale degree is plucked in ascending order via Karplus-Strong; notes are
+ * concatenated without overlap. The result is a 16-bit PCM mono WAV byte
+ * sequence ready to write to a `.wav` file.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` (tuningId mismatch
+ *   or degree indices out of range), or if the scale has no degrees.
+ *
+ * @example
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-edo',
+ *                 degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const wav = pluckScaleWav(major, edo(12));
+ * await fs.writeFile('major-scale.wav', wav);
+ */
+export function pluckScaleWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  opts: PluckScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
+): Uint8Array {
+  const samples = synthScaleFromScale(scale, tuning, opts);
   return encodeWav(samples, opts.sampleRate);
 }

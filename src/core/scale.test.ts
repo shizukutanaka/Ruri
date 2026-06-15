@@ -11,6 +11,7 @@ import {
   isScaleCompatible,
   rankScaleChords,
   synthScaleFromScale,
+  chordFromScale,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -18,6 +19,7 @@ import { rankChords } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
 import { DEFAULT_SYNTH_SCALE } from './ks-synth.js';
+import { chordToCents, chordFromDegrees } from './chord.js';
 
 const t12 = equalTemperament12(440);
 
@@ -512,5 +514,71 @@ describe('synthScaleFromScale — Scale to melodic audio (Q59)', () => {
     // synthScaleFromScale(major, t12, opts) should equal synthScale(freqs, opts)
     const direct = synthScaleFromScale(major, t12, opts);
     expect(direct.length).toBe(Math.floor(opts.sampleRate * opts.noteSeconds) * freqs.length);
+  });
+});
+
+// Q64: Scale is first-class — should building a chord from scale-local offsets be one call?
+describe('chordFromScale — chord from scale-local degree offsets (Q64)', () => {
+  const t12 = equalTemperament12(440);
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_triad_matches_chordFromDegrees_with_mapped_indices', () => {
+    // Scale offsets [0,2,4] → tuning indices [0,4,7] (major triad)
+    const chord = chordFromScale(major12, t12, [0, 2, 4], 'major-triad');
+    const expected = chordFromDegrees(t12, [0, 4, 7], 'major-triad');
+    expect(chordToCents(chord)).toEqual(chordToCents(expected));
+  });
+
+  it('test_root_is_zero_cents', () => {
+    const chord = chordFromScale(major12, t12, [0, 2, 4]);
+    expect(chordToCents(chord)[0]).toBe(0);
+  });
+
+  it('test_name_is_auto_generated_from_tuning_degrees_when_omitted', () => {
+    // offsets [0,2,4] → tuning degrees [0,4,7] → name 'chord-0-4-7'
+    const chord = chordFromScale(major12, t12, [0, 2, 4]);
+    expect(chord.name).toBe('chord-0-4-7');
+  });
+
+  it('test_explicit_name_overrides_auto_name', () => {
+    const chord = chordFromScale(major12, t12, [0, 2, 4], 'my-triad');
+    expect(chord.name).toBe('my-triad');
+  });
+
+  it('test_offset_out_of_range_throws_range_error', () => {
+    // major has 7 degrees (offsets 0..6); offset 7 is out of range
+    expect(() => chordFromScale(major12, t12, [0, 2, 7])).toThrow(RangeError);
+  });
+
+  it('test_negative_offset_throws_range_error', () => {
+    expect(() => chordFromScale(major12, t12, [0, -1, 4])).toThrow(RangeError);
+  });
+
+  it('test_empty_offsets_throws_range_error', () => {
+    expect(() => chordFromScale(major12, t12, [])).toThrow(RangeError);
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const wrongTuning = edo(19);
+    expect(() => chordFromScale(major12, wrongTuning, [0, 2, 4])).toThrow(RangeError);
+  });
+
+  it('test_19edo_scale_triad_matches_chordFromDegrees', () => {
+    const t19 = edo(19);
+    const major19: Scale = {
+      id: 'major-19',
+      name: 'Ionian-19',
+      tuningId: '19-edo',
+      degreeIndices: [0, 3, 6, 8, 11, 14, 17],
+    };
+    // Scale offsets [0,2,4] → tuning degrees [0,6,11]
+    const chord = chordFromScale(major19, t19, [0, 2, 4]);
+    const expected = chordFromDegrees(t19, [0, 6, 11]);
+    expect(chordToCents(chord)).toEqual(chordToCents(expected));
   });
 });

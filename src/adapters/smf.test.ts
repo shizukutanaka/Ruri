@@ -8,6 +8,7 @@ import {
   type NoteEvent,
   chordToSmf,
   progressionToSmf,
+  optimalProgressionSmf,
 } from './smf.js';
 import { chordFromSemitones } from '../core/chord.js';
 
@@ -223,5 +224,59 @@ describe('progressionToSmf — Chord[] to SMF MIDI in one call (Q58)', () => {
   it('test_velocity_option_applied_to_all_notes', () => {
     const { notes } = decodeSmf(progressionToSmf([major, minor], rootHz, { velocity: 50 }));
     for (const n of notes) expect(n.velocity).toBe(50);
+  });
+});
+
+// Q65: Chord[] → optimize order → MIDI should be one call
+describe('optimalProgressionSmf — optimised Chord[] to SMF MIDI in one call (Q65)', () => {
+  // optimalChordOrder uses voiceLeadingCost which requires equal voice counts.
+  // All chords in a progression must have the same number of voices.
+  const major = chordFromSemitones('major', [0, 4, 7]);
+  const minor = chordFromSemitones('minor', [0, 3, 7]);
+  const aug = chordFromSemitones('aug', [0, 4, 8]);
+  const rootHz = 261.63; // C4
+
+  it('test_output_starts_with_mthd_header', () => {
+    const midi = optimalProgressionSmf([major, minor], rootHz);
+    expect(midi[0]).toBe(0x4d); // 'M'
+    expect(midi[1]).toBe(0x54); // 'T'
+    expect(midi[2]).toBe(0x68); // 'h'
+    expect(midi[3]).toBe(0x64); // 'd'
+  });
+
+  it('test_two_chord_note_count_equals_sum_of_chord_sizes', () => {
+    // major (3 notes) + minor (3 notes) = 6 NoteEvents total
+    const { notes } = decodeSmf(optimalProgressionSmf([major, minor], rootHz));
+    expect(notes.length).toBe(6);
+  });
+
+  it('test_three_chord_note_count', () => {
+    // major(3) + minor(3) + aug(3) = 9 notes total (all same size — required by optimalChordOrder)
+    const { notes } = decodeSmf(optimalProgressionSmf([major, minor, aug], rootHz));
+    expect(notes.length).toBe(9);
+  });
+
+  it('test_single_chord_matches_progressionToSmf', () => {
+    const midi1 = optimalProgressionSmf([major], rootHz);
+    const midi2 = progressionToSmf([major], rootHz);
+    // Same bytes — single chord has trivial ordering
+    expect([...midi1]).toEqual([...midi2]);
+  });
+
+  it('test_empty_chords_throws_range_error', () => {
+    expect(() => optimalProgressionSmf([], rootHz)).toThrow(RangeError);
+  });
+
+  it('test_output_is_valid_midi_decodable', () => {
+    const midi = optimalProgressionSmf([major, minor, aug], rootHz);
+    // Should not throw when decoded
+    const { ppq, notes } = decodeSmf(midi);
+    expect(ppq).toBe(480);
+    expect(notes.length).toBeGreaterThan(0);
+  });
+
+  it('test_options_are_forwarded_to_progressionToSmf', () => {
+    const { notes } = decodeSmf(optimalProgressionSmf([major, minor], rootHz, { velocity: 42 }));
+    for (const n of notes) expect(n.velocity).toBe(42);
   });
 });

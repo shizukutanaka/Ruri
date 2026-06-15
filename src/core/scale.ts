@@ -3,6 +3,7 @@ import { type Spectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
 import { rankChords, type RankedChord, type ChordSearchOptions } from './chord-search.js';
 import { synthScale, type SynthScaleOptions, DEFAULT_SYNTH_SCALE } from './ks-synth.js';
+import { type Chord, chordFromDegrees } from './chord.js';
 
 /**
  * A scale / mode / jins / raga: an ordered selection of degrees over a tuning.
@@ -244,4 +245,45 @@ export function synthScaleFromScale(
   assertTuningMatch(scale, tuning);
   const freqs = scaleToFreqs(scale, tuning);
   return synthScale(freqs, opts);
+}
+
+/**
+ * Build a `Chord` from scale-local degree offsets within a `Scale`.
+ *
+ * Socratic Q64: `chordFromDegrees(tuning, indices)` works for any tuning, but
+ * it requires the caller to know the raw tuning indices. When working with a
+ * `Scale` (a curated melodic subset), thinking in scale-local degree offsets
+ * (0 = root, 1 = second scale degree, 2 = third scale degree, …) is more
+ * natural. This bridges that gap: `chordFromScale(scale, tuning, [0, 2, 4])`
+ * builds a triad from the 1st, 3rd, and 5th scale degrees without requiring
+ * the caller to look up `scale.degreeIndices` manually.
+ *
+ * Scale-local offset `i` maps to tuning degree `scale.degreeIndices[i]`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if any offset is outside `[0, scale.degreeIndices.length)`.
+ * @throws {RangeError} if `offsets` is empty.
+ *
+ * @example
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-edo',
+ *                 degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * // Triad on scale degrees 1, 3, 5 (0-indexed offsets 0, 2, 4)
+ * const triad = chordFromScale(major, edo(12), [0, 2, 4], 'major-triad');
+ */
+export function chordFromScale(
+  scale: Scale,
+  tuning: TuningSystem,
+  offsets: readonly number[],
+  name?: string,
+): Chord {
+  assertTuningMatch(scale, tuning);
+  if (offsets.length === 0) throw new RangeError('offsets must be non-empty');
+  const n = scale.degreeIndices.length;
+  for (const o of offsets) {
+    if (!Number.isInteger(o) || o < 0 || o >= n) {
+      throw new RangeError(`offset ${o} is out of range [0, ${n - 1}] for scale '${scale.id}'`);
+    }
+  }
+  const mappedIndices = offsets.map((o) => scale.degreeIndices[o] as number);
+  return chordFromDegrees(tuning, mappedIndices, name);
 }

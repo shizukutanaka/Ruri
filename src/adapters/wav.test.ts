@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { encodeWav, strikeChordToWav, tuningToScaleWav } from './wav.js';
+import { encodeWav, strikeChordToWav, tuningToScaleWav, pluckScaleWav } from './wav.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 import { edo } from '../core/tuning.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
+import { type Scale } from '../core/scale.js';
 
 describe('WAV encoder', () => {
   it('test_header_riff_wave', () => {
@@ -106,5 +107,62 @@ describe('tuningToScaleWav — TuningSystem sonification in one call (Q59)', () 
     const wav = tuningToScaleWav(edo(5), opts);
     const dv = new DataView(wav.buffer);
     expect(dv.getUint32(24, true)).toBe(22050);
+  });
+});
+
+// Q63: Scale is first-class — should Scale → WAV file bytes be one call?
+describe('pluckScaleWav — Scale melodic WAV in one call (Q63)', () => {
+  const tuning = edo(12);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-edo',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const wav = pluckScaleWav(major, tuning, { ...DEFAULT_KS, noteSeconds: 0.05 });
+    expect(wav[0]).toBe(0x52); // 'R'
+    expect(wav[1]).toBe(0x49); // 'I'
+    expect(wav[2]).toBe(0x46); // 'F'
+    expect(wav[3]).toBe(0x46); // 'F'
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_output_length_reflects_scale_degree_count', () => {
+    const noteSeconds = 0.1;
+    const opts = { ...DEFAULT_KS, noteSeconds };
+    const wav = pluckScaleWav(major, tuning, opts);
+    const samplesPerNote = Math.floor(DEFAULT_KS.sampleRate * noteSeconds);
+    const expectedSamples = samplesPerNote * major.degreeIndices.length;
+    // WAV = 44 byte header + 2 bytes per sample (16-bit PCM)
+    expect(wav.length).toBe(44 + expectedSamples * 2);
+  });
+
+  it('test_7_note_scale_longer_than_5_note_scale', () => {
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'Pentatonic',
+      tuningId: '12-edo',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const opts = { ...DEFAULT_KS, noteSeconds: 0.1 };
+    const wavMajor = pluckScaleWav(major, tuning, opts);
+    const wavPenta = pluckScaleWav(pentatonic, tuning, opts);
+    expect(wavMajor.length).toBeGreaterThan(wavPenta.length);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = { ...DEFAULT_KS, sampleRate: 22050, noteSeconds: 0.05 };
+    const wav = pluckScaleWav(major, tuning, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const wrongTuning = edo(19); // id='19-edo', but scale expects '12-edo'
+    expect(() => pluckScaleWav(major, wrongTuning, { ...DEFAULT_KS, noteSeconds: 0.05 })).toThrow(
+      RangeError,
+    );
   });
 });
