@@ -328,3 +328,43 @@ export function scaleAnalysisBundle(
   const summary = chordMapSummary(scale, tuning, spectrum);
   return { scl, summary };
 }
+
+/**
+ * Compute the distance between two Scala `.scl` file texts in one call.
+ *
+ * Socratic Q175: "If we can compare tunings by distance, comparing two Scala .scl files
+ * (after parsing each) should also be one call — can it?" Today: `parseScl(textA)` →
+ * collect cents → `parseScl(textB)` → collect cents → align and diff. If Scala files are
+ * first-class, "distance between two .scl texts" should be one call.
+ *
+ * Algorithm:
+ * 1. `parseScl(textA)` → `ScalaScale`; extract cents per degree via `degreeCents`.
+ * 2. `parseScl(textB)` → `ScalaScale`; extract cents per degree.
+ * 3. Sort both arrays ascending; pad the shorter one with 1200 cents.
+ * 4. Sum absolute differences per aligned degree index.
+ *
+ * @param textA - First `.scl` file content.
+ * @param textB - Second `.scl` file content.
+ * @returns Sum of absolute cent differences per aligned degree (≥ 0). Returns 0 if both are empty.
+ *
+ * @throws {RangeError} if either text is not a valid `.scl` file.
+ *
+ * @example
+ * const d = sclDistance(fs.readFileSync('a.scl', 'utf8'), fs.readFileSync('b.scl', 'utf8'));
+ * if (d < 10) console.log('Tunings are very close');
+ */
+export function sclDistance(textA: string, textB: string): number {
+  const sclA = parseScl(textA);
+  const sclB = parseScl(textB);
+  const centsA = [...sclA.degrees.map(degreeCents)].sort((a, b) => a - b);
+  const centsB = [...sclB.degrees.map(degreeCents)].sort((a, b) => a - b);
+  const len = Math.max(centsA.length, centsB.length);
+  if (len === 0) return 0;
+  let dist = 0;
+  for (let i = 0; i < len; i++) {
+    const a = i < centsA.length ? (centsA[i] as number) : 1200;
+    const b = i < centsB.length ? (centsB[i] as number) : 1200;
+    dist += Math.abs(a - b);
+  }
+  return dist;
+}

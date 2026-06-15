@@ -10,6 +10,7 @@ import {
   scaleChordMapToScl,
   chordMapBundle,
   scaleAnalysisBundle,
+  sclDistance,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -483,5 +484,46 @@ describe('scaleAnalysisBundle (Q172)', () => {
     const text = writeScl(scl);
     expect(text).toContain(t12.id);
     expect(text.startsWith('!')).toBe(true);
+  });
+});
+
+// Q175 — sclDistance: compare two .scl texts by cent-distance in one call
+describe('sclDistance (Q175)', () => {
+  const t12 = equalTemperament12(440);
+  const t19 = edo(19);
+
+  const sclText = (tuning: ReturnType<typeof equalTemperament12>): string =>
+    writeScl(tuningToScl(tuning));
+
+  it('test_identical_scl_has_zero_distance', () => {
+    const text = sclText(t12);
+    expect(sclDistance(text, text)).toBe(0);
+  });
+
+  it('test_different_tunings_have_positive_distance', () => {
+    const d = sclDistance(sclText(t12), sclText(t19));
+    expect(d).toBeGreaterThan(0);
+  });
+
+  it('test_distance_is_symmetric', () => {
+    const textA = sclText(t12);
+    const textB = sclText(t19);
+    expect(sclDistance(textA, textB)).toBeCloseTo(sclDistance(textB, textA), 10);
+  });
+
+  it('test_invalid_scl_throws', () => {
+    expect(() => sclDistance('not a scl file', sclText(t12))).toThrow(RangeError);
+  });
+
+  it('test_shorter_scl_padded_with_1200', () => {
+    const singleDegree = writeScl(sclFromCents('single', [700]));
+    const twoDegrees = writeScl(sclFromCents('two', [700, 1000]));
+    const d = sclDistance(singleDegree, twoDegrees);
+    expect(d).toBeCloseTo(Math.abs(1000 - 1200), 5);
+  });
+
+  it('test_non_negative_result', () => {
+    const d = sclDistance(sclText(t12), sclText(t19));
+    expect(d).toBeGreaterThanOrEqual(0);
   });
 });
