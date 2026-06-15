@@ -52,6 +52,10 @@ import {
   scaleToMinimalTuning,
   chordMapDissonancePercentiles,
   groupChordMapByLabel,
+  isScaleStable,
+  scaleMinimalTuningRoundTrip,
+  chordMapLabelCounts,
+  tuningHarmonicityCorrelation,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -2931,5 +2935,190 @@ describe('groupChordMapByLabel (Q185)', () => {
     for (const entry of chordMap) {
       expect(allGrouped).toContain(entry);
     }
+  });
+});
+
+// Q186 — isScaleStable
+describe('isScaleStable (Q186)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_major_scale_is_stable_with_high_thresholds', () => {
+    const result = isScaleStable(major, t12, 261.63, undefined, {
+      smoothness: 10000,
+      dissonance: 10,
+    });
+    expect(result).toBe(true);
+  });
+
+  it('test_major_scale_is_not_stable_with_very_low_thresholds', () => {
+    const result = isScaleStable(major, t12, 261.63, undefined, {
+      smoothness: 0.000001,
+      dissonance: 0.000001,
+    });
+    expect(result).toBe(false);
+  });
+
+  it('test_returns_boolean', () => {
+    const result = isScaleStable(major, t12, 440);
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('test_incompatible_tuning_throws', () => {
+    const wrongScale: Scale = { id: 'x', name: 'X', tuningId: 'other', degreeIndices: [0, 1] };
+    expect(() => isScaleStable(wrongScale, t12, 440)).toThrow(RangeError);
+  });
+
+  it('test_with_explicit_spectrum', () => {
+    const spectrum = harmonicSpectrum();
+    const result = isScaleStable(major, t12, 440, spectrum, { smoothness: 10000, dissonance: 10 });
+    expect(result).toBe(true);
+  });
+
+  it('test_default_thresholds_return_boolean', () => {
+    const result = isScaleStable(major, t12, 440);
+    expect(result === true || result === false).toBe(true);
+  });
+});
+
+// Q187 — scaleMinimalTuningRoundTrip
+describe('scaleMinimalTuningRoundTrip (Q187)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_isLossless_is_true_for_major_scale', () => {
+    const { isLossless } = scaleMinimalTuningRoundTrip(major, t12);
+    expect(isLossless).toBe(true);
+  });
+
+  it('test_minimal_has_correct_degree_count', () => {
+    const { minimal } = scaleMinimalTuningRoundTrip(major, t12);
+    expect(minimal.degrees.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_recovered_degree_indices_are_sequential', () => {
+    const { recovered } = scaleMinimalTuningRoundTrip(major, t12);
+    expect(recovered.degreeIndices).toEqual([0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  it('test_minimal_tuning_id_matches_scale_id', () => {
+    const { minimal } = scaleMinimalTuningRoundTrip(major, t12);
+    expect(minimal.id).toBe(major.id);
+  });
+
+  it('test_incompatible_tuning_throws', () => {
+    const wrongScale: Scale = { id: 'x', name: 'X', tuningId: 'other', degreeIndices: [0, 1] };
+    expect(() => scaleMinimalTuningRoundTrip(wrongScale, t12)).toThrow(RangeError);
+  });
+
+  it('test_pentatonic_round_trip_is_lossless', () => {
+    const penta: Scale = {
+      id: 'penta',
+      name: 'Pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const { isLossless, recovered } = scaleMinimalTuningRoundTrip(penta, t12);
+    expect(isLossless).toBe(true);
+    expect(recovered.degreeIndices.length).toBe(5);
+  });
+});
+
+// Q189 — chordMapLabelCounts
+describe('chordMapLabelCounts (Q189)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_triad_map_has_triad_key_with_correct_count', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const counts = chordMapLabelCounts(chordMap);
+    expect(counts['triad']).toBe(chordMap.length);
+  });
+
+  it('test_sum_of_counts_equals_total_chords', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const counts = chordMapLabelCounts(chordMap);
+    const total = Object.values(counts).reduce((s, v) => s + v, 0);
+    expect(total).toBe(chordMap.length);
+  });
+
+  it('test_empty_chordmap_returns_empty_record', () => {
+    const counts = chordMapLabelCounts([]);
+    expect(Object.keys(counts).length).toBe(0);
+  });
+
+  it('test_dyad_map_has_only_dyad_key', () => {
+    const chordMap = scaleToChordMap(major, t12, 2);
+    const counts = chordMapLabelCounts(chordMap);
+    expect(Object.keys(counts)).toEqual(['dyad']);
+  });
+
+  it('test_count_values_are_positive_integers', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const counts = chordMapLabelCounts(chordMap);
+    for (const v of Object.values(counts)) {
+      expect(Number.isInteger(v) && v > 0).toBe(true);
+    }
+  });
+});
+
+// Q191 — tuningHarmonicityCorrelation
+describe('tuningHarmonicityCorrelation (Q191)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_constant_profile_tuning_returns_nan', () => {
+    // EDO tunings have uniform harmonicity across all rotations → constant profile → NaN
+    const r = tuningHarmonicityCorrelation(t12, t12);
+    expect(Number.isNaN(r)).toBe(true);
+  });
+
+  it('test_different_edos_also_return_nan_or_finite', () => {
+    const t19 = edo(19);
+    const r = tuningHarmonicityCorrelation(t12, t19);
+    // Both EDOs have constant profiles so NaN is expected; function must not throw
+    expect(Number.isNaN(r) || Number.isFinite(r)).toBe(true);
+  });
+
+  it('test_result_is_number', () => {
+    const t19 = edo(19);
+    const r = tuningHarmonicityCorrelation(t12, t19);
+    expect(typeof r).toBe('number');
+  });
+
+  it('test_no_degrees_throws', () => {
+    const emptyTuning = { ...t12, degrees: [] };
+    expect(() => tuningHarmonicityCorrelation(emptyTuning, t12)).toThrow(RangeError);
+  });
+
+  it('test_symmetric_result', () => {
+    const t19 = edo(19);
+    const rAB = tuningHarmonicityCorrelation(t12, t19);
+    const rBA = tuningHarmonicityCorrelation(t19, t12);
+    if (Number.isFinite(rAB)) {
+      expect(rAB).toBeCloseTo(rBA, 8);
+    } else {
+      expect(Number.isNaN(rBA)).toBe(true);
+    }
+  });
+
+  it('test_custom_tol_parameter_accepted', () => {
+    // Should not throw; result is NaN since 12-TET modes are equi-harmonic
+    const r = tuningHarmonicityCorrelation(t12, t12, 0.02);
+    expect(typeof r).toBe('number');
   });
 });

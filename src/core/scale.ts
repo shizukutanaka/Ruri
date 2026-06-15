@@ -2285,6 +2285,83 @@ export function chordMapDissonancePercentiles(
 }
 
 /**
+ * Determine whether a scale qualifies as 'stable' (smooth progressions, low dissonance) in one call.
+ *
+ * Socratic Q186: "If we can get a progression score summary, checking whether a scale
+ * qualifies as 'stable' should be one call — can it?" Today: `progressionScoreSummary`
+ * → check `meanSmoothness` → `chordMapMeanDissonance` → compare both — three steps.
+ * If stability is a first-class property, checking it should be one call.
+ *
+ * Algorithm:
+ * 1. `progressionScoreSummary(scale, tuning, rootHz, spectrum)` → `meanSmoothness`.
+ * 2. `scaleToChordMap(scale, tuning)` → `chordMapMeanDissonance(chordMap, spectrum, rootHz)`.
+ * 3. Return `meanSmoothness < thresholds.smoothness && meanDissonance < thresholds.dissonance`.
+ *
+ * @param scale      - The parent scale.
+ * @param tuning     - The parent `TuningSystem`.
+ * @param rootHz     - Absolute frequency of the root in Hz.
+ * @param spectrum   - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param thresholds - Optional stability thresholds. Defaults to `{ smoothness: 200, dissonance: 0.5 }`.
+ * @returns `true` if the scale meets both stability criteria.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const stable = isScaleStable(major, t12, 261.63);
+ */
+export function isScaleStable(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+  thresholds: { smoothness: number; dissonance: number } = { smoothness: 200, dissonance: 0.5 },
+): boolean {
+  const summary = progressionScoreSummary(scale, tuning, rootHz, spectrum);
+  const chordMap = scaleToChordMap(scale, tuning);
+  const meanDissonance = chordMapMeanDissonance(chordMap, spectrum, rootHz);
+  return summary.meanSmoothness < thresholds.smoothness && meanDissonance < thresholds.dissonance;
+}
+
+/**
+ * Check whether a Scale → minimal TuningSystem → Scale round-trip is lossless in one call.
+ *
+ * Socratic Q187: "If we can convert a Scale to a minimal TuningSystem, converting it back
+ * and checking if the round-trip is lossless should be one call — can it?" Today:
+ * `scaleToMinimalTuning` → `tuningToScale` → compare degreeIndices — three steps.
+ * If round-tripping is first-class, verifying it should be one call.
+ *
+ * Algorithm:
+ * 1. `scaleToMinimalTuning(scale, tuning)` → `minimal` TuningSystem.
+ * 2. `tuningToScale(minimal)` → `recovered` Scale (degreeIndices = [0,1,...,n-1]).
+ * 3. `isLossless` = recovered degree count equals original and indices are sequential [0..n-1].
+ *
+ * @param scale  - The scale to project. Must be compatible with `tuning`.
+ * @param tuning - The parent `TuningSystem`.
+ * @returns `{ minimal, recovered, isLossless }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { isLossless } = scaleMinimalTuningRoundTrip(major, t12);
+ * // isLossless === true — all 7 degrees are recovered as [0,1,2,3,4,5,6]
+ */
+export function scaleMinimalTuningRoundTrip(
+  scale: Scale,
+  tuning: TuningSystem,
+): { minimal: TuningSystem; recovered: Scale; isLossless: boolean } {
+  const minimal = scaleToMinimalTuning(scale, tuning);
+  const recovered = tuningToScale(minimal);
+  const n = scale.degreeIndices.length;
+  const isLossless =
+    recovered.degreeIndices.length === n && recovered.degreeIndices.every((idx, i) => idx === i);
+  return { minimal, recovered, isLossless };
+}
+
+/**
  * Group a chord map by interval-count label in one call.
  *
  * Socratic Q185: "If we can label chords in a map, we should be able to group the chord
@@ -2319,4 +2396,91 @@ export function groupChordMapByLabel(
     group.push(entry);
   }
   return result;
+}
+
+/**
+ * Count how many chords of each type are in a chord map in one call.
+ *
+ * Socratic Q189: "If we can group chords by label, we should be able to count how many
+ * chords of each type are in a chord map — can it?" Today: `groupChordMapByLabel(chordMap)`
+ * → iterate over values and read `.length` — two explicit steps. If grouping is first-class,
+ * counting by label should be one call.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @returns `Record<string, number>` where each key is a chord-type label and each value is the count.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const counts = chordMapLabelCounts(chordMap);
+ * // counts['triad'] === 7 for a full diatonic triad map
+ */
+export function chordMapLabelCounts(
+  chordMap: readonly ScaleChordMapEntry[],
+): Record<string, number> {
+  const grouped = groupChordMapByLabel(chordMap);
+  const result: Record<string, number> = {};
+  for (const [label, entries] of grouped) {
+    result[label] = entries.length;
+  }
+  return result;
+}
+
+/**
+ * Compute the Pearson correlation between the harmonicity profiles of two tunings in one call.
+ *
+ * Socratic Q191: "If we can compute the harmonicity profile of a tuning, comparing two
+ * tunings' profiles (correlation score) should be one call — can it?" Today:
+ * `tuningHarmonicityProfile(a)` → `tuningHarmonicityProfile(b)` → pad → pearson — four steps.
+ * If comparing tuning profiles is first-class, a correlation score should be one call.
+ *
+ * Algorithm:
+ * 1. Get both profiles via `tuningHarmonicityProfile`.
+ * 2. Pad the shorter profile with zeros to match the longer one's length.
+ * 3. Compute Pearson correlation = cov(a,b) / (std(a) * std(b)).
+ * 4. If either std is 0, return NaN.
+ *
+ * @param tuningA - First tuning system.
+ * @param tuningB - Second tuning system.
+ * @param tol     - Stolzenburg tolerance forwarded to `tuningHarmonicityProfile`. Default 0.0136.
+ * @returns Pearson correlation in [-1, 1], or NaN if either profile is constant.
+ *
+ * @throws {RangeError} if either tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const r = tuningHarmonicityCorrelation(t12, t19);
+ */
+export function tuningHarmonicityCorrelation(
+  tuningA: TuningSystem,
+  tuningB: TuningSystem,
+  tol = 0.0136,
+): number {
+  const profileA = tuningHarmonicityProfile(tuningA, tol);
+  const profileB = tuningHarmonicityProfile(tuningB, tol);
+  const len = Math.max(profileA.length, profileB.length);
+  const a: number[] = Array.from({ length: len }, (_, i) =>
+    i < profileA.length ? (profileA[i] as number) : 0,
+  );
+  const b: number[] = Array.from({ length: len }, (_, i) =>
+    i < profileB.length ? (profileB[i] as number) : 0,
+  );
+  const meanA = a.reduce((s, v) => s + v, 0) / len;
+  const meanB = b.reduce((s, v) => s + v, 0) / len;
+  let cov = 0;
+  let varA = 0;
+  let varB = 0;
+  for (let i = 0; i < len; i++) {
+    const da = (a[i] as number) - meanA;
+    const db = (b[i] as number) - meanB;
+    cov += da * db;
+    varA += da * da;
+    varB += db * db;
+  }
+  const stdA = Math.sqrt(varA);
+  const stdB = Math.sqrt(varB);
+  if (stdA === 0 || stdB === 0) return NaN;
+  return cov / (stdA * stdB);
 }
