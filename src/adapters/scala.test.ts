@@ -9,6 +9,7 @@ import {
   chordMapToScl,
   scaleChordMapToScl,
   chordMapBundle,
+  scaleAnalysisBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -16,6 +17,7 @@ import { mpeToFreq } from '../core/midi.js';
 import { freqToCents } from '../core/cents.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
 import { type Scale, scaleToChordMap } from '../core/scale.js';
+import { harmonicSpectrum } from '../core/spectrum.js';
 
 const SCL_12TET = `! meanquar.scl
 !
@@ -439,5 +441,47 @@ describe('chordMapBundle (Q162)', () => {
 
   it('test_empty_chord_map_throws', () => {
     expect(() => chordMapBundle([], t12)).toThrow(RangeError);
+  });
+});
+
+describe('scaleAnalysisBundle (Q172)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_scl_and_summary', () => {
+    const { scl, summary } = scaleAnalysisBundle(major, t12);
+    expect(scl).toBeDefined();
+    expect(summary).toBeDefined();
+    expect(typeof summary.count).toBe('number');
+    expect(typeof summary.meanDissonance).toBe('number');
+  });
+
+  it('test_scl_matches_tuning', () => {
+    const { scl } = scaleAnalysisBundle(major, t12);
+    expect(scl.description).toBe(t12.id);
+    expect(scl.degrees.length).toBeGreaterThan(0);
+  });
+
+  it('test_summary_has_expected_chord_count', () => {
+    const { summary } = scaleAnalysisBundle(major, t12);
+    expect(summary.count).toBeGreaterThan(0);
+  });
+
+  it('test_with_spectrum_changes_dissonance_values', () => {
+    const { summary } = scaleAnalysisBundle(major, t12, harmonicSpectrum());
+    expect(Number.isFinite(summary.meanDissonance)).toBe(true);
+    expect(Number.isFinite(summary.meanHarmonicity)).toBe(true);
+  });
+
+  it('test_scl_is_serializable_via_write_scl', () => {
+    const { scl } = scaleAnalysisBundle(major, t12);
+    const text = writeScl(scl);
+    expect(text).toContain(t12.id);
+    expect(text.startsWith('!')).toBe(true);
   });
 });

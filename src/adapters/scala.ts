@@ -2,7 +2,13 @@
 import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import { pitchToCents, freqToCents } from '../core/cents.js';
 import { type Chord, chordToFreqRatios } from '../core/chord.js';
-import { type ScaleChordMapEntry, type Scale, scaleToChordMap } from '../core/scale.js';
+import {
+  type ScaleChordMapEntry,
+  type Scale,
+  scaleToChordMap,
+  chordMapSummary,
+} from '../core/scale.js';
+import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
 
 /** One scale degree, tagged by its original textual form. */
@@ -285,4 +291,40 @@ export function chordMapBundle(
   const frequencies = Array.from({ length: 128 }, (_, k) => degreeToFreq(tuning, k - 69));
   const tun = writeTun(frequencies, tunName);
   return { scl, tun };
+}
+
+/** Return type of `chordMapSummary`. */
+export type ChordMapSummaryType = ReturnType<typeof chordMapSummary>;
+
+/**
+ * Export a scale's Scala `.scl` representation alongside its chord map statistics in one call.
+ *
+ * Socratic Q172: "If a scale can be analyzed by its chord map, exporting the chord map stats
+ * alongside the scale's Scala representation should be one call — can it?" Today:
+ * `tuningToScl(tuning)` for the .scl, `chordMapSummary(scale, tuning, spectrum)` for the
+ * stats — two calls from two different modules. If scale export and analysis are first-class,
+ * bundling them should be one call.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for chord analysis. Defaults to `harmonicSpectrum()`.
+ * @returns `{ scl: ScalaScale, summary: ChordMapSummaryType }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scl, summary } = scaleAnalysisBundle(major, t12);
+ * fs.writeFileSync('major.scl', writeScl(scl));
+ * console.log(summary.meanDissonance);
+ */
+export function scaleAnalysisBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+): { scl: ScalaScale; summary: ChordMapSummaryType } {
+  const scl = tuningToScl(tuning);
+  const summary = chordMapSummary(scale, tuning, spectrum);
+  return { scl, summary };
 }
