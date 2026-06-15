@@ -18,8 +18,15 @@ import {
   type TuningReportType,
 } from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
-import { type Spectrum } from '../core/spectrum.js';
-import { tuningToScaleWav, encodeWav, type TuningScaleWavOptions } from '../adapters/wav.js';
+import { type Spectrum, harmonicSpectrum } from '../core/spectrum.js';
+import {
+  tuningToScaleWav,
+  encodeWav,
+  type TuningScaleWavOptions,
+  chordProgressionToWav,
+  type ChordProgressionToWavOptions,
+} from '../adapters/wav.js';
+import { DEFAULT_KS } from '../core/ks-synth.js';
 
 const SEMI = 100;
 
@@ -700,4 +707,129 @@ export function bestStabilityPreset(
     }
   }
   return bestEntry;
+}
+
+/**
+ * Find the preset whose best mode has the minimum (most harmonic) harmonicity score in one call.
+ *
+ * Socratic Q210: "If we can get all preset reports, finding the preset with the most harmonic
+ * best mode should be one call — can it?" Today: `allPresetReports` → argmin on
+ * `report.bestMode.harmonicity` — two steps. If preset harmonicity is first-class,
+ * finding the most harmonic preset should be one call.
+ *
+ * @param rootHz   - Absolute frequency of the root in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ preset, harmonicity }` for the preset with the lowest best-mode harmonicity,
+ *          or `undefined` if the preset pool is empty.
+ *
+ * @example
+ * const result = mostHarmonicPreset();
+ * // result.preset is the preset whose best mode has the lowest harmonicity score
+ */
+export function mostHarmonicPreset(
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): { preset: TuningPreset; harmonicity: number } | undefined {
+  const reports = allPresetReports(rootHz ?? 440, spectrum, presets);
+  if (reports.length === 0) return undefined;
+  let best = reports[0] as (typeof reports)[0];
+  for (let i = 1; i < reports.length; i++) {
+    const entry = reports[i] as (typeof reports)[0];
+    if (entry.report.bestMode.harmonicity < best.report.bestMode.harmonicity) {
+      best = entry;
+    }
+  }
+  return { preset: best.preset, harmonicity: best.report.bestMode.harmonicity };
+}
+
+/**
+ * Produce a league table (ranking) of ALL presets by best-mode harmonicity in one call.
+ *
+ * Socratic Q211: "If we can compare tuning reports, producing a league table (ranking) of
+ * ALL presets by best-mode harmonicity should be one call — can it?" Today:
+ * `allPresetReports` → sort by `report.bestMode.harmonicity` — two steps.
+ * If preset rankings are first-class, getting the full ordered table should be one call.
+ *
+ * @param rootHz   - Absolute frequency of the root in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ preset, harmonicity }` sorted by harmonicity ascending (most harmonic first).
+ *
+ * @example
+ * const league = presetHarmonicityLeague();
+ * // league[0].preset is the most harmonic preset
+ */
+export function presetHarmonicityLeague(
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Array<{ preset: TuningPreset; harmonicity: number }> {
+  return allPresetReports(rootHz ?? 440, spectrum, presets)
+    .map((entry) => ({ preset: entry.preset, harmonicity: entry.report.bestMode.harmonicity }))
+    .sort((a, b) => a.harmonicity - b.harmonicity);
+}
+
+/**
+ * Synthesize ALL presets' best-mode progressions as a single concatenated WAV demo track.
+ *
+ * Socratic Q212: "If we can synthesize scale progressions as WAV, synthesizing ALL presets'
+ * best-mode progressions as a single concatenated WAV 'demo track' should be one call — can it?"
+ * Today: iterate ALL_PRESETS → `loadTuningPreset` → `bestModeForTuning` →
+ * `progressionFromPattern` → `chordProgressionToWav` → decode PCM → concatenate → `encodeWav`
+ * — many manual steps. If preset audio is first-class, a full demo track should be one call.
+ *
+ * Algorithm:
+ * 1. For each preset: `loadTuningPreset` → `bestModeForTuning` → `progressionFromPattern` →
+ *    `chordProgressionToWav` → decode WAV PCM to Float32 samples.
+ * 2. Concatenate all Float32 sample arrays.
+ * 3. `encodeWav(combined, sampleRate)` → final WAV bytes.
+ *
+ * @param pattern  - Sequence of 0-based root degree indices (e.g. `[0, 2, 4, 0]` for I–III–V–I).
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns `Uint8Array` WAV bytes of all presets' best-mode progressions concatenated.
+ *
+ * @throws {RangeError} if `presets` is empty.
+ *
+ * @example
+ * const wav = allPresetsDemoWav([0, 2, 4, 0], 261.63);
+ * await fs.writeFile('demo.wav', wav);
+ */
+export function allPresetsDemoWav(
+  pattern: readonly number[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts?: ChordProgressionToWavOptions,
+): Uint8Array {
+  if (ALL_PRESETS.length === 0) throw new RangeError('allPresetsDemoWav: no presets available');
+  const sampleRate = opts?.sampleRate ?? DEFAULT_KS.sampleRate;
+  const allSamples: Float32Array[] = [];
+
+  for (const preset of ALL_PRESETS) {
+    const tuning = loadTuningPreset(preset);
+    const mode = bestModeForTuning(tuning, spectrum);
+    const chords = progressionFromPattern(mode, tuning, pattern);
+    const wav = chordProgressionToWav(chords, rootHz, spectrum ?? harmonicSpectrum(), opts);
+    const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+    const dataOffset = 44;
+    const numSamples = (wav.byteLength - dataOffset) / 2;
+    const samples = new Float32Array(numSamples);
+    for (let i = 0; i < numSamples; i++) {
+      samples[i] = view.getInt16(dataOffset + i * 2, true) / 32767;
+    }
+    allSamples.push(samples);
+  }
+
+  const totalLength = allSamples.reduce((sum, s) => sum + s.length, 0);
+  const combined = new Float32Array(totalLength);
+  let offset = 0;
+  for (const samples of allSamples) {
+    combined.set(samples, offset);
+    offset += samples.length;
+  }
+
+  return encodeWav(combined, sampleRate);
 }

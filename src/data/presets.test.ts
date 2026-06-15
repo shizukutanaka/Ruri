@@ -2,9 +2,13 @@ import { describe, it, expect } from 'vitest';
 import {
   ALL_PRESETS,
   TWELVE_TET,
+  JUST_INTONATION_5L,
   SLENDRO_EXAMPLE,
   allPresetReports,
   bestStabilityPreset,
+  mostHarmonicPreset,
+  presetHarmonicityLeague,
+  allPresetsDemoWav,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability } from '../core/scale.js';
@@ -94,5 +98,118 @@ describe('bestStabilityPreset (Q208)', () => {
     expect(result).not.toBeUndefined();
     if (result === undefined) return;
     expect(ALL_PRESETS.some((p) => p.id === result.preset.id)).toBe(true);
+  });
+});
+
+// Q210 — mostHarmonicPreset
+describe('mostHarmonicPreset (Q210)', () => {
+  it('test_returns_preset_and_harmonicity', () => {
+    const result = mostHarmonicPreset(440, undefined, [TWELVE_TET, SLENDRO_EXAMPLE]);
+    expect(result).not.toBeUndefined();
+    if (result === undefined) return;
+    expect(result).toHaveProperty('preset');
+    expect(result).toHaveProperty('harmonicity');
+  });
+
+  it('test_harmonicity_matches_report', () => {
+    const result = mostHarmonicPreset(440, undefined, [TWELVE_TET]);
+    if (result === undefined) throw new Error('no result');
+    const reports = allPresetReports(440, undefined, [TWELVE_TET]);
+    const entry = reports[0];
+    if (entry === undefined) throw new Error('no entry');
+    expect(result.harmonicity).toBeCloseTo(entry.report.bestMode.harmonicity, 10);
+  });
+
+  it('test_empty_pool_returns_undefined', () => {
+    const result = mostHarmonicPreset(440, undefined, []);
+    expect(result).toBeUndefined();
+  });
+
+  it('test_has_minimum_harmonicity_among_pool', () => {
+    const pool: readonly TuningPreset[] = [TWELVE_TET, SLENDRO_EXAMPLE, JUST_INTONATION_5L];
+    const result = mostHarmonicPreset(440, undefined, pool);
+    if (result === undefined) throw new Error('no result');
+    const reports = allPresetReports(440, undefined, pool);
+    const minH = Math.min(...reports.map((r) => r.report.bestMode.harmonicity));
+    expect(result.harmonicity).toBeCloseTo(minH, 10);
+  });
+
+  it('test_uses_440_as_default_rootHz', () => {
+    const a = mostHarmonicPreset(undefined, undefined, [TWELVE_TET]);
+    const b = mostHarmonicPreset(440, undefined, [TWELVE_TET]);
+    expect(a?.harmonicity).toBeCloseTo(b?.harmonicity ?? -1, 10);
+  });
+});
+
+// Q211 — presetHarmonicityLeague
+describe('presetHarmonicityLeague (Q211)', () => {
+  it('test_returns_array_same_length_as_pool', () => {
+    const league = presetHarmonicityLeague(440, undefined, [TWELVE_TET, SLENDRO_EXAMPLE]);
+    expect(league.length).toBe(2);
+  });
+
+  it('test_sorted_ascending_by_harmonicity', () => {
+    const league = presetHarmonicityLeague(440, undefined, [
+      TWELVE_TET,
+      SLENDRO_EXAMPLE,
+      JUST_INTONATION_5L,
+    ]);
+    for (let i = 1; i < league.length; i++) {
+      expect(league[i]?.harmonicity ?? 0).toBeGreaterThanOrEqual(league[i - 1]?.harmonicity ?? 0);
+    }
+  });
+
+  it('test_empty_pool_returns_empty_array', () => {
+    const league = presetHarmonicityLeague(440, undefined, []);
+    expect(league).toEqual([]);
+  });
+
+  it('test_each_entry_has_preset_and_harmonicity', () => {
+    const league = presetHarmonicityLeague(440, undefined, [TWELVE_TET]);
+    const entry = league[0];
+    expect(entry).toHaveProperty('preset');
+    expect(entry).toHaveProperty('harmonicity');
+    expect(typeof entry?.harmonicity).toBe('number');
+  });
+
+  it('test_first_entry_matches_most_harmonic_preset', () => {
+    const pool: readonly TuningPreset[] = [TWELVE_TET, SLENDRO_EXAMPLE];
+    const league = presetHarmonicityLeague(440, undefined, pool);
+    const most = mostHarmonicPreset(440, undefined, pool);
+    expect(league[0]?.preset.id).toBe(most?.preset.id);
+  });
+});
+
+// Q212 — allPresetsDemoWav
+describe('allPresetsDemoWav (Q212)', () => {
+  const FAST_OPTS = { sampleRate: 8000, chordSeconds: 0.05, seconds: 1.0, decay: 3 };
+
+  it('test_returns_uint8array', () => {
+    const wav = allPresetsDemoWav([0, 2], 261.63, undefined, FAST_OPTS);
+    expect(wav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_wav_has_riff_header', () => {
+    const wav = allPresetsDemoWav([0], 261.63, undefined, FAST_OPTS);
+    const header = String.fromCharCode(...wav.slice(0, 4));
+    expect(header).toBe('RIFF');
+  });
+
+  it('test_wav_length_scales_with_presets', () => {
+    const wav = allPresetsDemoWav([0], 261.63, undefined, FAST_OPTS);
+    expect(wav.byteLength).toBeGreaterThan(44);
+  });
+
+  it('test_pattern_with_more_steps_produces_longer_wav', () => {
+    const short = allPresetsDemoWav([0], 261.63, undefined, FAST_OPTS);
+    const long = allPresetsDemoWav([0, 2, 4], 261.63, undefined, FAST_OPTS);
+    expect(long.byteLength).toBeGreaterThan(short.byteLength);
+  });
+
+  it('test_uses_correct_sample_rate_in_header', () => {
+    const wav = allPresetsDemoWav([0], 261.63, undefined, FAST_OPTS);
+    const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+    const sr = view.getUint32(24, true);
+    expect(sr).toBe(8000);
   });
 });
