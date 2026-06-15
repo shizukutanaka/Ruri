@@ -3,7 +3,13 @@ import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordFromRatios, chordFromSemitones, realizeChordFreqs } from '../core/chord.js';
-import { type Scale, scaleToFreqs, scaleToChordMap } from '../core/scale.js';
+import {
+  type Scale,
+  scaleToFreqs,
+  scaleToChordMap,
+  scaleModeSeries,
+  tuningToScale,
+} from '../core/scale.js';
 import {
   freqToMtsKey,
   mtsBulkDump,
@@ -16,6 +22,7 @@ import {
   bestModeMts,
   chordEntryToMts,
   bestModeChordMapMts,
+  progressionNarrativeMts,
 } from './mts.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
@@ -836,5 +843,24 @@ describe('bestModeChordMapMts (Q192)', () => {
   it('test_custom_device_id_reflected_in_output', () => {
     const mts = bestModeChordMapMts(t12, undefined, { deviceId: 3 });
     expect(mts[2]).toBe(3);
+  });
+});
+
+describe('progressionNarrativeMts (Q239)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 3).map((e) => e.chord);
+
+  it('returns mts buffer and narrative string', () => {
+    const result = progressionNarrativeMts(chords, t12);
+    expect(result.mts).toBeInstanceOf(Uint8Array);
+    expect(result.mts.length).toBeGreaterThan(0);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+  it('narrative contains progression info', () => {
+    const { narrative } = progressionNarrativeMts(chords, t12);
+    expect(narrative).toContain('Progression');
   });
 });

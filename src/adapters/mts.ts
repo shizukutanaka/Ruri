@@ -34,6 +34,7 @@ import {
   type ScaleChordMapEntry,
   bestModeForTuning,
   scaleToChordMap,
+  progressionNarrative,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 
@@ -591,4 +592,39 @@ export function bestModeChordMapMts(
   const mode = bestModeForTuning(tuning, spectrum);
   const chordMap = scaleToChordMap(mode, tuning);
   return chordMapToMts(chordMap, tuning.id, opts ?? {});
+}
+
+/**
+ * Get both an MTS bulk dump and a narrative description of a chord progression in one call.
+ *
+ * Socratic Q239: "If I can get a progression's MTS dump and its narrative text, can I get
+ * both in one call?" → No → implement.
+ *
+ * The MTS bulk dump encodes the `tuning` system so a synth can be retuned to the correct
+ * intonation before playing the progression. The narrative describes the progression's
+ * energy shape, climax, and resolution.
+ *
+ * @param chords   - The chord progression to narrate.
+ * @param tuning   - The `TuningSystem` context (exported as the MTS dump).
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for the narrative analysis.
+ * @param opts     - Optional MTS encoding options.
+ * @returns `{ mts: Uint8Array, narrative: string }`.
+ *
+ * @example
+ * const { mts, narrative } = progressionNarrativeMts(chords, t12);
+ * port.send(mts); // retune synth
+ * console.log(narrative); // describe the progression
+ */
+export function progressionNarrativeMts(
+  chords: readonly Chord[],
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  opts?: TuningToMtsOptions,
+): { mts: Uint8Array; narrative: string } {
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const narrative = progressionNarrative(chords, effectiveRootHz, spectrum);
+  const mts = tuningToMts(tuning, undefined, opts ?? {});
+  return { mts, narrative };
 }
