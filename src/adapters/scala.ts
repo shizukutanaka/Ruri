@@ -9,6 +9,7 @@ import {
   chordMapSummary,
   scaleToMinimalTuning,
   scaleModeSeries,
+  bestModeForTuning,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -461,4 +462,29 @@ export function scaleToSubsetSclText(scale: Scale, tuning: TuningSystem, name?: 
 export function scaleModeScls(scale: Scale, tuning: TuningSystem): string[] {
   const modes = scaleModeSeries(scale, tuning);
   return modes.map((mode) => scaleToSubsetSclText(mode, tuning, mode.name));
+}
+
+/**
+ * Export the best mode of a tuning directly as a subset `.scl` text string in one call.
+ *
+ * Socratic Q221: "If we can export any scale as a subset .scl, we should be able to export
+ * the BEST MODE of a tuning directly as subset .scl text in one call — can it?" Today:
+ * `bestModeForTuning(tuning, spectrum)` → `scaleToSubsetSclText(mode, tuning, name)` — two steps.
+ * If the best mode is first-class, exporting it as Scala text should be one call.
+ *
+ * @param tuning   - The parent `TuningSystem`. Must have at least one degree.
+ * @param spectrum - Optional instrument spectrum for timbre-aware mode selection.
+ * @param name     - Optional `.scl` description. Defaults to the best mode's name.
+ * @returns A `.scl` text string ready to write to disk.
+ *
+ * @throws {RangeError} if `tuning` has no degrees (propagated from `bestModeForTuning`).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const text = bestModeSclText(t12);
+ * fs.writeFileSync('best-mode.scl', text);
+ */
+export function bestModeSclText(tuning: TuningSystem, spectrum?: Spectrum, name?: string): string {
+  const mode = bestModeForTuning(tuning, spectrum);
+  return scaleToSubsetSclText(mode, tuning, name ?? mode.name);
 }

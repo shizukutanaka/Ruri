@@ -14,6 +14,7 @@ import {
   scaleToSubsetScl,
   scaleToSubsetSclText,
   scaleModeScls,
+  bestModeSclText,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -671,5 +672,47 @@ describe('scaleModeScls (Q202)', () => {
       degreeIndices: [0, 1, 2],
     };
     expect(() => scaleModeScls(wrongScale, t12)).toThrow(RangeError);
+  });
+});
+
+// Q221 — bestModeSclText
+describe('bestModeSclText (Q221)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_string', () => {
+    const text = bestModeSclText(t12);
+    expect(typeof text).toBe('string');
+    expect(text.length).toBeGreaterThan(0);
+  });
+
+  it('test_output_is_valid_scl', () => {
+    const text = bestModeSclText(t12);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBeGreaterThan(0);
+  });
+
+  it('test_custom_name_appears_in_output', () => {
+    const text = bestModeSclText(t12, undefined, 'my-best-mode');
+    expect(text).toContain('my-best-mode');
+  });
+
+  it('test_output_ends_with_newline', () => {
+    const text = bestModeSclText(t12);
+    expect(text.endsWith('\n')).toBe(true);
+  });
+
+  it('test_works_with_different_edos', () => {
+    const t5 = edo(5);
+    const text = bestModeSclText(t5);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBeGreaterThan(0);
+    expect(parsed.degrees.length).toBeLessThanOrEqual(5);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const text = bestModeSclText(t12, harmonicSpectrum());
+    expect(typeof text).toBe('string');
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBeGreaterThan(0);
   });
 });
