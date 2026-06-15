@@ -3367,3 +3367,85 @@ export function tuningIntervalHistogram(
     count,
   }));
 }
+
+/**
+ * Render a tuning's interval histogram as an ASCII bar chart in one call.
+ *
+ * Socratic Q235: "If I have a tuningIntervalHistogram, can I render it as an ASCII bar
+ * chart in one call?" → No → implement.
+ *
+ * @param tuning   - The `TuningSystem` whose degrees to visualise.
+ * @param binCount - Number of equal-width bins across `tuning.periodCents` (default 12).
+ * @param width    - Maximum bar width in block characters (default 20).
+ * @returns A multi-line string with one row per bin: "bin{i} | {bar} | {count}".
+ *
+ * @throws {RangeError} if `binCount` <= 0 (propagated from `tuningIntervalHistogram`).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * console.log(tuningHistogramChart(t12));
+ * // bin 0 | ████████████████████ | 1
+ * // bin 1 | ████████████████████ | 1
+ * // ...
+ */
+export function tuningHistogramChart(
+  tuning: TuningSystem,
+  binCount?: number,
+  width?: number,
+): string {
+  const hist = tuningIntervalHistogram(tuning, binCount ?? 12);
+  const maxCount = Math.max(...hist.map((b) => b.count), 1);
+  const barWidth = width ?? 20;
+  return hist
+    .map((b, i) => {
+      const bar = '█'.repeat(Math.round((b.count / maxCount) * barWidth));
+      return `bin${i.toString().padStart(2)} | ${bar.padEnd(barWidth)} | ${b.count}`;
+    })
+    .join('\n');
+}
+
+/**
+ * Build a histogram of all intervals used across a chord map's chords in one call.
+ *
+ * Socratic Q238: "If I have a chord map and can get a tuning interval histogram, can I get
+ * the histogram of all intervals used across a chord map's chords in one call?" → No → implement.
+ *
+ * @param chordMap    - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param periodCents - Period in cents for binning (default 1200).
+ * @param binCount    - Number of equal-width bins (default 12).
+ * @returns Array of `{ bin, centsMid, count }` for each bin index.
+ *
+ * @throws {RangeError} if `binCount` <= 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const hist = chordMapIntervalHistogram(chordMap);
+ * // hist[0].count = number of chord intervals that fall in the first 100c bin
+ */
+export function chordMapIntervalHistogram(
+  chordMap: readonly ScaleChordMapEntry[],
+  periodCents?: number,
+  binCount?: number,
+): { bin: number; centsMid: number; count: number }[] {
+  const period = periodCents ?? 1200;
+  const bins = binCount ?? 12;
+  if (bins <= 0) {
+    throw new RangeError('chordMapIntervalHistogram: binCount must be positive');
+  }
+  const binSize = period / bins;
+  const counts = Array.from({ length: bins }, () => 0);
+  for (const entry of chordMap) {
+    for (const interval of entry.chord.intervals) {
+      const c = pitchToCents(interval);
+      const idx = Math.min(Math.floor(c / binSize), bins - 1);
+      counts[idx] = (counts[idx] as number) + 1;
+    }
+  }
+  return Array.from({ length: bins }, (_, i) => ({
+    bin: i,
+    centsMid: (i + 0.5) * binSize,
+    count: counts[i] ?? 0,
+  }));
+}

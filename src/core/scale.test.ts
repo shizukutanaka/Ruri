@@ -79,6 +79,8 @@ import {
   progressionNarrative,
   chordMapBestWorstBundle,
   tuningIntervalHistogram,
+  tuningHistogramChart,
+  chordMapIntervalHistogram,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4039,5 +4041,42 @@ describe('tuningIntervalHistogram (Q233)', () => {
   it('custom binCount', () => {
     const hist = tuningIntervalHistogram(t12Local, 6);
     expect(hist).toHaveLength(6);
+  });
+});
+
+describe('tuningHistogramChart (Q235)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns a non-empty string', () => {
+    const chart = tuningHistogramChart(t12);
+    expect(chart).toBeTruthy();
+    expect(typeof chart).toBe('string');
+  });
+  it('has binCount lines', () => {
+    const chart = tuningHistogramChart(t12, 6);
+    expect(chart.split('\n')).toHaveLength(6);
+  });
+  it('uses block character', () => {
+    expect(tuningHistogramChart(t12)).toContain('█');
+  });
+});
+
+describe('chordMapIntervalHistogram (Q238)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('returns binCount bins', () => {
+    const hist = chordMapIntervalHistogram(chordMap);
+    expect(hist).toHaveLength(12);
+  });
+  it('total count equals total intervals across all chords', () => {
+    const hist = chordMapIntervalHistogram(chordMap);
+    const total = hist.reduce((s, b) => s + b.count, 0);
+    const expected = chordMap.reduce((s, e) => s + e.chord.intervals.length, 0);
+    expect(total).toBe(expected);
+  });
+  it('throws for binCount <= 0', () => {
+    expect(() => chordMapIntervalHistogram(chordMap, 1200, 0)).toThrow(RangeError);
   });
 });
