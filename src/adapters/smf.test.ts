@@ -15,6 +15,7 @@ import {
   chordMapToSmf,
   presetProgressionSmf,
   bestChordMapSmf,
+  bestTuningChordSmf,
 } from './smf.js';
 import { chordFromSemitones, chordFromRatios } from '../core/chord.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -628,5 +629,58 @@ describe('bestChordMapSmf (Q141)', () => {
     const midi = bestChordMapSmf(major, t12, spectrum, { velocity: 75 });
     const { notes } = decodeSmf(midi);
     for (const n of notes) expect(n.velocity).toBe(75);
+  });
+});
+
+// Q157: bestTuningChordSmf — bestModeForTuning → bestChordMapEntry → chordToSmf in one call
+describe('bestTuningChordSmf (Q157)', () => {
+  const t12 = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_uint8array_with_mthd_header', () => {
+    const midi = bestTuningChordSmf(t12, spectrum);
+    expect(midi).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(midi[0]!, midi[1]!, midi[2]!, midi[3]!)).toBe('MThd');
+  });
+
+  it('test_decoded_smf_contains_exactly_one_chord', () => {
+    const midi = bestTuningChordSmf(t12, spectrum);
+    const { notes } = decodeSmf(midi);
+    const byTick = new Map<number, number>();
+    for (const n of notes) byTick.set(n.startTicks, (byTick.get(n.startTicks) ?? 0) + 1);
+    expect(byTick.size).toBe(1);
+  });
+
+  it('test_decoded_chord_has_triad_voices', () => {
+    const midi = bestTuningChordSmf(t12, spectrum);
+    const { notes } = decodeSmf(midi);
+    expect(notes.length).toBe(3);
+  });
+
+  it('test_default_spectrum_produces_valid_output', () => {
+    const midi = bestTuningChordSmf(t12);
+    expect(midi).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(midi[0]!, midi[1]!, midi[2]!, midi[3]!)).toBe('MThd');
+  });
+
+  it('test_custom_velocity_applied', () => {
+    const midi = bestTuningChordSmf(t12, spectrum, { velocity: 80 });
+    const { notes } = decodeSmf(midi);
+    for (const n of notes) expect(n.velocity).toBe(80);
+  });
+
+  it('test_different_tunings_produce_different_midi', () => {
+    const t19 = edo(19);
+    const midi12 = bestTuningChordSmf(t12, spectrum);
+    const midi19 = bestTuningChordSmf(t19, spectrum);
+    let differs = false;
+    const len = Math.min(midi12.length, midi19.length);
+    for (let i = 0; i < len; i++) {
+      if (midi12[i] !== midi19[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs || midi12.length !== midi19.length).toBe(true);
   });
 });

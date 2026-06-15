@@ -28,7 +28,13 @@
 import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
 import { degreeToFreq, type TuningSystem } from '../core/tuning.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
-import { type Scale, scaleToFreqs, type ScaleChordMapEntry } from '../core/scale.js';
+import {
+  type Scale,
+  scaleToFreqs,
+  type ScaleChordMapEntry,
+  bestModeForTuning,
+} from '../core/scale.js';
+import { type Spectrum } from '../core/spectrum.js';
 
 /** A single MTS key entry: semitone + 14-bit fractional offset above it. */
 export interface MtsKey {
@@ -478,4 +484,37 @@ export function chordMapToMts(
   void _rHz;
   void _a4;
   return mtsBulkDump(frequencies, name, bulkOpts);
+}
+
+/**
+ * Find the best mode for a tuning and export it as a 408-byte MTS bulk tuning dump SysEx.
+ *
+ * Socratic Q159: "If we have a best mode for a tuning, the MTS SysEx dump of that best mode
+ * should be one call — can it?" Today: `bestModeForTuning(tuning, spectrum)` → `scaleToMts(mode,
+ * tuning, opts)` — two explicit steps. If a tuning's best mode is first-class, retune a synth
+ * to that mode in one call.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → best modal rotation.
+ * 2. `scaleToMts(mode, tuning, opts)` → 408-byte MTS SysEx.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for mode ranking. If omitted, ranks by harmonicity.
+ * @param opts     - Optional MTS encoding options (device ID, program, middleNote, a4Hz).
+ * @returns A 408-byte `Uint8Array` MTS SysEx message for the best mode.
+ *
+ * @throws {RangeError} if `tuning` has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const mts = bestModeMts(t12);
+ * port.send(mts); // retune synth to the most harmonic mode of 12-TET
+ */
+export function bestModeMts(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts?: ScaleToMtsOptions,
+): Uint8Array {
+  const mode = bestModeForTuning(tuning, spectrum);
+  return scaleToMts(mode, tuning, mode.id, opts ?? {});
 }

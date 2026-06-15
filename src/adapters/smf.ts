@@ -10,6 +10,8 @@ import {
   type ChordProgressionStep,
   type ScaleChordMapEntry,
   chordMapAnalysis,
+  bestModeForTuning,
+  bestChordMapEntry,
 } from '../core/scale.js';
 import { type TuningSystem } from '../core/tuning.js';
 import { type ChordSearchOptions } from '../core/chord-search.js';
@@ -620,4 +622,43 @@ export function bestChordMapSmf(
     );
   }
   return chordToSmf(best.chord, tuning.referenceHz, opts);
+}
+
+export type BestTuningChordSmfOptions = ChordToSmfOptions;
+
+/**
+ * Find the best mode for a tuning, take its best chord, and export it as SMF in one call.
+ *
+ * Socratic Q157: "If a tuning has a best mode and that mode has a best chord, that chord
+ * encoded as SMF should be one call — can it?" Today: `bestModeForTuning(tuning, spectrum)`
+ * → `bestChordMapEntry(mode, tuning, spectrum)` → `chordToSmf(entry.chord, …)` — three steps.
+ * If a tuning is first-class, exporting its most consonant chord as MIDI should be one call.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → best modal rotation.
+ * 2. `bestChordMapEntry(mode, tuning, spectrum ?? harmonicSpectrum())` → most consonant chord.
+ * 3. `chordToSmf(entry.chord, tuning.referenceHz, opts)` → SMF bytes.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional SMF encoding options.
+ * @returns A Type-0 SMF `Uint8Array` of the best chord in the best mode, ready to write to `.mid`.
+ *
+ * @throws {RangeError} if `tuning` has no degrees.
+ * @throws {RangeError} if no chords are found.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const midi = bestTuningChordSmf(t12, harmonicSpectrum());
+ * await fs.writeFile('best-tuning-chord.mid', midi);
+ */
+export function bestTuningChordSmf(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts?: BestTuningChordSmfOptions,
+): Uint8Array {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const mode = bestModeForTuning(tuning, spectrum);
+  const entry = bestChordMapEntry(mode, tuning, effectiveSpectrum);
+  return chordToSmf(entry.chord, tuning.referenceHz, opts);
 }

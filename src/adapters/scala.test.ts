@@ -7,6 +7,7 @@ import {
   tuningToScl,
   chordToScl,
   chordMapToScl,
+  scaleChordMapToScl,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -339,6 +340,54 @@ describe('chordMapToScl (Q132)', () => {
     const scl = chordMapToScl(chordMap, t12);
     for (let i = 1; i < scl.degrees.length; i++) {
       expect(degreeCents(scl.degrees[i]!)).toBeGreaterThan(degreeCents(scl.degrees[i - 1]!));
+    }
+  });
+});
+
+// Q161 — scaleChordMapToScl: scale → chord map → Scala .scl in one call
+describe('scaleChordMapToScl (Q161)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_scala_scale_with_degrees', () => {
+    const scl = scaleChordMapToScl(major, t12);
+    expect(scl.degrees.length).toBeGreaterThan(0);
+  });
+
+  it('test_default_description_is_scale_name', () => {
+    const scl = scaleChordMapToScl(major, t12);
+    expect(scl.description).toBe(major.name);
+  });
+
+  it('test_custom_name_used_as_description', () => {
+    const scl = scaleChordMapToScl(major, t12, 'my-chord-map');
+    expect(scl.description).toBe('my-chord-map');
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const t19 = edo(19);
+    expect(() => scaleChordMapToScl(major, t19)).toThrow(RangeError);
+  });
+
+  it('test_degrees_sorted_ascending', () => {
+    const scl = scaleChordMapToScl(major, t12);
+    for (let i = 1; i < scl.degrees.length; i++) {
+      expect(degreeCents(scl.degrees[i]!)).toBeGreaterThan(degreeCents(scl.degrees[i - 1]!));
+    }
+  });
+
+  it('test_round_trips_through_write_and_parse', () => {
+    const scl = scaleChordMapToScl(major, t12);
+    const text = writeScl(scl);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBe(scl.degrees.length);
+    for (let i = 0; i < scl.degrees.length; i++) {
+      expect(degreeCents(parsed.degrees[i]!)).toBeCloseTo(degreeCents(scl.degrees[i]!), 3);
     }
   });
 });

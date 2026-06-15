@@ -2,7 +2,7 @@
 import { type TuningSystem } from '../core/tuning.js';
 import { pitchToCents, freqToCents } from '../core/cents.js';
 import { type Chord, chordToFreqRatios } from '../core/chord.js';
-import { type ScaleChordMapEntry } from '../core/scale.js';
+import { type ScaleChordMapEntry, type Scale, scaleToChordMap } from '../core/scale.js';
 
 /** One scale degree, tagged by its original textual form. */
 export type ScalaDegree =
@@ -212,4 +212,34 @@ export function chordMapToScl(
   }
   allCents.sort((a, b) => a - b);
   return sclFromCents(name ?? tuning.id, allCents);
+}
+
+/**
+ * Export a scale's full chord map as a Scala `.scl` file capturing all modal pitch classes.
+ *
+ * Socratic Q161: "If we can export a scale's chord map as a WAV, the same chord map as a
+ * Scala .scl file should be one call that also includes the scale's modal context — can it?"
+ * Today: `scaleToChordMap(scale, tuning)` → `chordMapToScl(chordMap, tuning, name)` — two steps.
+ * If a scale's chord map is first-class, exporting it as a Scala file should be one call.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → all diatonic chords (throws if incompatible).
+ * 2. `chordMapToScl(chordMap, tuning, name ?? scale.name)` → `ScalaScale`.
+ *
+ * @param scale  - The parent scale.
+ * @param tuning - The parent `TuningSystem`.
+ * @param name   - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns A `ScalaScale` capturing all unique pitch classes across the scale's diatonic chords.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const scl = scaleChordMapToScl(major, t12);
+ * fs.writeFileSync('major-chord-map.scl', writeScl(scl));
+ */
+export function scaleChordMapToScl(scale: Scale, tuning: TuningSystem, name?: string): ScalaScale {
+  const chordMap = scaleToChordMap(scale, tuning);
+  return chordMapToScl(chordMap, tuning, name ?? scale.name);
 }

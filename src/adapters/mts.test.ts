@@ -13,7 +13,9 @@ import {
   chordProgressionToMts,
   scaleToMts,
   chordMapToMts,
+  bestModeMts,
 } from './mts.js';
+import { harmonicSpectrum } from '../core/spectrum.js';
 
 // ---------------------------------------------------------------------------
 // freqToMtsKey
@@ -681,5 +683,52 @@ describe('chordMapToMts — chord map to MTS bulk dump in one call (Q139)', () =
       }
     }
     expect(differs).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// bestModeMts — bestModeForTuning → scaleToMts in one call (Q159)
+// ---------------------------------------------------------------------------
+
+describe('bestModeMts — best mode for tuning → MTS bulk dump in one call (Q159)', () => {
+  const tuning = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('test_output_length_is_408', () => {
+    expect(bestModeMts(tuning).length).toBe(408);
+  });
+
+  it('test_first_byte_is_sysex_start', () => {
+    expect(bestModeMts(tuning)[0]).toBe(0xf0);
+  });
+
+  it('test_last_byte_is_sysex_end', () => {
+    const mts = bestModeMts(tuning);
+    expect(mts[mts.length - 1]).toBe(0xf7);
+  });
+
+  it('test_with_spectrum_produces_valid_408_byte_output', () => {
+    const mts = bestModeMts(tuning, spectrum);
+    expect(mts.length).toBe(408);
+    expect(mts[0]).toBe(0xf0);
+  });
+
+  it('test_different_tunings_produce_different_mts', () => {
+    const t19 = edo(19);
+    const mts12 = bestModeMts(tuning);
+    const mts19 = bestModeMts(t19);
+    let differs = false;
+    for (let i = 22; i < 406; i++) {
+      if (mts12[i] !== mts19[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_custom_device_id_reflected_in_output', () => {
+    const mts = bestModeMts(tuning, undefined, { deviceId: 7 });
+    expect(mts[2]).toBe(7);
   });
 });
