@@ -1816,3 +1816,150 @@ export function chordMapMedianDissonance(
   }
   return ((values[mid - 1] as number) + (values[mid] as number)) / 2;
 }
+
+/**
+ * Keep only entries from a chord map whose Sethares dissonance is at or below a threshold.
+ *
+ * Socratic Q156: "If we can filter a chord map by harmonicity threshold, we should also be
+ * able to filter it by dissonance threshold in one call — can it?" Today:
+ * `rankChordMapByDissonance(chordMap, spectrum, rootHz)` → filter by index — two steps.
+ * If a chord map is first-class, filtering by dissonance should be one call.
+ *
+ * @param chordMap      - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param maxDissonance - Maximum Sethares roughness to keep (exclusive upper bound, must be > 0).
+ * @param spectrum      - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz        - Root frequency for dissonance computation (default 440 Hz).
+ * @returns New array containing only entries where dissonance ≤ maxDissonance.
+ *
+ * @throws {RangeError} if `maxDissonance` <= 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const consonant = filterChordMapByDissonance(chordMap, 0.5);
+ */
+export function filterChordMapByDissonance(
+  chordMap: readonly ScaleChordMapEntry[],
+  maxDissonance: number,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): ScaleChordMapEntry[] {
+  if (maxDissonance <= 0) {
+    throw new RangeError(
+      `filterChordMapByDissonance: maxDissonance must be > 0, got ${maxDissonance}`,
+    );
+  }
+  if (chordMap.length === 0) {
+    throw new RangeError('filterChordMapByDissonance: chordMap must be non-empty');
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  return chordMap.filter(
+    (entry) => chordObjectDissonance(entry.chord, rootHz, effectiveSpectrum) <= maxDissonance,
+  );
+}
+
+/**
+ * Compute the mean Sethares dissonance of all entries in a chord map.
+ *
+ * Socratic Q158: "If we can compute chord map median dissonance, computing the mean dissonance
+ * should also be one call — can it?" Today: iterate over all entries, sum dissonances, divide —
+ * three manual steps. If a chord map is first-class, its mean dissonance should be one call.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Root frequency for dissonance computation (default 440 Hz).
+ * @returns Mean Sethares roughness across all entries.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const mean = chordMapMeanDissonance(chordMap, harmonicSpectrum(), 261.63);
+ */
+export function chordMapMeanDissonance(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): number {
+  if (chordMap.length === 0) {
+    throw new RangeError('chordMapMeanDissonance: chordMap must be non-empty');
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const total = chordMap.reduce(
+    (sum, entry) => sum + chordObjectDissonance(entry.chord, rootHz, effectiveSpectrum),
+    0,
+  );
+  return total / chordMap.length;
+}
+
+/** JSON-serializable summary of a chord progression's dissonance profile. */
+export interface ProgressionScoreSummary {
+  /** Number of chords in the progression. */
+  readonly chordCount: number;
+  /** Sum of Sethares dissonance across all chords. */
+  readonly totalSmoothness: number;
+  /** Mean Sethares dissonance across all chords. */
+  readonly meanSmoothness: number;
+  /** Index of the chord with the lowest dissonance (most consonant). */
+  readonly bestChordIndex: number;
+  /** Index of the chord with the highest dissonance (most dissonant). */
+  readonly worstChordIndex: number;
+}
+
+/**
+ * Compute a JSON-serializable score summary of a scale's diatonic chord progression.
+ *
+ * Socratic Q160: "If we have a progression from a scale and can export it as SMF, exporting
+ * the chord progression analysis as a score summary (JSON-serializable) should be one call —
+ * can it?" Today: `scaleToChordMap` → extract chords → `chordProgressionAnalysis` → iterate
+ * and summarize — four explicit steps. If a Scale's chord progression is first-class, its
+ * summary should be one call.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → all diatonic chords.
+ * 2. `chordProgressionAnalysis(chords, rootHz, spectrum ?? harmonicSpectrum())` → per-step data.
+ * 3. Summarize: count, total/mean dissonance, best/worst index by dissonance.
+ *
+ * @param scale    - The parent scale.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Absolute frequency of the root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns JSON-serializable summary of the progression's dissonance profile.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const summary = progressionScoreSummary(major, t12, 261.63);
+ * console.log(JSON.stringify(summary));
+ */
+export function progressionScoreSummary(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+): ProgressionScoreSummary {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const chordMap = scaleToChordMap(scale, tuning);
+  const chords = chordMap.map((e) => e.chord);
+  const steps = chordProgressionAnalysis(chords, rootHz, effectiveSpectrum);
+  const dissonances = steps.map((s) => s.dissonance);
+  const total = dissonances.reduce((acc, d) => acc + d, 0);
+  let bestIdx = 0;
+  let worstIdx = 0;
+  for (let i = 1; i < dissonances.length; i++) {
+    if ((dissonances[i] as number) < (dissonances[bestIdx] as number)) bestIdx = i;
+    if ((dissonances[i] as number) > (dissonances[worstIdx] as number)) worstIdx = i;
+  }
+  return {
+    chordCount: steps.length,
+    totalSmoothness: total,
+    meanSmoothness: total / steps.length,
+    bestChordIndex: bestIdx,
+    worstChordIndex: worstIdx,
+  };
+}
