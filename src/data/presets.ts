@@ -11,6 +11,7 @@ import {
   progressionFromPattern,
   bestModeForTuning,
   scaleHarmonicity,
+  tuningHarmonicityProfile,
   type Scale,
 } from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
@@ -557,4 +558,40 @@ export function presetsComparisonWav(
   }
 
   return encodeWav(combined, sampleRate);
+}
+
+/**
+ * Rank all tuning presets by harmonicity profile variance, most uniform first.
+ *
+ * Socratic Q181: "If we can compute a harmonicity profile for a tuning, we should be able
+ * to rank ALL tuning presets by their harmonicity profile variance (spread) — tighter spread
+ * = more uniformly harmonic — can it?" Today: iterate presets → `loadTuningPreset` →
+ * `tuningHarmonicityProfile` → compute variance → sort — five manual steps. If presets
+ * are first-class, ranking them by profile uniformity should be one call.
+ *
+ * Algorithm:
+ * 1. For each preset: `loadTuningPreset(preset)` → `TuningSystem`.
+ * 2. `tuningHarmonicityProfile(tuning)` → `number[]`.
+ * 3. Compute variance (mean of squared deviations from the mean).
+ * 4. Sort ascending by variance (lowest variance = most uniform = first).
+ *
+ * @param presets - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ preset, variance }` sorted by variance ascending.
+ *
+ * @example
+ * const ranked = rankPresetsByHarmonicitySpread();
+ * // ranked[0].preset is the most uniformly harmonic preset across all its modal rotations
+ */
+export function rankPresetsByHarmonicitySpread(
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Array<{ preset: TuningPreset; variance: number }> {
+  const entries = presets.map((preset) => {
+    const tuning = loadTuningPreset(preset);
+    const profile = tuningHarmonicityProfile(tuning);
+    const mean = profile.reduce((s, v) => s + v, 0) / profile.length;
+    const variance =
+      profile.length > 0 ? profile.reduce((s, v) => s + (v - mean) ** 2, 0) / profile.length : 0;
+    return { preset, variance };
+  });
+  return entries.sort((a, b) => a.variance - b.variance);
 }

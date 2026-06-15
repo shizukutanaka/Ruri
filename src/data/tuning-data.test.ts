@@ -18,6 +18,7 @@ import {
   rankPresetsByDistance,
   closestPresetTuning,
   presetsComparisonWav,
+  rankPresetsByHarmonicitySpread,
 } from './presets.js';
 import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
@@ -683,5 +684,47 @@ describe('presetsComparisonWav (Q179)', () => {
     const one = presetsComparisonWav(['12-tet'])!;
     const two = presetsComparisonWav(['12-tet', 'just-5-limit'])!;
     expect(two.length).toBeGreaterThan(one.length);
+  });
+});
+
+// Q181 — rankPresetsByHarmonicitySpread: rank presets by harmonicity profile variance
+describe('rankPresetsByHarmonicitySpread (Q181)', () => {
+  it('test_returns_array_of_all_presets', () => {
+    const ranked = rankPresetsByHarmonicitySpread();
+    expect(ranked.length).toBe(ALL_PRESETS.length);
+  });
+
+  it('test_sorted_ascending_by_variance', () => {
+    const ranked = rankPresetsByHarmonicitySpread();
+    for (let i = 1; i < ranked.length; i++) {
+      expect((ranked[i] as (typeof ranked)[0]).variance).toBeGreaterThanOrEqual(
+        (ranked[i - 1] as (typeof ranked)[0]).variance,
+      );
+    }
+  });
+
+  it('test_variance_is_non_negative', () => {
+    const ranked = rankPresetsByHarmonicitySpread();
+    for (const { variance } of ranked) {
+      expect(variance).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('test_preset_field_is_tuning_preset', () => {
+    const ranked = rankPresetsByHarmonicitySpread();
+    for (const { preset } of ranked) {
+      expect(preset).toHaveProperty('id');
+      expect(preset).toHaveProperty('degrees');
+    }
+  });
+
+  it('test_custom_preset_pool', () => {
+    const ranked = rankPresetsByHarmonicitySpread([TWELVE_TET, JUST_INTONATION_5L]);
+    expect(ranked.length).toBe(2);
+  });
+
+  it('test_empty_pool_returns_empty', () => {
+    const ranked = rankPresetsByHarmonicitySpread([]);
+    expect(ranked).toEqual([]);
   });
 });
