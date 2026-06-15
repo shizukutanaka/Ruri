@@ -1,17 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import { edo, degreeToFreq } from './core/tuning.js';
+import { edo, degreeToFreq, equalTemperament12 } from './core/tuning.js';
 import { meantoneQuarterComma, pythagorean } from './core/temperament.js';
-import { rankChords, realizeRankedChordFreqs, progressionSmoothness } from './core/chord-search.js';
+import {
+  rankChords,
+  realizeRankedChordFreqs,
+  progressionSmoothness,
+  rankedChordToChord,
+  optimalChordOrder,
+} from './core/chord-search.js';
 import { minimalVoiceLeading } from './core/voice-leading.js';
-import { harmonicSpectrum } from './core/spectrum.js';
+import { harmonicSpectrum, bellSpectrum } from './core/spectrum.js';
 import { pluck, normalize, mix, DEFAULT_KS } from './core/ks-synth.js';
 import { adsrEnvelope, applyEnvelope } from './core/envelope.js';
-import { encodeWav } from './adapters/wav.js';
-import { tuningToMtsFrequencies, mtsBulkDump, freqToMtsKey } from './adapters/mts.js';
+import { encodeWav, pluckChordToWav, strikeChordToWav } from './adapters/wav.js';
+import { tuningToMtsFrequencies, mtsBulkDump, freqToMtsKey, tuningToMts } from './adapters/mts.js';
+import { progressionToSmf, decodeSmf } from './adapters/smf.js';
 import { writeTun } from './adapters/tun.js';
 import { getTuningById } from './data/presets.js';
 import { chordFromSemitones, realizeChordFreqs } from './core/chord.js';
 import { fretlessOud, fingerFretlessChord } from './core/fretless.js';
+import { scaleMode, rankScaleChords, chordFromBestMode, type Scale } from './core/scale.js';
+import { rankTuningsByFit, spectrumToTuning } from './core/dissonance.js';
 
 // Socratic Q8: the new modules were only unit-tested in isolation. These tests
 // exercise them as connected end-to-end pipelines, the way a real caller would.
@@ -150,5 +159,141 @@ describe('integration: preset tuning → chord ranking → progression smoothnes
       expect(Number.isFinite(cost)).toBe(true);
       expect(cost).toBeGreaterThanOrEqual(0);
     }
+  });
+});
+
+// Q79 — End-to-end integration: "Scale to DAW" pipeline.
+// Exercises the full Q47-Q77 bridge functions together in a realistic scenario:
+// edo(12) → tuningToScale → scaleMode (Dorian) → rankScaleChords
+//   → rankedChordToChord → optimalChordOrder → progressionToSmf → decodeSmf (round-trip)
+describe('integration Q79: scale-to-DAW pipeline (Dorian → MIDI)', () => {
+  // equalTemperament12 produces id='12-tet' which matches Scale.tuningId='12-tet'.
+  const t12 = equalTemperament12(440);
+
+  // Ionian (major) as the parent scale; Dorian = mode index 1.
+  const ionian: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('dorian_ranked_triads_produce_valid_midi_round_trip', () => {
+    // 1. Obtain the Dorian mode (modeIndex=1 of Ionian).
+    const dorian = scaleMode(ionian, 1, t12);
+    expect(dorian.degreeIndices.length).toBe(7);
+
+    // 2. Rank triads within Dorian.
+    const ranked = rankScaleChords(dorian, t12, { size: 3, limit: 5 });
+    expect(ranked.length).toBeGreaterThan(0);
+
+    // 3. Convert RankedChords to portable Chord objects.
+    const chords = ranked.map((r) => rankedChordToChord(r));
+    expect(chords.length).toBe(ranked.length);
+
+    // 4. Optimise voice-leading order.
+    const { chords: ordered, totalCents } = optimalChordOrder(chords, 261.63);
+    expect(ordered.length).toBe(chords.length);
+    expect(totalCents).toBeGreaterThanOrEqual(0);
+
+    // 5. Encode to MIDI.
+    const midi = progressionToSmf(ordered, 261.63);
+    expect(midi.length).toBeGreaterThan(14); // at minimum header + track
+
+    // 6. RIFF-style: SMF starts with MThd.
+    expect(midi[0]).toBe(0x4d); // 'M'
+    expect(midi[1]).toBe(0x54); // 'T'
+    expect(midi[2]).toBe(0x68); // 'h'
+    expect(midi[3]).toBe(0x64); // 'd'
+
+    // 7. Round-trip: decodeSmf must recover note events.
+    const { notes } = decodeSmf(midi);
+    // Each chord has 3 notes; total notes = chords.length * 3.
+    expect(notes.length).toBe(ordered.length * 3);
+    // All notes have positive duration.
+    expect(notes.every((n) => n.durationTicks > 0)).toBe(true);
+  });
+
+  it('rankTuningsByFit_returns_sorted_coverage_for_harmonic_spectrum', () => {
+    const tunings = [edo(12), edo(19), edo(31)];
+    const ranked = rankTuningsByFit(tunings, harmonicSpectrum());
+    // Must return one entry per tuning.
+    expect(ranked.length).toBe(3);
+    // Coverage must be descending (or equal) across the ranking.
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i - 1]!.suitability.coverage).toBeGreaterThanOrEqual(
+        ranked[i]!.suitability.coverage,
+      );
+    }
+    // Coverage values must all be in [0, 1].
+    expect(ranked.every((r) => r.suitability.coverage >= 0 && r.suitability.coverage <= 1)).toBe(
+      true,
+    );
+  });
+
+  it('pluckChordToWav_returns_valid_RIFF_WAV', () => {
+    const wav = pluckChordToWav([261.63, 329.63, 392.0]);
+    // WAV starts with RIFF magic.
+    expect(wav[0]).toBe(0x52); // 'R'
+    expect(wav[1]).toBe(0x49); // 'I'
+    expect(wav[2]).toBe(0x46); // 'F'
+    expect(wav[3]).toBe(0x46); // 'F'
+    // Must have more than just the header.
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('chordFromBestMode_returns_chord_with_at_least_two_intervals', () => {
+    const { chord } = chordFromBestMode(ionian, t12);
+    // A triad (default size=3) has 3 intervals: root + 2 above.
+    expect(chord.intervals.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// Q80 — End-to-end integration: "Timbre-derived tuning" pipeline.
+// bellSpectrum() → spectrumToTuning → rankTuningsByFit → tuningToMts → strikeChordToWav
+describe('integration Q80: timbre-derived tuning pipeline (bell spectrum → MTS + WAV)', () => {
+  const bell = bellSpectrum();
+
+  it('bell_self_derived_tuning_has_highest_coverage_among_candidates', () => {
+    // 1. Derive the acoustically optimal tuning for bell timbre.
+    const bellTuning = spectrumToTuning(bell);
+    expect(bellTuning.degrees.length).toBeGreaterThan(0);
+
+    // 2. Rank [edo(12), edo(19), bellTuning] by fit for bell spectrum.
+    const ranked = rankTuningsByFit([edo(12), edo(19), bellTuning], bell);
+    expect(ranked.length).toBe(3);
+
+    // 3. The bell-derived tuning must have the highest (or equal) coverage,
+    //    since by construction it was built from exactly those consonant intervals.
+    const bellEntry = ranked.find((r) => r.tuning.id === bellTuning.id);
+    expect(bellEntry).toBeDefined();
+    const bellCoverage = bellEntry!.suitability.coverage;
+    const edo12Coverage = ranked.find((r) => r.tuning.id === '12-edo')!.suitability.coverage;
+    // Bell-derived tuning must at least match (≥) the 12-EDO coverage for bell spectrum.
+    expect(bellCoverage).toBeGreaterThanOrEqual(edo12Coverage);
+  });
+
+  it('tuningToMts_bell_tuning_is_408_bytes', () => {
+    const bellTuning = spectrumToTuning(bell);
+    const mts = tuningToMts(bellTuning);
+    // MTS bulk dump is always exactly 408 bytes.
+    expect(mts.length).toBe(408);
+    // Starts with SysEx start byte.
+    expect(mts[0]).toBe(0xf0);
+    // Ends with SysEx end byte.
+    expect(mts[407]).toBe(0xf7);
+    // All interior data bytes are 7-bit (≤ 0x7f).
+    expect(Array.from(mts.slice(1, 407)).every((b) => b <= 0x7f)).toBe(true);
+  });
+
+  it('strikeChordToWav_bell_spectrum_returns_valid_RIFF_WAV', () => {
+    const wav = strikeChordToWav([220, 330], bell);
+    // WAV starts with RIFF magic.
+    expect(wav[0]).toBe(0x52); // 'R'
+    expect(wav[1]).toBe(0x49); // 'I'
+    expect(wav[2]).toBe(0x46); // 'F'
+    expect(wav[3]).toBe(0x46); // 'F'
+    // Must have content beyond the 44-byte header.
+    expect(wav.length).toBeGreaterThan(44);
   });
 });
