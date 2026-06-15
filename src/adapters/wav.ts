@@ -28,6 +28,7 @@ import {
   scaleToChordMap,
   rankAllModesForTimbre,
   tuningToScale,
+  rankModeSeriesByHarmonicity,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -1133,4 +1134,45 @@ export function chordMapToStereoWav(
   }
 
   return encodeWavStereo(outL, outR, sampleRate);
+}
+
+/**
+ * Synthesize the least harmonic mode of a tuning as a WAV scale run in one call.
+ *
+ * Socratic Q177: "If we can synthesize the best mode of a tuning, synthesizing the WORST
+ * (least harmonic) mode should also be one call — can it?" `bestModeWav` uses
+ * `rankModeSeriesByHarmonicity` → first entry. The worst mode is simply the last entry.
+ * If best-mode audio is one call, worst-mode audio should be one call too.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `rankModeSeriesByHarmonicity(fullScale, tuning)` → sorted ascending (best first).
+ * 3. Take the LAST entry (highest harmonicity = least harmonic).
+ * 4. `pluckScaleWav(worst, tuning, opts)` → WAV bytes.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Unused (accepted for API symmetry with `bestModeWav`).
+ * @param opts     - Optional Karplus-Strong + per-note duration options.
+ * @returns WAV bytes of the worst mode played as a melodic ascending sequence.
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const wav = worstModeWav(t12);
+ * await fs.writeFile('worst-mode.wav', wav);
+ */
+export function worstModeWav(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts: PluckScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
+): Uint8Array {
+  void spectrum; // accepted for API symmetry with bestModeWav
+  if (tuning.degrees.length === 0) {
+    throw new RangeError('worstModeWav: tuning has no degrees');
+  }
+  const fullScale = tuningToScale(tuning);
+  const ranked = rankModeSeriesByHarmonicity(fullScale, tuning);
+  const worst = (ranked[ranked.length - 1] as (typeof ranked)[0]).scale;
+  return pluckScaleWav(worst, tuning, opts);
 }

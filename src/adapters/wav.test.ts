@@ -28,6 +28,7 @@ import {
   tuningTimbreAnalysisWav,
   chordAudioBundle,
   chordMapToStereoWav,
+  worstModeWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1417,5 +1418,48 @@ describe('chordMapToStereoWav (Q171)', () => {
     const chordMap = scaleToChordMap(major, t12);
     const wav = chordMapToStereoWav(chordMap, t12.referenceHz, harmonicSpectrum());
     expect(wav.length).toBeGreaterThan(44);
+  });
+});
+
+// Q177 — worstModeWav: tuning → WAV of least harmonic mode in one call
+describe('worstModeWav (Q177)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_uint8array', () => {
+    const wav = worstModeWav(t12);
+    expect(wav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_riff_header_present', () => {
+    const wav = worstModeWav(t12);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_larger_than_header', () => {
+    const wav = worstModeWav(t12);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const empty = {
+      id: 'e',
+      name: 'e',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(() => worstModeWav(empty)).toThrow(RangeError);
+  });
+
+  it('test_accepts_spectrum_argument_without_error', () => {
+    expect(() => worstModeWav(t12, harmonicSpectrum())).not.toThrow();
+  });
+
+  it('test_both_best_and_worst_produce_valid_riff', () => {
+    const best = bestModeWav(t12, 440);
+    const worst = worstModeWav(t12);
+    expect(String.fromCharCode(best[0]!, best[1]!, best[2]!, best[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(worst[0]!, worst[1]!, worst[2]!, worst[3]!)).toBe('RIFF');
   });
 });
