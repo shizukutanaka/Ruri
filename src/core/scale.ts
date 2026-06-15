@@ -3029,3 +3029,191 @@ export function findChordByLabel(
   const entry = annotated[idx] as (typeof annotated)[0];
   return { chord: entry.chord, index: idx };
 }
+
+/**
+ * Find the peak-dissonance chord (climax) in a progression in one call.
+ *
+ * Socratic Q223: "If we can compute an energy arc from a progression, finding the peak
+ * dissonance chord (climax) should be one call — can it?" Today:
+ * `annotateProgression(chords, rootHz, spectrum)` → find entry with maximum dissonance —
+ * two steps. If annotation is first-class, finding the climax should be one call.
+ *
+ * Returns `undefined` if `chords` is empty.
+ *
+ * @param chords   - Array of `Chord` objects in progression order.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `{ chord, index, dissonance }` for the chord with the highest dissonance, or `undefined`.
+ *
+ * @example
+ * const climax = progressionClimaxChord(chords, 261.63);
+ * if (climax) console.log(climax.index, climax.dissonance);
+ */
+export function progressionClimaxChord(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): { chord: Chord; index: number; dissonance: number } | undefined {
+  const annotated = annotateProgression(chords, rootHz, spectrum);
+  if (annotated.length === 0) return undefined;
+  let maxIdx = 0;
+  for (let i = 1; i < annotated.length; i++) {
+    if (
+      (annotated[i] as (typeof annotated)[0]).dissonance >
+      (annotated[maxIdx] as (typeof annotated)[0]).dissonance
+    ) {
+      maxIdx = i;
+    }
+  }
+  const entry = annotated[maxIdx] as (typeof annotated)[0];
+  return { chord: entry.chord, index: maxIdx, dissonance: entry.dissonance };
+}
+
+/**
+ * Find the minimum-dissonance chord (resolution) in a progression in one call.
+ *
+ * Socratic Q224: "If we can find the climax chord, finding the RESOLUTION chord (minimum
+ * dissonance) should also be one call — can it?" Today:
+ * `annotateProgression(chords, rootHz, spectrum)` → find entry with minimum dissonance —
+ * two steps. If annotation is first-class, finding the resolution should be one call.
+ *
+ * Returns `undefined` if `chords` is empty.
+ *
+ * @param chords   - Array of `Chord` objects in progression order.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `{ chord, index, dissonance }` for the chord with the lowest dissonance, or `undefined`.
+ *
+ * @example
+ * const resolution = progressionResolutionChord(chords, 261.63);
+ * if (resolution) console.log(resolution.index, resolution.dissonance);
+ */
+export function progressionResolutionChord(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): { chord: Chord; index: number; dissonance: number } | undefined {
+  const annotated = annotateProgression(chords, rootHz, spectrum);
+  if (annotated.length === 0) return undefined;
+  let minIdx = 0;
+  for (let i = 1; i < annotated.length; i++) {
+    if (
+      (annotated[i] as (typeof annotated)[0]).dissonance <
+      (annotated[minIdx] as (typeof annotated)[0]).dissonance
+    ) {
+      minIdx = i;
+    }
+  }
+  const entry = annotated[minIdx] as (typeof annotated)[0];
+  return { chord: entry.chord, index: minIdx, dissonance: entry.dissonance };
+}
+
+/**
+ * Describe a single chord's acoustic properties in one call.
+ *
+ * Socratic Q225: "If we can describe a chord map, we should also be able to describe a SINGLE
+ * CHORD in one call — can it?" Today: `annotateProgression([chord], rootHz, spectrum)` → take
+ * first entry — two steps. If chord annotation is first-class, describing a single chord should
+ * be one call.
+ *
+ * @param chord    - The `Chord` to describe.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `{ label, dissonance, harmonicity }` for the chord.
+ *
+ * @throws {RangeError} if annotation returns no result (internal guard).
+ *
+ * @example
+ * const desc = chordDescription(chord, 261.63);
+ * console.log(desc.label, desc.dissonance);
+ */
+export function chordDescription(
+  chord: Chord,
+  rootHz: number,
+  spectrum?: Spectrum,
+): { label: string; dissonance: number; harmonicity: number } {
+  const result = annotateProgression([chord], rootHz, spectrum);
+  const entry = result[0];
+  if (entry === undefined) throw new RangeError('chordDescription: annotation produced no result');
+  return { label: entry.label, dissonance: entry.dissonance, harmonicity: entry.harmonicity };
+}
+
+/**
+ * Compute the overall shape label of a progression's energy arc in one call.
+ *
+ * Socratic Q227: "If we can get a progression energy arc, computing its overall shape label
+ * (ascending/descending/arch/valley/flat) should be one call — can it?" Today:
+ * `progressionEnergyArc(chords, rootHz, spectrum)` → analyze shape — two steps.
+ * If the arc is first-class, labelling its shape should be one call.
+ *
+ * Shape rules (applied in order):
+ * - `'flat'`: all values within 10% of mean (or fewer than 2 chords).
+ * - `'ascending'`: last > first AND Pearson correlation with index > 0.5.
+ * - `'descending'`: first > last AND Pearson correlation with index < -0.5.
+ * - `'arch'`: max is in middle third (n/3 ≤ index < 2n/3) AND first ≈ last (within 20%).
+ * - `'valley'`: min is in middle third AND first ≈ last (within 20%).
+ * - `'irregular'`: none of the above.
+ *
+ * Returns `'flat'` for empty or single-chord input.
+ *
+ * @param chords   - Array of `Chord` objects in progression order.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns Shape label string.
+ *
+ * @example
+ * const shape = progressionEnergyShape(chords, 261.63);
+ * // 'arch' | 'valley' | 'ascending' | 'descending' | 'flat' | 'irregular'
+ */
+export function progressionEnergyShape(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): string {
+  const arc = progressionEnergyArc(chords, rootHz, spectrum);
+  const n = arc.length;
+  if (n < 2) return 'flat';
+
+  const mean = arc.reduce((s, v) => s + v, 0) / n;
+
+  if (mean === 0) return 'flat';
+
+  const allFlat = arc.every((v) => Math.abs(v - mean) / mean <= 0.1);
+  if (allFlat) return 'flat';
+
+  // Pearson correlation with index
+  const meanIdx = (n - 1) / 2;
+  let num = 0;
+  let denArc = 0;
+  let denIdx = 0;
+  for (let i = 0; i < n; i++) {
+    const da = (arc[i] as number) - mean;
+    const di = i - meanIdx;
+    num += da * di;
+    denArc += da * da;
+    denIdx += di * di;
+  }
+  const correlation = denArc === 0 || denIdx === 0 ? 0 : num / Math.sqrt(denArc * denIdx);
+
+  const first = arc[0] as number;
+  const last = arc[n - 1] as number;
+
+  if (last > first && correlation > 0.5) return 'ascending';
+  if (first > last && correlation < -0.5) return 'descending';
+
+  // Find max and min indices
+  let maxIdx = 0;
+  let minIdx = 0;
+  for (let i = 1; i < n; i++) {
+    if ((arc[i] as number) > (arc[maxIdx] as number)) maxIdx = i;
+    if ((arc[i] as number) < (arc[minIdx] as number)) minIdx = i;
+  }
+
+  const inMiddleThird = (idx: number) => idx >= n / 3 && idx < (2 * n) / 3;
+  const endsClose = Math.abs(first - last) / Math.max(Math.abs(first), Math.abs(last), 1e-9) <= 0.2;
+
+  if (inMiddleThird(maxIdx) && endsClose) return 'arch';
+  if (inMiddleThird(minIdx) && endsClose) return 'valley';
+
+  return 'irregular';
+}

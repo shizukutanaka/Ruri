@@ -72,6 +72,10 @@ import {
   annotateProgression,
   progressionEnergyArc,
   findChordByLabel,
+  progressionClimaxChord,
+  progressionResolutionChord,
+  chordDescription,
+  progressionEnergyShape,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -3797,5 +3801,150 @@ describe('findChordByLabel (Q217)', () => {
   it('test_accepts_explicit_spectrum', () => {
     const result = findChordByLabel([triad], 'triad', 261.63, harmonicSpectrum());
     expect(result).not.toBeUndefined();
+  });
+});
+
+// Q223 — progressionClimaxChord
+describe('progressionClimaxChord (Q223)', () => {
+  const triad = chordFromSemitones('triad', [0, 4, 7]);
+  const dyad = chordFromSemitones('dyad', [0, 7]);
+
+  it('test_empty_input_returns_undefined', () => {
+    expect(progressionClimaxChord([], 261.63)).toBeUndefined();
+  });
+
+  it('test_single_chord_returns_it', () => {
+    const result = progressionClimaxChord([triad], 261.63);
+    expect(result).not.toBeUndefined();
+    expect(result?.index).toBe(0);
+    expect(result?.chord).toBe(triad);
+  });
+
+  it('test_returns_max_dissonance_entry', () => {
+    const result = progressionClimaxChord([triad, dyad], 261.63);
+    const annotated = annotateProgression([triad, dyad], 261.63);
+    const maxDissonance = Math.max(...annotated.map((e) => e.dissonance));
+    expect(result?.dissonance).toBeCloseTo(maxDissonance, 10);
+  });
+
+  it('test_dissonance_field_matches_annotate_progression', () => {
+    const chords = [triad, dyad, triad];
+    const result = progressionClimaxChord(chords, 261.63);
+    const annotated = annotateProgression(chords, 261.63);
+    expect(result?.dissonance).toBeCloseTo(annotated[result?.index ?? 0]?.dissonance ?? 0, 10);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const result = progressionClimaxChord([triad], 261.63, harmonicSpectrum());
+    expect(result).not.toBeUndefined();
+    expect(typeof result?.dissonance).toBe('number');
+  });
+});
+
+// Q224 — progressionResolutionChord
+describe('progressionResolutionChord (Q224)', () => {
+  const triad = chordFromSemitones('triad', [0, 4, 7]);
+  const dyad = chordFromSemitones('dyad', [0, 7]);
+
+  it('test_empty_input_returns_undefined', () => {
+    expect(progressionResolutionChord([], 261.63)).toBeUndefined();
+  });
+
+  it('test_single_chord_returns_it', () => {
+    const result = progressionResolutionChord([triad], 261.63);
+    expect(result).not.toBeUndefined();
+    expect(result?.index).toBe(0);
+    expect(result?.chord).toBe(triad);
+  });
+
+  it('test_returns_min_dissonance_entry', () => {
+    const result = progressionResolutionChord([triad, dyad], 261.63);
+    const annotated = annotateProgression([triad, dyad], 261.63);
+    const minDissonance = Math.min(...annotated.map((e) => e.dissonance));
+    expect(result?.dissonance).toBeCloseTo(minDissonance, 10);
+  });
+
+  it('test_climax_dissonance_gte_resolution_dissonance', () => {
+    const chords = [triad, dyad];
+    const climax = progressionClimaxChord(chords, 261.63);
+    const resolution = progressionResolutionChord(chords, 261.63);
+    expect((climax?.dissonance ?? 0) >= (resolution?.dissonance ?? 0)).toBe(true);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const result = progressionResolutionChord([triad], 261.63, harmonicSpectrum());
+    expect(result).not.toBeUndefined();
+    expect(typeof result?.dissonance).toBe('number');
+  });
+});
+
+// Q225 — chordDescription
+describe('chordDescription (Q225)', () => {
+  const triad = chordFromSemitones('triad', [0, 4, 7]);
+  const dyad = chordFromSemitones('dyad', [0, 7]);
+
+  it('test_returns_label_dissonance_harmonicity', () => {
+    const desc = chordDescription(triad, 261.63);
+    expect(desc).toHaveProperty('label');
+    expect(desc).toHaveProperty('dissonance');
+    expect(desc).toHaveProperty('harmonicity');
+  });
+
+  it('test_triad_label', () => {
+    expect(chordDescription(triad, 261.63).label).toBe('triad');
+  });
+
+  it('test_dyad_label', () => {
+    expect(chordDescription(dyad, 261.63).label).toBe('dyad');
+  });
+
+  it('test_dissonance_and_harmonicity_match_annotate_progression', () => {
+    const desc = chordDescription(triad, 261.63);
+    const annotated = annotateProgression([triad], 261.63);
+    expect(desc.dissonance).toBeCloseTo(annotated[0]?.dissonance ?? 0, 10);
+    expect(desc.harmonicity).toBeCloseTo(annotated[0]?.harmonicity ?? 0, 10);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const desc = chordDescription(triad, 261.63, harmonicSpectrum());
+    expect(typeof desc.label).toBe('string');
+    expect(typeof desc.dissonance).toBe('number');
+  });
+});
+
+// Q227 — progressionEnergyShape
+describe('progressionEnergyShape (Q227)', () => {
+  const unison = chordFromSemitones('unison', [0]);
+  const fifth = chordFromSemitones('fifth', [0, 7]);
+  const tritone = chordFromSemitones('tritone', [0, 6]);
+
+  it('test_empty_returns_flat', () => {
+    expect(progressionEnergyShape([], 261.63)).toBe('flat');
+  });
+
+  it('test_single_chord_returns_flat', () => {
+    expect(progressionEnergyShape([fifth], 261.63)).toBe('flat');
+  });
+
+  it('test_all_identical_chords_returns_flat', () => {
+    expect(progressionEnergyShape([fifth, fifth, fifth], 261.63)).toBe('flat');
+  });
+
+  it('test_returns_valid_label_string', () => {
+    const validLabels = ['flat', 'ascending', 'descending', 'arch', 'valley', 'irregular'];
+    const shape = progressionEnergyShape([unison, fifth, tritone], 261.63);
+    expect(validLabels).toContain(shape);
+  });
+
+  it('test_two_chords_returns_valid_label', () => {
+    const validLabels = ['flat', 'ascending', 'descending', 'arch', 'valley', 'irregular'];
+    const shape = progressionEnergyShape([unison, tritone], 261.63);
+    expect(validLabels).toContain(shape);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const validLabels = ['flat', 'ascending', 'descending', 'arch', 'valley', 'irregular'];
+    const shape = progressionEnergyShape([fifth, tritone], 261.63, harmonicSpectrum());
+    expect(validLabels).toContain(shape);
   });
 });
