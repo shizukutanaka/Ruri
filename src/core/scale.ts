@@ -617,3 +617,87 @@ export function scaleHarmonicity(scale: Scale, tuning: TuningSystem, tol = 0.013
   const freqs = scaleToFreqs(scale, tuning);
   return chordPeriodicity(freqs, tol);
 }
+
+/**
+ * Stolzenburg periodicity at each step of a modal progression (sequence of `Scale` objects).
+ *
+ * Socratic Q104: `scaleHarmonicity(scale, tuning)` scores a single scale's total sonority
+ * as a periodicity value, but mapping it across a sequence of scales (a modal progression)
+ * still requires a manual `.map(…)`.  If `Scale` is truly first-class, measuring
+ * harmonicity across a progression should be one call — parallel to
+ * `chordProgressionHarmonicity` for chord progressions.
+ *
+ * Returns `number[]` where each entry is the Stolzenburg relative periodicity of the
+ * corresponding scale's degrees sounded simultaneously: lower = more harmonic (simpler
+ * integer ratios).  `Infinity` signals that a scale is too inharmonic to quantify within
+ * the continued-fraction tolerance.
+ *
+ * @param scales - Ordered sequence of `Scale` objects (must all be compatible with `tuning`).
+ * @param tuning - The parent `TuningSystem` all scales belong to.
+ * @param tol - Continued-fraction tolerance (default 0.0136, snaps 12-TET to JI).
+ * @returns Array of periodicity values, one per scale step.
+ *
+ * @throws {RangeError} if `scales` is empty.
+ * @throws {RangeError} if any scale is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const modes = [0, 1, 2].map((i) => scaleMode(major, i, t12));
+ * const curve = scaleProgressionHarmonicity(modes, t12);
+ * // curve[i] is the periodicity of mode i sounded as a simultaneous chord
+ */
+export function scaleProgressionHarmonicity(
+  scales: readonly Scale[],
+  tuning: TuningSystem,
+  tol = 0.0136,
+): number[] {
+  if (scales.length === 0)
+    throw new RangeError('scaleProgressionHarmonicity: scales must be non-empty');
+  return scales.map((s) => scaleHarmonicity(s, tuning, tol));
+}
+
+/**
+ * Build a diatonic chord progression from a `Scale`, `TuningSystem`, and a degree-offset pattern.
+ *
+ * Socratic Q103: `chordFromScale(scale, tuning, offsets)` builds one chord, but constructing
+ * a full diatonic progression (e.g. I–IV–V triads) still requires a `pattern.map(…)` loop
+ * and assembling the array manually.  If chord building from scale degrees is first-class,
+ * producing a whole progression should be one call.
+ *
+ * Each entry in `pattern` is an array of scale-local offsets (0-indexed positions within
+ * `scale.degreeIndices`).  The function maps every pattern step through `chordFromScale`
+ * and returns the resulting `Chord[]`.
+ *
+ * @param scale   - The parent scale (mode) to draw degrees from.
+ * @param tuning  - The tuning the scale belongs to.
+ * @param pattern - Array of scale-degree-offset arrays, e.g. `[[0,2,4],[2,4,6],[4,6,1]]`
+ *                  for a I–III–V progression. Offsets are 0-indexed into
+ *                  `scale.degreeIndices`; out-of-range offsets throw.
+ * @param name    - Optional base name; each chord is named `${name}-${stepIndex+1}`.
+ *                  Defaults to `'chord'`.
+ * @returns `Chord[]` with one entry per pattern step.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `pattern` is empty.
+ * @throws {RangeError} if any offset array is empty.
+ * @throws {RangeError} if any offset is outside `[0, scale.degreeIndices.length)`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * // Classic I–IV–V triad progression (0-indexed diatonic offsets)
+ * const progression = buildChordProgression(major, t12, [[0,2,4],[3,5,0],[4,6,1]], 'diatonic');
+ * // progression[0] = tonic triad, progression[1] = subdominant, progression[2] = dominant
+ */
+export function buildChordProgression(
+  scale: Scale,
+  tuning: TuningSystem,
+  pattern: ReadonlyArray<readonly number[]>,
+  name = 'chord',
+): Chord[] {
+  assertTuningMatch(scale, tuning);
+  if (pattern.length === 0)
+    throw new RangeError('buildChordProgression: pattern must be non-empty');
+  return pattern.map((offsets, i) => chordFromScale(scale, tuning, offsets, `${name}-${i + 1}`));
+}

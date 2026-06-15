@@ -19,6 +19,8 @@ import {
   scaleIntervalHistogram,
   scaleSimilarity,
   scaleHarmonicity,
+  scaleProgressionHarmonicity,
+  buildChordProgression,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -1101,5 +1103,170 @@ describe('scaleHarmonicity (Q97)', () => {
       degreeIndices: [0, 2],
     };
     expect(() => scaleHarmonicity(wrongScale, t12)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q104 — scaleProgressionHarmonicity: Scale[] → periodicity curve in one call
+// ---------------------------------------------------------------------------
+
+describe('scaleProgressionHarmonicity (Q104)', () => {
+  const modes = [0, 1, 2].map((i) => scaleMode(major, i, t12));
+
+  it('test_returns_number_array_with_one_entry_per_scale', () => {
+    const curve = scaleProgressionHarmonicity(modes, t12);
+    expect(Array.isArray(curve)).toBe(true);
+    expect(curve.length).toBe(modes.length);
+  });
+
+  it('test_each_entry_matches_scaleHarmonicity', () => {
+    const curve = scaleProgressionHarmonicity(modes, t12);
+    for (let i = 0; i < modes.length; i++) {
+      expect(curve[i]).toBe(scaleHarmonicity(modes[i]!, t12));
+    }
+  });
+
+  it('test_single_scale_array_returns_that_scales_harmonicity', () => {
+    const curve = scaleProgressionHarmonicity([major], t12);
+    expect(curve.length).toBe(1);
+    expect(curve[0]).toBe(scaleHarmonicity(major, t12));
+  });
+
+  it('test_all_entries_are_positive_finite_or_infinity', () => {
+    const curve = scaleProgressionHarmonicity(modes, t12);
+    for (const v of curve) {
+      expect(v > 0 || v === Infinity).toBe(true);
+    }
+  });
+
+  it('test_empty_scales_throws_range_error', () => {
+    expect(() => scaleProgressionHarmonicity([], t12)).toThrow(RangeError);
+  });
+
+  it('test_tuning_mismatch_throws_for_any_scale', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0] };
+    expect(() => scaleProgressionHarmonicity([major, wrong], t12)).toThrow(RangeError);
+  });
+
+  it('test_same_scale_repeated_produces_identical_values', () => {
+    const curve = scaleProgressionHarmonicity([major, major, major], t12);
+    expect(curve[0]).toBe(curve[1]);
+    expect(curve[1]).toBe(curve[2]);
+  });
+
+  it('test_result_is_rootHz_independent', () => {
+    // Periodicity depends only on interval ratios, not the absolute root
+    const t440 = equalTemperament12(440);
+    const t220 = equalTemperament12(220);
+    const s440 = modes.map((m) => ({ ...m, tuningId: '12-tet' }));
+    const s220 = modes.map((m) => ({ ...m, tuningId: '12-tet' }));
+    const c440 = scaleProgressionHarmonicity(s440, t440);
+    const c220 = scaleProgressionHarmonicity(s220, t220);
+    expect(c440).toEqual(c220);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q103 — buildChordProgression: Scale + pattern → Chord[] in one call
+// ---------------------------------------------------------------------------
+
+describe('buildChordProgression (Q103)', () => {
+  it('test_returns_chord_array_with_one_entry_per_pattern_step', () => {
+    const pattern = [
+      [0, 2, 4],
+      [2, 4, 6],
+      [4, 6, 1],
+    ] as const;
+    const progression = buildChordProgression(major, t12, pattern);
+    expect(progression.length).toBe(3);
+  });
+
+  it('test_each_chord_matches_chordFromScale_call', () => {
+    const pattern = [
+      [0, 2, 4],
+      [3, 5, 0],
+      [4, 6, 1],
+    ] as const;
+    const progression = buildChordProgression(major, t12, pattern, 'dia');
+    for (let i = 0; i < pattern.length; i++) {
+      const expected = chordFromScale(major, t12, pattern[i]!, `dia-${i + 1}`);
+      expect(progression[i]!.intervals).toEqual(expected.intervals);
+      expect(progression[i]!.name).toBe(expected.name);
+    }
+  });
+
+  it('test_chord_names_follow_name_index_pattern', () => {
+    const progression = buildChordProgression(
+      major,
+      t12,
+      [
+        [0, 2, 4],
+        [2, 4, 6],
+      ],
+      'diatonic',
+    );
+    expect(progression[0]!.name).toBe('diatonic-1');
+    expect(progression[1]!.name).toBe('diatonic-2');
+  });
+
+  it('test_default_name_is_chord', () => {
+    const progression = buildChordProgression(major, t12, [[0, 2, 4]]);
+    expect(progression[0]!.name).toBe('chord-1');
+  });
+
+  it('test_each_chord_has_correct_interval_count', () => {
+    // Each triad offset array of length 3 yields a chord with 3 intervals (including root)
+    const progression = buildChordProgression(major, t12, [
+      [0, 2, 4],
+      [2, 4, 6],
+    ]);
+    expect(progression[0]!.intervals.length).toBe(3);
+    expect(progression[1]!.intervals.length).toBe(3);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2, 4, 5, 7] };
+    expect(() => buildChordProgression(wrong, t12, [[0, 2, 4]])).toThrow(RangeError);
+  });
+
+  it('test_empty_pattern_throws_range_error', () => {
+    expect(() => buildChordProgression(major, t12, [])).toThrow(RangeError);
+  });
+
+  it('test_empty_offsets_in_pattern_throws_range_error', () => {
+    expect(() => buildChordProgression(major, t12, [[]])).toThrow(RangeError);
+  });
+
+  it('test_out_of_range_offset_throws_range_error', () => {
+    // major has 7 degrees (0-6), offset 7 is invalid
+    expect(() => buildChordProgression(major, t12, [[0, 2, 7]])).toThrow(RangeError);
+  });
+
+  it('test_single_step_pattern_works', () => {
+    const prog = buildChordProgression(major, t12, [[0, 4]]);
+    expect(prog.length).toBe(1);
+    expect(prog[0]!.intervals.length).toBe(2);
+  });
+
+  it('test_classic_i_iv_v_progression_degrees_are_correct', () => {
+    // I=offsets[0,2,4], IV=offsets[3,5,0] (wraps), V=offsets[4,6,1]
+    // All chords root at degree 0 of their respective scale offsets, but since
+    // chordFromScale maps scale-local to absolute tuning degrees, the tuning
+    // degrees are what matter — just confirm intervals are well-formed Pitches
+    const progression = buildChordProgression(major, t12, [
+      [0, 2, 4],
+      [3, 5, 0],
+      [4, 6, 1],
+    ]);
+    expect(progression.length).toBe(3);
+    for (const chord of progression) {
+      expect(chord.intervals.length).toBe(3);
+      // Each interval is a Pitch object with either ratio or cents
+      for (const interval of chord.intervals) {
+        const hasRatio = 'ratio' in interval;
+        const hasCents = 'cents' in interval;
+        expect(hasRatio || hasCents).toBe(true);
+      }
+    }
   });
 });

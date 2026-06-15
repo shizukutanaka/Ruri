@@ -6,6 +6,7 @@ import {
   SLENDRO_EXAMPLE,
   JUST_INTONATION_5L,
   getTuningById,
+  rankChordsFromPreset,
 } from './presets.js';
 import { degreeToCents } from '../core/tuning.js';
 
@@ -171,5 +172,72 @@ describe('getTuningById — discoverable preset lookup', () => {
     expect(found).toBeDefined();
     const notFound = getTuningById('12-tet', custom);
     expect(notFound).toBeUndefined();
+  });
+});
+
+// Q102 — rankChordsFromPreset: preset id → ranked chord array in one call
+describe('rankChordsFromPreset (Q102)', () => {
+  it('test_known_id_returns_ranked_chord_array', () => {
+    const chords = rankChordsFromPreset('12-tet');
+    expect(chords).toBeDefined();
+    expect(Array.isArray(chords)).toBe(true);
+    expect((chords as unknown[]).length).toBeGreaterThan(0);
+  });
+
+  it('test_unknown_id_returns_undefined', () => {
+    expect(rankChordsFromPreset('does-not-exist')).toBeUndefined();
+  });
+
+  it('test_chords_sorted_ascending_by_score', () => {
+    const chords = rankChordsFromPreset('12-tet');
+    expect(chords).toBeDefined();
+    for (let i = 1; i < chords!.length; i++) {
+      expect(chords![i]!.score).toBeGreaterThanOrEqual(chords![i - 1]!.score);
+    }
+  });
+
+  it('test_size_option_controls_chord_cardinality', () => {
+    const triads = rankChordsFromPreset('12-tet', { size: 3 });
+    const tetrads = rankChordsFromPreset('12-tet', { size: 4 });
+    expect(triads).toBeDefined();
+    expect(tetrads).toBeDefined();
+    expect(triads![0]!.cents.length).toBe(3);
+    expect(tetrads![0]!.cents.length).toBe(4);
+  });
+
+  it('test_limit_option_caps_result_count', () => {
+    const chords = rankChordsFromPreset('just-5-limit', { limit: 3 });
+    expect(chords).toBeDefined();
+    expect((chords as unknown[]).length).toBeLessThanOrEqual(3);
+  });
+
+  it('test_just_intonation_best_triad_includes_degree_0', () => {
+    const chords = rankChordsFromPreset('just-5-limit', { size: 3 });
+    expect(chords).toBeDefined();
+    // All ranked chords are rooted at degree 0
+    expect(chords![0]!.degrees[0]).toBe(0);
+  });
+
+  it('test_each_preset_id_resolves_to_chords', () => {
+    for (const preset of ALL_PRESETS) {
+      const chords = rankChordsFromPreset(preset.id, { size: 3, limit: 5 });
+      expect(chords).toBeDefined();
+      expect((chords as unknown[]).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_custom_preset_pool_can_be_supplied', () => {
+    const custom = [JUST_INTONATION_5L];
+    const found = rankChordsFromPreset('just-5-limit', { size: 3 }, custom);
+    expect(found).toBeDefined();
+    const notFound = rankChordsFromPreset('12-tet', { size: 3 }, custom);
+    expect(notFound).toBeUndefined();
+  });
+
+  it('test_slendro_5_note_tuning_returns_chords', () => {
+    // Sléndro has 5 degrees; triads (size=3) should still work
+    const chords = rankChordsFromPreset('slendro-example', { size: 3 });
+    expect(chords).toBeDefined();
+    expect((chords as unknown[]).length).toBeGreaterThan(0);
   });
 });

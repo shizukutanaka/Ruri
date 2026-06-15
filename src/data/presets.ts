@@ -1,6 +1,7 @@
 /** Curated tuning presets. Each is ONE documented example with provenance — never "the" tuning. */
 
 import { type TuningSystem } from '../core/tuning.js';
+import { rankChords, type RankedChord, type ChordSearchOptions } from '../core/chord-search.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 
 const SEMI = 100;
@@ -111,4 +112,39 @@ export function getTuningById(
 ): TuningSystem | undefined {
   const preset = presets.find((p) => p.id === id);
   return preset !== undefined ? loadTuningPreset(preset) : undefined;
+}
+
+/**
+ * Look up a preset by id and return its ranked chords in one call.
+ *
+ * Socratic Q102: `getTuningById(id)` gives you a `TuningSystem`, and
+ * `rankChords(tuning, opts)` scores all size-N subsets — but going from a string
+ * preset ID all the way to a ranked chord array still requires two explicit steps
+ * (look up, then rank). If presets are truly first-class entry points, discovering
+ * the best chords for a named tuning should be one call.
+ *
+ * Bridges `presetId → getTuningById → rankChords`. Returns `undefined` when the
+ * preset id is not found (same semantics as `getTuningById`).
+ *
+ * Available ids: `'12-tet'`, `'just-5-limit'`, `'makam-ussak-example'`,
+ * `'slendro-example'`, `'pelog-example'`.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param opts - Optional `ChordSearchOptions` forwarded to `rankChords`
+ *   (size, spectrum, rootHz, periodicityWeight, limit).
+ * @param presets - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Ranked chord array (ascending score), or `undefined` if not found.
+ *
+ * @example
+ * const chords = rankChordsFromPreset('just-5-limit', { size: 3 });
+ * if (chords) console.log(chords[0]?.cents); // best triad in 5-limit JI
+ */
+export function rankChordsFromPreset(
+  presetId: string,
+  opts?: ChordSearchOptions,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): RankedChord[] | undefined {
+  const tuning = getTuningById(presetId, presets);
+  if (tuning === undefined) return undefined;
+  return rankChords(tuning, opts);
 }
