@@ -33,9 +33,10 @@ import { freqToCents } from '../core/cents.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
 import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
 import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
-import { type Scale, scaleToFreqs } from '../core/scale.js';
+import { type Scale, scaleToFreqs, tuningToScale } from '../core/scale.js';
 import { getTuningById } from '../data/presets.js';
-import { scaleChordProgressionSmf } from './smf.js';
+import { scaleChordProgressionSmf, scaleToSmf } from './smf.js';
+import { type ScalaScale, tuningToScl } from './scala.js';
 
 /** Default base frequency: MIDI note 0 at A4 = 440 Hz (440 × 2^(−69/12)). */
 export const TUN_DEFAULT_BASEFREQ_HZ = 440 * 2 ** (-69 / 12);
@@ -379,4 +380,41 @@ export function scaleProgressionBundle(
   const smf = scaleChordProgressionSmf(scale, tuning, rootHz);
   const tun = scaleToTunText(scale, tuning, name);
   return { smf, tun };
+}
+
+/**
+ * Export a `TuningSystem` as SMF (sequential scale notes), TUN, and Scala `.scl` simultaneously.
+ *
+ * Socratic Q174: "If we can export a scale as SMF and as TUN simultaneously, the same should
+ * work for a TUNING SYSTEM (not just a Scale) — can it?" `scaleProgressionBundle` does both for
+ * a `Scale`; doing the same for a raw `TuningSystem` still requires `tuningToScl` → `tuningToTun`
+ * → `tuningToScale` → `scaleToSmf` — four explicit steps. If a tuning is truly first-class, a
+ * three-format export bundle should be one call.
+ *
+ * Algorithm:
+ * 1. `tuningToScl(tuning)` → `ScalaScale`.
+ * 2. `tuningToTun(tuning, name, opts)` → TUN string.
+ * 3. `tuningToScale(tuning)` → full `Scale`; `scaleToSmf(scale, tuning, tuning.referenceHz)` → SMF.
+ *
+ * @param tuning - The tuning system to export.
+ * @param opts   - Optional TUN encoding options (anchor MIDI note, basefreq).
+ * @returns `{ smf: Uint8Array, tun: string, scl: ScalaScale }`.
+ *
+ * @throws {RangeError} if tuning has no degrees.
+ *
+ * @example
+ * const { smf, tun, scl } = tuningBundle(edo(19));
+ * fs.writeFileSync('19edo.mid', smf);
+ * fs.writeFileSync('19edo.tun', tun);
+ * fs.writeFileSync('19edo.scl', writeScl(scl));
+ */
+export function tuningBundle(
+  tuning: TuningSystem,
+  opts?: TuningToTunOptions,
+): { smf: Uint8Array; tun: string; scl: ScalaScale } {
+  const scl = tuningToScl(tuning);
+  const tun = tuningToTun(tuning, undefined, opts);
+  const scale = tuningToScale(tuning);
+  const smf = scaleToSmf(scale, tuning, tuning.referenceHz);
+  return { smf, tun, scl };
 }

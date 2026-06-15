@@ -9,7 +9,9 @@ import {
   tuningToTun,
   presetProgressionTun,
   scaleProgressionBundle,
+  tuningBundle,
 } from './tun.js';
+import { writeScl } from './scala.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { type Scale } from '../core/scale.js';
@@ -518,5 +520,49 @@ describe('scaleProgressionBundle (Q154)', () => {
 
   it('test_mismatched_tuning_throws', () => {
     expect(() => scaleProgressionBundle(major, edo(19), 261.63)).toThrow(RangeError);
+  });
+});
+
+// Q174 — tuningBundle: TuningSystem → { smf, tun, scl } in one call
+describe('tuningBundle (Q174)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_all_three_outputs', () => {
+    const { smf, tun, scl } = tuningBundle(t12);
+    expect(smf).toBeInstanceOf(Uint8Array);
+    expect(typeof tun).toBe('string');
+    expect(scl).toBeDefined();
+    expect(Array.isArray(scl.degrees)).toBe(true);
+  });
+
+  it('test_smf_starts_with_midi_header', () => {
+    const { smf } = tuningBundle(t12);
+    expect(String.fromCharCode(smf[0]!, smf[1]!, smf[2]!, smf[3]!)).toBe('MThd');
+  });
+
+  it('test_tun_has_tuning_sections', () => {
+    const { tun } = tuningBundle(t12);
+    expect(tun).toContain('[Tuning]');
+    expect(tun).toContain('[Exact Tuning]');
+    expect(tun.endsWith('\n')).toBe(true);
+  });
+
+  it('test_scl_is_serializable', () => {
+    const { scl } = tuningBundle(t12);
+    const text = writeScl(scl);
+    expect(text).toContain(t12.id);
+  });
+
+  it('test_smf_length_reflects_degree_count', () => {
+    const { smf } = tuningBundle(t12);
+    expect(smf.length).toBeGreaterThan(14);
+  });
+
+  it('test_19edo_produces_valid_bundle', () => {
+    const t19 = edo(19);
+    const { smf, tun, scl } = tuningBundle(t19);
+    expect(smf).toBeInstanceOf(Uint8Array);
+    expect(tun).toContain('[Tuning]');
+    expect(scl.degrees.length).toBeGreaterThan(0);
   });
 });
