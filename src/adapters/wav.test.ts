@@ -14,6 +14,8 @@ import {
   buildChordProgressionWav,
   optimalProgressionWav,
   scaleModeSeriesWav,
+  bestProgressionWav,
+  bestScaleChordWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -702,5 +704,110 @@ describe('scaleModeSeriesWav (Q112)', () => {
   it('test_mismatched_tuning_throws', () => {
     const wrongTuning = edo(19);
     expect(() => scaleModeSeriesWav(major, wrongTuning, fastOpts)).toThrow(RangeError);
+  });
+});
+
+// Q124 — bestProgressionWav: best acoustic progression for a scale as WAV audio
+describe('bestProgressionWav (Q124)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+  const rootHz = 261.63;
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.1,
+  };
+
+  it('test_returns_uint8array_with_wav_header', () => {
+    const wav = bestProgressionWav(major, t12, spectrum, rootHz, 3, 3, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_sample_rate_matches_opts', () => {
+    const wav = bestProgressionWav(major, t12, spectrum, rootHz, 3, 3, fastOpts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(8000);
+  });
+
+  it('test_different_spectra_produce_different_audio', () => {
+    const wavA = bestProgressionWav(major, t12, harmonicSpectrum(), rootHz, 3, 3, fastOpts);
+    const wavB = bestProgressionWav(major, t12, bellSpectrum(), rootHz, 3, 3, fastOpts);
+    // Bell vs harmonic spectrum should produce different audio content
+    let differs = false;
+    for (let i = 44; i < Math.min(wavA.length, wavB.length); i++) {
+      if (wavA[i] !== wavB[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => bestProgressionWav(major, edo(19), spectrum, rootHz)).toThrow(RangeError);
+  });
+
+  it('test_invalid_rootHz_throws', () => {
+    expect(() => bestProgressionWav(major, t12, spectrum, -1)).toThrow(RangeError);
+  });
+});
+
+// Q125 — bestScaleChordWav: best diatonic chord of a scale as WAV audio
+describe('bestScaleChordWav (Q125)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+  const rootHz = 261.63;
+  const fastOpts = { ...DEFAULT_KS, sampleRate: 8000 };
+
+  it('test_returns_uint8array_with_wav_header', () => {
+    const wav = bestScaleChordWav(major, t12, rootHz, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_sample_rate_matches_opts', () => {
+    const wav = bestScaleChordWav(major, t12, rootHz, spectrum, fastOpts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(8000);
+  });
+
+  it('test_works_without_spectrum', () => {
+    const wav = bestScaleChordWav(major, t12, rootHz, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_different_root_frequencies_produce_different_audio', () => {
+    // Same scale, different root → different pitched audio
+    const wavC = bestScaleChordWav(major, t12, 261.63, spectrum, fastOpts);
+    const wavG = bestScaleChordWav(major, t12, 392.0, spectrum, fastOpts);
+    let differs = false;
+    for (let i = 44; i < Math.min(wavC.length, wavG.length); i++) {
+      if (wavC[i] !== wavG[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => bestScaleChordWav(major, edo(19), rootHz, spectrum)).toThrow(RangeError);
   });
 });

@@ -17,6 +17,8 @@ import {
   synthScaleFromScale,
   buildChordProgression,
   scaleModeSeries,
+  bestProgressionForScale,
+  rankScaleChords,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -465,4 +467,93 @@ export function scaleModeSeriesWav(
   opts: PluckScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
 ): Uint8Array[] {
   return scaleModeSeries(scale, tuning).map((mode) => pluckScaleWav(mode, tuning, opts));
+}
+
+/**
+ * Best acoustic chord progression for a scale, synthesized to WAV in one call.
+ *
+ * Socratic Q124: `bestProgressionForScale(scale, tuning, spectrum)` discovers the
+ * most consonant N diatonic chords in voice-leading order. `chordProgressionToWav`
+ * synthesizes a `Chord[]` to WAV. Going from "I have a scale and want to hear its
+ * best progression" still requires two explicit calls. If the scale → best progression
+ * pipeline is truly first-class, the entire chain — scale → acoustic WAV — should be
+ * one call.
+ *
+ * @param scale      - The parent scale.
+ * @param tuning     - The parent `TuningSystem`.
+ * @param spectrum   - Instrument spectrum (for chord ranking and synthesis).
+ * @param rootHz     - Absolute frequency of the chord root (Hz). Defaults to `tuning.referenceHz`.
+ * @param numChords  - Number of chords to include in the progression (default 4).
+ * @param size       - Notes per chord (default 3).
+ * @param opts       - Optional chord progression WAV options.
+ * @returns WAV bytes of the best chord progression for the scale.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `numChords` < 1 or the scale has fewer available chords.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0 (when provided).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const wav = bestProgressionWav(major, t12, harmonicSpectrum(), 261.63);
+ * await fs.writeFile('best-prog.wav', wav);
+ */
+export function bestProgressionWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+  numChords = 4,
+  size = 3,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  if (rootHz !== undefined && (!Number.isFinite(rootHz) || rootHz <= 0)) {
+    throw new RangeError(`bestProgressionWav: rootHz must be finite and > 0, got ${rootHz}`);
+  }
+  const chords = bestProgressionForScale(scale, tuning, spectrum, numChords, size, effectiveRootHz);
+  return chordProgressionToWav(chords, effectiveRootHz, spectrum, opts);
+}
+
+/**
+ * Find the single best diatonic chord of a scale and synthesize it to WAV in one call.
+ *
+ * Socratic Q125: `rankScaleChords(scale, tuning, {limit:1})[0]` finds the most
+ * consonant diatonic chord; `rankedChordToChord` lifts it to a portable `Chord`;
+ * `pluckRankedChordWav` synthesizes it to WAV. Going from "I have a scale and want
+ * to hear its best chord" requires three explicit steps. If scale-based chord
+ * discovery is first-class, getting that chord as audio should be one call.
+ *
+ * @param scale    - The parent scale.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Absolute frequency of the chord root (Hz).
+ * @param spectrum - Optional instrument spectrum for chord ranking. When omitted,
+ *                   ranking uses the default Sethares scorer with a harmonic spectrum.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @returns WAV bytes of the best diatonic chord for this scale.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if no chords of the requested size can be drawn from the scale.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const wav = bestScaleChordWav(major, t12, 261.63);
+ * await fs.writeFile('best-chord.wav', wav);
+ */
+export function bestScaleChordWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: KsOptions = DEFAULT_KS,
+): Uint8Array {
+  const ranked = rankScaleChords(scale, tuning, spectrum !== undefined ? { spectrum } : undefined);
+  const best = ranked[0];
+  if (best === undefined) {
+    throw new RangeError(
+      `bestScaleChordWav: no chords found for scale '${scale.id}' — scale may be too small`,
+    );
+  }
+  return pluckRankedChordWav(best, rootHz, opts);
 }
