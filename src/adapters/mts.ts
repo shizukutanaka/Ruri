@@ -33,6 +33,7 @@ import {
   scaleToFreqs,
   type ScaleChordMapEntry,
   bestModeForTuning,
+  scaleToChordMap,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 
@@ -551,4 +552,43 @@ export function chordEntryToMts(
   opts?: ChordToMtsOptions,
 ): Uint8Array {
   return chordToMts(entry.chord, tuning.referenceHz, opts ?? {});
+}
+
+/**
+ * Find the best mode for a tuning and export its CHORD MAP as a 408-byte MTS bulk tuning dump SysEx.
+ *
+ * Socratic Q192: "If we can find the best mode for a tuning and export it as MTS, we should also
+ * be able to find the best mode and export its CHORD MAP as MTS in one call — can it?"
+ * Today: `bestModeForTuning(tuning, spectrum)` → `scaleToChordMap(mode, tuning)` →
+ * `chordMapToMts(chordMap, tuning, opts)` — three explicit steps with two intermediate objects.
+ * If the best-mode chord map is first-class, encoding it as MTS should be one call.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → best modal rotation.
+ * 2. `scaleToChordMap(mode, tuning)` → all diatonic chords for that mode.
+ * 3. `chordMapToMts(chordMap, tuning.id, opts)` → 408-byte MTS SysEx.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for mode ranking. If omitted, ranks by harmonicity.
+ * @param opts     - Optional MTS encoding options (device ID, program, rootHz, a4Hz).
+ * @returns A 408-byte `Uint8Array` MTS SysEx message for the best mode's chord map.
+ *
+ * @throws {RangeError} if `tuning` has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const mts = bestModeChordMapMts(t12);
+ * port.send(mts); // retune synth with all pitch classes from the best mode's chord map
+ */
+export function bestModeChordMapMts(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts?: ChordMapToMtsOptions,
+): Uint8Array {
+  if (tuning.degrees.length === 0) {
+    throw new RangeError('bestModeChordMapMts: tuning has no degrees');
+  }
+  const mode = bestModeForTuning(tuning, spectrum);
+  const chordMap = scaleToChordMap(mode, tuning);
+  return chordMapToMts(chordMap, tuning.id, opts ?? {});
 }

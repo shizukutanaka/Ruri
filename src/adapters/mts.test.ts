@@ -15,6 +15,7 @@ import {
   chordMapToMts,
   bestModeMts,
   chordEntryToMts,
+  bestModeChordMapMts,
 } from './mts.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
@@ -786,5 +787,54 @@ describe('chordEntryToMts (Q165)', () => {
     const chordMap = scaleToChordMap(major, t12);
     const mts = chordEntryToMts(chordMap[0]!, t12, { deviceId: 5 });
     expect(mts[2]).toBe(5);
+  });
+});
+
+// Q192 — bestModeChordMapMts: best mode chord map as 408-byte MTS SysEx in one call
+describe('bestModeChordMapMts (Q192)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_408_byte_uint8array', () => {
+    const mts = bestModeChordMapMts(t12);
+    expect(mts).toBeInstanceOf(Uint8Array);
+    expect(mts.length).toBe(408);
+  });
+
+  it('test_starts_with_sysex_header_and_ends_with_f7', () => {
+    const mts = bestModeChordMapMts(t12);
+    expect(mts[0]).toBe(0xf0);
+    expect(mts[1]).toBe(0x7e);
+    expect(mts[407]).toBe(0xf7);
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const empty = { ...t12, degrees: [] };
+    expect(() => bestModeChordMapMts(empty)).toThrow(RangeError);
+  });
+
+  it('test_with_spectrum_produces_valid_408_byte_output', () => {
+    const spectrum = harmonicSpectrum();
+    const mts = bestModeChordMapMts(t12, spectrum);
+    expect(mts.length).toBe(408);
+    expect(mts[0]).toBe(0xf0);
+  });
+
+  it('test_different_tunings_may_produce_different_output', () => {
+    const t19 = edo(19);
+    const mts12 = bestModeChordMapMts(t12);
+    const mts19 = bestModeChordMapMts(t19);
+    let differs = false;
+    for (let i = 22; i < 406; i++) {
+      if (mts12[i] !== mts19[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_custom_device_id_reflected_in_output', () => {
+    const mts = bestModeChordMapMts(t12, undefined, { deviceId: 3 });
+    expect(mts[2]).toBe(3);
   });
 });
