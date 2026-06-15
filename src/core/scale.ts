@@ -505,3 +505,81 @@ export function scaleIntervalHistogram(
   const subTuning = scaleToTuning(scale, tuning);
   return tuningToIntervalVector(subTuning, stepCents);
 }
+
+/**
+ * Similarity between two scales based on their interval histograms.
+ *
+ * Socratic Q95: `scaleIntervalHistogram(scale, tuning)` fingerprints a scale as a
+ * count of interval classes — but comparing two scales to see "how similar they
+ * sound" still requires computing both histograms and writing a bespoke overlap
+ * formula. If `Scale` is truly first-class, comparing two scales structurally
+ * should be one call.
+ *
+ * Algorithm: compute `scaleIntervalHistogram` for both scales (using the same
+ * `stepCents` bin width), then measure the **histogram intersection** normalized
+ * by the larger total count:
+ *
+ *   `similarity = Σ min(histA[k], histB[k]) / max(totalA, totalB)`
+ *
+ * Properties:
+ * - Returns 1.0 when both scales have identical interval content (same histogram).
+ * - Returns 0.0 when no bin is shared (completely different interval classes).
+ * - Invariant to the ordering of degrees (histograms are unordered).
+ * - `scaleSimilarity(a, b, t)` = `scaleSimilarity(b, a, t)` (symmetric).
+ * - The two scales do **not** need to belong to the same tuning; each is matched
+ *   to its own tuning. Comparing scales from different tunings (e.g. 12-TET major
+ *   vs 19-EDO major) is the primary use case.
+ *
+ * @param a - First scale.
+ * @param b - Second scale.
+ * @param tuningA - Tuning that `a` belongs to (must match `a.tuningId`).
+ * @param tuningB - Tuning that `b` belongs to (must match `b.tuningId`).
+ *   If omitted, `tuningA` is used for both scales (convenience when comparing
+ *   two scales in the same tuning).
+ * @param stepCents - Histogram bin width in cents (default 50).
+ * @returns Similarity in [0, 1]: 1 = identical interval content, 0 = no overlap.
+ *
+ * @throws {RangeError} if either scale is incompatible with its tuning.
+ *
+ * @example
+ * // Ionian (major) vs Lydian in 12-TET — differ only by one half-step (F vs F#)
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const lydian = { id: 'lydian', name: 'Lydian', tuningId: '12-tet', degreeIndices: [0,2,4,6,7,9,11] };
+ * const t12 = equalTemperament12(440);
+ * scaleSimilarity(major, lydian, t12); // high similarity (~0.9+)
+ *
+ * @example
+ * // Major scale in 12-TET vs 19-EDO — similar modal character, different tunings
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const major12 = { id: 'm12', name: 'major', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const major19 = { id: 'm19', name: 'major', tuningId: '19-edo', degreeIndices: [0,3,6,8,11,14,17] };
+ * scaleSimilarity(major12, major19, t12, t19);
+ */
+export function scaleSimilarity(
+  a: Scale,
+  b: Scale,
+  tuningA: TuningSystem,
+  tuningB: TuningSystem = tuningA,
+  stepCents = 50,
+): number {
+  const histA = scaleIntervalHistogram(a, tuningA, stepCents);
+  const histB = scaleIntervalHistogram(b, tuningB, stepCents);
+
+  // Compute totals and intersection
+  let totalA = 0;
+  for (const v of histA.values()) totalA += v;
+  let totalB = 0;
+  for (const v of histB.values()) totalB += v;
+
+  if (totalA === 0 && totalB === 0) return 1; // both empty → trivially identical
+  if (totalA === 0 || totalB === 0) return 0; // one empty → no overlap
+
+  let intersection = 0;
+  for (const [k, vA] of histA) {
+    const vB = histB.get(k) ?? 0;
+    intersection += Math.min(vA, vB);
+  }
+
+  return intersection / Math.max(totalA, totalB);
+}

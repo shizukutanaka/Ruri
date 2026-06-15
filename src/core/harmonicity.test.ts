@@ -7,7 +7,13 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { approxRatio, relativePeriodicity, chordPeriodicity } from './harmonicity.js';
+import {
+  approxRatio,
+  relativePeriodicity,
+  chordPeriodicity,
+  harmonicityForChord,
+} from './harmonicity.js';
+import { chordFromRatios, chordFromSemitones, realizeChordFreqs } from './chord.js';
 
 // ---------------------------------------------------------------------------
 // approxRatio
@@ -134,5 +140,77 @@ describe('chordPeriodicity', () => {
 describe('relativePeriodicity – validation', () => {
   it('empty_ratios_throws', () => {
     expect(() => relativePeriodicity([])).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q93 — harmonicityForChord
+// ---------------------------------------------------------------------------
+
+describe('harmonicityForChord (Q93)', () => {
+  const root = 261.63;
+
+  it('ji_major_triad_returns_15', () => {
+    // Just 5-limit major: 1/1, 5/4, 3/2 → periodicity = 15 (same as raw chordPeriodicity)
+    const jiMaj = chordFromRatios('ji-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    expect(harmonicityForChord(jiMaj, root)).toBe(15);
+  });
+
+  it('12tet_major_triad_also_snaps_to_15', () => {
+    // 12-TET major third ≈ 5/4 within default tol=0.0136
+    const tetMaj = chordFromSemitones('major', [0, 4, 7]);
+    expect(harmonicityForChord(tetMaj, root)).toBe(15);
+  });
+
+  it('ji_fifth_dyad_returns_3', () => {
+    // 1:3/2 ratio → periodicity = 3 (LCM(2, 3) / 2 = 3)
+    const fifth = chordFromRatios('fifth', [
+      [1, 1],
+      [3, 2],
+    ]);
+    expect(harmonicityForChord(fifth, 440)).toBe(3);
+  });
+
+  it('result_is_finite_positive', () => {
+    const maj = chordFromSemitones('major', [0, 4, 7]);
+    const p = harmonicityForChord(maj, 440);
+    expect(Number.isFinite(p) || p === Infinity).toBe(true);
+    expect(p).toBeGreaterThan(0);
+  });
+
+  it('matches_chordPeriodicity_on_same_freqs', () => {
+    // harmonicityForChord should agree with chordPeriodicity applied to realized freqs
+    const chord = chordFromSemitones('minor', [0, 3, 7]);
+    const freqs = realizeChordFreqs(chord, root);
+    expect(harmonicityForChord(chord, root)).toBeCloseTo(chordPeriodicity(freqs), 9);
+  });
+
+  it('invalid_rootHz_zero_throws', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    expect(() => harmonicityForChord(chord, 0)).toThrow(RangeError);
+  });
+
+  it('invalid_rootHz_negative_throws', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    expect(() => harmonicityForChord(chord, -440)).toThrow(RangeError);
+  });
+
+  it('empty_chord_throws', () => {
+    const empty = { name: 'empty', intervals: [] as const };
+    expect(() => harmonicityForChord(empty, 440)).toThrow(RangeError);
+  });
+
+  it('result_is_rootHz_independent', () => {
+    // Periodicity depends only on ratios, not absolute Hz
+    const chord = chordFromRatios('ji-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    expect(harmonicityForChord(chord, 220)).toBe(harmonicityForChord(chord, 880));
   });
 });

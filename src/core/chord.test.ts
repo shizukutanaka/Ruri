@@ -9,6 +9,7 @@ import {
   realizeChordFreqs,
   realizedFreqIntervalMatrix,
   chordSimilarity,
+  chordToFreqRatios,
 } from './chord.js';
 import { equalTemperament12, edo } from './tuning.js';
 import { guitarStandard } from './instrument.js';
@@ -342,5 +343,83 @@ describe('chordSimilarity (Q87)', () => {
     const chord = chordFromSemitones('c', [0, 4, 7]);
     expect(() => chordSimilarity(chord, chord, 0)).toThrow(RangeError);
     expect(() => chordSimilarity(chord, chord, -440)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q94 — chordToFreqRatios
+// ---------------------------------------------------------------------------
+
+describe('chordToFreqRatios (Q94)', () => {
+  it('test_root_is_always_1', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const ratios = chordToFreqRatios(chord, 261.63);
+    expect(ratios[0]).toBeCloseTo(1, 12);
+  });
+
+  it('test_ji_major_triad_gives_exact_ratios', () => {
+    const jiMaj = chordFromRatios('ji-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    const ratios = chordToFreqRatios(jiMaj, 261.63);
+    expect(ratios[0]).toBeCloseTo(1, 9);
+    expect(ratios[1]).toBeCloseTo(1.25, 9); // 5/4
+    expect(ratios[2]).toBeCloseTo(1.5, 9); // 3/2
+  });
+
+  it('test_12tet_major_third_ratio', () => {
+    const chord = chordFromSemitones('major', [0, 4]);
+    const ratios = chordToFreqRatios(chord, 440);
+    expect(ratios[1]).toBeCloseTo(2 ** (4 / 12), 9);
+  });
+
+  it('test_length_matches_chord_intervals', () => {
+    const chord = chordFromSemitones('dom7', [0, 4, 7, 10]);
+    const ratios = chordToFreqRatios(chord, 440);
+    expect(ratios.length).toBe(4);
+  });
+
+  it('test_ratios_are_rootHz_independent', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const r220 = chordToFreqRatios(chord, 220);
+    const r880 = chordToFreqRatios(chord, 880);
+    for (let i = 0; i < r220.length; i++) {
+      expect(r220[i]).toBeCloseTo(r880[i] as number, 9);
+    }
+  });
+
+  it('test_ratios_agree_with_realizeChordFreqs', () => {
+    const chord = chordFromSemitones('minor', [0, 3, 7]);
+    const rootHz = 261.63;
+    const freqs = realizeChordFreqs(chord, rootHz);
+    const ratios = chordToFreqRatios(chord, rootHz);
+    for (let i = 0; i < freqs.length; i++) {
+      expect(ratios[i]).toBeCloseTo((freqs[i] as number) / rootHz, 12);
+    }
+  });
+
+  it('test_single_note_chord_returns_array_of_one_unity', () => {
+    const chord = chordFromSemitones('root', [0]);
+    expect(chordToFreqRatios(chord, 440)).toEqual([1]);
+  });
+
+  it('test_invalid_rootHz_zero_throws', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    expect(() => chordToFreqRatios(chord, 0)).toThrow(RangeError);
+  });
+
+  it('test_invalid_rootHz_negative_throws', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    expect(() => chordToFreqRatios(chord, -440)).toThrow(RangeError);
+  });
+
+  it('test_ratios_are_ascending_for_ascending_intervals', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const ratios = chordToFreqRatios(chord, 440);
+    for (let i = 1; i < ratios.length; i++) {
+      expect(ratios[i] as number).toBeGreaterThan(ratios[i - 1] as number);
+    }
   });
 });

@@ -1,4 +1,6 @@
 /** Harmonicity via periodicity detection (Stolzenburg-style). Lower periodicity = more harmonic. */
+import type { Chord } from './chord.js';
+import { realizeChordFreqs } from './chord.js';
 
 const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
 // Guard: (a/gcd)*b can exceed MAX_SAFE_INTEGER for large coprime denominators.
@@ -90,4 +92,41 @@ export function chordPeriodicity(freqs: readonly number[], tol = 0.0136): number
     freqs.map((f) => f / fmin),
     tol,
   );
+}
+
+/**
+ * Stolzenburg periodicity of a `Chord` object at a given root frequency.
+ *
+ * Socratic Q93: `chordPeriodicity(freqs, tol)` scores an array of raw frequencies.
+ * But going from a `Chord` object to a harmonicity score still requires two steps:
+ * `realizeChordFreqs(chord, rootHz)` then `chordPeriodicity(freqs)`. If `Chord` is
+ * truly first-class, measuring its harmonicity should be one call.
+ *
+ * Bridges `Chord → realizeChordFreqs → chordPeriodicity`. Lower return value = more
+ * harmonic / simpler integer ratios. Just major triad (1:5/4:3/2) returns 15.
+ * Returns `Infinity` for chords too inharmonic to quantify.
+ *
+ * @param chord - The chord whose harmonicity to measure.
+ * @param rootHz - Absolute frequency of the chord root (must be > 0).
+ * @param tol - Continued-fraction tolerance (default 0.0136, snaps 12-TET to JI).
+ * @returns Relative periodicity ≥ 1, or `Infinity` for maximally inharmonic chords.
+ *
+ * @throws {RangeError} if `rootHz` ≤ 0 or the chord has no intervals.
+ *
+ * @example
+ * // Just major triad: periodicity = 15 (same as chordPeriodicity([261.63, 327.04, 392.44]))
+ * const jiMaj = chordFromRatios('ji-major', [[1,1],[5,4],[3,2]]);
+ * harmonicityForChord(jiMaj, 261.63); // → 15
+ */
+export function harmonicityForChord(chord: Chord, rootHz: number, tol = 0.0136): number {
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(
+      `harmonicityForChord: rootHz must be a positive finite number, got ${rootHz}`,
+    );
+  }
+  if (chord.intervals.length === 0) {
+    throw new RangeError('harmonicityForChord: chord must have at least one interval');
+  }
+  const freqs = realizeChordFreqs(chord, rootHz);
+  return chordPeriodicity(freqs, tol);
 }

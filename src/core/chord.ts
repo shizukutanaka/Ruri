@@ -175,6 +175,49 @@ export function chordSimilarity(a: Chord, b: Chord, rootHz: number): number {
 }
 
 /**
+ * Frequency ratios of all chord members relative to the root.
+ *
+ * Socratic Q94: `realizeChordFreqs(chord, rootHz)` produces absolute Hz values —
+ * but the root-normalized ratio representation (how far each note is from the root
+ * as a dimensionless multiplier) still requires a manual map. If `Chord` is truly
+ * first-class, obtaining its ratio vector should be one call.
+ *
+ * Each element is `realizeChordFreqs(chord, rootHz)[i] / rootHz`, i.e., the
+ * frequency ratio of member `i` relative to the root. The first element is always
+ * exactly 1.0 (the root unison).
+ *
+ * This is the inverse of `chordFromRatios`: `chordToFreqRatios` converts a `Chord`
+ * (whose intervals may be stored as cents, ratios, or both) to a canonical float
+ * ratio vector without loss of the primary representation.
+ *
+ * @param chord - The chord to convert.
+ * @param rootHz - Reference root frequency used to realize the chord (must be > 0).
+ *   Because ratios are dimensionless, any positive value produces the same result.
+ * @returns `number[]` of length `chord.intervals.length`; element 0 is always 1.0.
+ *
+ * @throws {RangeError} if `rootHz` ≤ 0.
+ *
+ * @example
+ * // Just major triad: [1, 1.25, 1.5] (i.e. 1/1, 5/4, 3/2)
+ * const jiMaj = chordFromRatios('ji-major', [[1,1],[5,4],[3,2]]);
+ * chordToFreqRatios(jiMaj, 261.63); // → [1, 1.25, 1.5]
+ *
+ * @example
+ * // 12-TET major triad: [1, 2^(4/12), 2^(7/12)]
+ * const tetMaj = chordFromSemitones('major', [0, 4, 7]);
+ * const ratios = chordToFreqRatios(tetMaj, 440);
+ * ratios[1]; // ≈ 1.2599 (12-TET major third)
+ */
+export function chordToFreqRatios(chord: Chord, rootHz: number): number[] {
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(
+      `chordToFreqRatios: rootHz must be a positive finite number, got ${rootHz}`,
+    );
+  }
+  return realizeChordFreqs(chord, rootHz).map((f) => f / rootHz);
+}
+
+/**
  * Build a chord from degree indices into a `TuningSystem`.
  *
  * `chordFromSemitones` only makes sense for 12-TET (1 semitone = 100c).

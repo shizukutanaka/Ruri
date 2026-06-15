@@ -17,6 +17,7 @@ import {
   rankScalesForTimbre,
   bestScaleForTimbre,
   scaleIntervalHistogram,
+  scaleSimilarity,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -901,5 +902,128 @@ describe('scaleIntervalHistogram (Q89)', () => {
   it('test_invalid_step_cents_throws', () => {
     expect(() => scaleIntervalHistogram(major, t12, 0)).toThrow(RangeError);
     expect(() => scaleIntervalHistogram(major, t12, -50)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q95 — scaleSimilarity
+// ---------------------------------------------------------------------------
+
+describe('scaleSimilarity (Q95)', () => {
+  const ionian: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const lydian: Scale = {
+    id: 'lydian',
+    name: 'Lydian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 6, 7, 9, 11], // F# instead of F
+  };
+  const minor: Scale = {
+    id: 'minor',
+    name: 'Aeolian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 3, 5, 7, 8, 10],
+  };
+
+  it('test_identical_scale_returns_1', () => {
+    expect(scaleSimilarity(ionian, ionian, t12)).toBeCloseTo(1, 9);
+  });
+
+  it('test_same_intervals_different_id_returns_1', () => {
+    const copy: Scale = { ...ionian, id: 'ionian-copy', name: 'copy' };
+    expect(scaleSimilarity(ionian, copy, t12)).toBeCloseTo(1, 9);
+  });
+
+  it('test_major_vs_lydian_returns_1_same_interval_vector', () => {
+    // All 7-note diatonic modes share the same interval vector (characteristic property
+    // of the diatonic set): rotating the scale does not change which intervals appear
+    // or how often. Ionian vs Lydian → similarity = 1.
+    const sim = scaleSimilarity(ionian, lydian, t12);
+    expect(sim).toBeCloseTo(1, 9);
+  });
+
+  it('test_major_vs_pentatonic_lower_similarity', () => {
+    // Major pentatonic (5 notes) has a different interval vector from 7-note major
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'major pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const sim = scaleSimilarity(ionian, pentatonic, t12);
+    // They share many intervals but the histogram totals differ → similarity < 1
+    expect(sim).toBeGreaterThan(0);
+    expect(sim).toBeLessThan(1);
+  });
+
+  it('test_major_vs_minor_shares_many_intervals_but_less_than_1', () => {
+    // Major and minor (Aeolian) share many interval classes but differ in some bins
+    // (e.g. major has more major-third intervals). Similarity is in (0, 1).
+    const simMin = scaleSimilarity(ionian, minor, t12);
+    expect(simMin).toBeGreaterThan(0);
+    expect(simMin).toBeLessThan(1);
+  });
+
+  it('test_symmetry_sim_ab_equals_sim_ba', () => {
+    const penta: Scale = {
+      id: 'penta',
+      name: 'major pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const ab = scaleSimilarity(ionian, penta, t12);
+    const ba = scaleSimilarity(penta, ionian, t12);
+    expect(ab).toBeCloseTo(ba, 9);
+  });
+
+  it('test_result_in_range_0_to_1', () => {
+    const penta: Scale = {
+      id: 'penta',
+      name: 'major pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const sim = scaleSimilarity(ionian, penta, t12);
+    expect(sim).toBeGreaterThanOrEqual(0);
+    expect(sim).toBeLessThanOrEqual(1);
+  });
+
+  it('test_cross_tuning_comparison_major12_vs_major19', () => {
+    // 19-EDO "major-like" scale (Meantone Ionian: steps 0,3,6,8,11,14,17)
+    const t19 = edo(19);
+    const major19: Scale = {
+      id: 'major-19',
+      name: 'Ionian 19-EDO',
+      tuningId: '19-edo',
+      degreeIndices: [0, 3, 6, 8, 11, 14, 17],
+    };
+    const sim = scaleSimilarity(ionian, major19, t12, t19);
+    // The two major scales should have moderate similarity (similar structure, different cents)
+    expect(sim).toBeGreaterThan(0);
+    expect(sim).toBeLessThanOrEqual(1);
+  });
+
+  it('test_single_degree_scale_similarity_to_self_is_1', () => {
+    const mono: Scale = {
+      id: 'mono',
+      name: 'mono',
+      tuningId: '12-tet',
+      degreeIndices: [0],
+    };
+    expect(scaleSimilarity(mono, mono, t12)).toBeCloseTo(1, 9);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrongScale: Scale = {
+      id: 'wrong',
+      name: 'wrong',
+      tuningId: 'other-id',
+      degreeIndices: [0, 1],
+    };
+    expect(() => scaleSimilarity(wrongScale, ionian, t12)).toThrow(RangeError);
   });
 });
