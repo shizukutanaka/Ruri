@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   encodeWav,
+  encodeWavStereo,
   strikeChordToWav,
   tuningToScaleWav,
   pluckScaleWav,
@@ -25,6 +26,8 @@ import {
   optimalProgressionWavFromScale,
   topKModesWav,
   tuningTimbreAnalysisWav,
+  chordAudioBundle,
+  chordMapToStereoWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1309,5 +1312,110 @@ describe('tuningTimbreAnalysisWav (Q167)', () => {
 
   it('test_k_less_than_1_throws', () => {
     expect(() => tuningTimbreAnalysisWav(t12, spectrum, 0, fastOpts)).toThrow(RangeError);
+  });
+});
+
+describe('chordAudioBundle (Q169)', () => {
+  const chord = chordFromSemitones('major', [0, 4, 7]);
+  const rootHz = 261.63;
+
+  it('test_returns_wav_and_smf_uint8arrays', () => {
+    const result = chordAudioBundle(chord, rootHz);
+    expect(result.wav).toBeInstanceOf(Uint8Array);
+    expect(result.smf).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_wav_has_riff_header', () => {
+    const { wav } = chordAudioBundle(chord, rootHz);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_smf_has_mthd_header', () => {
+    const { smf } = chordAudioBundle(chord, rootHz);
+    expect(String.fromCharCode(smf[0]!, smf[1]!, smf[2]!, smf[3]!)).toBe('MThd');
+  });
+
+  it('test_invalid_root_throws', () => {
+    expect(() => chordAudioBundle(chord, 0)).toThrow(RangeError);
+    expect(() => chordAudioBundle(chord, -1)).toThrow(RangeError);
+  });
+
+  it('test_with_spectrum_produces_valid_result', () => {
+    const result = chordAudioBundle(chord, rootHz, harmonicSpectrum());
+    expect(result.wav.length).toBeGreaterThan(44);
+    expect(result.smf.length).toBeGreaterThan(14);
+  });
+});
+
+describe('encodeWavStereo (Q171 helper)', () => {
+  it('test_stereo_header_has_2_channels', () => {
+    const L = new Float32Array(100);
+    const R = new Float32Array(100);
+    const wav = encodeWavStereo(L, R, 44100);
+    const view = new DataView(wav.buffer);
+    expect(view.getUint16(22, true)).toBe(2); // numChannels
+  });
+
+  it('test_size_is_44_plus_4_per_sample', () => {
+    const n = 50;
+    const wav = encodeWavStereo(new Float32Array(n), new Float32Array(n), 44100);
+    expect(wav.length).toBe(44 + n * 4); // 2 channels × 2 bytes each
+  });
+
+  it('test_riff_wave_markers_present', () => {
+    const wav = encodeWavStereo(new Float32Array(10), new Float32Array(10));
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_sample_rate_written_correctly', () => {
+    const wav = encodeWavStereo(new Float32Array(1), new Float32Array(1), 48000);
+    const view = new DataView(wav.buffer);
+    expect(view.getUint32(24, true)).toBe(48000);
+  });
+});
+
+describe('chordMapToStereoWav (Q171)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_uint8array', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = chordMapToStereoWav(chordMap, t12.referenceHz);
+    expect(wav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_stereo_header_2_channels', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = chordMapToStereoWav(chordMap, t12.referenceHz);
+    const view = new DataView(wav.buffer);
+    expect(view.getUint16(22, true)).toBe(2);
+  });
+
+  it('test_riff_header_present', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = chordMapToStereoWav(chordMap, t12.referenceHz);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => chordMapToStereoWav([], 440)).toThrow(RangeError);
+  });
+
+  it('test_invalid_root_hz_throws', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    expect(() => chordMapToStereoWav(chordMap, 0)).toThrow(RangeError);
+    expect(() => chordMapToStereoWav(chordMap, -1)).toThrow(RangeError);
+  });
+
+  it('test_with_spectrum_produces_larger_output', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = chordMapToStereoWav(chordMap, t12.referenceHz, harmonicSpectrum());
+    expect(wav.length).toBeGreaterThan(44);
   });
 });

@@ -36,6 +36,7 @@ import {
   optimalChordOrder,
 } from '../core/chord-search.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
+import { chordToSmf, type ChordToSmfOptions } from './smf.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
@@ -987,4 +988,149 @@ export function tuningTimbreAnalysisWav(
   }
 
   return encodeWav(combined, opts.sampleRate);
+}
+
+/** Encode stereo Float32 samples ([-1,1]) to a 16-bit PCM stereo WAV file (2 channels, interleaved L/R). */
+export function encodeWavStereo(
+  samplesL: Float32Array,
+  samplesR: Float32Array,
+  sampleRate = 44100,
+): Uint8Array {
+  const n = Math.min(samplesL.length, samplesR.length);
+  const numChannels = 2;
+  const bytesPerSample = 2;
+  const blockAlign = numChannels * bytesPerSample;
+  const byteRate = sampleRate * blockAlign;
+  const dataBytes = n * blockAlign;
+  const buffer = new ArrayBuffer(44 + dataBytes);
+  const view = new DataView(buffer);
+
+  writeStr(view, 0, 'RIFF');
+  view.setUint32(4, 36 + dataBytes, true);
+  writeStr(view, 8, 'WAVE');
+  writeStr(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true); // bits per sample
+  writeStr(view, 36, 'data');
+  view.setUint32(40, dataBytes, true);
+
+  for (let i = 0; i < n; i++) {
+    const l = Math.max(-1, Math.min(1, samplesL[i] as number));
+    const r = Math.max(-1, Math.min(1, samplesR[i] as number));
+    view.setInt16(44 + i * blockAlign, Math.round(l * 32767), true);
+    view.setInt16(44 + i * blockAlign + bytesPerSample, Math.round(r * 32767), true);
+  }
+  return new Uint8Array(buffer);
+}
+
+/**
+ * Synthesize a chord to both a WAV audio file and an SMF MIDI file in one call.
+ *
+ * Socratic Q169: "If we can export a chord to SMF and to WAV separately, exporting a chord
+ * as a complete audio+MIDI bundle should be one call — can it?" Today: `strikeChordToWav`
+ * for audio, `chordToSmf` for MIDI — two calls to two different modules. If a chord is
+ * truly first-class, bundling both outputs should be one call.
+ *
+ * @param chord    - The chord to synthesize.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum for synthesis. Defaults to `harmonicSpectrum()`.
+ * @param wavOpts  - Optional modal synthesis options forwarded to `strikeChordToWav`.
+ * @param smfOpts  - Optional SMF encoding options forwarded to `chordToSmf`.
+ * @returns `{ wav: Uint8Array, smf: Uint8Array }`.
+ *
+ * @throws {RangeError} if `rootHz` <= 0.
+ *
+ * @example
+ * const chord = chordFromSemitones('major', [0, 4, 7]);
+ * const { wav, smf } = chordAudioBundle(chord, 261.63, harmonicSpectrum());
+ * await fs.writeFile('major.wav', wav);
+ * await fs.writeFile('major.mid', smf);
+ */
+export function chordAudioBundle(
+  chord: Chord,
+  rootHz: number,
+  spectrum?: Spectrum,
+  wavOpts?: ModalOptions,
+  smfOpts?: ChordToSmfOptions,
+): { wav: Uint8Array; smf: Uint8Array } {
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(`chordAudioBundle: rootHz must be finite and > 0, got ${rootHz}`);
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const freqs = realizeChordFreqs(chord, rootHz);
+  const wav = strikeChordToWav(freqs, effectiveSpectrum, wavOpts);
+  const smf = chordToSmf(chord, rootHz, smfOpts);
+  return { wav, smf };
+}
+
+/**
+ * Synthesize every chord in a diatonic chord map as a STEREO WAV, alternating pan per chord.
+ *
+ * Socratic Q171: "If we can synthesize individual chords, synthesizing a chord map in STEREO
+ * (alternating left/right pan per chord) should be one call — can it?" Today: iterate the
+ * chord map → strike each chord → build two float arrays → interleave → `encodeWavStereo` —
+ * several manual steps. If a chord map is first-class, stereo panned rendering should be
+ * one call.
+ *
+ * Odd-indexed chords (1, 3, 5, …) pan left (only left channel); even-indexed chords
+ * (0, 2, 4, …) pan right (only right channel). pan=0 means full left, pan=1 means full right.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns Stereo 16-bit PCM WAV bytes with chords alternating L/R.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const wav = chordMapToStereoWav(chordMap, t12.referenceHz);
+ * await fs.writeFile('diatonic-stereo.wav', wav);
+ */
+export function chordMapToStereoWav(
+  chordMap: readonly ScaleChordMapEntry[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  if (chordMap.length === 0)
+    throw new RangeError('chordMapToStereoWav: chordMap must be non-empty');
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(`chordMapToStereoWav: rootHz must be finite and > 0, got ${rootHz}`);
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const { chordSeconds, sampleRate, ...modalOpts } = opts;
+  const fullModalOpts: ModalOptions = { sampleRate, ...modalOpts };
+  const samplesPerChord = Math.floor(sampleRate * Math.min(chordSeconds, opts.seconds));
+  const total = samplesPerChord * chordMap.length;
+  const outL = new Float32Array(total);
+  const outR = new Float32Array(total);
+
+  for (let i = 0; i < chordMap.length; i++) {
+    const entry = chordMap[i] as ScaleChordMapEntry;
+    const freqs = realizeChordFreqs(entry.chord, rootHz);
+    const wave = strikeChord(freqs, effectiveSpectrum, fullModalOpts);
+    const offset = i * samplesPerChord;
+    // Even index → pan right (only right channel), odd index → pan left (only left channel)
+    const isLeft = i % 2 !== 0;
+    for (let j = 0; j < samplesPerChord && j < wave.length; j++) {
+      const sample = wave[j] as number;
+      if (isLeft) {
+        outL[offset + j] = sample;
+      } else {
+        outR[offset + j] = sample;
+      }
+    }
+  }
+
+  return encodeWavStereo(outL, outR, sampleRate);
 }
