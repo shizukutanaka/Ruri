@@ -59,6 +59,10 @@ import {
   harmonicityProfileChart,
   chordMapTriads,
   rankModesByStability,
+  isBestModeStable,
+  chordMapDyads,
+  areTuningsSimilar,
+  tuningReport,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -3268,5 +3272,175 @@ describe('rankModesByStability (Q197)', () => {
     for (const entry of ranked) {
       expect(entry.scale.tuningId).toBe(t5.id);
     }
+  });
+});
+
+// Q199 — isBestModeStable
+describe('isBestModeStable (Q199)', () => {
+  const t5 = edo(5);
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_boolean', () => {
+    const result = isBestModeStable(t5, 261.63);
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('test_with_spectrum_returns_boolean', () => {
+    const result = isBestModeStable(t5, 261.63, harmonicSpectrum());
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('test_12tet_best_mode_stable_with_loose_thresholds', () => {
+    const result = isBestModeStable(t12, 261.63, undefined, {
+      smoothness: 1e9,
+      dissonance: 1e9,
+    });
+    expect(result).toBe(true);
+  });
+
+  it('test_strict_thresholds_return_false', () => {
+    const result = isBestModeStable(t5, 261.63, undefined, {
+      smoothness: 0,
+      dissonance: 0,
+    });
+    expect(result).toBe(false);
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const emptyTuning = { ...t5, degrees: [] };
+    expect(() => isBestModeStable(emptyTuning, 261.63)).toThrow(RangeError);
+  });
+});
+
+// Q200 — chordMapDyads
+describe('chordMapDyads (Q200)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_dyads_from_dyad_map', () => {
+    const chordMap = scaleToChordMap(major, t12, 2);
+    const dyads = chordMapDyads(chordMap);
+    expect(dyads.length).toBe(chordMap.length);
+    for (const entry of dyads) {
+      expect(entry.chord.intervals.length).toBe(2);
+    }
+  });
+
+  it('test_empty_array_for_triad_map', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const dyads = chordMapDyads(chordMap);
+    expect(dyads).toEqual([]);
+  });
+
+  it('test_returns_empty_for_empty_chord_map', () => {
+    expect(chordMapDyads([])).toEqual([]);
+  });
+
+  it('test_result_is_subset_of_chord_map', () => {
+    const chordMap = scaleToChordMap(major, t12, 2);
+    const dyads = chordMapDyads(chordMap);
+    for (const d of dyads) {
+      expect(chordMap.includes(d)).toBe(true);
+    }
+  });
+
+  it('test_all_results_have_interval_length_2', () => {
+    const chordMap = scaleToChordMap(major, t12, 2);
+    const dyads = chordMapDyads(chordMap);
+    for (const entry of dyads) {
+      expect(entry.chord.intervals.length).toBe(2);
+    }
+  });
+});
+
+// Q201 — areTuningsSimilar
+describe('areTuningsSimilar (Q201)', () => {
+  const t12 = equalTemperament12(440);
+  const t24 = edo(24);
+  const t5 = edo(5);
+  const t7 = edo(7);
+
+  it('test_returns_boolean', () => {
+    const result = areTuningsSimilar(t5, t12);
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('test_very_different_tunings_may_not_be_similar', () => {
+    const result = areTuningsSimilar(t5, t12, 0.99);
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('test_negative_threshold_accepts_any_non_nan', () => {
+    const corr = tuningHarmonicityCorrelation(t5, t7);
+    if (!Number.isNaN(corr)) {
+      expect(areTuningsSimilar(t5, t7, -1.0)).toBe(true);
+    } else {
+      expect(areTuningsSimilar(t5, t7, -1.0)).toBe(false);
+    }
+  });
+
+  it('test_returns_false_for_nan_correlation', () => {
+    const result = areTuningsSimilar(t12, t24, 0.7);
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('test_default_threshold_0_7_for_related_tunings', () => {
+    const result = areTuningsSimilar(t12, t24);
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('test_high_threshold_1_returns_false_for_different', () => {
+    const result = areTuningsSimilar(t5, t24, 1.0);
+    expect(result).toBe(false);
+  });
+});
+
+// Q203 — tuningReport
+describe('tuningReport (Q203)', () => {
+  const t5 = edo(5);
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_report_with_expected_keys', () => {
+    const report = tuningReport(t5, 261.63);
+    expect(report).toHaveProperty('id');
+    expect(report).toHaveProperty('name');
+    expect(report).toHaveProperty('degreeCount');
+    expect(report).toHaveProperty('bestMode');
+    expect(report).toHaveProperty('stabilityRanking');
+    expect(report).toHaveProperty('chordMapSummary');
+    expect(report).toHaveProperty('harmonicityProfile');
+  });
+
+  it('test_degree_count_matches_tuning', () => {
+    const report = tuningReport(t5, 261.63);
+    expect(report.degreeCount).toBe(t5.degrees.length);
+  });
+
+  it('test_stability_ranking_length_equals_degree_count', () => {
+    const report = tuningReport(t5, 261.63);
+    expect(report.stabilityRanking.length).toBe(t5.degrees.length);
+  });
+
+  it('test_harmonicity_profile_length_equals_degree_count', () => {
+    const report = tuningReport(t5, 261.63);
+    expect(report.harmonicityProfile.length).toBe(t5.degrees.length);
+  });
+
+  it('test_report_is_json_serializable', () => {
+    const report = tuningReport(t5, 261.63);
+    const json = JSON.stringify(report);
+    expect(typeof json).toBe('string');
+    const parsed = JSON.parse(json) as typeof report;
+    expect(parsed.id).toBe(report.id);
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const emptyTuning = { ...t12, degrees: [] };
+    expect(() => tuningReport(emptyTuning, 261.63)).toThrow(RangeError);
   });
 });

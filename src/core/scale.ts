@@ -2581,3 +2581,149 @@ export function rankModesByStability(
   });
   return entries.sort((a, b) => a.score - b.score);
 }
+
+/**
+ * Check whether the best mode of a tuning is stable in one call.
+ *
+ * Socratic Q199: "If we can check scale stability and rank scales by stability, checking if
+ * THE BEST MODE of a tuning is stable should be one call — can it?" Today:
+ * `bestModeForTuning(tuning, spectrum)` → `isScaleStable(mode, tuning, rootHz, spectrum, thresholds)` —
+ * two explicit steps. If best-mode detection and stability checking are first-class,
+ * combining them should be one call.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → most harmonically optimal `Scale`.
+ * 2. `isScaleStable(mode, tuning, rootHz, spectrum, thresholds)` → boolean.
+ *
+ * @param tuning     - The parent `TuningSystem`. Must be non-empty.
+ * @param rootHz     - Absolute frequency of the root in Hz.
+ * @param spectrum   - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param thresholds - Optional stability thresholds. Defaults: `{ smoothness: 200, dissonance: 0.5 }`.
+ * @returns `true` if the best mode passes both the smoothness and dissonance thresholds.
+ *
+ * @throws {RangeError} if tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const stable = isBestModeStable(t12, 261.63);
+ */
+export function isBestModeStable(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+  thresholds?: { smoothness: number; dissonance: number },
+): boolean {
+  const bestMode = bestModeForTuning(tuning, spectrum);
+  return isScaleStable(bestMode, tuning, rootHz, spectrum, thresholds);
+}
+
+/**
+ * Extract only the dyads (interval pairs) from a chord map in one call.
+ *
+ * Socratic Q200: "If we have a chord map, extracting only the DYADS (interval pairs) from
+ * it should be one call — can it?" Today: `groupChordMapByLabel(chordMap).get('dyad') ?? []` —
+ * two explicit steps. If grouping is first-class, extracting dyads should be one call.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @returns All `ScaleChordMapEntry` items whose chord has exactly 2 intervals (dyads).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12, 2);
+ * const dyads = chordMapDyads(chordMap);
+ */
+export function chordMapDyads(chordMap: readonly ScaleChordMapEntry[]): ScaleChordMapEntry[] {
+  return groupChordMapByLabel(chordMap).get('dyad') ?? [];
+}
+
+/**
+ * Check whether two tunings have similar harmonic character in one call.
+ *
+ * Socratic Q201: "If we can compute harmonicity profiles and correlations, checking whether
+ * two tunings have SIMILAR harmonic character (correlation > threshold) should be one call
+ * — can it?" Today: `tuningHarmonicityCorrelation(tuningA, tuningB, tol)` → compare to
+ * threshold — two explicit steps. If correlation is first-class, similarity should be one call.
+ *
+ * Returns `false` if the correlation is NaN (either profile is constant).
+ *
+ * @param tuningA   - First tuning system.
+ * @param tuningB   - Second tuning system.
+ * @param threshold - Minimum correlation to qualify as "similar" (default 0.7).
+ * @param tol       - Stolzenburg tolerance forwarded to `tuningHarmonicityCorrelation`. Default 0.0136.
+ * @returns `true` if Pearson correlation ≥ `threshold` and is not NaN.
+ *
+ * @throws {RangeError} if either tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t24 = edo(24);
+ * const similar = areTuningsSimilar(t12, t24);
+ */
+export function areTuningsSimilar(
+  tuningA: TuningSystem,
+  tuningB: TuningSystem,
+  threshold = 0.7,
+  tol?: number,
+): boolean {
+  const correlation = tuningHarmonicityCorrelation(tuningA, tuningB, tol);
+  if (Number.isNaN(correlation)) return false;
+  return correlation >= threshold;
+}
+
+/**
+ * Produce a complete JSON-serializable musical report for a tuning in one call.
+ *
+ * Socratic Q203: "If we have a progression score summary and stability ranking, producing
+ * a complete JSON-serializable musical report for a tuning should be one call — can it?"
+ * Today: `bestModeForTuning`, `scaleHarmonicity`, `rankModesByStability`,
+ * `chordMapSummary`, `tuningHarmonicityProfile` — five separate calls. If tuning analysis
+ * is first-class, producing a unified musical report should be one call.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → best modal `Scale`.
+ * 2. `scaleHarmonicity(bestMode, tuning)` → harmonicity score for the best mode.
+ * 3. `rankModesByStability(tuning, rootHz, spectrum)` → stability-ranked mode list.
+ * 4. `chordMapSummary(bestMode, tuning, spectrum)` → chord map statistics.
+ * 5. `tuningHarmonicityProfile(tuning)` → per-mode harmonicity array.
+ *
+ * @param tuning   - The parent `TuningSystem`. Must be non-empty.
+ * @param rootHz   - Absolute frequency of the root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns A JSON-serializable report object.
+ *
+ * @throws {RangeError} if tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const report = tuningReport(t12, 261.63);
+ * console.log(JSON.stringify(report));
+ */
+export function tuningReport(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+): {
+  id: string;
+  name: string;
+  degreeCount: number;
+  bestMode: { id: string; harmonicity: number };
+  stabilityRanking: Array<{ modeId: string; score: number }>;
+  chordMapSummary: ReturnType<typeof chordMapSummary>;
+  harmonicityProfile: number[];
+} {
+  const bestMode = bestModeForTuning(tuning, spectrum);
+  const bestHarmonicity = scaleHarmonicity(bestMode, tuning);
+  const stabilityRanked = rankModesByStability(tuning, rootHz, spectrum);
+  const summary = chordMapSummary(bestMode, tuning, spectrum);
+  const profile = tuningHarmonicityProfile(tuning);
+  return {
+    id: tuning.id,
+    name: tuning.name,
+    degreeCount: tuning.degrees.length,
+    bestMode: { id: bestMode.id, harmonicity: bestHarmonicity },
+    stabilityRanking: stabilityRanked.map((e) => ({ modeId: e.scale.id, score: e.score })),
+    chordMapSummary: summary,
+    harmonicityProfile: profile,
+  };
+}
