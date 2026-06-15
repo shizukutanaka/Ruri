@@ -30,6 +30,8 @@
  */
 
 import { freqToCents } from '../core/cents.js';
+import { type Chord, realizeChordFreqs } from '../core/chord.js';
+import { freqToMidiFloat, midiToFreq, A4_HZ_DEFAULT } from '../core/midi.js';
 
 /** Default base frequency: MIDI note 0 at A4 = 440 Hz (440 × 2^(−69/12)). */
 export const TUN_DEFAULT_BASEFREQ_HZ = 440 * 2 ** (-69 / 12);
@@ -108,4 +110,79 @@ export function writeTun(
   }
 
   return lines.join('\n') + '\n';
+}
+
+/** Options for {@link chordToTun}. */
+export interface ChordToTunOptions extends TunOptions {
+  /**
+   * A4 reference frequency in Hz used to fill non-chord MIDI keys with standard 12-TET.
+   * Default: 440.
+   */
+  readonly a4Hz?: number;
+}
+
+/**
+ * Export a microtonal `Chord` directly as an AnaMark `.tun` string.
+ *
+ * Socratic Q114: `chordToMts(chord, rootHz)` maps a chord's exact frequencies onto
+ * the nearest MIDI keys and returns a ready-to-send SysEx byte-stream — but there is
+ * no `.tun` equivalent. Going from a `Chord` to a `.tun` file still requires three
+ * manual steps: `realizeChordFreqs → fill 128-key array → writeTun`.
+ * If `Chord` is truly first-class (with `chordToMts`, `chordToScl`, `chordToSmf`…),
+ * exporting it as `.tun` should also be one call.
+ *
+ * Algorithm (mirrors `chordToMts`):
+ * 1. Realize chord frequencies: `realizeChordFreqs(chord, rootHz)`.
+ * 2. Fill a 128-entry array with standard 12-TET frequencies (via `midiToFreq`).
+ * 3. For each chord frequency, find the nearest MIDI key (clamped to [0, 127]) and
+ *    overwrite that slot with the exact chord Hz.
+ * 4. Encode with `writeTun` and return the `.tun` string.
+ *
+ * Non-chord MIDI keys retain standard 12-TET so that an unrelated synth part is not
+ * detuned.
+ *
+ * @param chord   - The chord to export.
+ * @param rootHz  - Absolute frequency of the chord root in Hz.
+ * @param name    - Human-readable name for the `.tun` file comment header.
+ *                  Defaults to `chord.name` (or `'chord'` if that is empty).
+ * @param opts    - Optional A4 reference Hz and basefreq override.
+ *
+ * @throws {RangeError} if `chord` has no intervals.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const justMajor = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+ * const tun = chordToTun(justMajor, 261.63);
+ * fs.writeFileSync('just-major.tun', tun, 'utf8');
+ */
+export function chordToTun(
+  chord: Chord,
+  rootHz: number,
+  name?: string,
+  opts?: ChordToTunOptions,
+): string {
+  if (chord.intervals.length === 0) {
+    throw new RangeError('chordToTun: chord must have at least one interval');
+  }
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(`chordToTun: rootHz must be finite and > 0, got ${rootHz}`);
+  }
+
+  const a4Hz = opts?.a4Hz ?? A4_HZ_DEFAULT;
+  const tunName = name ?? (chord.name.length > 0 ? chord.name : 'chord');
+
+  // Start with standard 12-TET for all 128 MIDI keys.
+  const frequencies: number[] = Array.from({ length: 128 }, (_, k) => midiToFreq(k, a4Hz));
+
+  // Overwrite the nearest MIDI key for each chord frequency.
+  const chordFreqs = realizeChordFreqs(chord, rootHz);
+  for (const hz of chordFreqs) {
+    const midiFloat = freqToMidiFloat(hz, a4Hz);
+    const key = Math.max(0, Math.min(127, Math.round(midiFloat)));
+    (frequencies as number[])[key] = hz;
+  }
+
+  const { a4Hz: _a4Hz, ...tunOpts } = opts ?? {};
+  void _a4Hz;
+  return writeTun(frequencies, tunName, Object.keys(tunOpts).length > 0 ? tunOpts : undefined);
 }

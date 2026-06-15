@@ -23,6 +23,8 @@ import {
   buildChordProgression,
   scaleModeSeries,
   rankModeSeriesByHarmonicity,
+  rankAllModesForTimbre,
+  chordProgressionAnalysis,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -30,7 +32,7 @@ import { rankChords } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
 import { DEFAULT_SYNTH_SCALE } from './ks-synth.js';
-import { chordToCents, chordFromDegrees } from './chord.js';
+import { chordToCents, chordFromDegrees, chordFromRatios } from './chord.js';
 
 const t12 = equalTemperament12(440);
 
@@ -1373,5 +1375,148 @@ describe('rankModeSeriesByHarmonicity (Q110)', () => {
   it('test_mismatched_tuning_throws', () => {
     const wrongTuning = edo(19);
     expect(() => rankModeSeriesByHarmonicity(major, wrongTuning)).toThrow(RangeError);
+  });
+});
+
+// Q115 — rankAllModesForTimbre: combined roughness + harmonicity leaderboard
+describe('rankAllModesForTimbre (Q115)', () => {
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_one_entry_per_mode', () => {
+    const ranked = rankAllModesForTimbre(major, t12, spectrum);
+    expect(ranked.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_sorted_ascending_by_combined_score', () => {
+    const ranked = rankAllModesForTimbre(major, t12, spectrum);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.combinedScore).toBeGreaterThanOrEqual(ranked[i - 1]!.combinedScore);
+    }
+  });
+
+  it('test_each_entry_has_roughness_and_harmonicity', () => {
+    const ranked = rankAllModesForTimbre(major, t12, spectrum);
+    for (const entry of ranked) {
+      expect(typeof entry.roughness).toBe('number');
+      expect(typeof entry.harmonicity).toBe('number');
+      expect(entry.roughness).toBeGreaterThanOrEqual(0);
+      expect(entry.harmonicity).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('test_combined_score_is_in_0_1_range', () => {
+    const ranked = rankAllModesForTimbre(major, t12, spectrum);
+    for (const entry of ranked) {
+      expect(entry.combinedScore).toBeGreaterThanOrEqual(0);
+      expect(entry.combinedScore).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('test_covers_all_mode_indices', () => {
+    const ranked = rankAllModesForTimbre(major, t12, spectrum);
+    const indices = new Set(ranked.map((r) => r.modeIndex));
+    for (let i = 0; i < major.degreeIndices.length; i++) {
+      expect(indices.has(i)).toBe(true);
+    }
+  });
+
+  it('test_roughness_matches_scaleDissonance', () => {
+    const ranked = rankAllModesForTimbre(major, t12, spectrum);
+    for (const entry of ranked) {
+      expect(entry.roughness).toBeCloseTo(scaleDissonance(entry.scale, t12, spectrum), 10);
+    }
+  });
+
+  it('test_harmonicity_matches_scaleHarmonicity', () => {
+    const ranked = rankAllModesForTimbre(major, t12, spectrum);
+    for (const entry of ranked) {
+      expect(entry.harmonicity).toBeCloseTo(scaleHarmonicity(entry.scale, t12), 10);
+    }
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => rankAllModesForTimbre(major, edo(19), spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q116 — chordProgressionAnalysis: comprehensive per-step analysis
+describe('chordProgressionAnalysis (Q116)', () => {
+  const spectrum = harmonicSpectrum();
+  const I = chordFromRatios('I', [
+    [1, 1],
+    [5, 4],
+    [3, 2],
+  ]);
+  const IV = chordFromRatios('IV', [
+    [1, 1],
+    [4, 3],
+    [5, 3],
+  ]);
+  const V = chordFromRatios('V', [
+    [1, 1],
+    [3, 2],
+    [15, 8],
+  ]);
+  const rootHz = 261.63;
+
+  it('test_returns_one_step_per_chord', () => {
+    const steps = chordProgressionAnalysis([I, IV, V], rootHz, spectrum);
+    expect(steps.length).toBe(3);
+  });
+
+  it('test_each_step_has_chord_freqs_dissonance_harmonicity', () => {
+    const steps = chordProgressionAnalysis([I, IV, V], rootHz, spectrum);
+    for (const step of steps) {
+      expect(step.chord).toBeDefined();
+      expect(step.freqs.length).toBeGreaterThan(0);
+      expect(typeof step.dissonance).toBe('number');
+      expect(step.dissonance).toBeGreaterThanOrEqual(0);
+      expect(typeof step.harmonicity).toBe('number');
+      expect(step.harmonicity).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('test_last_step_voiceLeadingCostToNext_is_null', () => {
+    const steps = chordProgressionAnalysis([I, IV, V], rootHz, spectrum);
+    expect(steps[2]!.voiceLeadingCostToNext).toBeNull();
+  });
+
+  it('test_non_last_steps_voiceLeadingCostToNext_is_number', () => {
+    const steps = chordProgressionAnalysis([I, IV, V], rootHz, spectrum);
+    expect(typeof steps[0]!.voiceLeadingCostToNext).toBe('number');
+    expect(typeof steps[1]!.voiceLeadingCostToNext).toBe('number');
+  });
+
+  it('test_voiceLeadingCost_is_non_negative', () => {
+    const steps = chordProgressionAnalysis([I, IV, V], rootHz, spectrum);
+    for (const step of steps) {
+      if (step.voiceLeadingCostToNext !== null) {
+        expect(step.voiceLeadingCostToNext).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it('test_single_chord_progression_works', () => {
+    const steps = chordProgressionAnalysis([I], rootHz, spectrum);
+    expect(steps.length).toBe(1);
+    expect(steps[0]!.voiceLeadingCostToNext).toBeNull();
+  });
+
+  it('test_freqs_match_realizeChordFreqs', () => {
+    const steps = chordProgressionAnalysis([I], rootHz, spectrum);
+    // The root is interval [0] cents = rootHz itself
+    expect(steps[0]!.freqs[0]).toBeCloseTo(rootHz, 5);
+  });
+
+  it('test_empty_chords_throws_range_error', () => {
+    expect(() => chordProgressionAnalysis([], rootHz, spectrum)).toThrow(RangeError);
+  });
+
+  it('test_zero_rootHz_throws_range_error', () => {
+    expect(() => chordProgressionAnalysis([I], 0, spectrum)).toThrow(RangeError);
+  });
+
+  it('test_negative_rootHz_throws_range_error', () => {
+    expect(() => chordProgressionAnalysis([I], -261.63, spectrum)).toThrow(RangeError);
   });
 });

@@ -6,7 +6,7 @@ import {
   tuningToIntervalVector,
 } from './tuning.js';
 import { type Spectrum } from './spectrum.js';
-import { chordDissonance } from './dissonance.js';
+import { chordDissonance, chordObjectDissonance } from './dissonance.js';
 import {
   rankChords,
   type RankedChord,
@@ -14,8 +14,9 @@ import {
   rankedChordToChord,
 } from './chord-search.js';
 import { synthScale, type SynthScaleOptions, DEFAULT_SYNTH_SCALE } from './ks-synth.js';
-import { type Chord, chordFromDegrees } from './chord.js';
-import { chordPeriodicity } from './harmonicity.js';
+import { type Chord, chordFromDegrees, realizeChordFreqs } from './chord.js';
+import { chordPeriodicity, harmonicityForChord } from './harmonicity.js';
+import { voiceLeadingCost } from './voice-leading.js';
 
 /**
  * A scale / mode / jins / raga: an ordered selection of degrees over a tuning.
@@ -778,4 +779,176 @@ export function rankModeSeriesByHarmonicity(
       harmonicity: scaleHarmonicity(mode, tuning, tol),
     }))
     .sort((a, b) => a.harmonicity - b.harmonicity);
+}
+
+/** One entry in the combined timbre-ranking leaderboard returned by `rankAllModesForTimbre`. */
+export interface RankedModeForTimbre {
+  /** The modal rotation (result of `scaleMode`). */
+  readonly scale: Scale;
+  /** The rotation index (0 = original, 1 = starting from second degree, …). */
+  readonly modeIndex: number;
+  /** Sethares sensory dissonance (lower = smoother/more consonant, timbre-dependent). */
+  readonly roughness: number;
+  /** Stolzenburg relative periodicity (lower = simpler ratios = more harmonic, timbre-independent). */
+  readonly harmonicity: number;
+  /**
+   * Combined score: arithmetic mean of roughness and harmonicity, each normalised to
+   * [0, 1] over this call's results. Lower = better across both dimensions.
+   *
+   * Normalisation is min–max: `(x − min) / max(max − min, ε)` where ε = 1e-12.
+   * When all values in a dimension are equal, the normalised score is 0 for all entries.
+   */
+  readonly combinedScore: number;
+}
+
+/**
+ * Rank all modal rotations of a scale by a combined timbre score (roughness + harmonicity).
+ *
+ * Socratic Q115: `rankModes(scale, tuning, spectrum)` ranks modes by Sethares sensory
+ * roughness — timbre-dependent. `rankModeSeriesByHarmonicity` ranks by Stolzenburg
+ * periodicity — timbre-independent. To get the "best mode for this timbre on both
+ * axes simultaneously," the caller must run both functions, correlate by `modeIndex`,
+ * and compute a combined score manually. If modes are truly first-class, a single
+ * call should surface both scores together and sort by the combination.
+ *
+ * Returns one entry per mode sorted by `combinedScore` ascending (best mode first).
+ * `combinedScore` is the arithmetic mean of min-max normalised roughness and harmonicity
+ * over this call's result set, so the two axes are weighted equally regardless of their
+ * absolute magnitudes.
+ *
+ * @param scale    - The parent scale to rotate.
+ * @param tuning   - The parent `TuningSystem` the scale belongs to.
+ * @param spectrum - Instrument spectrum for the roughness axis (timbre-dependent).
+ * @param tol      - Continued-fraction tolerance for harmonicity (default 0.0136).
+ * @returns Array sorted by `combinedScore` ascending (most consonant + most harmonic first).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const ranked = rankAllModesForTimbre(major, t12, harmonicSpectrum());
+ * // ranked[0] is the mode that is simultaneously most consonant (roughness) and most harmonic (harmonicity)
+ */
+export function rankAllModesForTimbre(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  tol = 0.0136,
+): RankedModeForTimbre[] {
+  assertTuningMatch(scale, tuning);
+  const modes = scaleModeSeries(scale, tuning);
+
+  const raw = modes.map((mode, modeIndex) => ({
+    scale: mode,
+    modeIndex,
+    roughness: scaleDissonance(mode, tuning, spectrum),
+    harmonicity: scaleHarmonicity(mode, tuning, tol),
+  }));
+
+  // Min-max normalise each axis independently.
+  const minR = Math.min(...raw.map((e) => e.roughness));
+  const maxR = Math.max(...raw.map((e) => e.roughness));
+  const minH = Math.min(...raw.map((e) => e.harmonicity));
+  const maxH = Math.max(...raw.map((e) => e.harmonicity));
+  const eps = 1e-12;
+
+  const entries: RankedModeForTimbre[] = raw.map((e) => {
+    const normR = (e.roughness - minR) / Math.max(maxR - minR, eps);
+    const normH = (e.harmonicity - minH) / Math.max(maxH - minH, eps);
+    return { ...e, combinedScore: (normR + normH) / 2 };
+  });
+
+  return entries.sort((a, b) => a.combinedScore - b.combinedScore);
+}
+
+/** Per-step analysis entry returned by `chordProgressionAnalysis`. */
+export interface ChordProgressionStep {
+  /** The chord at this progression step. */
+  readonly chord: Chord;
+  /** Realized frequencies in Hz for this chord at `rootHz`. */
+  readonly freqs: readonly number[];
+  /** Sethares sensory dissonance of this chord for the given spectrum. */
+  readonly dissonance: number;
+  /** Stolzenburg relative periodicity of this chord (lower = more harmonic). */
+  readonly harmonicity: number;
+  /**
+   * Minimal voice-leading cost in cents to the *next* chord in the progression.
+   * `null` for the last step (no successor).
+   */
+  readonly voiceLeadingCostToNext: number | null;
+}
+
+/**
+ * Comprehensive per-step analysis of a chord progression.
+ *
+ * Socratic Q116: `chordObjectDissonance(chord, rootHz, spectrum)` scores one chord's
+ * roughness; `harmonicityForChord(chord, rootHz)` scores its periodicity;
+ * `voiceLeadingCost(freqsA, freqsB)` gives the transition cost. Getting the full
+ * picture for a progression — roughness, harmonicity, and voice-leading cost at
+ * every step — still requires three separate mapping passes. If `Chord` progressions
+ * are truly first-class, one call should return the complete per-step picture.
+ *
+ * Returns one `ChordProgressionStep` per chord with:
+ * - `chord`: the original `Chord` object
+ * - `freqs`: realized frequencies at `rootHz`
+ * - `dissonance`: Sethares roughness (timbre-dependent)
+ * - `harmonicity`: Stolzenburg periodicity (timbre-independent)
+ * - `voiceLeadingCostToNext`: minimal voice-leading cost in cents to the next chord
+ *   (`null` on the last step). Only computed when adjacent chords have equal voice counts.
+ *   If voice counts differ, the field is `Infinity`.
+ *
+ * @param chords   - Ordered list of chords (at least one).
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Instrument spectrum for the dissonance computation.
+ * @param tol      - Continued-fraction tolerance for harmonicity (default 0.0136).
+ * @returns Array of `ChordProgressionStep`, one per input chord.
+ *
+ * @throws {RangeError} if `chords` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ * @throws {RangeError} if any chord has no intervals.
+ *
+ * @example
+ * const I  = chordFromRatios('I',  [[1,1],[5,4],[3,2]]);
+ * const IV = chordFromRatios('IV', [[1,1],[4,3],[5,3]]);
+ * const V  = chordFromRatios('V',  [[1,1],[3,2],[15,8]]);
+ * const analysis = chordProgressionAnalysis([I, IV, V], 261.63, harmonicSpectrum());
+ * // analysis[0].dissonance — roughness of I
+ * // analysis[0].voiceLeadingCostToNext — cost of I→IV
+ * // analysis[2].voiceLeadingCostToNext === null — no successor after V
+ */
+export function chordProgressionAnalysis(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum: Spectrum,
+  tol = 0.0136,
+): ChordProgressionStep[] {
+  if (chords.length === 0) {
+    throw new RangeError('chordProgressionAnalysis: chords must be non-empty');
+  }
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(`chordProgressionAnalysis: rootHz must be finite and > 0, got ${rootHz}`);
+  }
+
+  // Realize all chords once.
+  const allFreqs = chords.map((chord) => realizeChordFreqs(chord, rootHz));
+
+  return chords.map((chord, i) => {
+    const freqs = allFreqs[i] as number[];
+    const dissonance = chordObjectDissonance(chord, rootHz, spectrum);
+    const harmonicity = harmonicityForChord(chord, rootHz, tol);
+
+    let vlCost: number | null = null;
+    if (i < chords.length - 1) {
+      const nextFreqs = allFreqs[i + 1] as number[];
+      if (freqs.length !== nextFreqs.length) {
+        vlCost = Infinity;
+      } else {
+        vlCost = voiceLeadingCost(freqs, nextFreqs);
+      }
+    }
+
+    return { chord, freqs, dissonance, harmonicity, voiceLeadingCostToNext: vlCost };
+  });
 }

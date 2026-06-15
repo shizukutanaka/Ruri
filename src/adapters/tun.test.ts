@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
-import { writeTun, TUN_DEFAULT_BASEFREQ_HZ } from './tun.js';
+import { writeTun, TUN_DEFAULT_BASEFREQ_HZ, chordToTun } from './tun.js';
+import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -241,5 +242,87 @@ describe('writeTun fast-check properties', () => {
         return true;
       }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q114 — chordToTun
+// ---------------------------------------------------------------------------
+
+describe('chordToTun', () => {
+  const justMajor = chordFromRatios('just-major', [
+    [1, 1],
+    [5, 4],
+    [3, 2],
+  ]);
+  const rootHz = 261.63; // middle C
+
+  it('test_returns_valid_tun_string_for_just_major_chord', () => {
+    const out = chordToTun(justMajor, rootHz);
+    expect(out).toContain('[Tuning]');
+    expect(out).toContain('[Exact Tuning]');
+    expect(out.endsWith('\n')).toBe(true);
+  });
+
+  it('test_chord_name_used_in_comment_header', () => {
+    const out = chordToTun(justMajor, rootHz);
+    expect(out.split('\n')[0]).toBe('; just-major');
+  });
+
+  it('test_explicit_name_overrides_chord_name', () => {
+    const out = chordToTun(justMajor, rootHz, 'My Chord');
+    expect(out.split('\n')[0]).toBe('; My Chord');
+  });
+
+  it('test_has_exactly_128_note_lines_in_tuning_section', () => {
+    const out = chordToTun(justMajor, rootHz);
+    const lines = out.split('\n');
+    const tunStart = lines.indexOf('[Tuning]');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const noteLines = lines.slice(tunStart + 1, exactStart).filter((l) => l.startsWith('note '));
+    expect(noteLines).toHaveLength(128);
+  });
+
+  it('test_chord_frequency_overwrites_nearest_midi_key', () => {
+    // root at 261.63 Hz is MIDI 60 (middle C). Check that key 60 is NOT standard 12-TET.
+    const out = chordToTun(justMajor, rootHz);
+    const lines = out.split('\n');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const key60Line = lines.slice(exactStart + 1).find((l) => l.startsWith('note 60='));
+    expect(key60Line).toBeDefined();
+    // 261.63 Hz relative to default basefreq
+    const parsedCents = Number.parseFloat((key60Line as string).slice('note 60='.length));
+    const recoveredHz = TUN_DEFAULT_BASEFREQ_HZ * 2 ** (parsedCents / 1200);
+    expect(recoveredHz).toBeCloseTo(rootHz, 1);
+  });
+
+  it('test_empty_chord_throws_range_error', () => {
+    const empty = { name: 'empty', intervals: [] };
+    expect(() => chordToTun(empty, rootHz)).toThrow(RangeError);
+  });
+
+  it('test_zero_root_throws_range_error', () => {
+    expect(() => chordToTun(justMajor, 0)).toThrow(RangeError);
+  });
+
+  it('test_negative_root_throws_range_error', () => {
+    expect(() => chordToTun(justMajor, -440)).toThrow(RangeError);
+  });
+
+  it('test_non_finite_root_throws_range_error', () => {
+    expect(() => chordToTun(justMajor, NaN)).toThrow(RangeError);
+  });
+
+  it('test_semitone_chord_exported_correctly', () => {
+    const semChord = chordFromSemitones('major', [0, 4, 7]);
+    const out = chordToTun(semChord, 440);
+    expect(out).toContain('[Tuning]');
+    // key 69 = A4 = 440 Hz = root, should appear in exact tuning as ~6900 cents
+    const lines = out.split('\n');
+    const exactStart = lines.indexOf('[Exact Tuning]');
+    const key69Line = lines.slice(exactStart + 1).find((l) => l.startsWith('note 69='));
+    expect(key69Line).toBeDefined();
+    const cents = Number.parseFloat((key69Line as string).slice('note 69='.length));
+    expect(cents).toBeCloseTo(6900, 1);
   });
 });
