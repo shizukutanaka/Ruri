@@ -10,6 +10,8 @@ import {
   scaleToMinimalTuning,
   scaleModeSeries,
   bestModeForTuning,
+  tuningToScale,
+  rankModeSeriesByHarmonicity,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -487,4 +489,34 @@ export function scaleModeScls(scale: Scale, tuning: TuningSystem): string[] {
 export function bestModeSclText(tuning: TuningSystem, spectrum?: Spectrum, name?: string): string {
   const mode = bestModeForTuning(tuning, spectrum);
   return scaleToSubsetSclText(mode, tuning, name ?? mode.name);
+}
+
+/**
+ * Export the WORST (least harmonic) mode of a tuning as a subset `.scl` text string in one call.
+ *
+ * Socratic Q226: "If we can find the best mode's .scl text, we should also find the WORST
+ * (least harmonic) mode's .scl text in one call — can it?" Today:
+ * `tuningToScale(tuning)` → `rankModeSeriesByHarmonicity(fullScale, tuning)` → take last
+ * entry → `scaleToSubsetSclText(worst, tuning, name)` — three steps. If the worst mode
+ * is first-class, exporting it should be one call.
+ *
+ * @param tuning   - The parent `TuningSystem`. Must have at least one degree.
+ * @param spectrum - Optional instrument spectrum (accepted for API symmetry with `bestModeSclText`; not used).
+ * @param name     - Optional `.scl` description. Defaults to the worst mode's name.
+ * @returns A `.scl` text string ready to write to disk.
+ *
+ * @throws {RangeError} if `tuning` has no degrees (propagated from `rankModeSeriesByHarmonicity`).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const text = worstModeSclText(t12);
+ * fs.writeFileSync('worst-mode.scl', text);
+ */
+export function worstModeSclText(tuning: TuningSystem, spectrum?: Spectrum, name?: string): string {
+  void spectrum; // accepted for API symmetry; harmonicity ranking is timbre-independent
+  const fullScale = tuningToScale(tuning);
+  const ranked = rankModeSeriesByHarmonicity(fullScale, tuning);
+  const worst = ranked[ranked.length - 1];
+  if (worst === undefined) throw new RangeError('worstModeSclText: tuning has no modes');
+  return scaleToSubsetSclText(worst.scale, tuning, name ?? worst.scale.name);
 }

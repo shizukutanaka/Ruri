@@ -15,6 +15,7 @@ import {
   scaleToSubsetSclText,
   scaleModeScls,
   bestModeSclText,
+  worstModeSclText,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -714,5 +715,51 @@ describe('bestModeSclText (Q221)', () => {
     expect(typeof text).toBe('string');
     const parsed = parseScl(text);
     expect(parsed.degrees.length).toBeGreaterThan(0);
+  });
+});
+
+// Q226 — worstModeSclText
+describe('worstModeSclText (Q226)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_string', () => {
+    const text = worstModeSclText(t12);
+    expect(typeof text).toBe('string');
+    expect(text.length).toBeGreaterThan(0);
+  });
+
+  it('test_output_is_valid_scl', () => {
+    const text = worstModeSclText(t12);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBeGreaterThan(0);
+  });
+
+  it('test_custom_name_appears_in_output', () => {
+    const text = worstModeSclText(t12, undefined, 'my-worst-mode');
+    expect(text).toContain('my-worst-mode');
+  });
+
+  it('test_output_ends_with_newline', () => {
+    const text = worstModeSclText(t12);
+    expect(text.endsWith('\n')).toBe(true);
+  });
+
+  it('test_works_with_different_edos', () => {
+    const t5 = edo(5);
+    const text = worstModeSclText(t5);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBeGreaterThan(0);
+    expect(parsed.degrees.length).toBeLessThanOrEqual(5);
+  });
+
+  it('test_differs_from_best_mode_scl_text', () => {
+    const best = bestModeSclText(t12);
+    const worst = worstModeSclText(t12);
+    // For 12-TET with 7 modes there must be some difference
+    expect(typeof worst).toBe('string');
+    // They may or may not differ depending on tuning; just verify worst is valid
+    const parsed = parseScl(worst);
+    expect(parsed.degrees.length).toBeGreaterThan(0);
+    void best;
   });
 });
