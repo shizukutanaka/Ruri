@@ -5,14 +5,16 @@ import {
   MAKAM_USSAK,
   SLENDRO_EXAMPLE,
   JUST_INTONATION_5L,
+  TWELVE_TET,
   getTuningById,
   rankChordsFromPreset,
   presetToScl,
   presetToMts,
   presetChordProgression,
   presetToMtsAndSmf,
+  closestPreset,
 } from './presets.js';
-import { degreeToCents } from '../core/tuning.js';
+import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
 describe('all presets load and validate', () => {
@@ -432,5 +434,47 @@ describe('presetToMtsAndSmf (Q143)', () => {
     const combined = presetToMtsAndSmf('12-tet', pattern, rootHz);
     const mtsOnly = presetToMts('12-tet');
     expect(combined!.mts).toEqual(mtsOnly);
+  });
+});
+
+// Q149 — closestPreset: find the preset nearest to a given TuningSystem by tuning distance
+describe('closestPreset (Q149)', () => {
+  it('test_returns_twelve_tet_for_12_edo_tuning', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPreset(t12);
+    expect(result).toBeDefined();
+    expect(result!.id).toBe('12-tet');
+  });
+
+  it('test_returns_undefined_for_empty_preset_pool', () => {
+    const t12 = equalTemperament12(440);
+    expect(closestPreset(t12, [])).toBeUndefined();
+  });
+
+  it('test_single_preset_pool_always_returns_that_preset', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPreset(t12, [MAKAM_USSAK]);
+    expect(result!.id).toBe('makam-ussak-example');
+  });
+
+  it('test_custom_preset_pool_is_respected', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPreset(t12, [MAKAM_USSAK, TWELVE_TET]);
+    expect(result!.id).toBe('12-tet');
+  });
+
+  it('test_result_is_a_tuning_preset_object', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPreset(t12);
+    expect(result).not.toBeUndefined();
+    expect(typeof result!.id).toBe('string');
+    expect(typeof result!.name).toBe('string');
+    expect(Array.isArray(result!.degrees)).toBe(true);
+  });
+
+  it('test_slendro_is_closer_to_slendro_than_to_12tet', () => {
+    const slendroTuning = loadTuningPreset(SLENDRO_EXAMPLE);
+    const result = closestPreset(slendroTuning, [TWELVE_TET, SLENDRO_EXAMPLE]);
+    expect(result!.id).toBe('slendro-example');
   });
 });

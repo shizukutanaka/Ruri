@@ -1,6 +1,6 @@
 /** Curated tuning presets. Each is ONE documented example with provenance — never "the" tuning. */
 
-import { type TuningSystem } from '../core/tuning.js';
+import { type TuningSystem, tuningDistance } from '../core/tuning.js';
 import { rankChords, type RankedChord, type ChordSearchOptions } from '../core/chord-search.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { tuningToScl, writeScl } from '../adapters/scala.js';
@@ -318,4 +318,49 @@ export function presetToMtsAndSmf(
   const chords = progressionFromPattern(scale, tuning, pattern);
   const smf = progressionToSmf(chords, rootHz, opts?.smfOpts);
   return { mts, smf };
+}
+
+/**
+ * Find the closest preset (by tuning distance) to a given `TuningSystem` in one call.
+ *
+ * Socratic Q149: "If two tunings can be compared by distance, the closest preset to any
+ * given tuning should be found in one call — can it?" Today it requires: map all presets
+ * through `loadTuningPreset` → `tuningDistance(target, candidate)` for each → `argmin`.
+ * If presets are truly first-class, finding the most similar preset to an arbitrary tuning
+ * should be one call.
+ *
+ * Algorithm:
+ * 1. Map all `presets` through `loadTuningPreset` to get `TuningSystem[]`.
+ * 2. Compute `tuningDistance(tuning, candidate)` for each.
+ * 3. Return the preset with minimum distance.
+ *
+ * @param tuning   - The target `TuningSystem` to compare against.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns The `TuningPreset` with the smallest tuning distance, or `undefined` if `presets` is empty.
+ *
+ * @example
+ * const myTuning = edo(12);
+ * const closest = closestPreset(myTuning);
+ * // closest is TWELVE_TET — the preset nearest to 12-EDO by interval-vector distance
+ *
+ * @example
+ * // Custom preset pool:
+ * const closest = closestPreset(myTuning, [MAKAM_USSAK, SLENDRO_EXAMPLE]);
+ */
+export function closestPreset(
+  tuning: TuningSystem,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): TuningPreset | undefined {
+  if (presets.length === 0) return undefined;
+  let bestPreset = presets[0] as TuningPreset;
+  let bestDist = tuningDistance(tuning, loadTuningPreset(bestPreset));
+  for (let i = 1; i < presets.length; i++) {
+    const preset = presets[i] as TuningPreset;
+    const dist = tuningDistance(tuning, loadTuningPreset(preset));
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestPreset = preset;
+    }
+  }
+  return bestPreset;
 }
