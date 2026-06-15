@@ -33,6 +33,8 @@ import {
   chordMapAnalysisToStereoWav,
   chordMapToShuffledWav,
   mostStableModeProgressionWav,
+  progressionNarrativeWav,
+  presetBestModeWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -40,7 +42,7 @@ import { DEFAULT_KS } from '../core/ks-synth.js';
 import { type Scale } from '../core/scale.js';
 import { rankChords, rankedChordToChord } from '../core/chord-search.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
-import { rankScaleChords, scaleToChordMap } from '../core/scale.js';
+import { rankScaleChords, scaleToChordMap, scaleModeSeries, tuningToScale } from '../core/scale.js';
 
 describe('WAV encoder', () => {
   it('test_header_riff_wave', () => {
@@ -1662,5 +1664,35 @@ describe('mostStableModeProgressionWav (Q198)', () => {
   it('test_empty_tuning_throws', () => {
     const emptyTuning = { ...t5, degrees: [] };
     expect(() => mostStableModeProgressionWav(emptyTuning, 261.63)).toThrow(RangeError);
+  });
+});
+
+describe('progressionNarrativeWav (Q234)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 3).map((e) => e.chord);
+
+  it('returns wav and narrative', () => {
+    const result = progressionNarrativeWav(chords, 261.63);
+    expect(result.wav).toBeInstanceOf(Uint8Array);
+    expect(result.wav.length).toBeGreaterThan(44);
+    expect(result.narrative).toBeTruthy();
+    expect(typeof result.narrative).toBe('string');
+  });
+  it('narrative is non-empty', () => {
+    const { narrative } = progressionNarrativeWav(chords, 261.63);
+    expect(narrative.length).toBeGreaterThan(10);
+  });
+});
+
+describe('presetBestModeWav (Q237)', () => {
+  it('returns a WAV for 12-tet', () => {
+    const wav = presetBestModeWav('12-tet');
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetBestModeWav('nonexistent')).toThrow(RangeError);
   });
 });

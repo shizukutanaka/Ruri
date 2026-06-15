@@ -1394,3 +1394,71 @@ export function mostStableModeProgressionWav(
   const chords = bestProgressionForScale(mostStableMode, tuning, effectiveSpectrum, 4, 3, rootHz);
   return chordProgressionToWav(chords, rootHz, effectiveSpectrum, opts);
 }
+
+/**
+ * Get both a WAV rendering and a narrative description of a chord progression in one call.
+ *
+ * Socratic Q234: "If I can get a progression narrative (text) and also render a progression
+ * as WAV, can I get both in one call?" → No → implement.
+ *
+ * @param chords   - The chord progression to synthesize and narrate.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns `{ wav: Uint8Array, narrative: string }`.
+ *
+ * @throws {RangeError} if `chords` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const { wav, narrative } = progressionNarrativeWav(chords, 261.63, harmonicSpectrum());
+ * await fs.writeFile('prog.wav', wav);
+ * console.log(narrative);
+ */
+export function progressionNarrativeWav(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts?: ChordProgressionToWavOptions,
+): { wav: Uint8Array; narrative: string } {
+  const narrative = progressionNarrative(chords, rootHz, spectrum);
+  const wav = chordProgressionToWav(
+    chords,
+    rootHz,
+    spectrum ?? harmonicSpectrum(),
+    opts ?? DEFAULT_CHORD_PROGRESSION_WAV,
+  );
+  return { wav, narrative };
+}
+
+/**
+ * Go from a preset ID to a WAV of its best mode in one call.
+ *
+ * Socratic Q237: "If I know a preset's best mode and can render a mode's scale as WAV,
+ * can I go preset→WAV in one call?" → No → implement.
+ *
+ * @param presetId - ID of a named tuning preset (e.g. `'12-tet'`).
+ * @param spectrum - Optional instrument spectrum for mode selection and synthesis.
+ * @param opts     - Optional Karplus-Strong + per-note duration options.
+ * @param presets  - Optional preset list override (defaults to built-in presets).
+ * @returns WAV bytes of the best mode for the preset, played as a melodic scale.
+ *
+ * @throws {RangeError} if no preset with `presetId` is found.
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const wav = presetBestModeWav('12-tet');
+ * await fs.writeFile('12tet-best-mode.wav', wav);
+ */
+export function presetBestModeWav(
+  presetId: string,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+  presets?: readonly TuningPreset[],
+): Uint8Array {
+  const tuning = getTuningById(presetId, presets ?? ALL_PRESETS);
+  if (tuning === undefined) {
+    throw new RangeError('presetBestModeWav: preset not found: ' + presetId);
+  }
+  return bestModeWav(tuning, tuning.referenceHz, spectrum, opts);
+}
