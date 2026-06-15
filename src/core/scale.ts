@@ -1,6 +1,8 @@
 import { type TuningSystem, defineTuning, degreeToCents, degreeToFreq } from './tuning.js';
 import { type Spectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
+import { rankChords, type RankedChord, type ChordSearchOptions } from './chord-search.js';
+import { synthScale, type SynthScaleOptions, DEFAULT_SYNTH_SCALE } from './ks-synth.js';
 
 /**
  * A scale / mode / jins / raga: an ordered selection of degrees over a tuning.
@@ -179,4 +181,67 @@ export function rankModes(scale: Scale, tuning: TuningSystem, spectrum: Spectrum
       return { modeIndex: i, scale: mode, dissonance: scaleDissonance(mode, tuning, spectrum) };
     })
     .sort((a, b) => a.dissonance - b.dissonance);
+}
+
+/**
+ * Rank all chord sub-subsets of a `Scale` by timbre-weighted dissonance/periodicity score.
+ *
+ * Socratic Q57: `rankChords(tuning, opts)` discovers chords from the full tuning's degree
+ * pool. But if we already have a `Scale` (a curated subset of degrees, e.g. the diatonic
+ * major scale in 12-TET), finding the best triads *within that scale* requires two manual
+ * steps: `scaleToTuning(scale, tuning) → rankChords(subTuning, opts)`. A single
+ * `rankScaleChords(scale, tuning, opts)` closes this gap:
+ * if `Scale` is truly first-class, discovering chords within it should be one call.
+ *
+ * The `Scale` is projected into a sub-`TuningSystem` (via `scaleToTuning`) so that
+ * degree indices in the returned `RankedChord[]` are relative to the scale, not the
+ * parent tuning.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`, or if `rankChords` blows up.
+ *
+ * @example
+ * // Best triads within the diatonic major scale (12-TET):
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const triads = rankScaleChords(major, equalTemperament12(440), { size: 3, spectrum: harmonicSpectrum() });
+ * // triads[0] is the most consonant 3-note chord drawable from the 7-note major scale.
+ */
+export function rankScaleChords(
+  scale: Scale,
+  tuning: TuningSystem,
+  opts?: ChordSearchOptions,
+): RankedChord[] {
+  assertTuningMatch(scale, tuning);
+  const subTuning = scaleToTuning(scale, tuning);
+  return rankChords(subTuning, opts);
+}
+
+/**
+ * Synthesize a `Scale` as a melodic sequence (one note at a time) in one call.
+ *
+ * Socratic Q59: `scaleToFreqs(scale, tuning)` gives Hz per degree, and `synthScale`
+ * turns a frequency array into a sequential audio stream — but going from a `Scale`
+ * object directly to a melodic audio buffer still requires two explicit steps.
+ * If `Scale` is truly first-class, playing it as a melody should be one call:
+ * `synthScaleFromScale(scale, tuning) → Float32Array → encodeWav`.
+ *
+ * Each scale degree is plucked in ascending order via Karplus-Strong; notes are
+ * concatenated without overlap. The output is suitable for direct encoding with
+ * `encodeWav`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`, or if the scale
+ *   has no degrees (empty `degreeIndices`).
+ *
+ * @example
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const audio = synthScaleFromScale(major, equalTemperament12(440));
+ * const wav = encodeWav(audio); // 7-note major scale in one pipeline call
+ */
+export function synthScaleFromScale(
+  scale: Scale,
+  tuning: TuningSystem,
+  opts: SynthScaleOptions = DEFAULT_SYNTH_SCALE,
+): Float32Array {
+  assertTuningMatch(scale, tuning);
+  const freqs = scaleToFreqs(scale, tuning);
+  return synthScale(freqs, opts);
 }

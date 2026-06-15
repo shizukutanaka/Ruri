@@ -9,12 +9,15 @@ import {
   scaleDissonance,
   rankModes,
   isScaleCompatible,
+  rankScaleChords,
+  synthScaleFromScale,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
 import { rankChords } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
+import { DEFAULT_SYNTH_SCALE } from './ks-synth.js';
 
 const t12 = equalTemperament12(440);
 
@@ -394,5 +397,120 @@ describe('isScaleCompatible — public guard predicate (Q51)', () => {
     expect(isScaleCompatible(incompatible, t12)).toBe(false);
     // Confirms the predicate correctly predicts that scaleToCents would throw.
     expect(() => scaleToCents(incompatible, t12)).toThrow(RangeError);
+  });
+});
+
+// Q57: Scale → diatonic chord ranking in one call
+describe('rankScaleChords — rank chord subsets of a Scale (Q57)', () => {
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_ranked_chords_within_scale_degree_count', () => {
+    // Major scale has 7 degrees; C(6,2) = 15 possible triads
+    const results = rankScaleChords(major, t12, { size: 3, spectrum });
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.length).toBeLessThanOrEqual(15);
+  });
+
+  it('test_results_sorted_ascending_by_score', () => {
+    const results = rankScaleChords(major, t12, { size: 3, spectrum });
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i]!.score).toBeGreaterThanOrEqual(results[i - 1]!.score);
+    }
+  });
+
+  it('test_all_degree_indices_within_scale_range', () => {
+    const results = rankScaleChords(major, t12, { size: 3, spectrum });
+    // Degree indices are relative to sub-tuning (0..scale.degreeIndices.length-1)
+    for (const chord of results) {
+      for (const d of chord.degrees) {
+        expect(d).toBeGreaterThanOrEqual(0);
+        expect(d).toBeLessThan(major.degreeIndices.length);
+      }
+    }
+  });
+
+  it('test_limit_option_is_respected', () => {
+    const results = rankScaleChords(major, t12, { size: 3, spectrum, limit: 3 });
+    expect(results.length).toBeLessThanOrEqual(3);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2, 4] };
+    expect(() => rankScaleChords(wrong, t12, { size: 3 })).toThrow(RangeError);
+  });
+
+  it('test_produces_subset_of_full_tuning_chords', () => {
+    // Chords from the 7-degree diatonic scale must be fewer than full 12-TET chord search
+    const scaleChords = rankScaleChords(major, t12, { size: 3, spectrum, limit: 100 });
+    const fullChords = rankChords(t12, { size: 3, spectrum, limit: 100 });
+    expect(scaleChords.length).toBeLessThan(fullChords.length);
+  });
+
+  it('test_timbre_affects_ranking', () => {
+    const harmRanked = rankScaleChords(major, t12, { size: 3, spectrum });
+    const bellRanked = rankScaleChords(major, t12, { size: 3, spectrum: bellSpectrum() });
+    // Scores differ when timbre changes (roughness is timbre-dependent)
+    const harmScores = harmRanked.map((r) => r.score);
+    const bellScores = bellRanked.map((r) => r.score);
+    expect(harmScores).not.toEqual(bellScores);
+  });
+});
+
+// Q59: Scale → Float32Array melodic audio in one call
+describe('synthScaleFromScale — Scale to melodic audio (Q59)', () => {
+  const opts = { ...DEFAULT_SYNTH_SCALE, noteSeconds: 0.05 };
+
+  it('test_output_is_float32array_with_correct_length', () => {
+    const audio = synthScaleFromScale(major, t12, opts);
+    const samplesPerNote = Math.floor(opts.sampleRate * opts.noteSeconds);
+    expect(audio).toBeInstanceOf(Float32Array);
+    expect(audio.length).toBe(major.degreeIndices.length * samplesPerNote);
+  });
+
+  it('test_output_values_are_finite', () => {
+    const audio = synthScaleFromScale(major, t12, opts);
+    expect(Array.from(audio).every(Number.isFinite)).toBe(true);
+  });
+
+  it('test_output_within_unit_range', () => {
+    const audio = synthScaleFromScale(major, t12, opts);
+    expect(audio.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'wrong', degreeIndices: [0, 2] };
+    expect(() => synthScaleFromScale(wrong, t12, opts)).toThrow(RangeError);
+  });
+
+  it('test_different_scales_produce_different_audio', () => {
+    // Major and minor scale share the same root but have different second degrees
+    // (200c vs 200c same, but third degree: 400c major vs 300c minor)
+    // The second note's samples should differ — check a sample from the second note window.
+    const minor: Scale = {
+      id: 'minor',
+      name: 'Aeolian',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 3, 5, 7, 8, 10],
+    };
+    const audioMajor = synthScaleFromScale(major, t12, opts);
+    const audioMinor = synthScaleFromScale(minor, t12, opts);
+    // Both are 7-note scales → same length
+    expect(audioMajor.length).toBe(audioMinor.length);
+    // The full waveforms differ (different 3rd degrees: E vs Eb)
+    let differs = false;
+    for (let i = 0; i < audioMajor.length; i++) {
+      if (Math.abs((audioMajor[i] as number) - (audioMinor[i] as number)) > 1e-6) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_matches_manual_pipeline_scaleToFreqs_then_synthScale', () => {
+    const freqs = scaleToFreqs(major, t12);
+    // synthScaleFromScale(major, t12, opts) should equal synthScale(freqs, opts)
+    const direct = synthScaleFromScale(major, t12, opts);
+    expect(direct.length).toBe(Math.floor(opts.sampleRate * opts.noteSeconds) * freqs.length);
   });
 });

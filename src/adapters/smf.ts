@@ -224,3 +224,63 @@ export function chordToSmf(chord: Chord, rootHz: number, opts?: ChordToSmfOption
 
   return encodeSmf(notes, { ppq });
 }
+
+export type ProgressionToSmfOptions = ChordToSmfOptions;
+
+/**
+ * Convert a `Chord[]` progression directly to a SMF Type-0 MIDI file byte sequence.
+ *
+ * Socratic Q58 (extended): `chordToSmf` turns a single `Chord` into a `.mid` file —
+ * but a chord *progression* (e.g. ii–V–I) requires manually mapping each chord to a
+ * tick offset and concatenating `NoteEvent` lists. If `Chord[]` is the creative output
+ * of `rankChords → rankedChordToChord → optimalChordOrder`, writing it to MIDI should
+ * be one call. This closes the full pipeline:
+ * `rankChords → rankedChordToChord → optimalChordOrder → progressionToSmf → write .mid`.
+ *
+ * Each chord occupies `durationTicks` ticks in sequence (back-to-back, no gap).
+ * All notes in a given chord share the same start tick and duration.
+ *
+ * Hz → MIDI pitch conversion rounds to the nearest semitone (same caveat as `chordToSmf`).
+ *
+ * @throws {RangeError} if any realized frequency maps to a MIDI note outside [0, 127].
+ * @throws {RangeError} if `chords` is empty.
+ *
+ * @example
+ * const ranked = rankChords(edo(12), { size: 3, limit: 4 });
+ * const portable = ranked.map(r => rankedChordToChord(r));
+ * const { chords } = optimalChordOrder(portable, 261.63);
+ * const midi = progressionToSmf(chords, 261.63);
+ * await fs.writeFile('progression.mid', midi);
+ */
+export function progressionToSmf(
+  chords: readonly Chord[],
+  rootHz: number,
+  opts?: ProgressionToSmfOptions,
+): Uint8Array {
+  if (chords.length === 0) throw new RangeError('chords must be non-empty');
+
+  const ppq = opts?.ppq ?? DEFAULT_PPQ;
+  const durationTicks = opts?.durationTicks ?? ppq;
+  const velocity = opts?.velocity ?? 90;
+  const channel = opts?.channel ?? 0;
+  const a4Hz = opts?.a4Hz ?? 440;
+
+  const notes: NoteEvent[] = [];
+  for (let ci = 0; ci < chords.length; ci++) {
+    const chord = chords[ci] as Chord;
+    const startTicks = ci * durationTicks;
+    const freqs = realizeChordFreqs(chord, rootHz);
+    for (const hz of freqs) {
+      const midiFloat = freqToMidiFloat(hz, a4Hz);
+      const note = Math.round(midiFloat);
+      if (note < 0 || note > 127) {
+        throw new RangeError(
+          `chord[${ci}] frequency ${hz.toFixed(2)} Hz maps to MIDI note ${note}, which is outside [0, 127]`,
+        );
+      }
+      notes.push({ note, velocity, startTicks, durationTicks, channel });
+    }
+  }
+
+  return encodeSmf(notes, { ppq });
+}
