@@ -1,4 +1,5 @@
 import { freqToCents } from './cents.js';
+import { type Chord, realizeChordFreqs } from './chord.js';
 
 /** A single voice assignment from one chord to another. */
 export interface VoiceAssignment {
@@ -115,4 +116,43 @@ export function minimalVoiceLeading(
  */
 export function voiceLeadingCost(fromFreqs: readonly number[], toFreqs: readonly number[]): number {
   return minimalVoiceLeading(fromFreqs, toFreqs).totalCents;
+}
+
+/**
+ * Pairwise voice-leading cost matrix for a list of chords.
+ *
+ * Socratic Q92: `voiceLeadingCost(realizeChordFreqs(a, rootHz), realizeChordFreqs(b, rootHz))`
+ * gives the motion cost between two chords, but analysing all pairs in a
+ * collection — e.g. to find the globally smoothest ordering — still requires a
+ * nested loop over `realizeChordFreqs` calls. If `Chord` is first-class, the
+ * full pairwise cost matrix should be one call.
+ *
+ * Returns a symmetric `n × n` matrix where `matrix[i][j]` is the minimal
+ * voice-leading cost (in cents) from `chords[i]` to `chords[j]`. Diagonal
+ * entries are 0 (a chord costs nothing to "move" to itself). Only chords with
+ * equal voice counts can be compared; pairs with different voice counts are set
+ * to `Infinity`.
+ *
+ * Useful for: finding cheapest transitions, building weighted graphs for chord
+ * scheduling, visualizing voice-leading distances between all chord pairs.
+ *
+ * @example
+ * const chords = [tonic, subdominant, dominant];
+ * const mat = voiceLeadingMatrix(chords, 261.63);
+ * // mat[0][2] — cost of moving from tonic directly to dominant
+ * // mat[2][0] — same (matrix is symmetric)
+ */
+export function voiceLeadingMatrix(chords: readonly Chord[], rootHz: number): number[][] {
+  const n = chords.length;
+  const realized = chords.map((c) => realizeChordFreqs(c, rootHz));
+
+  return Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => {
+      if (i === j) return 0;
+      const from = realized[i] as number[];
+      const to = realized[j] as number[];
+      if (from.length !== to.length) return Infinity;
+      return voiceLeadingCost(from, to);
+    }),
+  );
 }

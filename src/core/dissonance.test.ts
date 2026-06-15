@@ -11,6 +11,8 @@ import {
   spectrumToTuning,
   tuningSuitability,
   rankTuningsByFit,
+  progressionDissonanceCurve,
+  rankChordsByDissonance,
 } from './dissonance.js';
 import { edo } from './tuning.js';
 import { chordFromSemitones, chordFromRatios, realizeChordFreqs } from './chord.js';
@@ -438,5 +440,138 @@ describe('chordObjectDissonance (Q85)', () => {
     const dHarm = chordObjectDissonance(chord, 261.63, harmonicSpectrum());
     const dBell = chordObjectDissonance(chord, 261.63, bellSpectrum());
     expect(dHarm).not.toBeCloseTo(dBell, 3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q90 — progressionDissonanceCurve
+// ---------------------------------------------------------------------------
+
+describe('progressionDissonanceCurve (Q90)', () => {
+  const spec = harmonicSpectrum();
+  const rootHz = 261.63;
+  const major = chordFromSemitones('major', [0, 4, 7]);
+  const dom7 = chordFromSemitones('dom7', [0, 4, 7, 10]);
+
+  it('test_length_matches_input_progression', () => {
+    const curve = progressionDissonanceCurve([major, dom7, major], rootHz, spec);
+    expect(curve).toHaveLength(3);
+  });
+
+  it('test_matches_individual_chordObjectDissonance_calls', () => {
+    const chords = [major, dom7];
+    const curve = progressionDissonanceCurve(chords, rootHz, spec);
+    expect(curve[0]).toBeCloseTo(chordObjectDissonance(major, rootHz, spec), 9);
+    expect(curve[1]).toBeCloseTo(chordObjectDissonance(dom7, rootHz, spec), 9);
+  });
+
+  it('test_empty_progression_returns_empty_array', () => {
+    expect(progressionDissonanceCurve([], rootHz, spec)).toEqual([]);
+  });
+
+  it('test_dom7_more_dissonant_than_major_triad', () => {
+    // Dominant 7th adds a minor seventh — should increase sensory dissonance.
+    const curve = progressionDissonanceCurve([major, dom7], rootHz, spec);
+    expect(curve[1]).toBeGreaterThan(curve[0] as number);
+  });
+
+  it('test_all_values_non_negative', () => {
+    const curve = progressionDissonanceCurve([major, dom7, major], rootHz, spec);
+    for (const d of curve) {
+      expect(d).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('test_single_chord_progression', () => {
+    const curve = progressionDissonanceCurve([major], rootHz, spec);
+    expect(curve).toHaveLength(1);
+    expect(curve[0]).toBeCloseTo(chordObjectDissonance(major, rootHz, spec), 9);
+  });
+
+  it('property_values_match_individual_scores', () => {
+    fc.assert(
+      fc.property(
+        fc.array(
+          fc.constantFrom(
+            chordFromSemitones('unison', [0]),
+            chordFromSemitones('fifth', [0, 7]),
+            major,
+            dom7,
+          ),
+          { minLength: 0, maxLength: 6 },
+        ),
+        (chords) => {
+          const curve = progressionDissonanceCurve(chords, rootHz, spec);
+          expect(curve).toHaveLength(chords.length);
+          for (let i = 0; i < chords.length; i++) {
+            expect(curve[i]).toBeCloseTo(chordObjectDissonance(chords[i]!, rootHz, spec), 9);
+          }
+        },
+      ),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q91 — rankChordsByDissonance
+// ---------------------------------------------------------------------------
+
+describe('rankChordsByDissonance (Q91)', () => {
+  const spec = harmonicSpectrum();
+  const rootHz = 261.63;
+  const major = chordFromSemitones('major', [0, 4, 7]);
+  const dom7 = chordFromSemitones('dom7', [0, 4, 7, 10]);
+  const justFifth = chordFromRatios('fifth', [
+    [1, 1],
+    [3, 2],
+  ]);
+
+  it('test_returns_same_length_as_input', () => {
+    const ranked = rankChordsByDissonance([major, dom7, justFifth], rootHz, spec);
+    expect(ranked).toHaveLength(3);
+  });
+
+  it('test_sorted_ascending_by_dissonance', () => {
+    const ranked = rankChordsByDissonance([major, dom7, justFifth], rootHz, spec);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.dissonance).toBeGreaterThanOrEqual(ranked[i - 1]!.dissonance);
+    }
+  });
+
+  it('test_dissonance_field_matches_chordObjectDissonance', () => {
+    const ranked = rankChordsByDissonance([major, dom7], rootHz, spec);
+    for (const entry of ranked) {
+      expect(entry.dissonance).toBeCloseTo(chordObjectDissonance(entry.chord, rootHz, spec), 9);
+    }
+  });
+
+  it('test_just_fifth_ranks_before_dom7', () => {
+    // A pure 3/2 fifth should be more consonant than a dominant 7th chord.
+    const ranked = rankChordsByDissonance([dom7, justFifth], rootHz, spec);
+    expect(ranked[0]!.chord.name).toBe('fifth');
+  });
+
+  it('test_empty_input_returns_empty_array', () => {
+    expect(rankChordsByDissonance([], rootHz, spec)).toEqual([]);
+  });
+
+  it('test_original_array_not_mutated', () => {
+    const chords = [dom7, major, justFifth];
+    const original = [...chords];
+    rankChordsByDissonance(chords, rootHz, spec);
+    expect(chords).toEqual(original);
+  });
+
+  it('test_single_chord_returns_single_entry', () => {
+    const ranked = rankChordsByDissonance([major], rootHz, spec);
+    expect(ranked).toHaveLength(1);
+    expect(ranked[0]!.chord).toBe(major);
+  });
+
+  it('test_all_dissonance_values_non_negative', () => {
+    const ranked = rankChordsByDissonance([major, dom7, justFifth], rootHz, spec);
+    for (const entry of ranked) {
+      expect(entry.dissonance).toBeGreaterThanOrEqual(0);
+    }
   });
 });

@@ -3,6 +3,14 @@ import { freqToCents, pitchToCents } from './cents.js';
 import { type TuningSystem, defineTuning } from './tuning.js';
 import { type Chord, realizeChordFreqs } from './chord.js';
 
+/** A chord with its computed dissonance score, as returned by `rankChordsByDissonance`. */
+export interface RankedChordByDissonance {
+  /** The original chord. */
+  readonly chord: Chord;
+  /** Sensory dissonance score (lower = more consonant). */
+  readonly dissonance: number;
+}
+
 // Sethares sensory-dissonance model constants (Plomp-Levelt based).
 const DSTAR = 0.24;
 const S1 = 0.0207;
@@ -312,4 +320,59 @@ export function rankTuningsByFit(
       if (covDiff !== 0) return covDiff;
       return a.suitability.avgErrorCents - b.suitability.avgErrorCents;
     });
+}
+
+/**
+ * Dissonance trace over a chord progression — one number per chord.
+ *
+ * Socratic Q90: `chordObjectDissonance(chord, rootHz, spectrum)` scores one
+ * chord at a time, but tracing how tension moves through a whole progression
+ * still requires a manual `map`. If `Chord` progressions are first-class,
+ * evaluating the dissonance arc should be a single call.
+ *
+ * Returns `number[]` where `result[i]` is the sensory dissonance of
+ * `chords[i]` realized at `rootHz` with the given `spectrum`. Useful for
+ * visualizing tension/resolution arcs (e.g. plotting dissonance over time).
+ *
+ * @example
+ * const chords = [major, dominant7, major]; // I – V7 – I
+ * const curve = progressionDissonanceCurve(chords, 261.63, harmonicSpectrum());
+ * // curve[1] > curve[0] — the dominant 7th is more dissonant than the tonic
+ */
+export function progressionDissonanceCurve(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum: Spectrum,
+): number[] {
+  return chords.map((chord) => chordObjectDissonance(chord, rootHz, spectrum));
+}
+
+/**
+ * Sort a list of `Chord` objects by sensory dissonance, most consonant first.
+ *
+ * Socratic Q91: `chordObjectDissonance(chord, rootHz, spectrum)` scores one
+ * chord — but sorting a list of already-discovered chords by consonance still
+ * requires a manual map + sort. If dissonance is first-class, ranking should
+ * be a single call.
+ *
+ * Distinct from `rankChords` (which *enumerates* all degree subsets of a
+ * tuning); this operates on an explicit `Chord[]` you supply — useful after
+ * chord search, scale analysis, or any ad-hoc collection.
+ *
+ * Returns a new array sorted by `dissonance` ascending (lowest = most
+ * consonant). The original array is not mutated.
+ *
+ * @example
+ * const chords = [dominantSeventh, majorTriad, diminished];
+ * const ranked = rankChordsByDissonance(chords, 261.63, harmonicSpectrum());
+ * // ranked[0] is the most consonant chord
+ */
+export function rankChordsByDissonance(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum: Spectrum,
+): RankedChordByDissonance[] {
+  return chords
+    .map((chord) => ({ chord, dissonance: chordObjectDissonance(chord, rootHz, spectrum) }))
+    .sort((a, b) => a.dissonance - b.dissonance);
 }

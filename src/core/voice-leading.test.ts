@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { minimalVoiceLeading, voiceLeadingCost } from './voice-leading.js';
+import { minimalVoiceLeading, voiceLeadingCost, voiceLeadingMatrix } from './voice-leading.js';
 import { freqToCents } from './cents.js';
+import { chordFromSemitones, realizeChordFreqs } from './chord.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -298,5 +299,135 @@ describe('minimalVoiceLeading duplicate-frequency tie-break', () => {
     const result = minimalVoiceLeading([330, 440], [440, 440]);
     // Both 440 s in toFreqs are matched; should not throw.
     expect(result.assignments).toHaveLength(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q92 — voiceLeadingMatrix
+// ---------------------------------------------------------------------------
+
+describe('voiceLeadingMatrix (Q92)', () => {
+  const rootHz = 261.63;
+  const major = chordFromSemitones('major', [0, 4, 7]);
+  const fMajor = chordFromSemitones('f-major', [5, 9, 12]); // F A C (same voice count)
+  const dominant = chordFromSemitones('dominant', [7, 11, 14]); // G B D
+
+  it('test_returns_n_by_n_matrix', () => {
+    const mat = voiceLeadingMatrix([major, fMajor, dominant], rootHz);
+    expect(mat).toHaveLength(3);
+    for (const row of mat) {
+      expect(row).toHaveLength(3);
+    }
+  });
+
+  it('test_diagonal_is_zero', () => {
+    const mat = voiceLeadingMatrix([major, fMajor, dominant], rootHz);
+    expect(mat[0]![0]).toBe(0);
+    expect(mat[1]![1]).toBe(0);
+    expect(mat[2]![2]).toBe(0);
+  });
+
+  it('test_matrix_is_symmetric', () => {
+    const mat = voiceLeadingMatrix([major, fMajor, dominant], rootHz);
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        expect(mat[i]![j]).toBeCloseTo(mat[j]![i]!, 9);
+      }
+    }
+  });
+
+  it('test_off_diagonal_is_finite_and_positive', () => {
+    const mat = voiceLeadingMatrix([major, fMajor], rootHz);
+    // Off-diagonal should be finite and positive (two different chords)
+    expect(mat[0]![1]).toBeGreaterThan(0);
+    expect(Number.isFinite(mat[0]![1])).toBe(true);
+    expect(mat[0]![1]).toBeCloseTo(mat[1]![0] as number, 9);
+  });
+
+  it('test_off_diagonal_matches_direct_voiceLeadingCost_call', () => {
+    const from = realizeChordFreqs(major, rootHz);
+    const to = realizeChordFreqs(fMajor, rootHz);
+    const expected = voiceLeadingCost(from, to);
+    const mat = voiceLeadingMatrix([major, fMajor], rootHz);
+    expect(mat[0]![1]).toBeCloseTo(expected, 9);
+  });
+
+  it('test_empty_input_returns_empty_matrix', () => {
+    const mat = voiceLeadingMatrix([], rootHz);
+    expect(mat).toEqual([]);
+  });
+
+  it('test_single_chord_returns_one_by_one_zero_matrix', () => {
+    const mat = voiceLeadingMatrix([major], rootHz);
+    expect(mat).toHaveLength(1);
+    expect(mat[0]).toHaveLength(1);
+    expect(mat[0]![0]).toBe(0);
+  });
+
+  it('test_mismatched_voice_counts_give_infinity', () => {
+    const triad = chordFromSemitones('triad', [0, 4, 7]);
+    const dyad = chordFromSemitones('dyad', [0, 7]);
+    const mat = voiceLeadingMatrix([triad, dyad], rootHz);
+    expect(mat[0]![1]).toBe(Infinity);
+    expect(mat[1]![0]).toBe(Infinity);
+    // Same-voice pairs still finite
+    expect(mat[0]![0]).toBe(0);
+    expect(mat[1]![1]).toBe(0);
+  });
+
+  it('test_all_off_diagonal_values_non_negative', () => {
+    const mat = voiceLeadingMatrix([major, fMajor, dominant], rootHz);
+    for (let i = 0; i < mat.length; i++) {
+      for (let j = 0; j < (mat[i]?.length ?? 0); j++) {
+        if (i !== j) {
+          expect(mat[i]![j]).toBeGreaterThanOrEqual(0);
+        }
+      }
+    }
+  });
+
+  it('property_diagonal_always_zero', () => {
+    fc.assert(
+      fc.property(
+        fc.array(
+          fc.constantFrom(
+            chordFromSemitones('c', [0, 4, 7]),
+            chordFromSemitones('g', [7, 11, 14]),
+            chordFromSemitones('f', [5, 9, 12]),
+          ),
+          { minLength: 1, maxLength: 5 },
+        ),
+        (chords) => {
+          const mat = voiceLeadingMatrix(chords, rootHz);
+          for (let i = 0; i < chords.length; i++) {
+            expect(mat[i]![i]).toBe(0);
+          }
+        },
+      ),
+    );
+  });
+
+  it('property_matrix_symmetric', () => {
+    fc.assert(
+      fc.property(
+        fc.array(
+          fc.constantFrom(
+            chordFromSemitones('c', [0, 4, 7]),
+            chordFromSemitones('g', [7, 11, 14]),
+            chordFromSemitones('f', [5, 9, 12]),
+          ),
+          { minLength: 1, maxLength: 5 },
+        ),
+        (chords) => {
+          const mat = voiceLeadingMatrix(chords, rootHz);
+          const n = chords.length;
+          for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+              expect(mat[i]![j]).toBeCloseTo(mat[j]![i]!, 9);
+            }
+          }
+        },
+      ),
+    );
   });
 });
