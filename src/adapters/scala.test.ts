@@ -16,6 +16,7 @@ import {
   scaleModeScls,
   bestModeSclText,
   worstModeSclText,
+  topNModesScls,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -761,5 +762,26 @@ describe('worstModeSclText (Q226)', () => {
     const parsed = parseScl(worst);
     expect(parsed.degrees.length).toBeGreaterThan(0);
     void best;
+  });
+});
+
+// Q230 — topNModesScls
+describe('topNModesScls (Q230)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns n SCL strings for top N modes', () => {
+    const scls = topNModesScls(t12, 3, undefined, 261.63);
+    expect(scls).toHaveLength(3);
+    scls.forEach((s) => expect(s).toContain('!'));
+  });
+
+  it('clamps to available mode count', () => {
+    const scls = topNModesScls(t12, 999, undefined, 261.63);
+    expect(scls.length).toBeLessThanOrEqual(t12.degrees.length);
+    expect(scls.length).toBeGreaterThan(0);
+  });
+
+  it('throws for n <= 0', () => {
+    expect(() => topNModesScls(t12, 0)).toThrow(RangeError);
   });
 });

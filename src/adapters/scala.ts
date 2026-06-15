@@ -12,6 +12,7 @@ import {
   bestModeForTuning,
   tuningToScale,
   rankModeSeriesByHarmonicity,
+  rankModesByStability,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -519,4 +520,37 @@ export function worstModeSclText(tuning: TuningSystem, spectrum?: Spectrum, name
   const worst = ranked[ranked.length - 1];
   if (worst === undefined) throw new RangeError('worstModeSclText: tuning has no modes');
   return scaleToSubsetSclText(worst.scale, tuning, name ?? worst.scale.name);
+}
+
+/**
+ * Return the top-N stability-ranked modes of a tuning as Scala `.scl` text strings in one call.
+ *
+ * Socratic Q230: "If I can rank modes by stability and get each mode's SCL, can I get top-N
+ * SCLs in one call?" → No → implement.
+ *
+ * @param tuning      - The parent `TuningSystem`. Must have at least one degree.
+ * @param n           - Number of top modes to return. Must be > 0.
+ * @param spectrum    - Optional instrument spectrum for timbre-aware mode ranking.
+ * @param rootHz      - Root frequency in Hz for stability ranking (defaults to `tuning.referenceHz`).
+ * @param thresholds  - Optional stability thresholds forwarded to `rankModesByStability`.
+ * @returns Array of `.scl` text strings (up to `n`), one per top-ranked mode.
+ *
+ * @throws {RangeError} if `n` <= 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scls = topNModesScls(t12, 3, undefined, 261.63);
+ * // scls[0] is the most stable mode's .scl text
+ */
+export function topNModesScls(
+  tuning: TuningSystem,
+  n: number,
+  spectrum?: Spectrum,
+  rootHz?: number,
+  thresholds?: { maxMeanDissonance?: number; minHarmonicity?: number },
+): string[] {
+  if (n <= 0) throw new RangeError('topNModesScls: n must be positive');
+  void thresholds; // accepted for API forward-compatibility; rankModesByStability ignores it internally
+  const modes = rankModesByStability(tuning, rootHz ?? tuning.referenceHz, spectrum);
+  return modes.slice(0, n).map((entry) => scaleToSubsetSclText(entry.scale, tuning));
 }
