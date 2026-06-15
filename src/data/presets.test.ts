@@ -13,6 +13,8 @@ import {
   presetBestChord,
   rankPresetsByReportSimilarity,
   comparePresets,
+  betterPreset,
+  presetProgressionNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -360,5 +362,43 @@ describe('comparePresets (Q222)', () => {
     const result = comparePresets('12-tet', 'just-5-limit', 261.63);
     expect(result).not.toBeUndefined();
     expect(typeof result?.comparison.harmonicityDistanceDiff).toBe('number');
+  });
+});
+
+// Q229 — betterPreset
+describe('betterPreset (Q229)', () => {
+  it('returns winner id which is one of the two inputs', () => {
+    const result = betterPreset('12-tet', 'just-5-limit', 261.63);
+    expect(['12-tet', 'just-5-limit']).toContain(result.winnerId);
+    expect(['12-tet', 'just-5-limit']).toContain(result.loserId);
+    expect(result.winnerId).not.toBe(result.loserId);
+  });
+
+  it('delta is non-negative', () => {
+    const result = betterPreset('12-tet', 'just-5-limit', 261.63);
+    expect(result.delta).toBeGreaterThanOrEqual(0);
+  });
+
+  it('metric is harmonicity or stability', () => {
+    const result = betterPreset('12-tet', 'just-5-limit', 261.63);
+    expect(['harmonicity', 'stability']).toContain(result.metric);
+  });
+
+  it('throws for invalid preset id', () => {
+    expect(() => betterPreset('nonexistent', 'just-5-limit', 261.63)).toThrow(RangeError);
+  });
+});
+
+// Q232 — presetProgressionNarrative
+describe('presetProgressionNarrative (Q232)', () => {
+  it('returns a non-empty string for 12-tet', () => {
+    const text = presetProgressionNarrative('12-tet', [0, 2, 4, 0], 261.63);
+    expect(text).toBeTruthy();
+    expect(text.length).toBeGreaterThan(10);
+  });
+
+  it('returns fallback for invalid preset', () => {
+    const text = presetProgressionNarrative('nonexistent', [0, 1], 261.63);
+    expect(text).toContain('nonexistent');
   });
 });

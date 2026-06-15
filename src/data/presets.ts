@@ -17,6 +17,7 @@ import {
   singleBestChord,
   tuningReportSimilarity,
   compareTuningReports,
+  progressionNarrative,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -971,4 +972,96 @@ export function comparePresets(
   const tuningB = loadTuningPreset(presetB);
   const comparison = compareTuningReports(tuningA, tuningB, rootHz ?? 440, spectrum);
   return { a: presetA, b: presetB, comparison };
+}
+
+/**
+ * Compare two presets and return only the winner's id in one call.
+ *
+ * Socratic Q229: "If comparePresets tells me which is better, can I get just the winner
+ * ID in one call?" → No → implement.
+ *
+ * Uses harmonicity as the primary metric; falls back to stability (mode count) when tied.
+ *
+ * @param idA      - Id of the first preset to compare.
+ * @param idB      - Id of the second preset to compare.
+ * @param rootHz   - Absolute frequency of the root in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ winnerId, loserId, metric, delta }`.
+ *
+ * @throws {RangeError} if either preset id is not found.
+ *
+ * @example
+ * const result = betterPreset('12-tet', 'just-5-limit', 261.63);
+ * // result.winnerId is 'just-5-limit' (better harmonicity)
+ */
+export function betterPreset(
+  idA: string,
+  idB: string,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): { winnerId: string; loserId: string; metric: 'harmonicity' | 'stability'; delta: number } {
+  const result = comparePresets(idA, idB, rootHz, spectrum, presets);
+  if (result === undefined) {
+    throw new RangeError(`betterPreset: one or both preset ids not found: '${idA}', '${idB}'`);
+  }
+
+  // Primary metric: harmonicity (lower = more harmonic / better)
+  const harmonicityA = result.comparison.a.bestMode.harmonicity;
+  const harmonicityB = result.comparison.b.bestMode.harmonicity;
+  const harmonicityDelta = Math.abs(harmonicityA - harmonicityB);
+  const harmonicityTol = 1e-9;
+
+  if (harmonicityDelta > harmonicityTol) {
+    const winnerId = harmonicityA < harmonicityB ? idA : idB;
+    const loserId = winnerId === idA ? idB : idA;
+    return { winnerId, loserId, metric: 'harmonicity', delta: harmonicityDelta };
+  }
+
+  // Fallback: stability (fewer modes in top rank = more stable; use mode degree count as proxy)
+  const stabilityA = result.comparison.a.degreeCount;
+  const stabilityB = result.comparison.b.degreeCount;
+  const stabilityDelta = Math.abs(stabilityA - stabilityB);
+
+  if (stabilityDelta > 0) {
+    // Lower degree count is treated as "more stable" (simpler structure)
+    const winnerId = stabilityA < stabilityB ? idA : idB;
+    const loserId = winnerId === idA ? idB : idA;
+    return { winnerId, loserId, metric: 'stability', delta: stabilityDelta };
+  }
+
+  // Still tied: return idA as arbitrary winner
+  return { winnerId: idA, loserId: idB, metric: 'harmonicity', delta: 0 };
+}
+
+/**
+ * Go from a preset id to a human-readable progression narrative in one call.
+ *
+ * Socratic Q232: "If I can get a preset progression and get a progression narrative,
+ * can I go preset→narrative in one call?" → No → implement.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param pattern  - Sequence of 0-based root degree indices (e.g. `[0, 2, 4, 0]`).
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns A descriptive narrative string for the progression.
+ *
+ * @example
+ * const text = presetProgressionNarrative('12-tet', [0, 2, 4, 0], 261.63);
+ * // "Progression of 4 chords; energy shape: ..."
+ */
+export function presetProgressionNarrative(
+  presetId: string,
+  pattern: number[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): string {
+  const chords = presetChordProgression(presetId, pattern, rootHz, spectrum, undefined, presets);
+  if (chords === undefined || chords.length === 0) {
+    return `No progression for preset ${presetId}.`;
+  }
+  return progressionNarrative(chords, rootHz, spectrum);
 }
