@@ -26,6 +26,8 @@ import {
   progressionFromPattern,
   rankChordMapByDissonance,
   scaleToChordMap,
+  rankAllModesForTimbre,
+  tuningToScale,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -860,4 +862,64 @@ export function optimalProgressionWavFromScale(
   const chords = chordMap.map((e) => e.chord);
   const { chords: ordered } = optimalChordOrder(chords, rootHz);
   return chordProgressionToWav(ordered, rootHz, effectiveSpectrum, opts);
+}
+
+/**
+ * Synthesize only the top-K modes of a tuning by combined timbre score as a WAV medley.
+ *
+ * Socratic Q155: "If we can rank all modes of a tuning for timbre, we should be able to
+ * export only the top-K modes as a WAV medley — can it?" Today: `rankAllModesForTimbre`
+ * → take first K → map each through `synthScaleFromScale` → concatenate → `encodeWav` —
+ * four explicit steps. If ranking and synthesis are first-class, "top-K modes as a single
+ * WAV" should be one call.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale spanning all degrees.
+ * 2. `rankAllModesForTimbre(fullScale, tuning, spectrum ?? harmonicSpectrum())` → ranked modes.
+ * 3. Take first K entries (best combined score).
+ * 4. For each mode: `synthScaleFromScale(mode.scale, tuning, pluckOpts ?? DEFAULT_KS)` → samples.
+ * 5. Concatenate all sample arrays → `encodeWav`.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param k        - Number of top modes to include (must be ≥ 1).
+ * @param spectrum - Optional instrument spectrum for mode ranking. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional Karplus-Strong + per-note duration options.
+ * @returns WAV bytes of the top-K modes concatenated as a medley.
+ *
+ * @throws {RangeError} if `k` < 1.
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const wav = topKModesWav(t12, 3, harmonicSpectrum());
+ * await fs.writeFile('top3-modes.wav', wav);
+ */
+export function topKModesWav(
+  tuning: TuningSystem,
+  k: number,
+  spectrum?: Spectrum,
+  opts: PluckScaleWavOptions = { ...DEFAULT_KS, noteSeconds: 0.5 },
+): Uint8Array {
+  if (!Number.isInteger(k) || k < 1) {
+    throw new RangeError(`topKModesWav: k must be an integer >= 1, got ${k}`);
+  }
+  if (tuning.degrees.length === 0) {
+    throw new RangeError('topKModesWav: tuning has no degrees');
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const fullScale = tuningToScale(tuning);
+  const ranked = rankAllModesForTimbre(fullScale, tuning, effectiveSpectrum);
+  const topK = ranked.slice(0, k);
+
+  const allSamples = topK.map((entry) => synthScaleFromScale(entry.scale, tuning, opts));
+
+  const totalLength = allSamples.reduce((sum, s) => sum + s.length, 0);
+  const combined = new Float32Array(totalLength);
+  let offset = 0;
+  for (const samples of allSamples) {
+    combined.set(samples, offset);
+    offset += samples.length;
+  }
+
+  return encodeWav(combined, opts.sampleRate);
 }

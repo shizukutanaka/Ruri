@@ -23,6 +23,7 @@ import {
   bestModeProgressionWav,
   worstNChordMapWav,
   optimalProgressionWavFromScale,
+  topKModesWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1206,5 +1207,59 @@ describe('optimalProgressionWavFromScale (Q147)', () => {
     const wavPenta = optimalProgressionWavFromScale(pentatonic, t12, rootHz, spectrum, fastOpts);
     // major has 7 chords, pentatonic has 5 chords → different WAV lengths
     expect(wavMajor.length).not.toBe(wavPenta.length);
+  });
+});
+
+// Q155 — topKModesWav: rank all modes for timbre, export top-K as a WAV medley
+describe('topKModesWav (Q155)', () => {
+  const t12 = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+  const fastOpts = {
+    ...DEFAULT_KS,
+    sampleRate: 8000,
+    noteSeconds: 0.05,
+    seconds: 0.15,
+  };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const wav = topKModesWav(t12, 3, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_k_less_than_1_throws_range_error', () => {
+    expect(() => topKModesWav(t12, 0, spectrum, fastOpts)).toThrow(RangeError);
+    expect(() => topKModesWav(t12, -1, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_tuning_with_no_degrees_throws_range_error', () => {
+    const empty = {
+      id: 'empty',
+      name: 'empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [] as [],
+      source: 'theoretical' as const,
+    };
+    expect(() => topKModesWav(empty, 1, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_k_1_returns_shorter_wav_than_k_3', () => {
+    const wav1 = topKModesWav(t12, 1, spectrum, fastOpts);
+    const wav3 = topKModesWav(t12, 3, spectrum, fastOpts);
+    expect(wav3.length).toBeGreaterThan(wav1.length);
+  });
+
+  it('test_default_spectrum_produces_valid_wav', () => {
+    const wav = topKModesWav(t12, 2, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const wav = topKModesWav(t12, 2, spectrum, { ...fastOpts, sampleRate: 22050 });
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
   });
 });
