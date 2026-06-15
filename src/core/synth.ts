@@ -2,6 +2,8 @@
 
 import { type Spectrum } from './spectrum.js';
 import { type Chord, realizeChordFreqs } from './chord.js';
+import { type Scale, scaleToFreqs } from './scale.js';
+import { type TuningSystem } from './tuning.js';
 
 const A4_HZ = 440;
 const A4_MIDI = 69;
@@ -60,4 +62,39 @@ export function detuneFromBase(
   const baseFreq = A4_HZ * 2 ** ((baseMidi - A4_MIDI) / 12);
   const detuneCents = 1200 * Math.log2(targetHz / baseFreq);
   return { baseFreq, detuneCents };
+}
+
+/**
+ * All Web Audio voices for a `Scale` sounded simultaneously, as a tone cluster.
+ *
+ * Socratic Q98: `voicesForChord(freqs, spectrum)` produces additive-synthesis
+ * voices from raw Hz[], and `scaleToFreqs(scale, tuning)` returns those Hz[].
+ * But going from a `Scale` object to Web Audio voices still requires two calls.
+ * If `Scale` is first-class, rendering it into synthesis voices should be one call.
+ *
+ * Bridges `scaleToFreqs → voicesForChord`. The resulting `Voice[]` is pure data
+ * (no Web Audio dependency) so it can be tested and passed to a Web Audio scheduler.
+ *
+ * @param scale - The scale whose degrees are all rendered into voices.
+ * @param tuning - The parent tuning the scale belongs to.
+ * @param spectrum - The timbre (partials) applied to each scale degree.
+ * @param gain - Per-voice gain multiplier (default 0.2).
+ * @returns Flat array of `Voice` objects ready to schedule on OscillatorNodes.
+ *
+ * @throws {RangeError} if the scale and tuning are incompatible.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'm', name: 'major', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const voices = scaleToVoices(major, t12, harmonicSpectrum());
+ * // voices.length === 7 * harmonicSpectrum().length
+ */
+export function scaleToVoices(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  gain = 0.2,
+): Voice[] {
+  const freqs = scaleToFreqs(scale, tuning);
+  return voicesForChord(freqs, spectrum, gain);
 }

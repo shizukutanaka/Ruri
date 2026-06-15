@@ -15,6 +15,7 @@ import {
 } from './chord-search.js';
 import { synthScale, type SynthScaleOptions, DEFAULT_SYNTH_SCALE } from './ks-synth.js';
 import { type Chord, chordFromDegrees } from './chord.js';
+import { chordPeriodicity } from './harmonicity.js';
 
 /**
  * A scale / mode / jins / raga: an ordered selection of degrees over a tuning.
@@ -582,4 +583,37 @@ export function scaleSimilarity(
   }
 
   return intersection / Math.max(totalA, totalB);
+}
+
+/**
+ * Stolzenburg periodicity of a scale sounded simultaneously as a chord.
+ *
+ * Socratic Q97: `harmonicityForChord(chord, rootHz)` scores a `Chord` object,
+ * and `scaleToFreqs(scale, tuning)` returns Hz[]. But going from a `Scale` to
+ * a single harmonicity score still requires converting to frequencies and then
+ * calling `chordPeriodicity` manually. If `Scale` is first-class, measuring its
+ * harmonicity should be one call.
+ *
+ * Bridges `scaleToFreqs → chordPeriodicity`. Lower return value = more harmonic.
+ * A pentatonic scale built from simple ratios returns a small value; a chromatic
+ * cluster returns a large one.
+ *
+ * @param scale - The scale whose degrees are treated as simultaneous pitches.
+ * @param tuning - The parent tuning the scale belongs to.
+ * @param tol - Continued-fraction tolerance (default 0.0136).
+ * @returns Relative periodicity ≥ 1, or `Infinity` for maximally inharmonic scales.
+ *
+ * @throws {RangeError} if the scale and tuning are incompatible, or the scale is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'm', name: 'major', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * scaleHarmonicity(major, t12); // periodicity of all 7 major-scale tones sounded together
+ */
+export function scaleHarmonicity(scale: Scale, tuning: TuningSystem, tol = 0.0136): number {
+  if (scale.degreeIndices.length === 0) {
+    throw new RangeError('scaleHarmonicity: scale must have at least one degree');
+  }
+  const freqs = scaleToFreqs(scale, tuning);
+  return chordPeriodicity(freqs, tol);
 }

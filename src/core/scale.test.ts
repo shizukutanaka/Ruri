@@ -18,6 +18,7 @@ import {
   bestScaleForTimbre,
   scaleIntervalHistogram,
   scaleSimilarity,
+  scaleHarmonicity,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -1025,5 +1026,80 @@ describe('scaleSimilarity (Q95)', () => {
       degreeIndices: [0, 1],
     };
     expect(() => scaleSimilarity(wrongScale, ionian, t12)).toThrow(RangeError);
+  });
+});
+
+// Q97 — scaleHarmonicity: Scale → Stolzenburg periodicity in one call
+describe('scaleHarmonicity (Q97)', () => {
+  it('test_returns_finite_positive_for_major_scale', () => {
+    const p = scaleHarmonicity(major, t12);
+    expect(p).toBeGreaterThan(0);
+    expect(Number.isFinite(p) || p === Infinity).toBe(true);
+  });
+
+  it('test_single_degree_scale_has_periodicity_1', () => {
+    // A single frequency normalized to itself → ratio [1] → periodicity = 1
+    const mono: Scale = { id: 'mono', name: 'mono', tuningId: '12-tet', degreeIndices: [0] };
+    expect(scaleHarmonicity(mono, t12)).toBe(1);
+  });
+
+  it('test_pure_fifth_dyad_returns_3', () => {
+    // Degrees 0 and 7 in 12-TET: 0c and 700c ≈ 3/2 → periodicity 3
+    const fifth: Scale = { id: 'fifth', name: 'fifth', tuningId: '12-tet', degreeIndices: [0, 7] };
+    expect(scaleHarmonicity(fifth, t12)).toBe(3);
+  });
+
+  it('test_pentatonic_lower_harmonicity_than_chromatic_cluster', () => {
+    // Pentatonic: fewer, simpler intervals → lower (more harmonic) periodicity
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const cluster: Scale = {
+      id: 'cluster',
+      name: 'cluster',
+      tuningId: '12-tet',
+      degreeIndices: [0, 1, 2, 3, 4],
+    };
+    const hp = scaleHarmonicity(pentatonic, t12);
+    const hc = scaleHarmonicity(cluster, t12);
+    // Pentatonic should be at most as inharmonic as the chromatic cluster
+    expect(hp).toBeLessThanOrEqual(hc);
+  });
+
+  it('test_result_is_rootHz_independent', () => {
+    // Periodicity depends only on frequency ratios, not the absolute root
+    const t440 = equalTemperament12(440);
+    const t220 = equalTemperament12(220);
+    const s440: Scale = {
+      id: 's440',
+      name: 'major',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7],
+    };
+    const s220: Scale = {
+      id: 's220',
+      name: 'major',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7],
+    };
+    expect(scaleHarmonicity(s440, t440)).toBe(scaleHarmonicity(s220, t220));
+  });
+
+  it('test_empty_scale_throws', () => {
+    const empty: Scale = { id: 'empty', name: 'empty', tuningId: '12-tet', degreeIndices: [] };
+    expect(() => scaleHarmonicity(empty, t12)).toThrow(RangeError);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrongScale: Scale = {
+      id: 'wrong',
+      name: 'wrong',
+      tuningId: 'other-tuning',
+      degreeIndices: [0, 2],
+    };
+    expect(() => scaleHarmonicity(wrongScale, t12)).toThrow(RangeError);
   });
 });

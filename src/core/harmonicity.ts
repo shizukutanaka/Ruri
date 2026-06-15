@@ -130,3 +130,37 @@ export function harmonicityForChord(chord: Chord, rootHz: number, tol = 0.0136):
   const freqs = realizeChordFreqs(chord, rootHz);
   return chordPeriodicity(freqs, tol);
 }
+
+/**
+ * Stolzenburg periodicity at each step of a chord progression.
+ *
+ * Socratic Q96: `harmonicityForChord(chord, rootHz)` scores one chord, but
+ * mapping it over a progression still requires a manual `chords.map(…)`.
+ * If chord harmonicity is first-class, measuring it across a progression
+ * should be one call — parallel to `progressionDissonanceCurve`.
+ *
+ * Returns `number[]` where each entry is the periodicity of the corresponding
+ * chord: lower = more harmonic (simpler integer ratios). A tonic major chord
+ * returns 15; a tritone substitution returns a much larger value.
+ *
+ * @param chords - Ordered list of chords (progression steps).
+ * @param rootHz - Absolute frequency of the root note shared by all chords (must be > 0).
+ * @param tol - Continued-fraction tolerance (default 0.0136).
+ * @returns Array of periodicity values, one per chord step.
+ *
+ * @throws {RangeError} if `rootHz` ≤ 0 or any chord has no intervals.
+ *
+ * @example
+ * const I   = chordFromRatios('I',   [[1,1],[5,4],[3,2]]);
+ * const IV  = chordFromRatios('IV',  [[1,1],[4,3],[5,3]]);
+ * const V7  = chordFromSemitones('V7', [0,4,7,10]);
+ * const curve = chordProgressionHarmonicity([I, IV, V7], 261.63);
+ * // curve[0] = 15 (tonic), curve[1] ≤ curve[2] (V7 most complex)
+ */
+export function chordProgressionHarmonicity(
+  chords: readonly Chord[],
+  rootHz: number,
+  tol = 0.0136,
+): number[] {
+  return chords.map((chord) => harmonicityForChord(chord, rootHz, tol));
+}

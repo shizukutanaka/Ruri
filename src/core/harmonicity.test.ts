@@ -12,6 +12,7 @@ import {
   relativePeriodicity,
   chordPeriodicity,
   harmonicityForChord,
+  chordProgressionHarmonicity,
 } from './harmonicity.js';
 import { chordFromRatios, chordFromSemitones, realizeChordFreqs } from './chord.js';
 
@@ -212,5 +213,63 @@ describe('harmonicityForChord (Q93)', () => {
       [3, 2],
     ]);
     expect(harmonicityForChord(chord, 220)).toBe(harmonicityForChord(chord, 880));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q96 — chordProgressionHarmonicity
+// ---------------------------------------------------------------------------
+
+describe('chordProgressionHarmonicity (Q96)', () => {
+  const root = 261.63;
+  const jiMaj = chordFromRatios('ji-major', [
+    [1, 1],
+    [5, 4],
+    [3, 2],
+  ]);
+  const dom7 = chordFromSemitones('dom7', [0, 4, 7, 10]);
+  const fifth = chordFromRatios('fifth', [
+    [1, 1],
+    [3, 2],
+  ]);
+
+  it('returns_one_value_per_chord', () => {
+    const curve = chordProgressionHarmonicity([jiMaj, dom7], root);
+    expect(curve.length).toBe(2);
+  });
+
+  it('tonic_major_triad_is_15', () => {
+    const curve = chordProgressionHarmonicity([jiMaj], root);
+    expect(curve[0]).toBe(15);
+  });
+
+  it('matches_individual_harmonicityForChord_calls', () => {
+    const curve = chordProgressionHarmonicity([jiMaj, fifth, dom7], root);
+    expect(curve[0]).toBe(harmonicityForChord(jiMaj, root));
+    expect(curve[1]).toBe(harmonicityForChord(fifth, root));
+    expect(curve[2]).toBe(harmonicityForChord(dom7, root));
+  });
+
+  it('simple_chord_has_lower_periodicity_than_complex', () => {
+    const curve = chordProgressionHarmonicity([fifth, dom7], root);
+    // Perfect fifth (periodicity 3) is simpler than dominant 7th
+    expect(curve[0]).toBeLessThan(curve[1]!);
+  });
+
+  it('empty_progression_returns_empty_array', () => {
+    const curve = chordProgressionHarmonicity([], root);
+    expect(curve).toEqual([]);
+  });
+
+  it('all_values_are_positive', () => {
+    const curve = chordProgressionHarmonicity([jiMaj, fifth, dom7], root);
+    for (const p of curve) {
+      expect(p).toBeGreaterThan(0);
+    }
+  });
+
+  it('invalid_rootHz_throws', () => {
+    expect(() => chordProgressionHarmonicity([jiMaj], 0)).toThrow(RangeError);
+    expect(() => chordProgressionHarmonicity([jiMaj], -1)).toThrow(RangeError);
   });
 });

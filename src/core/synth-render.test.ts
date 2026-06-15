@@ -218,8 +218,10 @@ describe('strikeChord — modal chord synthesis in one call (Q47)', () => {
 });
 
 // Q52: `voicesForChord` は Hz[] を要求するが Chord を直接渡せるか？
-import { voicesForChord, voicesForPitch, voicesForChordObject } from './synth.js';
+import { voicesForChord, voicesForPitch, voicesForChordObject, scaleToVoices } from './synth.js';
 import { chordFromSemitones } from './chord.js';
+import { type Scale } from './scale.js';
+import { equalTemperament12, degreeToFreq } from './tuning.js';
 
 describe('voicesForChordObject — Chord → Web Audio voices (Q52)', () => {
   const spectrum = harmonicSpectrum(4);
@@ -318,5 +320,74 @@ describe('synthScale — scale as melodic sequence (Q57)', () => {
     const audio = synthScale([440, 550], opts);
     const samplesPerNote = Math.floor(opts.sampleRate * opts.seconds); // clamped
     expect(audio.length).toBe(samplesPerNote * 2);
+  });
+});
+
+// Q98: Scale → Web Audio voices in one call (scaleToVoices)
+describe('scaleToVoices — Scale → Web Audio voices (Q98)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'major',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum(4);
+
+  it('test_voice_count_equals_scale_degrees_times_partials', () => {
+    const voices = scaleToVoices(major, t12, spectrum);
+    expect(voices.length).toBe(major.degreeIndices.length * spectrum.length);
+  });
+
+  it('test_all_voices_have_positive_freq_and_gain', () => {
+    const voices = scaleToVoices(major, t12, spectrum);
+    for (const v of voices) {
+      expect(v.freq).toBeGreaterThan(0);
+      expect(v.gain).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_matches_voicesForChord_on_same_freqs', () => {
+    const voices = scaleToVoices(major, t12, spectrum);
+    // Use degreeToFreq to build the expected voices without accessing internals
+    const freqs = [0, 2, 4, 5, 7, 9, 11].map((d) => degreeToFreq(t12, d));
+    const expected = voicesForChord(freqs, spectrum);
+    expect(voices.length).toBe(expected.length);
+    for (let i = 0; i < voices.length; i++) {
+      expect((voices[i] as { freq: number }).freq).toBeCloseTo(
+        (expected[i] as { freq: number }).freq,
+        6,
+      );
+    }
+  });
+
+  it('test_gain_parameter_scales_all_voices', () => {
+    const v1 = scaleToVoices(major, t12, spectrum, 0.1);
+    const v2 = scaleToVoices(major, t12, spectrum, 0.2);
+    for (let i = 0; i < v1.length; i++) {
+      expect((v2[i] as { gain: number }).gain).toBeCloseTo(2 * (v1[i] as { gain: number }).gain, 6);
+    }
+  });
+
+  it('test_single_degree_scale_matches_voicesForPitch', () => {
+    const mono: Scale = { id: 'mono', name: 'mono', tuningId: '12-tet', degreeIndices: [0] };
+    const voices = scaleToVoices(mono, t12, spectrum);
+    const expected = voicesForPitch(degreeToFreq(t12, 0), spectrum);
+    expect(voices.length).toBe(expected.length);
+    for (let i = 0; i < voices.length; i++) {
+      expect((voices[i] as { freq: number }).freq).toBeCloseTo(
+        (expected[i] as { freq: number }).freq,
+        6,
+      );
+    }
+  });
+
+  it('test_bell_spectrum_works', () => {
+    const voices = scaleToVoices(major, t12, bellSpectrum());
+    expect(voices.length).toBe(major.degreeIndices.length * bellSpectrum().length);
+    for (const v of voices) {
+      expect(Number.isFinite(v.freq)).toBe(true);
+      expect(Number.isFinite(v.gain)).toBe(true);
+    }
   });
 });
