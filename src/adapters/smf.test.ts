@@ -16,6 +16,7 @@ import {
   presetProgressionSmf,
   bestChordMapSmf,
   bestTuningChordSmf,
+  topNModesSmf,
 } from './smf.js';
 import { chordFromSemitones, chordFromRatios } from '../core/chord.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -682,5 +683,26 @@ describe('bestTuningChordSmf (Q157)', () => {
       }
     }
     expect(differs || midi12.length !== midi19.length).toBe(true);
+  });
+});
+
+describe('topNModesSmf (Q236)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns n SMF Uint8Arrays', () => {
+    const smfs = topNModesSmf(t12, 3);
+    expect(smfs).toHaveLength(3);
+    smfs.forEach((s) => {
+      expect(s).toBeInstanceOf(Uint8Array);
+      expect(s.length).toBeGreaterThan(14);
+    });
+  });
+  it('clamps to available mode count', () => {
+    const smfs = topNModesSmf(t12, 999);
+    expect(smfs.length).toBeGreaterThan(0);
+    expect(smfs.length).toBeLessThanOrEqual(t12.degrees.length);
+  });
+  it('throws for n <= 0', () => {
+    expect(() => topNModesSmf(t12, 0)).toThrow(RangeError);
   });
 });

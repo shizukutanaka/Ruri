@@ -12,6 +12,7 @@ import {
   chordMapAnalysis,
   bestModeForTuning,
   bestChordMapEntry,
+  rankModesByStability,
 } from '../core/scale.js';
 import { type TuningSystem } from '../core/tuning.js';
 import { type ChordSearchOptions } from '../core/chord-search.js';
@@ -661,4 +662,38 @@ export function bestTuningChordSmf(
   const mode = bestModeForTuning(tuning, spectrum);
   const entry = bestChordMapEntry(mode, tuning, effectiveSpectrum);
   return chordToSmf(entry.chord, tuning.referenceHz, opts);
+}
+
+/**
+ * Get the top-N modes ranked by stability and export each as an SMF in one call.
+ *
+ * Socratic Q236: "If I can get top-N mode SCLs and also encode a Scale as MIDI, can I get
+ * top-N mode SMFs in one call?" → No → implement.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param n        - Number of top modes to return (must be > 0).
+ * @param rootHz   - Root frequency in Hz (used for stability ranking). Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for ranking.
+ * @param opts     - Optional SMF encoding options.
+ * @returns Array of SMF `Uint8Array`s, one per mode, in stability order (most stable first).
+ *
+ * @throws {RangeError} if `n` <= 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const smfs = topNModesSmf(t12, 3);
+ * for (const [i, smf] of smfs.entries()) await fs.writeFile(`mode-${i}.mid`, smf);
+ */
+export function topNModesSmf(
+  tuning: TuningSystem,
+  n: number,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  opts?: SmfOptions,
+): Uint8Array[] {
+  if (n <= 0) throw new RangeError('topNModesSmf: n must be positive');
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const modes = rankModesByStability(tuning, effectiveRootHz, spectrum);
+  const selected = modes.slice(0, n);
+  return selected.map((entry) => scaleToSmf(entry.scale, tuning, effectiveRootHz, opts));
 }
