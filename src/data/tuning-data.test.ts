@@ -14,6 +14,7 @@ import {
   presetToMtsAndSmf,
   closestPreset,
   tuningToClosestPresetScale,
+  rankPresetsByBestMode,
 } from './presets.js';
 import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
@@ -522,5 +523,46 @@ describe('tuningToClosestPresetScale (Q152)', () => {
     const t12 = equalTemperament12(440);
     const scale = tuningToClosestPresetScale(t12);
     expect(scale!.id).toContain('scale');
+  });
+});
+
+// Q163 — rankPresetsByBestMode: map each preset → bestModeForTuning → scaleHarmonicity → ranked
+describe('rankPresetsByBestMode (Q163)', () => {
+  it('test_returns_one_entry_per_preset', () => {
+    const ranked = rankPresetsByBestMode();
+    expect(ranked.length).toBe(ALL_PRESETS.length);
+  });
+
+  it('test_entries_sorted_by_harmonicity_ascending', () => {
+    const ranked = rankPresetsByBestMode();
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.harmonicity).toBeGreaterThanOrEqual(ranked[i - 1]!.harmonicity);
+    }
+  });
+
+  it('test_each_entry_has_preset_mode_and_harmonicity', () => {
+    const ranked = rankPresetsByBestMode();
+    for (const entry of ranked) {
+      expect(entry.preset).toBeDefined();
+      expect(entry.mode).toBeDefined();
+      expect(typeof entry.harmonicity).toBe('number');
+      expect(entry.harmonicity).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_with_spectrum_still_returns_all_presets', () => {
+    const spectrum = harmonicSpectrum();
+    const ranked = rankPresetsByBestMode(spectrum);
+    expect(ranked.length).toBe(ALL_PRESETS.length);
+  });
+
+  it('test_custom_preset_pool_limits_results', () => {
+    const ranked = rankPresetsByBestMode(undefined, [TWELVE_TET, JUST_INTONATION_5L]);
+    expect(ranked.length).toBe(2);
+  });
+
+  it('test_just_intonation_has_finite_harmonicity', () => {
+    const ranked = rankPresetsByBestMode(undefined, [JUST_INTONATION_5L]);
+    expect(Number.isFinite(ranked[0]!.harmonicity)).toBe(true);
   });
 });

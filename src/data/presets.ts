@@ -6,7 +6,13 @@ import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { tuningToScl, writeScl } from '../adapters/scala.js';
 import { tuningToMts, type TuningToMtsOptions } from '../adapters/mts.js';
 import { progressionToSmf, type ProgressionToSmfOptions } from '../adapters/smf.js';
-import { tuningToScale, progressionFromPattern } from '../core/scale.js';
+import {
+  tuningToScale,
+  progressionFromPattern,
+  bestModeForTuning,
+  scaleHarmonicity,
+  type Scale,
+} from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
 import { type Spectrum } from '../core/spectrum.js';
 
@@ -395,4 +401,42 @@ export function tuningToClosestPresetScale(
   if (preset === undefined) return undefined;
   const closestTuning = loadTuningPreset(preset);
   return tuningToScale(closestTuning);
+}
+
+/**
+ * Rank all presets by the harmonicity of their best mode, most harmonic first.
+ *
+ * Socratic Q163: "If we can find the best mode for a tuning, finding the best mode for
+ * EVERY preset should be one call that returns a ranked list — can it?" Today: iterate
+ * `ALL_PRESETS` → `loadTuningPreset` → `bestModeForTuning` → `scaleHarmonicity` → sort.
+ * If presets are truly first-class, ranking them by best-mode harmonicity should be one call.
+ *
+ * Algorithm:
+ * 1. For each preset: `loadTuningPreset(preset)` → `TuningSystem`.
+ * 2. `bestModeForTuning(tuning, spectrum)` → best modal `Scale`.
+ * 3. `scaleHarmonicity(mode, tuning)` → harmonicity score (lower = more harmonic).
+ * 4. Sort by harmonicity ascending (most harmonic = best first).
+ *
+ * @param spectrum - Optional instrument spectrum for timbre-aware mode ranking.
+ *                   When omitted, uses harmonicity only (timbre-independent).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ preset, mode, harmonicity }` sorted by harmonicity ascending.
+ *
+ * @example
+ * const ranked = rankPresetsByBestMode();
+ * // ranked[0].preset is the preset whose best mode has the simplest integer ratios
+ * const ranked2 = rankPresetsByBestMode(harmonicSpectrum());
+ * // ranked2[0] uses timbre-aware mode selection
+ */
+export function rankPresetsByBestMode(
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Array<{ preset: TuningPreset; mode: Scale; harmonicity: number }> {
+  const entries = presets.map((preset) => {
+    const tuning = loadTuningPreset(preset);
+    const mode = bestModeForTuning(tuning, spectrum);
+    const harmonicity = scaleHarmonicity(mode, tuning);
+    return { preset, mode, harmonicity };
+  });
+  return entries.sort((a, b) => a.harmonicity - b.harmonicity);
 }
