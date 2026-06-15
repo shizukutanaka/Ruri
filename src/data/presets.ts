@@ -364,3 +364,35 @@ export function closestPreset(
   }
   return bestPreset;
 }
+
+/**
+ * Convert a `TuningSystem` to the `Scale` of its closest matching preset in one call.
+ *
+ * Socratic Q152: "If we can find the closest preset to a tuning, converting that tuning
+ * to the closest preset's scale should also be one call — can it?" Today: `closestPreset`
+ * → `loadTuningPreset` → `tuningToScale` — three steps. If the preset layer is first-class,
+ * mapping any arbitrary tuning to its nearest preset's full scale should be one call.
+ *
+ * Algorithm:
+ * 1. `closestPreset(tuning, presets)` → closest `TuningPreset`.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningToScale(closestTuning)` → `Scale`.
+ *
+ * @param tuning  - The target `TuningSystem` to match.
+ * @param presets - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `Scale` of the closest preset, or `undefined` if `presets` is empty.
+ *
+ * @example
+ * const myTuning = edo(12);
+ * const scale = tuningToClosestPresetScale(myTuning);
+ * // scale is the full Scale of TWELVE_TET (the closest preset to 12-EDO)
+ */
+export function tuningToClosestPresetScale(
+  tuning: TuningSystem,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningToScale> | undefined {
+  const preset = closestPreset(tuning, presets);
+  if (preset === undefined) return undefined;
+  const closestTuning = loadTuningPreset(preset);
+  return tuningToScale(closestTuning);
+}

@@ -13,6 +13,7 @@ import {
   presetChordProgression,
   presetToMtsAndSmf,
   closestPreset,
+  tuningToClosestPresetScale,
 } from './presets.js';
 import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
@@ -476,5 +477,50 @@ describe('closestPreset (Q149)', () => {
     const slendroTuning = loadTuningPreset(SLENDRO_EXAMPLE);
     const result = closestPreset(slendroTuning, [TWELVE_TET, SLENDRO_EXAMPLE]);
     expect(result!.id).toBe('slendro-example');
+  });
+});
+
+// Q152 — tuningToClosestPresetScale: tuning → closest preset's Scale in one call
+describe('tuningToClosestPresetScale (Q152)', () => {
+  it('test_returns_scale_for_12_edo_input', () => {
+    const t12 = equalTemperament12(440);
+    const scale = tuningToClosestPresetScale(t12);
+    expect(scale).toBeDefined();
+    expect(scale!.tuningId).toBe('12-tet');
+    expect(scale!.degreeIndices.length).toBeGreaterThan(0);
+  });
+
+  it('test_returns_undefined_for_empty_preset_pool', () => {
+    const t12 = equalTemperament12(440);
+    const result = tuningToClosestPresetScale(t12, []);
+    expect(result).toBeUndefined();
+  });
+
+  it('test_returned_scale_spans_all_degrees_of_closest_preset', () => {
+    const t12 = equalTemperament12(440);
+    const scale = tuningToClosestPresetScale(t12);
+    expect(scale).toBeDefined();
+    const closestTuning = loadTuningPreset(TWELVE_TET);
+    expect(scale!.degreeIndices.length).toBe(closestTuning.degrees.length);
+  });
+
+  it('test_slendro_returns_scale_for_slendro_preset', () => {
+    const slendroTuning = loadTuningPreset(SLENDRO_EXAMPLE);
+    const scale = tuningToClosestPresetScale(slendroTuning, [TWELVE_TET, SLENDRO_EXAMPLE]);
+    expect(scale).toBeDefined();
+    expect(scale!.tuningId).toBe('slendro-example');
+  });
+
+  it('test_custom_single_preset_pool_always_returns_scale_for_that_preset', () => {
+    const t12 = equalTemperament12(440);
+    const scale = tuningToClosestPresetScale(t12, [MAKAM_USSAK]);
+    expect(scale).toBeDefined();
+    expect(scale!.tuningId).toBe('makam-ussak-example');
+  });
+
+  it('test_scale_id_has_expected_format', () => {
+    const t12 = equalTemperament12(440);
+    const scale = tuningToClosestPresetScale(t12);
+    expect(scale!.id).toContain('scale');
   });
 });
