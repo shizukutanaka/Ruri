@@ -12,6 +12,7 @@ import {
   scaleAnalysisBundle,
   sclDistance,
   scaleToSubsetScl,
+  scaleToSubsetSclText,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -571,5 +572,48 @@ describe('scaleToSubsetScl (Q188)', () => {
     const subsetScl = scaleToSubsetScl(major, t12);
     const fullScl = tuningToScl(t12);
     expect(subsetScl.degrees.length).toBeLessThan(fullScl.degrees.length);
+  });
+});
+
+// Q195 — scaleToSubsetSclText
+describe('scaleToSubsetSclText (Q195)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_a_string', () => {
+    const text = scaleToSubsetSclText(major, t12);
+    expect(typeof text).toBe('string');
+  });
+
+  it('test_output_is_valid_scl_parseable', () => {
+    const text = scaleToSubsetSclText(major, t12);
+    const parsed = parseScl(text);
+    expect(parsed.degrees.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_matches_writeScl_of_scaleToSubsetScl', () => {
+    const text = scaleToSubsetSclText(major, t12);
+    const expected = writeScl(scaleToSubsetScl(major, t12));
+    expect(text).toBe(expected);
+  });
+
+  it('test_custom_name_appears_in_output', () => {
+    const text = scaleToSubsetSclText(major, t12, 'my-scale');
+    expect(text).toContain('my-scale');
+  });
+
+  it('test_incompatible_tuning_throws', () => {
+    const wrongScale: Scale = { id: 'x', name: 'X', tuningId: 'other', degreeIndices: [0, 1] };
+    expect(() => scaleToSubsetSclText(wrongScale, t12)).toThrow(RangeError);
+  });
+
+  it('test_output_ends_with_newline', () => {
+    const text = scaleToSubsetSclText(major, t12);
+    expect(text.endsWith('\n')).toBe(true);
   });
 });

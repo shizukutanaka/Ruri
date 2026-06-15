@@ -402,3 +402,32 @@ export function scaleToSubsetScl(scale: Scale, tuning: TuningSystem, name?: stri
   const scl = tuningToScl(minimal);
   return { ...scl, description: name ?? scale.name };
 }
+
+/**
+ * Export a scale's subset pitch classes directly as a Scala `.scl` text string in one call.
+ *
+ * Socratic Q195: "If we can export a scale as a subset .scl file, we should be able to export
+ * it as a subset Scala STRING directly — can it?" Today: `scaleToSubsetScl(scale, tuning, name)`
+ * → `writeScl(result)` — two explicit steps. If a scale's Scala text is first-class, producing
+ * it should be one call.
+ *
+ * Algorithm:
+ * 1. `scaleToSubsetScl(scale, tuning, name)` → `ScalaScale` with only the scale's degrees.
+ * 2. `writeScl(result)` → `.scl` text string.
+ *
+ * @param scale  - The scale to export. Must be compatible with `tuning`.
+ * @param tuning - The parent `TuningSystem` to pick degrees from.
+ * @param name   - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns A `.scl` text string ready to write to disk.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const text = scaleToSubsetSclText(major, t12);
+ * fs.writeFileSync('major-subset.scl', text);
+ */
+export function scaleToSubsetSclText(scale: Scale, tuning: TuningSystem, name?: string): string {
+  return writeScl(scaleToSubsetScl(scale, tuning, name));
+}
