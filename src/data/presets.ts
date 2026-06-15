@@ -3,6 +3,8 @@
 import { type TuningSystem } from '../core/tuning.js';
 import { rankChords, type RankedChord, type ChordSearchOptions } from '../core/chord-search.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
+import { tuningToScl, writeScl } from '../adapters/scala.js';
+import { tuningToMts, type TuningToMtsOptions } from '../adapters/mts.js';
 
 const SEMI = 100;
 
@@ -147,4 +149,70 @@ export function rankChordsFromPreset(
   const tuning = getTuningById(presetId, presets);
   if (tuning === undefined) return undefined;
   return rankChords(tuning, opts);
+}
+
+/**
+ * Look up a preset by id and export it as a Scala `.scl` text string in one call.
+ *
+ * Socratic Q108: `getTuningById(id)` → `tuningToScl(tuning)` → `writeScl(scl)` is
+ * a three-step pipeline. If presets are truly first-class entry points, getting the
+ * Scala representation of a named tuning should be one call — not a manual chain
+ * every caller must write.
+ *
+ * Returns `undefined` if the preset id is not found (same semantics as
+ * `getTuningById`).
+ *
+ * Available ids: `'12-tet'`, `'just-5-limit'`, `'makam-ussak-example'`,
+ * `'slendro-example'`, `'pelog-example'`.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns A `.scl` text string ready to write to disk, or `undefined` if not found.
+ *
+ * @example
+ * const scl = presetToScl('just-5-limit');
+ * if (scl) fs.writeFileSync('just5.scl', scl);
+ */
+export function presetToScl(
+  presetId: string,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): string | undefined {
+  const tuning = getTuningById(presetId, presets);
+  if (tuning === undefined) return undefined;
+  return writeScl(tuningToScl(tuning));
+}
+
+/**
+ * Look up a preset by id and export it as a 408-byte MTS bulk tuning dump SysEx
+ * message in one call.
+ *
+ * Socratic Q109: `getTuningById(id)` → `tuningToMts(tuning, name, opts)` is a
+ * two-step pipeline. If presets are truly first-class entry points, encoding a named
+ * tuning as MTS SysEx should be one call — not a manual sequence every caller writes.
+ *
+ * Returns `undefined` if the preset id is not found (same semantics as
+ * `getTuningById`).
+ *
+ * Available ids: `'12-tet'`, `'just-5-limit'`, `'makam-ussak-example'`,
+ * `'slendro-example'`, `'pelog-example'`.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param name     - Optional tuning name for the SysEx header (defaults to preset id).
+ * @param opts     - Optional MTS options (device ID, program, anchor MIDI note, A4 Hz).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns A 408-byte `Uint8Array` ready to send via SysEx, or `undefined` if not found.
+ *
+ * @example
+ * const mts = presetToMts('makam-ussak-example');
+ * if (mts) port.send(mts);
+ */
+export function presetToMts(
+  presetId: string,
+  name?: string,
+  opts?: TuningToMtsOptions,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Uint8Array | undefined {
+  const tuning = getTuningById(presetId, presets);
+  if (tuning === undefined) return undefined;
+  return tuningToMts(tuning, name, opts);
 }

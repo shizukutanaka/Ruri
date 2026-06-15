@@ -7,6 +7,8 @@ import {
   JUST_INTONATION_5L,
   getTuningById,
   rankChordsFromPreset,
+  presetToScl,
+  presetToMts,
 } from './presets.js';
 import { degreeToCents } from '../core/tuning.js';
 
@@ -239,5 +241,98 @@ describe('rankChordsFromPreset (Q102)', () => {
     const chords = rankChordsFromPreset('slendro-example', { size: 3 });
     expect(chords).toBeDefined();
     expect((chords as unknown[]).length).toBeGreaterThan(0);
+  });
+});
+
+// Q108 — presetToScl: preset id → .scl text string in one call
+describe('presetToScl (Q108)', () => {
+  it('test_known_id_returns_scl_string', () => {
+    const scl = presetToScl('12-tet');
+    expect(typeof scl).toBe('string');
+    expect(scl).toContain('12-tet');
+  });
+
+  it('test_unknown_id_returns_undefined', () => {
+    expect(presetToScl('does-not-exist')).toBeUndefined();
+  });
+
+  it('test_scl_string_is_valid_scala_format', () => {
+    const scl = presetToScl('just-5-limit');
+    expect(scl).toBeDefined();
+    // Scala .scl must start with "!" comment
+    expect(scl!).toMatch(/^!/);
+    // Must have a degree count line (a number)
+    const lines = scl!.split('\n').filter((l) => !l.startsWith('!') && l.trim() !== '');
+    const count = Number.parseInt(lines[1] as string, 10);
+    expect(Number.isInteger(count)).toBe(true);
+    expect(count).toBeGreaterThan(0);
+  });
+
+  it('test_makam_scl_contains_neutral_second_cents', () => {
+    const scl = presetToScl('makam-ussak-example');
+    expect(scl).toBeDefined();
+    // ~181c neutral second should appear as cents in the .scl output
+    expect(scl!).toContain('181.');
+  });
+
+  it('test_all_preset_ids_produce_scl', () => {
+    for (const preset of ALL_PRESETS) {
+      const scl = presetToScl(preset.id);
+      expect(scl).toBeDefined();
+      expect(typeof scl).toBe('string');
+      expect((scl as string).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_custom_preset_pool_can_be_supplied', () => {
+    const custom = [JUST_INTONATION_5L];
+    const found = presetToScl('just-5-limit', custom);
+    expect(found).toBeDefined();
+    const notFound = presetToScl('12-tet', custom);
+    expect(notFound).toBeUndefined();
+  });
+});
+
+// Q109 — presetToMts: preset id → 408-byte MTS SysEx in one call
+describe('presetToMts (Q109)', () => {
+  it('test_known_id_returns_uint8array', () => {
+    const mts = presetToMts('12-tet');
+    expect(mts).toBeInstanceOf(Uint8Array);
+    expect(mts!.length).toBe(408);
+  });
+
+  it('test_unknown_id_returns_undefined', () => {
+    expect(presetToMts('does-not-exist')).toBeUndefined();
+  });
+
+  it('test_sysex_starts_with_f0_and_ends_with_f7', () => {
+    const mts = presetToMts('just-5-limit');
+    expect(mts).toBeDefined();
+    expect(mts![0]).toBe(0xf0);
+    expect(mts![407]).toBe(0xf7);
+  });
+
+  it('test_name_parameter_appears_in_sysex_header', () => {
+    const mts = presetToMts('12-tet', 'MyTuning');
+    expect(mts).toBeDefined();
+    // The name occupies bytes 6..21 (16 bytes of ASCII). 'M' = 0x4D.
+    expect(mts![6]).toBe('M'.charCodeAt(0));
+    expect(mts![7]).toBe('y'.charCodeAt(0));
+  });
+
+  it('test_all_preset_ids_produce_mts', () => {
+    for (const preset of ALL_PRESETS) {
+      const mts = presetToMts(preset.id);
+      expect(mts).toBeDefined();
+      expect((mts as Uint8Array).length).toBe(408);
+    }
+  });
+
+  it('test_custom_preset_pool_can_be_supplied', () => {
+    const custom = [MAKAM_USSAK];
+    const found = presetToMts('makam-ussak-example', undefined, undefined, custom);
+    expect(found).toBeDefined();
+    const notFound = presetToMts('12-tet', undefined, undefined, custom);
+    expect(notFound).toBeUndefined();
   });
 });

@@ -22,6 +22,7 @@ import {
   scaleProgressionHarmonicity,
   buildChordProgression,
   scaleModeSeries,
+  rankModeSeriesByHarmonicity,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -1317,5 +1318,60 @@ describe('scaleModeSeries — all modal rotations as Scale[] in one call (Q106)'
   it('test_mismatched_tuning_throws_range_error', () => {
     const wrongTuning = edo(19);
     expect(() => scaleModeSeries(major, wrongTuning)).toThrow(RangeError);
+  });
+});
+
+// Q110 — rankModeSeriesByHarmonicity: all modal rotations ranked by Stolzenburg periodicity
+describe('rankModeSeriesByHarmonicity (Q110)', () => {
+  it('test_returns_one_entry_per_mode', () => {
+    const ranked = rankModeSeriesByHarmonicity(major, t12);
+    expect(ranked.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_sorted_ascending_by_harmonicity', () => {
+    const ranked = rankModeSeriesByHarmonicity(major, t12);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.harmonicity).toBeGreaterThanOrEqual(ranked[i - 1]!.harmonicity);
+    }
+  });
+
+  it('test_each_entry_has_modeIndex_and_scale_and_harmonicity', () => {
+    const ranked = rankModeSeriesByHarmonicity(major, t12);
+    for (const entry of ranked) {
+      expect(typeof entry.modeIndex).toBe('number');
+      expect(entry.modeIndex).toBeGreaterThanOrEqual(0);
+      expect(entry.modeIndex).toBeLessThan(major.degreeIndices.length);
+      expect(entry.scale).toBeDefined();
+      expect(typeof entry.harmonicity).toBe('number');
+      expect(entry.harmonicity).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('test_covers_all_mode_indices', () => {
+    const ranked = rankModeSeriesByHarmonicity(major, t12);
+    const indices = new Set(ranked.map((r) => r.modeIndex));
+    for (let i = 0; i < major.degreeIndices.length; i++) {
+      expect(indices.has(i)).toBe(true);
+    }
+  });
+
+  it('test_scale_in_entry_matches_scaleMode', () => {
+    const ranked = rankModeSeriesByHarmonicity(major, t12);
+    for (const entry of ranked) {
+      const expected = scaleMode(major, entry.modeIndex, t12);
+      expect(entry.scale.degreeIndices).toEqual(expected.degreeIndices);
+    }
+  });
+
+  it('test_harmonicity_matches_scaleHarmonicity', () => {
+    const ranked = rankModeSeriesByHarmonicity(major, t12);
+    for (const entry of ranked) {
+      expect(entry.harmonicity).toBeCloseTo(scaleHarmonicity(entry.scale, t12), 10);
+    }
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    const wrongTuning = edo(19);
+    expect(() => rankModeSeriesByHarmonicity(major, wrongTuning)).toThrow(RangeError);
   });
 });

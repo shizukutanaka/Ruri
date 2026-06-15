@@ -728,3 +728,54 @@ export function buildChordProgression(
     throw new RangeError('buildChordProgression: pattern must be non-empty');
   return pattern.map((offsets, i) => chordFromScale(scale, tuning, offsets, `${name}-${i + 1}`));
 }
+
+/** One entry in the ranked-modes-by-harmonicity leaderboard returned by `rankModeSeriesByHarmonicity`. */
+export interface RankedModeByHarmonicity {
+  /** The modal rotation (result of `scaleMode`). */
+  readonly scale: Scale;
+  /** The rotation index (0 = original, 1 = starting from second degree, …). */
+  readonly modeIndex: number;
+  /** Stolzenburg relative periodicity — lower = simpler integer ratios = more harmonic. */
+  readonly harmonicity: number;
+}
+
+/**
+ * Rank all modal rotations of a scale by Stolzenburg harmonicity, most harmonic first.
+ *
+ * Socratic Q110: `rankModes(scale, tuning, spectrum)` ranks modes by Sethares sensory
+ * dissonance — timbre-dependent. But there is no one-call equivalent that sorts modes by
+ * *harmonicity* (Stolzenburg periodicity): the caller must call `scaleModeSeries`, then
+ * map each mode through `scaleHarmonicity`, then sort — three steps. If modes are first-class,
+ * "which rotation is most just-intonation-friendly?" should be one call.
+ *
+ * Parallels `rankModes` but uses periodicity (Stolzenburg) rather than sensory dissonance
+ * (Sethares/Plomp-Levelt). Lower `harmonicity` = simpler integer ratios = more harmonic.
+ *
+ * @param scale  - The parent scale to rotate.
+ * @param tuning - The parent `TuningSystem` the scale belongs to.
+ * @param tol    - Continued-fraction tolerance (default 0.0136).
+ * @returns Array sorted by `harmonicity` ascending (most harmonic first).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const ranked = rankModeSeriesByHarmonicity(major, t12);
+ * // ranked[0].scale is the modal rotation with the simplest collective integer ratios
+ */
+export function rankModeSeriesByHarmonicity(
+  scale: Scale,
+  tuning: TuningSystem,
+  tol = 0.0136,
+): RankedModeByHarmonicity[] {
+  assertTuningMatch(scale, tuning);
+  return scaleModeSeries(scale, tuning)
+    .map((mode, modeIndex) => ({
+      scale: mode,
+      modeIndex,
+      harmonicity: scaleHarmonicity(mode, tuning, tol),
+    }))
+    .sort((a, b) => a.harmonicity - b.harmonicity);
+}
