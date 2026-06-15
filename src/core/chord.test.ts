@@ -7,6 +7,7 @@ import {
   chordToCents,
   chordToCentOffsets,
   realizeChordFreqs,
+  realizedFreqIntervalMatrix,
 } from './chord.js';
 import { equalTemperament12, edo } from './tuning.js';
 import { guitarStandard } from './instrument.js';
@@ -206,5 +207,66 @@ describe('chordFromDegrees — microtonal chord factory from tuning degrees', ()
   it('test_single_degree_gives_unison_chord', () => {
     const chord = chordFromDegrees(t12, [5]);
     expect(chordToCents(chord)).toEqual([0]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q84 — realizedFreqIntervalMatrix
+// ---------------------------------------------------------------------------
+
+describe('realizedFreqIntervalMatrix (Q84)', () => {
+  it('test_diagonal_is_zero', () => {
+    const m = realizedFreqIntervalMatrix([261.63, 329.63, 392.0]);
+    expect(m[0]![0]).toBeCloseTo(0, 9);
+    expect(m[1]![1]).toBeCloseTo(0, 9);
+    expect(m[2]![2]).toBeCloseTo(0, 9);
+  });
+
+  it('test_antisymmetry_mij_equals_neg_mji', () => {
+    const freqs = [261.63, 329.63, 392.0];
+    const m = realizedFreqIntervalMatrix(freqs);
+    for (let i = 0; i < freqs.length; i++) {
+      for (let j = 0; j < freqs.length; j++) {
+        expect(m[i]![j]).toBeCloseTo(-(m[j]![i] as number), 9);
+      }
+    }
+  });
+
+  it('test_octave_dyad_gives_1200_cents', () => {
+    // [261.63, 523.26] is a near-exact octave → m[0][1] ≈ 1200, m[1][0] ≈ -1200
+    const m = realizedFreqIntervalMatrix([261.63, 523.26]);
+    expect(m[0]![1]).toBeCloseTo(1200, 1);
+    expect(m[1]![0]).toBeCloseTo(-1200, 1);
+  });
+
+  it('test_result_is_n_by_n_matrix', () => {
+    const freqs = [200, 300, 400, 500];
+    const m = realizedFreqIntervalMatrix(freqs);
+    expect(m.length).toBe(4);
+    expect(m.every((row) => row.length === 4)).toBe(true);
+  });
+
+  it('test_single_freq_gives_1x1_matrix_with_zero', () => {
+    const m = realizedFreqIntervalMatrix([440]);
+    expect(m.length).toBe(1);
+    expect(m[0]![0]).toBeCloseTo(0, 9);
+  });
+
+  it('test_empty_freqs_throws', () => {
+    expect(() => realizedFreqIntervalMatrix([])).toThrow(RangeError);
+  });
+
+  it('test_non_positive_freq_throws', () => {
+    expect(() => realizedFreqIntervalMatrix([440, -220])).toThrow(RangeError);
+    expect(() => realizedFreqIntervalMatrix([0, 440])).toThrow(RangeError);
+  });
+
+  it('test_major_triad_root_to_fifth_is_approx_702_cents', () => {
+    // 12-TET C major triad at C4
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const freqs = realizeChordFreqs(chord, 261.63);
+    const m = realizedFreqIntervalMatrix(freqs);
+    // Root (index 0) to fifth (index 2) = 700 cents in 12-TET
+    expect(m[0]![2]).toBeCloseTo(700, 6);
   });
 });

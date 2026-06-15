@@ -1,5 +1,5 @@
 import { CENTS_PER_OCTAVE, ratio } from './ratio.js';
-import { type Pitch, centsToFreqFactor, pitchToCents, fromRatio } from './cents.js';
+import { type Pitch, centsToFreqFactor, pitchToCents, fromRatio, freqToCents } from './cents.js';
 import { type TuningSystem, degreeToCents } from './tuning.js';
 
 /** A chord as root-relative intervals (instrument-independent). */
@@ -72,6 +72,45 @@ export function chordFromRatios(
     name,
     intervals: ratios.map(([n, d]) => fromRatio(ratio(n as number, d as number))),
   };
+}
+
+/**
+ * Pairwise interval matrix in cents for a set of realized frequencies.
+ *
+ * Socratic Q84: `realizeChordFreqs(chord, rootHz)` gives the member Hz values,
+ * and `freqToCents(fHi, fLo)` converts a pair to an interval — but computing the
+ * full matrix of pairwise intervals for a realized chord still requires a manual
+ * double-loop. If a realized chord is truly first-class, every pairwise interval
+ * should be retrievable in one call.
+ *
+ * `matrix[i][j]` = cents from `freqs[i]` to `freqs[j]` =
+ * `freqToCents(freqs[j], freqs[i])`. Positive when `j` is higher in pitch.
+ *
+ * Properties:
+ * - Diagonal is always 0 (a frequency is 0 cents from itself).
+ * - Antisymmetric: `matrix[i][j] === -matrix[j][i]`.
+ *
+ * @example
+ * // Octave dyad: [261.63, 523.26] Hz → 1200c apart
+ * const m = realizedFreqIntervalMatrix([261.63, 523.26]);
+ * // m[0][1] ≈ 1200, m[1][0] ≈ -1200, m[0][0] === 0, m[1][1] === 0
+ *
+ * @throws {RangeError} if `freqs` is empty or any frequency is ≤ 0.
+ */
+export function realizedFreqIntervalMatrix(freqs: readonly number[]): number[][] {
+  if (freqs.length === 0)
+    throw new RangeError('realizedFreqIntervalMatrix: freqs must be non-empty');
+  for (let i = 0; i < freqs.length; i++) {
+    if (!Number.isFinite(freqs[i] as number) || (freqs[i] as number) <= 0) {
+      throw new RangeError(
+        `realizedFreqIntervalMatrix: freqs[${i}] must be a positive finite number, got ${freqs[i]}`,
+      );
+    }
+  }
+  const n = freqs.length;
+  return Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => freqToCents(freqs[j] as number, freqs[i] as number)),
+  );
 }
 
 /**

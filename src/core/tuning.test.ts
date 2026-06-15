@@ -6,6 +6,7 @@ import {
   degreeToCents,
   degreeToFreq,
   tuningIntervalMatrix,
+  tuningToIntervalVector,
   type TuningSystem,
 } from './tuning.js';
 import { cents, fromRatio } from './cents.js';
@@ -192,5 +193,80 @@ describe('tuningIntervalMatrix (Q82)', () => {
     expect(m.length).toBe(5);
     // Step from degree 0 to degree 1 = 1210/5 = 242 cents
     expect(m[0]![1]).toBeCloseTo(242, 9);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q86 — tuningToIntervalVector
+// ---------------------------------------------------------------------------
+
+describe('tuningToIntervalVector (Q86)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_a_map', () => {
+    const hist = tuningToIntervalVector(t12);
+    expect(hist instanceof Map).toBe(true);
+  });
+
+  it('test_total_pairs_equals_n_choose_2', () => {
+    // 12-TET: C(12,2) = 66 total pairs
+    const hist = tuningToIntervalVector(t12);
+    let total = 0;
+    hist.forEach((count) => (total += count));
+    expect(total).toBe((12 * 11) / 2);
+  });
+
+  it('test_12tet_perfect_fifth_700c_count', () => {
+    // Upper-triangle only: pairs (i,j) with i<j where (j-i)*100 = 700c → j-i=7
+    // i can be 0..4 (so j = i+7 ≤ 11): exactly 5 pairs.
+    const hist = tuningToIntervalVector(t12);
+    expect(hist.get(700)).toBe(5);
+  });
+
+  it('test_12tet_tritone_600c_count', () => {
+    // Pairs (i,j) with i<j where (j-i)*100 = 600c → j-i=6
+    // i can be 0..5 (so j = i+6 ≤ 11): exactly 6 pairs.
+    const hist = tuningToIntervalVector(t12);
+    expect(hist.get(600)).toBe(6);
+  });
+
+  it('test_single_degree_tuning_has_empty_histogram', () => {
+    // A tuning with 1 degree has no pairs: C(1,2) = 0
+    const t1: TuningSystem = {
+      id: 'mono',
+      name: 'mono',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [{ kind: 'cents', cents: 0 }],
+      source: 'theoretical',
+    };
+    const hist = tuningToIntervalVector(t1);
+    expect(hist.size).toBe(0);
+  });
+
+  it('test_step_cents_controls_bin_width', () => {
+    // With stepCents=100, 700c is a distinct bin (5 pairs where j-i=7).
+    // With stepCents=200, 700c rounds to 600 or 800 (nearest multiple of 200).
+    const hist100 = tuningToIntervalVector(t12, 100);
+    const hist200 = tuningToIntervalVector(t12, 200);
+    expect(hist100.get(700)).toBe(5);
+    // With stepCents=200, 700c → round(700/200)*200 = 800; not a separate 700 bin.
+    expect(hist200.get(700)).toBeUndefined();
+  });
+
+  it('test_invalid_step_cents_throws', () => {
+    expect(() => tuningToIntervalVector(t12, 0)).toThrow(RangeError);
+    expect(() => tuningToIntervalVector(t12, -50)).toThrow(RangeError);
+  });
+
+  it('test_5edo_has_correct_interval_count', () => {
+    // 5-EDO: step = 240c. Intervals: 240c (4 pairs), 480c (3 pairs), 720c (2 pairs), 960c (1 pair)
+    // C(5,2) = 10 total pairs; binned at 50c resolution.
+    const t5 = edo(5, 440);
+    const hist = tuningToIntervalVector(t5);
+    let total = 0;
+    hist.forEach((count) => (total += count));
+    expect(total).toBe((5 * 4) / 2);
+    expect(hist.get(250)).toBe(4); // 240c rounds to 250c at stepCents=50
   });
 });

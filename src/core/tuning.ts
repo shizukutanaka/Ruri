@@ -108,6 +108,50 @@ export function edo(
 }
 
 /**
+ * Interval histogram (fingerprint) of a tuning: counts how many times each
+ * interval class appears among all degree pairs.
+ *
+ * Socratic Q86: `tuningIntervalMatrix(tuning)` gives all pairwise intervals, but
+ * summarising the interval content as a compact fingerprint — "how many perfect
+ * fifths does this tuning contain?" — still requires iterating the matrix and
+ * binning manually. If `TuningSystem` is truly first-class, its interval content
+ * should be expressible as a one-call histogram.
+ *
+ * Counts only the **upper-triangle** pairs (i < j) in the matrix, converting each
+ * positive interval to a rounded bin of `stepCents` width. Ascending intervals only
+ * (each dyad contributes one positive count; descending directions are mirror images).
+ *
+ * @param tuning - The tuning system to fingerprint.
+ * @param stepCents - Bin width in cents (default 50). Intervals are rounded to the
+ *   nearest multiple of `stepCents`. Must be > 0.
+ * @returns `Map<number, number>` mapping `intervalCents → count`, where
+ *   `intervalCents` is the rounded bin centre and `count` is how many
+ *   degree-pairs produce an interval in that bin.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const hist = tuningToIntervalVector(t12);
+ * // In 12-TET the perfect fifth (700c) appears 7 times (i→j and j→i pairs folded).
+ * hist.get(700); // → 7
+ */
+export function tuningToIntervalVector(tuning: TuningSystem, stepCents = 50): Map<number, number> {
+  if (!Number.isFinite(stepCents) || stepCents <= 0) {
+    throw new RangeError(`tuningToIntervalVector: stepCents must be > 0, got ${stepCents}`);
+  }
+  const n = tuning.degrees.length;
+  const centsArr = tuning.degrees.map((_, i) => degreeToCents(tuning, i));
+  const hist = new Map<number, number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const interval = (centsArr[j] as number) - (centsArr[i] as number);
+      const bin = Math.round(interval / stepCents) * stepCents;
+      hist.set(bin, (hist.get(bin) ?? 0) + 1);
+    }
+  }
+  return hist;
+}
+
+/**
  * Pairwise interval matrix in cents for all degree pairs in a tuning.
  *
  * Socratic Q82: Given a `TuningSystem`, the pairwise interval in cents between

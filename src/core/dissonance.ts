@@ -1,6 +1,7 @@
 import { type Spectrum, type RealizedPartial, realizeSpectrum } from './spectrum.js';
 import { freqToCents, pitchToCents } from './cents.js';
 import { type TuningSystem, defineTuning } from './tuning.js';
+import { type Chord, realizeChordFreqs } from './chord.js';
 
 // Sethares sensory-dissonance model constants (Plomp-Levelt based).
 const DSTAR = 0.24;
@@ -37,6 +38,25 @@ export function totalDissonance(partials: readonly RealizedPartial[]): number {
 export function chordDissonance(freqs: readonly number[], spectrum: Spectrum): number {
   const all = freqs.flatMap((f) => realizeSpectrum(spectrum, f));
   return totalDissonance(all);
+}
+
+/**
+ * Dissonance of a `Chord` object realized at a given root frequency.
+ *
+ * Socratic Q85: `chordDissonance(freqs, spectrum)` already computes sensory
+ * dissonance for a list of Hz values, and `realizeChordFreqs(chord, rootHz)`
+ * turns a `Chord` into Hz — but going from a `Chord` object directly to its
+ * dissonance score without manually calling `realizeChordFreqs` first still
+ * requires two explicit steps. If `Chord` is truly first-class, evaluating its
+ * acoustic consonance should be one call.
+ *
+ * @example
+ * const justMajor = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+ * const d = chordObjectDissonance(justMajor, 261.63, harmonicSpectrum());
+ * // d is the sensory dissonance of the realized just major triad
+ */
+export function chordObjectDissonance(chord: Chord, rootHz: number, spectrum: Spectrum): number {
+  return chordDissonance(realizeChordFreqs(chord, rootHz), spectrum);
 }
 
 /** Sensory-dissonance curve: dyad of `fundamentalHz` against fundamentalHz * ratio. */

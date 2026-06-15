@@ -4,6 +4,7 @@ import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import {
   dissonancePair,
   chordDissonance,
+  chordObjectDissonance,
   dissonanceCurve,
   localMinima,
   consonantIntervals,
@@ -12,6 +13,7 @@ import {
   rankTuningsByFit,
 } from './dissonance.js';
 import { edo } from './tuning.js';
+import { chordFromSemitones, chordFromRatios, realizeChordFreqs } from './chord.js';
 
 const partial = fc.record({
   freq: fc.double({ min: 50, max: 8000, noNaN: true, noDefaultInfinity: true }),
@@ -387,5 +389,54 @@ describe('rankTuningsByFit — tuning leaderboard for a given timbre (Q56)', () 
     const idx12 = ranked.findIndex((r) => r.tuning.id === '12-edo');
     const idx31 = ranked.findIndex((r) => r.tuning.id === '31-edo');
     expect(idx31).toBeLessThanOrEqual(idx12);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q85 — chordObjectDissonance
+// ---------------------------------------------------------------------------
+
+describe('chordObjectDissonance (Q85)', () => {
+  const spec = harmonicSpectrum();
+
+  it('test_matches_manual_realizeChordFreqs_then_chordDissonance', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const rootHz = 261.63;
+    const expected = chordDissonance(realizeChordFreqs(chord, rootHz), spec);
+    const result = chordObjectDissonance(chord, rootHz, spec);
+    expect(result).toBeCloseTo(expected, 9);
+  });
+
+  it('test_result_is_non_negative', () => {
+    const chord = chordFromSemitones('dom7', [0, 4, 7, 10]);
+    expect(chordObjectDissonance(chord, 261.63, spec)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_perfect_fifth_dyad_less_dissonant_than_tritone_dyad', () => {
+    // A perfect fifth (1/1, 3/2) should be more consonant than a tritone (1/1, sqrt(2))
+    // under a harmonic spectrum — same number of notes, different intervals.
+    const justFifth = chordFromRatios('fifth', [
+      [1, 1],
+      [3, 2],
+    ]);
+    const tritoneDyad = chordFromSemitones('tritone', [0, 6]);
+    const dFifth = chordObjectDissonance(justFifth, 261.63, spec);
+    const dTritone = chordObjectDissonance(tritoneDyad, 261.63, spec);
+    expect(dFifth).toBeLessThan(dTritone);
+  });
+
+  it('test_different_root_hz_changes_score', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const d1 = chordObjectDissonance(chord, 261.63, spec);
+    const d2 = chordObjectDissonance(chord, 110, spec);
+    // Lower register tends to produce higher roughness, but values should differ
+    expect(d1).not.toBeCloseTo(d2, 3);
+  });
+
+  it('test_bell_spectrum_gives_different_score_than_harmonic', () => {
+    const chord = chordFromSemitones('major', [0, 4, 7]);
+    const dHarm = chordObjectDissonance(chord, 261.63, harmonicSpectrum());
+    const dBell = chordObjectDissonance(chord, 261.63, bellSpectrum());
+    expect(dHarm).not.toBeCloseTo(dBell, 3);
   });
 });
