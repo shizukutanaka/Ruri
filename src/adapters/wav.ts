@@ -31,6 +31,7 @@ import {
   tuningToScale,
   rankModeSeriesByHarmonicity,
   chordMapAnalysis,
+  rankModesByStability,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -1345,4 +1346,48 @@ export function chordMapToShuffledWav(
     shuffled[j] = tmp;
   }
   return chordMapToWav(shuffled, rootHz, spectrum, opts ?? DEFAULT_CHORD_PROGRESSION_WAV);
+}
+
+/**
+ * Full pipeline: tuning → most stable mode → chord progression → WAV bytes in one call.
+ *
+ * Socratic Q198: "If we can rank modes by stability, we should be able to export the MOST
+ * STABLE mode's chord progression as WAV in one call — can it?" Today:
+ * `rankModesByStability` → take first → `bestProgressionForScale` →
+ * `chordProgressionToWav` — four explicit steps. If mode stability is first-class,
+ * the most stable mode's audio should be one call.
+ *
+ * Algorithm:
+ * 1. `rankModesByStability(tuning, rootHz, spectrum)` → sorted modes (ascending score).
+ * 2. Take the first entry's `scale` — the most stable mode.
+ * 3. `bestProgressionForScale(mode, tuning, effectiveSpectrum, 4, 3, rootHz)` → `Chord[]`.
+ * 4. `chordProgressionToWav(chords, rootHz, effectiveSpectrum, opts)` → WAV bytes.
+ *
+ * @param tuning   - The parent `TuningSystem`. Must be non-empty.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns WAV bytes of the most stable mode's chord progression.
+ *
+ * @throws {RangeError} if tuning has no degrees.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const t5 = edo(5);
+ * const wav = mostStableModeProgressionWav(t5, 261.63);
+ * await fs.writeFile('most-stable.wav', wav);
+ */
+export function mostStableModeProgressionWav(
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  if (tuning.degrees.length === 0)
+    throw new RangeError('mostStableModeProgressionWav: tuning must have at least one degree');
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const ranked = rankModesByStability(tuning, rootHz, spectrum);
+  const mostStableMode = (ranked[0] as (typeof ranked)[0]).scale;
+  const chords = bestProgressionForScale(mostStableMode, tuning, effectiveSpectrum, 4, 3, rootHz);
+  return chordProgressionToWav(chords, rootHz, effectiveSpectrum, opts);
 }

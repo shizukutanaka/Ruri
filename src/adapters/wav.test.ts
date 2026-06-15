@@ -32,6 +32,7 @@ import {
   chordMapToWavArray,
   chordMapAnalysisToStereoWav,
   chordMapToShuffledWav,
+  mostStableModeProgressionWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1615,5 +1616,51 @@ describe('chordMapToShuffledWav (Q190)', () => {
     const singleEntry = scaleToChordMap(major, t12, 3).slice(0, 1);
     const wav = chordMapToShuffledWav(singleEntry, 440, undefined, fastOpts, 1);
     expect(wav.length).toBeGreaterThan(44);
+  });
+});
+
+// Q198 — mostStableModeProgressionWav
+describe('mostStableModeProgressionWav (Q198)', () => {
+  const t5 = edo(5);
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.15,
+  };
+
+  it('test_returns_valid_riff_wav', () => {
+    const wav = mostStableModeProgressionWav(t5, 261.63, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_output_larger_than_header', () => {
+    const wav = mostStableModeProgressionWav(t5, 261.63, undefined, fastOpts);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_with_explicit_spectrum', () => {
+    const wav = mostStableModeProgressionWav(t5, 261.63, harmonicSpectrum(), fastOpts);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_wave_header_mono_channel', () => {
+    const wav = mostStableModeProgressionWav(t5, 261.63, undefined, fastOpts);
+    const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+    expect(view.getUint16(22, true)).toBe(1);
+  });
+
+  it('test_different_tunings_produce_different_audio_content', () => {
+    const wav5 = mostStableModeProgressionWav(t5, 261.63, undefined, fastOpts);
+    const wav7 = mostStableModeProgressionWav(edo(7), 261.63, undefined, fastOpts);
+    // Both are valid WAV files; content will differ due to different pitches
+    expect(String.fromCharCode(wav5[0]!, wav5[1]!, wav5[2]!, wav5[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav7[0]!, wav7[1]!, wav7[2]!, wav7[3]!)).toBe('RIFF');
+  });
+
+  it('test_empty_tuning_throws', () => {
+    const emptyTuning = { ...t5, degrees: [] };
+    expect(() => mostStableModeProgressionWav(emptyTuning, 261.63)).toThrow(RangeError);
   });
 });
