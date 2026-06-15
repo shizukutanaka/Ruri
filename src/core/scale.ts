@@ -2969,3 +2969,63 @@ export function annotateProgression(
     return { chord, label, dissonance, harmonicity };
   });
 }
+
+/**
+ * Return the dissonance value for each chord in a progression as a plain number array.
+ *
+ * Socratic Q216: "If we can annotate a progression, summarizing the progression's energy arc
+ * (dissonance over time) as an array of values should be one call — can it?" Today:
+ * `annotateProgression(chords, rootHz, spectrum)` → `result.map(r => r.dissonance)` — two steps.
+ * If annotation is first-class, extracting just the dissonance arc should be one call.
+ *
+ * Returns `[]` for empty input (does not throw).
+ *
+ * @param chords   - Array of `Chord` objects in progression order.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `number[]` of dissonance values, one per chord, in progression order.
+ *
+ * @example
+ * const arc = progressionEnergyArc(chords, 261.63);
+ * // arc[0] is the dissonance of the first chord
+ */
+export function progressionEnergyArc(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): number[] {
+  return annotateProgression(chords, rootHz, spectrum).map((r) => r.dissonance);
+}
+
+/**
+ * Find the first chord in a progression that matches a given label in one call.
+ *
+ * Socratic Q217: "If we can get a chord description (label), finding the first chord in a
+ * progression that matches a given label should be one call — can it?" Today:
+ * `annotateProgression(chords, rootHz, spectrum)` → `find(e => e.label === label)` — two steps.
+ * If progression annotation is first-class, searching by label should be one call.
+ *
+ * Returns `undefined` if no chord with the given label is found.
+ *
+ * @param chords   - Array of `Chord` objects to search.
+ * @param label    - Label string to match (e.g. `'triad'`, `'dyad'`).
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns `{ chord: Chord, index: number }` for the first match, or `undefined`.
+ *
+ * @example
+ * const result = findChordByLabel(chords, 'triad', 261.63);
+ * if (result) console.log(result.index, result.chord.name);
+ */
+export function findChordByLabel(
+  chords: readonly Chord[],
+  label: string,
+  rootHz: number,
+  spectrum?: Spectrum,
+): { chord: Chord; index: number } | undefined {
+  const annotated = annotateProgression(chords, rootHz, spectrum);
+  const idx = annotated.findIndex((e) => e.label === label);
+  if (idx === -1) return undefined;
+  const entry = annotated[idx] as (typeof annotated)[0];
+  return { chord: entry.chord, index: idx };
+}

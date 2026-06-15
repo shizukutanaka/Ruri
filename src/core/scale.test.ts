@@ -70,6 +70,8 @@ import {
   chordMapDescription,
   tuningReportSimilarity,
   annotateProgression,
+  progressionEnergyArc,
+  findChordByLabel,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -3721,5 +3723,79 @@ describe('annotateProgression (Q215)', () => {
   it('test_chord_reference_preserved', () => {
     const result = annotateProgression([triad], 261.63);
     expect(result[0]?.chord).toBe(triad);
+  });
+});
+
+// Q216 — progressionEnergyArc
+describe('progressionEnergyArc (Q216)', () => {
+  const triad = chordFromSemitones('triad', [0, 4, 7]);
+  const dyad = chordFromSemitones('dyad', [0, 7]);
+
+  it('test_empty_input_returns_empty_array', () => {
+    expect(progressionEnergyArc([], 261.63)).toEqual([]);
+  });
+
+  it('test_returns_one_value_per_chord', () => {
+    const arc = progressionEnergyArc([triad, dyad], 261.63);
+    expect(arc.length).toBe(2);
+  });
+
+  it('test_values_are_non_negative_numbers', () => {
+    const arc = progressionEnergyArc([triad], 261.63);
+    expect(typeof arc[0]).toBe('number');
+    expect(arc[0]).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_matches_annotate_progression_dissonances', () => {
+    const chords = [triad, dyad];
+    const arc = progressionEnergyArc(chords, 261.63);
+    const annotated = annotateProgression(chords, 261.63);
+    expect(arc).toEqual(annotated.map((r) => r.dissonance));
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const arc = progressionEnergyArc([triad], 261.63, harmonicSpectrum());
+    expect(arc.length).toBe(1);
+    expect(typeof arc[0]).toBe('number');
+  });
+});
+
+// Q217 — findChordByLabel
+describe('findChordByLabel (Q217)', () => {
+  const triad = chordFromSemitones('triad', [0, 4, 7]);
+  const dyad = chordFromSemitones('dyad', [0, 7]);
+
+  it('test_returns_undefined_for_empty_chords', () => {
+    expect(findChordByLabel([], 'triad', 261.63)).toBeUndefined();
+  });
+
+  it('test_finds_triad_by_label', () => {
+    const result = findChordByLabel([triad], 'triad', 261.63);
+    expect(result).not.toBeUndefined();
+    expect(result?.chord).toBe(triad);
+    expect(result?.index).toBe(0);
+  });
+
+  it('test_finds_dyad_at_correct_index', () => {
+    const result = findChordByLabel([triad, dyad], 'dyad', 261.63);
+    expect(result?.index).toBe(1);
+    expect(result?.chord).toBe(dyad);
+  });
+
+  it('test_returns_undefined_for_missing_label', () => {
+    const result = findChordByLabel([triad, dyad], 'tetrad', 261.63);
+    expect(result).toBeUndefined();
+  });
+
+  it('test_returns_first_match_when_multiple_present', () => {
+    const triad2 = chordFromSemitones('triad2', [0, 3, 7]);
+    const result = findChordByLabel([triad, triad2], 'triad', 261.63);
+    expect(result?.index).toBe(0);
+    expect(result?.chord).toBe(triad);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const result = findChordByLabel([triad], 'triad', 261.63, harmonicSpectrum());
+    expect(result).not.toBeUndefined();
   });
 });
