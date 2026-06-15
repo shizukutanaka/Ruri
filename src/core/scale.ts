@@ -7,6 +7,7 @@ import {
 } from './tuning.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { midiToFreq } from './midi.js';
+import { pitchToCents } from './cents.js';
 import { chordDissonance, chordObjectDissonance } from './dissonance.js';
 import {
   rankChords,
