@@ -14,6 +14,7 @@ import {
   scaleToMts,
   chordMapToMts,
   bestModeMts,
+  chordEntryToMts,
 } from './mts.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
@@ -730,5 +731,60 @@ describe('bestModeMts — best mode for tuning → MTS bulk dump in one call (Q1
   it('test_custom_device_id_reflected_in_output', () => {
     const mts = bestModeMts(tuning, undefined, { deviceId: 7 });
     expect(mts[2]).toBe(7);
+  });
+});
+
+// Q165 — chordEntryToMts: ScaleChordMapEntry → 408-byte MTS SysEx in one call
+describe('chordEntryToMts (Q165)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_408_byte_uint8array', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const mts = chordEntryToMts(chordMap[0]!, t12);
+    expect(mts).toBeInstanceOf(Uint8Array);
+    expect(mts.length).toBe(408);
+  });
+
+  it('test_starts_with_sysex_header', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const mts = chordEntryToMts(chordMap[0]!, t12);
+    expect(mts[0]).toBe(0xf0);
+    expect(mts[1]).toBe(0x7e);
+    expect(mts[407]).toBe(0xf7);
+  });
+
+  it('test_different_entries_produce_different_chord_name_bytes', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    // Different entries have different chord names → name field differs
+    const mts0 = chordEntryToMts(chordMap[0]!, t12);
+    const mts3 = chordEntryToMts(chordMap[3]!, t12);
+    let differs = false;
+    for (let i = 0; i < 408; i++) {
+      if (mts0[i] !== mts3[i]) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
+  });
+
+  it('test_matches_chordToMts_with_referenceHz', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const entry = chordMap[0]!;
+    const viachordEntryToMts = chordEntryToMts(entry, t12);
+    const viaChordToMts = chordToMts(entry.chord, t12.referenceHz);
+    expect(viachordEntryToMts).toEqual(viaChordToMts);
+  });
+
+  it('test_device_id_option_respected', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const mts = chordEntryToMts(chordMap[0]!, t12, { deviceId: 5 });
+    expect(mts[2]).toBe(5);
   });
 });

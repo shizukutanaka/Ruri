@@ -8,6 +8,7 @@ import {
   chordToScl,
   chordMapToScl,
   scaleChordMapToScl,
+  chordMapBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -389,5 +390,54 @@ describe('scaleChordMapToScl (Q161)', () => {
     for (let i = 0; i < scl.degrees.length; i++) {
       expect(degreeCents(parsed.degrees[i]!)).toBeCloseTo(degreeCents(scl.degrees[i]!), 3);
     }
+  });
+});
+
+// Q162 — chordMapBundle: chord map → { scl, tun } in one call
+describe('chordMapBundle (Q162)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_both_scl_and_tun', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const { scl, tun } = chordMapBundle(chordMap, t12);
+    expect(scl).toBeDefined();
+    expect(typeof tun).toBe('string');
+  });
+
+  it('test_scl_degrees_are_non_empty', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const { scl } = chordMapBundle(chordMap, t12);
+    expect(scl.degrees.length).toBeGreaterThan(0);
+  });
+
+  it('test_tun_contains_tuning_and_exact_sections', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const { tun } = chordMapBundle(chordMap, t12);
+    expect(tun).toContain('[Tuning]');
+    expect(tun).toContain('[Exact Tuning]');
+  });
+
+  it('test_tun_has_128_note_entries', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const { tun } = chordMapBundle(chordMap, t12);
+    const matches = tun.match(/^note \d+=.+$/gm) ?? [];
+    expect(matches.length).toBe(256); // 128 in [Tuning] + 128 in [Exact Tuning]
+  });
+
+  it('test_custom_name_used_in_both_scl_and_tun', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const { scl, tun } = chordMapBundle(chordMap, t12, 'test-bundle');
+    expect(scl.description).toBe('test-bundle');
+    expect(tun).toContain('test-bundle');
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => chordMapBundle([], t12)).toThrow(RangeError);
   });
 });

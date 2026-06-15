@@ -1,8 +1,9 @@
 /** Scala .scl import/export. Preserves original ratio-vs-cents representation for lossless round-trip. */
-import { type TuningSystem } from '../core/tuning.js';
+import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
 import { pitchToCents, freqToCents } from '../core/cents.js';
 import { type Chord, chordToFreqRatios } from '../core/chord.js';
 import { type ScaleChordMapEntry, type Scale, scaleToChordMap } from '../core/scale.js';
+import { writeTun } from './tun.js';
 
 /** One scale degree, tagged by its original textual form. */
 export type ScalaDegree =
@@ -242,4 +243,46 @@ export function chordMapToScl(
 export function scaleChordMapToScl(scale: Scale, tuning: TuningSystem, name?: string): ScalaScale {
   const chordMap = scaleToChordMap(scale, tuning);
   return chordMapToScl(chordMap, tuning, name ?? scale.name);
+}
+
+/**
+ * Export a chord map as both a Scala `.scl` and an AnaMark `.tun` file simultaneously.
+ *
+ * Socratic Q162: "If a chord map can be exported as SMF and WAV, it should also be
+ * exportable as a Scala .scl AND a .tun file simultaneously — can it?" Today:
+ * `chordMapToScl(chordMap, tuning)` gives the .scl; building the 128-key TUN array
+ * for the same pitch classes requires separate steps. If a chord map is truly
+ * first-class, bundling both exports should be one call.
+ *
+ * Algorithm:
+ * 1. `chordMapToScl(chordMap, tuning, name)` → `ScalaScale` (and validates non-empty).
+ * 2. Build 128-key frequency array anchored at MIDI 69 = `tuning.referenceHz`.
+ * 3. `writeTun(frequencies, name ?? tuning.id)` → TUN string.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`). Must be non-empty.
+ * @param tuning   - The parent `TuningSystem` (provides `referenceHz` and tuning identity).
+ * @param name     - Optional name for both the `.scl` description and the `.tun` header.
+ *                   Defaults to `tuning.id`.
+ * @returns `{ scl: ScalaScale, tun: string }` — Scala scale and TUN text for the same pitch set.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const { scl, tun } = chordMapBundle(chordMap, t12, 'major-diatonic');
+ * fs.writeFileSync('major.scl', writeScl(scl));
+ * fs.writeFileSync('major.tun', tun);
+ */
+export function chordMapBundle(
+  chordMap: readonly ScaleChordMapEntry[],
+  tuning: TuningSystem,
+  name?: string,
+): { scl: ScalaScale; tun: string } {
+  const scl = chordMapToScl(chordMap, tuning, name);
+  const tunName = name ?? tuning.id;
+  const frequencies = Array.from({ length: 128 }, (_, k) => degreeToFreq(tuning, k - 69));
+  const tun = writeTun(frequencies, tunName);
+  return { scl, tun };
 }

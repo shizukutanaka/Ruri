@@ -518,3 +518,37 @@ export function bestModeMts(
   const mode = bestModeForTuning(tuning, spectrum);
   return scaleToMts(mode, tuning, mode.id, opts ?? {});
 }
+
+/**
+ * Export a single chord map entry's chord as a 408-byte MTS bulk tuning dump SysEx.
+ *
+ * Socratic Q165: "If we can export a chord map as MTS, exporting a specific SINGLE chord
+ * from the chord map as MTS (just that chord's frequencies) should also be one call — can it?"
+ * Today: extract `entry.chord` → `chordToMts(chord, rootHz, opts)` — two steps. If a
+ * `ScaleChordMapEntry` is first-class, realizing it as MTS should be one call.
+ *
+ * Delegates directly to `chordToMts(entry.chord, tuning.referenceHz, opts)`, using
+ * `tuning.referenceHz` as the root frequency so the chord is anchored at the tuning's
+ * reference pitch.
+ *
+ * @param entry  - A single entry from a diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param tuning - The parent `TuningSystem` (provides `referenceHz` as the chord root).
+ * @param opts   - Optional MTS encoding options (device ID, program, A4 Hz).
+ * @returns A 408-byte `Uint8Array` MTS SysEx message encoding the chord's frequencies.
+ *
+ * @throws {RangeError} if the chord has no intervals.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const mts = chordEntryToMts(chordMap[0]!, t12);
+ * port.send(mts); // retune synth to the first diatonic chord
+ */
+export function chordEntryToMts(
+  entry: ScaleChordMapEntry,
+  tuning: TuningSystem,
+  opts?: ChordToMtsOptions,
+): Uint8Array {
+  return chordToMts(entry.chord, tuning.referenceHz, opts ?? {});
+}
