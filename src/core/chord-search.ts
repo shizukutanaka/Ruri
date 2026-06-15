@@ -7,6 +7,7 @@ import { degreeToCents } from './tuning.js';
 import { voiceLeadingCost } from './voice-leading.js';
 import { type Chord, realizeChordFreqs } from './chord.js';
 import { strikeChord, type ModalOptions, DEFAULT_MODAL } from './modal-synth.js';
+import { pluckChord, type KsOptions, DEFAULT_KS } from './ks-synth.js';
 
 export interface RankedChord {
   /** Degree indices within one period, ascending, starting at the chord's root degree offset 0..n-1 — store absolute degree indices. */
@@ -475,4 +476,30 @@ export function strikeRankedChord(
   opts: ModalOptions = DEFAULT_MODAL,
 ): Float32Array {
   return strikeChord(realizeRankedChordFreqs(chord, rootHz), spectrum, opts);
+}
+
+/**
+ * Synthesize a `RankedChord` via Karplus-Strong (plucked string) in one call.
+ *
+ * Socratic Q67: `strikeRankedChord` plays a `RankedChord` with modal additive
+ * synthesis (bells/metallic timbres), but its Karplus-Strong analog — plucking
+ * a `RankedChord` — is missing. Going from a `RankedChord` to a plucked audio
+ * buffer currently requires two explicit steps:
+ * `realizeRankedChordFreqs(chord, rootHz)` → `pluckChord(freqs, opts)`.
+ * `pluckRankedChord` closes that gap: if `RankedChord` is truly first-class,
+ * it should be auditionable with *any* synthesis engine in one call.
+ *
+ * Closes the pipeline: `rankChords → pluckRankedChord → encodeWav`.
+ *
+ * @example
+ * const [best] = rankChords(tuning, { size: 3 });
+ * const audio = pluckRankedChord(best!, 261.63);
+ * const wav = encodeWav(audio); // plucked chord from discovery to WAV in 2 lines
+ */
+export function pluckRankedChord(
+  chord: RankedChord,
+  rootHz: number,
+  opts: KsOptions = DEFAULT_KS,
+): Float32Array {
+  return pluckChord(realizeRankedChordFreqs(chord, rootHz), opts);
 }

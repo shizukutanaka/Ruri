@@ -1,7 +1,12 @@
 import { type TuningSystem, defineTuning, degreeToCents, degreeToFreq } from './tuning.js';
 import { type Spectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
-import { rankChords, type RankedChord, type ChordSearchOptions } from './chord-search.js';
+import {
+  rankChords,
+  type RankedChord,
+  type ChordSearchOptions,
+  rankedChordToChord,
+} from './chord-search.js';
 import { synthScale, type SynthScaleOptions, DEFAULT_SYNTH_SCALE } from './ks-synth.js';
 import { type Chord, chordFromDegrees } from './chord.js';
 
@@ -245,6 +250,105 @@ export function synthScaleFromScale(
   assertTuningMatch(scale, tuning);
   const freqs = scaleToFreqs(scale, tuning);
   return synthScale(freqs, opts);
+}
+
+/** Result entry from `rankModeChords`. */
+export interface RankedModeChords {
+  readonly modeIndex: number;
+  readonly scale: Scale;
+  readonly chords: RankedChord[];
+}
+
+/**
+ * For each mode of a scale, rank its diatonic chords and return a leaderboard
+ * sorted by the best chord's score (most consonant mode first).
+ *
+ * Socratic Q66: `rankModes(scale, tuning, spectrum)` ranks modal rotations by
+ * their aggregate dissonance, and `rankScaleChords(scale, tuning, opts)` ranks
+ * chords within a fixed scale — but "which mode gives the best chord options?"
+ * requires calling both functions per mode and wiring them together manually.
+ * `rankModeChords` closes this gap: for every modal rotation, it discovers the
+ * diatonic chord pool and returns a leaderboard ordered by each mode's
+ * top-ranked chord's score.
+ *
+ * @returns One entry per mode, sorted ascending by `chords[0].score`
+ *   (lowest score = most consonant best chord = best mode for chords).
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-tet',
+ *                 degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const leaderboard = rankModeChords(major, equalTemperament12(440));
+ * // leaderboard[0] is the mode whose best triad is most consonant.
+ * const { modeIndex, scale: bestMode, chords } = leaderboard[0]!;
+ */
+export function rankModeChords(
+  scale: Scale,
+  tuning: TuningSystem,
+  opts?: ChordSearchOptions,
+): RankedModeChords[] {
+  assertTuningMatch(scale, tuning);
+  const entries: RankedModeChords[] = scale.degreeIndices.map((_, i) => {
+    const mode = scaleMode(scale, i, tuning);
+    const chords = rankScaleChords(mode, tuning, opts);
+    return { modeIndex: i, scale: mode, chords };
+  });
+  // Sort by the top chord's score (ascending); modes with no chords go last
+  entries.sort((a, b) => {
+    const aScore = a.chords[0]?.score ?? Infinity;
+    const bScore = b.chords[0]?.score ?? Infinity;
+    return aScore - bScore;
+  });
+  return entries;
+}
+
+/**
+ * Return the most-consonant chord from the most-consonant modal rotation of a scale.
+ *
+ * Socratic Q68: The full pipeline `rankModes → best mode → rankScaleChords →
+ * rankedChordToChord` closes the gap between the modal layer and the chord layer —
+ * but it still requires four explicit calls. `chordFromBestMode` collapses that
+ * pipeline into a single call: "give me the best triad from the most consonant
+ * modal rotation of this scale."
+ *
+ * The "best mode" is the rotation whose top-ranked diatonic chord has the
+ * lowest combined score (via `rankModeChords`). The returned `Chord` is the
+ * `rankedChordToChord` lift of that top chord, suitable for use anywhere a
+ * `Chord` is accepted.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`, or if no
+ *   chords can be found (scale too small for the requested `size`).
+ *
+ * @example
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-tet',
+ *                 degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const { mode, modeIndex, chord } = chordFromBestMode(major, equalTemperament12(440));
+ * // chord is the best triad from the most consonant modal rotation
+ */
+export function chordFromBestMode(
+  scale: Scale,
+  tuning: TuningSystem,
+  size?: number,
+  spectrum?: Spectrum,
+): { mode: Scale; modeIndex: number; chord: Chord } {
+  assertTuningMatch(scale, tuning);
+  const opts: ChordSearchOptions = {
+    ...(size !== undefined ? { size } : {}),
+    ...(spectrum !== undefined ? { spectrum } : {}),
+  };
+  const leaderboard = rankModeChords(scale, tuning, opts);
+  const best = leaderboard[0];
+  if (best === undefined || best.chords[0] === undefined) {
+    throw new RangeError(
+      `no chords found for any mode of scale '${scale.id}' — scale may be too small for the requested size`,
+    );
+  }
+  return {
+    mode: best.scale,
+    modeIndex: best.modeIndex,
+    chord: rankedChordToChord(best.chords[0]),
+  };
 }
 
 /**

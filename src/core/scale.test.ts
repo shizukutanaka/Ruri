@@ -12,6 +12,8 @@ import {
   rankScaleChords,
   synthScaleFromScale,
   chordFromScale,
+  rankModeChords,
+  chordFromBestMode,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -580,5 +582,121 @@ describe('chordFromScale — chord from scale-local degree offsets (Q64)', () =>
     const chord = chordFromScale(major19, t19, [0, 2, 4]);
     const expected = chordFromDegrees(t19, [0, 6, 11]);
     expect(chordToCents(chord)).toEqual(chordToCents(expected));
+  });
+});
+
+// Q66: For each mode, rank its diatonic chords → leaderboard sorted by best chord's score
+describe('rankModeChords — modal chord leaderboard (Q66)', () => {
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_one_entry_per_mode', () => {
+    const leaderboard = rankModeChords(major, t12, { size: 3, spectrum });
+    expect(leaderboard.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_each_entry_has_non_empty_chords_array', () => {
+    const leaderboard = rankModeChords(major, t12, { size: 3, spectrum });
+    for (const entry of leaderboard) {
+      expect(entry.chords.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('test_sorted_ascending_by_best_chord_score', () => {
+    const leaderboard = rankModeChords(major, t12, { size: 3, spectrum });
+    for (let i = 1; i < leaderboard.length; i++) {
+      const prevScore = leaderboard[i - 1]!.chords[0]!.score;
+      const currScore = leaderboard[i]!.chords[0]!.score;
+      expect(currScore).toBeGreaterThanOrEqual(prevScore);
+    }
+  });
+
+  it('test_modeIndex_values_cover_all_rotations', () => {
+    const leaderboard = rankModeChords(major, t12, { size: 3, spectrum });
+    const indices = leaderboard.map((e) => e.modeIndex).sort((a, b) => a - b);
+    expect(indices).toEqual([0, 1, 2, 3, 4, 5, 6]);
+  });
+
+  it('test_scale_in_each_entry_is_the_correct_modal_rotation', () => {
+    const leaderboard = rankModeChords(major, t12, { size: 3, spectrum });
+    for (const { modeIndex, scale } of leaderboard) {
+      expect(scale.id).toBe(`major-mode-${modeIndex + 1}`);
+      // Every modal rotation starts at 0 cents
+      expect(scaleToCents(scale, t12)[0]).toBe(0);
+    }
+  });
+
+  it('test_chords_within_each_entry_are_sorted_ascending_by_score', () => {
+    const leaderboard = rankModeChords(major, t12, { size: 3, spectrum });
+    for (const { chords } of leaderboard) {
+      for (let i = 1; i < chords.length; i++) {
+        expect(chords[i]!.score).toBeGreaterThanOrEqual(chords[i - 1]!.score);
+      }
+    }
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2, 4] };
+    expect(() => rankModeChords(wrong, t12)).toThrow(RangeError);
+  });
+
+  it('test_different_opts_size_changes_chord_count', () => {
+    const triads = rankModeChords(major, t12, { size: 3, spectrum });
+    const tetrads = rankModeChords(major, t12, { size: 4, spectrum });
+    // 4-note chords exist in a 7-note scale; both should succeed but differ
+    expect(triads.length).toBe(tetrads.length); // still one per mode
+    // but chord arrays differ (different sizes)
+    expect(triads[0]!.chords[0]!.cents.length).toBe(3);
+    expect(tetrads[0]!.chords[0]!.cents.length).toBe(4);
+  });
+});
+
+// Q68: Collapse rankModes → rankScaleChords → rankedChordToChord into one call
+describe('chordFromBestMode — best chord from most consonant mode (Q68)', () => {
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_a_chord_with_intervals', () => {
+    const { chord } = chordFromBestMode(major, t12, 3, spectrum);
+    expect(chord.intervals.length).toBe(3);
+  });
+
+  it('test_modeIndex_is_in_valid_range', () => {
+    const { modeIndex } = chordFromBestMode(major, t12, 3, spectrum);
+    expect(modeIndex).toBeGreaterThanOrEqual(0);
+    expect(modeIndex).toBeLessThan(major.degreeIndices.length);
+  });
+
+  it('test_mode_tuningId_matches_tuning', () => {
+    const { mode } = chordFromBestMode(major, t12, 3, spectrum);
+    expect(mode.tuningId).toBe(t12.id);
+  });
+
+  it('test_mode_is_a_valid_modal_rotation_of_the_scale', () => {
+    const { mode, modeIndex } = chordFromBestMode(major, t12, 3, spectrum);
+    // The returned mode must be the correct rotation
+    const expected = scaleMode(major, modeIndex, t12);
+    expect(mode.id).toBe(expected.id);
+    expect(scaleToCents(mode, t12)).toEqual(scaleToCents(expected, t12));
+  });
+
+  it('test_chord_matches_top_chord_of_best_mode_in_leaderboard', () => {
+    const { modeIndex, chord } = chordFromBestMode(major, t12, 3, spectrum);
+    const leaderboard = rankModeChords(major, t12, { size: 3, spectrum });
+    const bestEntry = leaderboard[0]!;
+    // The returned modeIndex should be the top of the leaderboard
+    expect(modeIndex).toBe(bestEntry.modeIndex);
+    // The chord's cents should match the top RankedChord lifted to a Chord
+    const topChordCents = chordToCents(chord);
+    const leaderTopCents = bestEntry.chords[0]!.cents;
+    expect(topChordCents).toEqual(Array.from(leaderTopCents));
+  });
+
+  it('test_default_size_3_works_without_explicit_opts', () => {
+    const result = chordFromBestMode(major, t12);
+    expect(result.chord.intervals.length).toBe(3);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrong: Scale = { id: 'x', name: 'x', tuningId: 'other', degreeIndices: [0, 2, 4] };
+    expect(() => chordFromBestMode(wrong, t12)).toThrow(RangeError);
   });
 });

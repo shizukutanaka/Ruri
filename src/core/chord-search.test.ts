@@ -13,6 +13,7 @@ import {
   chordProgressionSmoothness,
   optimalChordOrder,
   strikeRankedChord,
+  pluckRankedChord,
 } from './chord-search.js';
 import { chordToCents, realizeChordFreqs, chordFromSemitones } from './chord.js';
 
@@ -550,6 +551,60 @@ describe('optimalChordOrder — minimum voice-leading permutation (Q50)', () => 
     const result = optimalChordOrder(portable, rootHz);
     expect(result.totalCents).toBeLessThanOrEqual(inputCost + 1e-9);
     expect(result.order).toHaveLength(4);
+  });
+});
+
+// Q67: Karplus-Strong analog of strikeRankedChord — pluck a RankedChord in one call
+describe('pluckRankedChord — RankedChord → plucked audio in one call (Q67)', () => {
+  const rootHz = 261.63;
+  const tuning = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('test_output_is_finite_float32array', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const audio = pluckRankedChord(best!, rootHz);
+    expect(audio).toBeInstanceOf(Float32Array);
+    expect(Array.from(audio).every(Number.isFinite)).toBe(true);
+  });
+
+  it('test_output_within_unit_range', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const audio = pluckRankedChord(best!, rootHz);
+    expect(audio.every((s) => Math.abs(s) <= 1.0001)).toBe(true);
+  });
+
+  it('test_output_length_matches_opts_seconds', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const opts = { sampleRate: 44100, seconds: 0.25, damping: 0.996, seed: 1 };
+    const audio = pluckRankedChord(best!, rootHz, opts);
+    expect(audio.length).toBe(Math.floor(opts.sampleRate * opts.seconds));
+  });
+
+  it('test_matches_manual_pipeline_length_and_determinism', () => {
+    const [best] = rankChords(tuning, { size: 3, spectrum, limit: 1 });
+    const opts = { sampleRate: 44100, seconds: 0.15, damping: 0.996, seed: 1 };
+    const fromRanked = pluckRankedChord(best!, rootHz, opts);
+    // Verify length matches opts
+    expect(fromRanked.length).toBe(Math.floor(opts.sampleRate * opts.seconds));
+    expect(Number.isFinite(fromRanked[0])).toBe(true);
+    // Two separate calls with same opts must be identical (deterministic PRNG)
+    const fromRanked2 = pluckRankedChord(best!, rootHz, opts);
+    expect(Array.from(fromRanked)).toEqual(Array.from(fromRanked2));
+  });
+
+  it('test_different_chords_produce_different_audio', () => {
+    const [best, second] = rankChords(tuning, { size: 3, spectrum, limit: 2 });
+    const opts = { sampleRate: 44100, seconds: 0.1, damping: 0.996, seed: 1 };
+    const audioA = pluckRankedChord(best!, rootHz, opts);
+    const audioB = pluckRankedChord(second!, rootHz, opts);
+    let differs = false;
+    for (let i = 0; i < audioA.length; i++) {
+      if (Math.abs((audioA[i] as number) - (audioB[i] as number)) > 1e-6) {
+        differs = true;
+        break;
+      }
+    }
+    expect(differs).toBe(true);
   });
 });
 
