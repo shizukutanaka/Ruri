@@ -14,6 +14,7 @@ import {
 import {
   type Scale,
   type ScaleChordMapEntry,
+  type ChordMapAnalysisEntry,
   scaleToFreqs,
   synthScaleFromScale,
   buildChordProgression,
@@ -29,6 +30,7 @@ import {
   rankAllModesForTimbre,
   tuningToScale,
   rankModeSeriesByHarmonicity,
+  chordMapAnalysis,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -1175,4 +1177,118 @@ export function worstModeWav(
   const ranked = rankModeSeriesByHarmonicity(fullScale, tuning);
   const worst = (ranked[ranked.length - 1] as (typeof ranked)[0]).scale;
   return pluckScaleWav(worst, tuning, opts);
+}
+
+/**
+ * Synthesize ALL chords in a chord map as SEPARATE WAV buffers in one call.
+ *
+ * Socratic Q180: "If we can export any chord as WAV, exporting ALL chords in a chord map
+ * as SEPARATE WAV buffers (not concatenated) should be one call — can it?" Today: iterate
+ * the chord map → `strikeChordToWav` per entry → collect into an array — three manual
+ * steps. If a chord map is first-class, producing individual WAV files for every entry
+ * should be one call.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns `Uint8Array[]` — one WAV per chord entry, in chord map order.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const wavs = chordMapToWavArray(chordMap, t12.referenceHz);
+ * for (const [i, wav] of wavs.entries()) await fs.writeFile(`chord-${i}.wav`, wav);
+ */
+export function chordMapToWavArray(
+  chordMap: readonly ScaleChordMapEntry[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array[] {
+  if (chordMap.length === 0) throw new RangeError('chordMapToWavArray: chordMap must be non-empty');
+  if (!Number.isFinite(rootHz) || rootHz <= 0)
+    throw new RangeError(`chordMapToWavArray: rootHz must be finite and > 0, got ${rootHz}`);
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const { chordSeconds, sampleRate, ...modalOpts } = opts;
+  const fullModalOpts: ModalOptions = { sampleRate, ...modalOpts };
+  const samplesPerChord = Math.floor(sampleRate * Math.min(chordSeconds, opts.seconds));
+  return chordMap.map((entry) => {
+    const freqs = realizeChordFreqs(entry.chord, rootHz);
+    const wave = strikeChord(freqs, effectiveSpectrum, fullModalOpts);
+    const slice = new Float32Array(samplesPerChord);
+    for (let j = 0; j < samplesPerChord && j < wave.length; j++) {
+      slice[j] = wave[j] as number;
+    }
+    return encodeWav(slice, sampleRate);
+  });
+}
+
+/**
+ * Synthesize a chord map analysis as a stereo WAV where pan encodes harmonicity score.
+ *
+ * Socratic Q182: "If we can export a chord map as a stereo WAV, we should also be able
+ * to export a chord MAP ANALYSIS (with scores) as stereo WAV where panning encodes the
+ * harmonicity score — can it?" Today: `chordMapAnalysis` → sort → realize freqs → strike
+ * → scale L/R by pan — many manual steps. If a chord map analysis is first-class, encoding
+ * it spatially should be one call.
+ *
+ * Algorithm: `chordMapAnalysis(scale, tuning, spectrum)` sorted by harmonicity ascending
+ * (most harmonic first). For each entry: `pan = entry.harmonicity / maxHarmonicity`
+ * (0 = full left = most harmonic, 1 = full right = least harmonic). Synthesize mono,
+ * then scale: L = cos(pan * π/2), R = sin(pan * π/2). Output via `encodeWavStereo`.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns Stereo 16-bit PCM WAV bytes with harmonicity-encoded panning.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if no chord map entries are produced.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const wav = chordMapAnalysisToStereoWav(major, t12);
+ * await fs.writeFile('analysis-stereo.wav', wav);
+ */
+export function chordMapAnalysisToStereoWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const entries: ChordMapAnalysisEntry[] = chordMapAnalysis(scale, tuning, effectiveSpectrum).sort(
+    (a, b) => a.harmonicity - b.harmonicity,
+  );
+  if (entries.length === 0)
+    throw new RangeError('chordMapAnalysisToStereoWav: no chord map entries produced');
+  const maxHarmonicity = (entries[entries.length - 1] as ChordMapAnalysisEntry).harmonicity;
+  const { chordSeconds, sampleRate, ...modalOpts } = opts;
+  const fullModalOpts: ModalOptions = { sampleRate, ...modalOpts };
+  const samplesPerChord = Math.floor(sampleRate * Math.min(chordSeconds, opts.seconds));
+  const total = samplesPerChord * entries.length;
+  const outL = new Float32Array(total);
+  const outR = new Float32Array(total);
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i] as ChordMapAnalysisEntry;
+    const pan = maxHarmonicity > 0 ? entry.harmonicity / maxHarmonicity : 0;
+    const gainL = Math.cos((pan * Math.PI) / 2);
+    const gainR = Math.sin((pan * Math.PI) / 2);
+    const freqs = realizeChordFreqs(entry.chord, tuning.referenceHz);
+    const wave = strikeChord(freqs, effectiveSpectrum, fullModalOpts);
+    const offset = i * samplesPerChord;
+    for (let j = 0; j < samplesPerChord && j < wave.length; j++) {
+      const sample = wave[j] as number;
+      outL[offset + j] = sample * gainL;
+      outR[offset + j] = sample * gainR;
+    }
+  }
+  return encodeWavStereo(outL, outR, sampleRate);
 }

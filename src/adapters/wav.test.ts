@@ -29,6 +29,8 @@ import {
   chordAudioBundle,
   chordMapToStereoWav,
   worstModeWav,
+  chordMapToWavArray,
+  chordMapAnalysisToStereoWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1461,5 +1463,100 @@ describe('worstModeWav (Q177)', () => {
     const worst = worstModeWav(t12);
     expect(String.fromCharCode(best[0]!, best[1]!, best[2]!, best[3]!)).toBe('RIFF');
     expect(String.fromCharCode(worst[0]!, worst[1]!, worst[2]!, worst[3]!)).toBe('RIFF');
+  });
+});
+
+// Q180 — chordMapToWavArray: export ALL chords in a chord map as separate WAV buffers
+describe('chordMapToWavArray (Q180)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_array_of_uint8arrays', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wavs = chordMapToWavArray(chordMap, t12.referenceHz);
+    expect(Array.isArray(wavs)).toBe(true);
+    for (const wav of wavs) expect(wav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_length_matches_chord_map', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wavs = chordMapToWavArray(chordMap, t12.referenceHz);
+    expect(wavs.length).toBe(chordMap.length);
+  });
+
+  it('test_each_wav_has_riff_header', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wavs = chordMapToWavArray(chordMap, t12.referenceHz);
+    for (const wav of wavs) {
+      expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    }
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => chordMapToWavArray([], 440)).toThrow(RangeError);
+  });
+
+  it('test_invalid_root_hz_throws', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    expect(() => chordMapToWavArray(chordMap, 0)).toThrow(RangeError);
+    expect(() => chordMapToWavArray(chordMap, -1)).toThrow(RangeError);
+  });
+
+  it('test_with_spectrum_produces_valid_wavs', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wavs = chordMapToWavArray(chordMap, t12.referenceHz, harmonicSpectrum());
+    for (const wav of wavs) expect(wav.length).toBeGreaterThan(44);
+  });
+});
+
+// Q182 — chordMapAnalysisToStereoWav: chord map analysis → stereo WAV with harmonicity panning
+describe('chordMapAnalysisToStereoWav (Q182)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_returns_uint8array', () => {
+    const wav = chordMapAnalysisToStereoWav(major, t12);
+    expect(wav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_riff_header_present', () => {
+    const wav = chordMapAnalysisToStereoWav(major, t12);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_stereo_wav_has_two_channels', () => {
+    const wav = chordMapAnalysisToStereoWav(major, t12);
+    const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
+    expect(view.getUint16(22, true)).toBe(2);
+  });
+
+  it('test_output_larger_than_header', () => {
+    const wav = chordMapAnalysisToStereoWav(major, t12);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_with_explicit_spectrum', () => {
+    const wav = chordMapAnalysisToStereoWav(major, t12, harmonicSpectrum());
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_wrong_tuning_throws', () => {
+    const wrongScale: Scale = {
+      id: 'wrong',
+      name: 'Wrong',
+      tuningId: 'other-id',
+      degreeIndices: [0, 1, 2],
+    };
+    expect(() => chordMapAnalysisToStereoWav(wrongScale, t12)).toThrow(RangeError);
   });
 });
