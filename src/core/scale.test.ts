@@ -49,6 +49,9 @@ import {
   bestModeProgressionSummary,
   tuningHarmonicityProfile,
   chordMapWithLabels,
+  scaleToMinimalTuning,
+  chordMapDissonancePercentiles,
+  groupChordMapByLabel,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -2793,5 +2796,140 @@ describe('chordMapWithLabels (Q178)', () => {
   it('test_empty_map_returns_empty_array', () => {
     const labelled = chordMapWithLabels([]);
     expect(labelled).toEqual([]);
+  });
+});
+
+// Q183 — scaleToMinimalTuning: project scale degrees back to a minimal TuningSystem
+describe('scaleToMinimalTuning (Q183)', () => {
+  it('test_returns_tuning_with_same_id_and_name_as_scale', () => {
+    const minimal = scaleToMinimalTuning(major, t12);
+    expect(minimal.id).toBe(major.id);
+    expect(minimal.name).toBe(major.name);
+  });
+
+  it('test_degree_count_matches_scale_degree_indices', () => {
+    const minimal = scaleToMinimalTuning(major, t12);
+    expect(minimal.degrees.length).toBe(major.degreeIndices.length);
+  });
+
+  it('test_inherits_reference_hz_and_period_cents', () => {
+    const minimal = scaleToMinimalTuning(major, t12);
+    expect(minimal.referenceHz).toBe(t12.referenceHz);
+    expect(minimal.periodCents).toBe(t12.periodCents);
+  });
+
+  it('test_inherits_source', () => {
+    const minimal = scaleToMinimalTuning(major, t12);
+    expect(minimal.source).toBe(t12.source);
+  });
+
+  it('test_wrong_tuning_id_throws', () => {
+    const wrongScale: Scale = {
+      id: 'w',
+      name: 'w',
+      tuningId: 'other',
+      degreeIndices: [0, 1],
+    };
+    expect(() => scaleToMinimalTuning(wrongScale, t12)).toThrow(RangeError);
+  });
+
+  it('test_single_degree_scale', () => {
+    const single: Scale = {
+      id: 'root-only',
+      name: 'Root only',
+      tuningId: '12-tet',
+      degreeIndices: [0],
+    };
+    const minimal = scaleToMinimalTuning(single, t12);
+    expect(minimal.degrees.length).toBe(1);
+  });
+});
+
+// Q184 — chordMapDissonancePercentiles: full dissonance distribution as percentile record
+describe('chordMapDissonancePercentiles (Q184)', () => {
+  it('test_returns_record_with_default_percentile_keys', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const result = chordMapDissonancePercentiles(chordMap);
+    expect(result).toHaveProperty('0');
+    expect(result).toHaveProperty('0.25');
+    expect(result).toHaveProperty('0.5');
+    expect(result).toHaveProperty('0.75');
+    expect(result).toHaveProperty('1');
+  });
+
+  it('test_min_lte_max', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const result = chordMapDissonancePercentiles(chordMap);
+    expect(result['0']).toBeLessThanOrEqual(result['1']!);
+  });
+
+  it('test_median_between_min_and_max', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const result = chordMapDissonancePercentiles(chordMap);
+    expect(result['0.5']).toBeGreaterThanOrEqual(result['0']!);
+    expect(result['0.5']).toBeLessThanOrEqual(result['1']!);
+  });
+
+  it('test_custom_percentiles', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const result = chordMapDissonancePercentiles(chordMap, [0, 0.5, 1]);
+    expect(Object.keys(result).sort()).toEqual(['0', '0.5', '1']);
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => chordMapDissonancePercentiles([])).toThrow(RangeError);
+  });
+
+  it('test_all_values_non_negative', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const result = chordMapDissonancePercentiles(chordMap);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// Q185 — groupChordMapByLabel: group chord map entries by interval-count label
+describe('groupChordMapByLabel (Q185)', () => {
+  it('test_returns_map', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const grouped = groupChordMapByLabel(chordMap);
+    expect(grouped).toBeInstanceOf(Map);
+  });
+
+  it('test_triad_chord_map_has_triad_key', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const grouped = groupChordMapByLabel(chordMap);
+    expect(grouped.has('triad')).toBe(true);
+  });
+
+  it('test_all_entries_accounted_for', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const grouped = groupChordMapByLabel(chordMap);
+    let total = 0;
+    for (const entries of grouped.values()) total += entries.length;
+    expect(total).toBe(chordMap.length);
+  });
+
+  it('test_dyad_map_has_dyad_key', () => {
+    const chordMap = scaleToChordMap(major, t12, 2);
+    const grouped = groupChordMapByLabel(chordMap);
+    expect(grouped.has('dyad')).toBe(true);
+    expect(grouped.has('triad')).toBe(false);
+  });
+
+  it('test_empty_map_returns_empty_map', () => {
+    const grouped = groupChordMapByLabel([]);
+    expect(grouped.size).toBe(0);
+  });
+
+  it('test_entries_preserve_original_references', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const grouped = groupChordMapByLabel(chordMap);
+    const allGrouped: (typeof chordMap)[0][] = [];
+    for (const entries of grouped.values()) allGrouped.push(...entries);
+    for (const entry of chordMap) {
+      expect(allGrouped).toContain(entry);
+    }
   });
 });

@@ -2189,3 +2189,134 @@ export function chordMapWithLabels(
     label: labelFor(entry.chord.intervals.length),
   }));
 }
+
+/**
+ * Project a `Scale`'s selected degrees back into a minimal `TuningSystem`.
+ *
+ * Socratic Q183: "If we can convert a TuningSystem to a Scale, we should also be able to
+ * convert a Scale back to a minimal TuningSystem containing only the scale's degrees —
+ * can it?" Today: `scaleToTuning` exists but generates a new id and name. If a scale
+ * should round-trip back to a tuning with the same identity (same id and name), that
+ * requires a separate call. This bridges the identity-preserving direction.
+ *
+ * Algorithm: For each index in `scale.degreeIndices`, pick `tuning.degrees[idx]` and
+ * build a new `TuningSystem` with `id = scale.id`, `name = scale.name`, inheriting
+ * `referenceHz`, `periodCents`, and `source` from `tuning`.
+ *
+ * @param scale  - The scale to project. Must be compatible with `tuning`.
+ * @param tuning - The parent `TuningSystem` to pick degrees from.
+ * @returns A new `TuningSystem` containing only the scale's selected degrees.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const minimal = scaleToMinimalTuning(major, t12);
+ * // minimal.degrees has 7 pitches; minimal.id === 'major'
+ */
+export function scaleToMinimalTuning(scale: Scale, tuning: TuningSystem): TuningSystem {
+  assertTuningMatch(scale, tuning);
+  const pickedDegrees = scale.degreeIndices.map((idx) => {
+    const degree = tuning.degrees[idx];
+    if (degree === undefined) {
+      throw new RangeError(
+        `scaleToMinimalTuning: degree index ${idx} out of range for tuning '${tuning.id}'`,
+      );
+    }
+    return degree;
+  });
+  return defineTuning({
+    id: scale.id,
+    name: scale.name,
+    referenceHz: tuning.referenceHz,
+    periodCents: tuning.periodCents,
+    degrees: pickedDegrees,
+    source: tuning.source,
+    ...(tuning.region !== undefined ? { region: tuning.region } : {}),
+  });
+}
+
+/**
+ * Compute the full dissonance distribution of a chord map as percentile values.
+ *
+ * Socratic Q184: "If we can compute the median dissonance of a chord map, we should be
+ * able to compute the full dissonance distribution (percentiles) in one call — can it?"
+ * Today: `rankChordMapByDissonance` → extract values → compute each percentile manually
+ * — three steps. If a chord map is first-class, getting its full distribution should be
+ * one call.
+ *
+ * Algorithm: `rankChordMapByDissonance` → compute dissonance for each entry →
+ * for each percentile `p` in [0,1]: value at `floor(p * (n - 1))`.
+ *
+ * @param chordMap    - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param percentiles - Percentile values in [0,1]. Default: [0, 0.25, 0.5, 0.75, 1].
+ * @param spectrum    - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz      - Root frequency in Hz. Default: 440.
+ * @returns `Record<string, number>` mapping each percentile (as string key) to its dissonance value.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const percentiles = chordMapDissonancePercentiles(chordMap);
+ * // percentiles['0'] is the minimum dissonance, percentiles['1'] is the maximum
+ */
+export function chordMapDissonancePercentiles(
+  chordMap: readonly ScaleChordMapEntry[],
+  percentiles: readonly number[] = [0, 0.25, 0.5, 0.75, 1],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): Record<string, number> {
+  if (chordMap.length === 0)
+    throw new RangeError('chordMapDissonancePercentiles: chordMap must be non-empty');
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const sorted = rankChordMapByDissonance(chordMap, effectiveSpectrum, rootHz);
+  const values = sorted.map((e) => chordObjectDissonance(e.chord, rootHz, effectiveSpectrum));
+  const n = values.length;
+  const result: Record<string, number> = {};
+  for (const p of percentiles) {
+    const idx = Math.floor(p * (n - 1));
+    result[String(p)] = values[idx] as number;
+  }
+  return result;
+}
+
+/**
+ * Group a chord map by interval-count label in one call.
+ *
+ * Socratic Q185: "If we can label chords in a map, we should be able to group the chord
+ * map by label — can it?" Today: `chordMapWithLabels(chordMap)` → iterate and push into a
+ * `Map` — two explicit steps. If labelling is first-class, grouping by label should also
+ * be one call.
+ *
+ * Labels: 'unison' (1 note), 'dyad' (2), 'triad' (3), 'tetrad' (4), 'pentad' (5),
+ * '${n}-chord' for larger chords.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @returns `Map<string, ScaleChordMapEntry[]>` keyed by label, values in original map order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const grouped = groupChordMapByLabel(chordMap);
+ * // grouped.get('triad') — all triads in the map
+ */
+export function groupChordMapByLabel(
+  chordMap: readonly ScaleChordMapEntry[],
+): Map<string, ScaleChordMapEntry[]> {
+  const labelled = chordMapWithLabels(chordMap);
+  const result = new Map<string, ScaleChordMapEntry[]>();
+  for (const { entry, label } of labelled) {
+    let group = result.get(label);
+    if (group === undefined) {
+      group = [];
+      result.set(label, group);
+    }
+    group.push(entry);
+  }
+  return result;
+}
