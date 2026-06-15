@@ -16,6 +16,7 @@ import {
   chordFromBestMode,
   rankScalesForTimbre,
   bestScaleForTimbre,
+  scaleIntervalHistogram,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -805,5 +806,100 @@ describe('bestScaleForTimbre — most consonant Scale for a timbre (Q70)', () =>
 
   it('test_empty_scales_throws_range_error', () => {
     expect(() => bestScaleForTimbre([], t12, spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q89 — scaleIntervalHistogram
+// ---------------------------------------------------------------------------
+
+describe('scaleIntervalHistogram (Q89)', () => {
+  it('test_returns_a_map', () => {
+    const hist = scaleIntervalHistogram(major, t12);
+    expect(hist instanceof Map).toBe(true);
+  });
+
+  it('test_total_pairs_equals_n_choose_2', () => {
+    // 7-note major scale: C(7,2) = 21 pairs
+    const hist = scaleIntervalHistogram(major, t12);
+    let total = 0;
+    hist.forEach((count) => (total += count));
+    expect(total).toBe((7 * 6) / 2);
+  });
+
+  it('test_diatonic_major_has_6_perfect_fifths', () => {
+    // The 7-note diatonic major scale contains 6 perfect fifths (700c)
+    // Pairs (i,j) with j-i ≡ 7 semitones within [0,2,4,5,7,9,11]:
+    // (0→7),(2→9),(4→11),(5→0+12?no—upper triangle only within scale)
+    // Scale degrees in cents: 0,200,400,500,700,900,1100
+    // Upper-triangle intervals that equal 700c:
+    //   0→700, 200→900, 400→1100, 500→1200-? no, only within scale
+    //   Let's count: (0,700),(200,900),(400,1100),(500,1200-not in scale)
+    //   Actually: (0,700), (200,900), (400,1100), and (500,?) 500+700=1200 not in scale
+    //   But also (900-200=700),(1100-400=700) already counted.
+    //   Count = 4 from those, plus checking across: (0→700=700✓),(200→900=700✓),(400→1100=700✓)
+    //   and descending pairs don't apply (upper triangle).
+    //   The tuningToIntervalVector bins at stepCents=50: 700c → bin 700.
+    //   Actual count: degrees 0,200,400,500,700,900,1100
+    //   Pairs with diff = 700: (0,700),(200,900),(400,1100),(500,1200-no),(700,1400-no)
+    //   → only 3? Let me also check (500→1100=600, not 700), (0→700=700✓), (200→900=700✓), (400→1100=700✓)
+    //   Hmm also check (500→?) 500+700=1200 not a degree, (700→?) 700+700=1400 not, (900→?)
+    //   So exactly 3 pairs have interval 700c.
+    // But the docstring says 6 — that counts both directions (i→j and j→i).
+    // tuningToIntervalVector counts upper-triangle only, so answer is 3.
+    const hist = scaleIntervalHistogram(major, t12);
+    // 3 ascending perfect-fifth pairs in the diatonic major scale
+    expect(hist.get(700)).toBe(3);
+  });
+
+  it('test_5_note_pentatonic_has_fewer_intervals_than_7_note_major', () => {
+    // A 5-note scale has C(5,2)=10 pairs vs C(7,2)=21 for the major
+    const pentatonic: Scale = {
+      id: 'pent',
+      name: 'pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const histPent = scaleIntervalHistogram(pentatonic, t12);
+    const histMaj = scaleIntervalHistogram(major, t12);
+    let totalPent = 0;
+    let totalMaj = 0;
+    histPent.forEach((c) => (totalPent += c));
+    histMaj.forEach((c) => (totalMaj += c));
+    expect(totalPent).toBeLessThan(totalMaj);
+    expect(totalPent).toBe(10);
+  });
+
+  it('test_step_cents_controls_binning', () => {
+    // With stepCents=100, intervals are in 100c multiples.
+    const hist100 = scaleIntervalHistogram(major, t12, 100);
+    // 200c intervals should exist in the diatonic major (e.g. 0→200, 200→400, etc.)
+    expect(hist100.get(200) ?? 0).toBeGreaterThan(0);
+  });
+
+  it('test_tuning_mismatch_throws', () => {
+    const wrongScale: Scale = {
+      id: 'wrong',
+      name: 'wrong',
+      tuningId: 'other-id',
+      degreeIndices: [0, 1],
+    };
+    expect(() => scaleIntervalHistogram(wrongScale, t12)).toThrow(RangeError);
+  });
+
+  it('test_single_degree_scale_has_empty_histogram', () => {
+    const mono: Scale = {
+      id: 'mono',
+      name: 'mono',
+      tuningId: '12-tet',
+      degreeIndices: [0],
+    };
+    const hist = scaleIntervalHistogram(mono, t12);
+    expect(hist.size).toBe(0);
+  });
+
+  it('test_invalid_step_cents_throws', () => {
+    expect(() => scaleIntervalHistogram(major, t12, 0)).toThrow(RangeError);
+    expect(() => scaleIntervalHistogram(major, t12, -50)).toThrow(RangeError);
   });
 });

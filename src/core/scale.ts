@@ -1,4 +1,10 @@
-import { type TuningSystem, defineTuning, degreeToCents, degreeToFreq } from './tuning.js';
+import {
+  type TuningSystem,
+  defineTuning,
+  degreeToCents,
+  degreeToFreq,
+  tuningToIntervalVector,
+} from './tuning.js';
 import { type Spectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
 import {
@@ -455,4 +461,47 @@ export function bestScaleForTimbre(
   spectrum: Spectrum,
 ): Scale {
   return (rankScalesForTimbre(scales, tuning, spectrum)[0] as RankedScale).scale;
+}
+
+/**
+ * Interval histogram of a `Scale`: counts how often each interval class appears
+ * among all scale-degree pairs.
+ *
+ * Socratic Q89: `tuningToIntervalVector(tuning)` computes the interval histogram
+ * for a *full tuning* (all n×(n-1)/2 degree pairs). But most music uses a *scale*
+ * — a curated subset of those degrees (e.g. the 7-note diatonic major from 12-TET).
+ * The characteristic interval content of the scale (e.g. "how many perfect fifths
+ * does the major scale contain?") is a different histogram over just the 7 selected
+ * degrees. If `Scale` is truly first-class, computing its interval fingerprint
+ * should be one call.
+ *
+ * Delegates to `tuningToIntervalVector` over the scale's projected sub-tuning
+ * (via `scaleToTuning`), so the binning semantics are identical.
+ *
+ * Counts only **upper-triangle** pairs (i < j), ascending intervals only. Each
+ * pair contributes one count to the bin nearest to `stepCents` resolution.
+ *
+ * @param scale - The scale to fingerprint (degree subset of the tuning).
+ * @param tuning - Parent tuning system the scale belongs to.
+ * @param stepCents - Bin width in cents (default 50). Must be > 0.
+ * @returns `Map<number, number>` mapping interval bin (cents) → count.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if `stepCents` ≤ 0.
+ *
+ * @example
+ * // Diatonic major scale in 12-TET: how many perfect fifths?
+ * const major = { id: 'major', name: 'Ionian', tuningId: '12-tet',
+ *                 degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+ * const hist = scaleIntervalHistogram(major, equalTemperament12(440));
+ * hist.get(700); // → 6 (each of the 6 available fifths in the diatonic scale)
+ */
+export function scaleIntervalHistogram(
+  scale: Scale,
+  tuning: TuningSystem,
+  stepCents = 50,
+): Map<number, number> {
+  assertTuningMatch(scale, tuning);
+  const subTuning = scaleToTuning(scale, tuning);
+  return tuningToIntervalVector(subTuning, stepCents);
 }

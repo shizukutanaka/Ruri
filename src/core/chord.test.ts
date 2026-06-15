@@ -8,6 +8,7 @@ import {
   chordToCentOffsets,
   realizeChordFreqs,
   realizedFreqIntervalMatrix,
+  chordSimilarity,
 } from './chord.js';
 import { equalTemperament12, edo } from './tuning.js';
 import { guitarStandard } from './instrument.js';
@@ -268,5 +269,78 @@ describe('realizedFreqIntervalMatrix (Q84)', () => {
     const m = realizedFreqIntervalMatrix(freqs);
     // Root (index 0) to fifth (index 2) = 700 cents in 12-TET
     expect(m[0]![2]).toBeCloseTo(700, 6);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q87 — chordSimilarity
+// ---------------------------------------------------------------------------
+
+describe('chordSimilarity (Q87)', () => {
+  const root = 261.63;
+
+  it('test_identical_chords_return_1', () => {
+    const maj = chordFromSemitones('major', [0, 4, 7]);
+    expect(chordSimilarity(maj, maj, root)).toBeCloseTo(1, 9);
+  });
+
+  it('test_same_structure_different_name_returns_1', () => {
+    const a = chordFromSemitones('a', [0, 4, 7]);
+    const b = chordFromSemitones('b', [0, 4, 7]);
+    expect(chordSimilarity(a, b, root)).toBeCloseTo(1, 9);
+  });
+
+  it('test_12tet_vs_ji_major_triad_high_similarity', () => {
+    // TET major: 0, 400, 700c; JI major: 0, 386.31, 701.96c — very close
+    const tetMaj = chordFromSemitones('tet-major', [0, 4, 7]);
+    const jiMaj = chordFromRatios('ji-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    const sim = chordSimilarity(tetMaj, jiMaj, root);
+    // Mean abs diff ≈ (13.69 + 1.96 + 11.73) / 3 ≈ 9.13c → sim ≈ 0.916
+    expect(sim).toBeGreaterThan(0.85);
+    expect(sim).toBeLessThan(1.0);
+  });
+
+  it('test_major_vs_minor_triad_lower_similarity_than_major_vs_ji_major', () => {
+    const major = chordFromSemitones('major', [0, 4, 7]);
+    const minor = chordFromSemitones('minor', [0, 3, 7]);
+    const jiMaj = chordFromRatios('ji-major', [
+      [1, 1],
+      [5, 4],
+      [3, 2],
+    ]);
+    const simMajJi = chordSimilarity(major, jiMaj, root);
+    const simMajMin = chordSimilarity(major, minor, root);
+    // TET major vs JI major is more similar than major vs minor
+    expect(simMajJi).toBeGreaterThan(simMajMin);
+  });
+
+  it('test_result_is_in_range_0_to_1', () => {
+    const a = chordFromSemitones('a', [0, 1]);
+    const b = chordFromSemitones('b', [0, 11]);
+    const sim = chordSimilarity(a, b, root);
+    expect(sim).toBeGreaterThanOrEqual(0);
+    expect(sim).toBeLessThanOrEqual(1);
+  });
+
+  it('test_symmetry_sim_ab_equals_sim_ba', () => {
+    const major = chordFromSemitones('major', [0, 4, 7]);
+    const minor = chordFromSemitones('minor', [0, 3, 7]);
+    expect(chordSimilarity(major, minor, root)).toBeCloseTo(chordSimilarity(minor, major, root), 9);
+  });
+
+  it('test_single_note_chords_return_1', () => {
+    const a = chordFromSemitones('a', [0]);
+    const b = chordFromSemitones('b', [0]);
+    expect(chordSimilarity(a, b, root)).toBeCloseTo(1, 9);
+  });
+
+  it('test_invalid_rootHz_throws', () => {
+    const chord = chordFromSemitones('c', [0, 4, 7]);
+    expect(() => chordSimilarity(chord, chord, 0)).toThrow(RangeError);
+    expect(() => chordSimilarity(chord, chord, -440)).toThrow(RangeError);
   });
 });

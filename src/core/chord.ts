@@ -114,6 +114,67 @@ export function realizedFreqIntervalMatrix(freqs: readonly number[]): number[][]
 }
 
 /**
+ * Structural similarity between two chords based on their realized pairwise intervals.
+ *
+ * Socratic Q87: `realizedFreqIntervalMatrix` gives the full interval matrix for a
+ * realized chord — but comparing two chords to see "how similar they sound" still
+ * requires computing both matrices and writing a bespoke distance formula. If `Chord`
+ * is truly first-class, comparing two chords structurally should be one call.
+ *
+ * Computes the realized interval matrices for `a` and `b` at `rootHz`, then measures
+ * their structural closeness as the mean absolute difference (in cents) across all
+ * upper-triangle pairs, normalized into a 0–1 similarity score via:
+ * `similarity = 1 / (1 + meanAbsCentsDiff / 100)`.
+ *
+ * Properties:
+ * - Returns 1.0 when both chords have identical interval structures.
+ * - Decreases toward 0 as the mean interval deviation grows.
+ * - Uses only the **upper-triangle** pairs (i < j) to avoid double-counting.
+ * - If the chords have different numbers of voices, the comparison is over the
+ *   smaller chord's matrix size; extra voices in the larger chord are ignored.
+ *
+ * @param a - First chord.
+ * @param b - Second chord.
+ * @param rootHz - Root frequency used to realize both chords. Must be > 0.
+ * @returns Similarity in [0, 1]: 1 = identical structure, 0 = maximally distant.
+ *
+ * @throws {RangeError} if either chord has no intervals or `rootHz` ≤ 0.
+ *
+ * @example
+ * // 12-TET major triad vs JI major triad — very similar interval structure
+ * const tetMaj = chordFromSemitones('tet-major', [0, 4, 7]);
+ * const jiMaj = chordFromRatios('ji-major', [[1,1],[5,4],[3,2]]);
+ * const sim = chordSimilarity(tetMaj, jiMaj, 261.63);
+ * // sim ≈ 0.93 (JI third = 386.31c vs TET 400c; JI fifth = 701.96c vs TET 700c)
+ */
+export function chordSimilarity(a: Chord, b: Chord, rootHz: number): number {
+  if (!Number.isFinite(rootHz) || rootHz <= 0) {
+    throw new RangeError(`chordSimilarity: rootHz must be a positive finite number, got ${rootHz}`);
+  }
+  if (a.intervals.length === 0 || b.intervals.length === 0) {
+    throw new RangeError('chordSimilarity: chords must have at least one interval');
+  }
+  const freqsA = realizeChordFreqs(a, rootHz);
+  const freqsB = realizeChordFreqs(b, rootHz);
+  const matA = realizedFreqIntervalMatrix(freqsA);
+  const matB = realizedFreqIntervalMatrix(freqsB);
+  const n = Math.min(freqsA.length, freqsB.length);
+  if (n < 2) return 1; // single-note "chords" are trivially identical
+  let totalDiff = 0;
+  let pairCount = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      totalDiff += Math.abs(
+        ((matA[i] as number[])[j] as number) - ((matB[i] as number[])[j] as number),
+      );
+      pairCount++;
+    }
+  }
+  const meanAbsDiff = totalDiff / pairCount;
+  return 1 / (1 + meanAbsDiff / 100);
+}
+
+/**
  * Build a chord from degree indices into a `TuningSystem`.
  *
  * `chordFromSemitones` only makes sense for 12-TET (1 semitone = 100c).

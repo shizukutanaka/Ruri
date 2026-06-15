@@ -108,6 +108,61 @@ export function edo(
 }
 
 /**
+ * Symmetric distance between two `TuningSystem`s in cents.
+ *
+ * Socratic Q88: `tuningSuitability(tuning, spectrum)` measures how well a tuning
+ * fits a *timbre* — but comparing two tunings directly, independent of any spectrum,
+ * still requires a custom loop. If `TuningSystem` is truly first-class, measuring
+ * "how different two tunings sound" should be one call.
+ *
+ * Algorithm (symmetric Hausdorff-style):
+ * 1. For each degree in `a`, find the nearest degree in `b` (minimum absolute
+ *    difference in cents within the same period), and record that minimum distance.
+ * 2. Do the same in the other direction: for each degree in `b`, find the nearest in `a`.
+ * 3. Return the average of all these minimum distances across both directions.
+ *
+ * This is symmetric: `tuningDistance(a, b) === tuningDistance(b, a)`.
+ * Returns 0 when both tunings have identical degree positions (after normalizing
+ * to cents). The `referenceHz` and `source` fields are ignored — only the cent
+ * positions of the degrees matter.
+ *
+ * @param a - First tuning system.
+ * @param b - Second tuning system.
+ * @returns Average minimum-distance in cents (≥ 0). Lower = more similar.
+ *
+ * @example
+ * // 12-TET vs Pythagorean: small but non-zero distance
+ * const t12 = equalTemperament12(440);
+ * const pyth = pythagorean(440); // from temperament.ts
+ * const d = tuningDistance(t12, pyth);
+ * // d ≈ 5.9 cents (wolf fifth and commas spread small differences across degrees)
+ */
+export function tuningDistance(a: TuningSystem, b: TuningSystem): number {
+  const centsA = a.degrees.map((_, i) => degreeToCents(a, i));
+  const centsB = b.degrees.map((_, i) => degreeToCents(b, i));
+  let total = 0;
+  // a → nearest in b
+  for (const ca of centsA) {
+    let minDist = Infinity;
+    for (const cb of centsB) {
+      const d = Math.abs(ca - cb);
+      if (d < minDist) minDist = d;
+    }
+    total += minDist;
+  }
+  // b → nearest in a
+  for (const cb of centsB) {
+    let minDist = Infinity;
+    for (const ca of centsA) {
+      const d = Math.abs(cb - ca);
+      if (d < minDist) minDist = d;
+    }
+    total += minDist;
+  }
+  return total / (centsA.length + centsB.length);
+}
+
+/**
  * Interval histogram (fingerprint) of a tuning: counts how many times each
  * interval class appears among all degree pairs.
  *

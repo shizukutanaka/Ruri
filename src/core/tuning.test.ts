@@ -7,6 +7,7 @@ import {
   degreeToFreq,
   tuningIntervalMatrix,
   tuningToIntervalVector,
+  tuningDistance,
   type TuningSystem,
 } from './tuning.js';
 import { cents, fromRatio } from './cents.js';
@@ -268,5 +269,57 @@ describe('tuningToIntervalVector (Q86)', () => {
     hist.forEach((count) => (total += count));
     expect(total).toBe((5 * 4) / 2);
     expect(hist.get(250)).toBe(4); // 240c rounds to 250c at stepCents=50
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q88 — tuningDistance
+// ---------------------------------------------------------------------------
+
+describe('tuningDistance (Q88)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_same_tuning_distance_is_zero', () => {
+    expect(tuningDistance(t12, t12)).toBeCloseTo(0, 9);
+  });
+
+  it('test_same_structure_different_referenceHz_distance_is_zero', () => {
+    // referenceHz is irrelevant — only cent positions matter
+    const t12b = equalTemperament12(880);
+    expect(tuningDistance(t12, t12b)).toBeCloseTo(0, 9);
+  });
+
+  it('test_12tet_vs_24edo_is_nonzero', () => {
+    // 24-EDO has 50c steps; halfway between 12-TET degrees
+    const t24 = edo(24, 440);
+    const d = tuningDistance(t12, t24);
+    expect(d).toBeGreaterThan(0);
+  });
+
+  it('test_symmetry_distance_ab_equals_distance_ba', () => {
+    const t19 = edo(19, 440);
+    expect(tuningDistance(t12, t19)).toBeCloseTo(tuningDistance(t19, t12), 9);
+  });
+
+  it('test_12tet_vs_19edo_smaller_than_12tet_vs_7edo', () => {
+    // 19-EDO approximates 12-TET intervals more closely than 7-EDO
+    const t19 = edo(19, 440);
+    const t7 = edo(7, 440);
+    expect(tuningDistance(t12, t19)).toBeLessThan(tuningDistance(t12, t7));
+  });
+
+  it('test_distance_is_non_negative', () => {
+    const t31 = edo(31, 440);
+    expect(tuningDistance(t12, t31)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_result_is_in_cents_units', () => {
+    // 24-EDO has degrees at 0, 50, 100, ... Each 12-TET degree is 100c-spaced.
+    // a→b direction: every 12-TET degree lands exactly on a 24-EDO degree → 12 * 0 = 0.
+    // b→a direction: the 12 "extra" 24-EDO degrees (50, 150, ...) are each 50c from
+    //   the nearest 12-TET degree → 12 * 50 = 600.
+    // Total sum = 600, count = 12 + 24 = 36, average = 600 / 36 ≈ 16.667c.
+    const t24 = edo(24, 440);
+    expect(tuningDistance(t12, t24)).toBeCloseTo(600 / 36, 6);
   });
 });
