@@ -44,6 +44,8 @@ import {
   filterChordMapByDissonance,
   chordMapMeanDissonance,
   progressionScoreSummary,
+  chordMapSummary,
+  filterChordMapByCriteria,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -2550,5 +2552,104 @@ describe('progressionScoreSummary (Q160)', () => {
     expect(parsed.chordCount).toBe(summary.chordCount);
     expect(parsed.bestChordIndex).toBe(summary.bestChordIndex);
     expect(parsed.worstChordIndex).toBe(summary.worstChordIndex);
+  });
+});
+
+// Q164 — chordMapSummary: complete statistical summary of chord map analysis
+describe('chordMapSummary (Q164)', () => {
+  const t12 = equalTemperament12(440);
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('test_count_equals_number_of_diatonic_chords', () => {
+    const summary = chordMapSummary(major12, t12, spectrum);
+    expect(summary.count).toBe(major12.degreeIndices.length);
+  });
+
+  it('test_min_dissonance_leq_max_dissonance', () => {
+    const summary = chordMapSummary(major12, t12, spectrum);
+    expect(summary.minDissonance).toBeLessThanOrEqual(summary.maxDissonance);
+  });
+
+  it('test_mean_dissonance_between_min_and_max', () => {
+    const summary = chordMapSummary(major12, t12, spectrum);
+    expect(summary.meanDissonance).toBeGreaterThanOrEqual(summary.minDissonance);
+    expect(summary.meanDissonance).toBeLessThanOrEqual(summary.maxDissonance);
+  });
+
+  it('test_median_dissonance_is_finite', () => {
+    const summary = chordMapSummary(major12, t12, spectrum);
+    expect(Number.isFinite(summary.medianDissonance)).toBe(true);
+  });
+
+  it('test_min_harmonicity_leq_max_harmonicity', () => {
+    const summary = chordMapSummary(major12, t12, spectrum);
+    expect(summary.minHarmonicity).toBeLessThanOrEqual(summary.maxHarmonicity);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => chordMapSummary(major12, edo(19), spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q166 — filterChordMapByCriteria: filter by harmonicity AND dissonance simultaneously
+describe('filterChordMapByCriteria (Q166)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('test_empty_criteria_returns_all_entries', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const filtered = filterChordMapByCriteria(chordMap, {}, spectrum);
+    expect(filtered.length).toBe(chordMap.length);
+  });
+
+  it('test_very_low_max_harmonicity_reduces_entries', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const allEntries = filterChordMapByCriteria(chordMap, {}, spectrum);
+    const filtered = filterChordMapByCriteria(chordMap, { maxHarmonicity: 5 }, spectrum);
+    expect(filtered.length).toBeLessThanOrEqual(allEntries.length);
+  });
+
+  it('test_very_low_max_dissonance_reduces_entries', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const allEntries = filterChordMapByCriteria(chordMap, {}, spectrum);
+    const filtered = filterChordMapByCriteria(chordMap, { maxDissonance: 0.001 }, spectrum);
+    expect(filtered.length).toBeLessThanOrEqual(allEntries.length);
+  });
+
+  it('test_both_criteria_combined_is_subset_of_either_alone', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const byHarm = filterChordMapByCriteria(chordMap, { maxHarmonicity: 30 }, spectrum);
+    const byDiss = filterChordMapByCriteria(chordMap, { maxDissonance: 10 }, spectrum);
+    const both = filterChordMapByCriteria(
+      chordMap,
+      { maxHarmonicity: 30, maxDissonance: 10 },
+      spectrum,
+    );
+    expect(both.length).toBeLessThanOrEqual(byHarm.length);
+    expect(both.length).toBeLessThanOrEqual(byDiss.length);
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => filterChordMapByCriteria([], {}, spectrum)).toThrow(RangeError);
+  });
+
+  it('test_returns_subset_of_input', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const filtered = filterChordMapByCriteria(chordMap, { maxHarmonicity: 1000 }, spectrum);
+    for (const entry of filtered) {
+      expect(chordMap).toContainEqual(entry);
+    }
   });
 });

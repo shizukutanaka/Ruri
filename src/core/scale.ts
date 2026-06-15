@@ -1963,3 +1963,126 @@ export function progressionScoreSummary(
     worstChordIndex: worstIdx,
   };
 }
+
+/**
+ * Descriptive statistics summary of a scale's full chord map analysis.
+ *
+ * Socratic Q164: "If we can compute a progression score summary from a scale, summarizing
+ * the ENTIRE chord map analysis (not just progression) should be one call — can it?"
+ * `chordMapAnalysis(scale, tuning, spectrum)` returns per-chord dissonance and harmonicity
+ * for every diatonic chord; extracting min/max/mean/median for both axes still requires
+ * three manual passes. If a chord map analysis is first-class, summarising it should be
+ * one call.
+ *
+ * Algorithm:
+ * 1. `chordMapAnalysis(scale, tuning, spectrum ?? harmonicSpectrum())` → entries.
+ * 2. Extract dissonance and harmonicity arrays.
+ * 3. Compute min, max, mean, and median for each axis.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns Summary statistics for both dissonance and harmonicity across all diatonic chords.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const summary = chordMapSummary(major, t12);
+ * console.log(summary.meanDissonance, summary.meanHarmonicity);
+ */
+export function chordMapSummary(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+): {
+  count: number;
+  minDissonance: number;
+  maxDissonance: number;
+  meanDissonance: number;
+  medianDissonance: number;
+  minHarmonicity: number;
+  maxHarmonicity: number;
+  meanHarmonicity: number;
+} {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const entries = chordMapAnalysis(scale, tuning, effectiveSpectrum);
+  if (entries.length === 0) {
+    throw new RangeError('chordMapSummary: no chord map entries — scale may be too small');
+  }
+  const dissonances = entries.map((e) => e.dissonance);
+  const harmonicities = entries.map((e) => e.harmonicity);
+
+  const median = (sorted: number[]): number => {
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 1
+      ? (sorted[mid] as number)
+      : ((sorted[mid - 1] as number) + (sorted[mid] as number)) / 2;
+  };
+
+  const sortedDiss = [...dissonances].sort((a, b) => a - b);
+  const meanDiss = dissonances.reduce((a, b) => a + b, 0) / dissonances.length;
+
+  const sortedHarm = [...harmonicities].sort((a, b) => a - b);
+  const meanHarm = harmonicities.reduce((a, b) => a + b, 0) / harmonicities.length;
+
+  return {
+    count: entries.length,
+    minDissonance: sortedDiss[0] as number,
+    maxDissonance: sortedDiss[sortedDiss.length - 1] as number,
+    meanDissonance: meanDiss,
+    medianDissonance: median(sortedDiss),
+    minHarmonicity: sortedHarm[0] as number,
+    maxHarmonicity: sortedHarm[sortedHarm.length - 1] as number,
+    meanHarmonicity: meanHarm,
+  };
+}
+
+/**
+ * Filter a chord map to entries satisfying BOTH a harmonicity and a dissonance threshold.
+ *
+ * Socratic Q166: "If we can filter a chord map by harmonicity and by dissonance, filtering
+ * by BOTH simultaneously (entries that satisfy BOTH thresholds) should be one call — can it?"
+ * `filterChordMapByHarmonicity` and `filterChordMapByDissonance` each apply one filter.
+ * Combining both requires chaining two calls. If chord map filtering is first-class, applying
+ * both thresholds simultaneously should be one call.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`). Must be non-empty.
+ * @param criteria - Object with optional `maxHarmonicity` and `maxDissonance` thresholds.
+ *                   If neither key is provided, returns all entries unchanged.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ *                   Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Root frequency for chord realization (default 440 Hz).
+ * @returns New array containing only entries satisfying all provided criteria.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const filtered = filterChordMapByCriteria(chordMap, { maxHarmonicity: 10, maxDissonance: 0.5 });
+ * // filtered contains only chords that are both sufficiently harmonic and consonant
+ */
+export function filterChordMapByCriteria(
+  chordMap: readonly ScaleChordMapEntry[],
+  criteria: { maxHarmonicity?: number; maxDissonance?: number },
+  spectrum?: Spectrum,
+  rootHz = 440,
+): ScaleChordMapEntry[] {
+  if (chordMap.length === 0) {
+    throw new RangeError('filterChordMapByCriteria: chordMap must be non-empty');
+  }
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  return chordMap.filter((entry) => {
+    if (criteria.maxHarmonicity !== undefined) {
+      if (harmonicityForChord(entry.chord, rootHz) > criteria.maxHarmonicity) return false;
+    }
+    if (criteria.maxDissonance !== undefined) {
+      if (chordObjectDissonance(entry.chord, rootHz, effectiveSpectrum) > criteria.maxDissonance)
+        return false;
+    }
+    return true;
+  });
+}
