@@ -23,6 +23,9 @@ import {
   bestModeForTuning,
   bestChordForMidiNote,
   rankChordMapByHarmonicity,
+  progressionFromPattern,
+  rankChordMapByDissonance,
+  scaleToChordMap,
 } from '../core/scale.js';
 import {
   type RankedChord,
@@ -731,4 +734,130 @@ export function topNChordMapWav(
   const ranked = rankChordMapByHarmonicity(chordMap, rootHz);
   const topN = ranked.slice(0, n);
   return chordMapToWav(topN, rootHz, spectrum, opts);
+}
+
+/**
+ * Full pipeline: tuning → best mode → chord progression from pattern → WAV bytes in one call.
+ *
+ * Socratic Q144: "If we can rank modes by harmonicity, the best mode's chord progression
+ * should be exportable as WAV in one call — can it?" Today it requires: `bestModeForTuning`
+ * → `progressionFromPattern` → `chordProgressionToWav` — three explicit steps. This bridges
+ * the gap.
+ *
+ * Algorithm:
+ * 1. `bestModeForTuning(tuning, spectrum)` → best modal `Scale`.
+ * 2. `progressionFromPattern(mode, tuning, pattern)` → `Chord[]`.
+ * 3. `chordProgressionToWav(chords, rootHz, spectrum ?? harmonicSpectrum(), opts)` → WAV.
+ *
+ * @param tuning   - The parent `TuningSystem`.
+ * @param pattern  - Array of 0-based root degree indices within the best mode.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns WAV bytes of the best mode's chord progression.
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ * @throws {RangeError} if `pattern` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const wav = bestModeProgressionWav(t12, [0, 2, 4, 0], 261.63, harmonicSpectrum());
+ * await fs.writeFile('best-mode-prog.wav', wav);
+ */
+export function bestModeProgressionWav(
+  tuning: TuningSystem,
+  pattern: readonly number[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const bestMode = bestModeForTuning(tuning, spectrum);
+  const chords = progressionFromPattern(bestMode, tuning, pattern);
+  return chordProgressionToWav(chords, rootHz, effectiveSpectrum, opts);
+}
+
+/**
+ * Rank a chord map by dissonance, take the worst N entries, and synthesize to WAV in one call.
+ *
+ * Socratic Q145: "If we can analyze a chord map and export it as WAV, we should be able to
+ * rank and export the worst-N (most dissonant) chords as a WAV for comparison — can it?"
+ * Today it requires: `rankChordMapByDissonance` → reverse → take last N → `chordMapToWav` —
+ * four steps. This bridges the gap.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param n        - Number of most dissonant chords to include (must be ≥ 1).
+ * @param rootHz   - Absolute frequency of the shared root note in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns WAV bytes of the worst-N most dissonant chords, concatenated sequentially.
+ *
+ * @throws {RangeError} if `n` < 1.
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const wav = worstNChordMapWav(chordMap, 3, 261.63);
+ * await fs.writeFile('worst3-chords.wav', wav);
+ */
+export function worstNChordMapWav(
+  chordMap: readonly ScaleChordMapEntry[],
+  n: number,
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  if (!Number.isInteger(n) || n < 1) {
+    throw new RangeError(`worstNChordMapWav: n must be an integer >= 1, got ${n}`);
+  }
+  if (chordMap.length === 0) {
+    throw new RangeError('worstNChordMapWav: chordMap must be non-empty');
+  }
+  const ranked = rankChordMapByDissonance(chordMap, spectrum, rootHz);
+  const worstN = ranked.slice(-n);
+  return chordMapToWav(worstN, rootHz, spectrum, opts);
+}
+
+/**
+ * Build the optimal chord ordering from a scale and synthesize it to WAV in one call.
+ *
+ * Socratic Q147: "If we have a chord progression analysis that includes smoothness data,
+ * we should be able to export its optimal reordering as WAV in one call — can it?" Today it
+ * requires: `buildChordProgression(scale, tuning)` → `optimalChordOrder(chords)` →
+ * `chordProgressionToWav` — three explicit steps. This bridges the gap.
+ *
+ * Algorithm:
+ * 1. `buildChordProgression(scale, tuning)` → `Chord[]` of all diatonic chords.
+ * 2. `optimalChordOrder(chords)` → voice-leading–optimal ordering.
+ * 3. `chordProgressionToWav(ordered, rootHz, spectrum ?? harmonicSpectrum(), opts)` → WAV.
+ *
+ * @param scale    - The parent scale.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns WAV bytes of the scale's diatonic chords in optimal voice-leading order.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const wav = optimalProgressionWavFromScale(major, t12, 261.63, harmonicSpectrum());
+ * await fs.writeFile('optimal-scale-prog.wav', wav);
+ */
+export function optimalProgressionWavFromScale(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts: ChordProgressionToWavOptions = DEFAULT_CHORD_PROGRESSION_WAV,
+): Uint8Array {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const chordMap = scaleToChordMap(scale, tuning);
+  const chords = chordMap.map((e) => e.chord);
+  const { chords: ordered } = optimalChordOrder(chords, rootHz);
+  return chordProgressionToWav(ordered, rootHz, effectiveSpectrum, opts);
 }

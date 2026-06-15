@@ -20,6 +20,9 @@ import {
   bestModeWav,
   bestChordWav,
   topNChordMapWav,
+  bestModeProgressionWav,
+  worstNChordMapWav,
+  optimalProgressionWavFromScale,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1029,5 +1032,179 @@ describe('topNChordMapWav (Q142)', () => {
     const wav = topNChordMapWav(chordMap, 3, rootHz, undefined, fastOpts);
     expect(wav).toBeInstanceOf(Uint8Array);
     expect(wav.length).toBeGreaterThan(44);
+  });
+});
+
+// Q144: bestModeForTuning → progressionFromPattern → chordProgressionToWav in one call
+describe('bestModeProgressionWav (Q144)', () => {
+  const t12 = equalTemperament12(440);
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.05,
+  };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const wav = bestModeProgressionWav(t12, [0, 2, 4], rootHz, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_empty_pattern_throws_range_error', () => {
+    expect(() => bestModeProgressionWav(t12, [], rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_tuning_with_no_degrees_throws_range_error', () => {
+    const empty = {
+      id: 'empty',
+      name: 'Empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(() => bestModeProgressionWav(empty, [0], rootHz, spectrum, fastOpts)).toThrow(
+      RangeError,
+    );
+  });
+
+  it('test_without_spectrum_uses_harmonicity_ranking', () => {
+    const wav = bestModeProgressionWav(t12, [0, 2, 4], rootHz, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_longer_pattern_produces_longer_wav', () => {
+    const wavShort = bestModeProgressionWav(t12, [0, 2], rootHz, spectrum, fastOpts);
+    const wavLong = bestModeProgressionWav(t12, [0, 2, 4, 0], rootHz, spectrum, fastOpts);
+    expect(wavLong.length).toBeGreaterThan(wavShort.length);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = { ...fastOpts, sampleRate: 22050 };
+    const wav = bestModeProgressionWav(t12, [0, 2, 4], rootHz, spectrum, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+});
+
+// Q145: rankChordMapByDissonance reversed → take last N → chordMapToWav in one call
+describe('worstNChordMapWav (Q145)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.05,
+  };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = worstNChordMapWav(chordMap, 3, rootHz, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_n_less_than_1_throws_range_error', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    expect(() => worstNChordMapWav(chordMap, 0, rootHz, spectrum, fastOpts)).toThrow(RangeError);
+    expect(() => worstNChordMapWav(chordMap, -1, rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_empty_chord_map_throws_range_error', () => {
+    expect(() => worstNChordMapWav([], 3, rootHz, spectrum, fastOpts)).toThrow(RangeError);
+  });
+
+  it('test_n_1_produces_shorter_wav_than_n_3', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav1 = worstNChordMapWav(chordMap, 1, rootHz, spectrum, fastOpts);
+    const wav3 = worstNChordMapWav(chordMap, 3, rootHz, spectrum, fastOpts);
+    expect(wav3.length).toBeGreaterThan(wav1.length);
+  });
+
+  it('test_default_spectrum_produces_valid_output', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wav = worstNChordMapWav(chordMap, 2, rootHz, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_n_larger_than_map_uses_all_entries', () => {
+    const chordMap = scaleToChordMap(major, t12);
+    const wavAll = worstNChordMapWav(chordMap, chordMap.length, rootHz, spectrum, fastOpts);
+    const wavMore = worstNChordMapWav(chordMap, chordMap.length + 10, rootHz, spectrum, fastOpts);
+    expect(wavAll.length).toBe(wavMore.length);
+  });
+});
+
+// Q147: buildChordProgression → optimalChordOrder → chordProgressionToWav in one call
+describe('optimalProgressionWavFromScale (Q147)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const rootHz = 261.63;
+  const spectrum = harmonicSpectrum();
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.05,
+  };
+
+  it('test_returns_valid_riff_wav_bytes', () => {
+    const wav = optimalProgressionWavFromScale(major, t12, rootHz, spectrum, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_mismatched_tuning_throws_range_error', () => {
+    const t19 = edo(19);
+    expect(() => optimalProgressionWavFromScale(major, t19, rootHz, spectrum, fastOpts)).toThrow(
+      RangeError,
+    );
+  });
+
+  it('test_without_spectrum_defaults_to_harmonic', () => {
+    const wav = optimalProgressionWavFromScale(major, t12, rootHz, undefined, fastOpts);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+
+  it('test_sample_rate_in_header_matches_opts', () => {
+    const opts = { ...fastOpts, sampleRate: 22050 };
+    const wav = optimalProgressionWavFromScale(major, t12, rootHz, spectrum, opts);
+    const dv = new DataView(wav.buffer);
+    expect(dv.getUint32(24, true)).toBe(22050);
+  });
+
+  it('test_different_scale_degree_counts_produce_different_length_wav', () => {
+    const pentatonic: Scale = {
+      id: 'penta',
+      name: 'Pentatonic',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 7, 9],
+    };
+    const wavMajor = optimalProgressionWavFromScale(major, t12, rootHz, spectrum, fastOpts);
+    const wavPenta = optimalProgressionWavFromScale(pentatonic, t12, rootHz, spectrum, fastOpts);
+    // major has 7 chords, pentatonic has 5 chords → different WAV lengths
+    expect(wavMajor.length).not.toBe(wavPenta.length);
   });
 });
