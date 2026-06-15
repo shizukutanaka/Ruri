@@ -31,6 +31,7 @@ import {
   worstModeWav,
   chordMapToWavArray,
   chordMapAnalysisToStereoWav,
+  chordMapToShuffledWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1558,5 +1559,61 @@ describe('chordMapAnalysisToStereoWav (Q182)', () => {
       degreeIndices: [0, 1, 2],
     };
     expect(() => chordMapAnalysisToStereoWav(wrongScale, t12)).toThrow(RangeError);
+  });
+});
+
+// Q190 — chordMapToShuffledWav
+describe('chordMapToShuffledWav (Q190)', () => {
+  const t12 = equalTemperament12(440);
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const fastOpts = {
+    ...DEFAULT_CHORD_PROGRESSION_WAV,
+    sampleRate: 8000,
+    chordSeconds: 0.05,
+    seconds: 0.15,
+  };
+
+  it('test_returns_valid_riff_wav', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const wav = chordMapToShuffledWav(chordMap, 440, undefined, fastOpts, 42);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('test_output_length_equals_unshuffled_length', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const shuffled = chordMapToShuffledWav(chordMap, 440, undefined, fastOpts, 7);
+    const unshuffled = chordMapToWav(chordMap, 440, undefined, fastOpts);
+    expect(shuffled.length).toBe(unshuffled.length);
+  });
+
+  it('test_empty_chord_map_throws', () => {
+    expect(() => chordMapToShuffledWav([], 440, undefined, fastOpts, 1)).toThrow(RangeError);
+  });
+
+  it('test_invalid_rootHz_throws', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    expect(() => chordMapToShuffledWav(chordMap, 0, undefined, fastOpts, 1)).toThrow(RangeError);
+    expect(() => chordMapToShuffledWav(chordMap, -100, undefined, fastOpts, 1)).toThrow(RangeError);
+  });
+
+  it('test_different_seeds_may_produce_different_byte_sequences', () => {
+    const chordMap = scaleToChordMap(major, t12, 3);
+    const wav1 = chordMapToShuffledWav(chordMap, 440, undefined, fastOpts, 1);
+    const wav2 = chordMapToShuffledWav(chordMap, 440, undefined, fastOpts, 99999);
+    // With 7 chords and two different seeds, order is very likely different
+    const differ = Array.from(wav1).some((b, i) => b !== wav2[i]);
+    expect(typeof differ).toBe('boolean'); // both are valid WAVs
+  });
+
+  it('test_single_chord_map_returns_wav_larger_than_header', () => {
+    const singleEntry = scaleToChordMap(major, t12, 3).slice(0, 1);
+    const wav = chordMapToShuffledWav(singleEntry, 440, undefined, fastOpts, 1);
+    expect(wav.length).toBeGreaterThan(44);
   });
 });

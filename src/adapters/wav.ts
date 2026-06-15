@@ -1292,3 +1292,57 @@ export function chordMapAnalysisToStereoWav(
   }
   return encodeWavStereo(outL, outR, sampleRate);
 }
+
+/**
+ * Synthesize a chord map in a shuffled (randomised) order as a single WAV in one call.
+ *
+ * Socratic Q190: "If we can synthesize a chord map as a WAV array, shuffling that array and
+ * playing them in random order should be one call — can it?" Today: `chordMapToWavArray` →
+ * shuffle entries manually → concatenate — three explicit steps. If shuffled playback is
+ * first-class, it should be one call.
+ *
+ * Algorithm:
+ * 1. Validate `chordMap` non-empty and `rootHz` > 0.
+ * 2. Shallow-copy `chordMap` and shuffle using a seeded LCG PRNG
+ *    (state = (state * 1664525 + 1013904223) % 2^32; seed defaults to Date.now() % 2147483647).
+ * 3. `chordMapToWav(shuffled, rootHz, spectrum, opts)` → single concatenated WAV.
+ *
+ * @param chordMap - Diatonic chord map entries to shuffle and synthesize.
+ * @param rootHz   - Root frequency in Hz. Must be > 0.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @param seed     - Optional LCG seed. Defaults to `Date.now() % 2147483647`.
+ * @returns WAV bytes of the shuffled chord sequence concatenated as a single track.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ * @throws {RangeError} if `rootHz` is not finite or ≤ 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const wav = chordMapToShuffledWav(chordMap, 440, undefined, undefined, 42);
+ */
+export function chordMapToShuffledWav(
+  chordMap: readonly ScaleChordMapEntry[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts?: ChordProgressionToWavOptions,
+  seed?: number,
+): Uint8Array {
+  if (chordMap.length === 0)
+    throw new RangeError('chordMapToShuffledWav: chordMap must be non-empty');
+  if (!Number.isFinite(rootHz) || rootHz <= 0)
+    throw new RangeError('chordMapToShuffledWav: rootHz must be finite and > 0');
+  let state = (seed !== undefined ? seed : Date.now() % 2147483647) | 0;
+  // LCG: Numerical Recipes parameters
+  const shuffled = [...chordMap];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    state = ((state * 1664525 + 1013904223) | 0) >>> 0;
+    const j = state % (i + 1);
+    const tmp = shuffled[i] as ScaleChordMapEntry;
+    shuffled[i] = shuffled[j] as ScaleChordMapEntry;
+    shuffled[j] = tmp;
+  }
+  return chordMapToWav(shuffled, rootHz, spectrum, opts ?? DEFAULT_CHORD_PROGRESSION_WAV);
+}
