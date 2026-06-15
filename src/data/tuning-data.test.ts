@@ -10,6 +10,7 @@ import {
   presetToScl,
   presetToMts,
   presetChordProgression,
+  presetToMtsAndSmf,
 } from './presets.js';
 import { degreeToCents } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
@@ -390,5 +391,46 @@ describe('presetChordProgression (Q126)', () => {
     expect(found).toBeDefined();
     const notFound = presetChordProgression('12-tet', [0, 2, 4], 440, undefined, undefined, custom);
     expect(notFound).toBeUndefined();
+  });
+});
+
+// Q143 — presetToMtsAndSmf: export a preset as both MTS SysEx and SMF in one call
+describe('presetToMtsAndSmf (Q143)', () => {
+  const rootHz = 261.63;
+  const pattern = [0, 3, 4, 0];
+
+  it('test_known_preset_returns_mts_and_smf', () => {
+    const result = presetToMtsAndSmf('12-tet', pattern, rootHz);
+    expect(result).toBeDefined();
+    expect(result!.mts).toBeInstanceOf(Uint8Array);
+    expect(result!.smf).toBeInstanceOf(Uint8Array);
+  });
+
+  it('test_mts_is_408_bytes', () => {
+    const result = presetToMtsAndSmf('12-tet', pattern, rootHz);
+    expect(result!.mts.length).toBe(408);
+  });
+
+  it('test_mts_has_sysex_framing', () => {
+    const result = presetToMtsAndSmf('just-5-limit', pattern, rootHz);
+    expect(result!.mts[0]).toBe(0xf0);
+    expect(result!.mts[407]).toBe(0xf7);
+  });
+
+  it('test_smf_has_mthd_header', () => {
+    const result = presetToMtsAndSmf('12-tet', pattern, rootHz);
+    const smf = result!.smf;
+    expect(String.fromCharCode(smf[0]!, smf[1]!, smf[2]!, smf[3]!)).toBe('MThd');
+  });
+
+  it('test_unknown_preset_returns_undefined', () => {
+    const result = presetToMtsAndSmf('does-not-exist', pattern, rootHz);
+    expect(result).toBeUndefined();
+  });
+
+  it('test_mts_matches_presetToMts_result', () => {
+    const combined = presetToMtsAndSmf('12-tet', pattern, rootHz);
+    const mtsOnly = presetToMts('12-tet');
+    expect(combined!.mts).toEqual(mtsOnly);
   });
 });

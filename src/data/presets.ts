@@ -5,6 +5,7 @@ import { rankChords, type RankedChord, type ChordSearchOptions } from '../core/c
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { tuningToScl, writeScl } from '../adapters/scala.js';
 import { tuningToMts, type TuningToMtsOptions } from '../adapters/mts.js';
+import { progressionToSmf, type ProgressionToSmfOptions } from '../adapters/smf.js';
 import { tuningToScale, progressionFromPattern } from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
 import { type Spectrum } from '../core/spectrum.js';
@@ -262,4 +263,59 @@ export function presetToMts(
   const tuning = getTuningById(presetId, presets);
   if (tuning === undefined) return undefined;
   return tuningToMts(tuning, name, opts);
+}
+
+/** Options for {@link presetToMtsAndSmf}. */
+export interface PresetToMtsAndSmfOptions {
+  /** Options forwarded to `tuningToMts` for the MTS export. */
+  readonly mtsOpts?: TuningToMtsOptions;
+  /** Options forwarded to `progressionToSmf` for the SMF export. */
+  readonly smfOpts?: ProgressionToSmfOptions;
+}
+
+/**
+ * Export a tuning preset as both an MTS bulk dump and an SMF chord progression in one call.
+ *
+ * Socratic Q143: `presetToMts(presetId)` exports a preset's tuning as MTS SysEx;
+ * `presetProgressionSmf` (in smf.ts) exports it as a MIDI chord progression. Getting both
+ * outputs simultaneously — e.g. to save the tuning file AND the chord demo in one shot —
+ * requires two separate function calls from two different modules. If preset exports are
+ * first-class, "give me MTS and SMF for this preset in one call" should be possible.
+ *
+ * Algorithm:
+ * 1. `getTuningById(presetId)` → `TuningSystem | undefined`.
+ * 2. If not found, return `undefined`.
+ * 3. `tuningToMts(tuning, opts?.mtsOpts)` → MTS `Uint8Array` (408 bytes).
+ * 4. `tuningToScale(tuning)` + `progressionFromPattern(scale, tuning, pattern)` → `Chord[]`.
+ * 5. `progressionToSmf(chords, rootHz, opts?.smfOpts)` → SMF `Uint8Array`.
+ * 6. Return `{ mts, smf }`.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param pattern  - Degree-offset pattern for the chord progression (e.g. `[0, 3, 4, 0]`).
+ * @param rootHz   - Root frequency in Hz for SMF pitch mapping.
+ * @param opts     - Optional MTS and SMF encoding options.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ mts: Uint8Array; smf: Uint8Array }` — or `undefined` if preset not found.
+ *
+ * @example
+ * const result = presetToMtsAndSmf('just-5-limit', [0, 3, 4, 0], 261.63);
+ * if (result) {
+ *   port.send(result.mts);
+ *   fs.writeFileSync('prog.mid', result.smf);
+ * }
+ */
+export function presetToMtsAndSmf(
+  presetId: string,
+  pattern: readonly number[],
+  rootHz: number,
+  opts?: PresetToMtsAndSmfOptions,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): { mts: Uint8Array; smf: Uint8Array } | undefined {
+  const tuning = getTuningById(presetId, presets);
+  if (tuning === undefined) return undefined;
+  const mts = tuningToMts(tuning, undefined, opts?.mtsOpts);
+  const scale = tuningToScale(tuning);
+  const chords = progressionFromPattern(scale, tuning, pattern);
+  const smf = progressionToSmf(chords, rootHz, opts?.smfOpts);
+  return { mts, smf };
 }
