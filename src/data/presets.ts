@@ -14,8 +14,11 @@ import {
   tuningHarmonicityProfile,
   tuningReport,
   rankModesByStability,
+  singleBestChord,
+  tuningReportSimilarity,
   type Scale,
   type TuningReportType,
+  type ChordMapAnalysisEntry,
 } from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
 import { type Spectrum, harmonicSpectrum } from '../core/spectrum.js';
@@ -568,6 +571,98 @@ export function presetsComparisonWav(
   }
 
   return encodeWav(combined, sampleRate);
+}
+
+/**
+ * Check whether a preset ranks in the top-N by best-mode harmonicity in one call.
+ *
+ * Socratic Q218: "If we have a preset harmonicity league, checking if a preset is in the
+ * TOP-N of that league should be one call — can it?" Today: `presetHarmonicityLeague` →
+ * `slice(0, n)` → `some(e => e.preset.id === id)` — three steps. If the league is
+ * first-class, a top-N membership check should be one call.
+ *
+ * @param presetId - Id of the preset to check.
+ * @param n        - Number of top entries to consider.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `true` if `presetId` appears in the top-`n` entries of the harmonicity league.
+ *
+ * @example
+ * const inTop2 = isPresetTopN('just-5-limit', 2);
+ */
+export function isPresetTopN(
+  presetId: string,
+  n: number,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): boolean {
+  const league = presetHarmonicityLeague(rootHz, spectrum, presets);
+  return league.slice(0, n).some((e) => e.preset.id === presetId);
+}
+
+/**
+ * Find the best chord for a preset tuning in one call.
+ *
+ * Socratic Q219: "If we can find the single best chord in a chord map, finding the best
+ * chord FROM A PRESET should also be one call — can it?" Today: `getTuningById(presetId)`
+ * → `tuningToScale(tuning)` → `singleBestChord(scale, tuning, spectrum)` — three steps.
+ * If presets are first-class, the best chord should be one call.
+ *
+ * Returns `undefined` if the preset is not found.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `ChordMapAnalysisEntry` for the best chord, or `undefined` if not found.
+ *
+ * @example
+ * const best = presetBestChord('just-5-limit');
+ * if (best) console.log(best.dissonance);
+ */
+export function presetBestChord(
+  presetId: string,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ChordMapAnalysisEntry | undefined {
+  const tuning = getTuningById(presetId, presets);
+  if (tuning === undefined) return undefined;
+  const scale = tuningToScale(tuning);
+  return singleBestChord(scale, tuning, spectrum);
+}
+
+/**
+ * Rank all presets by their tuning-report similarity to a given report, most similar first.
+ *
+ * Socratic Q220: "If we can compare two tuning reports, comparing a tuning report against ALL
+ * presets' reports should produce a ranked similarity list in one call — can it?" Today:
+ * `allPresetReports(rootHz, spectrum, presets)` → for each: `tuningReportSimilarity(report, entry.report)`
+ * → sort — three manual steps. If report comparison is first-class, ranking should be one call.
+ *
+ * @param report   - The reference `TuningReportType` to compare against.
+ * @param rootHz   - Root frequency in Hz for generating preset reports (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ preset, similarity }` sorted descending (most similar first).
+ *
+ * @example
+ * const report = tuningReport(myTuning, 440);
+ * const ranked = rankPresetsByReportSimilarity(report);
+ * // ranked[0].preset is the most similar preset
+ */
+export function rankPresetsByReportSimilarity(
+  report: TuningReportType,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Array<{ preset: TuningPreset; similarity: number }> {
+  return allPresetReports(rootHz ?? 440, spectrum, presets)
+    .map((entry) => ({
+      preset: entry.preset,
+      similarity: tuningReportSimilarity(report, entry.report),
+    }))
+    .sort((a, b) => b.similarity - a.similarity);
 }
 
 /**

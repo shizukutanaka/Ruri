@@ -9,9 +9,12 @@ import {
   mostHarmonicPreset,
   presetHarmonicityLeague,
   allPresetsDemoWav,
+  isPresetTopN,
+  presetBestChord,
+  rankPresetsByReportSimilarity,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
-import { rankModesByStability } from '../core/scale.js';
+import { rankModesByStability, tuningReport } from '../core/scale.js';
 
 // Q207 — allPresetReports
 describe('allPresetReports (Q207)', () => {
@@ -211,5 +214,114 @@ describe('allPresetsDemoWav (Q212)', () => {
     const view = new DataView(wav.buffer, wav.byteOffset, wav.byteLength);
     const sr = view.getUint32(24, true);
     expect(sr).toBe(8000);
+  });
+});
+
+// Q218 — isPresetTopN
+describe('isPresetTopN (Q218)', () => {
+  it('test_top1_contains_most_harmonic', () => {
+    const league = presetHarmonicityLeague(440, undefined, [TWELVE_TET, JUST_INTONATION_5L]);
+    const topId = league[0]?.preset.id ?? '';
+    expect(isPresetTopN(topId, 1, 440, undefined, [TWELVE_TET, JUST_INTONATION_5L])).toBe(true);
+  });
+
+  it('test_non_top1_returns_false_for_n1', () => {
+    const league = presetHarmonicityLeague(440, undefined, [TWELVE_TET, JUST_INTONATION_5L]);
+    const bottomId = league[league.length - 1]?.preset.id ?? '';
+    if (league.length > 1) {
+      expect(isPresetTopN(bottomId, 1, 440, undefined, [TWELVE_TET, JUST_INTONATION_5L])).toBe(
+        false,
+      );
+    }
+  });
+
+  it('test_unknown_preset_returns_false', () => {
+    expect(isPresetTopN('nonexistent', 5)).toBe(false);
+  });
+
+  it('test_n_equal_pool_size_includes_all', () => {
+    const pool: readonly TuningPreset[] = [TWELVE_TET, SLENDRO_EXAMPLE];
+    expect(isPresetTopN(TWELVE_TET.id, 2, 440, undefined, pool)).toBe(true);
+    expect(isPresetTopN(SLENDRO_EXAMPLE.id, 2, 440, undefined, pool)).toBe(true);
+  });
+
+  it('test_n_zero_always_returns_false', () => {
+    expect(isPresetTopN(TWELVE_TET.id, 0)).toBe(false);
+  });
+});
+
+// Q219 — presetBestChord
+describe('presetBestChord (Q219)', () => {
+  it('test_returns_chord_map_analysis_entry', () => {
+    const entry = presetBestChord('12-tet');
+    expect(entry).not.toBeUndefined();
+    expect(entry).toHaveProperty('chord');
+    expect(entry).toHaveProperty('dissonance');
+    expect(entry).toHaveProperty('harmonicity');
+  });
+
+  it('test_unknown_preset_returns_undefined', () => {
+    expect(presetBestChord('nonexistent')).toBeUndefined();
+  });
+
+  it('test_dissonance_is_non_negative', () => {
+    const entry = presetBestChord('just-5-limit');
+    expect(entry?.dissonance).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_accepts_explicit_spectrum', () => {
+    const entry = presetBestChord('12-tet', undefined);
+    expect(entry).toHaveProperty('chord');
+  });
+
+  it('test_returns_entry_for_each_preset', () => {
+    for (const preset of [TWELVE_TET, JUST_INTONATION_5L, SLENDRO_EXAMPLE]) {
+      const entry = presetBestChord(preset.id);
+      expect(entry).not.toBeUndefined();
+    }
+  });
+});
+
+// Q220 — rankPresetsByReportSimilarity
+describe('rankPresetsByReportSimilarity (Q220)', () => {
+  const report = tuningReport(loadTuningPreset(TWELVE_TET), 440);
+
+  it('test_returns_array_same_length_as_pool', () => {
+    const ranked = rankPresetsByReportSimilarity(report, 440, undefined, [
+      TWELVE_TET,
+      SLENDRO_EXAMPLE,
+    ]);
+    expect(ranked.length).toBe(2);
+  });
+
+  it('test_sorted_descending_by_similarity', () => {
+    const ranked = rankPresetsByReportSimilarity(report, 440, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+      SLENDRO_EXAMPLE,
+    ]);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i - 1]?.similarity ?? 0).toBeGreaterThanOrEqual(ranked[i]?.similarity ?? 0);
+    }
+  });
+
+  it('test_most_similar_preset_has_highest_score', () => {
+    const ranked = rankPresetsByReportSimilarity(report, 440, undefined, [
+      TWELVE_TET,
+      SLENDRO_EXAMPLE,
+    ]);
+    expect(ranked[0]?.similarity).toBeGreaterThanOrEqual(ranked[1]?.similarity ?? 0);
+  });
+
+  it('test_empty_pool_returns_empty_array', () => {
+    const ranked = rankPresetsByReportSimilarity(report, 440, undefined, []);
+    expect(ranked).toEqual([]);
+  });
+
+  it('test_each_entry_has_preset_and_similarity', () => {
+    const ranked = rankPresetsByReportSimilarity(report, 440, undefined, [TWELVE_TET]);
+    expect(ranked[0]).toHaveProperty('preset');
+    expect(ranked[0]).toHaveProperty('similarity');
+    expect(typeof ranked[0]?.similarity).toBe('number');
   });
 });
