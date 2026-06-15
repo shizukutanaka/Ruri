@@ -15,6 +15,8 @@ import {
   closestPreset,
   tuningToClosestPresetScale,
   rankPresetsByBestMode,
+  rankPresetsByDistance,
+  closestPresetTuning,
 } from './presets.js';
 import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
@@ -564,5 +566,85 @@ describe('rankPresetsByBestMode (Q163)', () => {
   it('test_just_intonation_has_finite_harmonicity', () => {
     const ranked = rankPresetsByBestMode(undefined, [JUST_INTONATION_5L]);
     expect(Number.isFinite(ranked[0]!.harmonicity)).toBe(true);
+  });
+});
+
+// Q168 — rankPresetsByDistance: rank all presets by tuning distance to a target
+describe('rankPresetsByDistance (Q168)', () => {
+  it('test_returns_all_presets_ranked', () => {
+    const t12 = equalTemperament12(440);
+    const ranked = rankPresetsByDistance(t12);
+    expect(ranked.length).toBe(ALL_PRESETS.length);
+  });
+
+  it('test_12tet_closest_to_itself', () => {
+    const t12 = equalTemperament12(440);
+    const ranked = rankPresetsByDistance(t12, [TWELVE_TET, MAKAM_USSAK]);
+    expect(ranked[0]!.preset.id).toBe(TWELVE_TET.id);
+  });
+
+  it('test_sorted_ascending_by_distance', () => {
+    const t12 = equalTemperament12(440);
+    const ranked = rankPresetsByDistance(t12);
+    for (let i = 1; i < ranked.length; i++) {
+      expect(ranked[i]!.distance).toBeGreaterThanOrEqual(ranked[i - 1]!.distance);
+    }
+  });
+
+  it('test_distance_values_are_non_negative', () => {
+    const t12 = equalTemperament12(440);
+    const ranked = rankPresetsByDistance(t12);
+    for (const entry of ranked) {
+      expect(entry.distance).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('test_empty_presets_returns_empty', () => {
+    const t12 = equalTemperament12(440);
+    expect(rankPresetsByDistance(t12, [])).toEqual([]);
+  });
+
+  it('test_custom_preset_pool_respected', () => {
+    const t12 = equalTemperament12(440);
+    const ranked = rankPresetsByDistance(t12, [SLENDRO_EXAMPLE, MAKAM_USSAK]);
+    expect(ranked.length).toBe(2);
+    expect([SLENDRO_EXAMPLE.id, MAKAM_USSAK.id]).toContain(ranked[0]!.preset.id);
+  });
+});
+
+// Q173 — closestPresetTuning: return the TuningSystem of the closest preset
+describe('closestPresetTuning (Q173)', () => {
+  it('test_returns_tuning_system', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPresetTuning(t12);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result!.degrees)).toBe(true);
+  });
+
+  it('test_closest_to_12tet_matches_twelve_tet_preset', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPresetTuning(t12, [TWELVE_TET, MAKAM_USSAK]);
+    expect(result).toBeDefined();
+    expect(result!.degrees.length).toBe(TWELVE_TET.degrees.length);
+  });
+
+  it('test_returns_undefined_for_empty_pool', () => {
+    const t12 = equalTemperament12(440);
+    expect(closestPresetTuning(t12, [])).toBeUndefined();
+  });
+
+  it('test_single_pool_always_returns_that_tuning', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPresetTuning(t12, [MAKAM_USSAK]);
+    expect(result).toBeDefined();
+    expect(result!.degrees.length).toBeGreaterThan(0);
+  });
+
+  it('test_result_is_loadable_tuning', () => {
+    const t12 = equalTemperament12(440);
+    const result = closestPresetTuning(t12);
+    expect(result).toBeDefined();
+    expect(typeof result!.referenceHz).toBe('number');
+    expect(typeof result!.periodCents).toBe('number');
   });
 });

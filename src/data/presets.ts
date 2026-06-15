@@ -440,3 +440,59 @@ export function rankPresetsByBestMode(
   });
   return entries.sort((a, b) => a.harmonicity - b.harmonicity);
 }
+
+/**
+ * Rank all presets by their tuning distance to a given `TuningSystem`, closest first.
+ *
+ * Socratic Q168: "If two tunings can be compared by distance, comparing a tuning against
+ * ALL presets should return a ranked similarity list in one call — can it?" Today it
+ * requires: map all presets → `loadTuningPreset` → `tuningDistance(tuning, candidate)` →
+ * sort. If presets are first-class, getting a fully ranked list by distance should be one call.
+ *
+ * @param tuning  - The target `TuningSystem` to compare against.
+ * @param presets - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ preset, distance }` sorted by distance ascending (closest first).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const ranked = rankPresetsByDistance(t12);
+ * // ranked[0].preset is the most similar preset to 12-EDO
+ */
+export function rankPresetsByDistance(
+  tuning: TuningSystem,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): Array<{ preset: TuningPreset; distance: number }> {
+  const entries = presets.map((preset) => ({
+    preset,
+    distance: tuningDistance(tuning, loadTuningPreset(preset)),
+  }));
+  return entries.sort((a, b) => a.distance - b.distance);
+}
+
+/**
+ * Return the closest preset's `TuningSystem` (not the preset struct) to a given tuning in one call.
+ *
+ * Socratic Q173: "If we have a ranked preset list by distance, extracting just the closest
+ * preset's tuning (not the preset struct itself) should be one call — can it?" Today it
+ * requires: `rankPresetsByDistance(tuning)` → `result[0].preset` → `loadTuningPreset` — three steps.
+ * If the closest match is first-class, getting its resolved `TuningSystem` directly should
+ * be one call.
+ *
+ * @param tuning  - The target `TuningSystem` to compare against.
+ * @param presets - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns The resolved `TuningSystem` of the closest preset, or `undefined` if `presets` is empty.
+ *
+ * @example
+ * const myTuning = edo(12);
+ * const closest = closestPresetTuning(myTuning);
+ * // closest is a TuningSystem matching 12-TET
+ */
+export function closestPresetTuning(
+  tuning: TuningSystem,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): TuningSystem | undefined {
+  const ranked = rankPresetsByDistance(tuning, presets);
+  const top = ranked[0];
+  if (top === undefined) return undefined;
+  return loadTuningPreset(top.preset);
+}
