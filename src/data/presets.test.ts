@@ -79,6 +79,8 @@ import {
   presetParetoFrontCoverage,
   presetCorrelationMatrixNarrative,
   presetParetoFrontNarrative,
+  presetFullParetoCorrelationReport,
+  presetModeMetricOutliers,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2506,5 +2508,58 @@ describe('presetParetoFrontNarrative', () => {
     const result = presetParetoFrontNarrative('12-tet', spec, undefined, [TWELVE_TET]);
     expect(typeof result.bestMode.mode.id).toBe('string');
     expect(typeof result.bestMode.score).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q463 — presetFullParetoCorrelationReport
+// ---------------------------------------------------------------------------
+
+describe('presetFullParetoCorrelationReport (Q463)', () => {
+  it('returns combined report with all three narrative fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFullParetoCorrelationReport('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.combinedNarrative).toBe('string');
+    expect(result.paretoNarrative.paretoSize).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFullParetoCorrelationReport('not-real', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFullParetoCorrelationReport('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(typeof result.combinedNarrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q466 — presetModeMetricOutliers
+// ---------------------------------------------------------------------------
+
+describe('presetModeMetricOutliers (Q466)', () => {
+  it('returns array of outliers (may be empty)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricOutliers('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeMetricOutliers('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('if outliers exist, they have all fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricOutliers('12-tet', spec, undefined, [TWELVE_TET]);
+    if (result.length > 0) {
+      expect(typeof result[0]!.metric).toBe('string');
+    }
   });
 });

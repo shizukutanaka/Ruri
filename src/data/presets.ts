@@ -72,6 +72,8 @@ import {
   tuningParetoFrontCoverage,
   tuningCorrelationMatrixNarrative,
   tuningParetoFrontNarrative,
+  tuningFullParetoCorrelationReport,
+  tuningModeMetricOutliers,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3962,4 +3964,89 @@ export function presetParetoFrontNarrative(
   return rootHz !== undefined
     ? tuningParetoFrontNarrative(tuning, spectrum, rootHz)
     : tuningParetoFrontNarrative(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q463 — presetFullParetoCorrelationReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate a full Pareto+correlation report for a named preset.
+ *
+ * Delegates to `tuningFullParetoCorrelationReport` after resolving and loading the preset.
+ * Throws `RangeError` if the preset is not found.
+ *
+ * @param presetId - The preset id to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Full Pareto+correlation report with combinedNarrative.
+ */
+export function presetFullParetoCorrelationReport(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): {
+  paretoNarrative: {
+    narrative: string;
+    paretoSize: number;
+    bestMode: { mode: Scale; score: number };
+    coverage: {
+      paretoSize: number;
+      totalModes: number;
+      topRank: number;
+      coverageInTopK: number;
+    };
+  };
+  correlationNarrative: {
+    narrative: string;
+    topCorrelation: { metricA: string; metricB: string; correlation: number };
+    antiCorrelation: { metricA: string; metricB: string; correlation: number };
+    strongPairCount: number;
+  };
+  combinedNarrative: string;
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetFullParetoCorrelationReport: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningFullParetoCorrelationReport(tuning, spectrum, rootHz)
+    : tuningFullParetoCorrelationReport(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q466 — presetModeMetricOutliers
+// ---------------------------------------------------------------------------
+
+/**
+ * Find metric outlier modes for a named preset.
+ *
+ * Delegates to `tuningModeMetricOutliers` after resolving and loading the preset.
+ * Throws `RangeError` if the preset is not found.
+ *
+ * @param presetId - The preset id to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of outlier mode entries sorted by |zScore| descending (may be empty).
+ */
+export function presetModeMetricOutliers(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): { mode: Scale; metric: string; value: number; mean: number; stdDev: number; zScore: number }[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeMetricOutliers: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeMetricOutliers(tuning, spectrum, rootHz)
+    : tuningModeMetricOutliers(tuning, spectrum);
 }
