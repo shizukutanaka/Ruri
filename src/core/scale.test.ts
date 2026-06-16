@@ -81,6 +81,8 @@ import {
   tuningIntervalHistogram,
   tuningHistogramChart,
   chordMapIntervalHistogram,
+  scaleProgressionNarrative,
+  scaleSimilarityMatrix,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4078,5 +4080,50 @@ describe('chordMapIntervalHistogram (Q238)', () => {
   });
   it('throws for binCount <= 0', () => {
     expect(() => chordMapIntervalHistogram(chordMap, 1200, 0)).toThrow(RangeError);
+  });
+});
+
+describe('scaleProgressionNarrative (Q241)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns non-empty string', () => {
+    const text = scaleProgressionNarrative(scale, t12, 261.63);
+    expect(text).toBeTruthy();
+    expect(typeof text).toBe('string');
+    expect(text.length).toBeGreaterThan(10);
+  });
+  it('works with custom pattern', () => {
+    const text = scaleProgressionNarrative(scale, t12, 261.63, [0, 2, 1]);
+    expect(text).toBeTruthy();
+  });
+  it('contains Progression', () => {
+    expect(scaleProgressionNarrative(scale, t12, 261.63)).toContain('Progression');
+  });
+});
+
+describe('scaleSimilarityMatrix (Q245)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns n×n matrix for n tunings', () => {
+    const matrix = scaleSimilarityMatrix([t12, t12]);
+    expect(matrix).toHaveLength(2);
+    expect(matrix[0]).toHaveLength(2);
+    expect(matrix[1]).toHaveLength(2);
+  });
+  it('diagonal is 1.0', () => {
+    const matrix = scaleSimilarityMatrix([t12]);
+    expect(matrix[0]![0]).toBe(1.0);
+  });
+  it('is symmetric', () => {
+    const t19 = edo(19);
+    const matrix = scaleSimilarityMatrix([t12, t19]);
+    const a = matrix[0]![1]!;
+    const b = matrix[1]![0]!;
+    // Both NaN (constant profile) or equal finite value
+    expect(Number.isNaN(a) ? Number.isNaN(b) : Math.abs(a - b) < 1e-10).toBe(true);
+  });
+  it('returns empty matrix for empty input', () => {
+    expect(scaleSimilarityMatrix([])).toEqual([]);
   });
 });

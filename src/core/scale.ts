@@ -3449,3 +3449,81 @@ export function chordMapIntervalHistogram(
     count: counts[i] ?? 0,
   }));
 }
+
+/**
+ * Generate a narrative description of a chord progression derived from a scale's chord map.
+ *
+ * Socratic Q241: "If I have a Scale and can generate its chord map and then a progression
+ * narrative — should one call cover it?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → diatonic chord map.
+ * 2. Select chords by `pattern` (indices into chordMap, default `[0,1,2,3]` clamped to length).
+ * 3. `progressionNarrative(chords, rootHz, spectrum)` → narrative string.
+ *
+ * @param scale    - The parent scale.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz for narrative analysis.
+ * @param pattern  - Indices into the chord map (default `[0,1,2,3]` clamped to chordMap.length).
+ * @param spectrum - Optional instrument spectrum for analysis.
+ * @returns A single descriptive string summarising the progression.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const narrative = scaleProgressionNarrative(major, t12, 261.63);
+ */
+export function scaleProgressionNarrative(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz: number,
+  pattern?: number[],
+  spectrum?: Spectrum,
+): string {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const pat = pattern ?? [0, 1, 2, 3].slice(0, chordMap.length);
+  const chords = pat.map((i) => chordMap[i % chordMap.length]!.chord);
+  return progressionNarrative(chords, rootHz, spectrum);
+}
+
+/**
+ * Compute a pairwise similarity matrix for a set of tuning systems in one call.
+ *
+ * Socratic Q245: "If I can check if two tunings are similar and compare their harmonicity
+ * profiles, can I compute a full pairwise similarity matrix for a set of tunings in one call?"
+ * → No → implement.
+ *
+ * The matrix `M[i][j]` equals `tuningHarmonicityCorrelation(tunings[i], tunings[j], tol)`,
+ * which is in [-1, 1]. The diagonal `M[i][i]` is set to `1.0`.
+ *
+ * @param tunings   - Array of tuning systems to compare pairwise.
+ * @param threshold - Unused; accepted for API forward-compatibility.
+ * @param tol       - Stolzenburg tolerance forwarded to `tuningHarmonicityCorrelation`. Default 0.0136.
+ * @returns An `n×n` matrix where `matrix[i][j]` is the harmonicity correlation of tuning i and j.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const matrix = scaleSimilarityMatrix([t12, t19]);
+ * // matrix[0][1] is the correlation between 12-TET and 19-EDO
+ */
+export function scaleSimilarityMatrix(
+  tunings: readonly TuningSystem[],
+  threshold?: number,
+  tol?: number,
+): number[][] {
+  void threshold; // accepted for API forward-compatibility
+  const n = tunings.length;
+  const matrix = Array.from({ length: n }, () => Array(n).fill(0) as number[]);
+  for (let i = 0; i < n; i++) {
+    (matrix[i] as number[])[i] = 1.0;
+    for (let j = i + 1; j < n; j++) {
+      const corr = tuningHarmonicityCorrelation(tunings[i]!, tunings[j]!, tol);
+      (matrix[i] as number[])[j] = corr;
+      (matrix[j] as number[])[i] = corr;
+    }
+  }
+  return matrix;
+}
