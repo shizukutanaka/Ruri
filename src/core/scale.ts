@@ -8361,3 +8361,188 @@ export function tuningModeAntiCorrelation(
     correlation: bestVal,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Q438 — tuningFamilyTopCorrelations
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the top metric correlation for every tuning in a family in one call.
+ *
+ * Socratic Q438: "If I can find the top metric correlation for one tuning, can I find it for all
+ * tunings in a family?" → No → implement.
+ *
+ * Algorithm:
+ * `tunings.map(t => ({id: t.id, topCorrelation: tuningModeTopCorrelation(t, spectrum, rootHz?)}))`
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and top metric correlation.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyTopCorrelations([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, topCorrelation }) => console.log(id, topCorrelation.correlation));
+ */
+export function tuningFamilyTopCorrelations(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; topCorrelation: { metricA: string; metricB: string; correlation: number } }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    topCorrelation:
+      rootHz !== undefined
+        ? tuningModeTopCorrelation(t, spectrum, rootHz)
+        : tuningModeTopCorrelation(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q440 — tuningFamilyAntiCorrelations
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the anti-correlation for every tuning in a family in one call.
+ *
+ * Socratic Q440: "If I can find the anti-correlation for one tuning, can I find it for all tunings
+ * in a family?" → No → implement.
+ *
+ * Algorithm:
+ * `tunings.map(t => ({id: t.id, antiCorrelation: tuningModeAntiCorrelation(t, spectrum, rootHz?)}))`
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and most negatively correlated metric pair.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyAntiCorrelations([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, antiCorrelation }) => console.log(id, antiCorrelation.correlation));
+ */
+export function tuningFamilyAntiCorrelations(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; antiCorrelation: { metricA: string; metricB: string; correlation: number } }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    antiCorrelation:
+      rootHz !== undefined
+        ? tuningModeAntiCorrelation(t, spectrum, rootHz)
+        : tuningModeAntiCorrelation(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q441 — tuningParetoFrontSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute a statistical summary of the Pareto front for a tuning.
+ *
+ * Socratic Q441: "If I have the Pareto front, can I compute a summary of it — size and
+ * mean/min/max of each metric?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeParetoFront(tuning, spectrum, rootHz?)` → front.
+ * 2. Compute `{mean, min, max}` for each of the 5 metrics over all Pareto-front entries.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Summary including `paretoSize` and per-metric `{mean, min, max}` objects.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const summary = tuningParetoFrontSummary(equalTemperament12(440), spec);
+ * console.log(summary.paretoSize, summary.entropy.mean);
+ */
+export function tuningParetoFrontSummary(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  paretoSize: number;
+  entropy: { mean: number; min: number; max: number };
+  consistency: { mean: number; min: number; max: number };
+  volatility: { mean: number; min: number; max: number };
+  diversity: { mean: number; min: number; max: number };
+  smoothnessRatio: { mean: number; min: number; max: number };
+} {
+  const front =
+    rootHz !== undefined
+      ? tuningModeParetoFront(tuning, spectrum, rootHz)
+      : tuningModeParetoFront(tuning, spectrum);
+
+  function summarise(vals: number[]): { mean: number; min: number; max: number } {
+    if (vals.length === 0) return { mean: 0, min: 0, max: 0 };
+    let sum = 0;
+    let mn = vals[0] ?? 0;
+    let mx = vals[0] ?? 0;
+    for (const v of vals) {
+      sum += v;
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+    return { mean: sum / vals.length, min: mn, max: mx };
+  }
+
+  return {
+    paretoSize: front.length,
+    entropy: summarise(front.map((e) => e.entropy)),
+    consistency: summarise(front.map((e) => e.consistency)),
+    volatility: summarise(front.map((e) => e.volatility)),
+    diversity: summarise(front.map((e) => e.diversity)),
+    smoothnessRatio: summarise(front.map((e) => e.smoothnessRatio)),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q442 — tuningFamilyParetoFrontSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Summarise the Pareto front for every tuning in a family in one call.
+ *
+ * Socratic Q442: "If I can summarize the Pareto front for one tuning, can I do it for a whole
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * `tunings.map(t => ({id: t.id, summary: tuningParetoFrontSummary(t, spectrum, rootHz?)}))`
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and Pareto-front summary.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyParetoFrontSummaries([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, summary }) => console.log(id, summary.paretoSize));
+ */
+export function tuningFamilyParetoFrontSummaries(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  summary: {
+    paretoSize: number;
+    entropy: { mean: number; min: number; max: number };
+    consistency: { mean: number; min: number; max: number };
+    volatility: { mean: number; min: number; max: number };
+    diversity: { mean: number; min: number; max: number };
+    smoothnessRatio: { mean: number; min: number; max: number };
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    summary:
+      rootHz !== undefined
+        ? tuningParetoFrontSummary(t, spectrum, rootHz)
+        : tuningParetoFrontSummary(t, spectrum),
+  }));
+}

@@ -191,6 +191,10 @@ import {
   tuningParetoFrontBestMode,
   tuningModeTopCorrelation,
   tuningModeAntiCorrelation,
+  tuningFamilyTopCorrelations,
+  tuningFamilyAntiCorrelations,
+  tuningParetoFrontSummary,
+  tuningFamilyParetoFrontSummaries,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -7982,5 +7986,122 @@ describe('tuningModeAntiCorrelation (Q435)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningModeAntiCorrelation(t12, spec, 261.63);
     expect(typeof result.correlation).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q438 — tuningFamilyTopCorrelations
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyTopCorrelations', () => {
+  it('returns one entry per tuning with id and topCorrelation', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyTopCorrelations(tunings, spec);
+    expect(results).toHaveLength(2);
+    for (const entry of results) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.topCorrelation.metricA).toBe('string');
+      expect(typeof entry.topCorrelation.metricB).toBe('string');
+      expect(typeof entry.topCorrelation.correlation).toBe('number');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyTopCorrelations(tunings, spec, 261.63);
+    expect(results).toHaveLength(tunings.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q440 — tuningFamilyAntiCorrelations
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAntiCorrelations', () => {
+  it('returns one entry per tuning with id and antiCorrelation', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyAntiCorrelations(tunings, spec);
+    expect(results).toHaveLength(2);
+    for (const entry of results) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.antiCorrelation.correlation).toBe('number');
+    }
+  });
+
+  it('antiCorrelation.correlation <= topCorrelation.correlation for same tuning', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const [antiEntry] = tuningFamilyAntiCorrelations([t12], spec);
+    const [topEntry] = tuningFamilyTopCorrelations([t12], spec);
+    expect(antiEntry!.antiCorrelation.correlation).toBeLessThanOrEqual(
+      topEntry!.topCorrelation.correlation,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q441 — tuningParetoFrontSummary
+// ---------------------------------------------------------------------------
+
+describe('tuningParetoFrontSummary', () => {
+  it('returns paretoSize and 5 metric summaries', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const summary = tuningParetoFrontSummary(t12, spec);
+    expect(summary.paretoSize).toBeGreaterThan(0);
+    expect(typeof summary.entropy.mean).toBe('number');
+    expect(typeof summary.entropy.min).toBe('number');
+    expect(typeof summary.entropy.max).toBe('number');
+  });
+
+  it('min <= mean <= max for each metric', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const summary = tuningParetoFrontSummary(t12, spec);
+    for (const key of ['entropy', 'consistency', 'diversity'] as const) {
+      const s = summary[key];
+      expect(s.min).toBeLessThanOrEqual(s.mean + 1e-10);
+      expect(s.mean).toBeLessThanOrEqual(s.max + 1e-10);
+    }
+  });
+
+  it('volatility min <= max', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const summary = tuningParetoFrontSummary(t12, spec);
+    expect(summary.volatility.min).toBeLessThanOrEqual(summary.volatility.max + 1e-10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const summary = tuningParetoFrontSummary(t12, spec, 261.63);
+    expect(summary.paretoSize).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q442 — tuningFamilyParetoFrontSummaries
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyParetoFrontSummaries', () => {
+  it('returns one entry per tuning', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyParetoFrontSummaries(tunings, spec);
+    expect(results).toHaveLength(2);
+  });
+
+  it('each entry has id and summary with paretoSize', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyParetoFrontSummaries(tunings, spec);
+    for (const entry of results) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.summary.paretoSize).toBeGreaterThan(0);
+    }
   });
 });
