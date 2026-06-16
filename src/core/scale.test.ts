@@ -141,6 +141,10 @@ import {
   tuningFamilyChordMapBundles,
   scaleChordMapNarrativeBundle,
   tuningBestModeChordMapNarrative,
+  tuningModeNarrativeCompare,
+  tuningFamilyNarrativeCompare,
+  scaleBestProgressionNarrative,
+  tuningModeBestProgressionNarratives,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5851,5 +5855,135 @@ describe('tuningBestModeChordMapNarrative (Q352)', () => {
       harmonicSpectrum(),
     );
     expect(result.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q357 — scaleBestProgressionNarrative
+// ---------------------------------------------------------------------------
+
+describe('scaleBestProgressionNarrative (Q357)', () => {
+  it('returns narrative, smoothnessRatio, chords', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const result = scaleBestProgressionNarrative(scale, t12local);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(result.chords)).toBe(true);
+  });
+
+  it('result has exactly three keys', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const result = scaleBestProgressionNarrative(scale, t12local);
+    expect(result).toHaveProperty('narrative');
+    expect(result).toHaveProperty('smoothnessRatio');
+    expect(result).toHaveProperty('chords');
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const result = scaleBestProgressionNarrative(scale, t12local, 261.63, harmonicSpectrum());
+    expect(typeof result.narrative).toBe('string');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q354 — tuningModeNarrativeCompare
+// ---------------------------------------------------------------------------
+
+describe('tuningModeNarrativeCompare (Q354)', () => {
+  it('returns best modes for all three metrics and allSameMode flag', () => {
+    const t12local = equalTemperament12(440);
+    const cmp = tuningModeNarrativeCompare(t12local);
+    expect(cmp.bestEntropy.mode).toHaveProperty('degreeIndices');
+    expect(cmp.bestConsistency.mode).toHaveProperty('degreeIndices');
+    expect(cmp.bestVolatility.mode).toHaveProperty('degreeIndices');
+    expect(typeof cmp.allSameMode).toBe('boolean');
+  });
+
+  it('all three best modes have narrative strings', () => {
+    const t12local = equalTemperament12(440);
+    const cmp = tuningModeNarrativeCompare(t12local);
+    expect(typeof cmp.bestEntropy.narrative).toBe('string');
+    expect(typeof cmp.bestConsistency.narrative).toBe('string');
+    expect(typeof cmp.bestVolatility.narrative).toBe('string');
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const cmp = tuningModeNarrativeCompare(t12local, 261.63, harmonicSpectrum());
+    expect(typeof cmp.allSameMode).toBe('boolean');
+  });
+
+  it('throws RangeError for tuning with no modes', () => {
+    const empty = { ...equalTemperament12(440), degrees: [] };
+    expect(() => tuningModeNarrativeCompare(empty)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q356 — tuningFamilyNarrativeCompare
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyNarrativeCompare (Q356)', () => {
+  it('returns one entry per tuning with id and narrativeCompare', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19);
+    const result = tuningFamilyNarrativeCompare([t12local, t19]);
+    expect(result.length).toBe(2);
+    expect(result[0]!.id).toBe(t12local.id);
+    expect(result[1]!.id).toBe(t19.id);
+    expect(result[0]).toHaveProperty('narrativeCompare');
+  });
+
+  it('each narrativeCompare has allSameMode flag', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyNarrativeCompare([t12local]);
+    expect(typeof result[0]!.narrativeCompare.allSameMode).toBe('boolean');
+  });
+
+  it('returns empty array for empty tunings list', () => {
+    expect(tuningFamilyNarrativeCompare([])).toEqual([]);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyNarrativeCompare([t12local], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+    expect(typeof result[0]!.narrativeCompare.allSameMode).toBe('boolean');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q358 — tuningModeBestProgressionNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningModeBestProgressionNarratives (Q358)', () => {
+  it('returns one entry per mode with mode, narrative, smoothnessRatio', () => {
+    const t12local = equalTemperament12(440);
+    const results = tuningModeBestProgressionNarratives(t12local);
+    expect(results.length).toBeGreaterThan(0);
+    const first = results[0]!;
+    expect(first.mode).toHaveProperty('degreeIndices');
+    expect(typeof first.narrative).toBe('string');
+    expect(first.narrative.length).toBeGreaterThan(0);
+    expect(first.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('returns correct number of modes for 12-TET', () => {
+    const t12local = equalTemperament12(440);
+    const results = tuningModeBestProgressionNarratives(t12local);
+    expect(results.length).toBe(t12local.degrees.length);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const results = tuningModeBestProgressionNarratives(t12local, 261.63, harmonicSpectrum());
+    expect(results.length).toBeGreaterThan(0);
+    expect(typeof results[0]!.narrative).toBe('string');
   });
 });

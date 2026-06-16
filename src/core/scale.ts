@@ -6028,3 +6028,177 @@ export function tuningBestModeChordMapNarrative(
   const bundle = scaleChordMapNarrativeBundle(bestMode, tuning, rootHz, spectrum);
   return { mode: bestMode, ...bundle };
 }
+
+// ---------------------------------------------------------------------------
+// Q354 — tuningModeNarrativeCompare
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare the best mode chord map narrative for all three metrics in a single call.
+ *
+ * Socratic Q354: "If I can get best mode narrative by each metric separately, can I compare all
+ * three at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Call `tuningBestModeChordMapNarrative(tuning, 'entropy', rootHz, spectrum)` → bestEntropy.
+ * 2. Call `tuningBestModeChordMapNarrative(tuning, 'consistency', rootHz, spectrum)` → bestConsistency.
+ * 3. Call `tuningBestModeChordMapNarrative(tuning, 'volatility', rootHz, spectrum)` → bestVolatility.
+ * 4. `allSameMode` = all three mode ids are equal.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ bestEntropy, bestConsistency, bestVolatility, allSameMode }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const cmp = tuningModeNarrativeCompare(t12);
+ * console.log(cmp.allSameMode, cmp.bestEntropy.mode.id);
+ */
+export function tuningModeNarrativeCompare(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  bestEntropy: ReturnType<typeof tuningBestModeChordMapNarrative>;
+  bestConsistency: ReturnType<typeof tuningBestModeChordMapNarrative>;
+  bestVolatility: ReturnType<typeof tuningBestModeChordMapNarrative>;
+  allSameMode: boolean;
+} {
+  const bestEntropy = tuningBestModeChordMapNarrative(tuning, 'entropy', rootHz, spectrum);
+  const bestConsistency = tuningBestModeChordMapNarrative(tuning, 'consistency', rootHz, spectrum);
+  const bestVolatility = tuningBestModeChordMapNarrative(tuning, 'volatility', rootHz, spectrum);
+  const allSameMode =
+    bestEntropy.mode.id === bestConsistency.mode.id &&
+    bestConsistency.mode.id === bestVolatility.mode.id;
+  return { bestEntropy, bestConsistency, bestVolatility, allSameMode };
+}
+
+// ---------------------------------------------------------------------------
+// Q356 — tuningFamilyNarrativeCompare
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare the best mode chord map narratives for all three metrics across an entire tuning family.
+ *
+ * Socratic Q356: "If I can compare best mode narratives for one tuning, can I do it for a whole
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. tunings.map(t → `{id: t.id, narrativeCompare: tuningModeNarrativeCompare(t, rootHz, spectrum)}`).
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ id, narrativeCompare }`, one per tuning, in input order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilyNarrativeCompare([t12, t19]);
+ * console.log(result[0]!.narrativeCompare.allSameMode);
+ */
+export function tuningFamilyNarrativeCompare(
+  tunings: TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  id: string;
+  narrativeCompare: ReturnType<typeof tuningModeNarrativeCompare>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    narrativeCompare: tuningModeNarrativeCompare(t, rootHz, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q357 — scaleBestProgressionNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the smoothed progression narrative for a scale's chord map in one call.
+ *
+ * Socratic Q357: "If I can get progression + narrative for a scale's chord map, can I return
+ * only the smoothed narrative-related fields?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → chordMap.
+ * 2. `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → rawChords.
+ * 3. `chordProgressionSmooth(rawChords, rootHz, spectrum)` → smoothChords.
+ * 4. `progressionSmoothnessRatio(smoothChords, rootHz, spectrum)` → smoothnessRatio.
+ * 5. `progressionNarrative(smoothChords, rootHz, spectrum)` → narrative.
+ * Return `{ narrative, smoothnessRatio, chords: smoothChords }`.
+ *
+ * @param scale    - The scale (mode) to analyse.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ narrative, smoothnessRatio, chords }` with the smoothed chord sequence.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const result = scaleBestProgressionNarrative(major, t12);
+ * console.log(result.narrative, result.smoothnessRatio);
+ */
+export function scaleBestProgressionNarrative(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { narrative: string; smoothnessRatio: number; chords: Chord[] } {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const rawChords = chordMapProgressionBridge(chordMap, rootHz, spectrum);
+  const smoothChords = chordProgressionSmooth(rawChords, rootHz, spectrum);
+  const smoothnessRatio = progressionSmoothnessRatio(smoothChords, rootHz, spectrum);
+  const narrative = progressionNarrative(smoothChords, rootHz, spectrum);
+  return { narrative, smoothnessRatio, chords: smoothChords };
+}
+
+// ---------------------------------------------------------------------------
+// Q358 — tuningModeBestProgressionNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the smoothed best progression narrative for every mode of a tuning in one call.
+ *
+ * Socratic Q358: "If I can get the best progression narrative for one scale, can I get it for
+ * every mode of a tuning at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 3. For each mode: `scaleBestProgressionNarrative(mode, tuning, rootHz, spectrum)`.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ mode, narrative, smoothnessRatio }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const results = tuningModeBestProgressionNarratives(t12);
+ * for (const { mode, narrative, smoothnessRatio } of results) {
+ *   console.log(mode.id, smoothnessRatio, narrative);
+ * }
+ */
+export function tuningModeBestProgressionNarratives(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; narrative: string; smoothnessRatio: number }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const { narrative, smoothnessRatio } = scaleBestProgressionNarrative(
+      mode,
+      tuning,
+      rootHz,
+      spectrum,
+    );
+    return { mode, narrative, smoothnessRatio };
+  });
+}
