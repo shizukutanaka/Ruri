@@ -7747,3 +7747,220 @@ export function tuningFamilyBestModeComprehensive(
         : tuningBestModeComprehensive(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q420 — tuningModeScoreRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all modal rotations of a tuning by comprehensive five-metric score in one call.
+ *
+ * Socratic Q420: "If I can compute comprehensive mode bundles with scores, can I get modes ranked
+ * by score in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz)` → per-mode five-metric bundles.
+ * 2. For each entry compute `score = entropy + consistency + (1 - volatility) + diversity + smoothnessRatio`.
+ * 3. Sort descending by score.
+ * 4. Return `{mode, score}[]`.
+ *
+ * @param tuning   - The `TuningSystem` to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns All modal rotations sorted by combined score descending.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum(6);
+ * const ranking = tuningModeScoreRanking(t12, spec);
+ * ranking.forEach(({ mode, score }) => console.log(mode.id, score));
+ */
+export function tuningModeScoreRanking(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; score: number }[] {
+  const bundles =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  return bundles
+    .map((b) => ({
+      mode: b.mode,
+      score: b.entropy + b.consistency + (1 - b.volatility) + b.diversity + b.smoothnessRatio,
+    }))
+    .sort((a, b) => b.score - a.score);
+}
+
+// ---------------------------------------------------------------------------
+// Q422 — tuningFamilyModeScoreRankings
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank modal rotations by comprehensive score for every tuning in a family in one call.
+ *
+ * Socratic Q422: "If I can rank modes for one tuning, can I rank them for all tunings in a
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `{id: t.id, modeRanking: tuningModeScoreRanking(t, spectrum, rootHz)}`.
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and modes sorted by score descending.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyModeScoreRankings([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, modeRanking }) => console.log(id, modeRanking[0]?.score));
+ */
+export function tuningFamilyModeScoreRankings(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; modeRanking: { mode: Scale; score: number }[] }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeRanking:
+      rootHz !== undefined
+        ? tuningModeScoreRanking(t, spectrum, rootHz)
+        : tuningModeScoreRanking(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q423 — tuningModeComprehensiveTop
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the top N modes of a tuning ranked by comprehensive five-metric score in one call.
+ *
+ * Socratic Q423: "If I can rank modes by comprehensive score, can I get the top N in one call?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz)` → per-mode five-metric bundles.
+ * 2. For each entry compute `score = entropy + consistency + (1 - volatility) + diversity + smoothnessRatio`.
+ * 3. Sort descending by score.
+ * 4. Take the first `n` entries.
+ *
+ * @param tuning   - The `TuningSystem` to analyse.
+ * @param n        - Number of top modes to return (must be positive).
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Top `n` modal rotations sorted by combined score descending, each with all five metrics
+ *          and the combined score.
+ *
+ * @throws {RangeError} if `n` is not positive.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum(6);
+ * const top3 = tuningModeComprehensiveTop(t12, 3, spec);
+ * top3.forEach(({ mode, score }) => console.log(mode.id, score));
+ */
+export function tuningModeComprehensiveTop(
+  tuning: TuningSystem,
+  n: number,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+  score: number;
+}[] {
+  if (n <= 0) {
+    throw new RangeError('tuningModeComprehensiveTop: n must be positive');
+  }
+  const bundles =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  return bundles
+    .map((b) => ({
+      ...b,
+      score: b.entropy + b.consistency + (1 - b.volatility) + b.diversity + b.smoothnessRatio,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, n);
+}
+
+// ---------------------------------------------------------------------------
+// Q424 — tuningIntervalDiversityVsEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare interval diversity and entropy per mode and classify their alignment in one call.
+ *
+ * Socratic Q424: "If I have both diversity and entropy per mode, can I classify whether they align
+ * or oppose each other?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeIntervalProfile(tuning)` → diversity per mode (allModes order).
+ * 2. `tuningEntropyProfile(tuning, spectrum, rootHz)` → entropy per mode (allModes order).
+ * 3. Zip by index. Normalize both arrays to [0,1] using min-max normalization.
+ * 4. For each mode classify: if `Math.abs(normDiv - normEnt) < 0.25` → 'aligned';
+ *    if `Math.abs(normDiv - normEnt) > 0.5` → 'opposed'; else → 'neutral'.
+ *
+ * @param tuning   - The `TuningSystem` to analyse.
+ * @param spectrum - Optional instrument spectrum for entropy computation.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per modal rotation with diversity, entropy, and correlation classification.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const result = tuningIntervalDiversityVsEntropy(t12);
+ * result.forEach(({ mode, diversity, entropy, correlation }) =>
+ *   console.log(mode.id, diversity, entropy, correlation));
+ */
+export function tuningIntervalDiversityVsEntropy(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  diversity: number;
+  entropy: number;
+  correlation: 'aligned' | 'opposed' | 'neutral';
+}[] {
+  const intervalProfiles = tuningModeIntervalProfile(tuning);
+  const entropyProfiles =
+    spectrum !== undefined
+      ? rootHz !== undefined
+        ? tuningEntropyProfile(tuning, spectrum, rootHz)
+        : tuningEntropyProfile(tuning, spectrum)
+      : tuningEntropyProfile(tuning);
+
+  const diversities = intervalProfiles.map((p) => p.diversity);
+  const entropies = entropyProfiles.map((p) => p.entropy);
+
+  function normalizeArr(arr: number[]): number[] {
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    const range = max - min;
+    if (range === 0) return arr.map(() => 0.5);
+    return arr.map((v) => (v - min) / range);
+  }
+
+  const normDiversities = normalizeArr(diversities);
+  const normEntropies = normalizeArr(entropies);
+
+  return intervalProfiles.map((p, i) => {
+    const normDiv = normDiversities[i] ?? 0.5;
+    const normEnt = normEntropies[i] ?? 0.5;
+    const diff = Math.abs(normDiv - normEnt);
+    const correlation: 'aligned' | 'opposed' | 'neutral' =
+      diff < 0.25 ? 'aligned' : diff > 0.5 ? 'opposed' : 'neutral';
+    return {
+      mode: p.mode,
+      diversity: p.diversity,
+      entropy: entropyProfiles[i]?.entropy ?? 0,
+      correlation,
+    };
+  });
+}

@@ -180,6 +180,10 @@ import {
   tuningFamilyModeComprehensiveBundles,
   tuningBestModeComprehensive,
   tuningFamilyBestModeComprehensive,
+  tuningModeScoreRanking,
+  tuningFamilyModeScoreRankings,
+  tuningModeComprehensiveTop,
+  tuningIntervalDiversityVsEntropy,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -7445,5 +7449,222 @@ describe('tuningFamilyBestModeComprehensive (Q419)', () => {
     const result = tuningFamilyBestModeComprehensive([t12local], spec, 261.63);
     expect(result.length).toBe(1);
     expect(result[0]!.bestMode).toHaveProperty('score');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q420 — tuningModeScoreRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningModeScoreRanking (Q420)', () => {
+  it('returns modes sorted by score descending', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const ranking = tuningModeScoreRanking(t12local, spec);
+    expect(ranking.length).toBe(t12local.degrees.length);
+    for (let i = 1; i < ranking.length; i++) {
+      expect(ranking[i - 1]!.score).toBeGreaterThanOrEqual(ranking[i]!.score);
+    }
+  });
+
+  it('each entry has mode and numeric score', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const ranking = tuningModeScoreRanking(t12local, spec);
+    for (const r of ranking) {
+      expect(r.mode).toHaveProperty('degreeIndices');
+      expect(typeof r.score).toBe('number');
+    }
+  });
+
+  it('score matches formula applied to bundle', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const ranking = tuningModeScoreRanking(t12local, spec);
+    const bundle = tuningModeComprehensiveBundle(t12local, spec);
+    const bundleScores = bundle.map(
+      (b) => b.entropy + b.consistency + (1 - b.volatility) + b.diversity + b.smoothnessRatio,
+    );
+    const rankingScoresSorted = [...ranking.map((r) => r.score)].sort((a, b) => b - a);
+    const bundleScoresSorted = [...bundleScores].sort((a, b) => b - a);
+    expect(rankingScoresSorted).toEqual(bundleScoresSorted);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const ranking = tuningModeScoreRanking(t12local, spec, 261.63);
+    expect(ranking.length).toBe(t12local.degrees.length);
+  });
+
+  it('returns empty array for tuning with no degrees', () => {
+    const empty = { ...equalTemperament12(440), degrees: [] };
+    const spec = harmonicSpectrum(6);
+    const ranking = tuningModeScoreRanking(empty, spec);
+    expect(ranking).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q422 — tuningFamilyModeScoreRankings
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeScoreRankings (Q422)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeScoreRankings([t12local, t19], spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeRanking sorted descending', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeScoreRankings([t12local], spec);
+    expect(typeof result[0]!.id).toBe('string');
+    const ranking = result[0]!.modeRanking;
+    for (let i = 1; i < ranking.length; i++) {
+      expect(ranking[i - 1]!.score).toBeGreaterThanOrEqual(ranking[i]!.score);
+    }
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeScoreRankings([t12local], spec);
+    expect(result[0]!.id).toBe(t12local.id);
+  });
+
+  it('returns empty array for empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeScoreRankings([], spec);
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeScoreRankings([t12local], spec, 261.63);
+    expect(result.length).toBe(1);
+    expect(result[0]!.modeRanking.length).toBe(t12local.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q423 — tuningModeComprehensiveTop
+// ---------------------------------------------------------------------------
+
+describe('tuningModeComprehensiveTop (Q423)', () => {
+  it('returns exactly n modes when n <= total modes', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const top3 = tuningModeComprehensiveTop(t12local, 3, spec);
+    expect(top3.length).toBe(3);
+  });
+
+  it('returns all modes when n >= total modes', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const topAll = tuningModeComprehensiveTop(t12local, 100, spec);
+    expect(topAll.length).toBe(t12local.degrees.length);
+  });
+
+  it('results are sorted by score descending', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const top5 = tuningModeComprehensiveTop(t12local, 5, spec);
+    for (let i = 1; i < top5.length; i++) {
+      expect(top5[i - 1]!.score).toBeGreaterThanOrEqual(top5[i]!.score);
+    }
+  });
+
+  it('each entry has all five metrics plus score', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const top3 = tuningModeComprehensiveTop(t12local, 3, spec);
+    for (const entry of top3) {
+      expect(typeof entry.entropy).toBe('number');
+      expect(typeof entry.consistency).toBe('number');
+      expect(typeof entry.volatility).toBe('number');
+      expect(typeof entry.diversity).toBe('number');
+      expect(typeof entry.smoothnessRatio).toBe('number');
+      expect(typeof entry.score).toBe('number');
+    }
+  });
+
+  it('throws RangeError for n <= 0', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    expect(() => tuningModeComprehensiveTop(t12local, 0, spec)).toThrow(RangeError);
+    expect(() => tuningModeComprehensiveTop(t12local, -1, spec)).toThrow(RangeError);
+  });
+
+  it('first entry matches tuningBestModeComprehensive', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const top1 = tuningModeComprehensiveTop(t12local, 1, spec);
+    const best = tuningBestModeComprehensive(t12local, spec);
+    expect(top1[0]!.mode.id).toBe(best.mode.id);
+    expect(top1[0]!.score).toBeCloseTo(best.score, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const top3 = tuningModeComprehensiveTop(t12local, 3, spec, 261.63);
+    expect(top3.length).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q424 — tuningIntervalDiversityVsEntropy
+// ---------------------------------------------------------------------------
+
+describe('tuningIntervalDiversityVsEntropy (Q424)', () => {
+  it('returns one entry per mode with correlation label', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningIntervalDiversityVsEntropy(t12local);
+    expect(result.length).toBe(t12local.degrees.length);
+    for (const r of result) {
+      expect(['aligned', 'opposed', 'neutral']).toContain(r.correlation);
+      expect(r.diversity).toBeGreaterThanOrEqual(0);
+      expect(r.entropy).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('diversity values match tuningModeIntervalProfile', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningIntervalDiversityVsEntropy(t12local);
+    const profiles = tuningModeIntervalProfile(t12local);
+    for (let i = 0; i < result.length; i++) {
+      expect(result[i]!.diversity).toBeCloseTo(profiles[i]!.diversity, 10);
+    }
+  });
+
+  it('each entry has mode with degreeIndices', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningIntervalDiversityVsEntropy(t12local);
+    for (const r of result) {
+      expect(r.mode).toHaveProperty('degreeIndices');
+    }
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningIntervalDiversityVsEntropy(t12local, spec, 261.63);
+    expect(result.length).toBe(t12local.degrees.length);
+    for (const r of result) {
+      expect(['aligned', 'opposed', 'neutral']).toContain(r.correlation);
+    }
+  });
+
+  it('correlation is one of the three allowed values', () => {
+    const t19 = edo(19, 440);
+    const result = tuningIntervalDiversityVsEntropy(t19);
+    for (const r of result) {
+      expect(['aligned', 'opposed', 'neutral']).toContain(r.correlation);
+    }
   });
 });
