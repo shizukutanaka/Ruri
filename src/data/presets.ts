@@ -5,7 +5,11 @@ import { rankChords, type RankedChord, type ChordSearchOptions } from '../core/c
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { tuningToScl, writeScl } from '../adapters/scala.js';
 import { tuningToMts, type TuningToMtsOptions } from '../adapters/mts.js';
-import { progressionToSmf, type ProgressionToSmfOptions } from '../adapters/smf.js';
+import {
+  progressionToSmf,
+  type ProgressionToSmfOptions,
+  type SmfOptions,
+} from '../adapters/smf.js';
 import {
   tuningToScale,
   progressionFromPattern,
@@ -59,6 +63,9 @@ import {
   tuningEntropyBestModeWav,
   tuningBestModeProgressionBundle,
   tuningFullWavBundle,
+  scaleProgressionWavBundle,
+  tuningBestSmoothModeWav,
+  type PluckScaleWavOptions,
 } from '../adapters/wav.js';
 import { tuningToFullBundle } from '../adapters/tun.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
@@ -2505,4 +2512,100 @@ export function presetBestSmoothMode(
   }
   const tuning = loadTuningPreset(preset);
   return tuningBestSmoothMode(tuning, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q367 — presetProgressionWavBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a smoothed chord progression WAV, SMF, narrative, smoothness ratio, and chords
+ * for a preset's default scale in one call.
+ *
+ * Socratic Q367: "If I can get progression WAV bundle for a scale, can I do it for a
+ * preset's default scale?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningToScale(tuning)` → default scale.
+ * 4. `scaleProgressionWavBundle(scale, tuning, rootHz, spectrum, wavOpts, smfOpts)` → bundle.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param wavOpts  - Optional chord progression WAV options.
+ * @param smfOpts  - Optional SMF encoding options.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ wav, smf, narrative, smoothnessRatio, chords }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundle = presetProgressionWavBundle('12-tet');
+ * await fs.writeFile('12tet-prog.wav', bundle.wav);
+ * await fs.writeFile('12tet-prog.mid', bundle.smf);
+ * console.log(bundle.narrative, bundle.smoothnessRatio);
+ */
+export function presetProgressionWavBundle(
+  presetId: string,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  wavOpts?: ChordProgressionToWavOptions,
+  smfOpts?: SmfOptions,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof scaleProgressionWavBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetProgressionWavBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  const scale = tuningToScale(tuning);
+  return scaleProgressionWavBundle(scale, tuning, rootHz, spectrum, wavOpts, smfOpts);
+}
+
+// ---------------------------------------------------------------------------
+// Q369 — presetBestSmoothModeWav
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the smoothest mode for a preset tuning and render it to WAV in one call.
+ *
+ * Socratic Q369: "If I can get smoothest mode WAV for a tuning, can I do it for a preset
+ * by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningBestSmoothModeWav(tuning, rootHz, spectrum, opts)` → `{ wav, mode, smoothnessRatio }`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for smoothness computation.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ wav: Uint8Array, mode: Scale, smoothnessRatio: number }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const result = presetBestSmoothModeWav('12-tet');
+ * await fs.writeFile('12tet-smooth.wav', result.wav);
+ * console.log(result.mode.id, result.smoothnessRatio);
+ */
+export function presetBestSmoothModeWav(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningBestSmoothModeWav> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestSmoothModeWav: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningBestSmoothModeWav(tuning, rootHz, spectrum, opts);
 }

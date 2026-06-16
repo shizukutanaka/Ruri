@@ -48,6 +48,8 @@ import {
   presetModeNarrativeCompare,
   presetModeBestProgressionNarratives,
   presetBestSmoothMode,
+  presetProgressionWavBundle,
+  presetBestSmoothModeWav,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1318,6 +1320,89 @@ describe('presetBestSmoothMode (Q362)', () => {
 
   it('accepts optional presets pool', () => {
     const result = presetBestSmoothMode('12-tet', 440, undefined, [TWELVE_TET]);
+    expect(result.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q367 — presetProgressionWavBundle
+// ---------------------------------------------------------------------------
+
+describe('presetProgressionWavBundle (Q367)', () => {
+  it('returns wav, smf, narrative, smoothnessRatio, chords for a known preset', () => {
+    const bundle = presetProgressionWavBundle('12-tet');
+    expect(bundle.wav instanceof Uint8Array).toBe(true);
+    expect(bundle.wav.length).toBeGreaterThan(44);
+    expect(bundle.smf instanceof Uint8Array).toBe(true);
+    expect(typeof bundle.narrative).toBe('string');
+    expect(bundle.narrative.length).toBeGreaterThan(0);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(bundle.chords)).toBe(true);
+  });
+
+  it('wav has RIFF header', () => {
+    const { wav } = presetProgressionWavBundle('12-tet');
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetProgressionWavBundle('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const bundle = presetProgressionWavBundle('12-tet', 261.63, harmonicSpectrum());
+    expect(bundle.wav instanceof Uint8Array).toBe(true);
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const bundle = presetProgressionWavBundle(
+      '12-tet',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(bundle.wav instanceof Uint8Array).toBe(true);
+    expect(Array.isArray(bundle.chords)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q369 — presetBestSmoothModeWav
+// ---------------------------------------------------------------------------
+
+describe('presetBestSmoothModeWav (Q369)', () => {
+  it('returns wav, mode, smoothnessRatio for a known preset', () => {
+    const result = presetBestSmoothModeWav('12-tet');
+    expect(result.wav instanceof Uint8Array).toBe(true);
+    expect(result.wav.length).toBeGreaterThan(44);
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.smoothnessRatio).toBe('number');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('wav has RIFF header', () => {
+    const { wav } = presetBestSmoothModeWav('12-tet');
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetBestSmoothModeWav('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const result = presetBestSmoothModeWav('12-tet', 261.63, harmonicSpectrum());
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const result = presetBestSmoothModeWav('12-tet', 440, undefined, undefined, [TWELVE_TET]);
     expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
