@@ -227,6 +227,10 @@ import {
   tuningFamilyRadarVsScoreRankings,
   tuningBestRadarScoreAgreement,
   tuningFamilyBestRadarScoreAgreements,
+  tuningModeConsensusRanking,
+  tuningFamilyModeConsensusRankings,
+  tuningBestConsensusMode,
+  tuningFamilyBestConsensusModes,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9092,6 +9096,113 @@ describe('tuningFamilyBestRadarScoreAgreements (Q491)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(typeof entry.bestAgreement.mode.id).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningModeConsensusRanking (Q492)', () => {
+  it('returns one entry per mode with all Borda fields', () => {
+    const spec = harmonicSpectrum(6);
+    const tuning = equalTemperament12(440);
+    const result = tuningModeConsensusRanking(tuning, spec);
+    expect(result.length).toBe(tuning.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.bordaScore).toBe('number');
+      expect(typeof entry.scoreRank).toBe('number');
+      expect(typeof entry.radarRank).toBe('number');
+      expect(typeof entry.consensusRank).toBe('number');
+    }
+  });
+
+  it('consensusRanks are 1-based and each appears once', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusRanking(equalTemperament12(440), spec);
+    const ranks = result.map((e) => e.consensusRank);
+    expect(Math.min(...ranks)).toBe(1);
+    expect(Math.max(...ranks)).toBe(result.length);
+    expect(new Set(ranks).size).toBe(result.length);
+  });
+
+  it('sorted by bordaScore descending', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusRanking(equalTemperament12(440), spec);
+    if (result.length >= 2) {
+      expect(result[0]!.bordaScore).toBeGreaterThanOrEqual(result[1]!.bordaScore);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusRanking(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result[0]!.consensusRank).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeConsensusRankings (Q494)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeConsensusRankings(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and consensusRanking array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeConsensusRankings(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.consensusRanking.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningBestConsensusMode (Q495)', () => {
+  it('returns the mode with consensusRank 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestConsensusMode(equalTemperament12(440), spec);
+    expect(result.consensusRank).toBe(1);
+  });
+
+  it('bordaScore is the maximum in the ranking', () => {
+    const spec = harmonicSpectrum(6);
+    const tuning = equalTemperament12(440);
+    const ranking = tuningModeConsensusRanking(tuning, spec);
+    const best = tuningBestConsensusMode(tuning, spec);
+    expect(best.bordaScore).toBe(ranking[0]!.bordaScore);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestConsensusMode(equalTemperament12(440), spec, 261.63);
+    expect(result.consensusRank).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyBestConsensusModes (Q497)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyBestConsensusModes(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and bestConsensusMode.consensusRank === 1', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyBestConsensusModes(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.bestConsensusMode.consensusRank).toBe(1);
     }
   });
 });

@@ -10041,3 +10041,174 @@ export function tuningFamilyBestRadarScoreAgreements(
         : tuningBestRadarScoreAgreement(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q492 — tuningModeConsensusRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a Borda-count consensus ranking combining the score ranking and radar
+ * ranking for all modes in a tuning.
+ *
+ * Borda score for each mode = (n - scoreRank + 1) + (n - radarRank + 1)
+ * (higher is better). Ties are broken alphabetically by mode.id.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array sorted by bordaScore descending with 1-based consensusRank.
+ */
+export function tuningModeConsensusRanking(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  bordaScore: number;
+  scoreRank: number;
+  radarRank: number;
+  consensusRank: number;
+}[] {
+  const scoreRanking =
+    rootHz !== undefined
+      ? tuningModeScoreRanking(tuning, spectrum, rootHz)
+      : tuningModeScoreRanking(tuning, spectrum);
+  const radarRanking =
+    rootHz !== undefined
+      ? tuningModeRadarRanking(tuning, spectrum, rootHz)
+      : tuningModeRadarRanking(tuning, spectrum);
+
+  const n = scoreRanking.length;
+
+  // Build lookup maps: mode.id → rank (1-based, position in already-sorted arrays)
+  const scoreRankMap = new Map<string, number>();
+  scoreRanking.forEach((entry, idx) => {
+    scoreRankMap.set(entry.mode.id, idx + 1);
+  });
+
+  const radarRankMap = new Map<string, number>();
+  radarRanking.forEach((entry, idx) => {
+    radarRankMap.set(entry.mode.id, idx + 1);
+  });
+
+  // Compute Borda scores using the score ranking as the reference mode list
+  const entries = scoreRanking.map((entry) => {
+    const sRank = scoreRankMap.get(entry.mode.id) ?? n;
+    const rRank = radarRankMap.get(entry.mode.id) ?? n;
+    const bordaScore = n - sRank + 1 + (n - rRank + 1);
+    return { mode: entry.mode, bordaScore, scoreRank: sRank, radarRank: rRank };
+  });
+
+  // Sort descending by bordaScore, ties broken alphabetically by mode.id
+  entries.sort((a, b) =>
+    b.bordaScore !== a.bordaScore
+      ? b.bordaScore - a.bordaScore
+      : a.mode.id < b.mode.id
+        ? -1
+        : a.mode.id > b.mode.id
+          ? 1
+          : 0,
+  );
+
+  return entries.map((entry, idx) => ({ ...entry, consensusRank: idx + 1 }));
+}
+
+// ---------------------------------------------------------------------------
+// Q494 — tuningFamilyModeConsensusRankings
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce Borda-count consensus rankings for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and consensusRanking.
+ */
+export function tuningFamilyModeConsensusRankings(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  consensusRanking: {
+    mode: Scale;
+    bordaScore: number;
+    scoreRank: number;
+    radarRank: number;
+    consensusRank: number;
+  }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    consensusRanking:
+      rootHz !== undefined
+        ? tuningModeConsensusRanking(t, spectrum, rootHz)
+        : tuningModeConsensusRanking(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q495 — tuningBestConsensusMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the top-ranked mode from the Borda-count consensus ranking.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns The entry with consensusRank === 1.
+ */
+export function tuningBestConsensusMode(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  bordaScore: number;
+  scoreRank: number;
+  radarRank: number;
+  consensusRank: number;
+} {
+  const ranking =
+    rootHz !== undefined
+      ? tuningModeConsensusRanking(tuning, spectrum, rootHz)
+      : tuningModeConsensusRanking(tuning, spectrum);
+  return ranking[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q497 — tuningFamilyBestConsensusModes
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the top Borda-consensus mode for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and bestConsensusMode.
+ */
+export function tuningFamilyBestConsensusModes(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  bestConsensusMode: {
+    mode: Scale;
+    bordaScore: number;
+    scoreRank: number;
+    radarRank: number;
+    consensusRank: number;
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    bestConsensusMode:
+      rootHz !== undefined
+        ? tuningBestConsensusMode(t, spectrum, rootHz)
+        : tuningBestConsensusMode(t, spectrum),
+  }));
+}
