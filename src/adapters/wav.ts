@@ -33,6 +33,7 @@ import {
   chordMapAnalysis,
   rankModesByStability,
   progressionNarrative,
+  chordProgressionSmooth,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1508,4 +1509,49 @@ export function progressionFullBundle(
     offset += msg.length;
   }
   return { wav, smf, mts, narrative };
+}
+
+/**
+ * Reorder a chord progression to minimise dissonance jumps, then render as WAV in one call.
+ *
+ * Socratic Q269: "If I can reorder a progression to minimise dissonance jumps and render any
+ * progression as WAV, can I get a smoothed progression WAV in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordProgressionSmooth(chords, rootHz, spectrum)` → smoothed ordering.
+ * 2. `chordProgressionToWav(smoothed, rootHz, spectrum ?? harmonicSpectrum(), opts)` → WAV bytes.
+ *
+ * @param chords   - The chord progression to smooth and synthesize.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param opts     - Optional chord progression WAV options.
+ * @returns WAV bytes of the smoothed (dissonance-minimised) chord progression.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+ * const chordMap = scaleToChordMap(scale, t12);
+ * const chords = chordMap.slice(0, 4).map(e => e.chord);
+ * const wav = smoothProgressionWav(chords, 261.63);
+ * await fs.writeFile('smooth-progression.wav', wav);
+ */
+export function smoothProgressionWav(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+  opts?: ChordProgressionToWavOptions,
+): Uint8Array {
+  const smoothed = chordProgressionSmooth(chords, rootHz, spectrum);
+  if (smoothed.length === 0) {
+    return encodeWav(
+      new Float32Array(0),
+      opts?.sampleRate ?? DEFAULT_CHORD_PROGRESSION_WAV.sampleRate,
+    );
+  }
+  return chordProgressionToWav(
+    smoothed,
+    rootHz,
+    spectrum ?? harmonicSpectrum(),
+    opts ?? DEFAULT_CHORD_PROGRESSION_WAV,
+  );
 }

@@ -36,6 +36,7 @@ import {
   progressionNarrativeWav,
   presetBestModeWav,
   progressionFullBundle,
+  smoothProgressionWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1718,5 +1719,24 @@ describe('progressionFullBundle (Q244)', () => {
   it('narrative is non-empty', () => {
     const { narrative } = progressionFullBundle(chords, t12);
     expect(narrative.length).toBeGreaterThan(5);
+  });
+});
+
+describe('smoothProgressionWav (Q269)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 4).map((e) => e.chord);
+
+  it('returns a valid WAV buffer', () => {
+    const wav = smoothProgressionWav(chords, 261.63);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(wav[0]).toBe(0x52); // 'R'
+    expect(wav[1]).toBe(0x49); // 'I'
+  });
+  it('handles empty progression', () => {
+    const wav = smoothProgressionWav([], 261.63);
+    expect(wav).toBeInstanceOf(Uint8Array);
   });
 });
