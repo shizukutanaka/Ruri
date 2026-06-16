@@ -10212,3 +10212,176 @@ export function tuningFamilyBestConsensusModes(
         : tuningBestConsensusMode(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q498 — tuningUltimateBestMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Determine the mode that appears as 'best' across three independent ranking
+ * methods: Borda consensus, Pareto-front composite score, and Pareto ranked.
+ *
+ * @param tuning   - Tuning system to evaluate.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Winner mode with vote count, each method's best modeId, and
+ *          whether all three methods agree.
+ */
+export function tuningUltimateBestMode(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  winner: { mode: Scale; voteCount: number };
+  consensusBest: { modeId: string };
+  paretoBest: { modeId: string };
+  paretoRankedBest: { modeId: string };
+  isUnanimous: boolean;
+} {
+  const consensusResult =
+    rootHz !== undefined
+      ? tuningBestConsensusMode(tuning, spectrum, rootHz)
+      : tuningBestConsensusMode(tuning, spectrum);
+  const paretoResult =
+    rootHz !== undefined
+      ? tuningParetoFrontBestMode(tuning, spectrum, rootHz)
+      : tuningParetoFrontBestMode(tuning, spectrum);
+  const paretoRankedResult =
+    rootHz !== undefined
+      ? tuningBestParetoRankedMode(tuning, spectrum, rootHz)
+      : tuningBestParetoRankedMode(tuning, spectrum);
+
+  const consensusModeId = consensusResult.mode.id;
+  const paretoModeId = paretoResult.mode.id;
+  const paretoRankedModeId = paretoRankedResult.mode.id;
+
+  const votes: Record<string, number> = {};
+  votes[consensusModeId] = (votes[consensusModeId] ?? 0) + 1;
+  votes[paretoModeId] = (votes[paretoModeId] ?? 0) + 1;
+  votes[paretoRankedModeId] = (votes[paretoRankedModeId] ?? 0) + 1;
+
+  // Find mode with most votes; tie-break: consensusBest wins
+  let winnerModeId = consensusModeId;
+  let maxVotes = votes[consensusModeId] ?? 0;
+  for (const [modeId, voteCount] of Object.entries(votes)) {
+    if (voteCount > maxVotes) {
+      maxVotes = voteCount;
+      winnerModeId = modeId;
+    }
+  }
+
+  // Retrieve Scale object from comprehensive bundle
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  const winnerEntry = bundle.find((e) => e.mode.id === winnerModeId);
+  const winnerMode: Scale = winnerEntry !== undefined ? winnerEntry.mode : consensusResult.mode;
+
+  return {
+    winner: { mode: winnerMode, voteCount: maxVotes },
+    consensusBest: { modeId: consensusModeId },
+    paretoBest: { modeId: paretoModeId },
+    paretoRankedBest: { modeId: paretoRankedModeId },
+    isUnanimous: consensusModeId === paretoModeId && paretoModeId === paretoRankedModeId,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q500 — tuningFamilyUltimateBestModes
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the ultimate best mode for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and ultimateBest result.
+ */
+export function tuningFamilyUltimateBestModes(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; ultimateBest: ReturnType<typeof tuningUltimateBestMode> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    ultimateBest:
+      rootHz !== undefined
+        ? tuningUltimateBestMode(t, spectrum, rootHz)
+        : tuningUltimateBestMode(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q501 — tuningConsensusNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a human-readable narrative summarising multi-method agreement on
+ * the best mode for a tuning.
+ *
+ * @param tuning   - Tuning system to evaluate.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Narrative string plus the two underlying sub-results.
+ */
+export function tuningConsensusNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  narrative: string;
+  consensusBest: {
+    mode: Scale;
+    bordaScore: number;
+    scoreRank: number;
+    radarRank: number;
+    consensusRank: number;
+  };
+  ultimateBest: ReturnType<typeof tuningUltimateBestMode>;
+} {
+  const consensusBest =
+    rootHz !== undefined
+      ? tuningBestConsensusMode(tuning, spectrum, rootHz)
+      : tuningBestConsensusMode(tuning, spectrum);
+  const ultimateBest =
+    rootHz !== undefined
+      ? tuningUltimateBestMode(tuning, spectrum, rootHz)
+      : tuningUltimateBestMode(tuning, spectrum);
+
+  let narrative = `The Borda consensus top mode is '${consensusBest.mode.id}' (score=${consensusBest.bordaScore}). `;
+  if (ultimateBest.isUnanimous) {
+    narrative += 'All three ranking methods agree on this mode.';
+  } else {
+    narrative += `Methods agree on '${ultimateBest.winner.mode.id}' with ${ultimateBest.winner.voteCount}/3 votes.`;
+  }
+
+  return { narrative, consensusBest, ultimateBest };
+}
+
+// ---------------------------------------------------------------------------
+// Q503 — tuningFamilyConsensusNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a consensus narrative for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and consensusNarrative result.
+ */
+export function tuningFamilyConsensusNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; consensusNarrative: ReturnType<typeof tuningConsensusNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    consensusNarrative:
+      rootHz !== undefined
+        ? tuningConsensusNarrative(t, spectrum, rootHz)
+        : tuningConsensusNarrative(t, spectrum),
+  }));
+}

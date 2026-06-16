@@ -231,6 +231,10 @@ import {
   tuningFamilyModeConsensusRankings,
   tuningBestConsensusMode,
   tuningFamilyBestConsensusModes,
+  tuningUltimateBestMode,
+  tuningFamilyUltimateBestModes,
+  tuningConsensusNarrative,
+  tuningFamilyConsensusNarratives,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9203,6 +9207,106 @@ describe('tuningFamilyBestConsensusModes (Q497)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(entry.bestConsensusMode.consensusRank).toBe(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningUltimateBestMode (Q498)', () => {
+  it('returns winner with voteCount, and three method results', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningUltimateBestMode(equalTemperament12(440), spec);
+    expect(result.winner.voteCount).toBeGreaterThanOrEqual(1);
+    expect(typeof result.winner.mode.id).toBe('string');
+  });
+
+  it('isUnanimous is true iff all three modeIds are equal', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningUltimateBestMode(equalTemperament12(440), spec);
+    const expected =
+      result.consensusBest.modeId === result.paretoBest.modeId &&
+      result.paretoBest.modeId === result.paretoRankedBest.modeId;
+    expect(result.isUnanimous).toBe(expected);
+  });
+
+  it('voteCount is between 1 and 3', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningUltimateBestMode(equalTemperament12(440), spec);
+    expect(result.winner.voteCount).toBeGreaterThanOrEqual(1);
+    expect(result.winner.voteCount).toBeLessThanOrEqual(3);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningUltimateBestMode(equalTemperament12(440), spec, 261.63);
+    expect(typeof result.winner.mode.id).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyUltimateBestModes (Q500)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyUltimateBestModes(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and ultimateBest.winner.mode.id', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyUltimateBestModes(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.ultimateBest.winner.mode.id).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningConsensusNarrative (Q501)', () => {
+  it('returns narrative string and both sub-results', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningConsensusNarrative(equalTemperament12(440), spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+    expect(typeof result.consensusBest.mode.id).toBe('string');
+  });
+
+  it('narrative contains the consensus mode id', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningConsensusNarrative(equalTemperament12(440), spec);
+    expect(result.narrative).toContain(result.consensusBest.mode.id);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningConsensusNarrative(equalTemperament12(440), spec, 261.63);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyConsensusNarratives (Q503)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyConsensusNarratives(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and consensusNarrative.narrative', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyConsensusNarratives(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.consensusNarrative.narrative).toBe('string');
     }
   });
 });
