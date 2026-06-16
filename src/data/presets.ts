@@ -68,6 +68,8 @@ import {
   tuningParetoFrontSummary,
   tuningParetoFrontVsRanking,
   tuningBestParetoRankedMode,
+  tuningParetoFrontGap,
+  tuningParetoFrontCoverage,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3791,4 +3793,80 @@ export function presetBestParetoRankedMode(
   return rootHz !== undefined
     ? tuningBestParetoRankedMode(tuning, spectrum, rootHz)
     : tuningBestParetoRankedMode(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q453 — presetParetoFrontGap
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the largest gap between consecutive Pareto-optimal ranks for a named preset.
+ *
+ * Socratic Q453: Preset wrapper for `tuningParetoFrontGap`.
+ *
+ * @param presetId - The preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to ALL_PRESETS).
+ * @returns `{maxGap, gaps, paretoRanks}` describing gaps between consecutive Pareto ranks.
+ * @throws {RangeError} If the preset is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { maxGap, paretoRanks } = presetParetoFrontGap('12-tet', spec);
+ * console.log('largest gap between Pareto modes:', maxGap);
+ */
+export function presetParetoFrontGap(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { maxGap: number; gaps: number[]; paretoRanks: number[] } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetParetoFrontGap: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningParetoFrontGap(tuning, spectrum, rootHz)
+    : tuningParetoFrontGap(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q454 — presetParetoFrontCoverage
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute what fraction of the top-K modes are Pareto-optimal for a named preset.
+ *
+ * Socratic Q454: Preset wrapper for `tuningParetoFrontCoverage`.
+ *
+ * @param presetId - The preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to ALL_PRESETS).
+ * @returns `{paretoSize, totalModes, topRank, coverageInTopK}`
+ * @throws {RangeError} If the preset is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { paretoSize, coverageInTopK } = presetParetoFrontCoverage('12-tet', spec);
+ * console.log('Pareto coverage in top-K:', coverageInTopK);
+ */
+export function presetParetoFrontCoverage(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { paretoSize: number; totalModes: number; topRank: number; coverageInTopK: number } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetParetoFrontCoverage: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningParetoFrontCoverage(tuning, spectrum, rootHz)
+    : tuningParetoFrontCoverage(tuning, spectrum);
 }

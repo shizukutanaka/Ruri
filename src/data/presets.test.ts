@@ -75,6 +75,8 @@ import {
   presetParetoFrontSummary,
   presetParetoFrontVsRanking,
   presetBestParetoRankedMode,
+  presetParetoFrontGap,
+  presetParetoFrontCoverage,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2402,5 +2404,54 @@ describe('presetBestParetoRankedMode', () => {
     const spec = harmonicSpectrum(6);
     const result = presetBestParetoRankedMode('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.rank).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q453 — presetParetoFrontGap
+// ---------------------------------------------------------------------------
+
+describe('presetParetoFrontGap (Q453)', () => {
+  it('returns maxGap >= 0 and paretoRanks array', () => {
+    const spec = harmonicSpectrum(6);
+    const { maxGap, paretoRanks } = presetParetoFrontGap('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(maxGap).toBeGreaterThanOrEqual(0);
+    expect(paretoRanks.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetParetoFrontGap('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q454 — presetParetoFrontCoverage
+// ---------------------------------------------------------------------------
+
+describe('presetParetoFrontCoverage (Q454)', () => {
+  it('returns coverage fields', () => {
+    const spec = harmonicSpectrum(6);
+    const { paretoSize, coverageInTopK } = presetParetoFrontCoverage('12-tet', spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(paretoSize).toBeGreaterThan(0);
+    expect(coverageInTopK).toBeGreaterThanOrEqual(0);
+    expect(coverageInTopK).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetParetoFrontCoverage('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const { coverageInTopK } = presetParetoFrontCoverage('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(coverageInTopK).toBeGreaterThanOrEqual(0);
   });
 });
