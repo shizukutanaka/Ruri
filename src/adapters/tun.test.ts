@@ -10,11 +10,12 @@ import {
   presetProgressionTun,
   scaleProgressionBundle,
   tuningBundle,
+  scaleFullBundle,
 } from './tun.js';
 import { writeScl } from './scala.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
-import { type Scale } from '../core/scale.js';
+import { type Scale, scaleModeSeries, tuningToScale } from '../core/scale.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -564,5 +565,25 @@ describe('tuningBundle (Q174)', () => {
     expect(smf).toBeInstanceOf(Uint8Array);
     expect(tun).toContain('[Tuning]');
     expect(scl.degrees.length).toBeGreaterThan(0);
+  });
+});
+
+describe('scaleFullBundle (Q247)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns wav, smf, scl, tun, mts', () => {
+    const bundle = scaleFullBundle(scale, t12);
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.scl).toBe('string');
+    expect(typeof bundle.tun).toBe('string');
+    expect(bundle.mts).toBeInstanceOf(Uint8Array);
+  });
+  it('wav length > 44', () => {
+    expect(scaleFullBundle(scale, t12).wav.length).toBeGreaterThan(44);
+  });
+  it('scl contains !', () => {
+    expect(scaleFullBundle(scale, t12).scl).toContain('!');
   });
 });
