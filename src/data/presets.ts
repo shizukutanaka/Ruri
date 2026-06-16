@@ -22,6 +22,7 @@ import {
   modeIntervalSets,
   scaleToChordMap,
   chordMapVolatility,
+  tuningSpectralFit,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1329,4 +1330,38 @@ export function presetVolatilityRanking(
     return { presetId: p.id, volatility };
   });
   return entries.sort((a, b) => a.volatility - b.volatility);
+}
+
+/**
+ * Rank all presets by spectral fit (amplitude-weighted mean harmonicity), ascending.
+ *
+ * Socratic Q266: "If I can get a tuning's spectral fit for a given spectrum and have all
+ * presets, can I rank presets by spectral fit in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each preset: `loadTuningPreset(p)` → `TuningSystem`.
+ * 2. `tuningSpectralFit(tuning, spectrum, tol)` → scalar fit score.
+ * 3. Sort ascending by `spectralFit`.
+ *
+ * @param spectrum - The instrument spectrum to weight harmonicity against.
+ * @param tol      - Continued-fraction tolerance for harmonicity. Default 0.0136.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ presetId, spectralFit }` sorted ascending by spectral fit.
+ *
+ * @example
+ * const ranked = presetSpectralFitRanking(harmonicSpectrum());
+ * // ranked[0].presetId is the preset whose harmonic structure best matches the spectrum
+ */
+export function presetSpectralFitRanking(
+  spectrum: Spectrum,
+  tol?: number,
+  presets?: readonly TuningPreset[],
+): { presetId: string; spectralFit: number }[] {
+  const ps = presets ?? ALL_PRESETS;
+  const entries = ps.map((p) => {
+    const tuning = loadTuningPreset(p);
+    const spectralFit = tuningSpectralFit(tuning, spectrum, tol);
+    return { presetId: p.id, spectralFit };
+  });
+  return entries.sort((a, b) => a.spectralFit - b.spectralFit);
 }

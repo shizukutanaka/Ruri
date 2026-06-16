@@ -22,6 +22,7 @@ import {
   bestPresetForSpectrum,
   presetModeIntervalSets,
   presetVolatilityRanking,
+  presetSpectralFitRanking,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -526,6 +527,23 @@ describe('presetVolatilityRanking (Q262)', () => {
     const ranked = presetVolatilityRanking();
     for (let i = 0; i + 1 < ranked.length; i++) {
       expect(ranked[i]!.volatility).toBeLessThanOrEqual(ranked[i + 1]!.volatility);
+    }
+  });
+});
+
+describe('presetSpectralFitRanking (Q266)', () => {
+  it('returns all presets ranked by spectral fit', () => {
+    const ranked = presetSpectralFitRanking(harmonicSpectrum());
+    expect(ranked.length).toBeGreaterThan(0);
+    ranked.forEach((r) => {
+      expect(typeof r.presetId).toBe('string');
+      expect(Number.isFinite(r.spectralFit)).toBe(true);
+    });
+  });
+  it('sorted ascending by spectralFit', () => {
+    const ranked = presetSpectralFitRanking(harmonicSpectrum());
+    for (let i = 0; i + 1 < ranked.length; i++) {
+      expect(ranked[i]!.spectralFit).toBeLessThanOrEqual(ranked[i + 1]!.spectralFit);
     }
   });
 });
