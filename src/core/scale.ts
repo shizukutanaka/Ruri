@@ -7536,3 +7536,214 @@ export function tuningFamilyMostDiverseModes(tunings: TuningSystem[]): {
 }[] {
   return tunings.map((t) => ({ id: t.id, mostDiverseMode: tuningMostDiverseMode(t) }));
 }
+
+// ---------------------------------------------------------------------------
+// Q414 — tuningModeComprehensiveBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine entropy, consistency, volatility, interval diversity, and smoothness ratio per mode
+ * in a single call.
+ *
+ * Socratic Q414: "If I can get mode comparison (entropy/consistency/volatility), mode interval
+ * profile (diversity), and mode smoothness ratios separately, can I combine all five metrics per
+ * mode in one pass?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComparison(tuning, spectrum, rootHz)` → `{mode, entropy, consistency, volatility}[]`.
+ * 2. `tuningModeIntervalProfile(tuning)` → `{mode, diversity}[]`.
+ * 3. `tuningModeSmoothProgressionRatios(tuning, rootHz, spectrum)` → `{mode, smoothnessRatio}[]`.
+ * All three return arrays in the same mode order (allModes order). Zip by index.
+ *
+ * @param tuning   - The `TuningSystem` to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per modal rotation with all five metrics.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum(6);
+ * const bundle = tuningModeComprehensiveBundle(t12, spec);
+ * bundle.forEach(({ mode, entropy, diversity }) => console.log(mode.id, entropy, diversity));
+ */
+export function tuningModeComprehensiveBundle(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+}[] {
+  const comparison = tuningModeComparison(tuning, spectrum, rootHz);
+  const intervalProfiles = tuningModeIntervalProfile(tuning);
+  const smoothRatios = tuningModeSmoothProgressionRatios(tuning, rootHz, spectrum);
+  return comparison.map((c, i) => ({
+    mode: c.mode,
+    entropy: c.entropy,
+    consistency: c.consistency,
+    volatility: c.volatility,
+    diversity: intervalProfiles[i]?.diversity ?? 0,
+    smoothnessRatio: smoothRatios[i]?.smoothnessRatio ?? 0,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q416 — tuningFamilyModeComprehensiveBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute comprehensive five-metric mode bundles for every tuning in a family in one call.
+ *
+ * Socratic Q416: "If I can get comprehensive mode bundle for one tuning, can I do it for a whole
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `{id: t.id, modeBundles: tuningModeComprehensiveBundle(t, spectrum, rootHz)}`.
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and per-mode comprehensive bundles.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyModeComprehensiveBundles([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, modeBundles }) => console.log(id, modeBundles.length));
+ */
+export function tuningFamilyModeComprehensiveBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  modeBundles: {
+    mode: Scale;
+    entropy: number;
+    consistency: number;
+    volatility: number;
+    diversity: number;
+    smoothnessRatio: number;
+  }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeBundles:
+      rootHz !== undefined
+        ? tuningModeComprehensiveBundle(t, spectrum, rootHz)
+        : tuningModeComprehensiveBundle(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q417 — tuningBestModeComprehensive
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the single best mode of a tuning by a combined score of five metrics in one call.
+ *
+ * Socratic Q417: "If I have five metrics per mode, can I rank them by a combined score and find
+ * the single best mode?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz)` → per-mode five-metric bundles.
+ * 2. For each entry compute `score = entropy + consistency + (1 - volatility) + diversity + smoothnessRatio`.
+ *    Volatility is subtracted (lower is better); other metrics are additive (higher is better).
+ * 3. Return the entry with the highest score.
+ *
+ * @param tuning   - The `TuningSystem` to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns The best-mode entry extended with a `score` field.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const result = tuningBestModeComprehensive(t12, harmonicSpectrum(6));
+ * console.log(result.mode.id, result.score);
+ */
+export function tuningBestModeComprehensive(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+  score: number;
+} {
+  const bundles =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  if (bundles.length === 0) {
+    throw new RangeError('tuningBestModeComprehensive: tuning has no modes');
+  }
+  let best = bundles[0]!;
+  let bestScore =
+    best.entropy + best.consistency + (1 - best.volatility) + best.diversity + best.smoothnessRatio;
+  for (let i = 1; i < bundles.length; i++) {
+    const b = bundles[i]!;
+    const score = b.entropy + b.consistency + (1 - b.volatility) + b.diversity + b.smoothnessRatio;
+    if (score > bestScore) {
+      best = b;
+      bestScore = score;
+    }
+  }
+  return { ...best, score: bestScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q419 — tuningFamilyBestModeComprehensive
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the best comprehensive mode for every tuning in a family in one call.
+ *
+ * Socratic Q419: "If I can find the best comprehensive mode for one tuning, can I do it for a
+ * whole family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `{id: t.id, bestMode: tuningBestModeComprehensive(t, spectrum, rootHz)}`.
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and the best-mode result.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyBestModeComprehensive([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, bestMode }) => console.log(id, bestMode.score));
+ */
+export function tuningFamilyBestModeComprehensive(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  bestMode: {
+    mode: Scale;
+    entropy: number;
+    consistency: number;
+    volatility: number;
+    diversity: number;
+    smoothnessRatio: number;
+    score: number;
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    bestMode:
+      rootHz !== undefined
+        ? tuningBestModeComprehensive(t, spectrum, rootHz)
+        : tuningBestModeComprehensive(t, spectrum),
+  }));
+}

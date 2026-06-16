@@ -176,6 +176,10 @@ import {
   tuningFamilyIntervalProfiles,
   tuningMostDiverseMode,
   tuningFamilyMostDiverseModes,
+  tuningModeComprehensiveBundle,
+  tuningFamilyModeComprehensiveBundles,
+  tuningBestModeComprehensive,
+  tuningFamilyBestModeComprehensive,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -7252,5 +7256,194 @@ describe('tuningFamilyMostDiverseModes (Q413)', () => {
   it('returns empty array for empty input', () => {
     const result = tuningFamilyMostDiverseModes([]);
     expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q414 — tuningModeComprehensiveBundle
+// ---------------------------------------------------------------------------
+
+describe('tuningModeComprehensiveBundle (Q414)', () => {
+  it('returns one entry per mode', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const bundle = tuningModeComprehensiveBundle(t12local, spec);
+    expect(bundle.length).toBe(t12local.degrees.length);
+  });
+
+  it('each entry has all five metrics', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const bundle = tuningModeComprehensiveBundle(t12local, spec);
+    for (const b of bundle) {
+      expect(b.mode).toHaveProperty('degreeIndices');
+      expect(typeof b.entropy).toBe('number');
+      expect(typeof b.consistency).toBe('number');
+      expect(typeof b.volatility).toBe('number');
+      expect(typeof b.diversity).toBe('number');
+      expect(typeof b.smoothnessRatio).toBe('number');
+    }
+  });
+
+  it('diversity is in [0,1]', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const bundle = tuningModeComprehensiveBundle(t12local, spec);
+    for (const b of bundle) {
+      expect(b.diversity).toBeGreaterThanOrEqual(0);
+      expect(b.diversity).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('accepts explicit rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const bundle = tuningModeComprehensiveBundle(t12local, spec, 261.63);
+    expect(bundle.length).toBe(t12local.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q416 — tuningFamilyModeComprehensiveBundles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeComprehensiveBundles (Q416)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeComprehensiveBundles([t12local, t19], spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeBundles', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeComprehensiveBundles([t12local], spec);
+    expect(typeof result[0]!.id).toBe('string');
+    expect(Array.isArray(result[0]!.modeBundles)).toBe(true);
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeComprehensiveBundles([t12local], spec);
+    expect(result[0]!.id).toBe(t12local.id);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyModeComprehensiveBundles([], harmonicSpectrum(6));
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeComprehensiveBundles([t12local], spec, 261.63);
+    expect(result.length).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q417 — tuningBestModeComprehensive
+// ---------------------------------------------------------------------------
+
+describe('tuningBestModeComprehensive (Q417)', () => {
+  it('returns a mode with a score', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeComprehensive(t12local, harmonicSpectrum(6));
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.score).toBe('number');
+  });
+
+  it('returned entry has all five metrics plus score', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeComprehensive(t12local, harmonicSpectrum(6));
+    expect(typeof result.entropy).toBe('number');
+    expect(typeof result.consistency).toBe('number');
+    expect(typeof result.volatility).toBe('number');
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.smoothnessRatio).toBe('number');
+    expect(typeof result.score).toBe('number');
+  });
+
+  it('score matches the formula applied to the returned mode', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestModeComprehensive(t12local, spec);
+    const expected =
+      result.entropy +
+      result.consistency +
+      (1 - result.volatility) +
+      result.diversity +
+      result.smoothnessRatio;
+    expect(result.score).toBeCloseTo(expected, 10);
+  });
+
+  it('score is the maximum among all modes', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestModeComprehensive(t12local, spec);
+    const bundle = tuningModeComprehensiveBundle(t12local, spec);
+    const maxScore = Math.max(
+      ...bundle.map(
+        (b) => b.entropy + b.consistency + (1 - b.volatility) + b.diversity + b.smoothnessRatio,
+      ),
+    );
+    expect(result.score).toBeCloseTo(maxScore, 10);
+  });
+
+  it('throws RangeError for empty tuning', () => {
+    const empty = { ...equalTemperament12(440), degrees: [] };
+    expect(() => tuningBestModeComprehensive(empty, harmonicSpectrum(6))).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeComprehensive(t12local, harmonicSpectrum(6), 261.63);
+    expect(result.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q419 — tuningFamilyBestModeComprehensive
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyBestModeComprehensive (Q419)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyBestModeComprehensive([t12local, t19], spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and bestMode with score', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyBestModeComprehensive([t12local], spec);
+    expect(typeof result[0]!.id).toBe('string');
+    expect(result[0]!.bestMode).toHaveProperty('mode');
+    expect(result[0]!.bestMode).toHaveProperty('score');
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyBestModeComprehensive([t12local], spec);
+    expect(result[0]!.id).toBe(t12local.id);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyBestModeComprehensive([], harmonicSpectrum(6));
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyBestModeComprehensive([t12local], spec, 261.63);
+    expect(result.length).toBe(1);
+    expect(result[0]!.bestMode).toHaveProperty('score');
   });
 });
