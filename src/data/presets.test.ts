@@ -113,6 +113,8 @@ import {
   presetModeConsensusNarrative,
   presetModeQuadrantProfile,
   presetQuadrantCoverage,
+  presetModeGroupByProfile,
+  presetQuadrantCoverageNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3337,5 +3339,46 @@ describe('presetQuadrantCoverage (Q562)', () => {
     expect(() => presetQuadrantCoverage('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
       RangeError,
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q565 — presetModeGroupByProfile
+// ---------------------------------------------------------------------------
+
+describe('presetModeGroupByProfile (Q565)', () => {
+  it('groups modes by quadrant profile for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeGroupByProfile('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const total = result.reduce((s, g) => s + g.count, 0);
+    expect(total).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeGroupByProfile('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q568 — presetQuadrantCoverageNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetQuadrantCoverageNarrative (Q568)', () => {
+  it('returns coverage with narrative for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetQuadrantCoverageNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetQuadrantCoverageNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
   });
 });
