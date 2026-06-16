@@ -31,6 +31,7 @@ import {
   presetEntropyProfile,
   presetBestEntropyModeWav,
   presetConsistencyEntropyDelta,
+  presetModeComparison,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -666,5 +667,30 @@ describe('presetConsistencyEntropyDelta (Q301)', () => {
   it('accepts optional spectrum and rootHz', () => {
     const delta = presetConsistencyEntropyDelta('12-tet', harmonicSpectrum(), 261.63);
     expect(Number.isFinite(delta)).toBe(true);
+  });
+});
+
+describe('presetModeComparison (Q311)', () => {
+  it('returns one entry per mode with all three metrics', () => {
+    const cmp = presetModeComparison('12-tet');
+    expect(cmp.length).toBe(12);
+    for (const { mode, entropy, consistency, volatility } of cmp) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(entropy).toBeGreaterThanOrEqual(0);
+      expect(consistency).toBeGreaterThanOrEqual(0);
+      expect(volatility).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetModeComparison('not-a-preset')).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const cmp = presetModeComparison('12-tet', harmonicSpectrum(), 261.63);
+    expect(cmp.length).toBe(12);
+    expect(Number.isFinite(cmp[0]!.entropy)).toBe(true);
+  });
+  it('accepts optional presets pool', () => {
+    const cmp = presetModeComparison('12-tet', undefined, undefined, [TWELVE_TET]);
+    expect(cmp.length).toBeGreaterThan(0);
   });
 });

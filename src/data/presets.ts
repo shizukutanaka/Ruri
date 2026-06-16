@@ -29,6 +29,7 @@ import {
   chordMapEntropyScore,
   tuningEntropyProfile,
   tuningConsistencyEntropyDelta,
+  tuningModeComparison,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1731,4 +1732,46 @@ export function presetConsistencyEntropyDelta(
   }
   const tuning = loadTuningPreset(preset);
   return tuningConsistencyEntropyDelta(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q311 — presetModeComparison
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare all mode metrics (entropy, consistency, volatility) for each mode of a preset tuning.
+ *
+ * Socratic Q311: "If I can compare all mode metrics for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeComparison(tuning, spectrum, rootHz)` → `{mode, entropy, consistency, volatility}[]`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode, entropy, consistency, volatility }` in allModes order.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const cmp = presetModeComparison('12-tet');
+ * // cmp.length === 12; each entry has entropy, consistency, volatility >= 0
+ */
+export function presetModeComparison(
+  presetId: string,
+  spectrum?: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { mode: Scale; entropy: number; consistency: number; volatility: number }[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeComparison: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeComparison(tuning, spectrum, rootHz);
 }
