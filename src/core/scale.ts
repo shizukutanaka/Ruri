@@ -8182,3 +8182,182 @@ export function tuningFamilyModeCorrelationMatrices(
         : tuningModeCorrelationMatrix(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q432 — tuningParetoFrontBestMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Pick the single best mode from the Pareto front using a composite score.
+ *
+ * Socratic Q432: "If I can find the Pareto front, can I pick the single best mode from it using
+ * the composite score?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeParetoFront(tuning, spectrum, rootHz)` → Pareto front.
+ * 2. Compute composite score for each:
+ *    `score = entropy + consistency + (1 - Math.min(1, volatility)) + diversity + Math.min(1, smoothnessRatio)`
+ * 3. Return the mode with the highest score (ties: first one).
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns The best Pareto-front mode with all five metrics and composite score.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const best = tuningParetoFrontBestMode(equalTemperament12(440), spec);
+ * console.log(best.mode.id, best.score);
+ */
+export function tuningParetoFrontBestMode(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+  score: number;
+} {
+  const front =
+    rootHz !== undefined
+      ? tuningModeParetoFront(tuning, spectrum, rootHz)
+      : tuningModeParetoFront(tuning, spectrum);
+  let best = front[0];
+  if (best === undefined) {
+    throw new RangeError('tuningParetoFrontBestMode: Pareto front is empty');
+  }
+  const scoreOf = (e: {
+    entropy: number;
+    consistency: number;
+    volatility: number;
+    diversity: number;
+    smoothnessRatio: number;
+  }) =>
+    e.entropy +
+    e.consistency +
+    (1 - Math.min(1, e.volatility)) +
+    e.diversity +
+    Math.min(1, e.smoothnessRatio);
+  let bestScore = scoreOf(best);
+  for (let i = 1; i < front.length; i++) {
+    const candidate = front[i]!;
+    const s = scoreOf(candidate);
+    if (s > bestScore) {
+      best = candidate;
+      bestScore = s;
+    }
+  }
+  return { ...best, score: bestScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q434 — tuningModeTopCorrelation
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the metric pair with the highest positive Pearson r in the 5×5 correlation matrix.
+ *
+ * Socratic Q434: "If I have the 5×5 correlation matrix, can I find the metric pair with the
+ * highest positive Pearson r?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeCorrelationMatrix(tuning, spectrum, rootHz)` → `{metrics, matrix}`.
+ * 2. Iterate all off-diagonal pairs `(i, j)` with `i < j`; find the pair with the largest
+ *    `matrix[i][j]`.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{metricA, metricB, correlation}` for the most positively correlated pair.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { metricA, metricB, correlation } = tuningModeTopCorrelation(equalTemperament12(440), spec);
+ * console.log(metricA, metricB, correlation);
+ */
+export function tuningModeTopCorrelation(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { metricA: string; metricB: string; correlation: number } {
+  const { metrics, matrix } =
+    rootHz !== undefined
+      ? tuningModeCorrelationMatrix(tuning, spectrum, rootHz)
+      : tuningModeCorrelationMatrix(tuning, spectrum);
+  let bestI = 0;
+  let bestJ = 1;
+  let bestVal = -Infinity;
+  for (let i = 0; i < metrics.length; i++) {
+    for (let j = i + 1; j < metrics.length; j++) {
+      const val = matrix[i]?.[j] ?? -Infinity;
+      if (val > bestVal) {
+        bestVal = val;
+        bestI = i;
+        bestJ = j;
+      }
+    }
+  }
+  return {
+    metricA: metrics[bestI] ?? '',
+    metricB: metrics[bestJ] ?? '',
+    correlation: bestVal,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q435 — tuningModeAntiCorrelation
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the metric pair with the strongest negative Pearson r in the 5×5 correlation matrix.
+ *
+ * Socratic Q435: "If I have the 5×5 correlation matrix, can I find the metric pair with the
+ * strongest negative Pearson r?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeCorrelationMatrix(tuning, spectrum, rootHz)` → `{metrics, matrix}`.
+ * 2. Iterate all off-diagonal pairs `(i, j)` with `i < j`; find the pair with the smallest
+ *    (most negative) `matrix[i][j]`.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{metricA, metricB, correlation}` for the most negatively correlated pair.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { metricA, metricB, correlation } = tuningModeAntiCorrelation(equalTemperament12(440), spec);
+ * console.log(metricA, metricB, correlation);
+ */
+export function tuningModeAntiCorrelation(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { metricA: string; metricB: string; correlation: number } {
+  const { metrics, matrix } =
+    rootHz !== undefined
+      ? tuningModeCorrelationMatrix(tuning, spectrum, rootHz)
+      : tuningModeCorrelationMatrix(tuning, spectrum);
+  let bestI = 0;
+  let bestJ = 1;
+  let bestVal = Infinity;
+  for (let i = 0; i < metrics.length; i++) {
+    for (let j = i + 1; j < metrics.length; j++) {
+      const val = matrix[i]?.[j] ?? Infinity;
+      if (val < bestVal) {
+        bestVal = val;
+        bestI = i;
+        bestJ = j;
+      }
+    }
+  }
+  return {
+    metricA: metrics[bestI] ?? '',
+    metricB: metrics[bestJ] ?? '',
+    correlation: bestVal,
+  };
+}

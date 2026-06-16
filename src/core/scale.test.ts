@@ -188,6 +188,9 @@ import {
   tuningFamilyModeParetoFronts,
   tuningModeCorrelationMatrix,
   tuningFamilyModeCorrelationMatrices,
+  tuningParetoFrontBestMode,
+  tuningModeTopCorrelation,
+  tuningModeAntiCorrelation,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -7847,5 +7850,137 @@ describe('tuningFamilyModeCorrelationMatrices (Q431)', () => {
     const tunings = [equalTemperament12(440)];
     const results = tuningFamilyModeCorrelationMatrices(tunings, spec, 261.63);
     expect(results[0]!.correlationMatrix.matrix.length).toBe(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q432 — tuningParetoFrontBestMode
+// ---------------------------------------------------------------------------
+
+describe('tuningParetoFrontBestMode (Q432)', () => {
+  it('returns a single mode object with score', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningParetoFrontBestMode(t12, spec);
+    expect(typeof result.score).toBe('number');
+    expect(typeof result.entropy).toBe('number');
+    expect(typeof result.consistency).toBe('number');
+    expect(typeof result.volatility).toBe('number');
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.smoothnessRatio).toBe('number');
+    expect(result.mode).toBeDefined();
+  });
+
+  it('result is from the Pareto front', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const front = tuningModeParetoFront(t12, spec);
+    const result = tuningParetoFrontBestMode(t12, spec);
+    const frontIds = front.map((f) => f.mode.id);
+    expect(frontIds).toContain(result.mode.id);
+  });
+
+  it('score is highest in the front', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const front = tuningModeParetoFront(t12, spec);
+    const result = tuningParetoFrontBestMode(t12, spec);
+    const scoreOf = (e: {
+      entropy: number;
+      consistency: number;
+      volatility: number;
+      diversity: number;
+      smoothnessRatio: number;
+    }) =>
+      e.entropy +
+      e.consistency +
+      (1 - Math.min(1, e.volatility)) +
+      e.diversity +
+      Math.min(1, e.smoothnessRatio);
+    const maxScore = Math.max(...front.map(scoreOf));
+    expect(result.score).toBeCloseTo(maxScore, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningParetoFrontBestMode(t12, spec, 261.63);
+    expect(typeof result.score).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q434 — tuningModeTopCorrelation
+// ---------------------------------------------------------------------------
+
+describe('tuningModeTopCorrelation (Q434)', () => {
+  it('returns metricA, metricB, correlation', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeTopCorrelation(t12, spec);
+    expect(typeof result.metricA).toBe('string');
+    expect(typeof result.metricB).toBe('string');
+    expect(typeof result.correlation).toBe('number');
+    expect(result.correlation).toBeGreaterThanOrEqual(-1 - 1e-10);
+    expect(result.correlation).toBeLessThanOrEqual(1 + 1e-10);
+  });
+
+  it('correlation is the maximum off-diagonal value', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { metrics, matrix } = tuningModeCorrelationMatrix(t12, spec);
+    let maxVal = -Infinity;
+    for (let i = 0; i < metrics.length; i++) {
+      for (let j = i + 1; j < metrics.length; j++) {
+        const v = matrix[i]?.[j] ?? -Infinity;
+        if (v > maxVal) maxVal = v;
+      }
+    }
+    const result = tuningModeTopCorrelation(t12, spec);
+    expect(result.correlation).toBeCloseTo(maxVal, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeTopCorrelation(t12, spec, 261.63);
+    expect(typeof result.correlation).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q435 — tuningModeAntiCorrelation
+// ---------------------------------------------------------------------------
+
+describe('tuningModeAntiCorrelation (Q435)', () => {
+  it('returns metricA, metricB, correlation', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAntiCorrelation(t12, spec);
+    expect(typeof result.metricA).toBe('string');
+    expect(typeof result.metricB).toBe('string');
+    expect(typeof result.correlation).toBe('number');
+  });
+
+  it('correlation is the minimum off-diagonal value', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { metrics, matrix } = tuningModeCorrelationMatrix(t12, spec);
+    let minVal = Infinity;
+    for (let i = 0; i < metrics.length; i++) {
+      for (let j = i + 1; j < metrics.length; j++) {
+        const v = matrix[i]?.[j] ?? Infinity;
+        if (v < minVal) minVal = v;
+      }
+    }
+    const result = tuningModeAntiCorrelation(t12, spec);
+    expect(result.correlation).toBeCloseTo(minVal, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12 = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAntiCorrelation(t12, spec, 261.63);
+    expect(typeof result.correlation).toBe('number');
   });
 });
