@@ -41,6 +41,7 @@ import {
   tuningBestModeChordMapNarrative,
   tuningModeNarrativeCompare,
   tuningModeBestProgressionNarratives,
+  tuningBestSmoothMode,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2462,4 +2463,46 @@ export function presetModeBestProgressionNarratives(
   }
   const tuning = loadTuningPreset(preset);
   return tuningModeBestProgressionNarratives(tuning, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q362 — presetBestSmoothMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the mode with the highest progression smoothness ratio for a preset tuning in one call.
+ *
+ * Socratic Q362: "If I can find the smoothest mode for a tuning, can I do it for a preset by
+ * id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningBestSmoothMode(tuning, rootHz, spectrum)` → `{ mode, smoothnessRatio }`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ mode, smoothnessRatio }` for the smoothest mode.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const result = presetBestSmoothMode('12-tet');
+ * console.log(result.mode.id, result.smoothnessRatio);
+ */
+export function presetBestSmoothMode(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningBestSmoothMode> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestSmoothMode: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningBestSmoothMode(tuning, rootHz, spectrum);
 }

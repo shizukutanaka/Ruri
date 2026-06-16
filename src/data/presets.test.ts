@@ -47,6 +47,7 @@ import {
   presetBestModeChordMapNarrative,
   presetModeNarrativeCompare,
   presetModeBestProgressionNarratives,
+  presetBestSmoothMode,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1290,5 +1291,33 @@ describe('presetModeBestProgressionNarratives (Q359)', () => {
     const results = presetModeBestProgressionNarratives('12-tet', 440, undefined, [TWELVE_TET]);
     expect(results.length).toBeGreaterThan(0);
     expect(results[0]!.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q362 — presetBestSmoothMode
+// ---------------------------------------------------------------------------
+
+describe('presetBestSmoothMode (Q362)', () => {
+  it('returns mode and smoothnessRatio for a known preset', () => {
+    const result = presetBestSmoothMode('12-tet');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.smoothnessRatio).toBe('number');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetBestSmoothMode('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const result = presetBestSmoothMode('12-tet', 261.63, harmonicSpectrum());
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const result = presetBestSmoothMode('12-tet', 440, undefined, [TWELVE_TET]);
+    expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
