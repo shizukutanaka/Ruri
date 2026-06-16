@@ -15,6 +15,9 @@ import {
   comparePresets,
   betterPreset,
   presetProgressionNarrative,
+  allPresetsSimilarityMatrix,
+  presetFullBundle,
+  topPresetsByStabilityReport,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -400,5 +403,54 @@ describe('presetProgressionNarrative (Q232)', () => {
   it('returns fallback for invalid preset', () => {
     const text = presetProgressionNarrative('nonexistent', [0, 1], 261.63);
     expect(text).toContain('nonexistent');
+  });
+});
+
+describe('allPresetsSimilarityMatrix (Q246)', () => {
+  it('returns ids and square matrix', () => {
+    const { ids, matrix } = allPresetsSimilarityMatrix();
+    expect(ids.length).toBeGreaterThan(0);
+    expect(matrix).toHaveLength(ids.length);
+    matrix.forEach((row) => expect(row).toHaveLength(ids.length));
+  });
+  it('diagonal is 1.0', () => {
+    const { matrix } = allPresetsSimilarityMatrix();
+    matrix.forEach((row, i) => {
+      expect(row[i]).toBe(1.0);
+    });
+  });
+});
+
+describe('presetFullBundle (Q248)', () => {
+  it('returns all 6 fields for 12-tet', () => {
+    const bundle = presetFullBundle('12-tet');
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.scl).toBe('string');
+    expect(typeof bundle.tun).toBe('string');
+    expect(bundle.mts).toBeInstanceOf(Uint8Array);
+    expect(bundle.report).toBeDefined();
+    expect(bundle.report.id).toBeTruthy();
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFullBundle('nonexistent')).toThrow(RangeError);
+  });
+});
+
+describe('topPresetsByStabilityReport (Q251)', () => {
+  it('returns n entries', () => {
+    const results = topPresetsByStabilityReport(2, 261.63);
+    expect(results).toHaveLength(2);
+    results.forEach((r) => {
+      expect(typeof r.presetId).toBe('string');
+      expect(r.report).toBeDefined();
+    });
+  });
+  it('throws for n <= 0', () => {
+    expect(() => topPresetsByStabilityReport(0)).toThrow(RangeError);
+  });
+  it('clamps to preset count', () => {
+    const results = topPresetsByStabilityReport(999, 261.63);
+    expect(results.length).toBeGreaterThan(0);
   });
 });
