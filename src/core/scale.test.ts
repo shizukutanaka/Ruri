@@ -114,6 +114,10 @@ import {
   chordMapRankedBundle,
   bestModeByConsistency,
   tuningDualBestModes,
+  chordMapVolatilityBundle,
+  tuningModeComparison,
+  bestModeByVolatility,
+  tuningTripleBestModes,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4872,5 +4876,112 @@ describe('tuningDualBestModes (Q305)', () => {
   it('throws for empty tuning', () => {
     const empty: typeof t12 = { ...t12, degrees: [] };
     expect(() => tuningDualBestModes(empty)).toThrow(RangeError);
+  });
+});
+
+describe('chordMapVolatilityBundle (Q306)', () => {
+  const scale: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('returns volatility, entropy, consistency', () => {
+    const bundle = chordMapVolatilityBundle(chordMap);
+    expect(typeof bundle.volatility).toBe('number');
+    expect(typeof bundle.entropy).toBe('number');
+    expect(typeof bundle.consistency).toBe('number');
+  });
+  it('volatility and entropy are non-negative', () => {
+    const bundle = chordMapVolatilityBundle(chordMap);
+    expect(bundle.volatility).toBeGreaterThanOrEqual(0);
+    expect(bundle.entropy).toBeGreaterThanOrEqual(0);
+  });
+  it('consistency is in (0, 1]', () => {
+    const bundle = chordMapVolatilityBundle(chordMap);
+    expect(bundle.consistency).toBeGreaterThan(0);
+    expect(bundle.consistency).toBeLessThanOrEqual(1);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = chordMapVolatilityBundle(chordMap, harmonicSpectrum(), 261.63);
+    expect(Number.isFinite(bundle.volatility)).toBe(true);
+    expect(Number.isFinite(bundle.entropy)).toBe(true);
+    expect(Number.isFinite(bundle.consistency)).toBe(true);
+  });
+  it('returns zeros for empty chord map', () => {
+    const bundle = chordMapVolatilityBundle([]);
+    expect(bundle.volatility).toBe(0);
+    expect(bundle.entropy).toBe(0);
+    expect(bundle.consistency).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('tuningModeComparison (Q308)', () => {
+  it('returns one entry per mode with all three metrics', () => {
+    const cmp = tuningModeComparison(t12);
+    expect(cmp.length).toBe(t12.degrees.length);
+    for (const { mode, entropy, consistency, volatility } of cmp) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(entropy).toBeGreaterThanOrEqual(0);
+      expect(consistency).toBeGreaterThanOrEqual(0);
+      expect(volatility).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('returns empty array for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(tuningModeComparison(empty)).toEqual([]);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const cmp = tuningModeComparison(t12, harmonicSpectrum(), 261.63);
+    expect(cmp.length).toBe(t12.degrees.length);
+    expect(Number.isFinite(cmp[0]!.entropy)).toBe(true);
+  });
+});
+
+describe('bestModeByVolatility (Q309)', () => {
+  it('returns a Scale', () => {
+    const mode = bestModeByVolatility(t12);
+    expect(mode).toHaveProperty('degreeIndices');
+  });
+  it('has volatility <= all other modes', () => {
+    const mode = bestModeByVolatility(t12);
+    const cmp = tuningModeComparison(t12);
+    const minVolatility = Math.min(...cmp.map((e) => e.volatility));
+    const chordMap = scaleToChordMap(mode, t12);
+    const volatility = chordMapVolatilityBundle(chordMap).volatility;
+    expect(volatility).toBeCloseTo(minVolatility, 10);
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => bestModeByVolatility(empty)).toThrow(RangeError);
+  });
+});
+
+describe('tuningTripleBestModes (Q310)', () => {
+  it('returns byEntropy, byConsistency, byVolatility, allAgree', () => {
+    const result = tuningTripleBestModes(t12);
+    expect(result).toHaveProperty('byEntropy');
+    expect(result).toHaveProperty('byConsistency');
+    expect(result).toHaveProperty('byVolatility');
+    expect(typeof result.allAgree).toBe('boolean');
+  });
+  it('all three are Scales', () => {
+    const result = tuningTripleBestModes(t12);
+    expect(result.byEntropy).toHaveProperty('degreeIndices');
+    expect(result.byConsistency).toHaveProperty('degreeIndices');
+    expect(result.byVolatility).toHaveProperty('degreeIndices');
+  });
+  it('allAgree is true when all ids match', () => {
+    const result = tuningTripleBestModes(t12);
+    const expectedAgree =
+      result.byEntropy.id === result.byConsistency.id &&
+      result.byConsistency.id === result.byVolatility.id;
+    expect(result.allAgree).toBe(expectedAgree);
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => tuningTripleBestModes(empty)).toThrow(RangeError);
   });
 });

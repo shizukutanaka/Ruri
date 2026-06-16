@@ -4857,3 +4857,162 @@ export function tuningDualBestModes(
   const sameMode = byEntropy.id === byConsistency.id;
   return { byEntropy, byConsistency, sameMode };
 }
+
+// ---------------------------------------------------------------------------
+// Q306 — chordMapVolatilityBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get volatility, entropy, and consistency for a chord map in one call.
+ *
+ * Socratic Q306: "If chordMapVolatility, chordMapEntropyScore, and chordMapConsistencyScore
+ * all take the same chord map, can I get all three in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapVolatility(chordMap, spectrum, rootHz)` → volatility (CV of dissonance).
+ * 2. `chordMapEntropyScore(chordMap, spectrum, rootHz)` → Shannon entropy.
+ * 3. `chordMapConsistencyScore(chordMap, spectrum, rootHz)` → consistency ∈ (0, 1].
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @returns `{ volatility, entropy, consistency }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const bundle = chordMapVolatilityBundle(chordMap);
+ * // bundle.volatility >= 0; bundle.entropy >= 0; bundle.consistency > 0
+ */
+export function chordMapVolatilityBundle(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz?: number,
+): { volatility: number; entropy: number; consistency: number } {
+  const volatility = chordMapVolatility(chordMap, spectrum, rootHz);
+  const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
+  const consistency = chordMapConsistencyScore(chordMap, spectrum, rootHz);
+  return { volatility, entropy, consistency };
+}
+
+// ---------------------------------------------------------------------------
+// Q308 — tuningModeComparison
+// ---------------------------------------------------------------------------
+
+/**
+ * For each mode of a tuning, compute entropy, consistency, and volatility in one call.
+ *
+ * Socratic Q308: "If I can get entropy/consistency/volatility separately per mode,
+ * can I get all three together per mode in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 3. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapVolatilityBundle(chordMap, spectrum, rootHz)`.
+ *
+ * @param tuning   - The tuning system whose modes to compare.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{ mode, entropy, consistency, volatility }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const cmp = tuningModeComparison(t12);
+ * // cmp.length === 12; each entry has entropy, consistency, volatility >= 0
+ */
+export function tuningModeComparison(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): { mode: Scale; entropy: number; consistency: number; volatility: number }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const { volatility, entropy, consistency } = chordMapVolatilityBundle(
+      chordMap,
+      spectrum,
+      rootHz,
+    );
+    return { mode, entropy, consistency, volatility };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q309 — bestModeByVolatility
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the mode of `tuning` with the lowest chord-map volatility (most stable).
+ *
+ * Socratic Q309: "If I can compare all mode metrics, can I find the most stable
+ * (lowest volatility) mode in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComparison(tuning, spectrum, rootHz)` → `{mode, entropy, consistency, volatility}[]`.
+ * 2. Return the entry with the minimum volatility value.
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Optional instrument spectrum.
+ * @param rootHz   - Root frequency in Hz.
+ * @returns The `Scale` with the minimum volatility score.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const mode = bestModeByVolatility(t12);
+ * // mode is the modal rotation with the most uniform dissonance distribution
+ */
+export function bestModeByVolatility(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): Scale {
+  const comparison = tuningModeComparison(tuning, spectrum, rootHz);
+  if (comparison.length === 0) throw new RangeError('bestModeByVolatility: tuning has no modes');
+  let best = comparison[0]!;
+  for (const entry of comparison) {
+    if (entry.volatility < best.volatility) best = entry;
+  }
+  return best.mode;
+}
+
+// ---------------------------------------------------------------------------
+// Q310 — tuningTripleBestModes
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the best mode by entropy, consistency, and volatility, then compare all three.
+ *
+ * Socratic Q310: "If I can find best mode by entropy and consistency, can I also find
+ * best by volatility and compare all three at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningDualBestModes(tuning, spectrum, rootHz)` → `{ byEntropy, byConsistency, sameMode }`.
+ * 2. `bestModeByVolatility(tuning, spectrum, rootHz)` → byVolatility.
+ * 3. `allAgree` = true when all three modes have the same `id`.
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Optional instrument spectrum.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{ byEntropy, byConsistency, byVolatility, allAgree }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { byEntropy, byConsistency, byVolatility, allAgree } = tuningTripleBestModes(t12);
+ * // allAgree === true means entropy, consistency, and volatility all agree on the best mode
+ */
+export function tuningTripleBestModes(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { byEntropy: Scale; byConsistency: Scale; byVolatility: Scale; allAgree: boolean } {
+  const { byEntropy, byConsistency } = tuningDualBestModes(tuning, spectrum, rootHz);
+  const byVolatility = bestModeByVolatility(tuning, spectrum, rootHz);
+  const allAgree = byEntropy.id === byConsistency.id && byConsistency.id === byVolatility.id;
+  return { byEntropy, byConsistency, byVolatility, allAgree };
+}
