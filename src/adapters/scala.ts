@@ -19,6 +19,10 @@ import {
   chordMapRankedBundle,
   chordMapVolatilityBundle,
   modeProgressionBundle,
+  chordMapSpectralProfile,
+  chordMapProgressionBridge,
+  progressionNarrative,
+  progressionSmoothnessRatio,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -914,4 +918,60 @@ export function scaleFullAnalysisBundle(
       smoothnessRatio: progressionFull.smoothnessRatio,
     },
   };
+}
+
+// ---------------------------------------------------------------------------
+// Q340 — scaleSpectralNarrativeBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Export a scale as SCL text bundled with its spectral profile, progression narrative,
+ * and smoothness ratio in one call.
+ *
+ * Socratic Q340: "If I can get spectral profile and narrative for a scale's chord map,
+ * can I combine them with SCL export?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToSubsetSclText(scale, tuning, name)` → `scl: string`.
+ * 2. `scaleToChordMap(scale, tuning)` → chordMap.
+ * 3. `chordMapSpectralProfile(chordMap, spectrum, rootHz)` → spectralProfile.
+ * 4. `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → chords.
+ * 5. `progressionNarrative(chords, tuning, rootHz, spectrum)` → narrative.
+ * 6. `progressionSmoothnessRatio(chords, rootHz, spectrum)` → smoothnessRatio.
+ *
+ * @param scale    - The scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Instrument spectrum (required for spectral fit computation).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, spectralProfile, narrative, smoothnessRatio }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scl, spectralProfile, narrative, smoothnessRatio } =
+ *   scaleSpectralNarrativeBundle(major, t12, harmonicSpectrum());
+ * // scl contains '!'; spectralProfile[0] has spectralFit; narrative is a prose string
+ */
+export function scaleSpectralNarrativeBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+  name?: string,
+): {
+  scl: string;
+  spectralProfile: ReturnType<typeof chordMapSpectralProfile>;
+  narrative: string;
+  smoothnessRatio: number;
+} {
+  const scl = scaleToSubsetSclText(scale, tuning, name);
+  const chordMap = scaleToChordMap(scale, tuning);
+  const spectralProfile = chordMapSpectralProfile(chordMap, spectrum, rootHz);
+  const chords = chordMapProgressionBridge(chordMap, rootHz, spectrum);
+  const narrative = progressionNarrative(chords, rootHz, spectrum);
+  const smoothnessRatio = progressionSmoothnessRatio(chords, rootHz, spectrum);
+  return { scl, spectralProfile, narrative, smoothnessRatio };
 }

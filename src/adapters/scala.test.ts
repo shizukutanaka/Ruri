@@ -24,6 +24,7 @@ import {
   scaleVolatilityBundle,
   scaleModeProgressionBundle,
   scaleFullAnalysisBundle,
+  scaleSpectralNarrativeBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -1032,5 +1033,60 @@ describe('scaleFullAnalysisBundle (Q323)', () => {
   it('accepts optional rootHz and name', () => {
     const bundle = scaleFullAnalysisBundle(scale, t12, spectrum, 261.63, 'Custom');
     expect(bundle.scl).toContain('Custom');
+  });
+});
+
+describe('scaleSpectralNarrativeBundle (Q340)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('returns scl, spectralProfile, narrative, smoothnessRatio', () => {
+    const bundle = scaleSpectralNarrativeBundle(scale, t12, spectrum);
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.scl).toContain('!');
+    expect(Array.isArray(bundle.spectralProfile)).toBe(true);
+    expect(typeof bundle.narrative).toBe('string');
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+  });
+
+  it('spectralProfile entries have spectralFit', () => {
+    const { spectralProfile } = scaleSpectralNarrativeBundle(scale, t12, spectrum);
+    for (const entry of spectralProfile) {
+      expect(typeof entry.spectralFit).toBe('number');
+      expect(entry.spectralFit).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('narrative is a non-empty string', () => {
+    const { narrative } = scaleSpectralNarrativeBundle(scale, t12, spectrum);
+    expect(narrative.length).toBeGreaterThan(0);
+  });
+
+  it('smoothnessRatio is finite and non-negative', () => {
+    const { smoothnessRatio } = scaleSpectralNarrativeBundle(scale, t12, spectrum);
+    expect(Number.isFinite(smoothnessRatio)).toBe(true);
+    expect(smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('scl contains scale name when name omitted', () => {
+    const { scl } = scaleSpectralNarrativeBundle(scale, t12, spectrum);
+    expect(scl).toContain('Major');
+  });
+
+  it('scl contains custom name when provided', () => {
+    const { scl } = scaleSpectralNarrativeBundle(scale, t12, spectrum, 440, 'Custom Spectral');
+    expect(scl).toContain('Custom Spectral');
+  });
+
+  it('accepts optional rootHz', () => {
+    const bundle = scaleSpectralNarrativeBundle(scale, t12, spectrum, 261.63);
+    expect(typeof bundle.scl).toBe('string');
+    expect(typeof bundle.smoothnessRatio).toBe('number');
   });
 });
