@@ -41,6 +41,7 @@ import {
   smoothProgressionBundle,
   tuningFamilyWav,
   progressionBundleFromScale,
+  tuningReportCardWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1837,5 +1838,20 @@ describe('progressionBundleFromScale (Q284)', () => {
     expect(bundle.smf).toBeInstanceOf(Uint8Array);
     expect(typeof bundle.narrative).toBe('string');
     expect(bundle.wav.length).toBeGreaterThan(44);
+  });
+});
+
+describe('tuningReportCardWav (Q292)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns wav and reportCard string', () => {
+    const { wav, reportCard } = tuningReportCardWav(t12, 261.63);
+    expect(wav).toBeInstanceOf(Uint8Array);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(typeof reportCard).toBe('string');
+    expect(reportCard.length).toBeGreaterThan(10);
+  });
+  it('reportCard contains tuning id', () => {
+    expect(tuningReportCardWav(t12).reportCard).toContain(t12.id);
   });
 });

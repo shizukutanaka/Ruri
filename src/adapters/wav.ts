@@ -36,6 +36,7 @@ import {
   chordProgressionSmooth,
   modeVolatilityProfile,
   chordMapProgressionBridge,
+  tuningReportCard,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1757,4 +1758,44 @@ export function progressionBundleFromScale(
   const effectiveRootHz = rootHz ?? tuning.referenceHz;
   const chords = chordMapProgressionBridge(chordMap, effectiveRootHz, spectrum);
   return smoothProgressionBundle(chords, tuning, rootHz, spectrum, wavOpts, smfOpts);
+}
+
+// ---------------------------------------------------------------------------
+// Q292 — tuningReportCardWav
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a tuning report card text and render its best mode as WAV in one call.
+ *
+ * Socratic Q292: "If I can get a tuning report card text and render its best mode as WAV,
+ * can I get both in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningReportCard(tuning, rootHz, spectrum)` → report card string.
+ * 2. `bestModeWav(tuning, rootHz ?? tuning.referenceHz, spectrum, opts)` → WAV bytes.
+ * 3. Return `{ wav, reportCard }`.
+ *
+ * @param tuning   - The tuning system to report on and render.
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for mode selection and synthesis.
+ * @param opts     - Optional Karplus-Strong + per-note duration options.
+ * @returns `{ wav: Uint8Array, reportCard: string }`.
+ *
+ * @throws {RangeError} if the tuning has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { wav, reportCard } = tuningReportCardWav(t12, 261.63);
+ * await fs.writeFile('t12.wav', wav);
+ * console.log(reportCard);
+ */
+export function tuningReportCardWav(
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): { wav: Uint8Array; reportCard: string } {
+  const reportCard = tuningReportCard(tuning, rootHz, spectrum);
+  const wav = bestModeWav(tuning, rootHz ?? tuning.referenceHz, spectrum, opts);
+  return { wav, reportCard };
 }
