@@ -96,6 +96,8 @@ import {
   tuningModeEntropyDiversityMap,
   tuningModeConsistencyVolatilityMap,
   tuningModeFiveDimMap,
+  tuningModeFiveDimNarrative,
+  tuningModeSmoothnessEntropyMap,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4718,4 +4720,46 @@ export function presetModeFiveDimMap(
   return rootHz !== undefined
     ? tuningModeFiveDimMap(tuning, spectrum, rootHz)
     : tuningModeFiveDimMap(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q535 — presetModeFiveDimNarrative
+// ---------------------------------------------------------------------------
+
+export function presetModeFiveDimNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeFiveDimNarrative> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeFiveDimNarrative: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeFiveDimNarrative(tuning, spectrum, rootHz)
+    : tuningModeFiveDimNarrative(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q538 — presetModeSmoothnessEntropyMap
+// ---------------------------------------------------------------------------
+
+export function presetModeSmoothnessEntropyMap(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeSmoothnessEntropyMap> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeSmoothnessEntropyMap: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeSmoothnessEntropyMap(tuning, spectrum, rootHz)
+    : tuningModeSmoothnessEntropyMap(tuning, spectrum);
 }

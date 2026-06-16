@@ -103,6 +103,8 @@ import {
   presetModeEntropyDiversityMap,
   presetModeConsistencyVolatilityMap,
   presetModeFiveDimMap,
+  presetModeFiveDimNarrative,
+  presetModeSmoothnessEntropyMap,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3102,6 +3104,53 @@ describe('presetModeFiveDimMap (Q532)', () => {
   it('accepts optional rootHz', () => {
     const spec = harmonicSpectrum(6);
     const result = presetModeFiveDimMap('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q535 — presetModeFiveDimNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetModeFiveDimNarrative (Q535)', () => {
+  it('returns per-mode narratives with non-empty narrative strings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeFiveDimNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.narrative).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeFiveDimNarrative('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q538 — presetModeSmoothnessEntropyMap
+// ---------------------------------------------------------------------------
+
+describe('presetModeSmoothnessEntropyMap (Q538)', () => {
+  it('returns quadrant labels for each mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeSmoothnessEntropyMap('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const validQuadrants = ['fluid-complex', 'fluid-simple', 'rough-complex', 'rough-simple'];
+    expect(validQuadrants).toContain(result[0]!.quadrant);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeSmoothnessEntropyMap('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeSmoothnessEntropyMap('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.length).toBeGreaterThan(0);
   });
 });
