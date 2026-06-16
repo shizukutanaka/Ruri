@@ -22,6 +22,7 @@ import {
   scaleEntropyBundle,
   scaleRankedBundle,
   scaleVolatilityBundle,
+  scaleModeProgressionBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -942,5 +943,44 @@ describe('scaleVolatilityBundle (Q307)', () => {
   it('accepts optional spectrum and rootHz', () => {
     const bundle = scaleVolatilityBundle(scale, t12, harmonicSpectrum(), 261.63);
     expect(Number.isFinite(bundle.volatility)).toBe(true);
+  });
+});
+
+describe('scaleModeProgressionBundle (Q317)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns scl, chords, and smoothnessRatio', () => {
+    const bundle = scaleModeProgressionBundle(scale, t12);
+    expect(typeof bundle.scl).toBe('string');
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+  });
+  it('scl contains scale name when name omitted', () => {
+    const bundle = scaleModeProgressionBundle(scale, t12);
+    expect(bundle.scl).toContain('Major');
+  });
+  it('scl contains custom name when provided', () => {
+    const bundle = scaleModeProgressionBundle(scale, t12, 440, undefined, 'Custom Name');
+    expect(bundle.scl).toContain('Custom Name');
+  });
+  it('smoothnessRatio is finite and non-negative', () => {
+    const bundle = scaleModeProgressionBundle(scale, t12);
+    expect(Number.isFinite(bundle.smoothnessRatio)).toBe(true);
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+  it('scl starts with Scala comment marker', () => {
+    const bundle = scaleModeProgressionBundle(scale, t12);
+    expect(bundle.scl).toContain('!');
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = scaleModeProgressionBundle(scale, t12, 261.63, harmonicSpectrum());
+    expect(typeof bundle.scl).toBe('string');
+    expect(typeof bundle.smoothnessRatio).toBe('number');
   });
 });

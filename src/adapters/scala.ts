@@ -18,6 +18,7 @@ import {
   chordMapEntropyScore,
   chordMapRankedBundle,
   chordMapVolatilityBundle,
+  modeProgressionBundle,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -808,4 +809,45 @@ export function scaleVolatilityBundle(
   const scl = scaleToSubsetSclText(scale, tuning, name);
   const { volatility, entropy, consistency } = chordMapVolatilityBundle(chordMap, spectrum, rootHz);
   return { scl, volatility, entropy, consistency };
+}
+
+// ---------------------------------------------------------------------------
+// Q317 — scaleModeProgressionBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Export a scale as SCL text and build its smooth chord progression bundle in one call.
+ *
+ * Socratic Q317: "If I can get a progression bundle for a mode and export a scale to SCL,
+ * can I do both at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToSubsetSclText(scale, tuning, name)` → `.scl` text string.
+ * 2. `modeProgressionBundle(scale, tuning, rootHz, spectrum)` → `{chords, smoothnessRatio}`.
+ *
+ * @param scale    - The scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, chords, smoothnessRatio }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scl, chords, smoothnessRatio } = scaleModeProgressionBundle(major, t12);
+ * // scl contains '!'; chords is a smooth progression; smoothnessRatio ∈ [0, 1]
+ */
+export function scaleModeProgressionBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  name?: string,
+): { scl: string; chords: Chord[]; smoothnessRatio: number } {
+  const scl = scaleToSubsetSclText(scale, tuning, name);
+  const { chords, smoothnessRatio } = modeProgressionBundle(scale, tuning, rootHz, spectrum);
+  return { scl, chords, smoothnessRatio };
 }
