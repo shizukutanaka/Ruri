@@ -39,6 +39,7 @@ import {
   tuningReportCard,
   bestModeByEntropy,
   chordMapEntropyScore,
+  tuningBestModeProgression,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1842,4 +1843,57 @@ export function tuningEntropyBestModeWav(
   const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
   const wav = pluckScaleWav(mode, tuning, opts);
   return { wav, entropy, mode };
+}
+
+// ---------------------------------------------------------------------------
+// Q318 — tuningBestModeProgressionBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the best mode's chord progression bundle (WAV + SMF + narrative) for a tuning in one call.
+ *
+ * Socratic Q318: "If I can get the best mode's progression for a tuning and bundle it as
+ * WAV+SMF+narrative, can I do it in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningBestModeProgression(tuning, metric, rootHz, spectrum)` → `{ mode, chords, smoothnessRatio }`.
+ * 2. `smoothProgressionBundle(chords, tuning, rootHz, spectrum)` → `{ wav, smf, narrative }`.
+ * 3. Merge and return all fields.
+ *
+ * @param tuning   - The tuning system.
+ * @param metric   - Which metric to select the best mode by.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @returns `{ mode, chords, smoothnessRatio, wav, smf, narrative }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundle = tuningBestModeProgressionBundle(t12, 'entropy');
+ * await fs.writeFile('best-mode-prog.wav', bundle.wav);
+ * await fs.writeFile('best-mode-prog.mid', bundle.smf);
+ * console.log(bundle.narrative);
+ */
+export function tuningBestModeProgressionBundle(
+  tuning: TuningSystem,
+  metric: 'entropy' | 'consistency' | 'volatility',
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  mode: Scale;
+  chords: Chord[];
+  smoothnessRatio: number;
+  wav: Uint8Array;
+  smf: Uint8Array;
+  narrative: string;
+} {
+  const { mode, chords, smoothnessRatio } = tuningBestModeProgression(
+    tuning,
+    metric,
+    rootHz,
+    spectrum,
+  );
+  const { wav, smf, narrative } = smoothProgressionBundle(chords, tuning, rootHz, spectrum);
+  return { mode, chords, smoothnessRatio, wav, smf, narrative };
 }

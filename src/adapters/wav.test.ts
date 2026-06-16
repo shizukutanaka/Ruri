@@ -43,6 +43,7 @@ import {
   progressionBundleFromScale,
   tuningReportCardWav,
   tuningEntropyBestModeWav,
+  tuningBestModeProgressionBundle,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1876,5 +1877,45 @@ describe('tuningEntropyBestModeWav (Q298)', () => {
   it('throws for empty tuning', () => {
     const empty: typeof t12 = { ...t12, degrees: [] };
     expect(() => tuningEntropyBestModeWav(empty)).toThrow(RangeError);
+  });
+});
+
+describe('tuningBestModeProgressionBundle (Q318)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns mode, chords, smoothnessRatio, wav, smf, narrative', () => {
+    const bundle = tuningBestModeProgressionBundle(t12, 'entropy');
+    expect(bundle.mode).toHaveProperty('degreeIndices');
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.narrative).toBe('string');
+  });
+  it('wav is a valid WAV file', () => {
+    const { wav } = tuningBestModeProgressionBundle(t12, 'entropy');
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+  it('smf is non-empty', () => {
+    const { smf } = tuningBestModeProgressionBundle(t12, 'consistency');
+    expect(smf.length).toBeGreaterThan(0);
+  });
+  it('narrative is a non-empty string', () => {
+    const { narrative } = tuningBestModeProgressionBundle(t12, 'volatility');
+    expect(narrative.length).toBeGreaterThan(0);
+  });
+  it('smoothnessRatio is finite and non-negative', () => {
+    const { smoothnessRatio } = tuningBestModeProgressionBundle(t12, 'entropy');
+    expect(Number.isFinite(smoothnessRatio)).toBe(true);
+    expect(smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => tuningBestModeProgressionBundle(empty, 'entropy')).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = tuningBestModeProgressionBundle(t12, 'entropy', 261.63, harmonicSpectrum());
+    expect(bundle.mode).toHaveProperty('degreeIndices');
   });
 });
