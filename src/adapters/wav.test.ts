@@ -37,6 +37,7 @@ import {
   presetBestModeWav,
   progressionFullBundle,
   smoothProgressionWav,
+  modeVolatilityWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1738,5 +1739,18 @@ describe('smoothProgressionWav (Q269)', () => {
   it('handles empty progression', () => {
     const wav = smoothProgressionWav([], 261.63);
     expect(wav).toBeInstanceOf(Uint8Array);
+  });
+});
+
+describe('modeVolatilityWav (Q271)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns mostVolatile and leastVolatile WAV', () => {
+    const { mostVolatile, leastVolatile } = modeVolatilityWav(scale, t12);
+    expect(mostVolatile).toBeInstanceOf(Uint8Array);
+    expect(leastVolatile).toBeInstanceOf(Uint8Array);
+    expect(mostVolatile.length).toBeGreaterThan(44);
+    expect(leastVolatile.length).toBeGreaterThan(44);
   });
 });

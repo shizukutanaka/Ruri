@@ -34,6 +34,7 @@ import {
   rankModesByStability,
   progressionNarrative,
   chordProgressionSmooth,
+  modeVolatilityProfile,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1554,4 +1555,58 @@ export function smoothProgressionWav(
     spectrum ?? harmonicSpectrum(),
     opts ?? DEFAULT_CHORD_PROGRESSION_WAV,
   );
+}
+
+// ---------------------------------------------------------------------------
+// Q271 — modeVolatilityWav
+// ---------------------------------------------------------------------------
+
+/**
+ * Render the most volatile and least volatile modal rotations as WAV in one call.
+ *
+ * Socratic Q271: "If I have volatility scores for every mode, can I render the most
+ * volatile and least volatile modes as WAV in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `modeVolatilityProfile(scale, tuning, spectrum)` → `{ mode, volatility }[]`.
+ * 2. If empty, throw `RangeError`.
+ * 3. Find the mode with the highest volatility (most volatile) and the lowest (least volatile).
+ * 4. `pluckScaleWav(mostVolatileMode, tuning, opts)` and `pluckScaleWav(leastVolatileMode, tuning, opts)`.
+ * 5. Return `{ mostVolatile, leastVolatile }`.
+ *
+ * @param scale    - The parent scale.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for volatility scoring.
+ * @param opts     - Optional WAV synthesis options.
+ * @returns `{ mostVolatile, leastVolatile }` — WAV bytes for each extreme mode.
+ *
+ * @throws {RangeError} if no modal rotations are produced from the scale.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+ * const { mostVolatile, leastVolatile } = modeVolatilityWav(scale, t12);
+ * await fs.writeFile('most-volatile.wav', mostVolatile);
+ * await fs.writeFile('least-volatile.wav', leastVolatile);
+ */
+export function modeVolatilityWav(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): { mostVolatile: Uint8Array; leastVolatile: Uint8Array } {
+  const profile = modeVolatilityProfile(scale, tuning, spectrum);
+  if (profile.length === 0) {
+    throw new RangeError('modeVolatilityWav: no modes');
+  }
+  let mostVolatileEntry = profile[0]!;
+  let leastVolatileEntry = profile[0]!;
+  for (const entry of profile) {
+    if (entry.volatility > mostVolatileEntry.volatility) mostVolatileEntry = entry;
+    if (entry.volatility < leastVolatileEntry.volatility) leastVolatileEntry = entry;
+  }
+  return {
+    mostVolatile: pluckScaleWav(mostVolatileEntry.mode, tuning, opts),
+    leastVolatile: pluckScaleWav(leastVolatileEntry.mode, tuning, opts),
+  };
 }
