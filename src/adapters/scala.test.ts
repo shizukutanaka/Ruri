@@ -23,6 +23,7 @@ import {
   scaleRankedBundle,
   scaleVolatilityBundle,
   scaleModeProgressionBundle,
+  scaleFullAnalysisBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -982,5 +983,54 @@ describe('scaleModeProgressionBundle (Q317)', () => {
     const bundle = scaleModeProgressionBundle(scale, t12, 261.63, harmonicSpectrum());
     expect(typeof bundle.scl).toBe('string');
     expect(typeof bundle.smoothnessRatio).toBe('number');
+  });
+});
+
+describe('scaleFullAnalysisBundle (Q323)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('returns scl, rankedBundle, volatilityBundle, progressionBundle', () => {
+    const bundle = scaleFullAnalysisBundle(scale, t12, spectrum);
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.rankedBundle).toHaveProperty('spectralRanking');
+    expect(bundle.volatilityBundle).toHaveProperty('volatility');
+    expect(bundle.progressionBundle).toHaveProperty('chords');
+  });
+  it('scl is shared from rankedBundle', () => {
+    const bundle = scaleFullAnalysisBundle(scale, t12, spectrum);
+    expect(bundle.scl).toBe(bundle.rankedBundle.scl);
+    expect(bundle.scl).toContain('!');
+  });
+  it('volatilityBundle does not include scl key', () => {
+    const bundle = scaleFullAnalysisBundle(scale, t12, spectrum);
+    expect(bundle.volatilityBundle).not.toHaveProperty('scl');
+  });
+  it('progressionBundle does not include scl key', () => {
+    const bundle = scaleFullAnalysisBundle(scale, t12, spectrum);
+    expect(bundle.progressionBundle).not.toHaveProperty('scl');
+  });
+  it('rankedBundle entropy and consistency are numbers', () => {
+    const { rankedBundle } = scaleFullAnalysisBundle(scale, t12, spectrum);
+    expect(typeof rankedBundle.entropy).toBe('number');
+    expect(typeof rankedBundle.consistency).toBe('number');
+  });
+  it('volatilityBundle volatility is non-negative', () => {
+    const { volatilityBundle } = scaleFullAnalysisBundle(scale, t12, spectrum);
+    expect(volatilityBundle.volatility).toBeGreaterThanOrEqual(0);
+  });
+  it('progressionBundle chords is an array', () => {
+    const { progressionBundle } = scaleFullAnalysisBundle(scale, t12, spectrum);
+    expect(Array.isArray(progressionBundle.chords)).toBe(true);
+  });
+  it('accepts optional rootHz and name', () => {
+    const bundle = scaleFullAnalysisBundle(scale, t12, spectrum, 261.63, 'Custom');
+    expect(bundle.scl).toContain('Custom');
   });
 });

@@ -851,3 +851,67 @@ export function scaleModeProgressionBundle(
   const { chords, smoothnessRatio } = modeProgressionBundle(scale, tuning, rootHz, spectrum);
   return { scl, chords, smoothnessRatio };
 }
+
+// ---------------------------------------------------------------------------
+// Q323 — scaleFullAnalysisBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get all three Scala-layer analysis bundles for a scale in one call.
+ *
+ * Socratic Q323: "If I have scaleRankedBundle, scaleVolatilityBundle, and
+ * scaleModeProgressionBundle, can I get all three at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleRankedBundle(scale, tuning, spectrum, rootHz, name)` → `{ scl, spectralRanking, normalizedScores, entropy, consistency }`.
+ * 2. `scaleVolatilityBundle(scale, tuning, spectrum, rootHz, name)` → `{ scl, volatility, entropy, consistency }`.
+ * 3. `scaleModeProgressionBundle(scale, tuning, rootHz, spectrum, name)` → `{ scl, chords, smoothnessRatio }`.
+ * 4. Return a single `scl` (from the ranked bundle) plus the content fields of each sub-bundle.
+ *
+ * Note: `scaleRankedBundle` requires a non-optional `spectrum`.
+ *
+ * @param scale    - The scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, rankedBundle, volatilityBundle, progressionBundle }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scl, rankedBundle, volatilityBundle, progressionBundle } =
+ *   scaleFullAnalysisBundle(major, t12, harmonicSpectrum());
+ * // scl is the Scala text; rankedBundle contains spectralRanking; etc.
+ */
+export function scaleFullAnalysisBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+  name?: string,
+): {
+  scl: string;
+  rankedBundle: ReturnType<typeof scaleRankedBundle>;
+  volatilityBundle: Omit<ReturnType<typeof scaleVolatilityBundle>, 'scl'>;
+  progressionBundle: Omit<ReturnType<typeof scaleModeProgressionBundle>, 'scl'>;
+} {
+  const rankedBundle = scaleRankedBundle(scale, tuning, spectrum, rootHz, name);
+  const volatilityFull = scaleVolatilityBundle(scale, tuning, spectrum, rootHz, name);
+  const progressionFull = scaleModeProgressionBundle(scale, tuning, rootHz, spectrum, name);
+  return {
+    scl: rankedBundle.scl,
+    rankedBundle,
+    volatilityBundle: {
+      volatility: volatilityFull.volatility,
+      entropy: volatilityFull.entropy,
+      consistency: volatilityFull.consistency,
+    },
+    progressionBundle: {
+      chords: progressionFull.chords,
+      smoothnessRatio: progressionFull.smoothnessRatio,
+    },
+  };
+}
