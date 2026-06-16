@@ -259,6 +259,10 @@ import {
   tuningFamilyModeFiveDimNarratives,
   tuningModeSmoothnessEntropyMap,
   tuningFamilyModeSmoothnessEntropyMaps,
+  tuningModeDiversityVolatilityMap,
+  tuningFamilyModeDiversityVolatilityMaps,
+  tuningModeAllQuadrantsBundle,
+  tuningFamilyModeAllQuadrantsBundles,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9967,6 +9971,104 @@ describe('tuningFamilyModeSmoothnessEntropyMaps (Q539)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.smoothnessEntropyMap.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q540 — tuningModeDiversityVolatilityMap
+// ---------------------------------------------------------------------------
+
+describe('tuningModeDiversityVolatilityMap (Q540)', () => {
+  it('returns one entry per mode with valid quadrant label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeDiversityVolatilityMap(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    const validQuadrants = [
+      'diverse-volatile',
+      'diverse-stable',
+      'uniform-volatile',
+      'uniform-stable',
+    ];
+    for (const entry of result) {
+      expect(validQuadrants).toContain(entry.quadrant);
+    }
+  });
+
+  it('diversity and volatility match comprehensive bundle for first mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeDiversityVolatilityMap(t12, spec);
+    const bundle = tuningModeComprehensiveBundle(t12, spec);
+    expect(result[0]!.diversity).toBe(bundle[0]!.diversity);
+    expect(result[0]!.volatility).toBe(bundle[0]!.volatility);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeDiversityVolatilityMap(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q542 — tuningFamilyModeDiversityVolatilityMaps
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeDiversityVolatilityMaps (Q542)', () => {
+  it('returns one entry per tuning with id and diversityVolatilityMap', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeDiversityVolatilityMaps([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.diversityVolatilityMap.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q543 — tuningModeAllQuadrantsBundle
+// ---------------------------------------------------------------------------
+
+describe('tuningModeAllQuadrantsBundle (Q543)', () => {
+  it('returns one entry per mode with all four quadrant fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAllQuadrantsBundle(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.entropyDiversityQuadrant).toBe('string');
+      expect(typeof entry.consistencyVolatilityQuadrant).toBe('string');
+      expect(typeof entry.smoothnessEntropyQuadrant).toBe('string');
+      expect(typeof entry.diversityVolatilityQuadrant).toBe('string');
+    }
+  });
+
+  it('entropyDiversityQuadrant matches tuningModeEntropyDiversityMap for first mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAllQuadrantsBundle(t12, spec);
+    const edMap = tuningModeEntropyDiversityMap(t12, spec);
+    expect(result[0]!.entropyDiversityQuadrant).toBe(edMap[0]!.quadrant);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAllQuadrantsBundle(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q545 — tuningFamilyModeAllQuadrantsBundles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeAllQuadrantsBundles (Q545)', () => {
+  it('returns one entry per tuning with id and allQuadrantsBundle', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeAllQuadrantsBundles([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.allQuadrantsBundle.length).toBeGreaterThan(0);
     }
   });
 });

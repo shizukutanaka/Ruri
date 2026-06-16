@@ -11245,3 +11245,169 @@ export function tuningFamilyModeSmoothnessEntropyMaps(
         : tuningModeSmoothnessEntropyMap(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q540 — tuningModeDiversityVolatilityMap
+// ---------------------------------------------------------------------------
+
+/**
+ * Map each mode on a diversity×volatility plane.
+ *
+ * Socratic Q540: "Can I map modes on a diversity×volatility plane — are
+ * diverse scales necessarily more volatile?"
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle` → bundle
+ * 2. Compute meanDiversity and meanVolatility.
+ * 3. Assign quadrant per mode:
+ *    - diversity > mean AND volatility > mean  → 'diverse-volatile'
+ *    - diversity > mean AND volatility <= mean → 'diverse-stable'
+ *    - diversity <= mean AND volatility > mean → 'uniform-volatile'
+ *    - else                                    → 'uniform-stable'
+ */
+export function tuningModeDiversityVolatilityMap(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  diversity: number;
+  volatility: number;
+  quadrant: 'diverse-volatile' | 'diverse-stable' | 'uniform-volatile' | 'uniform-stable';
+}[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  const n = bundle.length;
+  if (n === 0) return [];
+  const meanDiversity = bundle.reduce((s, b) => s + b.diversity, 0) / n;
+  const meanVolatility = bundle.reduce((s, b) => s + b.volatility, 0) / n;
+  return bundle.map((b) => {
+    const aboveDiversity = b.diversity > meanDiversity;
+    const aboveVolatility = b.volatility > meanVolatility;
+    const quadrant: 'diverse-volatile' | 'diverse-stable' | 'uniform-volatile' | 'uniform-stable' =
+      aboveDiversity && aboveVolatility
+        ? 'diverse-volatile'
+        : aboveDiversity && !aboveVolatility
+          ? 'diverse-stable'
+          : !aboveDiversity && aboveVolatility
+            ? 'uniform-volatile'
+            : 'uniform-stable';
+    return { mode: b.mode, diversity: b.diversity, volatility: b.volatility, quadrant };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q542 — tuningFamilyModeDiversityVolatilityMaps
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeDiversityVolatilityMaps(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  diversityVolatilityMap: ReturnType<typeof tuningModeDiversityVolatilityMap>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    diversityVolatilityMap:
+      rootHz !== undefined
+        ? tuningModeDiversityVolatilityMap(t, spectrum, rootHz)
+        : tuningModeDiversityVolatilityMap(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q543 — tuningModeAllQuadrantsBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Join all four 2-D quadrant maps into a single per-mode bundle.
+ *
+ * Socratic Q543: "If I have the three 2D quadrant maps (entropy-diversity,
+ * consistency-volatility, smoothness-entropy), can I join them with
+ * diversity-volatility into one 4-quadrant per-mode bundle?"
+ *
+ * Algorithm:
+ * 1. `tuningModeEntropyDiversityMap`      → edMap
+ * 2. `tuningModeConsistencyVolatilityMap` → cvMap
+ * 3. `tuningModeSmoothnessEntropyMap`     → seMap
+ * 4. `tuningModeDiversityVolatilityMap`   → dvMap
+ * 5. Build Maps from mode.id → entry for each.
+ * 6. Return per mode (order: edMap order):
+ *    { mode, entropyDiversityQuadrant, consistencyVolatilityQuadrant,
+ *      smoothnessEntropyQuadrant, diversityVolatilityQuadrant }[]
+ */
+export function tuningModeAllQuadrantsBundle(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropyDiversityQuadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform';
+  consistencyVolatilityQuadrant:
+    | 'stable-consistent'
+    | 'consistent-volatile'
+    | 'smooth-inconsistent'
+    | 'rough-inconsistent';
+  smoothnessEntropyQuadrant: 'fluid-complex' | 'fluid-simple' | 'rough-complex' | 'rough-simple';
+  diversityVolatilityQuadrant:
+    | 'diverse-volatile'
+    | 'diverse-stable'
+    | 'uniform-volatile'
+    | 'uniform-stable';
+}[] {
+  const edMap =
+    rootHz !== undefined
+      ? tuningModeEntropyDiversityMap(tuning, spectrum, rootHz)
+      : tuningModeEntropyDiversityMap(tuning, spectrum);
+  const cvMap =
+    rootHz !== undefined
+      ? tuningModeConsistencyVolatilityMap(tuning, spectrum, rootHz)
+      : tuningModeConsistencyVolatilityMap(tuning, spectrum);
+  const seMap =
+    rootHz !== undefined
+      ? tuningModeSmoothnessEntropyMap(tuning, spectrum, rootHz)
+      : tuningModeSmoothnessEntropyMap(tuning, spectrum);
+  const dvMap =
+    rootHz !== undefined
+      ? tuningModeDiversityVolatilityMap(tuning, spectrum, rootHz)
+      : tuningModeDiversityVolatilityMap(tuning, spectrum);
+
+  const cvById = new Map(cvMap.map((e) => [e.mode.id, e]));
+  const seById = new Map(seMap.map((e) => [e.mode.id, e]));
+  const dvById = new Map(dvMap.map((e) => [e.mode.id, e]));
+
+  return edMap.map((ed) => {
+    const cv = cvById.get(ed.mode.id);
+    const se = seById.get(ed.mode.id);
+    const dv = dvById.get(ed.mode.id);
+    return {
+      mode: ed.mode,
+      entropyDiversityQuadrant: ed.quadrant,
+      consistencyVolatilityQuadrant: cv?.quadrant ?? 'rough-inconsistent',
+      smoothnessEntropyQuadrant: se?.quadrant ?? 'rough-simple',
+      diversityVolatilityQuadrant: dv?.quadrant ?? 'uniform-stable',
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q545 — tuningFamilyModeAllQuadrantsBundles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeAllQuadrantsBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; allQuadrantsBundle: ReturnType<typeof tuningModeAllQuadrantsBundle> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    allQuadrantsBundle:
+      rootHz !== undefined
+        ? tuningModeAllQuadrantsBundle(t, spectrum, rootHz)
+        : tuningModeAllQuadrantsBundle(t, spectrum),
+  }));
+}
