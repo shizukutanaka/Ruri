@@ -52,6 +52,8 @@ import {
   tuningModeHistogramSummaries,
   tuningModeAnalysisFull,
   tuningHarmonicSpectralScore,
+  tuningComprehensiveReport,
+  scaleSimilarityRanking,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2977,4 +2979,100 @@ export function presetHarmonicSpectralScore(
       : tuningHarmonicSpectralScore(tuning, spectrum, rootHz);
   }
   return tuningHarmonicSpectralScore(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q403 — presetComprehensiveReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine full analysis, harmonic-spectral score, stability score, and progression variety
+ * for a preset tuning in a single call.
+ *
+ * Socratic Q403: "If I can get comprehensive report for a tuning, can I do it for a preset by
+ * id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningComprehensiveReport(tuning, spectrum, rootHz)` → report.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{fullAnalysis, harmonicSpectralScore, stabilityScore, progressionVariety}`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const report = presetComprehensiveReport('12-tet', spec);
+ * console.log(report.stabilityScore, report.progressionVariety);
+ */
+export function presetComprehensiveReport(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningComprehensiveReport> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetComprehensiveReport: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningComprehensiveReport(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q406 — presetSimilarityRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all presets by similarity to a target preset in one call.
+ *
+ * Socratic Q406: "If I can rank tunings by similarity to a target, can I do it for presets by
+ * id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find target preset by id; throw `RangeError` if not found.
+ * 2. Load target tuning and all other tunings.
+ * 3. `scaleSimilarityRanking(otherTunings, targetTuning, tol)` → ranked by similarity.
+ * 4. Map back to preset ids.
+ *
+ * @param targetPresetId - Id of the preset to compare against.
+ * @param tol            - Tolerance for similarity computation (optional).
+ * @param presets        - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{presetId, similarity}` sorted descending by similarity.
+ *
+ * @throws {RangeError} if the target preset id is not found.
+ *
+ * @example
+ * const ranking = presetSimilarityRanking('12-tet');
+ * console.log(ranking[0]!.presetId, ranking[0]!.similarity);
+ */
+export function presetSimilarityRanking(
+  targetPresetId: string,
+  tol?: number,
+  presets?: readonly TuningPreset[],
+): { presetId: string; similarity: number }[] {
+  const pool = presets ?? ALL_PRESETS;
+  const targetPreset = pool.find((p) => p.id === targetPresetId);
+  if (targetPreset === undefined) {
+    throw new RangeError('presetSimilarityRanking: preset not found: ' + targetPresetId);
+  }
+  const targetTuning = loadTuningPreset(targetPreset);
+  const otherPairs = pool
+    .filter((p) => p.id !== targetPresetId)
+    .map((p) => ({ preset: p, tuning: loadTuningPreset(p) }));
+  const ranking = scaleSimilarityRanking(
+    otherPairs.map((x) => x.tuning),
+    targetTuning,
+    ...(tol !== undefined ? ([tol] as [number]) : ([] as [])),
+  );
+  return ranking.map((r) => ({
+    presetId: otherPairs.find((x) => x.tuning.id === r.tuning.id)?.preset.id ?? r.tuning.id,
+    similarity: r.similarity,
+  }));
 }

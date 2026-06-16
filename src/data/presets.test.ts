@@ -58,6 +58,8 @@ import {
   presetModeHistogramSummaries,
   presetModeAnalysisFull,
   presetHarmonicSpectralScore,
+  presetComprehensiveReport,
+  presetSimilarityRanking,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1731,5 +1733,97 @@ describe('presetHarmonicSpectralScore (Q400)', () => {
     const spec = harmonicSpectrum(6);
     const score = presetHarmonicSpectralScore('12-tet', spec, undefined, undefined, [TWELVE_TET]);
     expect(typeof score.combinedScore).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q403 — presetComprehensiveReport
+// ---------------------------------------------------------------------------
+
+describe('presetComprehensiveReport (Q403)', () => {
+  it('returns all four keys for 12-tet', () => {
+    const spec = harmonicSpectrum(6);
+    const report = presetComprehensiveReport('12-tet', spec);
+    expect(report).toHaveProperty('fullAnalysis');
+    expect(report).toHaveProperty('harmonicSpectralScore');
+    expect(report).toHaveProperty('stabilityScore');
+    expect(report).toHaveProperty('progressionVariety');
+  });
+
+  it('fullAnalysis has reportCard', () => {
+    const spec = harmonicSpectrum(6);
+    const report = presetComprehensiveReport('12-tet', spec);
+    expect(typeof report.fullAnalysis.reportCard).toBe('string');
+  });
+
+  it('stabilityScore is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const report = presetComprehensiveReport('12-tet', spec);
+    expect(report.stabilityScore).toBeGreaterThanOrEqual(0);
+    expect(report.stabilityScore).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetComprehensiveReport('not-a-preset', spec)).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const report = presetComprehensiveReport('12-tet', spec, 261.63);
+    expect(typeof report.stabilityScore).toBe('number');
+  });
+
+  it('accepts optional presets pool', () => {
+    const spec = harmonicSpectrum(6);
+    const report = presetComprehensiveReport('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof report.progressionVariety).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q406 — presetSimilarityRanking
+// ---------------------------------------------------------------------------
+
+describe('presetSimilarityRanking (Q406)', () => {
+  it('returns one entry per other preset', () => {
+    const ranking = presetSimilarityRanking('12-tet', undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+      SLENDRO_EXAMPLE,
+    ]);
+    expect(ranking.length).toBe(2); // 3 presets minus target
+  });
+
+  it('each entry has presetId and similarity', () => {
+    const ranking = presetSimilarityRanking('12-tet', undefined, [TWELVE_TET, JUST_INTONATION_5L]);
+    expect(typeof ranking[0]!.presetId).toBe('string');
+    expect(typeof ranking[0]!.similarity).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetSimilarityRanking('not-a-preset', undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('result is sorted descending by similarity when similarities are finite', () => {
+    const ranking = presetSimilarityRanking('12-tet', undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+      SLENDRO_EXAMPLE,
+    ]);
+    if (ranking.length >= 2) {
+      const s0 = ranking[0]!.similarity;
+      const s1 = ranking[1]!.similarity;
+      if (isFinite(s0) && isFinite(s1)) {
+        expect(s0).toBeGreaterThanOrEqual(s1);
+      }
+    }
+  });
+
+  it('accepts optional tol', () => {
+    const ranking = presetSimilarityRanking('12-tet', 0.02, [TWELVE_TET, JUST_INTONATION_5L]);
+    expect(typeof ranking[0]!.similarity).toBe('number');
   });
 });
