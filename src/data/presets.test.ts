@@ -81,6 +81,8 @@ import {
   presetParetoFrontNarrative,
   presetFullParetoCorrelationReport,
   presetModeMetricOutliers,
+  presetModeMetricOutlierSummary,
+  presetModeMetricProfile,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2561,5 +2563,46 @@ describe('presetModeMetricOutliers (Q466)', () => {
     if (result.length > 0) {
       expect(typeof result[0]!.metric).toBe('string');
     }
+  });
+});
+
+// Q469 — presetModeMetricOutlierSummary
+describe('presetModeMetricOutlierSummary (Q469)', () => {
+  it('returns totalOutliers and outlier maps', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricOutlierSummary('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.totalOutliers).toBe('number');
+    expect(result.totalOutliers).toBeGreaterThanOrEqual(0);
+    expect(typeof result.byMetric).toBe('object');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeMetricOutlierSummary('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// Q472 — presetModeMetricProfile
+describe('presetModeMetricProfile (Q472)', () => {
+  it('returns mode profiles with metric stats', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricProfile('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.metrics.entropy.value).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeMetricProfile('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricProfile('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
   });
 });

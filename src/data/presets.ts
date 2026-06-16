@@ -74,6 +74,8 @@ import {
   tuningParetoFrontNarrative,
   tuningFullParetoCorrelationReport,
   tuningModeMetricOutliers,
+  tuningModeMetricOutlierSummary,
+  tuningModeMetricProfile,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4049,4 +4051,76 @@ export function presetModeMetricOutliers(
   return rootHz !== undefined
     ? tuningModeMetricOutliers(tuning, spectrum, rootHz)
     : tuningModeMetricOutliers(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q469 — presetModeMetricOutlierSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Summarise metric outliers for a named preset.
+ *
+ * Delegates to `tuningModeMetricOutlierSummary` after resolving and loading the preset.
+ * Throws `RangeError` if the preset is not found.
+ *
+ * @param presetId - The preset id to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Summary object with total, byMetric, byMode, mostOutlierMetric, mostOutlierMode.
+ */
+export function presetModeMetricOutlierSummary(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): {
+  totalOutliers: number;
+  byMetric: Record<string, number>;
+  byMode: Record<string, number>;
+  mostOutlierMetric: string | null;
+  mostOutlierMode: string | null;
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeMetricOutlierSummary: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeMetricOutlierSummary(tuning, spectrum, rootHz)
+    : tuningModeMetricOutlierSummary(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q472 — presetModeMetricProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a per-mode metric profile for a named preset.
+ *
+ * Delegates to `tuningModeMetricProfile` after resolving and loading the preset.
+ * Throws `RangeError` if the preset is not found.
+ *
+ * @param presetId - The preset id to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of per-mode profiles with full metric statistics.
+ */
+export function presetModeMetricProfile(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeMetricProfile> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeMetricProfile: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeMetricProfile(tuning, spectrum, rootHz)
+    : tuningModeMetricProfile(tuning, spectrum);
 }
