@@ -8719,3 +8719,187 @@ export function tuningFamilyParetoRankPositions(
         : tuningParetoFrontRankPosition(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q450 — tuningParetoFrontGap
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the largest gap between consecutive Pareto-optimal ranks in the score ranking.
+ *
+ * Socratic Q450: "If I know the rank positions of Pareto modes, can I find the largest gap between
+ * consecutive ranks (i.e., how many non-Pareto modes separate consecutive Pareto modes in the ranking)?"
+ *
+ * Algorithm:
+ * 1. `tuningParetoFrontRankPosition(tuning, spectrum, rootHz?)` → sorted by rank (ascending)
+ * 2. Compute gaps between consecutive ranks: `gap[i] = ranks[i+1] - ranks[i] - 1`
+ * 3. Return `{maxGap, gaps, paretoRanks}`
+ *
+ * @param tuning   - The tuning system to evaluate.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{maxGap, gaps, paretoRanks}` describing gaps between consecutive Pareto ranks.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { maxGap, gaps, paretoRanks } = tuningParetoFrontGap(equalTemperament12(440), spec);
+ * console.log('largest gap:', maxGap);
+ */
+export function tuningParetoFrontGap(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { maxGap: number; gaps: number[]; paretoRanks: number[] } {
+  const entries =
+    rootHz !== undefined
+      ? tuningParetoFrontRankPosition(tuning, spectrum, rootHz)
+      : tuningParetoFrontRankPosition(tuning, spectrum);
+  const sorted = [...entries].sort((a, b) => a.rank - b.rank);
+  const paretoRanks = sorted.map((e) => e.rank);
+  const gaps: number[] = [];
+  for (let i = 0; i + 1 < sorted.length; i++) {
+    gaps.push((sorted[i + 1]?.rank ?? 0) - (sorted[i]?.rank ?? 0) - 1);
+  }
+  const maxGap = gaps.length > 0 ? Math.max(...gaps) : 0;
+  return { maxGap, gaps, paretoRanks };
+}
+
+// ---------------------------------------------------------------------------
+// Q451 — tuningParetoFrontCoverage
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute what fraction of the top-K modes are Pareto-optimal.
+ *
+ * Socratic Q451: "If I know the rank positions of Pareto modes, can I compute what fraction of the
+ * top-K modes are Pareto-optimal?"
+ *
+ * Algorithm:
+ * 1. `tuningParetoFrontRankPosition(tuning, spectrum, rootHz?)` → paretoRanks
+ * 2. `tuningModeScoreRanking(tuning, spectrum, rootHz?)` → all ranked modes
+ * 3. totalModes = ranking.length; paretoSize = paretoRanks.length
+ * 4. topRank = max rank in paretoRanks (or 0 if empty)
+ * 5. coverageInTopK = (paretoSize / topRank) if topRank > 0, else 1.0
+ *
+ * @param tuning   - The tuning system to evaluate.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{paretoSize, totalModes, topRank, coverageInTopK}`
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { paretoSize, coverageInTopK } = tuningParetoFrontCoverage(equalTemperament12(440), spec);
+ * console.log('coverage in top-K:', coverageInTopK);
+ */
+export function tuningParetoFrontCoverage(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { paretoSize: number; totalModes: number; topRank: number; coverageInTopK: number } {
+  const paretoEntries =
+    rootHz !== undefined
+      ? tuningParetoFrontRankPosition(tuning, spectrum, rootHz)
+      : tuningParetoFrontRankPosition(tuning, spectrum);
+  const ranking =
+    rootHz !== undefined
+      ? tuningModeScoreRanking(tuning, spectrum, rootHz)
+      : tuningModeScoreRanking(tuning, spectrum);
+  const totalModes = ranking.length;
+  const paretoSize = paretoEntries.length;
+  const topRank = paretoEntries.length > 0 ? Math.max(...paretoEntries.map((e) => e.rank)) : 0;
+  const coverageInTopK = topRank > 0 ? paretoSize / topRank : 1.0;
+  return { paretoSize, totalModes, topRank, coverageInTopK };
+}
+
+// ---------------------------------------------------------------------------
+// Q452 — tuningFamilyParetoFrontCoverage
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute Pareto-front coverage for every tuning in a family.
+ *
+ * Socratic Q452: "If I can compute Pareto coverage for one tuning, can I do it for a whole family?"
+ *
+ * Algorithm: `tunings.map(t => ({id: t.id, coverage: tuningParetoFrontCoverage(t, spectrum, rootHz?)}))`
+ *
+ * @param tunings  - Array of tuning systems to evaluate.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and coverage fields.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyParetoFrontCoverage([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, coverage }) => console.log(id, coverage.coverageInTopK));
+ */
+export function tuningFamilyParetoFrontCoverage(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  coverage: { paretoSize: number; totalModes: number; topRank: number; coverageInTopK: number };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    coverage:
+      rootHz !== undefined
+        ? tuningParetoFrontCoverage(t, spectrum, rootHz)
+        : tuningParetoFrontCoverage(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q455 — tuningParetoSummaryComparison
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare Pareto-front summaries across a family to find largest/smallest fronts.
+ *
+ * Socratic Q455: "If I can get Pareto summaries for a family, can I compare them to find which
+ * tuning has the largest Pareto front and which has the smallest?"
+ *
+ * Algorithm:
+ * 1. `tuningFamilyParetoFrontSummaries(tunings, spectrum, rootHz?)` → `{id, summary}[]`
+ * 2. Find the entry with the largest `summary.paretoSize` → `largest: {id, paretoSize}`
+ * 3. Find the entry with the smallest `summary.paretoSize` → `smallest: {id, paretoSize}`
+ * 4. Compute mean paretoSize across all tunings
+ * 5. Return `{largest, smallest, meanParetoSize, summaries}` sorted descending by paretoSize
+ *
+ * @param tunings  - Array of tuning systems to compare.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Comparison object with largest, smallest, meanParetoSize, and sorted summaries.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { largest, smallest } = tuningParetoSummaryComparison([equalTemperament12(440), edo(19, 440)], spec);
+ * console.log('largest Pareto front:', largest.id, largest.paretoSize);
+ */
+export function tuningParetoSummaryComparison(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  largest: { id: string; paretoSize: number };
+  smallest: { id: string; paretoSize: number };
+  meanParetoSize: number;
+  summaries: { id: string; paretoSize: number }[];
+} {
+  const raw =
+    rootHz !== undefined
+      ? tuningFamilyParetoFrontSummaries(tunings, spectrum, rootHz)
+      : tuningFamilyParetoFrontSummaries(tunings, spectrum);
+  const flat = raw.map((e) => ({ id: e.id, paretoSize: e.summary.paretoSize }));
+  const sorted = [...flat].sort((a, b) => b.paretoSize - a.paretoSize);
+  const largestEntry = sorted[0] ?? { id: '', paretoSize: 0 };
+  const smallestEntry = sorted[sorted.length - 1] ?? { id: '', paretoSize: 0 };
+  const meanParetoSize =
+    flat.length > 0 ? flat.reduce((sum, e) => sum + e.paretoSize, 0) / flat.length : 0;
+  return {
+    largest: { id: largestEntry.id, paretoSize: largestEntry.paretoSize },
+    smallest: { id: smallestEntry.id, paretoSize: smallestEntry.paretoSize },
+    meanParetoSize,
+    summaries: sorted,
+  };
+}

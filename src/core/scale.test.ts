@@ -199,6 +199,10 @@ import {
   tuningParetoFrontRankPosition,
   tuningBestParetoRankedMode,
   tuningFamilyParetoRankPositions,
+  tuningParetoFrontGap,
+  tuningParetoFrontCoverage,
+  tuningFamilyParetoFrontCoverage,
+  tuningParetoSummaryComparison,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -8236,5 +8240,137 @@ describe('tuningFamilyParetoRankPositions', () => {
       expect(typeof entry.id).toBe('string');
       expect(entry.paretoRanks.length).toBeGreaterThan(0);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q450 — tuningParetoFrontGap
+// ---------------------------------------------------------------------------
+
+describe('tuningParetoFrontGap (Q450)', () => {
+  it('returns maxGap, gaps, paretoRanks', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { maxGap, gaps, paretoRanks } = tuningParetoFrontGap(tuning, spec);
+    expect(maxGap).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(gaps)).toBe(true);
+    expect(Array.isArray(paretoRanks)).toBe(true);
+    paretoRanks.forEach((r) => expect(typeof r).toBe('number'));
+  });
+
+  it('maxGap equals max of gaps array (or 0 if empty gaps)', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { maxGap, gaps } = tuningParetoFrontGap(tuning, spec);
+    const expected = gaps.length > 0 ? Math.max(...gaps) : 0;
+    expect(maxGap).toBe(expected);
+  });
+
+  it('accepts optional rootHz', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { maxGap } = tuningParetoFrontGap(tuning, spec, 261.63);
+    expect(maxGap).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q451 — tuningParetoFrontCoverage
+// ---------------------------------------------------------------------------
+
+describe('tuningParetoFrontCoverage (Q451)', () => {
+  it('returns paretoSize, totalModes, topRank, coverageInTopK as numbers', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningParetoFrontCoverage(tuning, spec);
+    expect(typeof result.paretoSize).toBe('number');
+    expect(typeof result.totalModes).toBe('number');
+    expect(typeof result.topRank).toBe('number');
+    expect(typeof result.coverageInTopK).toBe('number');
+  });
+
+  it('paretoSize <= totalModes', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { paretoSize, totalModes } = tuningParetoFrontCoverage(tuning, spec);
+    expect(paretoSize).toBeLessThanOrEqual(totalModes);
+  });
+
+  it('coverageInTopK is in [0, 1]', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { coverageInTopK } = tuningParetoFrontCoverage(tuning, spec);
+    expect(coverageInTopK).toBeGreaterThanOrEqual(0);
+    expect(coverageInTopK).toBeLessThanOrEqual(1);
+  });
+
+  it('accepts optional rootHz', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { coverageInTopK } = tuningParetoFrontCoverage(tuning, spec, 261.63);
+    expect(coverageInTopK).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q452 — tuningFamilyParetoFrontCoverage
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyParetoFrontCoverage (Q452)', () => {
+  it('returns one entry per tuning', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyParetoFrontCoverage(tunings, spec);
+    expect(results).toHaveLength(2);
+  });
+
+  it('each entry has id and coverage fields', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyParetoFrontCoverage(tunings, spec);
+    for (const entry of results) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.coverage.paretoSize).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q455 — tuningParetoSummaryComparison
+// ---------------------------------------------------------------------------
+
+describe('tuningParetoSummaryComparison (Q455)', () => {
+  it('returns largest, smallest, meanParetoSize, summaries', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const result = tuningParetoSummaryComparison(tunings, spec);
+    expect(typeof result.largest.id).toBe('string');
+    expect(typeof result.largest.paretoSize).toBe('number');
+    expect(typeof result.smallest.id).toBe('string');
+    expect(typeof result.smallest.paretoSize).toBe('number');
+    expect(typeof result.meanParetoSize).toBe('number');
+    expect(Array.isArray(result.summaries)).toBe(true);
+  });
+
+  it('largest.paretoSize >= smallest.paretoSize', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const { largest, smallest } = tuningParetoSummaryComparison(tunings, spec);
+    expect(largest.paretoSize).toBeGreaterThanOrEqual(smallest.paretoSize);
+  });
+
+  it('summaries is sorted descending by paretoSize', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const { summaries } = tuningParetoSummaryComparison(tunings, spec);
+    expect(summaries[0]!.paretoSize).toBeGreaterThanOrEqual(summaries[1]!.paretoSize);
+  });
+
+  it('meanParetoSize is between smallest and largest', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const { largest, smallest, meanParetoSize } = tuningParetoSummaryComparison(tunings, spec);
+    expect(meanParetoSize).toBeGreaterThanOrEqual(smallest.paretoSize);
+    expect(meanParetoSize).toBeLessThanOrEqual(largest.paretoSize);
   });
 });
