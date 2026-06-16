@@ -46,6 +46,9 @@ import {
   tuningBestModeProgressionBundle,
   tuningFullWavBundle,
   tuningAnalysisWavBundle,
+  scaleProgressionWavBundle,
+  tuningBestSmoothModeWav,
+  tuningFamilyBestSmoothModeWavs,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -2007,5 +2010,131 @@ describe('tuningAnalysisWavBundle (Q329)', () => {
     const result = tuningAnalysisWavBundle(t12, 261.63, harmonicSpectrum());
     expect(typeof result.fullAnalysis.reportCard).toBe('string');
     expect(Number.isFinite(result.fullAnalysis.harmonicDensity)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q366 — scaleProgressionWavBundle
+// ---------------------------------------------------------------------------
+
+describe('scaleProgressionWavBundle (Q366)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns wav, smf, narrative, smoothnessRatio, chords', () => {
+    const scale = tuningToScale(t12);
+    const bundle = scaleProgressionWavBundle(scale, t12);
+    expect(bundle.wav instanceof Uint8Array).toBe(true);
+    expect(bundle.wav.length).toBeGreaterThan(44);
+    expect(bundle.smf instanceof Uint8Array).toBe(true);
+    expect(typeof bundle.narrative).toBe('string');
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(bundle.chords)).toBe(true);
+  });
+
+  it('wav has RIFF header', () => {
+    const scale = tuningToScale(t12);
+    const { wav } = scaleProgressionWavBundle(scale, t12);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('smoothnessRatio is finite', () => {
+    const scale = tuningToScale(t12);
+    const { smoothnessRatio } = scaleProgressionWavBundle(scale, t12);
+    expect(Number.isFinite(smoothnessRatio)).toBe(true);
+  });
+
+  it('narrative is a non-empty string', () => {
+    const scale = tuningToScale(t12);
+    const { narrative } = scaleProgressionWavBundle(scale, t12);
+    expect(narrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const scale = tuningToScale(t12);
+    const bundle = scaleProgressionWavBundle(scale, t12, 261.63, harmonicSpectrum());
+    expect(bundle.wav instanceof Uint8Array).toBe(true);
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q368 — tuningBestSmoothModeWav
+// ---------------------------------------------------------------------------
+
+describe('tuningBestSmoothModeWav (Q368)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns wav, mode, smoothnessRatio', () => {
+    const result = tuningBestSmoothModeWav(t12);
+    expect(result.wav instanceof Uint8Array).toBe(true);
+    expect(result.wav.length).toBeGreaterThan(44);
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('wav has RIFF header', () => {
+    const { wav } = tuningBestSmoothModeWav(t12);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('smoothnessRatio is finite and non-negative', () => {
+    const { smoothnessRatio } = tuningBestSmoothModeWav(t12);
+    expect(Number.isFinite(smoothnessRatio)).toBe(true);
+    expect(smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => tuningBestSmoothModeWav(empty)).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz, spectrum, and opts', () => {
+    const result = tuningBestSmoothModeWav(t12, 261.63, harmonicSpectrum());
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q370 — tuningFamilyBestSmoothModeWavs
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyBestSmoothModeWavs (Q370)', () => {
+  const t12 = equalTemperament12(440);
+  const t19 = edo(19);
+
+  it('returns one entry per tuning with id, wav, mode, smoothnessRatio', () => {
+    const results = tuningFamilyBestSmoothModeWavs([t12, t19]);
+    expect(results.length).toBe(2);
+    const first = results[0]!;
+    expect(typeof first.id).toBe('string');
+    expect(first.wav instanceof Uint8Array).toBe(true);
+    expect(first.wav.length).toBeGreaterThan(44);
+    expect(first.mode).toHaveProperty('degreeIndices');
+    expect(first.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('ids match tuning ids', () => {
+    const results = tuningFamilyBestSmoothModeWavs([t12, t19]);
+    expect(results[0]!.id).toBe(t12.id);
+    expect(results[1]!.id).toBe(t19.id);
+  });
+
+  it('each wav has RIFF header', () => {
+    const results = tuningFamilyBestSmoothModeWavs([t12]);
+    const { wav } = results[0]!;
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+
+  it('returns empty array for empty input', () => {
+    expect(tuningFamilyBestSmoothModeWavs([])).toEqual([]);
+  });
+
+  it('accepts optional rootHz, spectrum, and opts', () => {
+    const results = tuningFamilyBestSmoothModeWavs([t12], 261.63, harmonicSpectrum());
+    expect(results.length).toBe(1);
+    expect(results[0]!.smoothnessRatio).toBeGreaterThanOrEqual(0);
   });
 });

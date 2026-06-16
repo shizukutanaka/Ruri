@@ -43,6 +43,8 @@ import {
   chordMapEntropyScore,
   tuningBestModeProgression,
   tuningFullAnalysis,
+  progressionSmoothnessRatio,
+  tuningBestSmoothMode,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1991,4 +1993,146 @@ export function tuningAnalysisWavBundle(
   const fullAnalysis = tuningFullAnalysis(tuning, rootHz, spectrum);
   const { wav, reportCard } = tuningReportCardWav(tuning, rootHz, spectrum, opts);
   return { fullAnalysis, wav, reportCard };
+}
+
+// ---------------------------------------------------------------------------
+// Q366 — scaleProgressionWavBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a smoothed chord progression WAV, SMF, narrative, smoothness ratio, and chords
+ * for a scale in one call.
+ *
+ * Socratic Q366: "If I can get a progression full bundle for a scale and render it to
+ * WAV+SMF, can I do both at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → chordMap.
+ * 2. `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → chords.
+ * 3. `chordProgressionSmooth(chords, rootHz, spectrum)` → smoothedChords.
+ * 4. `progressionSmoothnessRatio(smoothedChords, rootHz, spectrum)` → smoothnessRatio.
+ * 5. `smoothProgressionBundle(smoothedChords, tuning, rootHz, spectrum, wavOpts, smfOpts)` → `{ wav, smf, narrative }`.
+ *
+ * @param scale    - The scale (mode) to render.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param wavOpts  - Optional chord progression WAV options.
+ * @param smfOpts  - Optional SMF encoding options.
+ * @returns `{ wav, smf, narrative, smoothnessRatio, chords }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const bundle = scaleProgressionWavBundle(scale, t12);
+ * await fs.writeFile('scale-prog.wav', bundle.wav);
+ * await fs.writeFile('scale-prog.mid', bundle.smf);
+ * console.log(bundle.narrative, bundle.smoothnessRatio);
+ */
+export function scaleProgressionWavBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  wavOpts?: ChordProgressionToWavOptions,
+  smfOpts?: SmfOptions,
+): {
+  wav: Uint8Array;
+  smf: Uint8Array;
+  narrative: string;
+  smoothnessRatio: number;
+  chords: Chord[];
+} {
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const chordMap = scaleToChordMap(scale, tuning);
+  const chords = chordMapProgressionBridge(chordMap, effectiveRootHz, spectrum);
+  const smoothedChords = chordProgressionSmooth(chords, effectiveRootHz, spectrum);
+  const smoothnessRatio = progressionSmoothnessRatio(smoothedChords, effectiveRootHz, spectrum);
+  const { wav, smf, narrative } = smoothProgressionBundle(
+    smoothedChords,
+    tuning,
+    rootHz,
+    spectrum,
+    wavOpts,
+    smfOpts,
+  );
+  return { wav, smf, narrative, smoothnessRatio, chords: smoothedChords };
+}
+
+// ---------------------------------------------------------------------------
+// Q368 — tuningBestSmoothModeWav
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the smoothest mode for a tuning and render it to WAV in one call.
+ *
+ * Socratic Q368: "If I can find the smoothest mode and render a scale to WAV, can I
+ * combine them?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningBestSmoothMode(tuning, rootHz, spectrum)` → `{ mode, smoothnessRatio }`.
+ * 2. `pluckScaleWav(mode, tuning, opts)` → WAV bytes.
+ *
+ * @param tuning   - The tuning system.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for smoothness computation.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @returns `{ wav: Uint8Array, mode: Scale, smoothnessRatio: number }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const result = tuningBestSmoothModeWav(t12);
+ * await fs.writeFile('smoothest-mode.wav', result.wav);
+ * console.log(result.mode.id, result.smoothnessRatio);
+ */
+export function tuningBestSmoothModeWav(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): { wav: Uint8Array; mode: Scale; smoothnessRatio: number } {
+  const { mode, smoothnessRatio } = tuningBestSmoothMode(tuning, rootHz, spectrum);
+  const wav = pluckScaleWav(mode, tuning, opts);
+  return { wav, mode, smoothnessRatio };
+}
+
+// ---------------------------------------------------------------------------
+// Q370 — tuningFamilyBestSmoothModeWavs
+// ---------------------------------------------------------------------------
+
+/**
+ * Render the smoothest mode WAV for every tuning in a family in one call.
+ *
+ * Socratic Q370: "If I can get smoothest mode WAV for one tuning and iterate a family,
+ * can I do it for an entire family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{ id: t.id, ...tuningBestSmoothModeWav(t, rootHz, spectrum, opts) }`).
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for smoothness computation and synthesis.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @returns Array of `{ id, wav, mode, smoothnessRatio }`, one per tuning, in input order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const results = tuningFamilyBestSmoothModeWavs([t12, t19]);
+ * for (const { id, wav, mode, smoothnessRatio } of results) {
+ *   await fs.writeFile(`${id}-smooth.wav`, wav);
+ *   console.log(id, mode.id, smoothnessRatio);
+ * }
+ */
+export function tuningFamilyBestSmoothModeWavs(
+  tunings: readonly TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): { id: string; wav: Uint8Array; mode: Scale; smoothnessRatio: number }[] {
+  return tunings.map((t) => ({ id: t.id, ...tuningBestSmoothModeWav(t, rootHz, spectrum, opts) }));
 }
