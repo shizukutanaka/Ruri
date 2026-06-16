@@ -37,6 +37,8 @@ import {
   tuningModeProgressionBundles,
   tuningFamilyFullBundle,
   scaleModeSpectralRankings,
+  tuningModeChordMapBundles,
+  tuningBestModeChordMapNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2284,4 +2286,92 @@ export function presetScaleModeSpectralRankings(
   const tuning = loadTuningPreset(preset);
   const scale = tuningToScale(tuning);
   return scaleModeSpectralRankings(scale, tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q349 — presetModeChordMapBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a full chord map bundle for every mode of a preset tuning in one call.
+ *
+ * Socratic Q349: "If I can get chord map bundles for all modes of a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeChordMapBundles(tuning, spectrum, rootHz)` → per-mode bundles.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode, chordMapBundle }` in allModes order.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundles = presetModeChordMapBundles('12-tet', harmonicSpectrum());
+ * for (const { mode, chordMapBundle } of bundles) {
+ *   console.log(mode.id, chordMapBundle.volatilityBundle.volatility);
+ * }
+ */
+export function presetModeChordMapBundles(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeChordMapBundles> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeChordMapBundles: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeChordMapBundles(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q353 — presetBestModeChordMapNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the best mode chord map narrative bundle for a preset by id in one call.
+ *
+ * Socratic Q353: "If I can get best mode chord map narrative for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningBestModeChordMapNarrative(tuning, metric, rootHz, spectrum)` → bundle.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param metric   - Ranking metric: `'entropy'` | `'consistency'` | `'volatility'`.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ mode, narrative, volatility, entropy, consistency, smoothnessRatio }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const result = presetBestModeChordMapNarrative('12-tet', 'entropy');
+ * console.log(result.mode.id, result.narrative);
+ */
+export function presetBestModeChordMapNarrative(
+  presetId: string,
+  metric: 'entropy' | 'consistency' | 'volatility',
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningBestModeChordMapNarrative> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestModeChordMapNarrative: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningBestModeChordMapNarrative(tuning, metric, rootHz, spectrum);
 }

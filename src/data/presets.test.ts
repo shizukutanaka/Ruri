@@ -43,6 +43,8 @@ import {
   presetFamilyModeRankings,
   presetFamilyFullBundle,
   presetScaleModeSpectralRankings,
+  presetModeChordMapBundles,
+  presetBestModeChordMapNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1132,5 +1134,91 @@ describe('presetScaleModeSpectralRankings (Q347)', () => {
   it('accepts optional presets pool', () => {
     const result = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum(), 440, [TWELVE_TET]);
     expect(result.spectralRanking.length).toBeGreaterThan(0);
+  });
+});
+
+describe('presetModeChordMapBundles (Q349)', () => {
+  it('returns one bundle per mode', () => {
+    const bundles = presetModeChordMapBundles('12-tet', harmonicSpectrum());
+    expect(bundles.length).toBeGreaterThan(0);
+  });
+
+  it('each bundle has mode and chordMapBundle', () => {
+    const bundles = presetModeChordMapBundles('12-tet', harmonicSpectrum());
+    for (const { mode, chordMapBundle } of bundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(chordMapBundle).toHaveProperty('rankedBundle');
+      expect(chordMapBundle).toHaveProperty('volatilityBundle');
+      expect(chordMapBundle).toHaveProperty('progression');
+    }
+  });
+
+  it('volatilityBundle has volatility, entropy, consistency', () => {
+    const bundles = presetModeChordMapBundles('12-tet', harmonicSpectrum());
+    const first = bundles[0]!;
+    expect(typeof first.chordMapBundle.volatilityBundle.volatility).toBe('number');
+    expect(typeof first.chordMapBundle.volatilityBundle.entropy).toBe('number');
+    expect(typeof first.chordMapBundle.volatilityBundle.consistency).toBe('number');
+  });
+
+  it('throws for unknown preset id', () => {
+    expect(() => presetModeChordMapBundles('not-a-preset', harmonicSpectrum())).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const bundles = presetModeChordMapBundles('12-tet', harmonicSpectrum(), 261.63);
+    expect(bundles.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const bundles = presetModeChordMapBundles('12-tet', harmonicSpectrum(), 440, [TWELVE_TET]);
+    expect(bundles.length).toBeGreaterThan(0);
+  });
+});
+
+describe('presetBestModeChordMapNarrative (Q353)', () => {
+  it('returns mode and narrative for entropy metric', () => {
+    const result = presetBestModeChordMapNarrative('12-tet', 'entropy');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('returns mode and narrative for consistency metric', () => {
+    const result = presetBestModeChordMapNarrative('12-tet', 'consistency');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.consistency).toBe('number');
+  });
+
+  it('returns mode and narrative for volatility metric', () => {
+    const result = presetBestModeChordMapNarrative('12-tet', 'volatility');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.volatility).toBe('number');
+  });
+
+  it('result has all six expected keys', () => {
+    const result = presetBestModeChordMapNarrative('12-tet', 'entropy');
+    expect(result).toHaveProperty('mode');
+    expect(result).toHaveProperty('narrative');
+    expect(result).toHaveProperty('volatility');
+    expect(result).toHaveProperty('entropy');
+    expect(result).toHaveProperty('consistency');
+    expect(result).toHaveProperty('smoothnessRatio');
+  });
+
+  it('throws for unknown preset id', () => {
+    expect(() => presetBestModeChordMapNarrative('not-a-preset', 'entropy')).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const result = presetBestModeChordMapNarrative('12-tet', 'entropy', 261.63, harmonicSpectrum());
+    expect(result.mode).toHaveProperty('degreeIndices');
+  });
+
+  it('accepts optional presets pool', () => {
+    const result = presetBestModeChordMapNarrative('12-tet', 'entropy', 440, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
