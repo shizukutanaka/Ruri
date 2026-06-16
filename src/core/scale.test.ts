@@ -211,6 +211,10 @@ import {
   tuningFamilyFullParetoCorrelationReports,
   tuningModeMetricOutliers,
   tuningFamilyModeMetricOutliers,
+  tuningModeMetricOutlierSummary,
+  tuningFamilyModeMetricOutlierSummaries,
+  tuningModeMetricProfile,
+  tuningFamilyModeMetricProfiles,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -8601,6 +8605,112 @@ describe('tuningFamilyModeMetricOutliers (Q467)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(Array.isArray(entry.outliers)).toBe(true);
+    }
+  });
+});
+
+// Q468 — tuningModeMetricOutlierSummary
+describe('tuningModeMetricOutlierSummary (Q468)', () => {
+  it('returns totalOutliers, byMetric, byMode, mostOutlierMetric, mostOutlierMode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricOutlierSummary(equalTemperament12(440), spec);
+    expect(typeof result.totalOutliers).toBe('number');
+    expect(typeof result.byMetric).toBe('object');
+    expect(typeof result.byMode).toBe('object');
+    expect(result.mostOutlierMetric === null || typeof result.mostOutlierMetric === 'string').toBe(
+      true,
+    );
+    expect(result.mostOutlierMode === null || typeof result.mostOutlierMode === 'string').toBe(
+      true,
+    );
+  });
+
+  it('totalOutliers matches sum of byMetric values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricOutlierSummary(equalTemperament12(440), spec);
+    const sum = Object.values(result.byMetric).reduce((s, v) => s + v, 0);
+    expect(sum).toBe(result.totalOutliers);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricOutlierSummary(equalTemperament12(440), spec, 261.63);
+    expect(typeof result.totalOutliers).toBe('number');
+  });
+});
+
+// Q470 — tuningFamilyModeMetricOutlierSummaries
+describe('tuningFamilyModeMetricOutlierSummaries (Q470)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricOutlierSummaries(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and outlierSummary.totalOutliers', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricOutlierSummaries(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.outlierSummary.totalOutliers).toBe('number');
+    }
+  });
+});
+
+// Q471 — tuningModeMetricProfile
+describe('tuningModeMetricProfile (Q471)', () => {
+  it('returns one profile per mode', () => {
+    const spec = harmonicSpectrum(6);
+    const tuning = equalTemperament12(440);
+    const result = tuningModeMetricProfile(tuning, spec);
+    expect(result.length).toBe(tuning.degrees.length);
+  });
+
+  it('each profile has mode and all 5 metric stats', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricProfile(equalTemperament12(440), spec);
+    const first = result[0]!;
+    expect(typeof first.metrics.entropy.value).toBe('number');
+    expect(typeof first.metrics.entropy.zScore).toBe('number');
+    expect(typeof first.metrics.entropy.isOutlier).toBe('boolean');
+  });
+
+  it('isOutlier is consistent with |zScore| > 1.5', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricProfile(equalTemperament12(440), spec);
+    for (const profile of result) {
+      for (const stat of Object.values(profile.metrics)) {
+        expect(stat.isOutlier).toBe(Math.abs(stat.zScore) > 1.5);
+      }
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricProfile(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// Q473 — tuningFamilyModeMetricProfiles
+describe('tuningFamilyModeMetricProfiles (Q473)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricProfiles(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeProfiles array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricProfiles(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(Array.isArray(entry.modeProfiles)).toBe(true);
+      expect(entry.modeProfiles.length).toBeGreaterThan(0);
     }
   });
 });

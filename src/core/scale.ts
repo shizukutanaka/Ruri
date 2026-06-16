@@ -9348,3 +9348,225 @@ export function tuningFamilyModeMetricOutliers(
         : tuningModeMetricOutliers(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q468 — tuningModeMetricOutlierSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Summarise metric outliers for a tuning: counts by metric and by mode,
+ * plus which metric and mode appear most often.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Summary object with total, byMetric, byMode, mostOutlierMetric, mostOutlierMode.
+ */
+export function tuningModeMetricOutlierSummary(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  totalOutliers: number;
+  byMetric: Record<string, number>;
+  byMode: Record<string, number>;
+  mostOutlierMetric: string | null;
+  mostOutlierMode: string | null;
+} {
+  const outliers =
+    rootHz !== undefined
+      ? tuningModeMetricOutliers(tuning, spectrum, rootHz)
+      : tuningModeMetricOutliers(tuning, spectrum);
+
+  const byMetric: Record<string, number> = {};
+  const byMode: Record<string, number> = {};
+
+  for (const entry of outliers) {
+    byMetric[entry.metric] = (byMetric[entry.metric] ?? 0) + 1;
+    const modeId = entry.mode.id;
+    byMode[modeId] = (byMode[modeId] ?? 0) + 1;
+  }
+
+  let mostOutlierMetric: string | null = null;
+  let maxMetricCount = 0;
+  for (const [metric, count] of Object.entries(byMetric)) {
+    if (count > maxMetricCount) {
+      maxMetricCount = count;
+      mostOutlierMetric = metric;
+    }
+  }
+
+  let mostOutlierMode: string | null = null;
+  let maxModeCount = 0;
+  for (const [modeId, count] of Object.entries(byMode)) {
+    if (count > maxModeCount) {
+      maxModeCount = count;
+      mostOutlierMode = modeId;
+    }
+  }
+
+  return {
+    totalOutliers: outliers.length,
+    byMetric,
+    byMode,
+    mostOutlierMetric,
+    mostOutlierMode,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q470 — tuningFamilyModeMetricOutlierSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce outlier summaries for a whole family of tunings.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and outlierSummary.
+ */
+export function tuningFamilyModeMetricOutlierSummaries(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  outlierSummary: {
+    totalOutliers: number;
+    byMetric: Record<string, number>;
+    byMode: Record<string, number>;
+    mostOutlierMetric: string | null;
+    mostOutlierMode: string | null;
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    outlierSummary:
+      rootHz !== undefined
+        ? tuningModeMetricOutlierSummary(t, spectrum, rootHz)
+        : tuningModeMetricOutlierSummary(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q471 — tuningModeMetricProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a compact per-mode profile with all 5 metric stats (value, mean,
+ * stdDev, zScore, isOutlier) in one call.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array of per-mode profiles with full metric statistics.
+ */
+export function tuningModeMetricProfile(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  metrics: {
+    entropy: { value: number; mean: number; stdDev: number; zScore: number; isOutlier: boolean };
+    consistency: {
+      value: number;
+      mean: number;
+      stdDev: number;
+      zScore: number;
+      isOutlier: boolean;
+    };
+    volatility: { value: number; mean: number; stdDev: number; zScore: number; isOutlier: boolean };
+    diversity: { value: number; mean: number; stdDev: number; zScore: number; isOutlier: boolean };
+    smoothnessRatio: {
+      value: number;
+      mean: number;
+      stdDev: number;
+      zScore: number;
+      isOutlier: boolean;
+    };
+  };
+}[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+
+  type MetricKey = 'entropy' | 'consistency' | 'volatility' | 'diversity' | 'smoothnessRatio';
+  const metricKeys: MetricKey[] = [
+    'entropy',
+    'consistency',
+    'volatility',
+    'diversity',
+    'smoothnessRatio',
+  ];
+
+  // Compute mean and stdDev for each metric across all modes
+  const stats: Record<MetricKey, { mean: number; stdDev: number }> = {
+    entropy: { mean: 0, stdDev: 0 },
+    consistency: { mean: 0, stdDev: 0 },
+    volatility: { mean: 0, stdDev: 0 },
+    diversity: { mean: 0, stdDev: 0 },
+    smoothnessRatio: { mean: 0, stdDev: 0 },
+  };
+
+  const n = bundle.length;
+  if (n === 0) return [];
+
+  for (const key of metricKeys) {
+    const values = bundle.map((b) => b[key]);
+    const mean = values.reduce((s, v) => s + v, 0) / n;
+    const variance = values.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    stats[key] = { mean, stdDev: Math.sqrt(variance) };
+  }
+
+  return bundle.map((b) => {
+    const buildStat = (key: MetricKey) => {
+      const value = b[key];
+      const { mean, stdDev } = stats[key];
+      const zScore = stdDev === 0 ? 0 : (value - mean) / stdDev;
+      return { value, mean, stdDev, zScore, isOutlier: Math.abs(zScore) > 1.5 };
+    };
+
+    return {
+      mode: b.mode,
+      metrics: {
+        entropy: buildStat('entropy'),
+        consistency: buildStat('consistency'),
+        volatility: buildStat('volatility'),
+        diversity: buildStat('diversity'),
+        smoothnessRatio: buildStat('smoothnessRatio'),
+      },
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q473 — tuningFamilyModeMetricProfiles
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce mode metric profiles for a whole family of tunings.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and modeProfiles array.
+ */
+export function tuningFamilyModeMetricProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  modeProfiles: ReturnType<typeof tuningModeMetricProfile>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeProfiles:
+      rootHz !== undefined
+        ? tuningModeMetricProfile(t, spectrum, rootHz)
+        : tuningModeMetricProfile(t, spectrum),
+  }));
+}
