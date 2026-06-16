@@ -13,6 +13,7 @@ import {
   bestModeForTuning,
   bestChordMapEntry,
   rankModesByStability,
+  chordProgressionSmooth,
 } from '../core/scale.js';
 import { type TuningSystem } from '../core/tuning.js';
 import { type ChordSearchOptions } from '../core/chord-search.js';
@@ -696,4 +697,46 @@ export function topNModesSmf(
   const modes = rankModesByStability(tuning, effectiveRootHz, spectrum);
   const selected = modes.slice(0, n);
   return selected.map((entry) => scaleToSmf(entry.scale, tuning, effectiveRootHz, opts));
+}
+
+// ---------------------------------------------------------------------------
+// Q270 — smoothProgressionSmf
+// ---------------------------------------------------------------------------
+
+/**
+ * Reorder a chord progression to minimise dissonance jumps, then encode as SMF in one call.
+ *
+ * Socratic Q270: "If I can get a smoothed progression WAV and also encode a progression
+ * as SMF, can I get a smoothed progression SMF in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordProgressionSmooth(chords, rootHz ?? tuning.referenceHz, spectrum)` → smoothed ordering.
+ * 2. `progressionToSmf(smoothed, effectiveRootHz, opts)` → SMF bytes.
+ *
+ * @param chords   - The chord progression to smooth and encode.
+ * @param tuning   - The `TuningSystem` context (used for default root Hz).
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for smoothing heuristic.
+ * @param opts     - Optional SMF encoding options.
+ * @returns Type-0 SMF `Uint8Array` of the smoothed chord progression.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const smf = smoothProgressionSmf(chords, t12);
+ * await fs.writeFile('smooth-progression.mid', smf);
+ */
+export function smoothProgressionSmf(
+  chords: readonly Chord[],
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  opts?: SmfOptions,
+): Uint8Array {
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const smoothed = chordProgressionSmooth(chords, effectiveRootHz, spectrum);
+  if (smoothed.length === 0) {
+    // Return an empty-track SMF (header + empty MTrk with only end-of-track)
+    return encodeSmf([], opts);
+  }
+  return progressionToSmf(smoothed, effectiveRootHz, opts);
 }

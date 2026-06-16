@@ -17,10 +17,17 @@ import {
   bestChordMapSmf,
   bestTuningChordSmf,
   topNModesSmf,
+  smoothProgressionSmf,
 } from './smf.js';
 import { chordFromSemitones, chordFromRatios } from '../core/chord.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
-import { type Scale, chordProgressionAnalysis, scaleToChordMap } from '../core/scale.js';
+import {
+  type Scale,
+  chordProgressionAnalysis,
+  scaleToChordMap,
+  scaleModeSeries,
+  tuningToScale,
+} from '../core/scale.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
 describe('VLQ (I7 high-risk)', () => {
@@ -704,5 +711,24 @@ describe('topNModesSmf (Q236)', () => {
   });
   it('throws for n <= 0', () => {
     expect(() => topNModesSmf(t12, 0)).toThrow(RangeError);
+  });
+});
+
+describe('smoothProgressionSmf (Q270)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 3).map((e) => e.chord);
+
+  it('returns a valid SMF Uint8Array', () => {
+    const smf = smoothProgressionSmf(chords, t12);
+    expect(smf).toBeInstanceOf(Uint8Array);
+    expect(smf.length).toBeGreaterThan(14);
+    expect(smf[0]).toBe(0x4d); // 'M'
+    expect(smf[1]).toBe(0x54); // 'T'
+  });
+  it('handles empty chords', () => {
+    const smf = smoothProgressionSmf([], t12);
+    expect(smf).toBeInstanceOf(Uint8Array);
   });
 });
