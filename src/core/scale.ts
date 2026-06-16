@@ -5016,3 +5016,174 @@ export function tuningTripleBestModes(
   const allAgree = byEntropy.id === byConsistency.id && byConsistency.id === byVolatility.id;
   return { byEntropy, byConsistency, byVolatility, allAgree };
 }
+
+// ---------------------------------------------------------------------------
+// Q312 — tuningModeRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all modal rotations of a tuning by a single metric in one call.
+ *
+ * Socratic Q312: "If I can compare all mode metrics, can I rank modes by any one
+ * metric in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComparison(tuning, spectrum, rootHz)` → `{mode, entropy, consistency, volatility}[]`.
+ * 2. Sort by chosen metric:
+ *    - `'entropy'` / `'consistency'`: descending (higher = better).
+ *    - `'volatility'`: ascending (lower = more stable = better).
+ * 3. Return sorted `Scale[]`.
+ *
+ * @param tuning   - The tuning system.
+ * @param metric   - Which metric to rank by: `'entropy'`, `'consistency'`, or `'volatility'`.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `Scale[]` sorted from best to worst by the chosen metric.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const ranked = tuningModeRanking(t12, 'entropy');
+ * // ranked[0] is the mode with highest entropy score
+ */
+export function tuningModeRanking(
+  tuning: TuningSystem,
+  metric: 'entropy' | 'consistency' | 'volatility',
+  spectrum?: Spectrum,
+  rootHz = 440,
+): Scale[] {
+  const comparison = tuningModeComparison(tuning, spectrum, rootHz);
+  const ascending = metric === 'volatility';
+  const sorted = comparison.slice().sort((a, b) => {
+    const diff = a[metric] - b[metric];
+    return ascending ? diff : -diff;
+  });
+  return sorted.map((e) => e.mode);
+}
+
+// ---------------------------------------------------------------------------
+// Q313 — tuningModeRankingBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all modal rotations by entropy, consistency, and volatility in one call.
+ *
+ * Socratic Q313: "If I can rank modes by any single metric, can I get all three
+ * rankings at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComparison(tuning, spectrum, rootHz)` → comparison data (one pass).
+ * 2. Sort three ways:
+ *    - `byEntropy`: descending by entropy.
+ *    - `byConsistency`: descending by consistency.
+ *    - `byVolatility`: ascending by volatility (lower = more stable = better).
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{ byEntropy, byConsistency, byVolatility }` — three sorted `Scale[]` arrays.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { byEntropy, byConsistency, byVolatility } = tuningModeRankingBundle(t12);
+ * // byEntropy[0] is the most entropic mode; byVolatility[0] is the most stable
+ */
+export function tuningModeRankingBundle(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { byEntropy: Scale[]; byConsistency: Scale[]; byVolatility: Scale[] } {
+  const comparison = tuningModeComparison(tuning, spectrum, rootHz);
+  const byEntropy = comparison
+    .slice()
+    .sort((a, b) => b.entropy - a.entropy)
+    .map((e) => e.mode);
+  const byConsistency = comparison
+    .slice()
+    .sort((a, b) => b.consistency - a.consistency)
+    .map((e) => e.mode);
+  const byVolatility = comparison
+    .slice()
+    .sort((a, b) => a.volatility - b.volatility)
+    .map((e) => e.mode);
+  return { byEntropy, byConsistency, byVolatility };
+}
+
+// ---------------------------------------------------------------------------
+// Q314 — modeProgressionBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a smooth chord progression for a scale and measure its smoothness in one call.
+ *
+ * Socratic Q314: "If I can get a smooth progression from a chord map and measure its
+ * smoothness, can I do both at once for a scale?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → diatonic chord map.
+ * 2. `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → smooth `Chord[]`.
+ * 3. `progressionSmoothnessRatio(chords, rootHz, spectrum)` → smoothness ratio.
+ *
+ * @param scale    - The scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @returns `{ chords, smoothnessRatio }` where `smoothnessRatio ∈ [0, 1]`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const { chords, smoothnessRatio } = modeProgressionBundle(scale, t12);
+ * // smoothnessRatio close to 1 means very smooth progression
+ */
+export function modeProgressionBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { chords: Chord[]; smoothnessRatio: number } {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const chords = chordMapProgressionBridge(chordMap, rootHz, spectrum);
+  const smoothnessRatio = progressionSmoothnessRatio(chords, rootHz, spectrum);
+  return { chords, smoothnessRatio };
+}
+
+// ---------------------------------------------------------------------------
+// Q315 — tuningBestModeProgression
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the best mode of a tuning by a metric and return its progression bundle in one call.
+ *
+ * Socratic Q315: "If I can rank modes and get a progression bundle for a mode, can I get
+ * the best mode's progression in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeRanking(tuning, metric, spectrum, rootHz)` → sorted `Scale[]`.
+ * 2. Take first element as `bestMode`.
+ * 3. `modeProgressionBundle(bestMode, tuning, rootHz, spectrum)` → `{chords, smoothnessRatio}`.
+ *
+ * @param tuning   - The tuning system.
+ * @param metric   - Which metric to select the best mode by.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @returns `{ mode, chords, smoothnessRatio }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { mode, chords, smoothnessRatio } = tuningBestModeProgression(t12, 'entropy');
+ * // mode is the highest-entropy mode; chords is its smooth progression
+ */
+export function tuningBestModeProgression(
+  tuning: TuningSystem,
+  metric: 'entropy' | 'consistency' | 'volatility',
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; chords: Chord[]; smoothnessRatio: number } {
+  const ranking = tuningModeRanking(tuning, metric, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('tuningBestModeProgression: tuning has no modes');
+  const mode = ranking[0]!;
+  const { chords, smoothnessRatio } = modeProgressionBundle(mode, tuning, rootHz, spectrum);
+  return { mode, chords, smoothnessRatio };
+}

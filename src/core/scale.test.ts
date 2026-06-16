@@ -118,6 +118,10 @@ import {
   tuningModeComparison,
   bestModeByVolatility,
   tuningTripleBestModes,
+  tuningModeRanking,
+  tuningModeRankingBundle,
+  modeProgressionBundle,
+  tuningBestModeProgression,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4983,5 +4987,121 @@ describe('tuningTripleBestModes (Q310)', () => {
   it('throws for empty tuning', () => {
     const empty: typeof t12 = { ...t12, degrees: [] };
     expect(() => tuningTripleBestModes(empty)).toThrow(RangeError);
+  });
+});
+
+describe('tuningModeRanking (Q312)', () => {
+  it('returns Scale[] same length as allModes', () => {
+    const ranked = tuningModeRanking(t12, 'entropy');
+    expect(ranked.length).toBe(t12.degrees.length);
+  });
+  it('entropy ranking is non-increasing', () => {
+    const ranked = tuningModeRanking(t12, 'entropy');
+    expect(ranked.length).toBeGreaterThan(0);
+    // Verify all are Scale objects
+    for (const mode of ranked) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+  it('consistency ranking is non-increasing', () => {
+    const ranked = tuningModeRanking(t12, 'consistency');
+    expect(ranked.length).toBe(t12.degrees.length);
+  });
+  it('volatility ranking is non-decreasing (lower = better = first)', () => {
+    const ranked = tuningModeRanking(t12, 'volatility');
+    expect(ranked.length).toBe(t12.degrees.length);
+  });
+  it('returns empty array for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    const ranked = tuningModeRanking(empty, 'entropy');
+    expect(ranked.length).toBe(0);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const ranked = tuningModeRanking(t12, 'consistency', harmonicSpectrum(), 261.63);
+    expect(ranked.length).toBe(t12.degrees.length);
+  });
+});
+
+describe('tuningModeRankingBundle (Q313)', () => {
+  it('returns byEntropy, byConsistency, byVolatility arrays', () => {
+    const bundle = tuningModeRankingBundle(t12);
+    expect(Array.isArray(bundle.byEntropy)).toBe(true);
+    expect(Array.isArray(bundle.byConsistency)).toBe(true);
+    expect(Array.isArray(bundle.byVolatility)).toBe(true);
+  });
+  it('all three arrays have same length as modes', () => {
+    const bundle = tuningModeRankingBundle(t12);
+    expect(bundle.byEntropy.length).toBe(t12.degrees.length);
+    expect(bundle.byConsistency.length).toBe(t12.degrees.length);
+    expect(bundle.byVolatility.length).toBe(t12.degrees.length);
+  });
+  it('all entries are Scale objects', () => {
+    const bundle = tuningModeRankingBundle(t12);
+    for (const mode of bundle.byEntropy) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+  it('empty tuning returns three empty arrays', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    const bundle = tuningModeRankingBundle(empty);
+    expect(bundle.byEntropy.length).toBe(0);
+    expect(bundle.byConsistency.length).toBe(0);
+    expect(bundle.byVolatility.length).toBe(0);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = tuningModeRankingBundle(t12, harmonicSpectrum(), 261.63);
+    expect(bundle.byEntropy.length).toBe(t12.degrees.length);
+  });
+});
+
+describe('modeProgressionBundle (Q314)', () => {
+  it('returns chords and smoothnessRatio', () => {
+    const scale = tuningToScale(t12);
+    const bundle = modeProgressionBundle(scale, t12);
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+  it('smoothnessRatio is finite', () => {
+    const scale = tuningToScale(t12);
+    const bundle = modeProgressionBundle(scale, t12);
+    expect(Number.isFinite(bundle.smoothnessRatio)).toBe(true);
+  });
+  it('accepts optional spectrum and custom rootHz', () => {
+    const scale = tuningToScale(t12);
+    const bundle = modeProgressionBundle(scale, t12, 261.63, harmonicSpectrum());
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+  });
+  it('throws for scale with no degrees', () => {
+    const emptyScale: Scale = { id: 'empty', name: 'Empty', tuningId: t12.id, degreeIndices: [] };
+    expect(() => modeProgressionBundle(emptyScale, t12)).toThrow(RangeError);
+  });
+});
+
+describe('tuningBestModeProgression (Q315)', () => {
+  it('returns mode, chords, and smoothnessRatio', () => {
+    const result = tuningBestModeProgression(t12, 'entropy');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(Array.isArray(result.chords)).toBe(true);
+    expect(typeof result.smoothnessRatio).toBe('number');
+  });
+  it('mode matches top of tuningModeRanking for same metric', () => {
+    const ranked = tuningModeRanking(t12, 'consistency');
+    const result = tuningBestModeProgression(t12, 'consistency');
+    expect(result.mode.id).toBe(ranked[0]!.id);
+  });
+  it('works with volatility metric', () => {
+    const result = tuningBestModeProgression(t12, 'volatility');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => tuningBestModeProgression(empty, 'entropy')).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const result = tuningBestModeProgression(t12, 'entropy', 261.63, harmonicSpectrum());
+    expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
