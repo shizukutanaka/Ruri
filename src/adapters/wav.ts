@@ -38,8 +38,11 @@ import {
   chordMapProgressionBridge,
   tuningReportCard,
   bestModeByEntropy,
+  bestModeByConsistency,
+  bestModeByVolatility,
   chordMapEntropyScore,
   tuningBestModeProgression,
+  tuningFullAnalysis,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1896,4 +1899,96 @@ export function tuningBestModeProgressionBundle(
   );
   const { wav, smf, narrative } = smoothProgressionBundle(chords, tuning, rootHz, spectrum);
   return { mode, chords, smoothnessRatio, wav, smf, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q327 — tuningFullWavBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the report card WAV and best-mode WAVs for all three metrics in one call.
+ *
+ * Socratic Q327: "If I have report card WAV and best-mode WAVs for all three metrics,
+ * can I get all four at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningReportCardWav(tuning, rootHz, spectrum, opts)` → `{ wav, reportCard }`.
+ * 2. `tuningEntropyBestModeWav(tuning, rootHz, spectrum, opts)` → `{ wav, entropy, mode }`.
+ * 3. `bestModeByConsistency(tuning, spectrum, rootHz)` → `pluckScaleWav(mode, tuning, opts)` → `Uint8Array`.
+ * 4. `bestModeByVolatility(tuning, spectrum, rootHz)` → `pluckScaleWav(mode, tuning, opts)` → `Uint8Array`.
+ *
+ * @param tuning   - The tuning system.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @returns `{ reportCardBundle, bestEntropyBundle, bestConsistencyWav, bestVolatilityWav }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundle = tuningFullWavBundle(t12);
+ * await fs.writeFile('report.wav', bundle.reportCardBundle.wav);
+ * await fs.writeFile('entropy.wav', bundle.bestEntropyBundle.wav);
+ */
+export function tuningFullWavBundle(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): {
+  reportCardBundle: { wav: Uint8Array; reportCard: string };
+  bestEntropyBundle: { wav: Uint8Array; entropy: number; mode: Scale };
+  bestConsistencyWav: Uint8Array;
+  bestVolatilityWav: Uint8Array;
+} {
+  const reportCardBundle = tuningReportCardWav(tuning, rootHz, spectrum, opts);
+  const bestEntropyBundle = tuningEntropyBestModeWav(tuning, rootHz, spectrum, opts);
+  const consistencyMode = bestModeByConsistency(tuning, spectrum, rootHz);
+  const effectiveOpts: PluckScaleWavOptions = opts ?? { ...DEFAULT_KS, noteSeconds: 0.5 };
+  const bestConsistencyWav = pluckScaleWav(consistencyMode, tuning, effectiveOpts);
+  const volatilityMode = bestModeByVolatility(tuning, spectrum, rootHz);
+  const bestVolatilityWav = pluckScaleWav(volatilityMode, tuning, effectiveOpts);
+  return { reportCardBundle, bestEntropyBundle, bestConsistencyWav, bestVolatilityWav };
+}
+
+// ---------------------------------------------------------------------------
+// Q329 — tuningAnalysisWavBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine full tuning analysis with a report card WAV in one call.
+ *
+ * Socratic Q329: "If I can do full analysis and get a report card WAV, can I combine them?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningFullAnalysis(tuning, rootHz, spectrum)` → full analysis object.
+ * 2. `tuningReportCardWav(tuning, rootHz, spectrum, opts)` → `{ wav, reportCard }`.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @returns `{ fullAnalysis, wav, reportCard }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { fullAnalysis, wav, reportCard } = tuningAnalysisWavBundle(t12);
+ * await fs.writeFile('report.wav', wav);
+ * console.log(reportCard);
+ * console.log(fullAnalysis.tripleMode.allAgree);
+ */
+export function tuningAnalysisWavBundle(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): {
+  fullAnalysis: ReturnType<typeof tuningFullAnalysis>;
+  wav: Uint8Array;
+  reportCard: string;
+} {
+  const fullAnalysis = tuningFullAnalysis(tuning, rootHz, spectrum);
+  const { wav, reportCard } = tuningReportCardWav(tuning, rootHz, spectrum, opts);
+  return { fullAnalysis, wav, reportCard };
 }

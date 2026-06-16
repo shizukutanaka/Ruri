@@ -44,6 +44,8 @@ import {
   tuningReportCardWav,
   tuningEntropyBestModeWav,
   tuningBestModeProgressionBundle,
+  tuningFullWavBundle,
+  tuningAnalysisWavBundle,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1917,5 +1919,93 @@ describe('tuningBestModeProgressionBundle (Q318)', () => {
   it('accepts optional spectrum and rootHz', () => {
     const bundle = tuningBestModeProgressionBundle(t12, 'entropy', 261.63, harmonicSpectrum());
     expect(bundle.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+describe('tuningFullWavBundle (Q327)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns all four bundle fields', () => {
+    const bundle = tuningFullWavBundle(t12);
+    expect(bundle.reportCardBundle).toHaveProperty('wav');
+    expect(bundle.reportCardBundle).toHaveProperty('reportCard');
+    expect(bundle.bestEntropyBundle).toHaveProperty('wav');
+    expect(bundle.bestEntropyBundle).toHaveProperty('entropy');
+    expect(bundle.bestEntropyBundle).toHaveProperty('mode');
+    expect(bundle.bestConsistencyWav).toBeInstanceOf(Uint8Array);
+    expect(bundle.bestVolatilityWav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('report card wav has RIFF header', () => {
+    const { reportCardBundle } = tuningFullWavBundle(t12);
+    expect(
+      String.fromCharCode(
+        reportCardBundle.wav[0]!,
+        reportCardBundle.wav[1]!,
+        reportCardBundle.wav[2]!,
+        reportCardBundle.wav[3]!,
+      ),
+    ).toBe('RIFF');
+  });
+
+  it('consistency wav has RIFF header', () => {
+    const { bestConsistencyWav } = tuningFullWavBundle(t12);
+    expect(
+      String.fromCharCode(
+        bestConsistencyWav[0]!,
+        bestConsistencyWav[1]!,
+        bestConsistencyWav[2]!,
+        bestConsistencyWav[3]!,
+      ),
+    ).toBe('RIFF');
+  });
+
+  it('volatility wav has RIFF header', () => {
+    const { bestVolatilityWav } = tuningFullWavBundle(t12);
+    expect(
+      String.fromCharCode(
+        bestVolatilityWav[0]!,
+        bestVolatilityWav[1]!,
+        bestVolatilityWav[2]!,
+        bestVolatilityWav[3]!,
+      ),
+    ).toBe('RIFF');
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = tuningFullWavBundle(t12, 261.63, harmonicSpectrum());
+    expect(bundle.reportCardBundle.wav.length).toBeGreaterThan(0);
+  });
+});
+
+describe('tuningAnalysisWavBundle (Q329)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns fullAnalysis, wav and reportCard', () => {
+    const result = tuningAnalysisWavBundle(t12);
+    expect(result.fullAnalysis).toHaveProperty('reportCard');
+    expect(result.fullAnalysis).toHaveProperty('tripleMode');
+    expect(result.fullAnalysis).toHaveProperty('consistencyEntropyDelta');
+    expect(result.fullAnalysis).toHaveProperty('harmonicDensity');
+    expect(result.wav).toBeInstanceOf(Uint8Array);
+    expect(typeof result.reportCard).toBe('string');
+    expect(result.reportCard.length).toBeGreaterThan(0);
+  });
+
+  it('wav has RIFF header', () => {
+    const { wav } = tuningAnalysisWavBundle(t12);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('fullAnalysis reportCard matches returned reportCard', () => {
+    const result = tuningAnalysisWavBundle(t12);
+    expect(result.reportCard).toBe(result.fullAnalysis.reportCard);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const result = tuningAnalysisWavBundle(t12, 261.63, harmonicSpectrum());
+    expect(typeof result.fullAnalysis.reportCard).toBe('string');
+    expect(Number.isFinite(result.fullAnalysis.harmonicDensity)).toBe(true);
   });
 });
