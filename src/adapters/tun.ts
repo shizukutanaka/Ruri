@@ -37,9 +37,9 @@ import { type Scale, scaleToFreqs, tuningToScale } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { getTuningById } from '../data/presets.js';
 import { scaleChordProgressionSmf, scaleToSmf } from './smf.js';
-import { type ScalaScale, tuningToScl, writeScl } from './scala.js';
-import { bestModeWav } from './wav.js';
-import { tuningToMts } from './mts.js';
+import { type ScalaScale, tuningToScl, writeScl, scaleToSubsetSclText } from './scala.js';
+import { bestModeWav, pluckScaleWav } from './wav.js';
+import { tuningToMts, scaleToMts } from './mts.js';
 
 /** Default base frequency: MIDI note 0 at A4 = 440 Hz (440 × 2^(−69/12)). */
 export const TUN_DEFAULT_BASEFREQ_HZ = 440 * 2 ** (-69 / 12);
@@ -466,5 +466,50 @@ export function tuningToFullBundle(
   const effectiveRootHz = rootHz ?? tuning.referenceHz;
   const wav = bestModeWav(tuning, effectiveRootHz, spectrum);
   const mts = tuningToMts(tuning, opts?.name);
+  return { wav, smf, scl, tun, mts };
+}
+
+/**
+ * Export a `Scale` as WAV + SMF + SCL text + TUN + MTS in one call.
+ *
+ * Socratic Q247: "If a Scale is truly first-class — exporting it as WAV + SMF + SCL + TUN + MTS
+ * should be one call — can it?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToSmf(scale, tuning, rootHz ?? tuning.referenceHz)` → SMF bytes.
+ * 2. `tuningToTun(tuning, name)` → TUN text.
+ * 3. `scaleToSubsetSclText(scale, tuning, name)` → SCL text.
+ * 4. `pluckScaleWav(scale, tuning)` → WAV bytes.
+ * 5. `scaleToMts(scale, tuning)` → MTS SysEx bytes.
+ *
+ * @param scale    - The scale to export.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz for SMF pitch mapping. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Unused (accepted for API forward-compatibility).
+ * @param name     - Optional name for SCL/TUN headers.
+ * @returns `{ wav, smf, scl, tun, mts }` — all five formats simultaneously.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ * @throws {RangeError} if the scale has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { wav, smf, scl, tun, mts } = scaleFullBundle(major, t12);
+ */
+export function scaleFullBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  name?: string,
+): { wav: Uint8Array; smf: Uint8Array; scl: string; tun: string; mts: Uint8Array } {
+  void spectrum; // accepted for API forward-compatibility
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const smf = scaleToSmf(scale, tuning, effectiveRootHz);
+  const tun = tuningToTun(tuning, name);
+  const scl = scaleToSubsetSclText(scale, tuning, name);
+  const wav = pluckScaleWav(scale, tuning);
+  const mts = scaleToMts(scale, tuning, name);
   return { wav, smf, scl, tun, mts };
 }
