@@ -20,6 +20,8 @@ import {
   topPresetsByStabilityReport,
   rankPresetsByFullBundle,
   bestPresetForSpectrum,
+  presetModeIntervalSets,
+  presetVolatilityRanking,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -487,5 +489,43 @@ describe('bestPresetForSpectrum (Q257)', () => {
   });
   it('harmonicity is non-negative', () => {
     expect(bestPresetForSpectrum(harmonicSpectrum()).harmonicity).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('presetModeIntervalSets (Q258)', () => {
+  it('returns interval sets for 12-tet', () => {
+    const sets = presetModeIntervalSets('12-tet');
+    expect(sets.length).toBeGreaterThan(0);
+    sets.forEach((s) => {
+      expect(s.mode).toBeDefined();
+      expect(Array.isArray(s.intervalCents)).toBe(true);
+    });
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetModeIntervalSets('nonexistent')).toThrow(RangeError);
+  });
+  it('interval cents sum to periodCents', () => {
+    const sets = presetModeIntervalSets('12-tet');
+    sets.forEach((s) => {
+      const sum = s.intervalCents.reduce((a, b) => a + b, 0);
+      expect(sum).toBeCloseTo(1200, 2);
+    });
+  });
+});
+
+describe('presetVolatilityRanking (Q262)', () => {
+  it('returns all presets ranked by volatility', () => {
+    const ranked = presetVolatilityRanking();
+    expect(ranked.length).toBeGreaterThan(0);
+    ranked.forEach((r) => {
+      expect(typeof r.presetId).toBe('string');
+      expect(r.volatility).toBeGreaterThanOrEqual(0);
+    });
+  });
+  it('sorted ascending by volatility', () => {
+    const ranked = presetVolatilityRanking();
+    for (let i = 0; i + 1 < ranked.length; i++) {
+      expect(ranked[i]!.volatility).toBeLessThanOrEqual(ranked[i + 1]!.volatility);
+    }
   });
 });

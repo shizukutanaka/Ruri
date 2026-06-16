@@ -19,6 +19,9 @@ import {
   compareTuningReports,
   progressionNarrative,
   scaleSimilarityMatrix,
+  modeIntervalSets,
+  scaleToChordMap,
+  chordMapVolatility,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1251,4 +1254,79 @@ export function bestPresetForSpectrum(
     if (e.harmonicity < best.harmonicity) best = e;
   }
   return { presetId: best.presetId, harmonicity: best.harmonicity };
+}
+
+/**
+ * Return all modal interval sets for a preset tuning in one call.
+ *
+ * Socratic Q258: "If I can get modeIntervalSets for a Scale and convert a preset to a tuning
+ * and scale, can I get all modal interval sets for a preset in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find the preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningToScale(tuning)` → full `Scale`.
+ * 4. `modeIntervalSets(scale, tuning)` → one entry per modal rotation.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode: Scale; intervalCents: number[] }`, one per modal rotation.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const sets = presetModeIntervalSets('12-tet');
+ * // sets.length === 12; sets[0].intervalCents.reduce((a, b) => a + b, 0) ≈ 1200
+ */
+export function presetModeIntervalSets(
+  presetId: string,
+  presets?: readonly TuningPreset[],
+): { mode: Scale; intervalCents: number[] }[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeIntervalSets: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  const scale = tuningToScale(tuning);
+  return modeIntervalSets(scale, tuning);
+}
+
+/**
+ * Rank all presets by chord map volatility (coefficient of variation of dissonance), ascending.
+ *
+ * Socratic Q262: "If I can compute a chord map volatility for one scale and have all presets,
+ * can I rank all presets by chord map volatility in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each preset: `loadTuningPreset(preset)` → `TuningSystem`.
+ * 2. `tuningToScale(tuning)` → full `Scale`.
+ * 3. `scaleToChordMap(scale, tuning)` → diatonic chord map.
+ * 4. `chordMapVolatility(chordMap, spectrum, rootHz)` → volatility score.
+ * 5. Sort ascending by volatility.
+ *
+ * @param spectrum - Optional instrument spectrum for dissonance computation. Defaults to
+ *                   `harmonicSpectrum()`.
+ * @param rootHz   - Reference frequency for chord realization (default 440 Hz).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ presetId, volatility }` sorted ascending by volatility.
+ *
+ * @example
+ * const ranked = presetVolatilityRanking();
+ * // ranked[0].presetId is the preset with the most uniform chord dissonance
+ */
+export function presetVolatilityRanking(
+  spectrum?: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): { presetId: string; volatility: number }[] {
+  const ps = presets ?? ALL_PRESETS;
+  const entries = ps.map((p) => {
+    const tuning = loadTuningPreset(p);
+    const scale = tuningToScale(tuning);
+    const chordMap = scaleToChordMap(scale, tuning);
+    const volatility = chordMapVolatility(chordMap, spectrum, rootHz);
+    return { presetId: p.id, volatility };
+  });
+  return entries.sort((a, b) => a.volatility - b.volatility);
 }
