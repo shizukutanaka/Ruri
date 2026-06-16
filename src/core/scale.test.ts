@@ -150,6 +150,10 @@ import {
   tuningFamilyBestSmoothModes,
   scaleProgressionFullBundle,
   tuningModeProgressionFullBundles,
+  tuningModeConsistencyEntropyProfiles,
+  tuningTopModesByDelta,
+  chordMapDissonanceHistogram,
+  tuningModeDissonanceHistograms,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -6166,5 +6170,156 @@ describe('tuningModeProgressionFullBundles (Q365)', () => {
     const bundles = tuningModeProgressionFullBundles(t12local, 261.63, harmonicSpectrum());
     expect(bundles.length).toBeGreaterThan(0);
     expect(typeof bundles[0]!.narrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q381 — chordMapDissonanceHistogram
+// ---------------------------------------------------------------------------
+
+describe('chordMapDissonanceHistogram (Q381)', () => {
+  it('returns array of length bins (default 10)', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const hist = chordMapDissonanceHistogram(cm);
+    expect(hist.length).toBe(10);
+    const total = hist.reduce((a, b) => a + b, 0);
+    expect(total).toBe(cm.length);
+  });
+
+  it('returns all zeros for empty chord map', () => {
+    const hist = chordMapDissonanceHistogram([]);
+    expect(hist).toEqual(Array(10).fill(0));
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    expect(chordMapDissonanceHistogram(cm, 5).length).toBe(5);
+  });
+
+  it('all histogram values are non-negative integers', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const hist = chordMapDissonanceHistogram(cm);
+    for (const count of hist) {
+      expect(count).toBeGreaterThanOrEqual(0);
+      expect(Number.isInteger(count)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q378 — tuningModeConsistencyEntropyProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningModeConsistencyEntropyProfiles (Q378)', () => {
+  it('returns one entry per mode with delta >= 0', () => {
+    const t12local = equalTemperament12(440);
+    const profiles = tuningModeConsistencyEntropyProfiles(t12local);
+    expect(profiles.length).toBe(t12local.degrees.length);
+    for (const { mode, entropy, consistency, delta } of profiles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(entropy).toBeGreaterThanOrEqual(0);
+      expect(consistency).toBeGreaterThanOrEqual(0);
+      expect(delta).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('delta is in [0, 1] for all modes', () => {
+    const t12local = equalTemperament12(440);
+    const profiles = tuningModeConsistencyEntropyProfiles(t12local);
+    for (const { delta } of profiles) {
+      expect(delta).toBeGreaterThanOrEqual(0);
+      expect(delta).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('returns empty array for tuning with no degrees', () => {
+    const t12local = equalTemperament12(440);
+    const empty = { ...t12local, degrees: [] };
+    const profiles = tuningModeConsistencyEntropyProfiles(empty);
+    expect(profiles).toEqual([]);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const profiles = tuningModeConsistencyEntropyProfiles(t12local, harmonicSpectrum(), 261.63);
+    expect(profiles.length).toBe(t12local.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q380 — tuningTopModesByDelta
+// ---------------------------------------------------------------------------
+
+describe('tuningTopModesByDelta (Q380)', () => {
+  it('returns exactly n entries sorted descending by delta', () => {
+    const t12local = equalTemperament12(440);
+    const top3 = tuningTopModesByDelta(t12local, 3);
+    expect(top3.length).toBe(3);
+    for (let i = 0; i < top3.length - 1; i++) {
+      expect(top3[i]!.delta).toBeGreaterThanOrEqual(top3[i + 1]!.delta);
+    }
+  });
+
+  it('each entry has mode and delta', () => {
+    const t12local = equalTemperament12(440);
+    const top = tuningTopModesByDelta(t12local, 2);
+    for (const { mode, delta } of top) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(delta).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('throws RangeError when n <= 0', () => {
+    const t12local = equalTemperament12(440);
+    expect(() => tuningTopModesByDelta(t12local, 0)).toThrow(RangeError);
+    expect(() => tuningTopModesByDelta(t12local, -1)).toThrow(RangeError);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const top = tuningTopModesByDelta(t12local, 1, harmonicSpectrum(), 261.63);
+    expect(top.length).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q382 — tuningModeDissonanceHistograms
+// ---------------------------------------------------------------------------
+
+describe('tuningModeDissonanceHistograms (Q382)', () => {
+  it('returns one entry per mode', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDissonanceHistograms(t12local);
+    expect(hists.length).toBe(t12local.degrees.length);
+  });
+
+  it('each histogram has length equal to bins (default 10)', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDissonanceHistograms(t12local);
+    for (const { histogram } of hists) {
+      expect(histogram.length).toBe(10);
+    }
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDissonanceHistograms(t12local, 5);
+    for (const { histogram } of hists) {
+      expect(histogram.length).toBe(5);
+    }
+  });
+
+  it('each entry has mode with degreeIndices', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDissonanceHistograms(t12local);
+    for (const { mode } of hists) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
   });
 });

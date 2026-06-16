@@ -6369,6 +6369,188 @@ export function scaleProgressionFullBundle(
 }
 
 // ---------------------------------------------------------------------------
+// Q378 — tuningModeConsistencyEntropyProfiles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get per-mode entropy, consistency, and their normalized delta in one pass.
+ *
+ * Socratic Q378: "If I have entropy and consistency profiles per mode, can I also compute
+ * per-mode delta (|entropy - consistency| normalized) in one pass?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningEntropyProfile(tuning, spectrum, rootHz)` → `{mode, entropy}[]`.
+ * 2. `tuningConsistencyProfile(tuning, spectrum, rootHz)` → `{mode, consistency}[]`.
+ * 3. Normalize both to [0,1] separately. Compute `delta = |normEntropy[i] - normConsistency[i]|` per mode.
+ * 4. Return `{mode, entropy, consistency, delta}[]` in mode order.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{mode, entropy, consistency, delta}[]` in mode order, or `[]` if no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const profiles = tuningModeConsistencyEntropyProfiles(t12);
+ * for (const { mode, entropy, consistency, delta } of profiles) {
+ *   console.log(mode.id, entropy, consistency, delta);
+ * }
+ */
+export function tuningModeConsistencyEntropyProfiles(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { mode: Scale; entropy: number; consistency: number; delta: number }[] {
+  const entropyProfile = tuningEntropyProfile(tuning, spectrum, rootHz);
+  const consistencyProfile = tuningConsistencyProfile(tuning, spectrum, rootHz);
+  if (entropyProfile.length === 0) return [];
+
+  const entropies = entropyProfile.map((e) => e.entropy);
+  const consistencies = consistencyProfile.map((e) => e.consistency);
+
+  const eMin = Math.min(...entropies);
+  const eMax = Math.max(...entropies);
+  const eRange = eMax - eMin;
+
+  const cMin = Math.min(...consistencies);
+  const cMax = Math.max(...consistencies);
+  const cRange = cMax - cMin;
+
+  return entropyProfile.map((ep, i) => {
+    const cp = consistencyProfile[i]!;
+    const normEntropy = eRange === 0 ? 0 : (ep.entropy - eMin) / eRange;
+    const normConsistency = cRange === 0 ? 0 : (cp.consistency - cMin) / cRange;
+    const delta = Math.abs(normEntropy - normConsistency);
+    return { mode: ep.mode, entropy: ep.entropy, consistency: cp.consistency, delta };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q380 — tuningTopModesByDelta
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the top N modes with highest consistency-entropy delta in one call.
+ *
+ * Socratic Q380: "If I have per-mode deltas, can I get the top N modes with highest delta
+ * (most disagreement) in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeConsistencyEntropyProfiles(tuning, spectrum, rootHz)` → profiles.
+ * 2. Sort descending by delta.
+ * 3. Take first n entries as `{mode, delta}`.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param n        - Number of top modes to return.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{mode, delta}` sorted descending by delta, length ≤ n.
+ *
+ * @throws {RangeError} if `n <= 0`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const top3 = tuningTopModesByDelta(t12, 3);
+ * for (const { mode, delta } of top3) {
+ *   console.log(mode.id, delta);
+ * }
+ */
+export function tuningTopModesByDelta(
+  tuning: TuningSystem,
+  n: number,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { mode: Scale; delta: number }[] {
+  if (n <= 0) throw new RangeError('tuningTopModesByDelta: n must be positive');
+  const profiles = tuningModeConsistencyEntropyProfiles(tuning, spectrum, rootHz);
+  return profiles
+    .slice()
+    .sort((a, b) => b.delta - a.delta)
+    .slice(0, n)
+    .map(({ mode, delta }) => ({ mode, delta }));
+}
+
+// ---------------------------------------------------------------------------
+// Q381 — chordMapDissonanceHistogram
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a histogram of normalized dissonance distribution from a chord map.
+ *
+ * Socratic Q381: "If I can normalize dissonance scores from a chord map, can I build a histogram
+ * of dissonance distribution?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapNormalizedScores(chordMap)` → `.map(e => e.normalizedDissonance)`.
+ * 2. `bins` defaults to 10. Histogram is `bins`-length array, all 0.
+ * 3. For each value v (0..1): `idx = Math.min(Math.floor(v * bins), bins - 1)`. Increment histogram[idx].
+ * 4. Return histogram as `number[]`.
+ * If chordMap has no entries, return `Array(bins).fill(0)`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param bins     - Number of histogram bins (default 10).
+ * @returns `number[]` of length `bins` where each value is the count of chords in that dissonance bucket.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const cm = scaleToChordMap(scale, t12);
+ * const hist = chordMapDissonanceHistogram(cm);
+ * console.log(hist); // [count0, count1, ..., count9]
+ */
+export function chordMapDissonanceHistogram(
+  chordMap: readonly ScaleChordMapEntry[],
+  bins = 10,
+): number[] {
+  const histogram = Array.from({ length: bins }, () => 0) as number[];
+  if (chordMap.length === 0) return histogram;
+  const scores = chordMapNormalizedScores(chordMap);
+  for (const { normalizedDissonance } of scores) {
+    const idx = Math.min(Math.floor(normalizedDissonance * bins), bins - 1);
+    histogram[idx] = (histogram[idx] ?? 0) + 1;
+  }
+  return histogram;
+}
+
+// ---------------------------------------------------------------------------
+// Q382 — tuningModeDissonanceHistograms
+// ---------------------------------------------------------------------------
+
+/**
+ * Get dissonance histograms for every mode of a tuning in one call.
+ *
+ * Socratic Q382: "If I can get a dissonance histogram for one chord map, can I get histograms
+ * for every mode of a tuning?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `allModes(tuning)` → all modal rotations.
+ * 2. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapDissonanceHistogram(chordMap, bins)`.
+ *
+ * @param tuning - The tuning system whose modes to process.
+ * @param bins   - Number of histogram bins (default 10).
+ * @returns Array of `{mode, histogram}`, one per mode, in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const hists = tuningModeDissonanceHistograms(t12);
+ * for (const { mode, histogram } of hists) {
+ *   console.log(mode.id, histogram);
+ * }
+ */
+export function tuningModeDissonanceHistograms(
+  tuning: TuningSystem,
+  bins = 10,
+): { mode: Scale; histogram: number[] }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const histogram = chordMapDissonanceHistogram(chordMap, bins);
+    return { mode, histogram };
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Q365 — tuningModeProgressionFullBundles
 // ---------------------------------------------------------------------------
 
