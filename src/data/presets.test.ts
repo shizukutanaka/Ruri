@@ -41,6 +41,8 @@ import {
   presetFamilyAnalysis,
   presetModeProgressionBundles,
   presetFamilyModeRankings,
+  presetFamilyFullBundle,
+  presetScaleModeSpectralRankings,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1037,5 +1039,98 @@ describe('presetFamilyModeRankings (Q341)', () => {
     const result = presetFamilyModeRankings(['12-tet'], 440, undefined, [TWELVE_TET]);
     expect(result.length).toBe(1);
     expect(result[0]!.id).toBe('12-tet');
+  });
+});
+
+describe('presetFamilyFullBundle (Q344)', () => {
+  it('returns one entry per preset id', () => {
+    const result = presetFamilyFullBundle(['12-tet', 'just-5-limit']);
+    expect(result.length).toBe(2);
+    expect(result[0]!.id).toBe('12-tet');
+    expect(result[1]!.id).toBe('just-5-limit');
+  });
+
+  it('fullAnalysis has expected keys', () => {
+    const result = presetFamilyFullBundle(['12-tet']);
+    const { fullAnalysis } = result[0]!;
+    expect(typeof fullAnalysis.reportCard).toBe('string');
+    expect(fullAnalysis).toHaveProperty('tripleMode');
+    expect(typeof fullAnalysis.consistencyEntropyDelta).toBe('number');
+    expect(typeof fullAnalysis.harmonicDensity).toBe('number');
+  });
+
+  it('modeFullBundle is non-empty', () => {
+    const result = presetFamilyFullBundle(['12-tet']);
+    expect(result[0]!.modeFullBundle.length).toBeGreaterThan(0);
+  });
+
+  it('each modeFullBundle entry has required keys', () => {
+    const result = presetFamilyFullBundle(['12-tet']);
+    for (const entry of result[0]!.modeFullBundle) {
+      expect(entry).toHaveProperty('mode');
+      expect(typeof entry.entropy).toBe('number');
+      expect(typeof entry.consistency).toBe('number');
+      expect(typeof entry.volatility).toBe('number');
+      expect(typeof entry.narrative).toBe('string');
+      expect(entry).toHaveProperty('summary');
+    }
+  });
+
+  it('throws for unknown preset id', () => {
+    expect(() => presetFamilyFullBundle(['not-a-preset'])).toThrow(RangeError);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = presetFamilyFullBundle([]);
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const result = presetFamilyFullBundle(['12-tet'], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+  });
+
+  it('accepts optional presets pool', () => {
+    const result = presetFamilyFullBundle(['12-tet'], 440, undefined, [TWELVE_TET]);
+    expect(result.length).toBe(1);
+    expect(result[0]!.id).toBe('12-tet');
+  });
+});
+
+describe('presetScaleModeSpectralRankings (Q347)', () => {
+  it('returns spectralRanking and normalizedScores', () => {
+    const result = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum());
+    expect(Array.isArray(result.spectralRanking)).toBe(true);
+    expect(Array.isArray(result.normalizedScores)).toBe(true);
+  });
+
+  it('spectralRanking is non-empty', () => {
+    const result = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum());
+    expect(result.spectralRanking.length).toBeGreaterThan(0);
+  });
+
+  it('normalizedScores entries have normalizedDissonance and normalizedHarmonicity', () => {
+    const result = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum());
+    for (const score of result.normalizedScores) {
+      expect(score).toHaveProperty('entry');
+      expect(typeof score.normalizedDissonance).toBe('number');
+      expect(typeof score.normalizedHarmonicity).toBe('number');
+    }
+  });
+
+  it('throws for unknown preset id', () => {
+    expect(() => presetScaleModeSpectralRankings('not-a-preset', harmonicSpectrum())).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum(), 261.63);
+    expect(result.spectralRanking.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const result = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum(), 440, [TWELVE_TET]);
+    expect(result.spectralRanking.length).toBeGreaterThan(0);
   });
 });

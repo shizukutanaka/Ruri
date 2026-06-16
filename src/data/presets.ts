@@ -35,7 +35,10 @@ import {
   tuningModeNarratives,
   tuningModeFullBundle,
   tuningModeProgressionBundles,
+  tuningFamilyFullBundle,
+  scaleModeSpectralRankings,
   type Scale,
+  type ScaleChordMapEntry,
   type TuningReportType,
   type ChordMapAnalysisEntry,
   type TuningFamilyReport,
@@ -2179,4 +2182,106 @@ export function presetFamilyModeRankings(
     const tuning = loadTuningPreset(preset);
     return { id, rankings: tuningModeRankingBundle(tuning, spectrum, rootHz) };
   });
+}
+
+// ---------------------------------------------------------------------------
+// Q344 — presetFamilyFullBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get full analysis and mode full bundle for each preset in a list of preset ids in one call.
+ *
+ * Socratic Q344: "If I can get family full bundle for TuningSystems, can I do it for preset ids?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. For each id: find preset in pool; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningFullAnalysis(tuning, rootHz, spectrum)` → full analysis.
+ * 4. `tuningModeFullBundle(tuning, rootHz, spectrum)` → per-mode bundle array.
+ * 5. Return `{id, fullAnalysis, modeFullBundle}`.
+ *
+ * @param presetIds - Array of preset ids to analyse.
+ * @param rootHz    - Root frequency in Hz (default 440).
+ * @param spectrum  - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets   - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ id, fullAnalysis, modeFullBundle }`, one per preset id, in input order.
+ *
+ * @throws {RangeError} if any preset id is not found.
+ *
+ * @example
+ * const result = presetFamilyFullBundle(['12-tet', '19-edo']);
+ * console.log(result[0]!.fullAnalysis.reportCard);
+ * console.log(result[0]!.modeFullBundle[0]!.narrative);
+ */
+export function presetFamilyFullBundle(
+  presetIds: string[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningFamilyFullBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  return presetIds.map((id) => {
+    const preset = pool.find((p) => p.id === id);
+    if (preset === undefined) {
+      throw new RangeError('presetFamilyFullBundle: preset not found: ' + id);
+    }
+    const tuning = loadTuningPreset(preset);
+    return {
+      id,
+      fullAnalysis: tuningFullAnalysis(tuning, rootHz, spectrum),
+      modeFullBundle: tuningModeFullBundle(tuning, rootHz, spectrum),
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q347 — presetScaleModeSpectralRankings
+// ---------------------------------------------------------------------------
+
+/**
+ * Get spectral ranking and normalized scores for a preset's default scale in one call.
+ *
+ * Socratic Q347: "If I can get spectral ranking bundle for a scale, can I do it for a preset's
+ * default scale?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningToScale(tuning)` → default `Scale`.
+ * 4. `scaleModeSpectralRankings(scale, tuning, spectrum, rootHz)` → `{spectralRanking, normalizedScores}`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ spectralRanking, normalizedScores }` for the preset's default scale.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const { spectralRanking, normalizedScores } = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum());
+ * console.log(spectralRanking[0]!.chord.name, normalizedScores[0]!.normalizedDissonance);
+ */
+export function presetScaleModeSpectralRankings(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): {
+  spectralRanking: ScaleChordMapEntry[];
+  normalizedScores: {
+    entry: ScaleChordMapEntry;
+    normalizedDissonance: number;
+    normalizedHarmonicity: number;
+  }[];
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetScaleModeSpectralRankings: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  const scale = tuningToScale(tuning);
+  return scaleModeSpectralRankings(scale, tuning, spectrum, rootHz);
 }
