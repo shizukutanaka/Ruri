@@ -88,6 +88,8 @@ import {
   tuningConsensusNarrative,
   tuningMasterReport,
   tuningModeComprehensiveMetricBundle,
+  tuningModeConsensusClusterBundle,
+  tuningTopClusterConsensusMode,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4502,4 +4504,67 @@ export function presetModeComprehensiveMetricBundle(
   return rootHz !== undefined
     ? tuningModeComprehensiveMetricBundle(tuning, spectrum, rootHz)
     : tuningModeComprehensiveMetricBundle(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q511 — presetModeConsensusClusterBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Join the Borda consensus ranking with the High/Mid/Low cluster label for
+ * each mode of a preset, delegating to {@link tuningModeConsensusClusterBundle}.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array sorted by consensusRank (ascending) with cluster and Borda fields.
+ */
+export function presetModeConsensusClusterBundle(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeConsensusClusterBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeConsensusClusterBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeConsensusClusterBundle(tuning, spectrum, rootHz)
+    : tuningModeConsensusClusterBundle(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q514 — presetTopClusterConsensusMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the top-ranked mode in the 'high' cluster for a preset, delegating to
+ * {@link tuningTopClusterConsensusMode}.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns The entry with the best consensusRank among 'high' cluster modes,
+ *          or the top consensus mode if none qualify.
+ */
+export function presetTopClusterConsensusMode(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningTopClusterConsensusMode> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetTopClusterConsensusMode: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningTopClusterConsensusMode(tuning, spectrum, rootHz)
+    : tuningTopClusterConsensusMode(tuning, spectrum);
 }

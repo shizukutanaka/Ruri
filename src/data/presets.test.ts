@@ -95,6 +95,8 @@ import {
   presetConsensusNarrative,
   presetMasterReport,
   presetModeComprehensiveMetricBundle,
+  presetModeConsensusClusterBundle,
+  presetTopClusterConsensusMode,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2901,5 +2903,48 @@ describe('presetModeComprehensiveMetricBundle (Q508)', () => {
     const spec = harmonicSpectrum(6);
     const result = presetModeComprehensiveMetricBundle('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetModeConsensusClusterBundle (Q511)', () => {
+  it('returns bundle with consensus rank and cluster fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeConsensusClusterBundle('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.cluster).toBe('string');
+    expect(result[0]!.consensusRank).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeConsensusClusterBundle('not-real', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetTopClusterConsensusMode (Q514)', () => {
+  it('returns top cluster consensus mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetTopClusterConsensusMode('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.mode.id).toBe('string');
+    expect(typeof result.meanScore).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetTopClusterConsensusMode('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetTopClusterConsensusMode('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(typeof result.cluster).toBe('string');
   });
 });
