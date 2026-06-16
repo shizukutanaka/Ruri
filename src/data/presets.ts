@@ -25,6 +25,7 @@ import {
   tuningSpectralFit,
   tuningFamilyReport,
   tuningProgressionVariety,
+  chordMapConsistencyScore,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1452,4 +1453,54 @@ export function presetProgressionVariety(
   }
   const tuning = loadTuningPreset(preset);
   return tuningProgressionVariety(tuning);
+}
+
+// ---------------------------------------------------------------------------
+// Q285 — bestPresetConsistency
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the most consistent preset (highest chord-map consistency score) in one call.
+ *
+ * Socratic Q285: "If I can rank presets by volatility and compute consistency for a chord map,
+ * can I find the most consistent preset in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `ps = presets ?? ALL_PRESETS`; throw `RangeError` if empty.
+ * 2. For each preset: `loadTuningPreset(p)` → `TuningSystem`.
+ * 3. `tuningToScale(tuning)` + `scaleToChordMap(scale, tuning)` → chord map.
+ * 4. `chordMapConsistencyScore(chordMap, spectrum, rootHz)` → consistency score.
+ * 5. Return `{ presetId, consistency }` for the maximum score.
+ *
+ * @param spectrum - Optional instrument spectrum for consistency computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ presetId: string; consistency: number }` for the most consistent preset.
+ *
+ * @throws {RangeError} if the preset pool is empty.
+ *
+ * @example
+ * const { presetId, consistency } = bestPresetConsistency();
+ * // presetId is the preset whose chord map has the most uniform harmonic character
+ */
+export function bestPresetConsistency(
+  spectrum?: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): { presetId: string; consistency: number } {
+  const ps = presets ?? ALL_PRESETS;
+  if (ps.length === 0) throw new RangeError('bestPresetConsistency: no presets');
+  let bestId = (ps[0] as TuningPreset).id;
+  let bestScore = -Infinity;
+  for (const p of ps) {
+    const tuning = loadTuningPreset(p);
+    const scale = tuningToScale(tuning);
+    const chordMap = scaleToChordMap(scale, tuning);
+    const consistency = chordMapConsistencyScore(chordMap, spectrum, rootHz);
+    if (consistency > bestScore) {
+      bestScore = consistency;
+      bestId = p.id;
+    }
+  }
+  return { presetId: bestId, consistency: bestScore };
 }

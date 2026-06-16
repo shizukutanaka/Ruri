@@ -25,6 +25,7 @@ import {
   presetSpectralFitRanking,
   presetFamilyReport,
   presetProgressionVariety,
+  bestPresetConsistency,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -572,5 +573,15 @@ describe('presetProgressionVariety (Q280)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetProgressionVariety('nonexistent')).toThrow(RangeError);
+  });
+});
+
+describe('bestPresetConsistency (Q285)', () => {
+  it('returns a preset id and consistency score', () => {
+    const { presetId, consistency } = bestPresetConsistency();
+    expect(typeof presetId).toBe('string');
+    expect(presetId.length).toBeGreaterThan(0);
+    expect(consistency).toBeGreaterThan(0);
+    expect(consistency).toBeLessThanOrEqual(1);
   });
 });
