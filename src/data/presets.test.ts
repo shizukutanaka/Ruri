@@ -45,6 +45,8 @@ import {
   presetScaleModeSpectralRankings,
   presetModeChordMapBundles,
   presetBestModeChordMapNarrative,
+  presetModeNarrativeCompare,
+  presetModeBestProgressionNarratives,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1220,5 +1222,73 @@ describe('presetBestModeChordMapNarrative (Q353)', () => {
       TWELVE_TET,
     ]);
     expect(result.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q355 — presetModeNarrativeCompare
+// ---------------------------------------------------------------------------
+
+describe('presetModeNarrativeCompare (Q355)', () => {
+  it('returns best modes for all three metrics and allSameMode flag', () => {
+    const cmp = presetModeNarrativeCompare('12-tet');
+    expect(cmp.bestEntropy.mode).toHaveProperty('degreeIndices');
+    expect(cmp.bestConsistency.mode).toHaveProperty('degreeIndices');
+    expect(cmp.bestVolatility.mode).toHaveProperty('degreeIndices');
+    expect(typeof cmp.allSameMode).toBe('boolean');
+  });
+
+  it('all three best modes have narrative strings', () => {
+    const cmp = presetModeNarrativeCompare('12-tet');
+    expect(typeof cmp.bestEntropy.narrative).toBe('string');
+    expect(cmp.bestEntropy.narrative.length).toBeGreaterThan(0);
+    expect(typeof cmp.bestConsistency.narrative).toBe('string');
+    expect(typeof cmp.bestVolatility.narrative).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeNarrativeCompare('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const cmp = presetModeNarrativeCompare('12-tet', 261.63, harmonicSpectrum());
+    expect(typeof cmp.allSameMode).toBe('boolean');
+  });
+
+  it('accepts optional presets pool', () => {
+    const cmp = presetModeNarrativeCompare('12-tet', 440, undefined, [TWELVE_TET]);
+    expect(cmp.bestEntropy.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q359 — presetModeBestProgressionNarratives
+// ---------------------------------------------------------------------------
+
+describe('presetModeBestProgressionNarratives (Q359)', () => {
+  it('returns one entry per mode with mode, narrative, smoothnessRatio', () => {
+    const results = presetModeBestProgressionNarratives('12-tet');
+    expect(results.length).toBeGreaterThan(0);
+    const first = results[0]!;
+    expect(first.mode).toHaveProperty('degreeIndices');
+    expect(typeof first.narrative).toBe('string');
+    expect(first.narrative.length).toBeGreaterThan(0);
+    expect(first.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeBestProgressionNarratives('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const results = presetModeBestProgressionNarratives('12-tet', 261.63, harmonicSpectrum());
+    expect(results.length).toBeGreaterThan(0);
+    expect(typeof results[0]!.narrative).toBe('string');
+  });
+
+  it('accepts optional presets pool', () => {
+    const results = presetModeBestProgressionNarratives('12-tet', 440, undefined, [TWELVE_TET]);
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]!.mode).toHaveProperty('degreeIndices');
   });
 });

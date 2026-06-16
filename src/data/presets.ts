@@ -39,6 +39,8 @@ import {
   scaleModeSpectralRankings,
   tuningModeChordMapBundles,
   tuningBestModeChordMapNarrative,
+  tuningModeNarrativeCompare,
+  tuningModeBestProgressionNarratives,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2374,4 +2376,90 @@ export function presetBestModeChordMapNarrative(
   }
   const tuning = loadTuningPreset(preset);
   return tuningBestModeChordMapNarrative(tuning, metric, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q355 — presetModeNarrativeCompare
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare the best mode chord map narrative for all three metrics for a preset in one call.
+ *
+ * Socratic Q355: "If I can compare best mode narratives for a tuning, can I do it for a preset
+ * by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeNarrativeCompare(tuning, rootHz, spectrum)` → comparison bundle.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ bestEntropy, bestConsistency, bestVolatility, allSameMode }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const cmp = presetModeNarrativeCompare('12-tet');
+ * console.log(cmp.allSameMode, cmp.bestEntropy.mode.id);
+ */
+export function presetModeNarrativeCompare(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeNarrativeCompare> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeNarrativeCompare: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeNarrativeCompare(tuning, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q359 — presetModeBestProgressionNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the smoothed best progression narrative for every mode of a preset tuning in one call.
+ *
+ * Socratic Q359: "If I can get best progression narratives for all modes of a tuning, can I do
+ * it for a preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeBestProgressionNarratives(tuning, rootHz, spectrum)` → per-mode results.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode, narrative, smoothnessRatio }` in allModes order.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const results = presetModeBestProgressionNarratives('12-tet');
+ * for (const { mode, narrative, smoothnessRatio } of results) {
+ *   console.log(mode.id, smoothnessRatio, narrative);
+ * }
+ */
+export function presetModeBestProgressionNarratives(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeBestProgressionNarratives> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeBestProgressionNarratives: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeBestProgressionNarratives(tuning, rootHz, spectrum);
 }
