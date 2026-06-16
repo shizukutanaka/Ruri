@@ -267,6 +267,10 @@ import {
   tuningFamilyModeAllQuadrantsNarratives,
   tuningModeQuadrantConsensus,
   tuningFamilyModeQuadrantConsensus,
+  tuningBestQuadrantConsensusMode,
+  tuningFamilyBestQuadrantConsensusModes,
+  tuningModeConsensusNarrative,
+  tuningFamilyModeConsensusNarratives,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10175,6 +10179,102 @@ describe('tuningFamilyModeQuadrantConsensus (Q551)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.quadrantConsensus.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q552 — tuningBestQuadrantConsensusMode
+// ---------------------------------------------------------------------------
+
+describe('tuningBestQuadrantConsensusMode (Q552)', () => {
+  it('returns a single mode entry with consensus field', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestQuadrantConsensusMode(t12, spec);
+    expect(typeof result.consensus).toBe('string');
+    const valid = ['versatile', 'specialized', 'balanced'];
+    expect(valid).toContain(result.consensus);
+  });
+
+  it('result is present in tuningModeQuadrantConsensus output', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestQuadrantConsensusMode(t12, spec);
+    const all = tuningModeQuadrantConsensus(t12, spec);
+    const match = all.find((e) => e.mode.id === result.mode.id);
+    expect(match).toBeDefined();
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestQuadrantConsensusMode(t12, spec, 261.63);
+    expect(typeof result.mode.id).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q554 — tuningFamilyBestQuadrantConsensusModes
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyBestQuadrantConsensusModes (Q554)', () => {
+  it('returns one entry per tuning with id and bestMode', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyBestQuadrantConsensusModes([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.bestMode.consensus).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q555 — tuningModeConsensusNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningModeConsensusNarrative (Q555)', () => {
+  it('returns one entry per mode with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusNarrative(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.narrative).toBe('string');
+      expect(entry.narrative.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('narrative contains the dominant token', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusNarrative(t12, spec);
+    const entry = result[0]!;
+    expect(entry.narrative).toContain(entry.dominantToken);
+  });
+
+  it('narrative contains the consensus label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusNarrative(t12, spec);
+    const entry = result[0]!;
+    expect(entry.narrative).toContain(entry.consensus);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusNarrative(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q557 — tuningFamilyModeConsensusNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeConsensusNarratives (Q557)', () => {
+  it('returns one entry per tuning with id and consensusNarratives', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeConsensusNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.consensusNarratives.length).toBeGreaterThan(0);
     }
   });
 });

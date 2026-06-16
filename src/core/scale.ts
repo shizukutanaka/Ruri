@@ -11539,3 +11539,88 @@ export function tuningFamilyModeQuadrantConsensus(
     quadrantConsensus: tuningModeQuadrantConsensus(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q552 — tuningBestQuadrantConsensusMode
+// ---------------------------------------------------------------------------
+
+export function tuningBestQuadrantConsensusMode(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  quadrantVotes: Record<string, number>;
+  dominantToken: string;
+  consensus: 'versatile' | 'specialized' | 'balanced';
+} {
+  const results = tuningModeQuadrantConsensus(tuning, spectrum, rootHz);
+  if (results.length === 0) throw new RangeError('No modes in tuning');
+  const positiveWords = new Set(['rich', 'complex', 'stable', 'consistent', 'fluid', 'diverse']);
+  const posScore = (e: (typeof results)[number]): number =>
+    Object.entries(e.quadrantVotes)
+      .filter(([t]) => positiveWords.has(t))
+      .reduce((s, [, c]) => s + c, 0);
+  const best = (arr: typeof results): (typeof results)[number] =>
+    arr.reduce((b, e) => (posScore(e) >= posScore(b) ? e : b), arr[0]!);
+  const versatile = results.filter((e) => e.consensus === 'versatile');
+  if (versatile.length > 0) return best(versatile);
+  const balanced = results.filter((e) => e.consensus === 'balanced');
+  if (balanced.length > 0) return best(balanced);
+  return best(results);
+}
+
+// ---------------------------------------------------------------------------
+// Q554 — tuningFamilyBestQuadrantConsensusModes
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyBestQuadrantConsensusModes(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; bestMode: ReturnType<typeof tuningBestQuadrantConsensusMode> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    bestMode: tuningBestQuadrantConsensusMode(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q555 — tuningModeConsensusNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningModeConsensusNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  quadrantVotes: Record<string, number>;
+  dominantToken: string;
+  consensus: 'versatile' | 'specialized' | 'balanced';
+  narrative: string;
+}[] {
+  return tuningModeQuadrantConsensus(tuning, spectrum, rootHz).map((entry) => {
+    const { mode, quadrantVotes, dominantToken, consensus } = entry;
+    const dominantCount = quadrantVotes[dominantToken] ?? 0;
+    const narrative =
+      `"${mode.name}" reads as ${consensus}: dominant token "${dominantToken}" appears ` +
+      `${dominantCount} time${dominantCount !== 1 ? 's' : ''} across 8 quadrant dimension tokens.`;
+    return { ...entry, narrative };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q557 — tuningFamilyModeConsensusNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeConsensusNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; consensusNarratives: ReturnType<typeof tuningModeConsensusNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    consensusNarratives: tuningModeConsensusNarrative(t, spectrum, rootHz),
+  }));
+}
