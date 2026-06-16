@@ -110,6 +110,10 @@ import {
   chordMapEntropyScore,
   tuningEntropyProfile,
   bestModeByEntropy,
+  tuningConsistencyEntropyDelta,
+  chordMapRankedBundle,
+  bestModeByConsistency,
+  tuningDualBestModes,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4767,5 +4771,106 @@ describe('bestModeByEntropy (Q295)', () => {
   it('throws for empty tuning', () => {
     const empty: typeof t12 = { ...t12, degrees: [] };
     expect(() => bestModeByEntropy(empty)).toThrow(RangeError);
+  });
+});
+
+describe('tuningConsistencyEntropyDelta (Q300)', () => {
+  it('returns a number in [0, 1]', () => {
+    const delta = tuningConsistencyEntropyDelta(t12);
+    expect(delta).toBeGreaterThanOrEqual(0);
+    expect(delta).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(delta)).toBe(true);
+  });
+  it('returns 0 for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(tuningConsistencyEntropyDelta(empty)).toBe(0);
+  });
+  it('returns 0 for single-degree tuning', () => {
+    const single: typeof t12 = { ...t12, degrees: [t12.degrees[0]!] };
+    expect(tuningConsistencyEntropyDelta(single)).toBe(0);
+  });
+  it('accepts optional rootHz and spectrum', () => {
+    const delta = tuningConsistencyEntropyDelta(t12, harmonicSpectrum(), 261.63);
+    expect(Number.isFinite(delta)).toBe(true);
+  });
+});
+
+describe('chordMapRankedBundle (Q302)', () => {
+  const scale: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const chordMap = scaleToChordMap(scale, t12);
+  const spectrum = harmonicSpectrum();
+
+  it('returns spectralRanking, normalizedScores, entropy, consistency', () => {
+    const bundle = chordMapRankedBundle(chordMap, spectrum);
+    expect(Array.isArray(bundle.spectralRanking)).toBe(true);
+    expect(Array.isArray(bundle.normalizedScores)).toBe(true);
+    expect(typeof bundle.entropy).toBe('number');
+    expect(typeof bundle.consistency).toBe('number');
+  });
+  it('spectralRanking has same length as chord map', () => {
+    const bundle = chordMapRankedBundle(chordMap, spectrum);
+    expect(bundle.spectralRanking).toHaveLength(chordMap.length);
+  });
+  it('entropy is non-negative', () => {
+    const bundle = chordMapRankedBundle(chordMap, spectrum);
+    expect(bundle.entropy).toBeGreaterThanOrEqual(0);
+  });
+  it('consistency is in (0, 1]', () => {
+    const bundle = chordMapRankedBundle(chordMap, spectrum);
+    expect(bundle.consistency).toBeGreaterThan(0);
+    expect(bundle.consistency).toBeLessThanOrEqual(1);
+  });
+  it('returns empty spectralRanking and zero scores for empty chord map', () => {
+    const bundle = chordMapRankedBundle([], spectrum);
+    expect(bundle.spectralRanking).toEqual([]);
+    expect(bundle.normalizedScores).toEqual([]);
+    expect(bundle.entropy).toBe(0);
+  });
+});
+
+describe('bestModeByConsistency (Q304)', () => {
+  it('returns a Scale', () => {
+    const mode = bestModeByConsistency(t12);
+    expect(mode).toHaveProperty('degreeIndices');
+  });
+  it('has consistency >= all other modes', () => {
+    const mode = bestModeByConsistency(t12);
+    const profile = tuningConsistencyProfile(t12);
+    const best = Math.max(...profile.map((e) => e.consistency));
+    const chordMap = scaleToChordMap(mode, t12);
+    const consistency = chordMapConsistencyScore(chordMap);
+    expect(consistency).toBeCloseTo(best, 10);
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => bestModeByConsistency(empty)).toThrow(RangeError);
+  });
+});
+
+describe('tuningDualBestModes (Q305)', () => {
+  it('returns byEntropy, byConsistency, sameMode', () => {
+    const result = tuningDualBestModes(t12);
+    expect(result).toHaveProperty('byEntropy');
+    expect(result).toHaveProperty('byConsistency');
+    expect(typeof result.sameMode).toBe('boolean');
+  });
+  it('byEntropy and byConsistency are Scales', () => {
+    const result = tuningDualBestModes(t12);
+    expect(result.byEntropy).toHaveProperty('degreeIndices');
+    expect(result.byConsistency).toHaveProperty('degreeIndices');
+  });
+  it('sameMode is true when ids match', () => {
+    const result = tuningDualBestModes(t12);
+    const expectedSame = result.byEntropy.id === result.byConsistency.id;
+    expect(result.sameMode).toBe(expectedSame);
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => tuningDualBestModes(empty)).toThrow(RangeError);
   });
 });

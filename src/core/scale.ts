@@ -4676,3 +4676,184 @@ export function bestModeByEntropy(tuning: TuningSystem, spectrum?: Spectrum, roo
   }
   return best.mode;
 }
+
+// ---------------------------------------------------------------------------
+// Q300 — tuningConsistencyEntropyDelta
+// ---------------------------------------------------------------------------
+
+/**
+ * Measure how much consistency and entropy rankings disagree across a tuning's modes.
+ *
+ * Socratic Q300: "If I have consistency and entropy profiles for each mode, can I measure
+ * how much they disagree in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningConsistencyProfile(tuning, spectrum, rootHz)` → `{mode, consistency}[]`.
+ * 2. `tuningEntropyProfile(tuning, spectrum, rootHz)` → `{mode, entropy}[]`.
+ * 3. Pair by mode index (same order — both from `allModes(tuning)`).
+ * 4. Normalize each array to [0, 1].
+ * 5. Return mean absolute difference: `sum(|normC[i] - normE[i]|) / n`.
+ *
+ * High delta means modes that are consistent are NOT necessarily diverse.
+ * Returns 0 if tuning has 0 or 1 modes.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Optional instrument spectrum for computation.
+ * @param rootHz   - Root frequency in Hz.
+ * @returns Mean absolute difference in [0, 1].
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const delta = tuningConsistencyEntropyDelta(t12);
+ * // delta ∈ [0, 1]; 0 means profiles agree perfectly
+ */
+export function tuningConsistencyEntropyDelta(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): number {
+  const consistencyProfile = tuningConsistencyProfile(tuning, spectrum, rootHz);
+  const n = consistencyProfile.length;
+  if (n <= 1) return 0;
+  const entropyProfile = tuningEntropyProfile(tuning, spectrum, rootHz ?? 440);
+  const cVals = consistencyProfile.map((e) => e.consistency);
+  const eVals = entropyProfile.map((e) => e.entropy);
+  const normalize = (arr: number[]): number[] => {
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    const range = max - min || 1;
+    return arr.map((v) => (v - min) / range);
+  };
+  const normC = normalize(cVals);
+  const normE = normalize(eVals);
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += Math.abs(normC[i]! - normE[i]!);
+  }
+  return sum / n;
+}
+
+// ---------------------------------------------------------------------------
+// Q302 — chordMapRankedBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get spectral ranking, normalized scores, entropy, and consistency for a chord map in one call.
+ *
+ * Socratic Q302: "If I can get spectral ranking, normalized scores, entropy, and consistency
+ * separately, can I get them all at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapSpectralRanking(chordMap, spectrum, rootHz)` → ranked entries.
+ * 2. `chordMapNormalizedScores(chordMap, spectrum, rootHz)` → normalized scores.
+ * 3. `chordMapEntropyScore(chordMap, spectrum, rootHz)` → entropy.
+ * 4. `chordMapConsistencyScore(chordMap, spectrum, rootHz)` → consistency.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @returns `{ spectralRanking, normalizedScores, entropy, consistency }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const bundle = chordMapRankedBundle(chordMap, harmonicSpectrum());
+ * // bundle.spectralRanking[0] is most spectrally fit chord
+ */
+export function chordMapRankedBundle(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  spectralRanking: ScaleChordMapEntry[];
+  normalizedScores: {
+    entry: ScaleChordMapEntry;
+    normalizedDissonance: number;
+    normalizedHarmonicity: number;
+  }[];
+  entropy: number;
+  consistency: number;
+} {
+  const spectralRanking = chordMapSpectralRanking(chordMap, spectrum, rootHz);
+  const normalizedScores = chordMapNormalizedScores(chordMap, spectrum, rootHz);
+  const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
+  const consistency = chordMapConsistencyScore(chordMap, spectrum, rootHz);
+  return { spectralRanking, normalizedScores, entropy, consistency };
+}
+
+// ---------------------------------------------------------------------------
+// Q304 — bestModeByConsistency
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the mode of `tuning` with the highest chord-map consistency score.
+ *
+ * Socratic Q304: "If I can find the best mode by entropy, can I also find the best mode
+ * by consistency in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningConsistencyProfile(tuning, spectrum, rootHz)` → `{mode, consistency}[]`.
+ * 2. Return the entry with the maximum consistency value.
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Optional instrument spectrum.
+ * @param rootHz   - Root frequency in Hz.
+ * @returns The `Scale` with the maximum consistency score.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const mode = bestModeByConsistency(t12);
+ * // mode is the most internally consistent modal rotation
+ */
+export function bestModeByConsistency(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): Scale {
+  const profile = tuningConsistencyProfile(tuning, spectrum, rootHz);
+  if (profile.length === 0) throw new RangeError('bestModeByConsistency: tuning has no modes');
+  let best = profile[0]!;
+  for (const entry of profile) {
+    if (entry.consistency > best.consistency) best = entry;
+  }
+  return best.mode;
+}
+
+// ---------------------------------------------------------------------------
+// Q305 — tuningDualBestModes
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the best mode by entropy and by consistency, then compare them in one call.
+ *
+ * Socratic Q305: "If I can find the best mode by entropy and the best mode by consistency,
+ * can I compare them in one call to see if they agree?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `bestModeByEntropy(tuning, spectrum, rootHz)` → byEntropy.
+ * 2. `bestModeByConsistency(tuning, spectrum, rootHz)` → byConsistency.
+ * 3. `sameMode` = true when both modes have the same `id`.
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Optional instrument spectrum.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{ byEntropy: Scale, byConsistency: Scale, sameMode: boolean }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { byEntropy, byConsistency, sameMode } = tuningDualBestModes(t12);
+ * // sameMode === true means the most diverse and most consistent modes coincide
+ */
+export function tuningDualBestModes(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { byEntropy: Scale; byConsistency: Scale; sameMode: boolean } {
+  const byEntropy = bestModeByEntropy(tuning, spectrum, rootHz);
+  const byConsistency = bestModeByConsistency(tuning, spectrum, rootHz);
+  const sameMode = byEntropy.id === byConsistency.id;
+  return { byEntropy, byConsistency, sameMode };
+}
