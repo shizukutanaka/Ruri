@@ -126,6 +126,10 @@ import {
   tuningFamilyFullReport,
   tuningModeNarratives,
   bestModeNarrative,
+  tuningModeSummaries,
+  tuningModeFullBundle,
+  tuningFamilyNarratives,
+  tuningFamilyModeRankings,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5226,5 +5230,142 @@ describe('bestModeNarrative (Q325)', () => {
     const result = bestModeNarrative(t12, 'entropy', 261.63, harmonicSpectrum());
     expect(result.mode).toHaveProperty('degreeIndices');
     expect(typeof result.narrative).toBe('string');
+  });
+});
+
+describe('tuningModeSummaries (Q330)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns one summary per mode', () => {
+    const summaries = tuningModeSummaries(t12);
+    expect(summaries.length).toBe(t12.degrees.length);
+    for (const { mode, summary } of summaries) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(summary).toHaveProperty('count');
+    }
+  });
+
+  it('count is non-negative for every mode', () => {
+    const summaries = tuningModeSummaries(t12);
+    for (const { summary } of summaries) {
+      expect(summary.count).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const summaries = tuningModeSummaries(t12, 261.63, harmonicSpectrum());
+    expect(summaries.length).toBe(t12.degrees.length);
+    expect(summaries[0]!.summary).toHaveProperty('count');
+  });
+});
+
+describe('tuningModeFullBundle (Q331)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns per-mode bundle with all metrics', () => {
+    const bundle = tuningModeFullBundle(t12);
+    expect(bundle.length).toBe(t12.degrees.length);
+    const first = bundle[0]!;
+    expect(typeof first.entropy).toBe('number');
+    expect(typeof first.consistency).toBe('number');
+    expect(typeof first.volatility).toBe('number');
+    expect(typeof first.narrative).toBe('string');
+    expect(first.summary).toHaveProperty('count');
+  });
+
+  it('mode has degreeIndices on every entry', () => {
+    const bundle = tuningModeFullBundle(t12);
+    for (const { mode } of bundle) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+
+  it('narrative is non-empty for every mode', () => {
+    const bundle = tuningModeFullBundle(t12);
+    for (const { narrative } of bundle) {
+      expect(narrative.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = tuningModeFullBundle(t12, 261.63, harmonicSpectrum());
+    expect(bundle.length).toBe(t12.degrees.length);
+    expect(typeof bundle[0]!.entropy).toBe('number');
+  });
+});
+
+describe('tuningFamilyNarratives (Q333)', () => {
+  const t12 = equalTemperament12(440);
+  const t19 = edo(19);
+
+  it('returns one entry per tuning', () => {
+    const result = tuningFamilyNarratives([t12, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('id matches tuning id', () => {
+    const result = tuningFamilyNarratives([t12, t19]);
+    expect(result[0]!.id).toBe(t12.id);
+    expect(result[1]!.id).toBe(t19.id);
+  });
+
+  it('bestModeNarrative is a non-empty string', () => {
+    const result = tuningFamilyNarratives([t12]);
+    expect(typeof result[0]!.bestModeNarrative).toBe('string');
+    expect(result[0]!.bestModeNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const result = tuningFamilyNarratives([t12], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+    expect(typeof result[0]!.bestModeNarrative).toBe('string');
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyNarratives([]);
+    expect(result).toEqual([]);
+  });
+});
+
+describe('tuningFamilyModeRankings (Q334)', () => {
+  const t12 = equalTemperament12(440);
+  const t19 = edo(19);
+
+  it('returns one entry per tuning', () => {
+    const result = tuningFamilyModeRankings([t12, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('id matches tuning id', () => {
+    const result = tuningFamilyModeRankings([t12, t19]);
+    expect(result[0]!.id).toBe(t12.id);
+    expect(result[1]!.id).toBe(t19.id);
+  });
+
+  it('rankings has byEntropy, byConsistency, byVolatility', () => {
+    const result = tuningFamilyModeRankings([t12]);
+    const { rankings } = result[0]!;
+    expect(Array.isArray(rankings.byEntropy)).toBe(true);
+    expect(Array.isArray(rankings.byConsistency)).toBe(true);
+    expect(Array.isArray(rankings.byVolatility)).toBe(true);
+  });
+
+  it('each ranking array has one Scale per mode', () => {
+    const result = tuningFamilyModeRankings([t12]);
+    const { rankings } = result[0]!;
+    expect(rankings.byEntropy.length).toBe(t12.degrees.length);
+    expect(rankings.byConsistency.length).toBe(t12.degrees.length);
+    expect(rankings.byVolatility.length).toBe(t12.degrees.length);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const result = tuningFamilyModeRankings([t12], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+    expect(result[0]!.rankings.byEntropy.length).toBeGreaterThan(0);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyModeRankings([]);
+    expect(result).toEqual([]);
   });
 });

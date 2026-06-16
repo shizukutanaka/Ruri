@@ -5355,3 +5355,172 @@ export function tuningFamilyFullReport(
   }));
   return { familyReport, perTuningAnalysis };
 }
+
+// ---------------------------------------------------------------------------
+// Q330 — tuningModeSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a chord map summary for every mode of a tuning in one call.
+ *
+ * Socratic Q330: "If I can get a chord map summary for one scale, can I get it for every
+ * mode of a tuning at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 3. For each mode: `scaleToChordMapSummary(mode, tuning, spectrum)` → summary.
+ *
+ * @param tuning   - The tuning system whose modes to summarize.
+ * @param rootHz   - Root frequency in Hz (default 440, unused here but kept for API consistency).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @returns Array of `{ mode, summary }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const summaries = tuningModeSummaries(t12);
+ * for (const { mode, summary } of summaries) {
+ *   console.log(mode.id, summary.count, summary.meanDissonance);
+ * }
+ */
+export function tuningModeSummaries(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; summary: ReturnType<typeof scaleToChordMapSummary> }[] {
+  void rootHz; // kept for API symmetry with sibling functions
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => ({
+    mode,
+    summary: scaleToChordMapSummary(mode, tuning, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q331 — tuningModeFullBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get entropy, consistency, volatility, narrative, and chord-map summary for every mode of a
+ * tuning in one call.
+ *
+ * Socratic Q331: "If I can get mode comparison, narratives, and summaries separately, can I get
+ * all of them together per mode?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComparison(tuning, spectrum, rootHz)` → `{mode, entropy, consistency, volatility}[]`.
+ * 2. `tuningModeNarratives(tuning, rootHz, spectrum)` → `{mode, narrative}[]`.
+ * 3. `tuningModeSummaries(tuning, rootHz, spectrum)` → `{mode, summary}[]`.
+ * 4. Zip the three arrays by index (all iterate modes in the same `scaleModeSeries` order).
+ *
+ * @param tuning   - The tuning system whose modes to bundle.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @returns Array of `{ mode, entropy, consistency, volatility, narrative, summary }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundle = tuningModeFullBundle(t12);
+ * const first = bundle[0]!;
+ * console.log(first.mode.id, first.entropy, first.narrative);
+ */
+export function tuningModeFullBundle(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  narrative: string;
+  summary: ReturnType<typeof scaleToChordMapSummary>;
+}[] {
+  const comparison = tuningModeComparison(tuning, spectrum, rootHz);
+  const narratives = tuningModeNarratives(tuning, rootHz, spectrum);
+  const summaries = tuningModeSummaries(tuning, rootHz, spectrum);
+  return comparison.map((c, i) => ({
+    mode: c.mode,
+    entropy: c.entropy,
+    consistency: c.consistency,
+    volatility: c.volatility,
+    narrative: narratives[i]!.narrative,
+    summary: summaries[i]!.summary,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q333 — tuningFamilyNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the best-mode narrative for every tuning in a family in one call.
+ *
+ * Socratic Q333: "If I can get best mode narrative for one tuning and iterate a family, can I get
+ * narratives for all tunings in a family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `bestModeNarrative(tuning, 'entropy', rootHz, spectrum)` → `{mode, narrative}`.
+ * 2. Return `{id: tuning.id, bestModeNarrative: narrative}`.
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ id, bestModeNarrative }`, one per tuning.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const narratives = tuningFamilyNarratives([t12, t19]);
+ * console.log(narratives[0]!.id, narratives[0]!.bestModeNarrative);
+ */
+export function tuningFamilyNarratives(
+  tunings: TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { id: string; bestModeNarrative: string }[] {
+  return tunings.map((tuning) => {
+    const { narrative } = bestModeNarrative(tuning, 'entropy', rootHz, spectrum);
+    return { id: tuning.id, bestModeNarrative: narrative };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q334 — tuningFamilyModeRankings
+// ---------------------------------------------------------------------------
+
+/**
+ * Get mode rankings by all three metrics for every tuning in a family in one call.
+ *
+ * Socratic Q334: "If I can get mode ranking bundle for one tuning and iterate a family, can I get
+ * all rankings for a whole family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `tuningModeRankingBundle(tuning, spectrum, rootHz)` → `{byEntropy, byConsistency, byVolatility}`.
+ * 2. Return `{id: tuning.id, rankings: ...}`.
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @returns Array of `{ id, rankings }` where `rankings` has `byEntropy`, `byConsistency`, `byVolatility`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilyModeRankings([t12, t19]);
+ * console.log(result[0]!.rankings.byEntropy[0]!.id);
+ */
+export function tuningFamilyModeRankings(
+  tunings: TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  id: string;
+  rankings: { byEntropy: Scale[]; byConsistency: Scale[]; byVolatility: Scale[] };
+}[] {
+  return tunings.map((tuning) => ({
+    id: tuning.id,
+    rankings: tuningModeRankingBundle(tuning, spectrum, rootHz),
+  }));
+}
