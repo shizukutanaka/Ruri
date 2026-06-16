@@ -20,6 +20,7 @@ import {
   chordMapToFullBundle,
   scaleConsistencyBundle,
   scaleEntropyBundle,
+  scaleRankedBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -862,5 +863,42 @@ describe('scaleEntropyBundle (Q297)', () => {
     const bundle = scaleEntropyBundle(fullScale, t12);
     expect(typeof bundle.scl).toBe('string');
     expect(bundle.entropy).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('scaleRankedBundle (Q303)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns scl, spectralRanking, normalizedScores, entropy, consistency', () => {
+    const bundle = scaleRankedBundle(scale, t12, harmonicSpectrum());
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.scl).toContain('!');
+    expect(Array.isArray(bundle.spectralRanking)).toBe(true);
+    expect(Array.isArray(bundle.normalizedScores)).toBe(true);
+    expect(typeof bundle.entropy).toBe('number');
+    expect(typeof bundle.consistency).toBe('number');
+  });
+  it('spectralRanking has same length as chord map entries', () => {
+    const bundle = scaleRankedBundle(scale, t12, harmonicSpectrum());
+    expect(bundle.spectralRanking.length).toBeGreaterThan(0);
+  });
+  it('entropy is non-negative', () => {
+    const bundle = scaleRankedBundle(scale, t12, harmonicSpectrum());
+    expect(bundle.entropy).toBeGreaterThanOrEqual(0);
+  });
+  it('consistency is in (0, 1]', () => {
+    const bundle = scaleRankedBundle(scale, t12, harmonicSpectrum());
+    expect(bundle.consistency).toBeGreaterThan(0);
+    expect(bundle.consistency).toBeLessThanOrEqual(1);
+  });
+  it('works with optional rootHz and name', () => {
+    const bundle = scaleRankedBundle(scale, t12, harmonicSpectrum(), 261.63, 'Test Scale');
+    expect(bundle.scl).toContain('Test Scale');
   });
 });

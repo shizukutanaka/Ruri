@@ -16,6 +16,7 @@ import {
   chordMapConsistencyScore,
   chordMapNormalizedScores,
   chordMapEntropyScore,
+  chordMapRankedBundle,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -704,4 +705,62 @@ export function scaleEntropyBundle(
   const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
   const normalizedScores = chordMapNormalizedScores(chordMap, spectrum, rootHz);
   return { scl, entropy, normalizedScores };
+}
+
+// ---------------------------------------------------------------------------
+// Q303 — scaleRankedBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Export a scale as SCL text bundled with its full ranked bundle (spectral ranking,
+ * normalized scores, entropy, consistency) in one call.
+ *
+ * Socratic Q303: "If I can get a ranked bundle for a chord map, can I get it plus
+ * SCL export for a scale?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → diatonic chord map.
+ * 2. `scaleToSubsetSclText(scale, tuning, name)` → `.scl` text string.
+ * 3. `chordMapRankedBundle(chordMap, spectrum, rootHz)` → `{ spectralRanking, normalizedScores, entropy, consistency }`.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, spectralRanking, normalizedScores, entropy, consistency }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const bundle = scaleRankedBundle(major, t12, harmonicSpectrum());
+ * // bundle.scl contains '!'; bundle.spectralRanking[0] is most spectrally fit chord
+ */
+export function scaleRankedBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+  name?: string,
+): {
+  scl: string;
+  spectralRanking: ScaleChordMapEntry[];
+  normalizedScores: {
+    entry: ScaleChordMapEntry;
+    normalizedDissonance: number;
+    normalizedHarmonicity: number;
+  }[];
+  entropy: number;
+  consistency: number;
+} {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const scl = scaleToSubsetSclText(scale, tuning, name);
+  const { spectralRanking, normalizedScores, entropy, consistency } = chordMapRankedBundle(
+    chordMap,
+    spectrum,
+    rootHz,
+  );
+  return { scl, spectralRanking, normalizedScores, entropy, consistency };
 }
