@@ -3527,3 +3527,87 @@ export function scaleSimilarityMatrix(
   }
   return matrix;
 }
+
+/**
+ * Return the chord from a progression whose dissonance is closest to the centroid
+ * (mean) of the progression's energy arc, in one call.
+ *
+ * Socratic Q249: "If I have a progression's energy arc (one number per chord), can I
+ * get the chord whose dissonance is closest to the centroid of the arc in one call?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. `progressionEnergyArc(chords, rootHz, spectrum)` → dissonance values per chord.
+ * 2. Centroid = mean of the arc values.
+ * 3. Return the chord whose arc value is closest (minimum absolute distance) to centroid.
+ *
+ * @param chords   - Ordered list of chords (must be non-empty).
+ * @param rootHz   - Root frequency in Hz.
+ * @param spectrum - Optional instrument spectrum.
+ * @returns The `Chord` whose dissonance is closest to the arc centroid.
+ *
+ * @throws {RangeError} if `chords` is empty.
+ *
+ * @example
+ * const centroid = progressionChordCentroid([I, IV, V], 261.63);
+ * // centroid is the chord closest to the mean energy of the progression
+ */
+export function progressionChordCentroid(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): Chord {
+  if (chords.length === 0) throw new RangeError('progressionChordCentroid: empty progression');
+  const arc = progressionEnergyArc(chords, rootHz, spectrum);
+  const centroid = arc.reduce((s, v) => s + v, 0) / arc.length;
+  let bestIdx = 0;
+  let bestDist = Infinity;
+  arc.forEach((v, i) => {
+    const d = Math.abs(v - centroid);
+    if (d < bestDist) {
+      bestDist = d;
+      bestIdx = i;
+    }
+  });
+  return chords[bestIdx]!;
+}
+
+/**
+ * Compute the consecutive interval set (in cents) for every modal rotation of a scale.
+ *
+ * Socratic Q250: "If I can get all modal rotations of a scale and compute interval sets,
+ * can I get the set of all unique intervals for each mode in one call?" → No → implement.
+ *
+ * For each mode, the interval set is the ordered list of consecutive step sizes (in cents)
+ * from the first degree to the next, wrapping around at the octave (period). The sum of
+ * all intervals equals `tuning.periodCents`.
+ *
+ * @param scale  - The parent scale.
+ * @param tuning - The parent `TuningSystem`.
+ * @returns One entry per modal rotation: `{ mode, intervalCents }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const sets = modeIntervalSets(major, t12);
+ * // sets[0].intervalCents contains the 7 step sizes of the Ionian mode
+ * // sets[0].intervalCents.reduce((a, b) => a + b, 0) ≈ 1200
+ */
+export function modeIntervalSets(
+  scale: Scale,
+  tuning: TuningSystem,
+): { mode: Scale; intervalCents: number[] }[] {
+  const allModes = scaleModeSeries(scale, tuning);
+  return allModes.map((mode) => {
+    const degreeCents = mode.degreeIndices.map((i) => pitchToCents(tuning.degrees[i]!));
+    degreeCents.sort((a, b) => a - b);
+    const intervals = degreeCents.map((c, idx) => {
+      const next =
+        idx + 1 < degreeCents.length ? degreeCents[idx + 1]! : degreeCents[0]! + tuning.periodCents;
+      return next - c;
+    });
+    return { mode, intervalCents: intervals };
+  });
+}
