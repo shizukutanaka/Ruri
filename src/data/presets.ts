@@ -65,6 +65,7 @@ import {
   tuningParetoFrontBestMode,
   tuningModeTopCorrelation,
   tuningModeAntiCorrelation,
+  tuningParetoFrontSummary,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3617,4 +3618,99 @@ export function presetModeAntiCorrelation(
   return rootHz !== undefined
     ? tuningModeAntiCorrelation(tuning, spectrum, rootHz)
     : tuningModeAntiCorrelation(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q439 — presetFamilyTopCorrelations
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the top metric correlation for each preset in an array of preset ids.
+ *
+ * Socratic Q439: "If I can find family-level top correlations for tunings, can I do it for an
+ * array of preset ids?" → No → implement.
+ *
+ * Algorithm: For each id, find preset (throw RangeError if missing), loadTuningPreset, call
+ * `tuningModeTopCorrelation`.
+ *
+ * @param presetIds - Array of preset ids to analyse.
+ * @param spectrum  - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz    - Root frequency in Hz (default 440).
+ * @param presets   - Optional preset pool (defaults to ALL_PRESETS).
+ * @returns One entry per preset id with its id and top metric correlation.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = presetFamilyTopCorrelations(['12-tet', 'just-5-limit'], spec);
+ * results.forEach(({ id, topCorrelation }) => console.log(id, topCorrelation.correlation));
+ */
+export function presetFamilyTopCorrelations(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { id: string; topCorrelation: { metricA: string; metricB: string; correlation: number } }[] {
+  const pool = presets ?? ALL_PRESETS;
+  return presetIds.map((id) => {
+    const preset = pool.find((p) => p.id === id);
+    if (preset === undefined) {
+      throw new RangeError('presetFamilyTopCorrelations: preset not found: ' + id);
+    }
+    const tuning = loadTuningPreset(preset);
+    return {
+      id,
+      topCorrelation:
+        rootHz !== undefined
+          ? tuningModeTopCorrelation(tuning, spectrum, rootHz)
+          : tuningModeTopCorrelation(tuning, spectrum),
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q443 — presetParetoFrontSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute a statistical summary of the Pareto front for a preset by id.
+ *
+ * Socratic Q443: "If I can summarize the Pareto front for a tuning, can I do it for a preset by
+ * id?" → No → implement.
+ *
+ * Algorithm: Find preset (throw RangeError if missing), loadTuningPreset, delegate to
+ * `tuningParetoFrontSummary`.
+ *
+ * @param presetId - Preset id to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to ALL_PRESETS).
+ * @returns Summary including `paretoSize` and per-metric `{mean, min, max}` objects.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const summary = presetParetoFrontSummary('12-tet', spec);
+ * console.log(summary.paretoSize, summary.entropy.mean);
+ */
+export function presetParetoFrontSummary(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  paretoSize: number;
+  entropy: { mean: number; min: number; max: number };
+  consistency: { mean: number; min: number; max: number };
+  volatility: { mean: number; min: number; max: number };
+  diversity: { mean: number; min: number; max: number };
+  smoothnessRatio: { mean: number; min: number; max: number };
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetParetoFrontSummary: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningParetoFrontSummary(tuning, spectrum, rootHz)
+    : tuningParetoFrontSummary(tuning, spectrum);
 }

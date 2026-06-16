@@ -71,6 +71,8 @@ import {
   presetParetoFrontBestMode,
   presetModeTopCorrelation,
   presetModeAntiCorrelation,
+  presetFamilyTopCorrelations,
+  presetParetoFrontSummary,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2294,5 +2296,54 @@ describe('presetModeAntiCorrelation (Q437)', () => {
     const result = presetModeAntiCorrelation('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.correlation).toBeGreaterThanOrEqual(-1 - 1e-10);
     expect(result.correlation).toBeLessThanOrEqual(1 + 1e-10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q439 — presetFamilyTopCorrelations
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyTopCorrelations', () => {
+  it('returns entry for each preset id', () => {
+    const spec = harmonicSpectrum(6);
+    const results = presetFamilyTopCorrelations(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(results).toHaveLength(1);
+    expect(results[0]!.id).toBe('12-tet');
+    expect(typeof results[0]!.topCorrelation.metricA).toBe('string');
+    expect(typeof results[0]!.topCorrelation.metricB).toBe('string');
+    expect(typeof results[0]!.topCorrelation.correlation).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset in array', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetFamilyTopCorrelations(['not-real'], spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q443 — presetParetoFrontSummary
+// ---------------------------------------------------------------------------
+
+describe('presetParetoFrontSummary', () => {
+  it('returns paretoSize and metric summaries', () => {
+    const spec = harmonicSpectrum(6);
+    const summary = presetParetoFrontSummary('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(summary.paretoSize).toBeGreaterThan(0);
+    expect(typeof summary.entropy.mean).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetParetoFrontSummary('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const summary = presetParetoFrontSummary('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(summary.paretoSize).toBeGreaterThan(0);
   });
 });
