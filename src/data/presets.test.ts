@@ -54,6 +54,7 @@ import {
   presetFullSclBundle,
   presetModeConsistencyEntropyProfiles,
   presetModeDissonanceHistograms,
+  presetModeDualHistograms,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1563,5 +1564,48 @@ describe('presetModeDissonanceHistograms (Q383)', () => {
   it('accepts optional presets pool', () => {
     const hists = presetModeDissonanceHistograms('12-tet', 10, [TWELVE_TET]);
     expect(hists.length).toBe(12);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q388 — presetModeDualHistograms
+// ---------------------------------------------------------------------------
+
+describe('presetModeDualHistograms (Q388)', () => {
+  it('returns one entry per mode for 12-tet', () => {
+    const hists = presetModeDualHistograms('12-tet');
+    expect(hists.length).toBe(12);
+  });
+
+  it('each entry has dissonance and harmonicity arrays of length 10', () => {
+    const hists = presetModeDualHistograms('12-tet');
+    for (const { dissonance, harmonicity } of hists) {
+      expect(dissonance.length).toBe(10);
+      expect(harmonicity.length).toBe(10);
+    }
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeDualHistograms('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('respects custom bins', () => {
+    const hists = presetModeDualHistograms('12-tet', 5);
+    for (const { dissonance, harmonicity } of hists) {
+      expect(dissonance.length).toBe(5);
+      expect(harmonicity.length).toBe(5);
+    }
+  });
+
+  it('accepts optional presets pool', () => {
+    const hists = presetModeDualHistograms('12-tet', 10, [TWELVE_TET]);
+    expect(hists.length).toBe(12);
+  });
+
+  it('each entry has mode with degreeIndices', () => {
+    const hists = presetModeDualHistograms('12-tet');
+    for (const { mode } of hists) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
   });
 });

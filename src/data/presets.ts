@@ -48,6 +48,7 @@ import {
   tuningBestSmoothMode,
   tuningModeConsistencyEntropyProfiles,
   tuningModeDissonanceHistograms,
+  tuningModeDualHistograms,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2794,4 +2795,46 @@ export function presetModeDissonanceHistograms(
   }
   const tuning = loadTuningPreset(preset);
   return tuningModeDissonanceHistograms(tuning, bins);
+}
+
+// ---------------------------------------------------------------------------
+// Q388 — presetModeDualHistograms
+// ---------------------------------------------------------------------------
+
+/**
+ * Get dual dissonance+harmonicity histograms for all modes of a preset tuning in one call.
+ *
+ * Socratic Q388: "If I can get dual histograms for all modes of a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeDualHistograms(tuning, bins)` → per-mode dual histograms.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param bins     - Number of histogram bins (default 10).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{mode, dissonance, harmonicity}`, one per mode.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const hists = presetModeDualHistograms('12-tet');
+ * for (const { mode, dissonance, harmonicity } of hists) {
+ *   console.log(mode.id, dissonance, harmonicity);
+ * }
+ */
+export function presetModeDualHistograms(
+  presetId: string,
+  bins = 10,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeDualHistograms> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeDualHistograms: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeDualHistograms(tuning, bins);
 }
