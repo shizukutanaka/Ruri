@@ -101,6 +101,8 @@ import {
   presetModeInsightSummary,
   presetFinalRecommendation,
   presetModeEntropyDiversityMap,
+  presetModeConsistencyVolatilityMap,
+  presetModeFiveDimMap,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3045,6 +3047,61 @@ describe('presetModeEntropyDiversityMap (Q526)', () => {
   it('accepts optional rootHz', () => {
     const spec = harmonicSpectrum(6);
     const result = presetModeEntropyDiversityMap('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q529 — presetModeConsistencyVolatilityMap
+// ---------------------------------------------------------------------------
+
+describe('presetModeConsistencyVolatilityMap (Q529)', () => {
+  it('returns quadrant labels for each mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeConsistencyVolatilityMap('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const validQuadrants = [
+      'stable-consistent',
+      'consistent-volatile',
+      'smooth-inconsistent',
+      'rough-inconsistent',
+    ];
+    for (const entry of result) {
+      expect(validQuadrants).toContain(entry.quadrant);
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeConsistencyVolatilityMap('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q532 — presetModeFiveDimMap
+// ---------------------------------------------------------------------------
+
+describe('presetModeFiveDimMap (Q532)', () => {
+  it('returns merged per-mode data with cluster labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeFiveDimMap('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const validClusters = ['high', 'mid', 'low'];
+    expect(validClusters).toContain(result[0]!.cluster);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeFiveDimMap('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeFiveDimMap('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.length).toBeGreaterThan(0);
   });
 });

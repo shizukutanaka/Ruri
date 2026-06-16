@@ -94,6 +94,8 @@ import {
   tuningModeInsightSummary,
   tuningFinalRecommendation,
   tuningModeEntropyDiversityMap,
+  tuningModeConsistencyVolatilityMap,
+  tuningModeFiveDimMap,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4674,4 +4676,46 @@ export function presetModeEntropyDiversityMap(
   return rootHz !== undefined
     ? tuningModeEntropyDiversityMap(tuning, spectrum, rootHz)
     : tuningModeEntropyDiversityMap(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q529 — presetModeConsistencyVolatilityMap
+// ---------------------------------------------------------------------------
+
+export function presetModeConsistencyVolatilityMap(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeConsistencyVolatilityMap> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeConsistencyVolatilityMap: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeConsistencyVolatilityMap(tuning, spectrum, rootHz)
+    : tuningModeConsistencyVolatilityMap(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q532 — presetModeFiveDimMap
+// ---------------------------------------------------------------------------
+
+export function presetModeFiveDimMap(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeFiveDimMap> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeFiveDimMap: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeFiveDimMap(tuning, spectrum, rootHz)
+    : tuningModeFiveDimMap(tuning, spectrum);
 }
