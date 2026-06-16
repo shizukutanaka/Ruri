@@ -35,6 +35,7 @@ import {
   mostStableModeProgressionWav,
   progressionNarrativeWav,
   presetBestModeWav,
+  progressionFullBundle,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1694,5 +1695,28 @@ describe('presetBestModeWav (Q237)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetBestModeWav('nonexistent')).toThrow(RangeError);
+  });
+});
+
+describe('progressionFullBundle (Q244)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 3).map((e) => e.chord);
+
+  it('returns wav, smf, mts, narrative', () => {
+    const bundle = progressionFullBundle(chords, t12);
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(bundle.mts).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.narrative).toBe('string');
+  });
+  it('wav length > 44', () => {
+    const { wav } = progressionFullBundle(chords, t12);
+    expect(wav.length).toBeGreaterThan(44);
+  });
+  it('narrative is non-empty', () => {
+    const { narrative } = progressionFullBundle(chords, t12);
+    expect(narrative.length).toBeGreaterThan(5);
   });
 });

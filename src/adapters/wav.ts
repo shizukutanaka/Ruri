@@ -43,7 +43,8 @@ import {
   optimalChordOrder,
 } from '../core/chord-search.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
-import { chordToSmf, type ChordToSmfOptions } from './smf.js';
+import { chordToSmf, type ChordToSmfOptions, progressionToSmf } from './smf.js';
+import { chordProgressionToMts } from './mts.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
   for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
@@ -1461,4 +1462,50 @@ export function presetBestModeWav(
     throw new RangeError('presetBestModeWav: preset not found: ' + presetId);
   }
   return bestModeWav(tuning, tuning.referenceHz, spectrum, opts);
+}
+
+/**
+ * Export a chord progression as WAV + SMF + MTS + narrative simultaneously in one call.
+ *
+ * Socratic Q244: "If a chord progression is first-class, WAV + SMF + MTS + narrative
+ * should all come from one call — can it?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `progressionNarrativeWav(chords, rootHz ?? tuning.referenceHz, spectrum)` → `{ wav, narrative }`.
+ * 2. `progressionToSmf(chords, rootHz ?? tuning.referenceHz)` → SMF bytes.
+ * 3. `chordProgressionToMts(chords, rootHz ?? tuning.referenceHz)` → array of MTS SysEx messages;
+ *    concatenate into a single `Uint8Array` (one SysEx per chord).
+ *
+ * @param chords   - The chord progression to export.
+ * @param tuning   - The `TuningSystem` context (used for default root Hz).
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for WAV synthesis and narrative analysis.
+ * @returns `{ wav, smf, mts, narrative }` — all four formats simultaneously.
+ *
+ * @throws {RangeError} if `chords` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const chords = progressionFromPattern(major, t12, [0, 3, 4, 0]);
+ * const { wav, smf, mts, narrative } = progressionFullBundle(chords, t12);
+ */
+export function progressionFullBundle(
+  chords: readonly Chord[],
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+): { wav: Uint8Array; smf: Uint8Array; mts: Uint8Array; narrative: string } {
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const { wav, narrative } = progressionNarrativeWav(chords, effectiveRootHz, spectrum);
+  const smf = progressionToSmf(chords, effectiveRootHz);
+  // chordProgressionToMts returns one 408-byte Uint8Array per chord; concatenate them
+  const mtsMessages = chordProgressionToMts(chords, effectiveRootHz);
+  const totalLen = mtsMessages.reduce((sum, m) => sum + m.length, 0);
+  const mts = new Uint8Array(totalLen);
+  let offset = 0;
+  for (const msg of mtsMessages) {
+    mts.set(msg, offset);
+    offset += msg.length;
+  }
+  return { wav, smf, mts, narrative };
 }
