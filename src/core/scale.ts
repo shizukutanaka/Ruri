@@ -3611,3 +3611,183 @@ export function modeIntervalSets(
     return { mode, intervalCents: intervals };
   });
 }
+
+/**
+ * Partition a chord map into consonant, dissonant, and neutral subsets in one call.
+ *
+ * Socratic Q252: "If I can filter a chord map by dissonance and by harmonicity separately,
+ * can I get both the consonant subset and the dissonant subset in one call?" → No → implement.
+ *
+ * Scoring:
+ * - `consonant`: dissonance ≤ `maxDissonance` AND harmonicity ≤ `minHarmonicity`
+ * - `dissonant`: dissonance > `maxDissonance` AND harmonicity > `minHarmonicity`
+ * - `neutral`: everything else (one threshold passes, the other does not)
+ *
+ * @param chordMap       - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param maxDissonance  - Maximum Sethares roughness for the consonant category (must be > 0).
+ * @param minHarmonicity - Maximum Stolzenburg periodicity for the consonant category (must be > 0).
+ * @param spectrum       - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz         - Reference frequency for chord realization (default 440 Hz).
+ * @returns `{ consonant, dissonant, neutral }` — three non-overlapping subsets of `chordMap`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const { consonant, dissonant, neutral } = chordMapRangeBundle(chordMap, 0.5, 0.5);
+ */
+export function chordMapRangeBundle(
+  chordMap: readonly ScaleChordMapEntry[],
+  maxDissonance: number,
+  minHarmonicity: number,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): {
+  consonant: ScaleChordMapEntry[];
+  dissonant: ScaleChordMapEntry[];
+  neutral: ScaleChordMapEntry[];
+} {
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  // Score every entry once
+  const scored = chordMap.map((entry) => ({
+    entry,
+    dissonance: chordObjectDissonance(entry.chord, rootHz, effectiveSpectrum),
+    harmonicity: harmonicityForChord(entry.chord, rootHz),
+  }));
+
+  const consonant: ScaleChordMapEntry[] = [];
+  const dissonant: ScaleChordMapEntry[] = [];
+  const neutral: ScaleChordMapEntry[] = [];
+
+  for (const { entry, dissonance, harmonicity } of scored) {
+    const lowDissonance = dissonance <= maxDissonance;
+    const lowHarmonicity = harmonicity <= minHarmonicity;
+    if (lowDissonance && lowHarmonicity) {
+      consonant.push(entry);
+    } else if (!lowDissonance && !lowHarmonicity) {
+      dissonant.push(entry);
+    } else {
+      neutral.push(entry);
+    }
+  }
+
+  return { consonant, dissonant, neutral };
+}
+
+/**
+ * Compute the interval class histogram (interval vector) of a scale.
+ *
+ * Socratic Q254: "If I have a scale's interval set, can I compute its interval vector
+ * (interval class histogram) in one call?" → No → implement.
+ *
+ * The interval vector counts how many times each interval class appears among all
+ * scale-degree pairs (including the implicit root at 0 cents). Interval classes are
+ * mapped by rounding the interval to the nearest multiple of `periodCents / n`.
+ *
+ * @param scale  - The scale to analyse (must be compatible with `tuning`).
+ * @param tuning - The parent `TuningSystem`.
+ * @returns `number[]` of length `Math.floor((scale.degreeIndices.length + 1) / 2)`,
+ *          where each entry is the count of pairs falling into that interval class.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const vec = scaleIntervalVector(major, t12);
+ * // vec has length 4 (= floor(8/2)), counting interval classes 1–4
+ */
+export function scaleIntervalVector(scale: Scale, tuning: TuningSystem): number[] {
+  // Get cents for each degree; prepend root at 0
+  const degreeCents = scale.degreeIndices.map((i) => pitchToCents(tuning.degrees[i]!));
+  const allCents = [0, ...degreeCents];
+  const n = allCents.length;
+  const period = tuning.periodCents;
+  const halfClasses = Math.floor(n / 2);
+  const vector = new Array<number>(halfClasses).fill(0);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs((allCents[j] as number) - (allCents[i] as number)) % period;
+      const normalized = Math.min(diff, period - diff); // fold into [0, period/2]
+      const classIdx = Math.round((normalized / period) * n) - 1; // 0-based
+      if (classIdx >= 0 && classIdx < halfClasses) {
+        vector[classIdx] = (vector[classIdx] as number) + 1;
+      }
+    }
+  }
+
+  return vector;
+}
+
+/**
+ * Compute the total change in dissonance across a chord progression in one call.
+ *
+ * Socratic Q255: "If I can get a progression's energy arc, can I get the total change in
+ * dissonance (sum of absolute differences between consecutive chords) in one call?" → No → implement.
+ *
+ * Returns the sum `Σ |arc[i+1] - arc[i]|` for all consecutive chord pairs.
+ * Returns `0` for progressions of fewer than 2 chords.
+ *
+ * @param chords   - Ordered list of chords.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns Total absolute dissonance change across the progression (≥ 0).
+ *
+ * @example
+ * const delta = progressionDissonanceDelta([I, IV, V], 261.63, harmonicSpectrum());
+ * // delta is the sum of |dissonance changes| between successive chords
+ */
+export function progressionDissonanceDelta(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): number {
+  if (chords.length < 2) return 0;
+  const arc = progressionEnergyArc(chords, rootHz, spectrum);
+  let total = 0;
+  for (let i = 0; i < arc.length - 1; i++) {
+    total += Math.abs((arc[i + 1] as number) - (arc[i] as number));
+  }
+  return total;
+}
+
+/**
+ * Count the number of modal rotations in a tuning and how many have a unique interval set.
+ *
+ * Socratic Q256: "If a tuning has N degrees, it has N distinct modal rotations — should
+ * counting them be one call?" → No → implement.
+ *
+ * Returns `{ total, withUniqueIntervalSets }`:
+ * - `total`: the number of degrees (= number of modal rotations).
+ * - `withUniqueIntervalSets`: the number of rotations whose consecutive interval set
+ *   (rounded to nearest cent, sorted) differs from all other rotations.
+ *
+ * @param tuning - The tuning system to analyse.
+ * @returns `{ total, withUniqueIntervalSets }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { total, withUniqueIntervalSets } = tuningModeCount(t12);
+ * // total === 12; withUniqueIntervalSets <= 12
+ *
+ * @example
+ * // Whole-tone scale (6-EDO): all modes are identical
+ * const { total, withUniqueIntervalSets } = tuningModeCount(edo(6));
+ * // total === 6; withUniqueIntervalSets === 1
+ */
+export function tuningModeCount(tuning: TuningSystem): {
+  total: number;
+  withUniqueIntervalSets: number;
+} {
+  const total = tuning.degrees.length;
+  const scale = tuningToScale(tuning);
+  const sets = modeIntervalSets(scale, tuning);
+  const unique = new Set(
+    sets.map((s) =>
+      s.intervalCents
+        .map((c) => Math.round(c))
+        .sort((a, b) => a - b)
+        .join(','),
+    ),
+  );
+  return { total, withUniqueIntervalSets: unique.size };
+}

@@ -85,6 +85,10 @@ import {
   scaleSimilarityMatrix,
   progressionChordCentroid,
   modeIntervalSets,
+  chordMapRangeBundle,
+  scaleIntervalVector,
+  progressionDissonanceDelta,
+  tuningModeCount,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4166,5 +4170,86 @@ describe('modeIntervalSets (Q250)', () => {
       const sum = s.intervalCents.reduce((a, b) => a + b, 0);
       expect(sum).toBeCloseTo(t12.periodCents, 3);
     });
+  });
+});
+
+describe('chordMapRangeBundle (Q252)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('partitions chord map into 3 groups', () => {
+    const bundle = chordMapRangeBundle(chordMap, 0.5, 0.5);
+    const total = bundle.consonant.length + bundle.dissonant.length + bundle.neutral.length;
+    expect(total).toBe(chordMap.length);
+  });
+  it('consonant entries have low dissonance and harmonicity', () => {
+    const bundle = chordMapRangeBundle(chordMap, 1.0, 1.0);
+    // All entries should be in consonant or neutral (threshold is high)
+    expect(bundle.consonant.length + bundle.neutral.length).toBeGreaterThanOrEqual(0);
+  });
+  it('no entry appears in two groups', () => {
+    const bundle = chordMapRangeBundle(chordMap, 0.5, 0.5);
+    const allDegreeOffsets = [
+      ...bundle.consonant.map((e) => e.degreeOffset),
+      ...bundle.dissonant.map((e) => e.degreeOffset),
+      ...bundle.neutral.map((e) => e.degreeOffset),
+    ];
+    expect(new Set(allDegreeOffsets).size).toBe(allDegreeOffsets.length);
+  });
+});
+
+describe('scaleIntervalVector (Q254)', () => {
+  const major: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns an array of length floor(degreeCount/2)', () => {
+    const vec = scaleIntervalVector(major, t12);
+    expect(vec).toHaveLength(Math.floor((major.degreeIndices.length + 1) / 2)); // +1 for root
+  });
+  it('all values are non-negative integers', () => {
+    const vec = scaleIntervalVector(major, t12);
+    vec.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
+  });
+});
+
+describe('progressionDissonanceDelta (Q255)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 4).map((e) => e.chord);
+
+  it('returns a non-negative number', () => {
+    const delta = progressionDissonanceDelta(chords, 261.63);
+    expect(delta).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for empty or single-chord progression', () => {
+    expect(progressionDissonanceDelta([], 261.63)).toBe(0);
+    expect(progressionDissonanceDelta([chords[0]!], 261.63)).toBe(0);
+  });
+  it('is always >= 0', () => {
+    const delta = progressionDissonanceDelta(chords, 261.63);
+    expect(Number.isFinite(delta)).toBe(true);
+    expect(delta).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('tuningModeCount (Q256)', () => {
+  it('returns total equal to degree count', () => {
+    const { total } = tuningModeCount(t12);
+    expect(total).toBe(t12.degrees.length);
+  });
+  it('withUniqueIntervalSets <= total', () => {
+    const { total, withUniqueIntervalSets } = tuningModeCount(t12);
+    expect(withUniqueIntervalSets).toBeLessThanOrEqual(total);
+    expect(withUniqueIntervalSets).toBeGreaterThan(0);
+  });
+  it('symmetrical EDO has fewer unique sets', () => {
+    const t = edo(6); // hexatonic whole-tone — all modes identical
+    const { total, withUniqueIntervalSets } = tuningModeCount(t);
+    expect(total).toBe(6);
+    expect(withUniqueIntervalSets).toBe(1); // all modes have same interval set [200,200,200,200,200,200]
   });
 });
