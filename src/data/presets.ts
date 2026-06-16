@@ -100,6 +100,8 @@ import {
   tuningModeSmoothnessEntropyMap,
   tuningModeDiversityVolatilityMap,
   tuningModeAllQuadrantsBundle,
+  tuningModeAllQuadrantsNarrative,
+  tuningModeQuadrantConsensus,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4806,4 +4808,34 @@ export function presetModeAllQuadrantsBundle(
   return rootHz !== undefined
     ? tuningModeAllQuadrantsBundle(tuning, spectrum, rootHz)
     : tuningModeAllQuadrantsBundle(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q547 — presetModeAllQuadrantsNarrative
+// ---------------------------------------------------------------------------
+
+export function presetModeAllQuadrantsNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeAllQuadrantsNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeAllQuadrantsNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q550 — presetModeQuadrantConsensus
+// ---------------------------------------------------------------------------
+
+export function presetModeQuadrantConsensus(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeQuadrantConsensus> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeQuadrantConsensus(loadTuningPreset(preset), spectrum, rootHz);
 }

@@ -107,6 +107,8 @@ import {
   presetModeSmoothnessEntropyMap,
   presetModeDiversityVolatilityMap,
   presetModeAllQuadrantsBundle,
+  presetModeAllQuadrantsNarrative,
+  presetModeQuadrantConsensus,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3209,5 +3211,46 @@ describe('presetModeAllQuadrantsBundle (Q544)', () => {
     const spec = harmonicSpectrum(6);
     const result = presetModeAllQuadrantsBundle('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q547 — presetModeAllQuadrantsNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetModeAllQuadrantsNarrative (Q547)', () => {
+  it('returns narrative strings for each mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAllQuadrantsNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.narrative).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeAllQuadrantsNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q550 — presetModeQuadrantConsensus
+// ---------------------------------------------------------------------------
+
+describe('presetModeQuadrantConsensus (Q550)', () => {
+  it('returns consensus for each mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeQuadrantConsensus('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const valid = ['versatile', 'specialized', 'balanced'];
+    expect(valid).toContain(result[0]!.consensus);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeQuadrantConsensus('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
   });
 });
