@@ -239,6 +239,10 @@ import {
   tuningFamilyMasterReports,
   tuningModeComprehensiveMetricBundle,
   tuningFamilyModeComprehensiveMetricBundles,
+  tuningModeConsensusClusterBundle,
+  tuningFamilyModeConsensusClusterBundles,
+  tuningTopClusterConsensusMode,
+  tuningFamilyTopClusterConsensusModes,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9410,6 +9414,114 @@ describe('tuningFamilyModeComprehensiveMetricBundles (Q509)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(entry.modeComprehensiveMetricBundles.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningModeConsensusClusterBundle (Q510)', () => {
+  it('returns one entry per mode with consensus rank and cluster', () => {
+    const spec = harmonicSpectrum(6);
+    const tuning = equalTemperament12(440);
+    const result = tuningModeConsensusClusterBundle(tuning, spec);
+    expect(result.length).toBe(tuning.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.consensusRank).toBe('number');
+      expect(['high', 'mid', 'low']).toContain(entry.cluster);
+    }
+  });
+
+  it('sorted by consensusRank ascending', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusClusterBundle(equalTemperament12(440), spec);
+    expect(result[0]!.consensusRank).toBe(1);
+  });
+
+  it('cluster labels are consistent with meanScore', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusClusterBundle(equalTemperament12(440), spec);
+    for (const entry of result) {
+      if (entry.cluster === 'high') {
+        expect(entry.meanScore).toBeGreaterThanOrEqual(0.67);
+      } else if (entry.cluster === 'low') {
+        expect(entry.meanScore).toBeLessThanOrEqual(0.33);
+      } else {
+        expect(entry.meanScore).toBeGreaterThan(0.33);
+        expect(entry.meanScore).toBeLessThan(0.67);
+      }
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusClusterBundle(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeConsensusClusterBundles (Q512)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeConsensusClusterBundles(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and consensusClusterBundle array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeConsensusClusterBundles(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.consensusClusterBundle.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningTopClusterConsensusMode (Q513)', () => {
+  it('returns a single mode with cluster label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningTopClusterConsensusMode(equalTemperament12(440), spec);
+    expect(typeof result.mode.id).toBe('string');
+    expect(['high', 'mid', 'low']).toContain(result.cluster);
+  });
+
+  it('result is in the high cluster OR is the top consensus mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningTopClusterConsensusMode(equalTemperament12(440), spec);
+    expect(result.cluster === 'high' || result.consensusRank === 1).toBe(true);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningTopClusterConsensusMode(equalTemperament12(440), spec, 261.63);
+    expect(typeof result.mode.id).toBe('string');
+    expect(['high', 'mid', 'low']).toContain(result.cluster);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyTopClusterConsensusModes (Q515)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyTopClusterConsensusModes(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and topClusterConsensusMode.mode.id', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyTopClusterConsensusModes(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.topClusterConsensusMode.mode.id).toBe('string');
     }
   });
 });

@@ -10581,3 +10581,153 @@ export function tuningFamilyModeComprehensiveMetricBundles(
         : tuningModeComprehensiveMetricBundle(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q510 — tuningModeConsensusClusterBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Join the Borda consensus ranking with the High/Mid/Low cluster label for
+ * each mode, producing a single per-mode bundle.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array sorted by consensusRank (ascending) with cluster and Borda fields.
+ */
+export function tuningModeConsensusClusterBundle(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  bordaScore: number;
+  scoreRank: number;
+  radarRank: number;
+  consensusRank: number;
+  meanScore: number;
+  cluster: 'high' | 'mid' | 'low';
+}[] {
+  const consensusRanking =
+    rootHz !== undefined
+      ? tuningModeConsensusRanking(tuning, spectrum, rootHz)
+      : tuningModeConsensusRanking(tuning, spectrum);
+  const clusters =
+    rootHz !== undefined
+      ? tuningModeMetricCluster(tuning, spectrum, rootHz)
+      : tuningModeMetricCluster(tuning, spectrum);
+
+  const clusterMap = new Map<string, { meanScore: number; cluster: 'high' | 'mid' | 'low' }>();
+  for (const c of clusters) {
+    clusterMap.set(c.mode.id, { meanScore: c.meanScore, cluster: c.cluster });
+  }
+
+  return consensusRanking.map((entry) => {
+    const clusterEntry = clusterMap.get(entry.mode.id);
+    return {
+      mode: entry.mode,
+      bordaScore: entry.bordaScore,
+      scoreRank: entry.scoreRank,
+      radarRank: entry.radarRank,
+      consensusRank: entry.consensusRank,
+      meanScore: clusterEntry?.meanScore ?? 0,
+      cluster: clusterEntry?.cluster ?? 'mid',
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q512 — tuningFamilyModeConsensusClusterBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a consensus-cluster bundle for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and consensusClusterBundle array.
+ */
+export function tuningFamilyModeConsensusClusterBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  consensusClusterBundle: ReturnType<typeof tuningModeConsensusClusterBundle>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    consensusClusterBundle:
+      rootHz !== undefined
+        ? tuningModeConsensusClusterBundle(t, spectrum, rootHz)
+        : tuningModeConsensusClusterBundle(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q513 — tuningTopClusterConsensusMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the top-ranked mode that is also in the 'high' cluster.
+ *
+ * If no mode is in the 'high' cluster, returns the best overall consensus mode
+ * (first entry in the bundle, i.e. consensusRank === 1).
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns The entry with the best consensusRank among 'high' cluster modes,
+ *          or the top consensus mode if none qualify.
+ */
+export function tuningTopClusterConsensusMode(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  bordaScore: number;
+  scoreRank: number;
+  radarRank: number;
+  consensusRank: number;
+  meanScore: number;
+  cluster: 'high' | 'mid' | 'low';
+} {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeConsensusClusterBundle(tuning, spectrum, rootHz)
+      : tuningModeConsensusClusterBundle(tuning, spectrum);
+
+  const highEntry = bundle.find((entry) => entry.cluster === 'high');
+  return highEntry ?? bundle[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q515 — tuningFamilyTopClusterConsensusModes
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the top-cluster consensus mode for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and topClusterConsensusMode.
+ */
+export function tuningFamilyTopClusterConsensusModes(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  topClusterConsensusMode: ReturnType<typeof tuningTopClusterConsensusMode>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    topClusterConsensusMode:
+      rootHz !== undefined
+        ? tuningTopClusterConsensusMode(t, spectrum, rootHz)
+        : tuningTopClusterConsensusMode(t, spectrum),
+  }));
+}
