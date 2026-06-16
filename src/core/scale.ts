@@ -9905,3 +9905,139 @@ export function tuningFamilyModeRadarRankings(
         : tuningModeRadarRanking(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare radar ranking vs composite-score ranking for each mode in a tuning.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array ordered by radar rank with radarRank, scoreRank, and rankDelta.
+ */
+export function tuningRadarRankingVsScoreRanking(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; radarRank: number; scoreRank: number; rankDelta: number }[] {
+  const radarRanking =
+    rootHz !== undefined
+      ? tuningModeRadarRanking(tuning, spectrum, rootHz)
+      : tuningModeRadarRanking(tuning, spectrum);
+  const scoreRanking =
+    rootHz !== undefined
+      ? tuningModeScoreRanking(tuning, spectrum, rootHz)
+      : tuningModeScoreRanking(tuning, spectrum);
+
+  const scoreRankMap: Record<string, number> = {};
+  for (let i = 0; i < scoreRanking.length; i++) {
+    const entry = scoreRanking[i];
+    if (entry !== undefined) {
+      scoreRankMap[entry.mode.id] = i + 1;
+    }
+  }
+
+  return radarRanking.map((entry, idx) => {
+    const radarRank = idx + 1;
+    const scoreRank = scoreRankMap[entry.mode.id] ?? radarRanking.length;
+    return {
+      mode: entry.mode,
+      radarRank,
+      scoreRank,
+      rankDelta: scoreRank - radarRank,
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare radar vs score rankings for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and comparison array.
+ */
+export function tuningFamilyRadarVsScoreRankings(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  comparison: { mode: Scale; radarRank: number; scoreRank: number; rankDelta: number }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    comparison:
+      rootHz !== undefined
+        ? tuningRadarRankingVsScoreRanking(t, spectrum, rootHz)
+        : tuningRadarRankingVsScoreRanking(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the mode where radar rank and score rank agree most (smallest |rankDelta|).
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns The entry with the smallest absolute rankDelta (first on tie).
+ */
+export function tuningBestRadarScoreAgreement(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; radarRank: number; scoreRank: number; rankDelta: number } {
+  const comparison =
+    rootHz !== undefined
+      ? tuningRadarRankingVsScoreRanking(tuning, spectrum, rootHz)
+      : tuningRadarRankingVsScoreRanking(tuning, spectrum);
+
+  let best = comparison[0];
+  if (best === undefined) {
+    throw new RangeError('tuningBestRadarScoreAgreement: tuning has no modes');
+  }
+  let bestAbs = Math.abs(best.rankDelta);
+  for (let i = 1; i < comparison.length; i++) {
+    const entry = comparison[i];
+    if (entry !== undefined) {
+      const abs = Math.abs(entry.rankDelta);
+      if (abs < bestAbs) {
+        best = entry;
+        bestAbs = abs;
+      }
+    }
+  }
+  return best;
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the best radar-score agreement mode for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and bestAgreement.
+ */
+export function tuningFamilyBestRadarScoreAgreements(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  bestAgreement: { mode: Scale; radarRank: number; scoreRank: number; rankDelta: number };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    bestAgreement:
+      rootHz !== undefined
+        ? tuningBestRadarScoreAgreement(t, spectrum, rootHz)
+        : tuningBestRadarScoreAgreement(t, spectrum),
+  }));
+}

@@ -223,6 +223,10 @@ import {
   tuningFamilyClusterSummaries,
   tuningModeRadarRanking,
   tuningFamilyModeRadarRankings,
+  tuningRadarRankingVsScoreRanking,
+  tuningFamilyRadarVsScoreRankings,
+  tuningBestRadarScoreAgreement,
+  tuningFamilyBestRadarScoreAgreements,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -8978,6 +8982,116 @@ describe('tuningFamilyModeRadarRankings (Q485)', () => {
       expect(typeof entry.id).toBe('string');
       expect(Array.isArray(entry.radarRanking)).toBe(true);
       expect(entry.radarRanking.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningRadarRankingVsScoreRanking (Q486)', () => {
+  it('returns one entry per mode with radarRank, scoreRank, rankDelta', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningRadarRankingVsScoreRanking(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.radarRank).toBe('number');
+      expect(typeof entry.scoreRank).toBe('number');
+      expect(typeof entry.rankDelta).toBe('number');
+    }
+  });
+
+  it('radarRanks are 1-based consecutive', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningRadarRankingVsScoreRanking(t12, spec);
+    const sorted = [...result].sort((a, b) => a.radarRank - b.radarRank);
+    sorted.forEach((entry, idx) => {
+      expect(entry.radarRank).toBe(idx + 1);
+    });
+  });
+
+  it('scoreRanks are in [1, totalModes]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningRadarRankingVsScoreRanking(t12, spec);
+    const total = t12.degrees.length;
+    for (const entry of result) {
+      expect(entry.scoreRank).toBeGreaterThanOrEqual(1);
+      expect(entry.scoreRank).toBeLessThanOrEqual(total);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningRadarRankingVsScoreRanking(t12, spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyRadarVsScoreRankings (Q488)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyRadarVsScoreRankings(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and comparison array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyRadarVsScoreRankings(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(Array.isArray(entry.comparison)).toBe(true);
+      expect(entry.comparison.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningBestRadarScoreAgreement (Q489)', () => {
+  it('returns single mode with |rankDelta| minimised', () => {
+    const spec = harmonicSpectrum(6);
+    const comparison = tuningRadarRankingVsScoreRanking(t12, spec);
+    const result = tuningBestRadarScoreAgreement(t12, spec);
+    const minAbs = Math.min(...comparison.map((e) => Math.abs(e.rankDelta)));
+    expect(Math.abs(result.rankDelta)).toBe(minAbs);
+  });
+
+  it('result has mode, radarRank, scoreRank, rankDelta', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestRadarScoreAgreement(t12, spec);
+    expect(result.mode).toBeDefined();
+    expect(typeof result.radarRank).toBe('number');
+    expect(typeof result.scoreRank).toBe('number');
+    expect(typeof result.rankDelta).toBe('number');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestRadarScoreAgreement(t12, spec, 261.63);
+    expect(result.mode).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyBestRadarScoreAgreements (Q491)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyBestRadarScoreAgreements(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and bestAgreement.mode.id', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyBestRadarScoreAgreements(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.bestAgreement.mode.id).toBe('string');
     }
   });
 });
