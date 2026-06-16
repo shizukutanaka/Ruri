@@ -11624,3 +11624,98 @@ export function tuningFamilyModeConsensusNarratives(
     consensusNarratives: tuningModeConsensusNarrative(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q558 — tuningModeQuadrantProfile
+// ---------------------------------------------------------------------------
+
+export function tuningModeQuadrantProfile(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropyDiversityQuadrant: string;
+  consistencyVolatilityQuadrant: string;
+  smoothnessEntropyQuadrant: string;
+  diversityVolatilityQuadrant: string;
+  quadrantProfile: string;
+}[] {
+  return tuningModeAllQuadrantsBundle(tuning, spectrum, rootHz).map((entry) => ({
+    ...entry,
+    quadrantProfile: [
+      entry.entropyDiversityQuadrant,
+      entry.consistencyVolatilityQuadrant,
+      entry.smoothnessEntropyQuadrant,
+      entry.diversityVolatilityQuadrant,
+    ].join('|'),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q560 — tuningFamilyModeQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeQuadrantProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; quadrantProfiles: ReturnType<typeof tuningModeQuadrantProfile> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    quadrantProfiles: tuningModeQuadrantProfile(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q561 — tuningQuadrantCoverage
+// ---------------------------------------------------------------------------
+
+export function tuningQuadrantCoverage(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  entropyDiversityUnique: number;
+  consistencyVolatilityUnique: number;
+  smoothnessEntropyUnique: number;
+  diversityVolatilityUnique: number;
+  totalUniqueProfiles: number;
+  totalModes: number;
+} {
+  const bundle = tuningModeAllQuadrantsBundle(tuning, spectrum, rootHz);
+  const edSet = new Set(bundle.map((e) => e.entropyDiversityQuadrant));
+  const cvSet = new Set(bundle.map((e) => e.consistencyVolatilityQuadrant));
+  const seSet = new Set(bundle.map((e) => e.smoothnessEntropyQuadrant));
+  const dvSet = new Set(bundle.map((e) => e.diversityVolatilityQuadrant));
+  const profileSet = new Set(
+    bundle.map((e) =>
+      [
+        e.entropyDiversityQuadrant,
+        e.consistencyVolatilityQuadrant,
+        e.smoothnessEntropyQuadrant,
+        e.diversityVolatilityQuadrant,
+      ].join('|'),
+    ),
+  );
+  return {
+    entropyDiversityUnique: edSet.size,
+    consistencyVolatilityUnique: cvSet.size,
+    smoothnessEntropyUnique: seSet.size,
+    diversityVolatilityUnique: dvSet.size,
+    totalUniqueProfiles: profileSet.size,
+    totalModes: bundle.length,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q563 — tuningFamilyQuadrantCoverage
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantCoverage(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; coverage: ReturnType<typeof tuningQuadrantCoverage> }[] {
+  return tunings.map((t) => ({ id: t.id, coverage: tuningQuadrantCoverage(t, spectrum, rootHz) }));
+}

@@ -271,6 +271,10 @@ import {
   tuningFamilyBestQuadrantConsensusModes,
   tuningModeConsensusNarrative,
   tuningFamilyModeConsensusNarratives,
+  tuningModeQuadrantProfile,
+  tuningFamilyModeQuadrantProfiles,
+  tuningQuadrantCoverage,
+  tuningFamilyQuadrantCoverage,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10275,6 +10279,108 @@ describe('tuningFamilyModeConsensusNarratives (Q557)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.consensusNarratives.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q558 — tuningModeQuadrantProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningModeQuadrantProfile (Q558)', () => {
+  it('returns one entry per mode with quadrantProfile string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeQuadrantProfile(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.quadrantProfile).toBe('string');
+      expect(entry.quadrantProfile.split('|').length).toBe(4);
+    }
+  });
+
+  it('quadrantProfile contains all four quadrant labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeQuadrantProfile(t12, spec);
+    const entry = result[0]!;
+    expect(entry.quadrantProfile).toContain(entry.entropyDiversityQuadrant);
+    expect(entry.quadrantProfile).toContain(entry.consistencyVolatilityQuadrant);
+    expect(entry.quadrantProfile).toContain(entry.smoothnessEntropyQuadrant);
+    expect(entry.quadrantProfile).toContain(entry.diversityVolatilityQuadrant);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeQuadrantProfile(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q560 — tuningFamilyModeQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeQuadrantProfiles (Q560)', () => {
+  it('returns one entry per tuning with id and quadrantProfiles', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeQuadrantProfiles([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.quadrantProfiles.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q561 — tuningQuadrantCoverage
+// ---------------------------------------------------------------------------
+
+describe('tuningQuadrantCoverage (Q561)', () => {
+  it('returns coverage counts for all four quadrant axes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverage(t12, spec);
+    expect(result.totalModes).toBe(t12.degrees.length);
+    expect(result.entropyDiversityUnique).toBeGreaterThan(0);
+    expect(result.consistencyVolatilityUnique).toBeGreaterThan(0);
+    expect(result.smoothnessEntropyUnique).toBeGreaterThan(0);
+    expect(result.diversityVolatilityUnique).toBeGreaterThan(0);
+    expect(result.totalUniqueProfiles).toBeGreaterThan(0);
+  });
+
+  it('unique counts are bounded by max 4 (only 4 quadrants per axis)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverage(t12, spec);
+    expect(result.entropyDiversityUnique).toBeLessThanOrEqual(4);
+    expect(result.consistencyVolatilityUnique).toBeLessThanOrEqual(4);
+    expect(result.smoothnessEntropyUnique).toBeLessThanOrEqual(4);
+    expect(result.diversityVolatilityUnique).toBeLessThanOrEqual(4);
+  });
+
+  it('totalUniqueProfiles <= totalModes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverage(t12, spec);
+    expect(result.totalUniqueProfiles).toBeLessThanOrEqual(result.totalModes);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverage(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q563 — tuningFamilyQuadrantCoverage
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantCoverage (Q563)', () => {
+  it('returns one entry per tuning with id and coverage', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyQuadrantCoverage([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.coverage.totalModes).toBeGreaterThan(0);
     }
   });
 });
