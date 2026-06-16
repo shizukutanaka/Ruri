@@ -98,6 +98,8 @@ import {
   tuningModeFiveDimMap,
   tuningModeFiveDimNarrative,
   tuningModeSmoothnessEntropyMap,
+  tuningModeDiversityVolatilityMap,
+  tuningModeAllQuadrantsBundle,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4762,4 +4764,46 @@ export function presetModeSmoothnessEntropyMap(
   return rootHz !== undefined
     ? tuningModeSmoothnessEntropyMap(tuning, spectrum, rootHz)
     : tuningModeSmoothnessEntropyMap(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q541 — presetModeDiversityVolatilityMap
+// ---------------------------------------------------------------------------
+
+export function presetModeDiversityVolatilityMap(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeDiversityVolatilityMap> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeDiversityVolatilityMap: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeDiversityVolatilityMap(tuning, spectrum, rootHz)
+    : tuningModeDiversityVolatilityMap(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q544 — presetModeAllQuadrantsBundle
+// ---------------------------------------------------------------------------
+
+export function presetModeAllQuadrantsBundle(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeAllQuadrantsBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeAllQuadrantsBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeAllQuadrantsBundle(tuning, spectrum, rootHz)
+    : tuningModeAllQuadrantsBundle(tuning, spectrum);
 }
