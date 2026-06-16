@@ -18,6 +18,7 @@ import {
   tuningReportSimilarity,
   compareTuningReports,
   progressionNarrative,
+  scaleSimilarityMatrix,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -31,6 +32,7 @@ import {
   chordProgressionToWav,
   type ChordProgressionToWavOptions,
 } from '../adapters/wav.js';
+import { tuningToFullBundle } from '../adapters/tun.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
 
 const SEMI = 100;
@@ -1064,4 +1066,116 @@ export function presetProgressionNarrative(
     return `No progression for preset ${presetId}.`;
   }
   return progressionNarrative(chords, rootHz, spectrum);
+}
+
+/**
+ * Compute the inter-preset similarity matrix for all presets in one call.
+ *
+ * Socratic Q246: "If I can compute a similarity matrix for arbitrary tunings and have a
+ * list of all presets, can I get the inter-preset similarity matrix in one call?" → No → implement.
+ *
+ * The matrix `M[i][j]` equals `tuningHarmonicityCorrelation(tunings[i], tunings[j])` via
+ * `scaleSimilarityMatrix`. The diagonal `M[i][i]` is always 1.0.
+ *
+ * @param presets - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @param tol     - Stolzenburg tolerance forwarded to the underlying correlation. Default 0.0136.
+ * @returns `{ ids: string[], matrix: number[][] }` — ids in the same order as presets, square matrix.
+ *
+ * @example
+ * const { ids, matrix } = allPresetsSimilarityMatrix();
+ * // matrix[0][1] is the correlation between ids[0] and ids[1]
+ */
+export function allPresetsSimilarityMatrix(
+  presets?: readonly TuningPreset[],
+  tol?: number,
+): { ids: string[]; matrix: number[][] } {
+  const ps = presets ?? ALL_PRESETS;
+  const tunings = ps.map((p) => loadTuningPreset(p));
+  const matrix = scaleSimilarityMatrix(tunings, undefined, tol);
+  return { ids: ps.map((p) => p.id), matrix };
+}
+
+/**
+ * Export a preset as WAV + SMF + SCL + TUN + MTS + full tuning report in one call.
+ *
+ * Socratic Q248: "If a preset is first-class, I should be able to get WAV+SMF+SCL+TUN+MTS+report
+ * in one call — can it?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningToFullBundle(tuning, rootHz, spectrum)` → `{ wav, smf, scl, tun, mts }`.
+ * 4. `tuningReport(tuning, rootHz ?? tuning.referenceHz, spectrum)` → `TuningReportType`.
+ * 5. Return all six fields combined.
+ *
+ * @param presetId - Id string of a curated tuning preset.
+ * @param rootHz   - Root frequency in Hz for WAV and report generation. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ wav, smf, scl, tun, mts, report }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundle = presetFullBundle('12-tet');
+ * fs.writeFileSync('12tet.wav', bundle.wav);
+ * console.log(bundle.report.bestMode.harmonicity);
+ */
+export function presetFullBundle(
+  presetId: string,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): {
+  wav: Uint8Array;
+  smf: Uint8Array;
+  scl: string;
+  tun: string;
+  mts: Uint8Array;
+  report: TuningReportType;
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetFullBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  const { wav, smf, scl, tun, mts } = tuningToFullBundle(tuning, rootHz, spectrum);
+  const report = tuningReport(tuning, rootHz ?? tuning.referenceHz, spectrum);
+  return { wav, smf, scl, tun, mts, report };
+}
+
+/**
+ * Return the top-N presets sorted by best-mode harmonicity, each with their full report.
+ *
+ * Socratic Q251: "If I can get all preset reports and rank them by stability, can I get the
+ * top-N presets with their full reports in one call?" → No → implement.
+ *
+ * Sorts all presets by `report.bestMode.harmonicity` ascending (most harmonic first) and
+ * returns the first `n` entries. If `n` exceeds the number of presets, all presets are returned.
+ *
+ * @param n        - Number of top entries to return (must be > 0).
+ * @param rootHz   - Root frequency in Hz for report generation. Defaults to 440.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ presetId, report }` sorted by harmonicity ascending (most harmonic first).
+ *
+ * @throws {RangeError} if `n` <= 0.
+ *
+ * @example
+ * const top2 = topPresetsByStabilityReport(2, 261.63);
+ * // top2[0].report.bestMode.harmonicity is the lowest (most harmonic)
+ */
+export function topPresetsByStabilityReport(
+  n: number,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): { presetId: string; report: TuningReportType }[] {
+  if (n <= 0) throw new RangeError('topPresetsByStabilityReport: n must be positive');
+  const reports = allPresetReports(rootHz ?? 440, spectrum, presets ?? ALL_PRESETS);
+  const sorted = reports
+    .map((entry) => ({ presetId: entry.preset.id, report: entry.report }))
+    .sort((a, b) => a.report.bestMode.harmonicity - b.report.bestMode.harmonicity);
+  return sorted.slice(0, n);
 }
