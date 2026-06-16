@@ -8903,3 +8903,212 @@ export function tuningParetoSummaryComparison(
     summaries: sorted,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Q456 — tuningCorrelationMatrixNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a human-readable narrative about metric relationships from the correlation matrix.
+ *
+ * Socratic Q456: "If I have the 5×5 correlation matrix and the top/anti-correlation pairs,
+ * can I produce a human-readable narrative about the metric relationships?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeTopCorrelation` → top (strongest positive).
+ * 2. `tuningModeAntiCorrelation` → anti (strongest negative).
+ * 3. `tuningModeCorrelationMatrix` → `{metrics, matrix}`.
+ * 4. Count off-diagonal pairs with |r| > 0.5.
+ * 5. Build narrative string.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{narrative, topCorrelation, antiCorrelation, strongPairCount}`.
+ */
+export function tuningCorrelationMatrixNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  narrative: string;
+  topCorrelation: { metricA: string; metricB: string; correlation: number };
+  antiCorrelation: { metricA: string; metricB: string; correlation: number };
+  strongPairCount: number;
+} {
+  const top =
+    rootHz !== undefined
+      ? tuningModeTopCorrelation(tuning, spectrum, rootHz)
+      : tuningModeTopCorrelation(tuning, spectrum);
+  const anti =
+    rootHz !== undefined
+      ? tuningModeAntiCorrelation(tuning, spectrum, rootHz)
+      : tuningModeAntiCorrelation(tuning, spectrum);
+  const { metrics, matrix } =
+    rootHz !== undefined
+      ? tuningModeCorrelationMatrix(tuning, spectrum, rootHz)
+      : tuningModeCorrelationMatrix(tuning, spectrum);
+
+  let strongPairCount = 0;
+  for (let i = 0; i < metrics.length; i++) {
+    for (let j = i + 1; j < metrics.length; j++) {
+      const r = matrix[i]?.[j] ?? 0;
+      if (Math.abs(r) > 0.5) strongPairCount++;
+    }
+  }
+  const totalPairs = (metrics.length * (metrics.length - 1)) / 2;
+
+  const narrative =
+    `The strongest positive correlation is between ${top.metricA} and ${top.metricB} (r=${top.correlation.toFixed(2)}). ` +
+    `The strongest negative correlation is between ${anti.metricA} and ${anti.metricB} (r=${anti.correlation.toFixed(2)}). ` +
+    `${strongPairCount} of ${totalPairs} metric pairs show strong correlation (|r| > 0.5).`;
+
+  return { narrative, topCorrelation: top, antiCorrelation: anti, strongPairCount };
+}
+
+// ---------------------------------------------------------------------------
+// Q458 — tuningFamilyCorrelationNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce correlation narratives for a family of tuning systems.
+ *
+ * Socratic Q458: "If I can produce a correlation narrative for one tuning, can I do it for a
+ * whole family?" → No → implement.
+ *
+ * Algorithm: map each tuning to `{id, narrative: tuningCorrelationMatrixNarrative(...)}`.
+ *
+ * @param tunings  - Array of tuning systems to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{id, narrative}` objects.
+ */
+export function tuningFamilyCorrelationNarratives(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  narrative: {
+    narrative: string;
+    topCorrelation: { metricA: string; metricB: string; correlation: number };
+    antiCorrelation: { metricA: string; metricB: string; correlation: number };
+    strongPairCount: number;
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    narrative:
+      rootHz !== undefined
+        ? tuningCorrelationMatrixNarrative(t, spectrum, rootHz)
+        : tuningCorrelationMatrixNarrative(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q459 — tuningParetoFrontNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a human-readable narrative about the Pareto front analysis of a tuning.
+ *
+ * Socratic Q459: "If I have the Pareto front summary and the best Pareto mode, can I produce a
+ * human-readable narrative about the Pareto analysis?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningParetoFrontSummary` → summary.
+ * 2. `tuningParetoFrontBestMode` → bestMode.
+ * 3. `tuningParetoFrontCoverage` → coverage.
+ * 4. Build narrative string.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{narrative, paretoSize, bestMode, coverage}`.
+ */
+export function tuningParetoFrontNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  narrative: string;
+  paretoSize: number;
+  bestMode: { mode: Scale; score: number };
+  coverage: {
+    paretoSize: number;
+    totalModes: number;
+    topRank: number;
+    coverageInTopK: number;
+  };
+} {
+  const summary =
+    rootHz !== undefined
+      ? tuningParetoFrontSummary(tuning, spectrum, rootHz)
+      : tuningParetoFrontSummary(tuning, spectrum);
+  const best =
+    rootHz !== undefined
+      ? tuningParetoFrontBestMode(tuning, spectrum, rootHz)
+      : tuningParetoFrontBestMode(tuning, spectrum);
+  const coverage =
+    rootHz !== undefined
+      ? tuningParetoFrontCoverage(tuning, spectrum, rootHz)
+      : tuningParetoFrontCoverage(tuning, spectrum);
+
+  const narrative =
+    `${summary.paretoSize} of ${coverage.totalModes} modes are Pareto-optimal ` +
+    `(coverage: ${coverage.coverageInTopK.toFixed(2)} in top ${coverage.topRank} modes). ` +
+    `The best Pareto mode is '${best.mode.id}' with composite score ${best.score.toFixed(2)}. ` +
+    `Pareto front entropy ranges from ${summary.entropy.min.toFixed(2)} to ${summary.entropy.max.toFixed(2)} ` +
+    `(mean ${summary.entropy.mean.toFixed(2)}).`;
+
+  return {
+    narrative,
+    paretoSize: summary.paretoSize,
+    bestMode: { mode: best.mode, score: best.score },
+    coverage,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q461 — tuningFamilyParetoNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce Pareto front narratives for a family of tuning systems.
+ *
+ * Socratic Q461: "If I can produce a Pareto narrative for one tuning, can I do it for a
+ * whole family?" → No → implement.
+ *
+ * Algorithm: map each tuning to `{id, paretoNarrative: tuningParetoFrontNarrative(...)}`.
+ *
+ * @param tunings  - Array of tuning systems to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{id, paretoNarrative}` objects.
+ */
+export function tuningFamilyParetoNarratives(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  paretoNarrative: {
+    narrative: string;
+    paretoSize: number;
+    bestMode: { mode: Scale; score: number };
+    coverage: {
+      paretoSize: number;
+      totalModes: number;
+      topRank: number;
+      coverageInTopK: number;
+    };
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    paretoNarrative:
+      rootHz !== undefined
+        ? tuningParetoFrontNarrative(t, spectrum, rootHz)
+        : tuningParetoFrontNarrative(t, spectrum),
+  }));
+}
