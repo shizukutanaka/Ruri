@@ -89,8 +89,12 @@ import {
   scaleIntervalVector,
   progressionDissonanceDelta,
   tuningModeCount,
+  scaleToChordMapSummary,
+  tuningStabilityScore,
+  chordMapVolatility,
+  tuningHarmonicDensity,
 } from './scale.js';
-import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
+import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
 import { rankChords } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
@@ -4251,5 +4255,79 @@ describe('tuningModeCount (Q256)', () => {
     const { total, withUniqueIntervalSets } = tuningModeCount(t);
     expect(total).toBe(6);
     expect(withUniqueIntervalSets).toBe(1); // all modes have same interval set [200,200,200,200,200,200]
+  });
+});
+
+describe('scaleToChordMapSummary (Q259)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns a summary with count and stats', () => {
+    const summary = scaleToChordMapSummary(scale, t12);
+    expect(summary.count).toBeGreaterThan(0);
+    expect(typeof summary.minDissonance).toBe('number');
+    expect(typeof summary.maxDissonance).toBe('number');
+    expect(summary.maxDissonance).toBeGreaterThanOrEqual(summary.minDissonance);
+  });
+  it('is consistent with chordMapSummary', () => {
+    const a = scaleToChordMapSummary(scale, t12);
+    const b = chordMapSummary(scale, t12);
+    expect(a.count).toBe(b.count);
+    expect(a.meanDissonance).toBeCloseTo(b.meanDissonance, 5);
+  });
+});
+
+describe('tuningStabilityScore (Q260)', () => {
+  it('returns a value in [0, 1]', () => {
+    const score = tuningStabilityScore(t12, 261.63);
+    expect(score).toBeGreaterThanOrEqual(0);
+    expect(score).toBeLessThanOrEqual(1);
+  });
+  it('is 0 for an empty tuning', () => {
+    const empty: TuningSystem = {
+      id: 'empty',
+      name: 'Empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(tuningStabilityScore(empty, 261.63)).toBe(0);
+  });
+});
+
+describe('chordMapVolatility (Q261)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('returns a non-negative number', () => {
+    const v = chordMapVolatility(chordMap);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for empty chord map', () => {
+    expect(chordMapVolatility([])).toBe(0);
+  });
+  it('returns a finite number', () => {
+    expect(Number.isFinite(chordMapVolatility(chordMap))).toBe(true);
+  });
+});
+
+describe('tuningHarmonicDensity (Q263)', () => {
+  it('returns a non-negative number', () => {
+    const d = tuningHarmonicDensity(t12);
+    expect(d).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for tuning with no degrees', () => {
+    const empty: TuningSystem = {
+      id: 'empty',
+      name: 'Empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(tuningHarmonicDensity(empty)).toBe(0);
+  });
+  it('is a finite number', () => {
+    expect(Number.isFinite(tuningHarmonicDensity(t12))).toBe(true);
   });
 });

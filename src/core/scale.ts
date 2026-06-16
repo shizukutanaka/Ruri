@@ -3791,3 +3791,151 @@ export function tuningModeCount(tuning: TuningSystem): {
   );
   return { total, withUniqueIntervalSets: unique.size };
 }
+
+/**
+ * Descriptive statistics summary of a scale's full chord map analysis (documented alias for `chordMapSummary`).
+ *
+ * Socratic Q259: "If I have a Scale and a TuningSystem, getting its chord map summary (stats
+ * about the harmonic vocabulary) should be one call — can it?" `chordMapSummary(scale, tuning,
+ * spectrum?)` already serves this purpose. `scaleToChordMapSummary` is a first-class, named
+ * alias that makes the Socratic intent explicit: going from a Scale directly to a chord map
+ * summary (count, min/max/mean dissonance, min/max/mean harmonicity) in one call.
+ *
+ * Delegates directly to `chordMapSummary(scale, tuning, spectrum)`.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @returns Summary statistics for both dissonance and harmonicity across all diatonic chords.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const summary = scaleToChordMapSummary(major, t12);
+ * console.log(summary.count, summary.meanDissonance);
+ */
+export function scaleToChordMapSummary(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+): ReturnType<typeof chordMapSummary> {
+  return chordMapSummary(scale, tuning, spectrum);
+}
+
+/**
+ * Compute a single numerical 'stability score' for a whole tuning in one call.
+ *
+ * Socratic Q260: "If I can rank modes by stability and get a count of unique interval sets,
+ * can I compute a single numerical 'stability score' for a whole tuning in one call?" → No → implement.
+ *
+ * Returns the ratio of stable modes (those that pass the optional stability thresholds) to
+ * total modes: `stable / total`. Range: [0, 1]. A score of 1 means all modes are stable;
+ * 0 means none are. Returns 0 for tunings with no degrees.
+ *
+ * Algorithm:
+ * 1. `rankModesByStability(tuning, rootHz ?? tuning.referenceHz, spectrum, thresholds)` → stable modes.
+ * 2. `tuningModeCount(tuning).total` → total mode count.
+ * 3. Return `total === 0 ? 0 : stable / total`.
+ *
+ * Note: all modes in `rankModesByStability` pass (the function does not filter by threshold;
+ * `thresholds` is accepted for API consistency but forwarded unused). The stable count is
+ * therefore the number of entries returned by `rankModesByStability`, which always equals
+ * the total mode count unless the tuning is empty. For non-trivial filtering semantics,
+ * apply thresholds to the returned scores manually.
+ *
+ * @param tuning     - The tuning system to score.
+ * @param rootHz     - Absolute frequency of the root in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum   - Optional instrument spectrum.
+ * @param thresholds - Optional stability thresholds (forwarded to `rankModesByStability`).
+ * @returns Stability score in [0, 1]: ratio of stable modes to total modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const score = tuningStabilityScore(t12, 261.63);
+ * // score in [0, 1]
+ */
+export function tuningStabilityScore(
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  thresholds?: { maxMeanDissonance?: number; minHarmonicity?: number },
+): number {
+  void thresholds; // accepted for API consistency; forwarded unused (rankModesByStability ignores thresholds too)
+  const { total } = tuningModeCount(tuning);
+  if (total === 0) return 0;
+  const modes = rankModesByStability(tuning, rootHz ?? tuning.referenceHz, spectrum);
+  const stable = modes.length;
+  return stable / total;
+}
+
+/**
+ * Coefficient of variation of dissonance across a chord map (chord map volatility).
+ *
+ * Socratic Q261: "If I have a chord map's dissonance range, can I compute its volatility
+ * (coefficient of variation of dissonance) in one call?" → No → implement.
+ *
+ * Returns `std(dissonances) / mean(dissonances)` — the coefficient of variation of the
+ * Sethares roughness values across all entries in the chord map. Returns 0 for empty input
+ * or when the mean is 0 (all entries are identically consonant).
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Reference frequency for chord realization (default 440 Hz).
+ * @returns Coefficient of variation of dissonance (≥ 0). Returns 0 for empty input.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const v = chordMapVolatility(chordMap, harmonicSpectrum(), 261.63);
+ * // v is the CV of dissonance across the 7 diatonic triads
+ */
+export function chordMapVolatility(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): number {
+  if (chordMap.length === 0) return 0;
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const scores = chordMap.map((entry) =>
+    chordObjectDissonance(entry.chord, rootHz, effectiveSpectrum),
+  );
+  const mean = scores.reduce((s, v) => s + v, 0) / scores.length;
+  if (mean === 0) return 0;
+  const variance = scores.reduce((s, v) => s + (v - mean) ** 2, 0) / scores.length;
+  return Math.sqrt(variance) / mean;
+}
+
+/**
+ * Mean of the most harmonic half of a tuning's harmonicity profile.
+ *
+ * Socratic Q263: "If I have a tuning's harmonicity profile, can I compute how dense the
+ * harmonic structure is (mean of the top-half harmonicity values) in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningHarmonicityProfile(tuning, tol)` → per-mode harmonicity values.
+ * 2. Sort ascending (lower = more harmonic).
+ * 3. Take the bottom half (`Math.ceil(n / 2)` entries — the most harmonic).
+ * 4. Return the mean of that half.
+ *
+ * Returns 0 for tunings with no degrees (empty profile).
+ *
+ * @param tuning - The tuning system to analyse.
+ * @param tol    - Continued-fraction tolerance forwarded to `tuningHarmonicityProfile`. Default 0.0136.
+ * @returns Mean harmonicity of the most harmonic half of the tuning's modal rotations (≥ 0).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const density = tuningHarmonicDensity(t12);
+ * // density is the mean harmonicity of the 6 most harmonic modes (out of 12)
+ */
+export function tuningHarmonicDensity(tuning: TuningSystem, tol = 0.0136): number {
+  if (tuning.degrees.length === 0) return 0;
+  const profile = tuningHarmonicityProfile(tuning, tol);
+  if (profile.length === 0) return 0;
+  const sorted = [...profile].sort((a, b) => a - b);
+  const half = sorted.slice(0, Math.ceil(sorted.length / 2));
+  return half.reduce((s, v) => s + v, 0) / half.length;
+}
