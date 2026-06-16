@@ -122,6 +122,8 @@ import {
   tuningModeRankingBundle,
   modeProgressionBundle,
   tuningBestModeProgression,
+  tuningFullAnalysis,
+  tuningFamilyFullReport,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5103,5 +5105,75 @@ describe('tuningBestModeProgression (Q315)', () => {
   it('accepts optional spectrum and rootHz', () => {
     const result = tuningBestModeProgression(t12, 'entropy', 261.63, harmonicSpectrum());
     expect(result.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+describe('tuningFullAnalysis (Q320)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns reportCard, tripleMode, consistencyEntropyDelta, harmonicDensity', () => {
+    const analysis = tuningFullAnalysis(t12);
+    expect(typeof analysis.reportCard).toBe('string');
+    expect(analysis.reportCard.length).toBeGreaterThan(0);
+    expect(typeof analysis.consistencyEntropyDelta).toBe('number');
+    expect(typeof analysis.harmonicDensity).toBe('number');
+    expect(analysis.tripleMode).toHaveProperty('allAgree');
+  });
+  it('reportCard contains tuning id', () => {
+    const { reportCard } = tuningFullAnalysis(t12);
+    expect(reportCard).toContain(t12.id);
+  });
+  it('tripleMode has all three best modes', () => {
+    const { tripleMode } = tuningFullAnalysis(t12);
+    expect(tripleMode.byEntropy).toHaveProperty('degreeIndices');
+    expect(tripleMode.byConsistency).toHaveProperty('degreeIndices');
+    expect(tripleMode.byVolatility).toHaveProperty('degreeIndices');
+  });
+  it('consistencyEntropyDelta is in [0, 1]', () => {
+    const { consistencyEntropyDelta } = tuningFullAnalysis(t12);
+    expect(consistencyEntropyDelta).toBeGreaterThanOrEqual(0);
+    expect(consistencyEntropyDelta).toBeLessThanOrEqual(1);
+  });
+  it('harmonicDensity is non-negative', () => {
+    const { harmonicDensity } = tuningFullAnalysis(t12);
+    expect(harmonicDensity).toBeGreaterThanOrEqual(0);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const analysis = tuningFullAnalysis(t12, 261.63, harmonicSpectrum());
+    expect(typeof analysis.reportCard).toBe('string');
+    expect(Number.isFinite(analysis.harmonicDensity)).toBe(true);
+  });
+});
+
+describe('tuningFamilyFullReport (Q322)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns familyReport and perTuningAnalysis', () => {
+    const result = tuningFamilyFullReport([t12, edo(19)]);
+    expect(result.familyReport).toHaveProperty('meanSimilarity');
+    expect(Array.isArray(result.perTuningAnalysis)).toBe(true);
+    expect(result.perTuningAnalysis).toHaveLength(2);
+  });
+  it('perTuningAnalysis entries have id and analysis', () => {
+    const result = tuningFamilyFullReport([t12, edo(19)]);
+    for (const entry of result.perTuningAnalysis) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.analysis.reportCard).toBe('string');
+      expect(typeof entry.analysis.harmonicDensity).toBe('number');
+    }
+  });
+  it('perTuningAnalysis ids match tuning ids', () => {
+    const t19 = edo(19);
+    const result = tuningFamilyFullReport([t12, t19]);
+    expect(result.perTuningAnalysis[0]!.id).toBe(t12.id);
+    expect(result.perTuningAnalysis[1]!.id).toBe(t19.id);
+  });
+  it('throws for empty tunings array', () => {
+    expect(() => tuningFamilyFullReport([])).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const result = tuningFamilyFullReport([t12], 261.63, harmonicSpectrum());
+    expect(result.perTuningAnalysis).toHaveLength(1);
+    expect(typeof result.perTuningAnalysis[0]!.analysis.reportCard).toBe('string');
   });
 });

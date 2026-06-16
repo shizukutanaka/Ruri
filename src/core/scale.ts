@@ -5187,3 +5187,91 @@ export function tuningBestModeProgression(
   const { chords, smoothnessRatio } = modeProgressionBundle(mode, tuning, rootHz, spectrum);
   return { mode, chords, smoothnessRatio };
 }
+
+// ---------------------------------------------------------------------------
+// Q320 — tuningFullAnalysis
+// ---------------------------------------------------------------------------
+
+/**
+ * Get all high-level tuning summary metrics in one call.
+ *
+ * Socratic Q320: "If I have multiple high-level tuning summary functions, can I get them all
+ * in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningReportCard(tuning, rootHz, spectrum)` → formatted report card string.
+ * 2. `tuningTripleBestModes(tuning, spectrum, rootHz)` → best modes by all three metrics.
+ * 3. `tuningConsistencyEntropyDelta(tuning, spectrum, rootHz)` → metric divergence scalar.
+ * 4. `tuningHarmonicDensity(tuning)` → harmonic density score.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ reportCard, tripleMode, consistencyEntropyDelta, harmonicDensity }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const analysis = tuningFullAnalysis(t12);
+ * console.log(analysis.reportCard);
+ * console.log(analysis.tripleMode.allAgree);
+ */
+export function tuningFullAnalysis(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  reportCard: string;
+  tripleMode: { byEntropy: Scale; byConsistency: Scale; byVolatility: Scale; allAgree: boolean };
+  consistencyEntropyDelta: number;
+  harmonicDensity: number;
+} {
+  const reportCard = tuningReportCard(tuning, rootHz, spectrum);
+  const tripleMode = tuningTripleBestModes(tuning, spectrum, rootHz);
+  const consistencyEntropyDelta = tuningConsistencyEntropyDelta(tuning, spectrum, rootHz);
+  const harmonicDensity = tuningHarmonicDensity(tuning);
+  return { reportCard, tripleMode, consistencyEntropyDelta, harmonicDensity };
+}
+
+// ---------------------------------------------------------------------------
+// Q322 — tuningFamilyFullReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a tuning family report plus a full per-tuning analysis in one call.
+ *
+ * Socratic Q322: "If I can get a family report and full analysis per tuning, can I combine
+ * them?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningFamilyReport(tunings, rootHz, spectrum)` → family-level report.
+ * 2. For each tuning: `tuningFullAnalysis(tuning, rootHz, spectrum)` → per-tuning analysis.
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ familyReport, perTuningAnalysis }` where each entry has an `id` and `analysis`.
+ *
+ * @throws {RangeError} if `tunings` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const { familyReport, perTuningAnalysis } = tuningFamilyFullReport([t12, t19]);
+ * console.log(familyReport.meanSimilarity);
+ * console.log(perTuningAnalysis[0]!.analysis.harmonicDensity);
+ */
+export function tuningFamilyFullReport(
+  tunings: TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  familyReport: TuningFamilyReport;
+  perTuningAnalysis: { id: string; analysis: ReturnType<typeof tuningFullAnalysis> }[];
+} {
+  const familyReport = tuningFamilyReport(tunings, rootHz, spectrum);
+  const perTuningAnalysis = tunings.map((t) => ({
+    id: t.id,
+    analysis: tuningFullAnalysis(t, rootHz, spectrum),
+  }));
+  return { familyReport, perTuningAnalysis };
+}
