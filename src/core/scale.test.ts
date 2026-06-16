@@ -219,6 +219,10 @@ import {
   tuningFamilyModeMetricRadarData,
   tuningModeMetricCluster,
   tuningFamilyModeMetricClusters,
+  tuningClusterSummary,
+  tuningFamilyClusterSummaries,
+  tuningModeRadarRanking,
+  tuningFamilyModeRadarRankings,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -8858,6 +8862,122 @@ describe('tuningFamilyModeMetricClusters (Q479)', () => {
       expect(typeof entry.id).toBe('string');
       expect(Array.isArray(entry.clusters)).toBe(true);
       expect(entry.clusters.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningClusterSummary (Q480)', () => {
+  it('returns highCount, midCount, lowCount, high, mid, low arrays', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningClusterSummary(t12, spec);
+    expect(result).toHaveProperty('highCount');
+    expect(result).toHaveProperty('midCount');
+    expect(result).toHaveProperty('lowCount');
+    expect(Array.isArray(result.high)).toBe(true);
+    expect(Array.isArray(result.mid)).toBe(true);
+    expect(Array.isArray(result.low)).toBe(true);
+  });
+
+  it('counts equal array lengths', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningClusterSummary(t12, spec);
+    expect(result.highCount).toBe(result.high.length);
+    expect(result.midCount).toBe(result.mid.length);
+    expect(result.lowCount).toBe(result.low.length);
+  });
+
+  it('total modes covered', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningClusterSummary(t12, spec);
+    expect(result.highCount + result.midCount + result.lowCount).toBe(t12.degrees.length);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningClusterSummary(t12, spec, 261.63);
+    expect(result.highCount + result.midCount + result.lowCount).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyClusterSummaries (Q482)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyClusterSummaries(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and clusterSummary with total modes', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyClusterSummaries(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      const s = entry.clusterSummary;
+      expect(s.highCount + s.midCount + s.lowCount).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningModeRadarRanking (Q483)', () => {
+  it('returns one entry per mode with rank', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeRadarRanking(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.rank).toBe('number');
+      expect(entry.rank).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('ranks are 1-based consecutive', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeRadarRanking(t12, spec);
+    const sorted = [...result].sort((a, b) => a.rank - b.rank);
+    sorted.forEach((entry, i) => {
+      expect(entry.rank).toBe(i + 1);
+    });
+  });
+
+  it('sorted descending by meanScore', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeRadarRanking(t12, spec);
+    if (result.length >= 2) {
+      expect(result[0]!.meanScore).toBeGreaterThanOrEqual(result[1]!.meanScore);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeRadarRanking(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeRadarRankings (Q485)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeRadarRankings(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and radarRanking array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeRadarRankings(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(Array.isArray(entry.radarRanking)).toBe(true);
+      expect(entry.radarRanking.length).toBeGreaterThan(0);
     }
   });
 });

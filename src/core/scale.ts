@@ -9758,3 +9758,150 @@ export function tuningFamilyModeMetricClusters(
         : tuningModeMetricCluster(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q480 — tuningClusterSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Summarise cluster counts and list the modes in each High/Mid/Low bucket.
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns An object with highCount, midCount, lowCount, high, mid, low arrays.
+ */
+export function tuningClusterSummary(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  highCount: number;
+  midCount: number;
+  lowCount: number;
+  high: Scale[];
+  mid: Scale[];
+  low: Scale[];
+} {
+  const clusters =
+    rootHz !== undefined
+      ? tuningModeMetricCluster(tuning, spectrum, rootHz)
+      : tuningModeMetricCluster(tuning, spectrum);
+  const high: Scale[] = [];
+  const mid: Scale[] = [];
+  const low: Scale[] = [];
+  for (const entry of clusters) {
+    if (entry.cluster === 'high') {
+      high.push(entry.mode);
+    } else if (entry.cluster === 'mid') {
+      mid.push(entry.mode);
+    } else {
+      low.push(entry.mode);
+    }
+  }
+  return {
+    highCount: high.length,
+    midCount: mid.length,
+    lowCount: low.length,
+    high,
+    mid,
+    low,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q482 — tuningFamilyClusterSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Summarise clusters for each tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and clusterSummary.
+ */
+export function tuningFamilyClusterSummaries(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  clusterSummary: {
+    highCount: number;
+    midCount: number;
+    lowCount: number;
+    high: Scale[];
+    mid: Scale[];
+    low: Scale[];
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    clusterSummary:
+      rootHz !== undefined
+        ? tuningClusterSummary(t, spectrum, rootHz)
+        : tuningClusterSummary(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q483 — tuningModeRadarRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank modes by their mean radar score (descending).
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array of {mode, meanScore, rank} sorted descending by meanScore.
+ */
+export function tuningModeRadarRanking(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; meanScore: number; rank: number }[] {
+  const radarData =
+    rootHz !== undefined
+      ? tuningModeMetricRadarData(tuning, spectrum, rootHz)
+      : tuningModeMetricRadarData(tuning, spectrum);
+  const withScores = radarData.map((entry) => {
+    const r = entry.radar;
+    const meanScore =
+      (r.entropy + r.consistency + r.volatility + r.diversity + r.smoothnessRatio) / 5;
+    return { mode: entry.mode, meanScore };
+  });
+  withScores.sort((a, b) => b.meanScore - a.meanScore);
+  return withScores.map((entry, i) => ({
+    mode: entry.mode,
+    meanScore: entry.meanScore,
+    rank: i + 1,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q485 — tuningFamilyModeRadarRankings
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank modes by radar score for each tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and radarRanking array.
+ */
+export function tuningFamilyModeRadarRankings(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; radarRanking: { mode: Scale; meanScore: number; rank: number }[] }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    radarRanking:
+      rootHz !== undefined
+        ? tuningModeRadarRanking(t, spectrum, rootHz)
+        : tuningModeRadarRanking(t, spectrum),
+  }));
+}
