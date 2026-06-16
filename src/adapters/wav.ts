@@ -37,6 +37,8 @@ import {
   modeVolatilityProfile,
   chordMapProgressionBridge,
   tuningReportCard,
+  bestModeByEntropy,
+  chordMapEntropyScore,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1798,4 +1800,46 @@ export function tuningReportCardWav(
   const reportCard = tuningReportCard(tuning, rootHz, spectrum);
   const wav = bestModeWav(tuning, rootHz ?? tuning.referenceHz, spectrum, opts);
   return { wav, reportCard };
+}
+
+// ---------------------------------------------------------------------------
+// Q298 — tuningEntropyBestModeWav
+// ---------------------------------------------------------------------------
+
+/**
+ * Render the highest-entropy mode of a tuning to WAV.
+ *
+ * Socratic Q298: "If I can find the best mode by entropy, can I render it
+ * to WAV in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `bestModeByEntropy(tuning, spectrum, rootHz)` → the mode with maximum chord-map entropy.
+ * 2. `scaleToChordMap(mode, tuning)` + `chordMapEntropyScore` → compute entropy for return value.
+ * 3. `pluckScaleWav(mode, tuning, opts)` → WAV bytes.
+ *
+ * @param tuning   - The tuning system.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param spectrum - Optional instrument spectrum for entropy computation.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @returns `{ wav: Uint8Array, entropy: number, mode: Scale }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { wav, entropy, mode } = tuningEntropyBestModeWav(t12);
+ * await fs.writeFile('best-entropy-mode.wav', wav);
+ * console.log(`Best mode by entropy: ${mode.id}, entropy: ${entropy}`);
+ */
+export function tuningEntropyBestModeWav(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): { wav: Uint8Array; entropy: number; mode: Scale } {
+  const mode = bestModeByEntropy(tuning, spectrum, rootHz);
+  const chordMap = scaleToChordMap(mode, tuning);
+  const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
+  const wav = pluckScaleWav(mode, tuning, opts);
+  return { wav, entropy, mode };
 }

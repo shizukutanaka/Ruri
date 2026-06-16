@@ -42,6 +42,7 @@ import {
   tuningFamilyWav,
   progressionBundleFromScale,
   tuningReportCardWav,
+  tuningEntropyBestModeWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1853,5 +1854,27 @@ describe('tuningReportCardWav (Q292)', () => {
   });
   it('reportCard contains tuning id', () => {
     expect(tuningReportCardWav(t12).reportCard).toContain(t12.id);
+  });
+});
+
+describe('tuningEntropyBestModeWav (Q298)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns wav, entropy, mode', () => {
+    const result = tuningEntropyBestModeWav(t12);
+    expect(result.wav).toBeInstanceOf(Uint8Array);
+    expect(result.wav.length).toBeGreaterThan(44);
+    expect(typeof result.entropy).toBe('number');
+    expect(result.entropy).toBeGreaterThanOrEqual(0);
+    expect(result.mode).toHaveProperty('degreeIndices');
+  });
+  it('wav has valid RIFF header', () => {
+    const { wav } = tuningEntropyBestModeWav(t12);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => tuningEntropyBestModeWav(empty)).toThrow(RangeError);
   });
 });
