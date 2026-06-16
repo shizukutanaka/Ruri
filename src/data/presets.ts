@@ -1179,3 +1179,76 @@ export function topPresetsByStabilityReport(
     .sort((a, b) => a.report.bestMode.harmonicity - b.report.bestMode.harmonicity);
   return sorted.slice(0, n);
 }
+
+/**
+ * Rank all presets by their full bundle sizes and tuning reports in one call.
+ *
+ * Socratic Q253: "If I can get a full bundle for one preset and rank presets by harmonicity,
+ * can I get the ranked list with full bundles in one call?" → No → implement.
+ *
+ * To keep tests fast, bundle size is estimated as the total byte length of WAV + SMF + MTS
+ * byte arrays from `presetFullBundle`. Sorted ascending by `report.bestMode.harmonicity`
+ * (most harmonic first).
+ *
+ * @param rootHz   - Root frequency in Hz for report generation. Defaults to 440.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ presetId, report, bundleSize }` sorted by harmonicity ascending.
+ *
+ * @example
+ * const ranked = rankPresetsByFullBundle(261.63);
+ * // ranked[0].presetId is the most harmonic preset with its full bundle info
+ */
+export function rankPresetsByFullBundle(
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): { presetId: string; report: TuningReportType; bundleSize: number }[] {
+  const ps = presets ?? ALL_PRESETS;
+  const entries = ps.map((p) => {
+    const bundle = presetFullBundle(p.id, rootHz, spectrum, ps);
+    const bundleSize = bundle.wav.length + bundle.smf.length + bundle.mts.length;
+    return { presetId: p.id, report: bundle.report, bundleSize };
+  });
+  return entries.sort((a, b) => a.report.bestMode.harmonicity - b.report.bestMode.harmonicity);
+}
+
+/**
+ * Find which preset tuning best matches a given spectrum's harmonic structure in one call.
+ *
+ * Socratic Q257: "If timbre determines consonance, and I have a spectrum, can I find which
+ * preset tuning best matches that spectrum's harmonic structure in one call?" → No → implement.
+ *
+ * For each preset, computes `tuningReport` with the given spectrum and returns the preset
+ * whose best mode has the minimum harmonicity score (lowest = most harmonic / best match).
+ *
+ * @param spectrum - Instrument spectrum whose harmonic structure to match.
+ * @param rootHz   - Root frequency in Hz for report generation. Defaults to `tuning.referenceHz`.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ presetId, harmonicity }` for the most spectrum-compatible preset.
+ *
+ * @throws {RangeError} if the preset pool is empty.
+ *
+ * @example
+ * const { presetId } = bestPresetForSpectrum(harmonicSpectrum());
+ * // presetId is the tuning whose best mode is most harmonic for a harmonic spectrum
+ */
+export function bestPresetForSpectrum(
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { presetId: string; harmonicity: number } {
+  const ps = presets ?? ALL_PRESETS;
+  if (ps.length === 0) throw new RangeError('bestPresetForSpectrum: no presets');
+  const entries = ps.map((p) => {
+    const tuning = loadTuningPreset(p);
+    const report = tuningReport(tuning, rootHz ?? tuning.referenceHz, spectrum);
+    return { presetId: p.id, harmonicity: report.bestMode.harmonicity };
+  });
+  let best = entries[0] as (typeof entries)[0];
+  for (let i = 1; i < entries.length; i++) {
+    const e = entries[i] as (typeof entries)[0];
+    if (e.harmonicity < best.harmonicity) best = e;
+  }
+  return { presetId: best.presetId, harmonicity: best.harmonicity };
+}

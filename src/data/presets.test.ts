@@ -18,9 +18,12 @@ import {
   allPresetsSimilarityMatrix,
   presetFullBundle,
   topPresetsByStabilityReport,
+  rankPresetsByFullBundle,
+  bestPresetForSpectrum,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
+import { harmonicSpectrum } from '../core/spectrum.js';
 
 // Q207 — allPresetReports
 describe('allPresetReports (Q207)', () => {
@@ -452,5 +455,37 @@ describe('topPresetsByStabilityReport (Q251)', () => {
   it('clamps to preset count', () => {
     const results = topPresetsByStabilityReport(999, 261.63);
     expect(results.length).toBeGreaterThan(0);
+  });
+});
+
+describe('rankPresetsByFullBundle (Q253)', () => {
+  it('returns all presets ranked', () => {
+    const ranked = rankPresetsByFullBundle(261.63);
+    expect(ranked.length).toBeGreaterThan(0);
+    ranked.forEach((r) => {
+      expect(typeof r.presetId).toBe('string');
+      expect(r.bundleSize).toBeGreaterThan(0);
+      expect(r.report).toBeDefined();
+    });
+  });
+  it('sorted by harmonicity ascending', () => {
+    const ranked = rankPresetsByFullBundle(261.63);
+    for (let i = 0; i + 1 < ranked.length; i++) {
+      expect(ranked[i]!.report.bestMode.harmonicity).toBeLessThanOrEqual(
+        ranked[i + 1]!.report.bestMode.harmonicity,
+      );
+    }
+  });
+});
+
+describe('bestPresetForSpectrum (Q257)', () => {
+  it('returns a preset id and harmonicity', () => {
+    const { presetId, harmonicity } = bestPresetForSpectrum(harmonicSpectrum());
+    expect(typeof presetId).toBe('string');
+    expect(presetId.length).toBeGreaterThan(0);
+    expect(Number.isFinite(harmonicity)).toBe(true);
+  });
+  it('harmonicity is non-negative', () => {
+    expect(bestPresetForSpectrum(harmonicSpectrum()).harmonicity).toBeGreaterThanOrEqual(0);
   });
 });
