@@ -104,6 +104,8 @@ import {
   tuningModeQuadrantConsensus,
   tuningBestQuadrantConsensusMode,
   tuningModeConsensusNarrative,
+  tuningModeQuadrantProfile,
+  tuningQuadrantCoverage,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4870,4 +4872,34 @@ export function presetModeConsensusNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningModeConsensusNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q559 — presetModeQuadrantProfile
+// ---------------------------------------------------------------------------
+
+export function presetModeQuadrantProfile(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeQuadrantProfile> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeQuadrantProfile(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q562 — presetQuadrantCoverage
+// ---------------------------------------------------------------------------
+
+export function presetQuadrantCoverage(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningQuadrantCoverage> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningQuadrantCoverage(loadTuningPreset(preset), spectrum, rootHz);
 }

@@ -111,6 +111,8 @@ import {
   presetModeQuadrantConsensus,
   presetBestQuadrantConsensusMode,
   presetModeConsensusNarrative,
+  presetModeQuadrantProfile,
+  presetQuadrantCoverage,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3294,5 +3296,46 @@ describe('presetModeConsensusNarrative (Q556)', () => {
     expect(() =>
       presetModeConsensusNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q559 — presetModeQuadrantProfile
+// ---------------------------------------------------------------------------
+
+describe('presetModeQuadrantProfile (Q559)', () => {
+  it('returns quadrant profile strings for each mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeQuadrantProfile('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.quadrantProfile).toBe('string');
+    expect(result[0]!.quadrantProfile.split('|').length).toBe(4);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeQuadrantProfile('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q562 — presetQuadrantCoverage
+// ---------------------------------------------------------------------------
+
+describe('presetQuadrantCoverage (Q562)', () => {
+  it('returns coverage for 12-tet preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetQuadrantCoverage('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.totalModes).toBeGreaterThan(0);
+    expect(result.totalUniqueProfiles).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetQuadrantCoverage('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
   });
 });
