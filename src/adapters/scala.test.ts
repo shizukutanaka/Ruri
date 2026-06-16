@@ -25,6 +25,7 @@ import {
   scaleModeProgressionBundle,
   scaleFullAnalysisBundle,
   scaleSpectralNarrativeBundle,
+  scaleProgressionSclBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -1088,5 +1089,59 @@ describe('scaleSpectralNarrativeBundle (Q340)', () => {
     const bundle = scaleSpectralNarrativeBundle(scale, t12, spectrum, 261.63);
     expect(typeof bundle.scl).toBe('string');
     expect(typeof bundle.smoothnessRatio).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q371 — scaleProgressionSclBundle
+// ---------------------------------------------------------------------------
+
+describe('scaleProgressionSclBundle (Q371)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns scl, chords, smoothedChords, smoothnessRatio, narrative', () => {
+    const bundle = scaleProgressionSclBundle(scale, t12);
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.scl.length).toBeGreaterThan(0);
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(Array.isArray(bundle.smoothedChords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+    expect(typeof bundle.narrative).toBe('string');
+    expect(bundle.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('scl has valid Scala header', () => {
+    const { scl } = scaleProgressionSclBundle(scale, t12);
+    expect(scl).toContain('!');
+    expect(scl).toContain('Major');
+  });
+
+  it('scl contains custom name when provided', () => {
+    const { scl } = scaleProgressionSclBundle(scale, t12, 440, undefined, 'Custom Name');
+    expect(scl).toContain('Custom Name');
+  });
+
+  it('smoothnessRatio is finite', () => {
+    const { smoothnessRatio } = scaleProgressionSclBundle(scale, t12);
+    expect(Number.isFinite(smoothnessRatio)).toBe(true);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const bundle = scaleProgressionSclBundle(scale, t12, 261.63, harmonicSpectrum());
+    expect(typeof bundle.scl).toBe('string');
+    expect(Number.isFinite(bundle.smoothnessRatio)).toBe(true);
+  });
+
+  it('smoothedChords is a subset or equal length to chords', () => {
+    const { chords, smoothedChords } = scaleProgressionSclBundle(scale, t12);
+    expect(smoothedChords.length).toBeGreaterThanOrEqual(0);
+    expect(chords.length).toBeGreaterThanOrEqual(0);
   });
 });

@@ -23,6 +23,7 @@ import {
   chordMapProgressionBridge,
   progressionNarrative,
   progressionSmoothnessRatio,
+  scaleProgressionFullBundle,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -974,4 +975,62 @@ export function scaleSpectralNarrativeBundle(
   const narrative = progressionNarrative(chords, rootHz, spectrum);
   const smoothnessRatio = progressionSmoothnessRatio(chords, rootHz, spectrum);
   return { scl, spectralProfile, narrative, smoothnessRatio };
+}
+
+// ---------------------------------------------------------------------------
+// Q371 — scaleProgressionSclBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Export a scale as SCL text bundled with its full chord progression analysis in one call.
+ *
+ * Socratic Q371: "If I can get a full progression bundle for a scale and export it to SCL,
+ * can I combine them?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToSubsetSclText(scale, tuning, name)` → scl.
+ * 2. `scaleProgressionFullBundle(scale, tuning, rootHz, spectrum)` → bundle.
+ *
+ * The return includes `chords` (raw), `smoothedChords`, `smoothnessRatio`, and `narrative`
+ * from the full bundle, but omits `volatility`, `entropy`, and `consistency` to keep the
+ * SCL-focused bundle focused on progression.
+ *
+ * @param scale    - The scale (mode) to analyse and export.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, chords, smoothedChords, smoothnessRatio, narrative }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const bundle = scaleProgressionSclBundle(major, t12);
+ * fs.writeFileSync('major.scl', bundle.scl);
+ * console.log(bundle.smoothnessRatio, bundle.narrative);
+ */
+export function scaleProgressionSclBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  name?: string,
+): {
+  scl: string;
+  chords: ReturnType<typeof scaleProgressionFullBundle>['chords'];
+  smoothedChords: ReturnType<typeof scaleProgressionFullBundle>['smoothedChords'];
+  smoothnessRatio: number;
+  narrative: string;
+} {
+  const scl = scaleToSubsetSclText(scale, tuning, name);
+  const bundle = scaleProgressionFullBundle(scale, tuning, rootHz, spectrum);
+  return {
+    scl,
+    chords: bundle.chords,
+    smoothedChords: bundle.smoothedChords,
+    smoothnessRatio: bundle.smoothnessRatio,
+    narrative: bundle.narrative,
+  };
 }
