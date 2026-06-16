@@ -97,6 +97,8 @@ import {
   presetModeComprehensiveMetricBundle,
   presetModeConsensusClusterBundle,
   presetTopClusterConsensusMode,
+  presetModeConsensusOutlierBundle,
+  presetModeInsightSummary,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2946,5 +2948,47 @@ describe('presetTopClusterConsensusMode (Q514)', () => {
     const spec = harmonicSpectrum(6);
     const result = presetTopClusterConsensusMode('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(typeof result.cluster).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetModeConsensusOutlierBundle (Q517)', () => {
+  it('returns bundle with outlierMetrics field', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeConsensusOutlierBundle('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(Array.isArray(result[0]!.outlierMetrics)).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeConsensusOutlierBundle('not-real', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetModeInsightSummary (Q520)', () => {
+  it('returns insight summaries with strings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeInsightSummary('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.insight).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeInsightSummary('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeInsightSummary('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
   });
 });

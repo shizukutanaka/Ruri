@@ -90,6 +90,8 @@ import {
   tuningModeComprehensiveMetricBundle,
   tuningModeConsensusClusterBundle,
   tuningTopClusterConsensusMode,
+  tuningModeConsensusOutlierBundle,
+  tuningModeInsightSummary,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4567,4 +4569,65 @@ export function presetTopClusterConsensusMode(
   return rootHz !== undefined
     ? tuningTopClusterConsensusMode(tuning, spectrum, rootHz)
     : tuningTopClusterConsensusMode(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q517 — presetModeConsensusOutlierBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Join consensus ranking and metric outlier data for a preset's modes.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of per-mode consensus+outlier bundles.
+ */
+export function presetModeConsensusOutlierBundle(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeConsensusOutlierBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeConsensusOutlierBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeConsensusOutlierBundle(tuning, spectrum, rootHz)
+    : tuningModeConsensusOutlierBundle(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q520 — presetModeInsightSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a compact per-mode insight string for a preset.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns One entry per mode with mode, consensusRank, cluster,
+ *          outlierMetrics, and a human-readable insight string.
+ */
+export function presetModeInsightSummary(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeInsightSummary> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeInsightSummary: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeInsightSummary(tuning, spectrum, rootHz)
+    : tuningModeInsightSummary(tuning, spectrum);
 }
