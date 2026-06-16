@@ -87,6 +87,8 @@ import {
   presetModeMetricCluster,
   presetClusterSummary,
   presetModeRadarRanking,
+  presetRadarRankingVsScoreRanking,
+  presetBestRadarScoreAgreement,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2708,5 +2710,47 @@ describe('presetModeRadarRanking (Q484)', () => {
     const spec = harmonicSpectrum(6);
     const result = presetModeRadarRanking('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetRadarRankingVsScoreRanking (Q487)', () => {
+  it('returns comparison array with rankDelta fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetRadarRankingVsScoreRanking('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.rankDelta).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetRadarRankingVsScoreRanking('not-real', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetBestRadarScoreAgreement (Q490)', () => {
+  it('returns single best agreement mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestRadarScoreAgreement('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.mode.id).toBe('string');
+    expect(result.radarRank).toBeGreaterThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetBestRadarScoreAgreement('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestRadarScoreAgreement('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.scoreRank).toBeGreaterThanOrEqual(1);
   });
 });

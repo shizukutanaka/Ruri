@@ -80,6 +80,8 @@ import {
   tuningModeMetricCluster,
   tuningClusterSummary,
   tuningModeRadarRanking,
+  tuningRadarRankingVsScoreRanking,
+  tuningBestRadarScoreAgreement,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4253,4 +4255,60 @@ export function presetModeRadarRanking(
   return rootHz !== undefined
     ? tuningModeRadarRanking(tuning, spectrum, rootHz)
     : tuningModeRadarRanking(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare radar ranking vs composite-score ranking for a preset.
+ *
+ * @param presetId - The preset identifier.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of {mode, radarRank, scoreRank, rankDelta} ordered by radar rank.
+ */
+export function presetRadarRankingVsScoreRanking(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningRadarRankingVsScoreRanking> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetRadarRankingVsScoreRanking: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningRadarRankingVsScoreRanking(tuning, spectrum, rootHz)
+    : tuningRadarRankingVsScoreRanking(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the mode where radar rank and score rank agree most for a preset.
+ *
+ * @param presetId - The preset identifier.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns The entry with the smallest absolute rankDelta (first on tie).
+ */
+export function presetBestRadarScoreAgreement(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningBestRadarScoreAgreement> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestRadarScoreAgreement: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningBestRadarScoreAgreement(tuning, spectrum, rootHz)
+    : tuningBestRadarScoreAgreement(tuning, spectrum);
 }
