@@ -27,6 +27,7 @@ import {
   tuningProgressionVariety,
   chordMapConsistencyScore,
   chordMapEntropyScore,
+  tuningEntropyProfile,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -40,6 +41,7 @@ import {
   type TuningScaleWavOptions,
   chordProgressionToWav,
   type ChordProgressionToWavOptions,
+  tuningEntropyBestModeWav,
 } from '../adapters/wav.js';
 import { tuningToFullBundle } from '../adapters/tun.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
@@ -1599,4 +1601,91 @@ export function presetEntropyLeague(
   const medium = entries.slice(third, 2 * third).map((r) => r.presetId);
   const low = entries.slice(2 * third).map((r) => r.presetId);
   return { high, medium, low };
+}
+
+// ---------------------------------------------------------------------------
+// Q296 — presetEntropyProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute chord-map entropy for every mode of a preset tuning.
+ *
+ * Socratic Q296: "If I can get entropy profile for a tuning, can I get it
+ * for a preset by id in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningEntropyProfile(tuning, spectrum, rootHz)` → `{mode, entropy}[]`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{mode, entropy}` — one entry per modal rotation.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const profile = presetEntropyProfile('12-tet');
+ * // profile.length === 12; profile[0].entropy >= 0
+ */
+export function presetEntropyProfile(
+  presetId: string,
+  spectrum?: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): { mode: Scale; entropy: number }[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetEntropyProfile: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningEntropyProfile(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q299 — presetBestEntropyModeWav
+// ---------------------------------------------------------------------------
+
+/**
+ * Render the highest-entropy mode of a preset tuning to WAV.
+ *
+ * Socratic Q299: "If I can get best-entropy WAV for a tuning, can I do it
+ * for a preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningEntropyBestModeWav(tuning, rootHz, spectrum, opts)` → `{wav, entropy, mode}`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param spectrum - Optional instrument spectrum for mode selection.
+ * @param opts     - Optional synthesis options.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ wav: Uint8Array, entropy: number, mode: Scale }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const { wav, entropy, mode } = presetBestEntropyModeWav('12-tet');
+ * await fs.writeFile('best-entropy-mode.wav', wav);
+ * console.log(`Entropy: ${entropy}, Mode: ${mode.id}`);
+ */
+export function presetBestEntropyModeWav(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: TuningScaleWavOptions,
+  presets?: readonly TuningPreset[],
+): { wav: Uint8Array; entropy: number; mode: Scale } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestEntropyModeWav: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningEntropyBestModeWav(tuning, rootHz, spectrum, opts);
 }

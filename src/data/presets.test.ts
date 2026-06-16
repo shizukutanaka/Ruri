@@ -28,6 +28,8 @@ import {
   bestPresetConsistency,
   topPresetsByEntropy,
   presetEntropyLeague,
+  presetEntropyProfile,
+  presetBestEntropyModeWav,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -612,5 +614,39 @@ describe('presetEntropyLeague (Q293)', () => {
     const { high, medium, low } = presetEntropyLeague();
     const all = [...high, ...medium, ...low];
     expect(new Set(all).size).toBe(all.length);
+  });
+});
+
+describe('presetEntropyProfile (Q296)', () => {
+  it('returns array of mode/entropy pairs', () => {
+    const profile = presetEntropyProfile('12-tet');
+    expect(Array.isArray(profile)).toBe(true);
+    expect(profile.length).toBeGreaterThan(0);
+    for (const { mode, entropy } of profile) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(entropy).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetEntropyProfile('not-a-preset')).toThrow(RangeError);
+  });
+  it('returns one entry per tuning degree', () => {
+    const profile = presetEntropyProfile('12-tet');
+    // 12-TET has 12 degrees
+    expect(profile.length).toBe(12);
+  });
+});
+
+describe('presetBestEntropyModeWav (Q299)', () => {
+  it('returns wav, entropy, mode for preset', () => {
+    const result = presetBestEntropyModeWav('12-tet');
+    expect(result.wav).toBeInstanceOf(Uint8Array);
+    expect(result.wav.length).toBeGreaterThan(44);
+    expect(typeof result.entropy).toBe('number');
+    expect(result.entropy).toBeGreaterThanOrEqual(0);
+    expect(result.mode).toHaveProperty('degreeIndices');
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetBestEntropyModeWav('not-a-preset')).toThrow(RangeError);
   });
 });
