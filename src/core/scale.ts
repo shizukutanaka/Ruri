@@ -4089,3 +4089,174 @@ export function modeVolatilityProfile(
     volatility: scaleChordMapVolatility(mode, tuning, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q272 — tuningFamilyReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Comprehensive report for a family of related tunings: individual reports, similarity
+ * matrix, most/least similar pair, and mean similarity in one call.
+ *
+ * Socratic Q272: "If I can get individual tuning reports and similarity matrices, can I
+ * get a comprehensive family report for a set of related tunings in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningReport(t, rootHz, spectrum)` for every tuning.
+ * 2. `scaleSimilarityMatrix(tunings)` → N×N correlation matrix.
+ * 3. Scan all off-diagonal entries to find the most and least similar pair.
+ * 4. Mean of all finite off-diagonal values.
+ *
+ * @param tunings  - Array of tuning systems to compare (must be non-empty).
+ * @param rootHz   - Root frequency for individual reports (default: `t.referenceHz` per tuning).
+ * @param spectrum - Optional instrument spectrum for report computation.
+ * @returns `TuningFamilyReport` containing ids, reports, matrix, pair extremes, and mean.
+ *
+ * @throws {RangeError} if `tunings` is empty.
+ *
+ * @example
+ * const report = tuningFamilyReport([equalTemperament12(440), edo(19)]);
+ * // report.ids === ['12-tet', ...]; report.meanSimilarity ∈ [-1, 1]
+ */
+export interface TuningFamilyReport {
+  ids: string[];
+  reports: TuningReportType[];
+  similarityMatrix: number[][];
+  mostSimilarPair: [string, string];
+  leastSimilarPair: [string, string];
+  meanSimilarity: number;
+}
+
+export function tuningFamilyReport(
+  tunings: readonly TuningSystem[],
+  rootHz?: number,
+  spectrum?: Spectrum,
+): TuningFamilyReport {
+  if (tunings.length === 0) {
+    throw new RangeError('tuningFamilyReport: empty tunings array');
+  }
+  const ids = tunings.map((t) => t.id);
+  const reports = tunings.map((t) => tuningReport(t, rootHz ?? t.referenceHz, spectrum));
+  const matrix = scaleSimilarityMatrix(tunings);
+
+  // If only 1 tuning, pairs default to self
+  let mostSimilarPair: [string, string] = [ids[0]!, ids[0]!];
+  let leastSimilarPair: [string, string] = [ids[0]!, ids[0]!];
+  let maxSim = -Infinity;
+  let minSim = Infinity;
+  const offDiagonal: number[] = [];
+
+  for (let i = 0; i < tunings.length; i++) {
+    for (let j = i + 1; j < tunings.length; j++) {
+      const val = (matrix[i] as number[])[j] as number;
+      offDiagonal.push(val);
+      if (Number.isFinite(val)) {
+        if (val > maxSim) {
+          maxSim = val;
+          mostSimilarPair = [ids[i]!, ids[j]!];
+        }
+        if (val < minSim) {
+          minSim = val;
+          leastSimilarPair = [ids[i]!, ids[j]!];
+        }
+      }
+    }
+  }
+
+  const finite = offDiagonal.filter(Number.isFinite);
+  const meanSimilarity =
+    finite.length > 0 ? finite.reduce((s, v) => s + v, 0) / finite.length : NaN;
+
+  return {
+    ids,
+    reports,
+    similarityMatrix: matrix,
+    mostSimilarPair,
+    leastSimilarPair,
+    meanSimilarity,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q273 — progressionSmoothnessRatio
+// ---------------------------------------------------------------------------
+
+/**
+ * Smoothness ratio of a chord progression: 1 = perfectly smooth, 0 = maximally jagged.
+ *
+ * Socratic Q273: "If I can compute `progressionDissonanceDelta` (total motion) and
+ * `progressionEnergyArc` (per-chord dissonance), can I get a smoothness ratio
+ * (actual motion / maximum possible) in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. If `chords.length < 2` return `1.0` (trivially smooth).
+ * 2. `arc = progressionEnergyArc(chords, rootHz, spectrum)`.
+ * 3. `totalDelta = progressionDissonanceDelta(chords, rootHz, spectrum)`.
+ * 4. `maxPossible = (max(arc) - min(arc)) * (arc.length - 1)`.
+ * 5. If `maxPossible === 0` return `1.0`.
+ * 6. Return `1 - totalDelta / maxPossible`.
+ *
+ * @param chords   - Ordered list of chords.
+ * @param rootHz   - Root frequency in Hz.
+ * @param spectrum - Optional instrument spectrum.
+ * @returns Smoothness ratio ∈ [0, 1] (higher = smoother motion).
+ *
+ * @example
+ * const ratio = progressionSmoothnessRatio(chords, 261.63);
+ * // ratio close to 1 → dissonance changes are small; close to 0 → large jumps
+ */
+export function progressionSmoothnessRatio(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): number {
+  if (chords.length < 2) return 1.0;
+  const arc = progressionEnergyArc(chords, rootHz, spectrum);
+  const totalDelta = progressionDissonanceDelta(chords, rootHz, spectrum);
+  const arcMax = Math.max(...arc);
+  const arcMin = Math.min(...arc);
+  const maxPossible = (arcMax - arcMin) * (arc.length - 1);
+  if (maxPossible === 0) return 1.0;
+  return 1 - totalDelta / maxPossible;
+}
+
+// ---------------------------------------------------------------------------
+// Q274 — chordMapSpectralProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-chord spectral fit (harmonicity) profile for a chord map in one call.
+ *
+ * Socratic Q274: "If I can compute spectral fit for a tuning and chord map analysis
+ * per-entry, can I get a per-chord spectral fit profile for a chord map in one call?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. For each `ScaleChordMapEntry`, compute `harmonicityForChord(entry.chord, rootHz, tol)`.
+ * 2. Return `{ entry, spectralFit }` for each.
+ *
+ * @param chordMap - Array of scale chord map entries (e.g. from `scaleToChordMap`).
+ * @param spectrum - Instrument spectrum (accepted for API consistency; harmonicity is spectrum-independent).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param tol      - Continued-fraction tolerance for harmonicity (default 0.0136).
+ * @returns Array of `{ entry, spectralFit }`, one per chord map entry, in original order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const profile = chordMapSpectralProfile(chordMap, harmonicSpectrum());
+ * // profile[0].spectralFit is the harmonicity of the first diatonic triad
+ */
+export function chordMapSpectralProfile(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum: Spectrum,
+  rootHz = 440,
+  tol = 0.0136,
+): { entry: ScaleChordMapEntry; spectralFit: number }[] {
+  void spectrum; // accepted for API consistency; harmonicity is timbre-independent
+  return chordMap.map((entry) => ({
+    entry,
+    spectralFit: harmonicityForChord(entry.chord, rootHz, tol),
+  }));
+}

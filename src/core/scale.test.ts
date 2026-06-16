@@ -97,6 +97,9 @@ import {
   chordProgressionSmooth,
   scaleChordMapVolatility,
   modeVolatilityProfile,
+  tuningFamilyReport,
+  progressionSmoothnessRatio,
+  chordMapSpectralProfile,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4471,5 +4474,53 @@ describe('modeVolatilityProfile (Q268)', () => {
     modeVolatilityProfile(scale, t12).forEach((p) =>
       expect(p.volatility).toBeGreaterThanOrEqual(0),
     );
+  });
+});
+
+describe('tuningFamilyReport (Q272)', () => {
+  const t19 = edo(19);
+
+  it('returns report with correct structure', () => {
+    const report = tuningFamilyReport([t12, t19], 261.63);
+    expect(report.ids).toHaveLength(2);
+    expect(report.reports).toHaveLength(2);
+    expect(report.similarityMatrix).toHaveLength(2);
+    expect(report.mostSimilarPair).toHaveLength(2);
+    expect(report.leastSimilarPair).toHaveLength(2);
+    expect(Number.isFinite(report.meanSimilarity) || Number.isNaN(report.meanSimilarity)).toBe(
+      true,
+    );
+  });
+  it('throws for empty tunings', () => {
+    expect(() => tuningFamilyReport([])).toThrow(RangeError);
+  });
+});
+
+describe('progressionSmoothnessRatio (Q273)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 4).map((e) => e.chord);
+
+  it('returns a finite number', () => {
+    const r = progressionSmoothnessRatio(chords, 261.63);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+  it('returns 1 for fewer than 2 chords', () => {
+    expect(progressionSmoothnessRatio([], 261.63)).toBe(1.0);
+    expect(progressionSmoothnessRatio([chords[0]!], 261.63)).toBe(1.0);
+  });
+});
+
+describe('chordMapSpectralProfile (Q274)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('returns one entry per chord', () => {
+    const profile = chordMapSpectralProfile(chordMap, harmonicSpectrum());
+    expect(profile).toHaveLength(chordMap.length);
+  });
+  it('all spectralFit values are non-negative', () => {
+    const profile = chordMapSpectralProfile(chordMap, harmonicSpectrum());
+    profile.forEach((p) => expect(p.spectralFit).toBeGreaterThanOrEqual(0));
   });
 });
