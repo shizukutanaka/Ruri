@@ -10882,3 +10882,104 @@ export function tuningFamilyModeInsightSummaries(
         : tuningModeInsightSummary(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q522 — tuningFinalRecommendation
+// ---------------------------------------------------------------------------
+
+export function tuningFinalRecommendation(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  recommendation: string;
+  recommendedMode: ReturnType<typeof tuningTopClusterConsensusMode>;
+  masterNarrative: string;
+} {
+  const topMode =
+    rootHz !== undefined
+      ? tuningTopClusterConsensusMode(tuning, spectrum, rootHz)
+      : tuningTopClusterConsensusMode(tuning, spectrum);
+  const report =
+    rootHz !== undefined
+      ? tuningMasterReport(tuning, spectrum, rootHz)
+      : tuningMasterReport(tuning, spectrum);
+  const recommendation =
+    `For tuning '${tuning.id}', the recommended mode is '${topMode.mode.id}' ` +
+    `(consensus rank ${topMode.consensusRank}, cluster: ${topMode.cluster}). ` +
+    report.masterNarrative;
+  return { recommendation, recommendedMode: topMode, masterNarrative: report.masterNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q524 — tuningFamilyFinalRecommendations
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyFinalRecommendations(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; finalRecommendation: ReturnType<typeof tuningFinalRecommendation> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    finalRecommendation:
+      rootHz !== undefined
+        ? tuningFinalRecommendation(t, spectrum, rootHz)
+        : tuningFinalRecommendation(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q525 — tuningModeEntropyDiversityMap
+// ---------------------------------------------------------------------------
+
+export function tuningModeEntropyDiversityMap(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropy: number;
+  diversity: number;
+  quadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform';
+}[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  const n = bundle.length;
+  if (n === 0) return [];
+  const meanEntropy = bundle.reduce((s, b) => s + b.entropy, 0) / n;
+  const meanDiversity = bundle.reduce((s, b) => s + b.diversity, 0) / n;
+  return bundle.map((b) => {
+    const aboveEntropy = b.entropy > meanEntropy;
+    const aboveDiversity = b.diversity > meanDiversity;
+    const quadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform' =
+      aboveEntropy && aboveDiversity
+        ? 'rich-complex'
+        : aboveEntropy && !aboveDiversity
+          ? 'varied-uniform'
+          : !aboveEntropy && aboveDiversity
+            ? 'stable-diverse'
+            : 'stable-uniform';
+    return { mode: b.mode, entropy: b.entropy, diversity: b.diversity, quadrant };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q527 — tuningFamilyModeEntropyDiversityMaps
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeEntropyDiversityMaps(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; entropyDiversityMap: ReturnType<typeof tuningModeEntropyDiversityMap> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    entropyDiversityMap:
+      rootHz !== undefined
+        ? tuningModeEntropyDiversityMap(t, spectrum, rootHz)
+        : tuningModeEntropyDiversityMap(t, spectrum),
+  }));
+}

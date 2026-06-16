@@ -247,6 +247,10 @@ import {
   tuningFamilyModeConsensusOutlierBundles,
   tuningModeInsightSummary,
   tuningFamilyModeInsightSummaries,
+  tuningFinalRecommendation,
+  tuningFamilyFinalRecommendations,
+  tuningModeEntropyDiversityMap,
+  tuningFamilyModeEntropyDiversityMaps,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9648,6 +9652,106 @@ describe('tuningFamilyModeInsightSummaries (Q521)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(entry.insightSummaries.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q522 — tuningFinalRecommendation
+// ---------------------------------------------------------------------------
+
+describe('tuningFinalRecommendation (Q522)', () => {
+  it('returns recommendation, recommendedMode, masterNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFinalRecommendation(t12, spec);
+    expect(typeof result.recommendation).toBe('string');
+    expect(result.recommendation.length).toBeGreaterThan(0);
+    expect(typeof result.recommendedMode.mode.id).toBe('string');
+    expect(typeof result.masterNarrative).toBe('string');
+  });
+
+  it('recommendation includes tuning id and recommended mode id', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFinalRecommendation(t12, spec);
+    expect(result.recommendation).toContain(t12.id);
+    expect(result.recommendation).toContain(result.recommendedMode.mode.id);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFinalRecommendation(t12, spec, 261.63);
+    expect(result.recommendation.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q524 — tuningFamilyFinalRecommendations
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyFinalRecommendations (Q524)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyFinalRecommendations([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+  });
+
+  it('each entry has id and finalRecommendation.recommendation', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyFinalRecommendations([t12, edo(19, 440)], spec);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.finalRecommendation.recommendation).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q525 — tuningModeEntropyDiversityMap
+// ---------------------------------------------------------------------------
+
+describe('tuningModeEntropyDiversityMap (Q525)', () => {
+  it('returns one entry per mode with quadrant label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeEntropyDiversityMap(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    const validQuadrants = ['rich-complex', 'varied-uniform', 'stable-diverse', 'stable-uniform'];
+    for (const entry of result) {
+      expect(validQuadrants).toContain(entry.quadrant);
+    }
+  });
+
+  it('entropy and diversity match comprehensive bundle', () => {
+    const spec = harmonicSpectrum(6);
+    const map = tuningModeEntropyDiversityMap(t12, spec);
+    const bundle = tuningModeComprehensiveBundle(t12, spec);
+    expect(map[0]!.entropy).toBeCloseTo(bundle[0]!.entropy, 10);
+    expect(map[0]!.diversity).toBeCloseTo(bundle[0]!.diversity, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeEntropyDiversityMap(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q527 — tuningFamilyModeEntropyDiversityMaps
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeEntropyDiversityMaps (Q527)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeEntropyDiversityMaps([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+  });
+
+  it('each entry has id and entropyDiversityMap array', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeEntropyDiversityMaps([t12, edo(19, 440)], spec);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.entropyDiversityMap.length).toBeGreaterThan(0);
     }
   });
 });
