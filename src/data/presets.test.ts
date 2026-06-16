@@ -50,6 +50,8 @@ import {
   presetBestSmoothMode,
   presetProgressionWavBundle,
   presetBestSmoothModeWav,
+  presetModeProgressionWavBundles,
+  presetFullSclBundle,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1404,5 +1406,97 @@ describe('presetBestSmoothModeWav (Q369)', () => {
   it('accepts optional presets pool', () => {
     const result = presetBestSmoothModeWav('12-tet', 440, undefined, undefined, [TWELVE_TET]);
     expect(result.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q373 — presetModeProgressionWavBundles
+// ---------------------------------------------------------------------------
+
+describe('presetModeProgressionWavBundles (Q373)', () => {
+  it('returns one bundle per mode for a known preset', () => {
+    const bundles = presetModeProgressionWavBundles('12-tet');
+    expect(bundles.length).toBe(12);
+    for (const { mode, wav, smf, narrative, smoothnessRatio } of bundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(wav instanceof Uint8Array).toBe(true);
+      expect(wav.length).toBeGreaterThan(44);
+      expect(smf instanceof Uint8Array).toBe(true);
+      expect(typeof narrative).toBe('string');
+      expect(smoothnessRatio).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('each wav has RIFF header', () => {
+    const bundles = presetModeProgressionWavBundles('12-tet');
+    const first = bundles[0]!;
+    expect(String.fromCharCode(first.wav[0]!, first.wav[1]!, first.wav[2]!, first.wav[3]!)).toBe(
+      'RIFF',
+    );
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeProgressionWavBundles('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and spectrum', () => {
+    const bundles = presetModeProgressionWavBundles('12-tet', 261.63, harmonicSpectrum());
+    expect(bundles.length).toBe(12);
+    expect(bundles[0]!.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const bundles = presetModeProgressionWavBundles(
+      '12-tet',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(bundles.length).toBe(12);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q376 — presetFullSclBundle
+// ---------------------------------------------------------------------------
+
+describe('presetFullSclBundle (Q376)', () => {
+  it('returns scl, rankedBundle, volatilityBundle, progressionSclBundle for a known preset', () => {
+    const bundle = presetFullSclBundle('12-tet', harmonicSpectrum());
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.scl.length).toBeGreaterThan(0);
+    expect(bundle.rankedBundle).toHaveProperty('spectralRanking');
+    expect(bundle.rankedBundle).toHaveProperty('entropy');
+    expect(bundle.volatilityBundle).toHaveProperty('volatility');
+    expect(bundle.volatilityBundle).toHaveProperty('consistency');
+    expect(bundle.progressionSclBundle).toHaveProperty('chords');
+    expect(bundle.progressionSclBundle).toHaveProperty('smoothnessRatio');
+    expect(bundle.progressionSclBundle).toHaveProperty('narrative');
+  });
+
+  it('scl has valid Scala header', () => {
+    const { scl } = presetFullSclBundle('12-tet', harmonicSpectrum());
+    expect(scl).toContain('!');
+  });
+
+  it('scl matches the scl in rankedBundle', () => {
+    const bundle = presetFullSclBundle('12-tet', harmonicSpectrum());
+    expect(bundle.scl).toBe(bundle.rankedBundle.scl);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetFullSclBundle('not-a-preset', harmonicSpectrum())).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz and name', () => {
+    const bundle = presetFullSclBundle('12-tet', harmonicSpectrum(), 261.63, 'Custom');
+    expect(bundle.scl).toContain('Custom');
+  });
+
+  it('accepts optional presets pool', () => {
+    const bundle = presetFullSclBundle('12-tet', harmonicSpectrum(), 440, undefined, [TWELVE_TET]);
+    expect(typeof bundle.scl).toBe('string');
   });
 });

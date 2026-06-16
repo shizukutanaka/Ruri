@@ -3,7 +3,7 @@
 import { type TuningSystem, tuningDistance } from '../core/tuning.js';
 import { rankChords, type RankedChord, type ChordSearchOptions } from '../core/chord-search.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
-import { tuningToScl, writeScl } from '../adapters/scala.js';
+import { tuningToScl, writeScl, scaleFullSclBundle } from '../adapters/scala.js';
 import { tuningToMts, type TuningToMtsOptions } from '../adapters/mts.js';
 import {
   progressionToSmf,
@@ -66,6 +66,7 @@ import {
   scaleProgressionWavBundle,
   tuningBestSmoothModeWav,
   type PluckScaleWavOptions,
+  tuningModeProgressionWavBundles,
 } from '../adapters/wav.js';
 import { tuningToFullBundle } from '../adapters/tun.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
@@ -2608,4 +2609,101 @@ export function presetBestSmoothModeWav(
   }
   const tuning = loadTuningPreset(preset);
   return tuningBestSmoothModeWav(tuning, rootHz, spectrum, opts);
+}
+
+// ---------------------------------------------------------------------------
+// Q373 — presetModeProgressionWavBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get progression WAV bundles for every mode of a preset tuning in one call.
+ *
+ * Socratic Q373: "If I can get WAV bundles for every mode of a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeProgressionWavBundles(tuning, rootHz, spectrum, wavOpts, smfOpts)` → bundles.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param wavOpts  - Optional chord progression WAV options.
+ * @param smfOpts  - Optional SMF encoding options.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode, wav, smf, narrative, smoothnessRatio }`, one per mode.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundles = presetModeProgressionWavBundles('12-tet');
+ * for (const { mode, wav, smf, narrative, smoothnessRatio } of bundles) {
+ *   await fs.writeFile(`${mode.id}-prog.wav`, wav);
+ *   console.log(mode.id, smoothnessRatio, narrative);
+ * }
+ */
+export function presetModeProgressionWavBundles(
+  presetId: string,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  wavOpts?: ChordProgressionToWavOptions,
+  smfOpts?: SmfOptions,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeProgressionWavBundles> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeProgressionWavBundles: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeProgressionWavBundles(tuning, rootHz, spectrum, wavOpts, smfOpts);
+}
+
+// ---------------------------------------------------------------------------
+// Q376 — presetFullSclBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get all SCL-adjacent scale analysis for a preset's default scale in one call.
+ *
+ * Socratic Q376: "If I can get full SCL bundle for a scale, can I do it for a preset's
+ * default scale?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningToScale(tuning)` → default scale.
+ * 4. `scaleFullSclBundle(scale, tuning, spectrum, rootHz, name)` → bundle.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param name     - Optional description for the `.scl` header. Defaults to scale name.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ scl, rankedBundle, volatilityBundle, progressionSclBundle }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const { scl, rankedBundle, volatilityBundle, progressionSclBundle } =
+ *   presetFullSclBundle('12-tet', harmonicSpectrum());
+ * fs.writeFileSync('12tet.scl', scl);
+ * console.log(rankedBundle.entropy, volatilityBundle.volatility, progressionSclBundle.smoothnessRatio);
+ */
+export function presetFullSclBundle(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz = 440,
+  name?: string,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof scaleFullSclBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetFullSclBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  const scale = tuningToScale(tuning);
+  return scaleFullSclBundle(scale, tuning, spectrum, rootHz, name);
 }
