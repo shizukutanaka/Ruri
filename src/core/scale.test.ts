@@ -83,6 +83,8 @@ import {
   chordMapIntervalHistogram,
   scaleProgressionNarrative,
   scaleSimilarityMatrix,
+  progressionChordCentroid,
+  modeIntervalSets,
 } from './scale.js';
 import { equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4125,5 +4127,44 @@ describe('scaleSimilarityMatrix (Q245)', () => {
   });
   it('returns empty matrix for empty input', () => {
     expect(scaleSimilarityMatrix([])).toEqual([]);
+  });
+});
+
+describe('progressionChordCentroid (Q249)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 4).map((e) => e.chord);
+
+  it('returns a Chord', () => {
+    const chord = progressionChordCentroid(chords, 261.63);
+    expect(chord).toBeDefined();
+    expect(chord.intervals).toBeDefined();
+  });
+  it('returns a chord that is in the progression', () => {
+    const chord = progressionChordCentroid(chords, 261.63);
+    expect(chords).toContainEqual(chord);
+  });
+  it('throws for empty progression', () => {
+    expect(() => progressionChordCentroid([], 261.63)).toThrow(RangeError);
+  });
+});
+
+describe('modeIntervalSets (Q250)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns one entry per mode', () => {
+    const sets = modeIntervalSets(scale, t12);
+    expect(sets.length).toBe(scale.degreeIndices.length);
+  });
+  it('each intervalCents array has length === degreeIndices.length', () => {
+    const sets = modeIntervalSets(scale, t12);
+    sets.forEach((s) => expect(s.intervalCents).toHaveLength(scale.degreeIndices.length));
+  });
+  it('intervals sum to periodCents', () => {
+    const sets = modeIntervalSets(scale, t12);
+    sets.forEach((s) => {
+      const sum = s.intervalCents.reduce((a, b) => a + b, 0);
+      expect(sum).toBeCloseTo(t12.periodCents, 3);
+    });
   });
 });
