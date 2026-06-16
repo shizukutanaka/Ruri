@@ -26,6 +26,8 @@ import {
   presetFamilyReport,
   presetProgressionVariety,
   bestPresetConsistency,
+  topPresetsByEntropy,
+  presetEntropyLeague,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -583,5 +585,32 @@ describe('bestPresetConsistency (Q285)', () => {
     expect(presetId.length).toBeGreaterThan(0);
     expect(consistency).toBeGreaterThan(0);
     expect(consistency).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('topPresetsByEntropy (Q290)', () => {
+  it('returns n entries sorted by entropy descending', () => {
+    const results = topPresetsByEntropy(2, undefined, 261.63);
+    expect(results).toHaveLength(2);
+    expect(results[0]!.entropy).toBeGreaterThanOrEqual(results[1]!.entropy);
+  });
+  it('throws for n <= 0', () => {
+    expect(() => topPresetsByEntropy(0)).toThrow(RangeError);
+  });
+});
+
+describe('presetEntropyLeague (Q293)', () => {
+  it('returns high, medium, low arrays', () => {
+    const { high, medium, low } = presetEntropyLeague();
+    expect(Array.isArray(high)).toBe(true);
+    expect(Array.isArray(medium)).toBe(true);
+    expect(Array.isArray(low)).toBe(true);
+    // Total should cover all presets
+    expect(high.length + medium.length + low.length).toBeGreaterThan(0);
+  });
+  it('each preset appears exactly once', () => {
+    const { high, medium, low } = presetEntropyLeague();
+    const all = [...high, ...medium, ...low];
+    expect(new Set(all).size).toBe(all.length);
   });
 });

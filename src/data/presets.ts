@@ -26,6 +26,7 @@ import {
   tuningFamilyReport,
   tuningProgressionVariety,
   chordMapConsistencyScore,
+  chordMapEntropyScore,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1503,4 +1504,99 @@ export function bestPresetConsistency(
     }
   }
   return { presetId: bestId, consistency: bestScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q290 — topPresetsByEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank tuning presets by chord map entropy (most harmonically diverse first) in one call.
+ *
+ * Socratic Q290: "If I can compute chord map entropy for one scale and have all presets,
+ * can I rank presets by chord map entropy in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `if (n <= 0) throw new RangeError(...)`.
+ * 2. `const ps = presets ?? ALL_PRESETS`.
+ * 3. For each preset: `loadTuningPreset` → `tuningToScale` → `scaleToChordMap` → `chordMapEntropyScore`.
+ * 4. Sort DESCENDING by entropy (most diverse first).
+ * 5. Return first `n`.
+ *
+ * @param n        - Number of top entries to return (must be > 0).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ presetId, entropy }` sorted descending by entropy.
+ *
+ * @throws {RangeError} if `n` <= 0.
+ *
+ * @example
+ * const top2 = topPresetsByEntropy(2, undefined, 261.63);
+ * // top2[0].presetId is the preset with the most diverse chord dissonance distribution
+ */
+export function topPresetsByEntropy(
+  n: number,
+  spectrum?: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): { presetId: string; entropy: number }[] {
+  if (n <= 0) throw new RangeError('topPresetsByEntropy: n must be positive');
+  const ps = presets ?? ALL_PRESETS;
+  const entries = ps.map((p) => {
+    const tuning = loadTuningPreset(p);
+    const scale = tuningToScale(tuning);
+    const chordMap = scaleToChordMap(scale, tuning);
+    const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
+    return { presetId: p.id, entropy };
+  });
+  entries.sort((a, b) => b.entropy - a.entropy);
+  return entries.slice(0, n);
+}
+
+// ---------------------------------------------------------------------------
+// Q293 — presetEntropyLeague
+// ---------------------------------------------------------------------------
+
+/**
+ * Categorize all presets as high/medium/low entropy in one call.
+ *
+ * Socratic Q293: "If I can rank presets by entropy, can I categorize them as
+ * high/medium/low entropy in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Compute entropy for every preset (same algorithm as `topPresetsByEntropy`).
+ * 2. Sort descending by entropy.
+ * 3. `const third = Math.ceil(n / 3)`.
+ * 4. Top third → `high`, middle third → `medium`, bottom third → `low`.
+ *
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ high, medium, low }` — arrays of preset ids.
+ *
+ * @example
+ * const { high, medium, low } = presetEntropyLeague();
+ * // high contains the presets with the most diverse chord dissonance distributions
+ */
+export function presetEntropyLeague(
+  spectrum?: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): { high: string[]; medium: string[]; low: string[] } {
+  const ps = presets ?? ALL_PRESETS;
+  const entries = ps.map((p) => {
+    const tuning = loadTuningPreset(p);
+    const scale = tuningToScale(tuning);
+    const chordMap = scaleToChordMap(scale, tuning);
+    const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
+    return { presetId: p.id, entropy };
+  });
+  entries.sort((a, b) => b.entropy - a.entropy);
+  const n = ps.length;
+  const third = Math.ceil(n / 3);
+  const high = entries.slice(0, third).map((r) => r.presetId);
+  const medium = entries.slice(third, 2 * third).map((r) => r.presetId);
+  const low = entries.slice(2 * third).map((r) => r.presetId);
+  return { high, medium, low };
 }
