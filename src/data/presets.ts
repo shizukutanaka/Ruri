@@ -56,6 +56,8 @@ import {
   scaleSimilarityRanking,
   tuningModeIntervalProfile,
   tuningMostDiverseMode,
+  tuningModeComprehensiveBundle,
+  tuningBestModeComprehensive,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3160,4 +3162,111 @@ export function presetMostDiverseMode(
   }
   const tuning = loadTuningPreset(preset);
   return tuningMostDiverseMode(tuning);
+}
+
+// ---------------------------------------------------------------------------
+// Q415 — presetModeComprehensiveBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine entropy, consistency, volatility, interval diversity, and smoothness ratio per mode
+ * for a preset tuning in a single call.
+ *
+ * Socratic Q415: "If I can get comprehensive mode bundle for a tuning, can I do it for a preset
+ * by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz)` → per-mode five-metric bundles.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns One entry per modal rotation with all five metrics.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const bundle = presetModeComprehensiveBundle('12-tet', spec);
+ * bundle.forEach(({ mode, entropy, diversity }) => console.log(mode.id, entropy, diversity));
+ */
+export function presetModeComprehensiveBundle(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+}[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeComprehensiveBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+    : tuningModeComprehensiveBundle(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q418 — presetBestModeComprehensive
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the single best mode of a preset tuning by a combined score of five metrics in one call.
+ *
+ * Socratic Q418: "If I can find the best comprehensive mode for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningBestModeComprehensive(tuning, spectrum, rootHz)` → best mode with score.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns The best-mode entry extended with a `score` field.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ * @throws {RangeError} if the preset tuning has no modes.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const result = presetBestModeComprehensive('12-tet', spec);
+ * console.log(result.mode.id, result.score);
+ */
+export function presetBestModeComprehensive(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+  score: number;
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestModeComprehensive: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningBestModeComprehensive(tuning, spectrum, rootHz)
+    : tuningBestModeComprehensive(tuning, spectrum);
 }

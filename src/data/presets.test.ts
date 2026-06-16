@@ -62,6 +62,8 @@ import {
   presetSimilarityRanking,
   presetModeIntervalProfile,
   presetMostDiverseMode,
+  presetModeComprehensiveBundle,
+  presetBestModeComprehensive,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1912,5 +1914,109 @@ describe('presetMostDiverseMode (Q412)', () => {
     const profiles = presetModeIntervalProfile('12-tet', [TWELVE_TET]);
     const maxDiversity = Math.max(...profiles.map((p) => p.diversity));
     expect(diversity).toBeCloseTo(maxDiversity, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q415 — presetModeComprehensiveBundle
+// ---------------------------------------------------------------------------
+
+describe('presetModeComprehensiveBundle (Q415)', () => {
+  it('returns one entry per mode', () => {
+    const spec = harmonicSpectrum(6);
+    const bundle = presetModeComprehensiveBundle('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(bundle.length).toBeGreaterThan(0);
+  });
+
+  it('each entry has all five metrics', () => {
+    const spec = harmonicSpectrum(6);
+    const bundle = presetModeComprehensiveBundle('12-tet', spec, undefined, [TWELVE_TET]);
+    const first = bundle[0]!;
+    expect(first).toHaveProperty('mode');
+    expect(typeof first.entropy).toBe('number');
+    expect(typeof first.consistency).toBe('number');
+    expect(typeof first.volatility).toBe('number');
+    expect(typeof first.diversity).toBe('number');
+    expect(typeof first.smoothnessRatio).toBe('number');
+  });
+
+  it('diversity is in [0,1]', () => {
+    const spec = harmonicSpectrum(6);
+    const bundle = presetModeComprehensiveBundle('12-tet', spec, undefined, [TWELVE_TET]);
+    for (const b of bundle) {
+      expect(b.diversity).toBeGreaterThanOrEqual(0);
+      expect(b.diversity).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const bundle = presetModeComprehensiveBundle('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(bundle.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() =>
+      presetModeComprehensiveBundle('not-a-preset', harmonicSpectrum(6), undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const bundle = presetModeComprehensiveBundle('12-tet', harmonicSpectrum(6));
+    expect(bundle.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q418 — presetBestModeComprehensive
+// ---------------------------------------------------------------------------
+
+describe('presetBestModeComprehensive (Q418)', () => {
+  it('returns a mode with a score', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestModeComprehensive('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.score).toBe('number');
+  });
+
+  it('returned entry has all five metrics plus score', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestModeComprehensive('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.entropy).toBe('number');
+    expect(typeof result.consistency).toBe('number');
+    expect(typeof result.volatility).toBe('number');
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.smoothnessRatio).toBe('number');
+    expect(typeof result.score).toBe('number');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestModeComprehensive('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.mode).toHaveProperty('degreeIndices');
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() =>
+      presetBestModeComprehensive('not-a-preset', harmonicSpectrum(6), undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const result = presetBestModeComprehensive('12-tet', harmonicSpectrum(6));
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.score).toBe('number');
+  });
+
+  it('score matches formula applied to the returned mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestModeComprehensive('12-tet', spec, undefined, [TWELVE_TET]);
+    const expected =
+      result.entropy +
+      result.consistency +
+      (1 - result.volatility) +
+      result.diversity +
+      result.smoothnessRatio;
+    expect(result.score).toBeCloseTo(expected, 10);
   });
 });
