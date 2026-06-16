@@ -663,3 +663,43 @@ export function topNModesMts(
     .slice(0, n)
     .map((entry) => scaleToMts(entry.scale, tuning, entry.scale.id, opts ?? {}));
 }
+
+// ---------------------------------------------------------------------------
+// Q287 — scaleToMtsBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get both a Scale-level MTS dump and a TuningSystem-level MTS dump in one call.
+ *
+ * Socratic Q287: "If I can convert a Scale to MTS and a TuningSystem to MTS, can I get both
+ * in one call — scale-level tuning AND tuning-level tuning as MTS?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleMts = scaleToMts(scale, tuning, undefined, opts)` → 408-byte MTS for the scale.
+ * 2. `tuningMts = tuningToMts(tuning, undefined, opts)` → 408-byte MTS for the full tuning.
+ * 3. Return `{ scaleMts, tuningMts }`.
+ *
+ * @param scale  - The scale to export as MTS (must be compatible with `tuning`).
+ * @param tuning - The tuning system to export as MTS.
+ * @param opts   - Optional MTS encoding options forwarded to both exports.
+ * @returns `{ scaleMts: Uint8Array, tuningMts: Uint8Array }` — both 408 bytes each.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale: Scale = { id: 'major', name: 'Major', tuningId: t12.id, degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scaleMts, tuningMts } = scaleToMtsBundle(scale, t12);
+ * // scaleMts encodes the 7-degree major scale; tuningMts encodes all 12 degrees
+ */
+export function scaleToMtsBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  opts?: TuningToMtsOptions,
+): { scaleMts: Uint8Array; tuningMts: Uint8Array } {
+  const { anchorMidiNote: _anchor, ...bulkOpts } = opts ?? {};
+  void _anchor; // not applicable for scaleToMts (uses middleNote instead)
+  const scaleMts = scaleToMts(scale, tuning, undefined, bulkOpts);
+  const tuningMts = tuningToMts(tuning, undefined, opts ?? {});
+  return { scaleMts, tuningMts };
+}

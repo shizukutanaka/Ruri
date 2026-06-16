@@ -24,6 +24,7 @@ import {
   bestModeChordMapMts,
   progressionNarrativeMts,
   topNModesMts,
+  scaleToMtsBundle,
 } from './mts.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
@@ -881,5 +882,28 @@ describe('topNModesMts (Q242)', () => {
   });
   it('throws for n <= 0', () => {
     expect(() => topNModesMts(t12, 0)).toThrow(RangeError);
+  });
+});
+
+describe('scaleToMtsBundle (Q287)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns scaleMts and tuningMts buffers', () => {
+    const { scaleMts, tuningMts } = scaleToMtsBundle(scale, t12);
+    expect(scaleMts).toBeInstanceOf(Uint8Array);
+    expect(tuningMts).toBeInstanceOf(Uint8Array);
+    expect(scaleMts.length).toBe(408); // MTS bulk dump
+    expect(tuningMts.length).toBe(408);
+  });
+  it('scaleMts and tuningMts differ for non-full scale', () => {
+    const { scaleMts, tuningMts } = scaleToMtsBundle(scale, t12);
+    // They should differ since scale has 7 degrees vs 12 in tuning
+    expect(scaleMts).not.toEqual(tuningMts);
   });
 });
