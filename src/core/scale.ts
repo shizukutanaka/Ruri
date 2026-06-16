@@ -4384,3 +4384,133 @@ export function chordMapConsistencyScore(
   if (meanHarmonicity <= 0) return 0;
   return 1 / (1 + vol + meanHarmonicity);
 }
+
+// ---------------------------------------------------------------------------
+// Q282 — chordMapProgressionBridge
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract chords from a chord map and return them in dissonance-minimised order in one call.
+ *
+ * Socratic Q282: "If I have a chord map and can smooth a progression, can I go chord map →
+ * optimally-ordered progression in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. If `chordMap.length === 0` return `[]`.
+ * 2. Extract chords: `chordMap.map(e => e.chord)`.
+ * 3. `chordProgressionSmooth(chords, rootHz, spectrum)` → optimally-ordered `Chord[]`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param rootHz   - Root frequency in Hz for dissonance computation.
+ * @param spectrum - Optional instrument spectrum.
+ * @returns Reordered `Chord[]` with minimised dissonance jumps.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const ordered = chordMapProgressionBridge(chordMap, 261.63);
+ * // ordered contains all 7 diatonic triads in smoothest progression order
+ */
+export function chordMapProgressionBridge(
+  chordMap: readonly ScaleChordMapEntry[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): Chord[] {
+  if (chordMap.length === 0) return [];
+  const chords = chordMap.map((e) => e.chord);
+  return chordProgressionSmooth(chords, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q283 — tuningConsistencyProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Consistency score for every modal rotation of a tuning in one call.
+ *
+ * Socratic Q283: "If I can get consistency scores for chord maps and compute all modal
+ * rotations, can I get a consistency score for every mode of a tuning in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 3. For each mode: `chordMapConsistencyScore(scaleToChordMap(mode, tuning), spectrum, rootHz)`.
+ *
+ * @param tuning   - The tuning system to profile.
+ * @param spectrum - Optional instrument spectrum for consistency computation.
+ * @param rootHz   - Root frequency in Hz (default `tuning.referenceHz`).
+ * @returns Array of `{ mode: Scale; consistency: number }`, one per modal rotation.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const profile = tuningConsistencyProfile(t12);
+ * // profile.length === 12; profile[0].consistency ∈ (0, 1]
+ */
+export function tuningConsistencyProfile(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): { mode: Scale; consistency: number }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  return modes.map((mode) => ({
+    mode,
+    consistency: chordMapConsistencyScore(scaleToChordMap(mode, tuning), spectrum, effectiveRootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q286 — chordMapNormalizedScores
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize dissonance and harmonicity scores for all entries in a chord map to [0, 1] in one call.
+ *
+ * Socratic Q286: "If I have raw dissonance and harmonicity scores per chord, can I normalize
+ * them to [0, 1] in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. If `chordMap.length === 0` return `[]`.
+ * 2. For each entry: compute `dissonance = chordObjectDissonance(chord, rootHz, spectrum ?? harmonicSpectrum())`
+ *    and `harmonicity = harmonicityForChord(chord, rootHz)`.
+ * 3. Compute min/max for each axis.
+ * 4. Normalize each value: `(x - min) / (range || 1)`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @returns Array of `{ entry, normalizedDissonance, normalizedHarmonicity }`, one per chord.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const scores = chordMapNormalizedScores(chordMap);
+ * // scores[0].normalizedDissonance ∈ [0, 1]
+ */
+export function chordMapNormalizedScores(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { entry: ScaleChordMapEntry; normalizedDissonance: number; normalizedHarmonicity: number }[] {
+  if (chordMap.length === 0) return [];
+  const effectiveSpectrum = spectrum ?? harmonicSpectrum();
+  const raw = chordMap.map((entry) => ({
+    entry,
+    dissonance: chordObjectDissonance(entry.chord, rootHz, effectiveSpectrum),
+    harmonicity: harmonicityForChord(entry.chord, rootHz),
+  }));
+  const maxDiss = Math.max(...raw.map((a) => a.dissonance));
+  const minDiss = Math.min(...raw.map((a) => a.dissonance));
+  const maxHarm = Math.max(...raw.map((a) => a.harmonicity));
+  const minHarm = Math.min(...raw.map((a) => a.harmonicity));
+  const rangeDiss = maxDiss - minDiss || 1;
+  const rangeHarm = maxHarm - minHarm || 1;
+  return raw.map((a) => ({
+    entry: a.entry,
+    normalizedDissonance: (a.dissonance - minDiss) / rangeDiss,
+    normalizedHarmonicity: (a.harmonicity - minHarm) / rangeHarm,
+  }));
+}

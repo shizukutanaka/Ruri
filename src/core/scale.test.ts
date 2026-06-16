@@ -103,6 +103,9 @@ import {
   chordMapSpectralRanking,
   tuningProgressionVariety,
   chordMapConsistencyScore,
+  chordMapProgressionBridge,
+  tuningConsistencyProfile,
+  chordMapNormalizedScores,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4637,5 +4640,57 @@ describe('chordMapConsistencyScore (Q281)', () => {
   });
   it('is finite', () => {
     expect(Number.isFinite(chordMapConsistencyScore(chordMap))).toBe(true);
+  });
+});
+
+describe('chordMapProgressionBridge (Q282)', () => {
+  const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
+
+  it('returns chords in count equal to chord map size', () => {
+    const chords = chordMapProgressionBridge(chordMap, 261.63);
+    expect(chords).toHaveLength(chordMap.length);
+  });
+  it('returns empty for empty chord map', () => {
+    expect(chordMapProgressionBridge([], 261.63)).toEqual([]);
+  });
+  it('returned chords are all Chord objects', () => {
+    const chords = chordMapProgressionBridge(chordMap, 261.63);
+    chords.forEach((c) => expect(c.intervals).toBeDefined());
+  });
+});
+
+describe('tuningConsistencyProfile (Q283)', () => {
+  it('returns one entry per mode', () => {
+    const profile = tuningConsistencyProfile(t12, undefined, 261.63);
+    expect(profile.length).toBe(t12.degrees.length);
+  });
+  it('all consistency values are in (0, 1]', () => {
+    tuningConsistencyProfile(t12).forEach((p) => {
+      expect(p.consistency).toBeGreaterThan(0);
+      expect(p.consistency).toBeLessThanOrEqual(1);
+    });
+  });
+});
+
+describe('chordMapNormalizedScores (Q286)', () => {
+  const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
+
+  it('returns one entry per chord', () => {
+    expect(chordMapNormalizedScores(chordMap)).toHaveLength(chordMap.length);
+  });
+  it('normalizedDissonance in [0, 1]', () => {
+    chordMapNormalizedScores(chordMap).forEach((s) => {
+      expect(s.normalizedDissonance).toBeGreaterThanOrEqual(0);
+      expect(s.normalizedDissonance).toBeLessThanOrEqual(1);
+    });
+  });
+  it('normalizedHarmonicity in [0, 1]', () => {
+    chordMapNormalizedScores(chordMap).forEach((s) => {
+      expect(s.normalizedHarmonicity).toBeGreaterThanOrEqual(0);
+      expect(s.normalizedHarmonicity).toBeLessThanOrEqual(1);
+    });
+  });
+  it('returns empty for empty chord map', () => {
+    expect(chordMapNormalizedScores([])).toEqual([]);
   });
 });
