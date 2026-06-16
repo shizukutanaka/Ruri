@@ -32,6 +32,7 @@ import {
   presetBestEntropyModeWav,
   presetConsistencyEntropyDelta,
   presetModeComparison,
+  presetModeRankingBundle,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -692,5 +693,37 @@ describe('presetModeComparison (Q311)', () => {
   it('accepts optional presets pool', () => {
     const cmp = presetModeComparison('12-tet', undefined, undefined, [TWELVE_TET]);
     expect(cmp.length).toBeGreaterThan(0);
+  });
+});
+
+describe('presetModeRankingBundle (Q316)', () => {
+  it('returns byEntropy, byConsistency, byVolatility arrays', () => {
+    const bundle = presetModeRankingBundle('12-tet');
+    expect(Array.isArray(bundle.byEntropy)).toBe(true);
+    expect(Array.isArray(bundle.byConsistency)).toBe(true);
+    expect(Array.isArray(bundle.byVolatility)).toBe(true);
+  });
+  it('all three arrays have length 12 for 12-tet', () => {
+    const bundle = presetModeRankingBundle('12-tet');
+    expect(bundle.byEntropy.length).toBe(12);
+    expect(bundle.byConsistency.length).toBe(12);
+    expect(bundle.byVolatility.length).toBe(12);
+  });
+  it('all entries are Scale objects with degreeIndices', () => {
+    const bundle = presetModeRankingBundle('12-tet');
+    for (const mode of bundle.byEntropy) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetModeRankingBundle('not-a-preset')).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = presetModeRankingBundle('12-tet', harmonicSpectrum(), 261.63);
+    expect(bundle.byEntropy.length).toBe(12);
+  });
+  it('accepts optional presets pool', () => {
+    const bundle = presetModeRankingBundle('12-tet', undefined, undefined, [TWELVE_TET]);
+    expect(bundle.byEntropy.length).toBeGreaterThan(0);
   });
 });

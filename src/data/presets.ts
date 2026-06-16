@@ -30,6 +30,7 @@ import {
   tuningEntropyProfile,
   tuningConsistencyEntropyDelta,
   tuningModeComparison,
+  tuningModeRankingBundle,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1774,4 +1775,46 @@ export function presetModeComparison(
   }
   const tuning = loadTuningPreset(preset);
   return tuningModeComparison(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q316 — presetModeRankingBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all modal rotations of a preset tuning by entropy, consistency, and volatility in one call.
+ *
+ * Socratic Q316: "If I can get mode ranking bundle for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeRankingBundle(tuning, spectrum, rootHz)` → `{byEntropy, byConsistency, byVolatility}`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ byEntropy, byConsistency, byVolatility }` — three sorted `Scale[]` arrays.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const { byEntropy, byConsistency, byVolatility } = presetModeRankingBundle('12-tet');
+ * // byEntropy[0] is the highest-entropy mode of 12-TET
+ */
+export function presetModeRankingBundle(
+  presetId: string,
+  spectrum?: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { byEntropy: Scale[]; byConsistency: Scale[]; byVolatility: Scale[] } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeRankingBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeRankingBundle(tuning, spectrum, rootHz);
 }
