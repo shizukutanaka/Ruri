@@ -275,6 +275,10 @@ import {
   tuningFamilyModeQuadrantProfiles,
   tuningQuadrantCoverage,
   tuningFamilyQuadrantCoverage,
+  tuningModeGroupByProfile,
+  tuningFamilyModeGroupByProfiles,
+  tuningQuadrantCoverageNarrative,
+  tuningFamilyQuadrantCoverageNarratives,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10381,6 +10385,105 @@ describe('tuningFamilyQuadrantCoverage (Q563)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.coverage.totalModes).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q564 — tuningModeGroupByProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningModeGroupByProfile (Q564)', () => {
+  it('groups modes by quadrant profile, sorted by count descending', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeGroupByProfile(t12, spec);
+    expect(result.length).toBeGreaterThan(0);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i - 1]!.count).toBeGreaterThanOrEqual(result[i]!.count);
+    }
+  });
+
+  it('total modes across all groups equals tuning degree count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeGroupByProfile(t12, spec);
+    const total = result.reduce((s, g) => s + g.count, 0);
+    expect(total).toBe(t12.degrees.length);
+  });
+
+  it('profile string splits into 4 parts', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeGroupByProfile(t12, spec);
+    for (const group of result) {
+      expect(group.profile.split('|').length).toBe(4);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeGroupByProfile(t12, spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q566 — tuningFamilyModeGroupByProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeGroupByProfiles (Q566)', () => {
+  it('returns one entry per tuning with id and profileGroups', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeGroupByProfiles([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.profileGroups.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q567 — tuningQuadrantCoverageNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningQuadrantCoverageNarrative (Q567)', () => {
+  it('returns coverage with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverageNarrative(t12, spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverageNarrative(t12, spec);
+    expect(result.narrative).toContain(t12.name);
+  });
+
+  it('narrative contains the totalUniqueProfiles count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverageNarrative(t12, spec);
+    expect(result.narrative).toContain(String(result.totalUniqueProfiles));
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantCoverageNarrative(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q569 — tuningFamilyQuadrantCoverageNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantCoverageNarratives (Q569)', () => {
+  it('returns one entry per tuning with id and coverageNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyQuadrantCoverageNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.coverageNarrative.narrative).toBe('string');
     }
   });
 });

@@ -11719,3 +11719,90 @@ export function tuningFamilyQuadrantCoverage(
 ): { id: string; coverage: ReturnType<typeof tuningQuadrantCoverage> }[] {
   return tunings.map((t) => ({ id: t.id, coverage: tuningQuadrantCoverage(t, spectrum, rootHz) }));
 }
+
+// ---------------------------------------------------------------------------
+// Q564 — tuningModeGroupByProfile
+// ---------------------------------------------------------------------------
+
+export function tuningModeGroupByProfile(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; modes: Scale[]; count: number }[] {
+  const profiles = tuningModeQuadrantProfile(tuning, spectrum, rootHz);
+  const map = new Map<string, Scale[]>();
+  for (const entry of profiles) {
+    const existing = map.get(entry.quadrantProfile);
+    if (existing) {
+      existing.push(entry.mode);
+    } else {
+      map.set(entry.quadrantProfile, [entry.mode]);
+    }
+  }
+  return Array.from(map.entries())
+    .map(([profile, modes]) => ({ profile, modes, count: modes.length }))
+    .sort((a, b) => b.count - a.count);
+}
+
+// ---------------------------------------------------------------------------
+// Q566 — tuningFamilyModeGroupByProfiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeGroupByProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; profileGroups: ReturnType<typeof tuningModeGroupByProfile> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    profileGroups: tuningModeGroupByProfile(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q567 — tuningQuadrantCoverageNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningQuadrantCoverageNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  entropyDiversityUnique: number;
+  consistencyVolatilityUnique: number;
+  smoothnessEntropyUnique: number;
+  diversityVolatilityUnique: number;
+  totalUniqueProfiles: number;
+  totalModes: number;
+  narrative: string;
+} {
+  const coverage = tuningQuadrantCoverage(tuning, spectrum, rootHz);
+  const {
+    entropyDiversityUnique,
+    consistencyVolatilityUnique,
+    smoothnessEntropyUnique,
+    diversityVolatilityUnique,
+    totalUniqueProfiles,
+    totalModes,
+  } = coverage;
+  const narrative =
+    `"${tuning.name}" covers ${totalUniqueProfiles} unique quadrant profile${totalUniqueProfiles !== 1 ? 's' : ''} across ${totalModes} modes: ` +
+    `entropy-diversity ${entropyDiversityUnique}/4, consistency-volatility ${consistencyVolatilityUnique}/4, ` +
+    `smoothness-entropy ${smoothnessEntropyUnique}/4, diversity-volatility ${diversityVolatilityUnique}/4.`;
+  return { ...coverage, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q569 — tuningFamilyQuadrantCoverageNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantCoverageNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; coverageNarrative: ReturnType<typeof tuningQuadrantCoverageNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    coverageNarrative: tuningQuadrantCoverageNarrative(t, spectrum, rootHz),
+  }));
+}
