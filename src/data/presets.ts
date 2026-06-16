@@ -58,6 +58,8 @@ import {
   tuningMostDiverseMode,
   tuningModeComprehensiveBundle,
   tuningBestModeComprehensive,
+  tuningModeScoreRanking,
+  tuningIntervalDiversityVsEntropy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3269,4 +3271,105 @@ export function presetBestModeComprehensive(
   return rootHz !== undefined
     ? tuningBestModeComprehensive(tuning, spectrum, rootHz)
     : tuningBestModeComprehensive(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q421 — presetModeScoreRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all modal rotations of a preset tuning by comprehensive five-metric score in one call.
+ *
+ * Socratic Q421: "If I can rank modes by score for a tuning, can I do it for a preset by id?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningModeScoreRanking(tuning, spectrum, rootHz)` → modes ranked by score descending.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns All modal rotations sorted by combined score descending.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const ranking = presetModeScoreRanking('12-tet', spec);
+ * ranking.forEach(({ mode, score }) => console.log(mode.id, score));
+ */
+export function presetModeScoreRanking(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { mode: Scale; score: number }[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeScoreRanking: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeScoreRanking(tuning, spectrum, rootHz)
+    : tuningModeScoreRanking(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q425 — presetIntervalDiversityVsEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare interval diversity and entropy per mode for a preset tuning in one call.
+ *
+ * Socratic Q425: "If I can compare diversity vs entropy per mode for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningIntervalDiversityVsEntropy(tuning, spectrum, rootHz)` → per-mode diversity, entropy,
+ *    and correlation classification.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Optional instrument spectrum for entropy computation.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns One entry per modal rotation with diversity, entropy, and correlation classification.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const result = presetIntervalDiversityVsEntropy('12-tet');
+ * result.forEach(({ mode, diversity, entropy, correlation }) =>
+ *   console.log(mode.id, diversity, entropy, correlation));
+ */
+export function presetIntervalDiversityVsEntropy(
+  presetId: string,
+  spectrum?: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  mode: Scale;
+  diversity: number;
+  entropy: number;
+  correlation: 'aligned' | 'opposed' | 'neutral';
+}[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetIntervalDiversityVsEntropy: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  if (spectrum !== undefined) {
+    return rootHz !== undefined
+      ? tuningIntervalDiversityVsEntropy(tuning, spectrum, rootHz)
+      : tuningIntervalDiversityVsEntropy(tuning, spectrum);
+  }
+  return rootHz !== undefined
+    ? tuningIntervalDiversityVsEntropy(tuning, undefined, rootHz)
+    : tuningIntervalDiversityVsEntropy(tuning);
 }

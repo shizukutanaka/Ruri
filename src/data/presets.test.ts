@@ -64,6 +64,8 @@ import {
   presetMostDiverseMode,
   presetModeComprehensiveBundle,
   presetBestModeComprehensive,
+  presetModeScoreRanking,
+  presetIntervalDiversityVsEntropy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2018,5 +2020,97 @@ describe('presetBestModeComprehensive (Q418)', () => {
       result.diversity +
       result.smoothnessRatio;
     expect(result.score).toBeCloseTo(expected, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q421 — presetModeScoreRanking
+// ---------------------------------------------------------------------------
+
+describe('presetModeScoreRanking (Q421)', () => {
+  it('returns modes sorted by score descending', () => {
+    const spec = harmonicSpectrum(6);
+    const ranking = presetModeScoreRanking('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(ranking.length).toBeGreaterThan(0);
+    for (let i = 1; i < ranking.length; i++) {
+      expect(ranking[i - 1]!.score).toBeGreaterThanOrEqual(ranking[i]!.score);
+    }
+  });
+
+  it('each entry has mode and numeric score', () => {
+    const spec = harmonicSpectrum(6);
+    const ranking = presetModeScoreRanking('12-tet', spec, undefined, [TWELVE_TET]);
+    for (const r of ranking) {
+      expect(r.mode).toHaveProperty('degreeIndices');
+      expect(typeof r.score).toBe('number');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const ranking = presetModeScoreRanking('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(ranking.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeScoreRanking('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const spec = harmonicSpectrum(6);
+    const ranking = presetModeScoreRanking('12-tet', spec);
+    expect(ranking.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q425 — presetIntervalDiversityVsEntropy
+// ---------------------------------------------------------------------------
+
+describe('presetIntervalDiversityVsEntropy (Q425)', () => {
+  it('returns one entry per mode with correlation label', () => {
+    const result = presetIntervalDiversityVsEntropy('12-tet', undefined, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    for (const r of result) {
+      expect(['aligned', 'opposed', 'neutral']).toContain(r.correlation);
+      expect(r.diversity).toBeGreaterThanOrEqual(0);
+      expect(r.entropy).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('each entry has mode with degreeIndices', () => {
+    const result = presetIntervalDiversityVsEntropy('12-tet', undefined, undefined, [TWELVE_TET]);
+    for (const r of result) {
+      expect(r.mode).toHaveProperty('degreeIndices');
+    }
+  });
+
+  it('accepts optional spectrum', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetIntervalDiversityVsEntropy('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetIntervalDiversityVsEntropy('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    for (const r of result) {
+      expect(['aligned', 'opposed', 'neutral']).toContain(r.correlation);
+    }
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() =>
+      presetIntervalDiversityVsEntropy('not-a-preset', undefined, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const result = presetIntervalDiversityVsEntropy('12-tet');
+    expect(result.length).toBeGreaterThan(0);
   });
 });
