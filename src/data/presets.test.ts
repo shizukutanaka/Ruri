@@ -91,6 +91,8 @@ import {
   presetBestRadarScoreAgreement,
   presetModeConsensusRanking,
   presetBestConsensusMode,
+  presetUltimateBestMode,
+  presetConsensusNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2804,5 +2806,52 @@ describe('presetBestConsensusMode (Q496)', () => {
     const spec = harmonicSpectrum(6);
     const result = presetBestConsensusMode('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.bordaScore).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetUltimateBestMode (Q499)', () => {
+  it('returns winner mode and vote count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetUltimateBestMode('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.winner.mode.id).toBe('string');
+    expect(result.winner.voteCount).toBeGreaterThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetUltimateBestMode('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('isUnanimous is boolean', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetUltimateBestMode('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.isUnanimous).toBe('boolean');
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetConsensusNarrative (Q502)', () => {
+  it('returns narrative string mentioning consensus mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetConsensusNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetConsensusNarrative('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetConsensusNarrative('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(typeof result.narrative).toBe('string');
   });
 });

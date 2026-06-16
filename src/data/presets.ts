@@ -84,6 +84,8 @@ import {
   tuningBestRadarScoreAgreement,
   tuningModeConsensusRanking,
   tuningBestConsensusMode,
+  tuningUltimateBestMode,
+  tuningConsensusNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4373,4 +4375,66 @@ export function presetBestConsensusMode(
   return rootHz !== undefined
     ? tuningBestConsensusMode(tuning, spectrum, rootHz)
     : tuningBestConsensusMode(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q499 — presetUltimateBestMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the ultimate best mode for a preset by delegating to
+ * {@link tuningUltimateBestMode}.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns The ultimate best mode result.
+ */
+export function presetUltimateBestMode(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningUltimateBestMode> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetUltimateBestMode: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningUltimateBestMode(tuning, spectrum, rootHz)
+    : tuningUltimateBestMode(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q502 — presetConsensusNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a consensus narrative for a preset by delegating to
+ * {@link tuningConsensusNarrative}.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Narrative string plus the two underlying sub-results.
+ */
+export function presetConsensusNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningConsensusNarrative> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetConsensusNarrative: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningConsensusNarrative(tuning, spectrum, rootHz)
+    : tuningConsensusNarrative(tuning, spectrum);
 }
