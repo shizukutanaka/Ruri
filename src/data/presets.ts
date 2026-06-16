@@ -102,6 +102,8 @@ import {
   tuningModeAllQuadrantsBundle,
   tuningModeAllQuadrantsNarrative,
   tuningModeQuadrantConsensus,
+  tuningBestQuadrantConsensusMode,
+  tuningModeConsensusNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4838,4 +4840,34 @@ export function presetModeQuadrantConsensus(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningModeQuadrantConsensus(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q553 — presetBestQuadrantConsensusMode
+// ---------------------------------------------------------------------------
+
+export function presetBestQuadrantConsensusMode(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningBestQuadrantConsensusMode> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningBestQuadrantConsensusMode(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q556 — presetModeConsensusNarrative
+// ---------------------------------------------------------------------------
+
+export function presetModeConsensusNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeConsensusNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeConsensusNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }
