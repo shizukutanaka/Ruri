@@ -76,6 +76,8 @@ import {
   tuningModeMetricOutliers,
   tuningModeMetricOutlierSummary,
   tuningModeMetricProfile,
+  tuningModeMetricRadarData,
+  tuningModeMetricCluster,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4123,4 +4125,70 @@ export function presetModeMetricProfile(
   return rootHz !== undefined
     ? tuningModeMetricProfile(tuning, spectrum, rootHz)
     : tuningModeMetricProfile(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q475 — presetModeMetricRadarData
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce normalised radar-chart data for a named preset.
+ *
+ * Delegates to `tuningModeMetricRadarData` after resolving and loading the preset.
+ * Throws `RangeError` if the preset is not found.
+ *
+ * @param presetId - The preset id to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of per-mode normalised radar values in [0,1].
+ */
+export function presetModeMetricRadarData(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeMetricRadarData> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeMetricRadarData: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeMetricRadarData(tuning, spectrum, rootHz)
+    : tuningModeMetricRadarData(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q478 — presetModeMetricCluster
+// ---------------------------------------------------------------------------
+
+/**
+ * Cluster modes into High/Mid/Low buckets for a named preset.
+ *
+ * Delegates to `tuningModeMetricCluster` after resolving and loading the preset.
+ * Throws `RangeError` if the preset is not found.
+ *
+ * @param presetId - The preset id to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of per-mode cluster entries with meanScore and cluster label.
+ */
+export function presetModeMetricCluster(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeMetricCluster> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeMetricCluster: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeMetricCluster(tuning, spectrum, rootHz)
+    : tuningModeMetricCluster(tuning, spectrum);
 }

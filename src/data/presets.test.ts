@@ -83,6 +83,8 @@ import {
   presetModeMetricOutliers,
   presetModeMetricOutlierSummary,
   presetModeMetricProfile,
+  presetModeMetricRadarData,
+  presetModeMetricCluster,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2603,6 +2605,54 @@ describe('presetModeMetricProfile (Q472)', () => {
   it('accepts optional rootHz', () => {
     const spec = harmonicSpectrum(6);
     const result = presetModeMetricProfile('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q475 — presetModeMetricRadarData
+// ---------------------------------------------------------------------------
+
+describe('presetModeMetricRadarData (Q475)', () => {
+  it('returns radar data with values in [0,1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricRadarData('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const first = result[0]!;
+    expect(first.radar.entropy).toBeGreaterThanOrEqual(0);
+    expect(first.radar.entropy).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeMetricRadarData('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q478 — presetModeMetricCluster
+// ---------------------------------------------------------------------------
+
+describe('presetModeMetricCluster (Q478)', () => {
+  it('returns clusters with valid labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricCluster('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(['high', 'mid', 'low']).toContain(result[0]!.cluster);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeMetricCluster('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeMetricCluster('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.length).toBeGreaterThan(0);
   });
 });
