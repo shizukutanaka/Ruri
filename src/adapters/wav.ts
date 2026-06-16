@@ -2136,3 +2136,148 @@ export function tuningFamilyBestSmoothModeWavs(
 ): { id: string; wav: Uint8Array; mode: Scale; smoothnessRatio: number }[] {
   return tunings.map((t) => ({ id: t.id, ...tuningBestSmoothModeWav(t, rootHz, spectrum, opts) }));
 }
+
+// ---------------------------------------------------------------------------
+// Q372 — tuningModeProgressionWavBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a smoothed chord progression WAV, SMF, narrative, and smoothness ratio for every
+ * mode of a tuning in one call.
+ *
+ * Socratic Q372: "If I can get progression WAV bundle for one scale and iterate all modes,
+ * can I get WAV bundles for every mode of a tuning?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleModeSeries(tuningToScale(tuning), tuning)` → all modal rotations.
+ * 2. For each mode: `scaleProgressionWavBundle(mode, tuning, rootHz, spectrum, wavOpts, smfOpts)`.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param wavOpts  - Optional chord progression WAV options.
+ * @param smfOpts  - Optional SMF encoding options.
+ * @returns Array of `{ mode, wav, smf, narrative, smoothnessRatio }`, one per mode, in mode order.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundles = tuningModeProgressionWavBundles(t12);
+ * for (const { mode, wav, smf, narrative, smoothnessRatio } of bundles) {
+ *   await fs.writeFile(`${mode.id}-prog.wav`, wav);
+ *   console.log(mode.id, smoothnessRatio, narrative);
+ * }
+ */
+export function tuningModeProgressionWavBundles(
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  wavOpts?: ChordProgressionToWavOptions,
+  smfOpts?: SmfOptions,
+): { mode: Scale; wav: Uint8Array; smf: Uint8Array; narrative: string; smoothnessRatio: number }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const { wav, smf, narrative, smoothnessRatio } = scaleProgressionWavBundle(
+      mode,
+      tuning,
+      rootHz,
+      spectrum,
+      wavOpts,
+      smfOpts,
+    );
+    return { mode, wav, smf, narrative, smoothnessRatio };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q374 — tuningFamilyProgressionWavBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get progression WAV bundles for all modes of every tuning in a family in one call.
+ *
+ * Socratic Q374: "If I can get WAV bundles for all modes of one tuning, can I do it for
+ * an entire family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{ id: t.id, modeBundles: tuningModeProgressionWavBundles(t, rootHz, spectrum, wavOpts, smfOpts) }`).
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param wavOpts  - Optional chord progression WAV options.
+ * @param smfOpts  - Optional SMF encoding options.
+ * @returns Array of `{ id, modeBundles }`, one per tuning, in input order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const family = tuningFamilyProgressionWavBundles([t12, t19]);
+ * for (const { id, modeBundles } of family) {
+ *   for (const { mode, wav } of modeBundles) {
+ *     await fs.writeFile(`${id}-${mode.id}.wav`, wav);
+ *   }
+ * }
+ */
+export function tuningFamilyProgressionWavBundles(
+  tunings: readonly TuningSystem[],
+  rootHz?: number,
+  spectrum?: Spectrum,
+  wavOpts?: ChordProgressionToWavOptions,
+  smfOpts?: SmfOptions,
+): {
+  id: string;
+  modeBundles: {
+    mode: Scale;
+    wav: Uint8Array;
+    smf: Uint8Array;
+    narrative: string;
+    smoothnessRatio: number;
+  }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeBundles: tuningModeProgressionWavBundles(t, rootHz, spectrum, wavOpts, smfOpts),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q377 — tuningFamilyFullWavBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the full WAV bundle for every tuning in a family in one call.
+ *
+ * Socratic Q377: "If I can get full WAV bundle for one tuning and iterate a family, can I
+ * do it for an entire family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{ id: t.id, fullWavBundle: tuningFullWavBundle(t, rootHz, spectrum, opts) }`).
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @returns Array of `{ id, fullWavBundle }`, one per tuning, in input order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const bundles = tuningFamilyFullWavBundles([t12, t19]);
+ * for (const { id, fullWavBundle } of bundles) {
+ *   await fs.writeFile(`${id}-report.wav`, fullWavBundle.reportCardBundle.wav);
+ * }
+ */
+export function tuningFamilyFullWavBundles(
+  tunings: readonly TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): { id: string; fullWavBundle: ReturnType<typeof tuningFullWavBundle> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    fullWavBundle: tuningFullWavBundle(t, rootHz, spectrum, opts),
+  }));
+}
