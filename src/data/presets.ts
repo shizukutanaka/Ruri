@@ -54,6 +54,8 @@ import {
   tuningHarmonicSpectralScore,
   tuningComprehensiveReport,
   scaleSimilarityRanking,
+  tuningModeIntervalProfile,
+  tuningMostDiverseMode,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3075,4 +3077,87 @@ export function presetSimilarityRanking(
     presetId: otherPairs.find((x) => x.tuning.id === r.tuning.id)?.preset.id ?? r.tuning.id,
     similarity: r.similarity,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Q409 — presetModeIntervalProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute interval diversity metrics for every modal rotation of a preset tuning in one call.
+ *
+ * Socratic Q409: "If I can get interval profile for all modes of a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningModeIntervalProfile(tuning)` → per-mode interval profiles.
+ *
+ * @param presetId - Id of the preset to profile.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns One entry per modal rotation with interval count, unique intervals, and diversity ratio.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const profiles = presetModeIntervalProfile('12-tet');
+ * profiles.forEach(({ mode, diversity }) => console.log(mode.id, diversity));
+ */
+export function presetModeIntervalProfile(
+  presetId: string,
+  presets?: readonly TuningPreset[],
+): {
+  mode: Scale;
+  intervals: number[];
+  intervalCount: number;
+  uniqueIntervals: number[];
+  diversity: number;
+}[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeIntervalProfile: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeIntervalProfile(tuning);
+}
+
+// ---------------------------------------------------------------------------
+// Q412 — presetMostDiverseMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the modal rotation with the highest interval diversity for a preset tuning in one call.
+ *
+ * Socratic Q412: "If I can find the most diverse mode for a tuning, can I do it for a preset by
+ * id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningMostDiverseMode(tuning)` → most interval-diverse modal rotation.
+ *
+ * @param presetId - Id of the preset to search.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{mode, diversity}` for the most interval-diverse modal rotation.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ * @throws {RangeError} if the preset tuning has no modes.
+ *
+ * @example
+ * const { mode, diversity } = presetMostDiverseMode('12-tet');
+ * console.log(mode.id, diversity);
+ */
+export function presetMostDiverseMode(
+  presetId: string,
+  presets?: readonly TuningPreset[],
+): { mode: Scale; diversity: number } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetMostDiverseMode: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningMostDiverseMode(tuning);
 }

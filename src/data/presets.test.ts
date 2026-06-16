@@ -60,6 +60,8 @@ import {
   presetHarmonicSpectralScore,
   presetComprehensiveReport,
   presetSimilarityRanking,
+  presetModeIntervalProfile,
+  presetMostDiverseMode,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1825,5 +1827,90 @@ describe('presetSimilarityRanking (Q406)', () => {
   it('accepts optional tol', () => {
     const ranking = presetSimilarityRanking('12-tet', 0.02, [TWELVE_TET, JUST_INTONATION_5L]);
     expect(typeof ranking[0]!.similarity).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q409 — presetModeIntervalProfile
+// ---------------------------------------------------------------------------
+
+describe('presetModeIntervalProfile (Q409)', () => {
+  it('returns one entry per mode', () => {
+    const profiles = presetModeIntervalProfile('12-tet', [TWELVE_TET]);
+    expect(profiles.length).toBeGreaterThan(0);
+  });
+
+  it('each entry has mode, intervals, intervalCount, uniqueIntervals, diversity', () => {
+    const profiles = presetModeIntervalProfile('12-tet', [TWELVE_TET]);
+    const first = profiles[0]!;
+    expect(first).toHaveProperty('mode');
+    expect(first).toHaveProperty('intervals');
+    expect(first).toHaveProperty('intervalCount');
+    expect(first).toHaveProperty('uniqueIntervals');
+    expect(first).toHaveProperty('diversity');
+  });
+
+  it('diversity is in [0,1]', () => {
+    const profiles = presetModeIntervalProfile('12-tet', [TWELVE_TET]);
+    for (const { diversity } of profiles) {
+      expect(diversity).toBeGreaterThanOrEqual(0);
+      expect(diversity).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('intervalCount equals intervals.length', () => {
+    const profiles = presetModeIntervalProfile('12-tet', [TWELVE_TET]);
+    for (const { intervalCount, intervals } of profiles) {
+      expect(intervalCount).toBe(intervals.length);
+    }
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeIntervalProfile('not-a-preset', [TWELVE_TET])).toThrow(RangeError);
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const profiles = presetModeIntervalProfile('12-tet');
+    expect(profiles.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q412 — presetMostDiverseMode
+// ---------------------------------------------------------------------------
+
+describe('presetMostDiverseMode (Q412)', () => {
+  it('returns mode and diversity', () => {
+    const result = presetMostDiverseMode('12-tet', [TWELVE_TET]);
+    expect(result).toHaveProperty('mode');
+    expect(result).toHaveProperty('diversity');
+  });
+
+  it('diversity is in [0,1]', () => {
+    const { diversity } = presetMostDiverseMode('12-tet', [TWELVE_TET]);
+    expect(diversity).toBeGreaterThanOrEqual(0);
+    expect(diversity).toBeLessThanOrEqual(1);
+  });
+
+  it('mode has degreeIndices', () => {
+    const { mode } = presetMostDiverseMode('12-tet', [TWELVE_TET]);
+    expect(mode).toHaveProperty('degreeIndices');
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetMostDiverseMode('not-a-preset', [TWELVE_TET])).toThrow(RangeError);
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const result = presetMostDiverseMode('12-tet');
+    expect(result).toHaveProperty('mode');
+    expect(result).toHaveProperty('diversity');
+  });
+
+  it('diversity matches maximum from presetModeIntervalProfile', () => {
+    const { diversity } = presetMostDiverseMode('12-tet', [TWELVE_TET]);
+    const profiles = presetModeIntervalProfile('12-tet', [TWELVE_TET]);
+    const maxDiversity = Math.max(...profiles.map((p) => p.diversity));
+    expect(diversity).toBeCloseTo(maxDiversity, 10);
   });
 });
