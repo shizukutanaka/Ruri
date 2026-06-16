@@ -6750,6 +6750,237 @@ export function tuningFamilyDualHistograms(
 }
 
 // ---------------------------------------------------------------------------
+// Q390 — chordMapHistogramSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Build dual histograms and summarize them with peak and spread info in one call.
+ *
+ * Socratic Q390: "If I can build dual histograms, can I also summarize them with peak and spread
+ * info in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapDualHistogram(chordMap, bins)` → `{dissonance, harmonicity}`.
+ * 2. For each histogram: compute peak (index of max value, first max if tie) and spread
+ *    (normalized range of non-zero bins: `(lastNonZeroIdx - firstNonZeroIdx) / (bins - 1)`).
+ *    Returns 0 for empty or single-bin histograms.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param bins     - Number of histogram bins (default 10).
+ * @returns `{dissonance, harmonicity, peakDissonanceBin, peakHarmonicityBin, dissonanceSpread, harmonicitySpread}`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const cm = scaleToChordMap(scale, t12);
+ * const summary = chordMapHistogramSummary(cm);
+ * console.log(summary.peakDissonanceBin, summary.dissonanceSpread);
+ */
+export function chordMapHistogramSummary(
+  chordMap: readonly ScaleChordMapEntry[],
+  bins = 10,
+): {
+  dissonance: number[];
+  harmonicity: number[];
+  peakDissonanceBin: number;
+  peakHarmonicityBin: number;
+  dissonanceSpread: number;
+  harmonicitySpread: number;
+} {
+  const { dissonance, harmonicity } = chordMapDualHistogram(chordMap, bins);
+
+  const peakIdx = (arr: number[]): number => {
+    let max = -1;
+    let idx = 0;
+    arr.forEach((v, i) => {
+      if (v > max) {
+        max = v;
+        idx = i;
+      }
+    });
+    return idx;
+  };
+
+  const spread = (arr: number[]): number => {
+    const first = arr.findIndex((v) => v > 0);
+    if (first === -1) return 0;
+    let last = 0;
+    arr.forEach((v, i) => {
+      if (v > 0) last = i;
+    });
+    return arr.length <= 1 ? 0 : (last - first) / (arr.length - 1);
+  };
+
+  return {
+    dissonance,
+    harmonicity,
+    peakDissonanceBin: peakIdx(dissonance),
+    peakHarmonicityBin: peakIdx(harmonicity),
+    dissonanceSpread: spread(dissonance),
+    harmonicitySpread: spread(harmonicity),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q391 — tuningModeHistogramSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Get histogram summary for every mode of a tuning in one call.
+ *
+ * Socratic Q391: "If I can get histogram summary for one chord map, can I get it for every mode
+ * at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleModeSeries(tuningToScale(tuning), tuning)` → all modal rotations.
+ * 2. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapHistogramSummary(chordMap, bins)`.
+ *
+ * @param tuning - The tuning system whose modes to process.
+ * @param bins   - Number of histogram bins (default 10).
+ * @returns Array of `{mode, histogramSummary}`, one per mode, in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const summaries = tuningModeHistogramSummaries(t12);
+ * for (const { mode, histogramSummary } of summaries) {
+ *   console.log(mode.id, histogramSummary.peakDissonanceBin, histogramSummary.dissonanceSpread);
+ * }
+ */
+export function tuningModeHistogramSummaries(
+  tuning: TuningSystem,
+  bins = 10,
+): { mode: Scale; histogramSummary: ReturnType<typeof chordMapHistogramSummary> }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const histogramSummary = chordMapHistogramSummary(chordMap, bins);
+    return { mode, histogramSummary };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q393 — tuningFamilyHistogramSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Get histogram summaries for all modes of every tuning in a family.
+ *
+ * Socratic Q393: "If I can get histogram summaries for all modes of one tuning, can I do it for
+ * a whole family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{id: t.id, modeSummaries: tuningModeHistogramSummaries(t, bins)}`).
+ *
+ * @param tunings - Array of tuning systems to analyse.
+ * @param bins    - Number of histogram bins (default 10).
+ * @returns Array of `{id, modeSummaries}`, one per tuning.
+ *
+ * @example
+ * const family = [equalTemperament12(440), edo(19, 440)];
+ * const result = tuningFamilyHistogramSummaries(family);
+ * for (const { id, modeSummaries } of result) {
+ *   console.log(id, modeSummaries.length);
+ * }
+ */
+export function tuningFamilyHistogramSummaries(
+  tunings: readonly TuningSystem[],
+  bins = 10,
+): {
+  id: string;
+  modeSummaries: { mode: Scale; histogramSummary: ReturnType<typeof chordMapHistogramSummary> }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeSummaries: tuningModeHistogramSummaries(t, bins),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q394 — chordMapAnalysisFull
+// ---------------------------------------------------------------------------
+
+/**
+ * Get dual histogram, histogram summary, ranked bundle, and volatility bundle for a chord map
+ * in one call.
+ *
+ * Socratic Q394: "If I can get dual histogram, histogram summary, ranked bundle, and volatility
+ * bundle for a chord map, can I get all of them at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapDualHistogram(chordMap)` → dualHistogram.
+ * 2. `chordMapHistogramSummary(chordMap)` → histogramSummary.
+ * 3. `chordMapRankedBundle(chordMap, spectrum, rootHz)` → rankedBundle.
+ * 4. `chordMapVolatilityBundle(chordMap, spectrum, rootHz)` → volatilityBundle.
+ *
+ * @param chordMap  - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum  - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz    - Root frequency in Hz (default 440).
+ * @returns `{dualHistogram, histogramSummary, rankedBundle, volatilityBundle}`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const cm = scaleToChordMap(scale, t12);
+ * const spec = harmonicSpectrum();
+ * const full = chordMapAnalysisFull(cm, spec);
+ * console.log(full.dualHistogram, full.histogramSummary.peakDissonanceBin, full.rankedBundle.entropy);
+ */
+export function chordMapAnalysisFull(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  dualHistogram: { dissonance: number[]; harmonicity: number[] };
+  histogramSummary: ReturnType<typeof chordMapHistogramSummary>;
+  rankedBundle: ReturnType<typeof chordMapRankedBundle>;
+  volatilityBundle: ReturnType<typeof chordMapVolatilityBundle>;
+} {
+  const dualHistogram = chordMapDualHistogram(chordMap);
+  const histogramSummary = chordMapHistogramSummary(chordMap);
+  const rankedBundle = chordMapRankedBundle(chordMap, spectrum, rootHz);
+  const volatilityBundle = chordMapVolatilityBundle(chordMap, spectrum, rootHz);
+  return { dualHistogram, histogramSummary, rankedBundle, volatilityBundle };
+}
+
+// ---------------------------------------------------------------------------
+// Q395 — scaleChordMapAnalysisFull
+// ---------------------------------------------------------------------------
+
+/**
+ * Get full chord map analysis for a scale in one call.
+ *
+ * Socratic Q395: "If I can get full chord map analysis, can I get it for a scale in one call?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → chordMap.
+ * 2. `chordMapAnalysisFull(chordMap, spectrum, rootHz)` → full analysis.
+ *
+ * @param scale    - The scale to analyse.
+ * @param tuning   - The tuning system the scale belongs to.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{dualHistogram, histogramSummary, rankedBundle, volatilityBundle}`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const spec = harmonicSpectrum();
+ * const full = scaleChordMapAnalysisFull(scale, t12, spec);
+ * console.log(full.rankedBundle.entropy, full.volatilityBundle.volatility);
+ */
+export function scaleChordMapAnalysisFull(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof chordMapAnalysisFull> {
+  const chordMap = scaleToChordMap(scale, tuning);
+  return chordMapAnalysisFull(chordMap, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
 // Q365 — tuningModeProgressionFullBundles
 // ---------------------------------------------------------------------------
 

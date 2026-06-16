@@ -159,6 +159,11 @@ import {
   chordMapDualHistogram,
   tuningModeDualHistograms,
   tuningFamilyDualHistograms,
+  chordMapHistogramSummary,
+  tuningModeHistogramSummaries,
+  tuningFamilyHistogramSummaries,
+  chordMapAnalysisFull,
+  scaleChordMapAnalysisFull,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -6522,5 +6527,240 @@ describe('tuningFamilyDualHistograms (Q389)', () => {
   it('returns empty array for empty family', () => {
     const result = tuningFamilyDualHistograms([]);
     expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q390 — chordMapHistogramSummary
+// ---------------------------------------------------------------------------
+
+describe('chordMapHistogramSummary (Q390)', () => {
+  it('returns histograms and peak/spread info', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const summary = chordMapHistogramSummary(cm);
+    expect(summary.dissonance.length).toBe(10);
+    expect(summary.harmonicity.length).toBe(10);
+    expect(summary.peakDissonanceBin).toBeGreaterThanOrEqual(0);
+    expect(summary.peakDissonanceBin).toBeLessThan(10);
+    expect(summary.dissonanceSpread).toBeGreaterThanOrEqual(0);
+    expect(summary.dissonanceSpread).toBeLessThanOrEqual(1);
+    expect(summary.harmonicitySpread).toBeGreaterThanOrEqual(0);
+    expect(summary.harmonicitySpread).toBeLessThanOrEqual(1);
+  });
+
+  it('empty chordMap gives all zeros', () => {
+    const s = chordMapHistogramSummary([]);
+    expect(s.dissonance).toEqual(Array(10).fill(0));
+    expect(s.harmonicity).toEqual(Array(10).fill(0));
+    expect(s.peakDissonanceBin).toBe(0);
+    expect(s.peakHarmonicityBin).toBe(0);
+    expect(s.dissonanceSpread).toBe(0);
+    expect(s.harmonicitySpread).toBe(0);
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const summary = chordMapHistogramSummary(cm, 5);
+    expect(summary.dissonance.length).toBe(5);
+    expect(summary.harmonicity.length).toBe(5);
+    expect(summary.peakDissonanceBin).toBeLessThan(5);
+    expect(summary.peakHarmonicityBin).toBeLessThan(5);
+  });
+
+  it('spread is between 0 and 1 inclusive', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const summary = chordMapHistogramSummary(cm, 10);
+    expect(summary.dissonanceSpread).toBeGreaterThanOrEqual(0);
+    expect(summary.dissonanceSpread).toBeLessThanOrEqual(1);
+    expect(summary.harmonicitySpread).toBeGreaterThanOrEqual(0);
+    expect(summary.harmonicitySpread).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q391 — tuningModeHistogramSummaries
+// ---------------------------------------------------------------------------
+
+describe('tuningModeHistogramSummaries (Q391)', () => {
+  it('returns one entry per mode', () => {
+    const t12local = equalTemperament12(440);
+    const summaries = tuningModeHistogramSummaries(t12local);
+    expect(summaries.length).toBe(t12local.degrees.length);
+  });
+
+  it('each entry has mode and histogramSummary', () => {
+    const t12local = equalTemperament12(440);
+    const summaries = tuningModeHistogramSummaries(t12local);
+    for (const { mode, histogramSummary } of summaries) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(histogramSummary.dissonance.length).toBe(10);
+      expect(histogramSummary.harmonicity.length).toBe(10);
+      expect(histogramSummary.peakDissonanceBin).toBeGreaterThanOrEqual(0);
+      expect(histogramSummary.peakDissonanceBin).toBeLessThan(10);
+      expect(histogramSummary.dissonanceSpread).toBeGreaterThanOrEqual(0);
+      expect(histogramSummary.dissonanceSpread).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const summaries = tuningModeHistogramSummaries(t12local, 5);
+    for (const { histogramSummary } of summaries) {
+      expect(histogramSummary.dissonance.length).toBe(5);
+      expect(histogramSummary.harmonicity.length).toBe(5);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q393 — tuningFamilyHistogramSummaries
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyHistogramSummaries (Q393)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const result = tuningFamilyHistogramSummaries([t12local, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeSummaries array', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyHistogramSummaries([t12local]);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('modeSummaries');
+    expect(Array.isArray(result[0]?.modeSummaries)).toBe(true);
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyHistogramSummaries([t12local]);
+    expect(result[0]?.id).toBe(t12local.id);
+  });
+
+  it('modeSummaries length equals mode count', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyHistogramSummaries([t12local]);
+    expect(result[0]?.modeSummaries.length).toBe(t12local.degrees.length);
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyHistogramSummaries([t12local], 5);
+    for (const { histogramSummary } of result[0]?.modeSummaries ?? []) {
+      expect(histogramSummary.dissonance.length).toBe(5);
+      expect(histogramSummary.harmonicity.length).toBe(5);
+    }
+  });
+
+  it('returns empty array for empty family', () => {
+    const result = tuningFamilyHistogramSummaries([]);
+    expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q394 — chordMapAnalysisFull
+// ---------------------------------------------------------------------------
+
+describe('chordMapAnalysisFull (Q394)', () => {
+  it('returns all four bundles', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const spec = harmonicSpectrum();
+    const full = chordMapAnalysisFull(cm, spec);
+    expect(full).toHaveProperty('dualHistogram');
+    expect(full).toHaveProperty('histogramSummary');
+    expect(full).toHaveProperty('rankedBundle');
+    expect(full).toHaveProperty('volatilityBundle');
+  });
+
+  it('dualHistogram has dissonance and harmonicity arrays', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const spec = harmonicSpectrum();
+    const { dualHistogram } = chordMapAnalysisFull(cm, spec);
+    expect(dualHistogram.dissonance.length).toBe(10);
+    expect(dualHistogram.harmonicity.length).toBe(10);
+  });
+
+  it('histogramSummary has peak and spread fields', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const spec = harmonicSpectrum();
+    const { histogramSummary } = chordMapAnalysisFull(cm, spec);
+    expect(histogramSummary).toHaveProperty('peakDissonanceBin');
+    expect(histogramSummary).toHaveProperty('peakHarmonicityBin');
+    expect(histogramSummary).toHaveProperty('dissonanceSpread');
+    expect(histogramSummary).toHaveProperty('harmonicitySpread');
+  });
+
+  it('rankedBundle has entropy and consistency', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const spec = harmonicSpectrum();
+    const { rankedBundle } = chordMapAnalysisFull(cm, spec);
+    expect(typeof rankedBundle.entropy).toBe('number');
+    expect(typeof rankedBundle.consistency).toBe('number');
+  });
+
+  it('volatilityBundle has volatility, entropy, consistency', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const spec = harmonicSpectrum();
+    const { volatilityBundle } = chordMapAnalysisFull(cm, spec);
+    expect(typeof volatilityBundle.volatility).toBe('number');
+    expect(typeof volatilityBundle.entropy).toBe('number');
+    expect(typeof volatilityBundle.consistency).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q395 — scaleChordMapAnalysisFull
+// ---------------------------------------------------------------------------
+
+describe('scaleChordMapAnalysisFull (Q395)', () => {
+  it('returns full analysis for a scale', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const spec = harmonicSpectrum();
+    const full = scaleChordMapAnalysisFull(scale, t12local, spec);
+    expect(full).toHaveProperty('dualHistogram');
+    expect(full).toHaveProperty('histogramSummary');
+    expect(full).toHaveProperty('rankedBundle');
+    expect(full).toHaveProperty('volatilityBundle');
+  });
+
+  it('result matches chordMapAnalysisFull for the same scale', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const spec = harmonicSpectrum();
+    const cm = scaleToChordMap(scale, t12local);
+    const direct = chordMapAnalysisFull(cm, spec);
+    const bridge = scaleChordMapAnalysisFull(scale, t12local, spec);
+    expect(bridge.dualHistogram).toEqual(direct.dualHistogram);
+    expect(bridge.histogramSummary).toEqual(direct.histogramSummary);
+    expect(bridge.rankedBundle.entropy).toBeCloseTo(direct.rankedBundle.entropy);
+    expect(bridge.volatilityBundle.volatility).toBeCloseTo(direct.volatilityBundle.volatility);
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const spec = harmonicSpectrum();
+    const full = scaleChordMapAnalysisFull(scale, t12local, spec, 261.63);
+    expect(full).toHaveProperty('rankedBundle');
+    expect(typeof full.volatilityBundle.volatility).toBe('number');
   });
 });
