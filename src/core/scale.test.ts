@@ -106,6 +106,8 @@ import {
   chordMapProgressionBridge,
   tuningConsistencyProfile,
   chordMapNormalizedScores,
+  tuningReportCard,
+  chordMapEntropyScore,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4692,5 +4694,38 @@ describe('chordMapNormalizedScores (Q286)', () => {
   });
   it('returns empty for empty chord map', () => {
     expect(chordMapNormalizedScores([])).toEqual([]);
+  });
+});
+
+describe('tuningReportCard (Q288)', () => {
+  it('returns a non-empty string', () => {
+    const card = tuningReportCard(t12, 261.63);
+    expect(typeof card).toBe('string');
+    expect(card.length).toBeGreaterThan(20);
+  });
+  it('contains tuning id', () => {
+    const card = tuningReportCard(t12, 261.63);
+    expect(card).toContain(t12.id);
+  });
+  it('contains stability and variety', () => {
+    const card = tuningReportCard(t12, 261.63);
+    expect(card.toLowerCase()).toContain('stability');
+    expect(card.toLowerCase()).toContain('variety');
+  });
+});
+
+describe('chordMapEntropyScore (Q289)', () => {
+  const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
+
+  it('returns non-negative finite number', () => {
+    const h = chordMapEntropyScore(chordMap);
+    expect(h).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(h)).toBe(true);
+  });
+  it('returns 0 for single-chord map', () => {
+    expect(chordMapEntropyScore([chordMap[0]!])).toBe(0);
+  });
+  it('returns 0 for empty', () => {
+    expect(chordMapEntropyScore([])).toBe(0);
   });
 });

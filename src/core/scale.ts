@@ -4514,3 +4514,100 @@ export function chordMapNormalizedScores(
     normalizedHarmonicity: (a.harmonicity - minHarm) / rangeHarm,
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q288 — tuningReportCard
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a human-readable report card for a tuning system in one call.
+ *
+ * Socratic Q288: "If I have a tuning report, consistency profile, and variety score, can I
+ * produce a human-readable report card in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningReport(tuning, rootHz ?? tuning.referenceHz, spectrum)` → full report.
+ * 2. `tuningProgressionVariety(tuning)` → variety ratio.
+ * 3. `tuningStabilityScore(tuning, rootHz, spectrum)` → stability ratio.
+ * 4. `tuningHarmonicDensity(tuning)` → harmonic density score.
+ * 5. Build and return a formatted string.
+ *
+ * @param tuning   - The tuning system to report on.
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns A formatted multi-line report card string.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * console.log(tuningReportCard(t12, 261.63));
+ */
+export function tuningReportCard(
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+): string {
+  const report = tuningReport(tuning, rootHz ?? tuning.referenceHz, spectrum);
+  const variety = tuningProgressionVariety(tuning);
+  const stability = tuningStabilityScore(tuning, rootHz, spectrum);
+  const density = tuningHarmonicDensity(tuning);
+  const summary = report.chordMapSummary;
+  return [
+    `Tuning: ${tuning.id} (${tuning.degrees.length} degrees)`,
+    `Best mode: ${report.bestMode.id} (harmonicity: ${report.bestMode.harmonicity.toFixed(3)})`,
+    `Stability: ${(stability * 100).toFixed(1)}% | Variety: ${(variety * 100).toFixed(1)}% | Density: ${density.toFixed(3)}`,
+    `Chord map: ${summary.count} chords | dissonance range [${summary.minDissonance.toFixed(2)}, ${summary.maxDissonance.toFixed(2)}]`,
+  ].join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Q289 — chordMapEntropyScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the Shannon entropy of the dissonance distribution of a chord map in one call.
+ *
+ * Socratic Q289: "If I have normalized dissonance scores, can I compute the Shannon entropy
+ * of the dissonance distribution in one call? High entropy = diverse harmonic vocabulary."
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. If `chordMap.length <= 1` return `0`.
+ * 2. `chordMapNormalizedScores(chordMap, spectrum, rootHz)` → normalized dissonance values.
+ * 3. Bin into 10 equal bins (0..0.1, 0.1..0.2, etc.).
+ * 4. Compute Shannon entropy: `H = -Σ (p * log2(p))` where `p = bin[i] / total`.
+ * 5. Return `H` (max is `log2(10) ≈ 3.32` for uniform distribution).
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @returns Shannon entropy in [0, log2(10)] — higher = more diverse harmonic vocabulary.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const h = chordMapEntropyScore(chordMap);
+ * // h is the Shannon entropy of the normalized dissonance distribution
+ */
+export function chordMapEntropyScore(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): number {
+  if (chordMap.length <= 1) return 0;
+  const normalized = chordMapNormalizedScores(chordMap, spectrum, rootHz);
+  const scores = normalized.map((s) => s.normalizedDissonance);
+  const bins = new Array(10).fill(0) as number[];
+  for (const score of scores) {
+    (bins as number[])[Math.min(Math.floor(score * 10), 9)]!++;
+  }
+  const total = scores.length;
+  let H = 0;
+  for (const count of bins) {
+    if (count > 0) {
+      const p = count / total;
+      H -= p * Math.log2(p);
+    }
+  }
+  return H;
+}
