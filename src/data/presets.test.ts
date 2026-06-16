@@ -89,6 +89,8 @@ import {
   presetModeRadarRanking,
   presetRadarRankingVsScoreRanking,
   presetBestRadarScoreAgreement,
+  presetModeConsensusRanking,
+  presetBestConsensusMode,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2752,5 +2754,55 @@ describe('presetBestRadarScoreAgreement (Q490)', () => {
     const spec = harmonicSpectrum(6);
     const result = presetBestRadarScoreAgreement('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.scoreRank).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetModeConsensusRanking (Q493)', () => {
+  it('returns Borda consensus ranking for preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeConsensusRanking('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result[0]!.consensusRank).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeConsensusRanking('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('sorted by bordaScore descending', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeConsensusRanking('12-tet', spec, undefined, [TWELVE_TET]);
+    if (result.length >= 2) {
+      expect(result[0]!.bordaScore).toBeGreaterThanOrEqual(result[1]!.bordaScore);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetBestConsensusMode (Q496)', () => {
+  it('returns top consensus mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestConsensusMode('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.mode.id).toBe('string');
+    expect(result.consensusRank).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetBestConsensusMode('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestConsensusMode('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.bordaScore).toBeGreaterThan(0);
   });
 });

@@ -82,6 +82,8 @@ import {
   tuningModeRadarRanking,
   tuningRadarRankingVsScoreRanking,
   tuningBestRadarScoreAgreement,
+  tuningModeConsensusRanking,
+  tuningBestConsensusMode,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4311,4 +4313,64 @@ export function presetBestRadarScoreAgreement(
   return rootHz !== undefined
     ? tuningBestRadarScoreAgreement(tuning, spectrum, rootHz)
     : tuningBestRadarScoreAgreement(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q493 — presetModeConsensusRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a Borda-count consensus ranking for a preset's modes.
+ *
+ * @param presetId - The preset identifier.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array sorted by bordaScore descending with 1-based consensusRank.
+ */
+export function presetModeConsensusRanking(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeConsensusRanking> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeConsensusRanking: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeConsensusRanking(tuning, spectrum, rootHz)
+    : tuningModeConsensusRanking(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q496 — presetBestConsensusMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the top Borda-consensus mode for a preset.
+ *
+ * @param presetId - The preset identifier.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns The entry with consensusRank === 1.
+ */
+export function presetBestConsensusMode(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningBestConsensusMode> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestConsensusMode: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningBestConsensusMode(tuning, spectrum, rootHz)
+    : tuningBestConsensusMode(tuning, spectrum);
 }
