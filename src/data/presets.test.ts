@@ -24,6 +24,7 @@ import {
   presetVolatilityRanking,
   presetSpectralFitRanking,
   presetFamilyReport,
+  presetProgressionVariety,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -560,5 +561,16 @@ describe('presetFamilyReport (Q275)', () => {
   });
   it('throws for unknown preset id', () => {
     expect(() => presetFamilyReport(['nonexistent'])).toThrow(RangeError);
+  });
+});
+
+describe('presetProgressionVariety (Q280)', () => {
+  it('returns value in (0, 1] for 12-tet', () => {
+    const v = presetProgressionVariety('12-tet');
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetProgressionVariety('nonexistent')).toThrow(RangeError);
   });
 });

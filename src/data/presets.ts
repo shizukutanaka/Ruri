@@ -24,6 +24,7 @@ import {
   chordMapVolatility,
   tuningSpectralFit,
   tuningFamilyReport,
+  tuningProgressionVariety,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1413,4 +1414,42 @@ export function presetFamilyReport(
     return loadTuningPreset(p);
   });
   return tuningFamilyReport(tunings, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q280 — presetProgressionVariety
+// ---------------------------------------------------------------------------
+
+/**
+ * Harmonic variety score for a named tuning preset in one call.
+ *
+ * Socratic Q280: "If I can get progression variety for a tuning and convert a preset to a
+ * tuning, can I get progression variety for a preset in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Resolve `presetId` to a `TuningPreset` from the preset pool (throw if not found).
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningProgressionVariety(tuning)` → variety ratio.
+ *
+ * @param presetId - ID of a named tuning preset (e.g. `'12-tet'`).
+ * @param presets  - Optional preset pool override (defaults to `ALL_PRESETS`).
+ * @returns Variety ratio ∈ (0, 1] — proportion of distinct modal interval patterns.
+ *
+ * @throws {RangeError} if no preset with `presetId` is found.
+ *
+ * @example
+ * const v = presetProgressionVariety('12-tet');
+ * // v is the fraction of 12-TET's modal rotations that are harmonically distinct
+ */
+export function presetProgressionVariety(
+  presetId: string,
+  presets?: readonly TuningPreset[],
+): number {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetProgressionVariety: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningProgressionVariety(tuning);
 }
