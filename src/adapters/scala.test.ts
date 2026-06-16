@@ -19,13 +19,14 @@ import {
   topNModesScls,
   chordMapToFullBundle,
   scaleConsistencyBundle,
+  scaleEntropyBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
 import { mpeToFreq } from '../core/midi.js';
 import { freqToCents } from '../core/cents.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
-import { type Scale, scaleToChordMap } from '../core/scale.js';
+import { type Scale, scaleToChordMap, tuningToScale } from '../core/scale.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
 const SCL_12TET = `! meanquar.scl
@@ -832,5 +833,34 @@ describe('scaleConsistencyBundle (Q291)', () => {
   it('normalizedScores length equals chord map size', () => {
     const bundle = scaleConsistencyBundle(scale, t12);
     expect(bundle.normalizedScores.length).toBeGreaterThan(0);
+  });
+});
+
+describe('scaleEntropyBundle (Q297)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns scl, entropy, normalizedScores', () => {
+    const bundle = scaleEntropyBundle(scale, t12);
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.scl).toContain('!');
+    expect(typeof bundle.entropy).toBe('number');
+    expect(bundle.entropy).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(bundle.normalizedScores)).toBe(true);
+  });
+  it('normalizedScores length equals chord map size', () => {
+    const bundle = scaleEntropyBundle(scale, t12);
+    expect(bundle.normalizedScores.length).toBeGreaterThan(0);
+  });
+  it('works for full tuning scale', () => {
+    const fullScale = tuningToScale(t12);
+    const bundle = scaleEntropyBundle(fullScale, t12);
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.entropy).toBeGreaterThanOrEqual(0);
   });
 });
