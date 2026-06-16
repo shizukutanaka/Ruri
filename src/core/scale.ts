@@ -5845,3 +5845,186 @@ export function scaleModeSpectralRankings(
   const normalizedScores = chordMapNormalizedScores(chordMap, spectrum, rootHz);
   return { spectralRanking, normalizedScores };
 }
+
+// ---------------------------------------------------------------------------
+// Q348 — tuningModeChordMapBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a full chord map bundle for every mode of a tuning in one call.
+ *
+ * Socratic Q348: "If I can get a full chord map bundle for one chord map, can I get it for
+ * every mode of a tuning?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 3. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapFullBundle(chordMap, spectrum, rootHz)`.
+ * 4. Return `{mode, chordMapBundle}[]`.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{ mode, chordMapBundle }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundles = tuningModeChordMapBundles(t12, harmonicSpectrum());
+ * for (const { mode, chordMapBundle } of bundles) {
+ *   console.log(mode.id, chordMapBundle.volatilityBundle.volatility);
+ * }
+ */
+export function tuningModeChordMapBundles(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+): {
+  mode: Scale;
+  chordMapBundle: ReturnType<typeof chordMapFullBundle>;
+}[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    return { mode, chordMapBundle: chordMapFullBundle(chordMap, spectrum, rootHz) };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q350 — tuningFamilyChordMapBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get chord map bundles for all modes of every tuning in a family in one call.
+ *
+ * Socratic Q350: "If I can get chord map bundles for all modes of one tuning, can I do it for
+ * an entire family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. tunings.map(t → `{id: t.id, modeBundles: tuningModeChordMapBundles(t, spectrum, rootHz)}`).
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{ id, modeBundles }` where `modeBundles` is `{ mode, chordMapBundle }[]`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilyChordMapBundles([t12, t19], harmonicSpectrum());
+ * console.log(result[0]!.id, result[0]!.modeBundles[0]!.chordMapBundle.volatilityBundle.volatility);
+ */
+export function tuningFamilyChordMapBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz = 440,
+): {
+  id: string;
+  modeBundles: { mode: Scale; chordMapBundle: ReturnType<typeof chordMapFullBundle> }[];
+}[] {
+  return tunings.map((tuning) => ({
+    id: tuning.id,
+    modeBundles: tuningModeChordMapBundles(tuning, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q351 — scaleChordMapNarrativeBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get volatility bundle, progression, and narrative for a scale's chord map in one call.
+ *
+ * Socratic Q351: "If I can get volatility bundle + progression + narrative from a scale's
+ * chord map, can I get them all at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → chordMap.
+ * 2. `chordMapVolatilityBundle(chordMap, spectrum, rootHz)` → `{volatility, entropy, consistency}`.
+ * 3. `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → chords.
+ * 4. `progressionSmoothnessRatio(chords, rootHz, spectrum)` → smoothnessRatio.
+ * 5. `progressionNarrative(chords, rootHz, spectrum)` → narrative.
+ *
+ * @param scale    - The scale (mode) to analyse.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ chords, smoothnessRatio, narrative, volatility, entropy, consistency }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const bundle = scaleChordMapNarrativeBundle(major, t12);
+ * console.log(bundle.narrative, bundle.volatility, bundle.smoothnessRatio);
+ */
+export function scaleChordMapNarrativeBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  chords: Chord[];
+  smoothnessRatio: number;
+  narrative: string;
+  volatility: number;
+  entropy: number;
+  consistency: number;
+} {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const { volatility, entropy, consistency } = chordMapVolatilityBundle(chordMap, spectrum, rootHz);
+  const chords = chordMapProgressionBridge(chordMap, rootHz, spectrum);
+  const smoothnessRatio = progressionSmoothnessRatio(chords, rootHz, spectrum);
+  const narrative = progressionNarrative(chords, rootHz, spectrum);
+  return { chords, smoothnessRatio, narrative, volatility, entropy, consistency };
+}
+
+// ---------------------------------------------------------------------------
+// Q352 — tuningBestModeChordMapNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the best mode of a tuning by a metric and return its chord map narrative bundle in one call.
+ *
+ * Socratic Q352: "If I can find the best mode and get its chord map narrative bundle, can I
+ * combine them?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeRanking(tuning, metric, spectrum, rootHz)` → sorted modes (best first).
+ * 2. Throw `RangeError` if ranking is empty.
+ * 3. `scaleChordMapNarrativeBundle(bestMode, tuning, rootHz, spectrum)` → bundle.
+ * 4. Return `{mode, ...bundle}`.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param metric   - Ranking metric: `'entropy'` | `'consistency'` | `'volatility'`.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ mode, narrative, volatility, entropy, consistency, smoothnessRatio }`.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const result = tuningBestModeChordMapNarrative(t12, 'entropy');
+ * console.log(result.mode.id, result.narrative, result.volatility);
+ */
+export function tuningBestModeChordMapNarrative(
+  tuning: TuningSystem,
+  metric: 'entropy' | 'consistency' | 'volatility',
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  mode: Scale;
+  narrative: string;
+  volatility: number;
+  entropy: number;
+  consistency: number;
+  smoothnessRatio: number;
+} {
+  const ranking = tuningModeRanking(tuning, metric, spectrum, rootHz);
+  if (ranking.length === 0) {
+    throw new RangeError('tuningBestModeChordMapNarrative: tuning has no modes');
+  }
+  const bestMode = ranking[0]!;
+  const bundle = scaleChordMapNarrativeBundle(bestMode, tuning, rootHz, spectrum);
+  return { mode: bestMode, ...bundle };
+}

@@ -137,6 +137,10 @@ import {
   tuningFamilyFullBundle,
   chordMapFullBundle,
   scaleModeSpectralRankings,
+  tuningModeChordMapBundles,
+  tuningFamilyChordMapBundles,
+  scaleChordMapNarrativeBundle,
+  tuningBestModeChordMapNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5676,5 +5680,176 @@ describe('scaleModeSpectralRankings (Q346)', () => {
   it('accepts optional rootHz', () => {
     const result = scaleModeSpectralRankings(major12, t12local, harmonicSpectrum(), 261.63);
     expect(result.spectralRanking.length).toBeGreaterThan(0);
+  });
+});
+
+describe('tuningModeChordMapBundles (Q348)', () => {
+  it('returns one bundle per mode', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeChordMapBundles(t12local, harmonicSpectrum());
+    expect(bundles.length).toBe(t12local.degrees.length);
+  });
+
+  it('each bundle has mode and chordMapBundle', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeChordMapBundles(t12local, harmonicSpectrum());
+    for (const { mode, chordMapBundle } of bundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(chordMapBundle).toHaveProperty('rankedBundle');
+      expect(chordMapBundle).toHaveProperty('volatilityBundle');
+      expect(chordMapBundle).toHaveProperty('progression');
+    }
+  });
+
+  it('volatilityBundle has volatility, entropy, consistency', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeChordMapBundles(t12local, harmonicSpectrum());
+    const first = bundles[0]!;
+    expect(typeof first.chordMapBundle.volatilityBundle.volatility).toBe('number');
+    expect(typeof first.chordMapBundle.volatilityBundle.entropy).toBe('number');
+    expect(typeof first.chordMapBundle.volatilityBundle.consistency).toBe('number');
+  });
+
+  it('progression has chords array and smoothnessRatio', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeChordMapBundles(t12local, harmonicSpectrum());
+    const first = bundles[0]!;
+    expect(Array.isArray(first.chordMapBundle.progression.chords)).toBe(true);
+    expect(typeof first.chordMapBundle.progression.smoothnessRatio).toBe('number');
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeChordMapBundles(t12local, harmonicSpectrum(), 261.63);
+    expect(bundles.length).toBeGreaterThan(0);
+  });
+});
+
+describe('tuningFamilyChordMapBundles (Q350)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19);
+    const result = tuningFamilyChordMapBundles([t12local, t19], harmonicSpectrum());
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeBundles', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyChordMapBundles([t12local], harmonicSpectrum());
+    expect(result[0]!.id).toBe(t12local.id);
+    expect(Array.isArray(result[0]!.modeBundles)).toBe(true);
+  });
+
+  it('modeBundles length matches tuning degree count', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyChordMapBundles([t12local], harmonicSpectrum());
+    expect(result[0]!.modeBundles.length).toBe(t12local.degrees.length);
+  });
+
+  it('each modeBundles entry has mode and chordMapBundle', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyChordMapBundles([t12local], harmonicSpectrum());
+    for (const { mode, chordMapBundle } of result[0]!.modeBundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(chordMapBundle).toHaveProperty('volatilityBundle');
+    }
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyChordMapBundles([], harmonicSpectrum());
+    expect(result).toEqual([]);
+  });
+});
+
+describe('scaleChordMapNarrativeBundle (Q351)', () => {
+  it('returns all six metrics', () => {
+    const t12local = equalTemperament12(440);
+    const scale = { ...major, tuningId: t12local.id };
+    const bundle = scaleChordMapNarrativeBundle(scale, t12local);
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+    expect(typeof bundle.narrative).toBe('string');
+    expect(bundle.narrative.length).toBeGreaterThan(0);
+    expect(typeof bundle.volatility).toBe('number');
+    expect(typeof bundle.entropy).toBe('number');
+    expect(typeof bundle.consistency).toBe('number');
+  });
+
+  it('narrative is non-empty for a valid scale', () => {
+    const t12local = equalTemperament12(440);
+    const scale = { ...major, tuningId: t12local.id };
+    const bundle = scaleChordMapNarrativeBundle(scale, t12local);
+    expect(bundle.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional spectrum', () => {
+    const t12local = equalTemperament12(440);
+    const scale = { ...major, tuningId: t12local.id };
+    const bundle = scaleChordMapNarrativeBundle(scale, t12local, 440, harmonicSpectrum());
+    expect(typeof bundle.volatility).toBe('number');
+  });
+
+  it('metrics are finite numbers', () => {
+    const t12local = equalTemperament12(440);
+    const scale = { ...major, tuningId: t12local.id };
+    const { volatility, entropy, consistency, smoothnessRatio } = scaleChordMapNarrativeBundle(
+      scale,
+      t12local,
+    );
+    expect(isFinite(volatility)).toBe(true);
+    expect(isFinite(entropy)).toBe(true);
+    expect(isFinite(consistency)).toBe(true);
+    expect(isFinite(smoothnessRatio)).toBe(true);
+  });
+});
+
+describe('tuningBestModeChordMapNarrative (Q352)', () => {
+  it('returns mode and narrative for entropy metric', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeChordMapNarrative(t12local, 'entropy');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.narrative).toBe('string');
+    expect(result.volatility).toBeGreaterThanOrEqual(0);
+  });
+
+  it('returns mode and narrative for consistency metric', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeChordMapNarrative(t12local, 'consistency');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.consistency).toBe('number');
+  });
+
+  it('returns mode and narrative for volatility metric', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeChordMapNarrative(t12local, 'volatility');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.volatility).toBe('number');
+  });
+
+  it('throws RangeError for empty tuning', () => {
+    const empty = { ...equalTemperament12(440), degrees: [] };
+    expect(() => tuningBestModeChordMapNarrative(empty, 'entropy')).toThrow(RangeError);
+  });
+
+  it('result has all six expected keys', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeChordMapNarrative(t12local, 'entropy');
+    expect(result).toHaveProperty('mode');
+    expect(result).toHaveProperty('narrative');
+    expect(result).toHaveProperty('volatility');
+    expect(result).toHaveProperty('entropy');
+    expect(result).toHaveProperty('consistency');
+    expect(result).toHaveProperty('smoothnessRatio');
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestModeChordMapNarrative(
+      t12local,
+      'consistency',
+      261.63,
+      harmonicSpectrum(),
+    );
+    expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
