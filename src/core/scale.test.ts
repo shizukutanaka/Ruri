@@ -100,6 +100,9 @@ import {
   tuningFamilyReport,
   progressionSmoothnessRatio,
   chordMapSpectralProfile,
+  chordMapSpectralRanking,
+  tuningProgressionVariety,
+  chordMapConsistencyScore,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4522,5 +4525,117 @@ describe('chordMapSpectralProfile (Q274)', () => {
   it('all spectralFit values are non-negative', () => {
     const profile = chordMapSpectralProfile(chordMap, harmonicSpectrum());
     profile.forEach((p) => expect(p.spectralFit).toBeGreaterThanOrEqual(0));
+  });
+});
+
+describe('chordMapSpectralRanking (Q278)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('returns same length as chordMap', () => {
+    const ranked = chordMapSpectralRanking(chordMap, harmonicSpectrum());
+    expect(ranked).toHaveLength(chordMap.length);
+  });
+  it('contains same entries as chordMap', () => {
+    const ranked = chordMapSpectralRanking(chordMap, harmonicSpectrum());
+    expect(new Set(ranked.map((e) => e.degreeOffset)).size).toBe(chordMap.length);
+  });
+  it('returns empty array for empty chordMap', () => {
+    expect(chordMapSpectralRanking([], harmonicSpectrum())).toEqual([]);
+  });
+});
+
+describe('tuningProgressionVariety (Q279)', () => {
+  it('returns value in (0, 1]', () => {
+    const v = tuningProgressionVariety(t12);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for tuning with no degrees', () => {
+    const empty: TuningSystem = {
+      id: 'e',
+      name: 'E',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(tuningProgressionVariety(empty)).toBe(0);
+  });
+  it('whole-tone scale (6-edo) has variety 1/6', () => {
+    const t6 = edo(6);
+    const v = tuningProgressionVariety(t6);
+    // 6-EDO: all modes identical → 1 unique / 6 total = 1/6
+    expect(v).toBeCloseTo(1 / 6, 5);
+  });
+});
+
+describe('chordMapConsistencyScore (Q281)', () => {
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('returns a value in (0, 1]', () => {
+    const score = chordMapConsistencyScore(chordMap);
+    expect(score).toBeGreaterThan(0);
+    expect(score).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for empty chord map', () => {
+    expect(chordMapConsistencyScore([])).toBe(0);
+  });
+  it('returns a finite number', () => {
+    expect(Number.isFinite(chordMapConsistencyScore(chordMap))).toBe(true);
+  });
+});
+
+describe('chordMapSpectralRanking (Q278)', () => {
+  const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
+
+  it('returns same length as chordMap', () => {
+    expect(chordMapSpectralRanking(chordMap, harmonicSpectrum())).toHaveLength(chordMap.length);
+  });
+  it('contains same entries', () => {
+    const ranked = chordMapSpectralRanking(chordMap, harmonicSpectrum());
+    expect(new Set(ranked.map((e) => e.degreeOffset)).size).toBe(chordMap.length);
+  });
+  it('returns empty array for empty input', () => {
+    expect(chordMapSpectralRanking([], harmonicSpectrum())).toEqual([]);
+  });
+});
+
+describe('tuningProgressionVariety (Q279)', () => {
+  it('returns value in (0, 1] for 12-TET', () => {
+    const v = tuningProgressionVariety(t12);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for tuning with no degrees', () => {
+    const empty: TuningSystem = {
+      id: 'e',
+      name: 'E',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(tuningProgressionVariety(empty)).toBe(0);
+  });
+  it('6-EDO (whole-tone) has 1/6 variety', () => {
+    expect(tuningProgressionVariety(edo(6))).toBeCloseTo(1 / 6, 5);
+  });
+});
+
+describe('chordMapConsistencyScore (Q281)', () => {
+  const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
+
+  it('returns value in (0, 1]', () => {
+    const s = chordMapConsistencyScore(chordMap);
+    expect(s).toBeGreaterThan(0);
+    expect(s).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for empty chord map', () => {
+    expect(chordMapConsistencyScore([])).toBe(0);
+  });
+  it('is finite', () => {
+    expect(Number.isFinite(chordMapConsistencyScore(chordMap))).toBe(true);
   });
 });

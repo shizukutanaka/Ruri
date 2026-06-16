@@ -4260,3 +4260,127 @@ export function chordMapSpectralProfile(
     spectralFit: harmonicityForChord(entry.chord, rootHz, tol),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q278 — chordMapSpectralRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Sort a chord map by spectral fit (harmonicity) ascending in one call.
+ *
+ * Socratic Q278: "If I can get a per-chord spectral profile, can I sort the chord map
+ * by spectral fit in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapSpectralProfile(chordMap, spectrum, rootHz)` → profile with per-entry spectralFit.
+ * 2. Sort ascending by `spectralFit` (most harmonic first).
+ * 3. Return `profile.map(p => p.entry)`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Instrument spectrum (accepted for API consistency; harmonicity is spectrum-independent).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @returns New array of `ScaleChordMapEntry` sorted by spectral fit ascending.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const ranked = chordMapSpectralRanking(chordMap, harmonicSpectrum());
+ * // ranked[0] is the most spectrally fit chord
+ */
+export function chordMapSpectralRanking(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ScaleChordMapEntry[] {
+  const profile = chordMapSpectralProfile(chordMap, spectrum, rootHz);
+  return [...profile].sort((a, b) => a.spectralFit - b.spectralFit).map((p) => p.entry);
+}
+
+// ---------------------------------------------------------------------------
+// Q279 — tuningProgressionVariety
+// ---------------------------------------------------------------------------
+
+/**
+ * Harmonic variety score of a tuning: ratio of unique interval patterns to total modes.
+ *
+ * Socratic Q279: "If I have all the mode interval sets for a tuning, can I compute how much
+ * harmonic variety (distinct interval patterns) the tuning's modes offer in one call?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale spanning all degrees.
+ * 2. `modeIntervalSets(scale, tuning)` → one interval set per modal rotation.
+ * 3. Build a Set of unique patterns: round each cent value and join with ','.
+ * 4. Return `unique.size / Math.max(tuning.degrees.length, 1)`.
+ *
+ * Returns 0 for tunings with no degrees. For fully symmetrical tunings (all modes identical,
+ * e.g. 6-EDO whole-tone), returns 1/n where n = degree count.
+ *
+ * @param tuning - The tuning system to analyse.
+ * @returns Variety ratio ∈ (0, 1] — higher means more distinct modal flavors.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const v = tuningProgressionVariety(t12); // proportion of distinct modes in 12-TET
+ *
+ * @example
+ * const t6 = edo(6); // whole-tone — all modes identical
+ * const v = tuningProgressionVariety(t6); // 1/6 ≈ 0.1667
+ */
+export function tuningProgressionVariety(tuning: TuningSystem): number {
+  if (tuning.degrees.length === 0) return 0;
+  const scale = tuningToScale(tuning);
+  const sets = modeIntervalSets(scale, tuning);
+  const unique = new Set(
+    sets.map((s) =>
+      s.intervalCents
+        .map((c) => Math.round(c))
+        .sort()
+        .join(','),
+    ),
+  );
+  return unique.size / Math.max(tuning.degrees.length, 1);
+}
+
+// ---------------------------------------------------------------------------
+// Q281 — chordMapConsistencyScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Consistency score for a chord map: high when harmonicity is low and volatility is low.
+ *
+ * Socratic Q281: "If volatility measures spread and harmonicity measures center, can I compute
+ * a consistency score (high harmonicity, low volatility) in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. If `chordMap.length === 0` return `0`.
+ * 2. `vol = chordMapVolatility(chordMap, spectrum, rootHz)`.
+ * 3. Compute mean harmonicity from per-entry `harmonicityForChord`.
+ * 4. If `meanHarmonicity <= 0` return `0`.
+ * 5. `return 1 / (1 + vol + meanHarmonicity)` — ranges in (0, 1), high when both are small.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Optional instrument spectrum for volatility computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @returns Consistency score ∈ (0, 1] (or 0 for empty map / zero harmonicity).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const score = chordMapConsistencyScore(chordMap);
+ */
+export function chordMapConsistencyScore(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum?: Spectrum,
+  rootHz = 440,
+): number {
+  if (chordMap.length === 0) return 0;
+  const vol = chordMapVolatility(chordMap, spectrum, rootHz);
+  const meanHarmonicity =
+    chordMap.reduce((s, entry) => s + harmonicityForChord(entry.chord, rootHz), 0) /
+    chordMap.length;
+  if (meanHarmonicity <= 0) return 0;
+  return 1 / (1 + vol + meanHarmonicity);
+}
