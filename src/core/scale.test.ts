@@ -243,6 +243,10 @@ import {
   tuningFamilyModeConsensusClusterBundles,
   tuningTopClusterConsensusMode,
   tuningFamilyTopClusterConsensusModes,
+  tuningModeConsensusOutlierBundle,
+  tuningFamilyModeConsensusOutlierBundles,
+  tuningModeInsightSummary,
+  tuningFamilyModeInsightSummaries,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9522,6 +9526,128 @@ describe('tuningFamilyTopClusterConsensusModes (Q515)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(typeof entry.topClusterConsensusMode.mode.id).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningModeConsensusOutlierBundle (Q516)', () => {
+  it('returns one entry per mode with outlierMetrics field', () => {
+    const spec = harmonicSpectrum(6);
+    const tuning = equalTemperament12(440);
+    const result = tuningModeConsensusOutlierBundle(tuning, spec);
+    expect(result.length).toBe(tuning.degrees.length);
+    for (const entry of result) {
+      expect(Array.isArray(entry.outlierMetrics)).toBe(true);
+    }
+  });
+
+  it('outlierMetrics are subsets of the 5 metric names', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusOutlierBundle(equalTemperament12(440), spec);
+    const validMetrics = new Set([
+      'entropy',
+      'consistency',
+      'volatility',
+      'diversity',
+      'smoothnessRatio',
+    ]);
+    for (const entry of result) {
+      for (const metric of entry.outlierMetrics) {
+        expect(validMetrics.has(metric)).toBe(true);
+      }
+    }
+  });
+
+  it('sorted by consensusRank ascending', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusOutlierBundle(equalTemperament12(440), spec);
+    expect(result[0]!.consensusRank).toBe(1);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsensusOutlierBundle(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeConsensusOutlierBundles (Q518)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeConsensusOutlierBundles(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and consensusOutlierBundle array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeConsensusOutlierBundles(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.consensusOutlierBundle.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningModeInsightSummary (Q519)', () => {
+  it('returns one entry per mode with insight string', () => {
+    const spec = harmonicSpectrum(6);
+    const tuning = equalTemperament12(440);
+    const result = tuningModeInsightSummary(tuning, spec);
+    expect(result.length).toBe(tuning.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.insight).toBe('string');
+      expect(entry.insight.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('insight contains mode id and cluster', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeInsightSummary(equalTemperament12(440), spec);
+    expect(result[0]!.insight.includes(result[0]!.mode.id)).toBe(true);
+    expect(result[0]!.insight.includes(result[0]!.cluster)).toBe(true);
+  });
+
+  it('insight mentions outliers when present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeInsightSummary(equalTemperament12(440), spec);
+    const withOutliers = result.find((e) => e.outlierMetrics.length > 0);
+    if (withOutliers !== undefined) {
+      expect(withOutliers.insight.includes('outlier')).toBe(true);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeInsightSummary(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeInsightSummaries (Q521)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeInsightSummaries(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and insightSummaries array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeInsightSummaries(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.insightSummaries.length).toBeGreaterThan(0);
     }
   });
 });

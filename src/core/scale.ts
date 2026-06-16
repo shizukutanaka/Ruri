@@ -10731,3 +10731,154 @@ export function tuningFamilyTopClusterConsensusModes(
         : tuningTopClusterConsensusMode(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q516 — tuningModeConsensusOutlierBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Join consensus ranking data with metric outlier data per mode.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array (same length & order as consensusBundle) with an added
+ *          `outlierMetrics` field listing every metric on which the mode is
+ *          a statistical outlier.
+ */
+export function tuningModeConsensusOutlierBundle(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): (ReturnType<typeof tuningModeConsensusClusterBundle>[number] & {
+  outlierMetrics: string[];
+})[] {
+  const consensusBundle =
+    rootHz !== undefined
+      ? tuningModeConsensusClusterBundle(tuning, spectrum, rootHz)
+      : tuningModeConsensusClusterBundle(tuning, spectrum);
+  const outliers =
+    rootHz !== undefined
+      ? tuningModeMetricOutliers(tuning, spectrum, rootHz)
+      : tuningModeMetricOutliers(tuning, spectrum);
+
+  // Build Map from mode.id → outlier metric names
+  const outlierMap = new Map<string, string[]>();
+  for (const o of outliers) {
+    const existing = outlierMap.get(o.mode.id);
+    if (existing !== undefined) {
+      existing.push(o.metric);
+    } else {
+      outlierMap.set(o.mode.id, [o.metric]);
+    }
+  }
+
+  return consensusBundle.map((entry) => ({
+    ...entry,
+    outlierMetrics: outlierMap.get(entry.mode.id) ?? [],
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q518 — tuningFamilyModeConsensusOutlierBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Join consensus and outlier data for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and consensusOutlierBundle.
+ */
+export function tuningFamilyModeConsensusOutlierBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  consensusOutlierBundle: ReturnType<typeof tuningModeConsensusOutlierBundle>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    consensusOutlierBundle:
+      rootHz !== undefined
+        ? tuningModeConsensusOutlierBundle(t, spectrum, rootHz)
+        : tuningModeConsensusOutlierBundle(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q519 — tuningModeInsightSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a compact per-mode insight string that mentions rank, cluster, and
+ * any outlier metrics.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per mode with mode, consensusRank, cluster,
+ *          outlierMetrics, and a human-readable insight string.
+ */
+export function tuningModeInsightSummary(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: ReturnType<typeof tuningModeConsensusOutlierBundle>[number]['mode'];
+  consensusRank: number;
+  cluster: 'high' | 'mid' | 'low';
+  outlierMetrics: string[];
+  insight: string;
+}[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeConsensusOutlierBundle(tuning, spectrum, rootHz)
+      : tuningModeConsensusOutlierBundle(tuning, spectrum);
+  const total = bundle.length;
+
+  return bundle.map((entry) => {
+    let insight = `[${entry.mode.id}]: rank ${entry.consensusRank}/${total}, cluster ${entry.cluster}`;
+    if (entry.outlierMetrics.length > 0) {
+      insight += `, outlier on [${entry.outlierMetrics.join(', ')}]`;
+    }
+    return {
+      mode: entry.mode,
+      consensusRank: entry.consensusRank,
+      cluster: entry.cluster,
+      outlierMetrics: entry.outlierMetrics,
+      insight,
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q521 — tuningFamilyModeInsightSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce insight summaries for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and insightSummaries array.
+ */
+export function tuningFamilyModeInsightSummaries(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  insightSummaries: ReturnType<typeof tuningModeInsightSummary>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    insightSummaries:
+      rootHz !== undefined
+        ? tuningModeInsightSummary(t, spectrum, rootHz)
+        : tuningModeInsightSummary(t, spectrum),
+  }));
+}
