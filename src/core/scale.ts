@@ -4611,3 +4611,68 @@ export function chordMapEntropyScore(
   }
   return H;
 }
+
+// ---------------------------------------------------------------------------
+// Q294 — tuningEntropyProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute chord-map entropy for every mode of a tuning.
+ *
+ * Socratic Q294: "If I can compute entropy for one chord map, can I compute
+ * entropy for every mode of a tuning in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 3. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapEntropyScore(chordMap, spectrum, rootHz)`.
+ *
+ * @param tuning   - The tuning system whose modes to profile.
+ * @param spectrum - Optional instrument spectrum for dissonance.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{mode, entropy}` sorted by mode degree index ascending.
+ */
+export function tuningEntropyProfile(
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz = 440,
+): { mode: Scale; entropy: number }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const entropy = chordMapEntropyScore(chordMap, spectrum, rootHz);
+    return { mode, entropy };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q295 — bestModeByEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the mode of `tuning` with the highest chord-map entropy.
+ *
+ * Socratic Q295: "If I have all mode entropies, can I find the most diverse
+ * mode in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningEntropyProfile(tuning, spectrum, rootHz)` → `{mode, entropy}[]`.
+ * 2. Return the entry with the maximum entropy value.
+ *
+ * @param tuning   - The tuning system.
+ * @param spectrum - Optional instrument spectrum.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns The `Scale` with the maximum entropy value.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ */
+export function bestModeByEntropy(tuning: TuningSystem, spectrum?: Spectrum, rootHz = 440): Scale {
+  const profile = tuningEntropyProfile(tuning, spectrum, rootHz);
+  if (profile.length === 0) throw new RangeError('bestModeByEntropy: tuning has no modes');
+  let best = profile[0]!;
+  for (const entry of profile) {
+    if (entry.entropy > best.entropy) best = entry;
+  }
+  return best.mode;
+}

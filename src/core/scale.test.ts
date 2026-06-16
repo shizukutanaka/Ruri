@@ -108,6 +108,8 @@ import {
   chordMapNormalizedScores,
   tuningReportCard,
   chordMapEntropyScore,
+  tuningEntropyProfile,
+  bestModeByEntropy,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4727,5 +4729,43 @@ describe('chordMapEntropyScore (Q289)', () => {
   });
   it('returns 0 for empty', () => {
     expect(chordMapEntropyScore([])).toBe(0);
+  });
+});
+
+describe('tuningEntropyProfile (Q294)', () => {
+  it('returns one entry per mode', () => {
+    const profile = tuningEntropyProfile(t12);
+    expect(profile.length).toBe(t12.degrees.length);
+  });
+  it('all entropies are non-negative', () => {
+    const profile = tuningEntropyProfile(t12);
+    for (const { entropy } of profile) {
+      expect(entropy).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('each entry has a mode with degreeIndices', () => {
+    const profile = tuningEntropyProfile(t12);
+    for (const { mode } of profile) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+});
+
+describe('bestModeByEntropy (Q295)', () => {
+  it('returns a Scale', () => {
+    const mode = bestModeByEntropy(t12);
+    expect(mode).toHaveProperty('degreeIndices');
+  });
+  it('has entropy >= all other modes', () => {
+    const mode = bestModeByEntropy(t12);
+    const profile = tuningEntropyProfile(t12);
+    const best = Math.max(...profile.map((e) => e.entropy));
+    const chordMap = scaleToChordMap(mode, t12);
+    const entropy = chordMapEntropyScore(chordMap);
+    expect(entropy).toBeCloseTo(best, 10);
+  });
+  it('throws for empty tuning', () => {
+    const empty: typeof t12 = { ...t12, degrees: [] };
+    expect(() => bestModeByEntropy(empty)).toThrow(RangeError);
   });
 });
