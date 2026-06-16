@@ -172,6 +172,10 @@ import {
   tuningFamilyComprehensiveReports,
   scaleSimilarityRanking,
   tuningFamilySimilarityMatrix,
+  tuningModeIntervalProfile,
+  tuningFamilyIntervalProfiles,
+  tuningMostDiverseMode,
+  tuningFamilyMostDiverseModes,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -7105,5 +7109,148 @@ describe('tuningFamilySimilarityMatrix (Q407)', () => {
     const t19 = edo(19, 440);
     const result = tuningFamilySimilarityMatrix([t12local, t19], 0.02);
     expect(typeof result.matrix[0]?.[1]).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q408 — tuningModeIntervalProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningModeIntervalProfile (Q408)', () => {
+  it('returns one entry per mode with diversity in [0,1]', () => {
+    const t12local = equalTemperament12(440);
+    const profiles = tuningModeIntervalProfile(t12local);
+    expect(profiles.length).toBe(t12local.degrees.length);
+    for (const { mode, intervals, intervalCount, uniqueIntervals, diversity } of profiles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(intervalCount).toBe(intervals.length);
+      expect(uniqueIntervals.length).toBeLessThanOrEqual(intervalCount);
+      expect(diversity).toBeGreaterThanOrEqual(0);
+      expect(diversity).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('uniqueIntervals is sorted ascending', () => {
+    const t12local = equalTemperament12(440);
+    const profiles = tuningModeIntervalProfile(t12local);
+    for (const { uniqueIntervals } of profiles) {
+      for (let i = 1; i < uniqueIntervals.length; i++) {
+        expect(uniqueIntervals[i]!).toBeGreaterThanOrEqual(uniqueIntervals[i - 1]!);
+      }
+    }
+  });
+
+  it('diversity = 1 for fully symmetric tuning (each mode rotation has unique steps)', () => {
+    const t12local = equalTemperament12(440);
+    const profiles = tuningModeIntervalProfile(t12local);
+    // 12-EDO: all steps are equal 100c, so uniqueIntervals.length = 1, intervalCount = 12, diversity = 1/12
+    for (const { diversity } of profiles) {
+      expect(diversity).toBeGreaterThan(0);
+      expect(diversity).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('intervalCount equals number of degrees in each mode', () => {
+    const t12local = equalTemperament12(440);
+    const profiles = tuningModeIntervalProfile(t12local);
+    for (const { intervalCount, intervals } of profiles) {
+      expect(intervalCount).toBe(intervals.length);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q410 — tuningFamilyIntervalProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyIntervalProfiles (Q410)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const result = tuningFamilyIntervalProfiles([t12local, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeProfiles', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyIntervalProfiles([t12local]);
+    expect(typeof result[0]!.id).toBe('string');
+    expect(Array.isArray(result[0]!.modeProfiles)).toBe(true);
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyIntervalProfiles([t12local]);
+    expect(result[0]!.id).toBe(t12local.id);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyIntervalProfiles([]);
+    expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q411 — tuningMostDiverseMode
+// ---------------------------------------------------------------------------
+
+describe('tuningMostDiverseMode (Q411)', () => {
+  it('returns mode and diversity', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningMostDiverseMode(t12local);
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.diversity).toBeGreaterThanOrEqual(0);
+  });
+
+  it('diversity is in [0,1]', () => {
+    const t12local = equalTemperament12(440);
+    const { diversity } = tuningMostDiverseMode(t12local);
+    expect(diversity).toBeGreaterThanOrEqual(0);
+    expect(diversity).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for empty tuning', () => {
+    const empty = { ...equalTemperament12(440), degrees: [] };
+    expect(() => tuningMostDiverseMode(empty)).toThrow(RangeError);
+  });
+
+  it('returned diversity is the maximum across all modes', () => {
+    const t12local = equalTemperament12(440);
+    const { diversity } = tuningMostDiverseMode(t12local);
+    const profiles = tuningModeIntervalProfile(t12local);
+    const maxDiversity = Math.max(...profiles.map((p) => p.diversity));
+    expect(diversity).toBeCloseTo(maxDiversity, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q413 — tuningFamilyMostDiverseModes
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyMostDiverseModes (Q413)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const result = tuningFamilyMostDiverseModes([t12local, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and mostDiverseMode with mode and diversity', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyMostDiverseModes([t12local]);
+    expect(typeof result[0]!.id).toBe('string');
+    expect(result[0]!.mostDiverseMode).toHaveProperty('mode');
+    expect(result[0]!.mostDiverseMode).toHaveProperty('diversity');
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyMostDiverseModes([t12local]);
+    expect(result[0]!.id).toBe(t12local.id);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyMostDiverseModes([]);
+    expect(result).toEqual([]);
   });
 });

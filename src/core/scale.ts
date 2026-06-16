@@ -7400,3 +7400,139 @@ export function tuningFamilySimilarityMatrix(
   const leastSimilarPair: [TuningSystem, TuningSystem] = [tunings[minI]!, tunings[minJ]!];
   return { tunings, matrix, mostSimilarPair, leastSimilarPair };
 }
+
+// ---------------------------------------------------------------------------
+// Q408 — tuningModeIntervalProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute interval diversity metrics for every modal rotation of a tuning in one call.
+ *
+ * Socratic Q408: "If I can get interval sets for all modes, can I also compute diversity metrics
+ * per mode in one pass?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale spanning all degrees.
+ * 2. `modeIntervalSets(scale, tuning)` → one entry per modal rotation.
+ * 3. For each `{mode, intervalCents}`:
+ *    - `intervalCount = intervalCents.length`
+ *    - `uniqueIntervals = [...new Set(intervalCents)].sort((a,b) => a-b)`
+ *    - `diversity = uniqueIntervals.length / Math.max(intervalCount, 1)`
+ *
+ * @param tuning - The `TuningSystem` to profile.
+ * @returns One entry per modal rotation with interval count, unique intervals, and diversity ratio.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const profiles = tuningModeIntervalProfile(t12);
+ * profiles.forEach(({ mode, diversity }) => console.log(mode.id, diversity));
+ */
+export function tuningModeIntervalProfile(tuning: TuningSystem): {
+  mode: Scale;
+  intervals: number[];
+  intervalCount: number;
+  uniqueIntervals: number[];
+  diversity: number;
+}[] {
+  const scale = tuningToScale(tuning);
+  return modeIntervalSets(scale, tuning).map(({ mode, intervalCents }) => {
+    const intervalCount = intervalCents.length;
+    const uniqueIntervals = [...new Set(intervalCents)].sort((a, b) => a - b);
+    const diversity = uniqueIntervals.length / Math.max(intervalCount, 1);
+    return { mode, intervals: intervalCents, intervalCount, uniqueIntervals, diversity };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q410 — tuningFamilyIntervalProfiles
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute interval diversity profiles for every tuning in a family in one call.
+ *
+ * Socratic Q410: "If I can get interval profile for one tuning, can I get it for a whole family?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `{id: t.id, modeProfiles: tuningModeIntervalProfile(t)}`.
+ *
+ * @param tunings - Array of `TuningSystem` objects to profile.
+ * @returns One entry per tuning with its id and per-mode interval profiles.
+ *
+ * @example
+ * const profiles = tuningFamilyIntervalProfiles([equalTemperament12(440), edo(19, 440)]);
+ * profiles.forEach(({ id, modeProfiles }) => console.log(id, modeProfiles.length));
+ */
+export function tuningFamilyIntervalProfiles(tunings: TuningSystem[]): {
+  id: string;
+  modeProfiles: {
+    mode: Scale;
+    intervals: number[];
+    intervalCount: number;
+    uniqueIntervals: number[];
+    diversity: number;
+  }[];
+}[] {
+  return tunings.map((t) => ({ id: t.id, modeProfiles: tuningModeIntervalProfile(t) }));
+}
+
+// ---------------------------------------------------------------------------
+// Q411 — tuningMostDiverseMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the modal rotation with the highest interval diversity for a tuning in one call.
+ *
+ * Socratic Q411: "If I have diversity scores for all modes, can I find the most interval-diverse
+ * mode in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeIntervalProfile(tuning)` → per-mode diversity scores.
+ * 2. Find the entry with maximum `diversity`.
+ *
+ * @param tuning - The `TuningSystem` to search.
+ * @returns `{mode, diversity}` for the most interval-diverse modal rotation.
+ *
+ * @throws {RangeError} if the tuning has no degrees (no modes).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { mode, diversity } = tuningMostDiverseMode(t12);
+ * console.log(mode.id, diversity);
+ */
+export function tuningMostDiverseMode(tuning: TuningSystem): { mode: Scale; diversity: number } {
+  const profiles = tuningModeIntervalProfile(tuning);
+  if (profiles.length === 0) throw new RangeError('tuningMostDiverseMode: tuning has no modes');
+  let best = profiles[0]!;
+  for (const p of profiles) {
+    if (p.diversity > best.diversity) best = p;
+  }
+  return { mode: best.mode, diversity: best.diversity };
+}
+
+// ---------------------------------------------------------------------------
+// Q413 — tuningFamilyMostDiverseModes
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the most interval-diverse modal rotation for every tuning in a family in one call.
+ *
+ * Socratic Q413: "If I can find the most diverse mode for one tuning, can I do it for a whole
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `{id: t.id, mostDiverseMode: tuningMostDiverseMode(t)}`.
+ *
+ * @param tunings - Array of `TuningSystem` objects to search.
+ * @returns One entry per tuning with its id and most-diverse mode.
+ *
+ * @example
+ * const results = tuningFamilyMostDiverseModes([equalTemperament12(440), edo(19, 440)]);
+ * results.forEach(({ id, mostDiverseMode }) => console.log(id, mostDiverseMode.diversity));
+ */
+export function tuningFamilyMostDiverseModes(tunings: TuningSystem[]): {
+  id: string;
+  mostDiverseMode: { mode: Scale; diversity: number };
+}[] {
+  return tunings.map((t) => ({ id: t.id, mostDiverseMode: tuningMostDiverseMode(t) }));
+}
