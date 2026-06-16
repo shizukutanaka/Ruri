@@ -10983,3 +10983,132 @@ export function tuningFamilyModeEntropyDiversityMaps(
         : tuningModeEntropyDiversityMap(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q528 — tuningModeConsistencyVolatilityMap
+// ---------------------------------------------------------------------------
+
+export function tuningModeConsistencyVolatilityMap(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  consistency: number;
+  volatility: number;
+  quadrant:
+    | 'stable-consistent'
+    | 'consistent-volatile'
+    | 'smooth-inconsistent'
+    | 'rough-inconsistent';
+}[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  if (bundle.length === 0) return [];
+  const meanConsistency = bundle.reduce((s, b) => s + b.consistency, 0) / bundle.length;
+  const meanVolatility = bundle.reduce((s, b) => s + b.volatility, 0) / bundle.length;
+  return bundle.map((b) => {
+    const aboveConsistency = b.consistency > meanConsistency;
+    const belowVolatility = b.volatility < meanVolatility;
+    const quadrant:
+      | 'stable-consistent'
+      | 'consistent-volatile'
+      | 'smooth-inconsistent'
+      | 'rough-inconsistent' =
+      aboveConsistency && belowVolatility
+        ? 'stable-consistent'
+        : aboveConsistency && !belowVolatility
+          ? 'consistent-volatile'
+          : !aboveConsistency && belowVolatility
+            ? 'smooth-inconsistent'
+            : 'rough-inconsistent';
+    return { mode: b.mode, consistency: b.consistency, volatility: b.volatility, quadrant };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q530 — tuningFamilyModeConsistencyVolatilityMaps
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeConsistencyVolatilityMaps(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  consistencyVolatilityMap: ReturnType<typeof tuningModeConsistencyVolatilityMap>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    consistencyVolatilityMap:
+      rootHz !== undefined
+        ? tuningModeConsistencyVolatilityMap(t, spectrum, rootHz)
+        : tuningModeConsistencyVolatilityMap(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q531 — tuningModeFiveDimMap
+// ---------------------------------------------------------------------------
+
+export function tuningModeFiveDimMap(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropyDiversityQuadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform';
+  consistencyVolatilityQuadrant:
+    | 'stable-consistent'
+    | 'consistent-volatile'
+    | 'smooth-inconsistent'
+    | 'rough-inconsistent';
+  cluster: 'high' | 'mid' | 'low';
+}[] {
+  const edMap =
+    rootHz !== undefined
+      ? tuningModeEntropyDiversityMap(tuning, spectrum, rootHz)
+      : tuningModeEntropyDiversityMap(tuning, spectrum);
+  const cvMap =
+    rootHz !== undefined
+      ? tuningModeConsistencyVolatilityMap(tuning, spectrum, rootHz)
+      : tuningModeConsistencyVolatilityMap(tuning, spectrum);
+  const clusters =
+    rootHz !== undefined
+      ? tuningModeMetricCluster(tuning, spectrum, rootHz)
+      : tuningModeMetricCluster(tuning, spectrum);
+
+  const cvById = new Map(cvMap.map((e) => [e.mode.id, e]));
+  const clusterById = new Map(clusters.map((e) => [e.mode.id, e]));
+
+  return edMap.map((ed) => {
+    const cv = cvById.get(ed.mode.id);
+    const cl = clusterById.get(ed.mode.id);
+    return {
+      mode: ed.mode,
+      entropyDiversityQuadrant: ed.quadrant,
+      consistencyVolatilityQuadrant: cv?.quadrant ?? 'rough-inconsistent',
+      cluster: cl?.cluster ?? 'low',
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q533 — tuningFamilyModeFiveDimMaps
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeFiveDimMaps(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; fiveDimMap: ReturnType<typeof tuningModeFiveDimMap> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    fiveDimMap:
+      rootHz !== undefined
+        ? tuningModeFiveDimMap(t, spectrum, rootHz)
+        : tuningModeFiveDimMap(t, spectrum),
+  }));
+}

@@ -251,6 +251,10 @@ import {
   tuningFamilyFinalRecommendations,
   tuningModeEntropyDiversityMap,
   tuningFamilyModeEntropyDiversityMaps,
+  tuningModeConsistencyVolatilityMap,
+  tuningFamilyModeConsistencyVolatilityMaps,
+  tuningModeFiveDimMap,
+  tuningFamilyModeFiveDimMaps,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9752,6 +9756,121 @@ describe('tuningFamilyModeEntropyDiversityMaps (Q527)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.entropyDiversityMap.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q528 — tuningModeConsistencyVolatilityMap
+// ---------------------------------------------------------------------------
+
+describe('tuningModeConsistencyVolatilityMap (Q528)', () => {
+  it('returns one entry per mode with quadrant label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsistencyVolatilityMap(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    const validQuadrants = [
+      'stable-consistent',
+      'consistent-volatile',
+      'smooth-inconsistent',
+      'rough-inconsistent',
+    ];
+    for (const entry of result) {
+      expect(validQuadrants).toContain(entry.quadrant);
+    }
+  });
+
+  it('consistency and volatility match comprehensive bundle for first mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsistencyVolatilityMap(t12, spec);
+    const bundle = tuningModeComprehensiveBundle(t12, spec);
+    expect(result[0]!.consistency).toBeCloseTo(bundle[0]!.consistency, 10);
+    expect(result[0]!.volatility).toBeCloseTo(bundle[0]!.volatility, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeConsistencyVolatilityMap(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q530 — tuningFamilyModeConsistencyVolatilityMaps
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeConsistencyVolatilityMaps (Q530)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeConsistencyVolatilityMaps([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+  });
+
+  it('each entry has id and consistencyVolatilityMap array', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeConsistencyVolatilityMaps([t12, edo(19, 440)], spec);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.consistencyVolatilityMap.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q531 — tuningModeFiveDimMap
+// ---------------------------------------------------------------------------
+
+describe('tuningModeFiveDimMap (Q531)', () => {
+  it('returns one entry per mode with all quadrant labels and cluster', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeFiveDimMap(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    const validED = ['rich-complex', 'varied-uniform', 'stable-diverse', 'stable-uniform'];
+    const validCV = [
+      'stable-consistent',
+      'consistent-volatile',
+      'smooth-inconsistent',
+      'rough-inconsistent',
+    ];
+    const validClusters = ['high', 'mid', 'low'];
+    for (const entry of result) {
+      expect(validED).toContain(entry.entropyDiversityQuadrant);
+      expect(validCV).toContain(entry.consistencyVolatilityQuadrant);
+      expect(validClusters).toContain(entry.cluster);
+    }
+  });
+
+  it('entropyDiversityQuadrant matches tuningModeEntropyDiversityMap for same mode', () => {
+    const spec = harmonicSpectrum(6);
+    const fiveDim = tuningModeFiveDimMap(t12, spec);
+    const edMap = tuningModeEntropyDiversityMap(t12, spec);
+    expect(fiveDim[0]!.entropyDiversityQuadrant).toBe(edMap[0]!.quadrant);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeFiveDimMap(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q533 — tuningFamilyModeFiveDimMaps
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeFiveDimMaps (Q533)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeFiveDimMaps([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+  });
+
+  it('each entry has id and fiveDimMap array', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeFiveDimMaps([t12, edo(19, 440)], spec);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.fiveDimMap.length).toBeGreaterThan(0);
     }
   });
 });
