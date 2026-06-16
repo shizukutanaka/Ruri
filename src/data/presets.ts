@@ -66,6 +66,8 @@ import {
   tuningModeTopCorrelation,
   tuningModeAntiCorrelation,
   tuningParetoFrontSummary,
+  tuningParetoFrontVsRanking,
+  tuningBestParetoRankedMode,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3713,4 +3715,80 @@ export function presetParetoFrontSummary(
   return rootHz !== undefined
     ? tuningParetoFrontSummary(tuning, spectrum, rootHz)
     : tuningParetoFrontSummary(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q448 — presetParetoFrontVsRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Annotate the score ranking with Pareto-front membership for a named preset.
+ *
+ * Socratic Q448: Preset wrapper for `tuningParetoFrontVsRanking`.
+ *
+ * @param presetId - The preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to ALL_PRESETS).
+ * @returns The score ranking annotated with `inParetoFront: boolean`, in score-descending order.
+ * @throws {RangeError} If the preset is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = presetParetoFrontVsRanking('12-tet', spec);
+ * results.forEach(({ mode, score, inParetoFront }) => console.log(mode.id, inParetoFront));
+ */
+export function presetParetoFrontVsRanking(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { mode: Scale; score: number; inParetoFront: boolean }[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetParetoFrontVsRanking: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningParetoFrontVsRanking(tuning, spectrum, rootHz)
+    : tuningParetoFrontVsRanking(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q449 — presetBestParetoRankedMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Pick the Pareto-optimal mode with the best (lowest) rank for a named preset.
+ *
+ * Socratic Q449: Preset wrapper for `tuningBestParetoRankedMode`.
+ *
+ * @param presetId - The preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to ALL_PRESETS).
+ * @returns The Pareto mode with rank 1 (or lowest available rank).
+ * @throws {RangeError} If the preset is not found or no Pareto modes exist.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const best = presetBestParetoRankedMode('12-tet', spec);
+ * console.log(best.mode.id, best.rank);
+ */
+export function presetBestParetoRankedMode(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { mode: Scale; score: number; rank: number } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestParetoRankedMode: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningBestParetoRankedMode(tuning, spectrum, rootHz)
+    : tuningBestParetoRankedMode(tuning, spectrum);
 }

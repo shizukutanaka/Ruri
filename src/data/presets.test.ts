@@ -73,6 +73,8 @@ import {
   presetModeAntiCorrelation,
   presetFamilyTopCorrelations,
   presetParetoFrontSummary,
+  presetParetoFrontVsRanking,
+  presetBestParetoRankedMode,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2345,5 +2347,60 @@ describe('presetParetoFrontSummary', () => {
     const spec = harmonicSpectrum(6);
     const summary = presetParetoFrontSummary('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(summary.paretoSize).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q448 — presetParetoFrontVsRanking
+// ---------------------------------------------------------------------------
+
+describe('presetParetoFrontVsRanking', () => {
+  it('returns all modes annotated with inParetoFront', () => {
+    const spec = harmonicSpectrum(6);
+    const results = presetParetoFrontVsRanking('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(results.length).toBeGreaterThan(0);
+    for (const entry of results) {
+      expect(typeof entry.inParetoFront).toBe('boolean');
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetParetoFrontVsRanking('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('at least one mode is in Pareto front', () => {
+    const spec = harmonicSpectrum(6);
+    const results = presetParetoFrontVsRanking('12-tet', spec, undefined, [TWELVE_TET]);
+    const inFront = results.filter((r) => r.inParetoFront);
+    expect(inFront.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q449 — presetBestParetoRankedMode
+// ---------------------------------------------------------------------------
+
+describe('presetBestParetoRankedMode', () => {
+  it('returns single best Pareto mode with rank', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestParetoRankedMode('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.mode.id).toBe('string');
+    expect(result.rank).toBeGreaterThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetBestParetoRankedMode('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetBestParetoRankedMode('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.rank).toBeGreaterThanOrEqual(1);
   });
 });
