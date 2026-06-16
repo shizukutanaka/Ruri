@@ -235,6 +235,10 @@ import {
   tuningFamilyUltimateBestModes,
   tuningConsensusNarrative,
   tuningFamilyConsensusNarratives,
+  tuningMasterReport,
+  tuningFamilyMasterReports,
+  tuningModeComprehensiveMetricBundle,
+  tuningFamilyModeComprehensiveMetricBundles,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9307,6 +9311,105 @@ describe('tuningFamilyConsensusNarratives (Q503)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(typeof entry.consensusNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningMasterReport (Q504)', () => {
+  it('returns paretoCorrelationReport, consensusNarrative, masterNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningMasterReport(equalTemperament12(440), spec);
+    expect(result).toHaveProperty('paretoCorrelationReport');
+    expect(result).toHaveProperty('consensusNarrative');
+    expect(result).toHaveProperty('masterNarrative');
+  });
+
+  it('masterNarrative is concatenation of the two sub-narratives', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningMasterReport(equalTemperament12(440), spec);
+    expect(result.masterNarrative).toBe(
+      result.paretoCorrelationReport.combinedNarrative + ' ' + result.consensusNarrative.narrative,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningMasterReport(equalTemperament12(440), spec, 261.63);
+    expect(typeof result.masterNarrative).toBe('string');
+    expect(result.masterNarrative.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyMasterReports (Q506)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyMasterReports(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and masterReport.masterNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyMasterReports(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.masterReport.masterNarrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningModeComprehensiveMetricBundle (Q507)', () => {
+  it('returns one entry per mode with all raw metrics plus metricProfile', () => {
+    const spec = harmonicSpectrum(6);
+    const t12 = equalTemperament12(440);
+    const result = tuningModeComprehensiveMetricBundle(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+
+  it('each entry has entropy as raw value and metricProfile.entropy with stats', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeComprehensiveMetricBundle(equalTemperament12(440), spec);
+    expect(typeof result[0]!.entropy).toBe('number');
+    expect(typeof result[0]!.metricProfile.entropy.zScore).toBe('number');
+  });
+
+  it('metricProfile values match comprehensive bundle values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeComprehensiveMetricBundle(equalTemperament12(440), spec);
+    expect(result[0]!.entropy).toBe(result[0]!.metricProfile.entropy.value);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeComprehensiveMetricBundle(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeComprehensiveMetricBundles (Q509)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeComprehensiveMetricBundles(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeComprehensiveMetricBundles array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeComprehensiveMetricBundles(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.modeComprehensiveMetricBundles.length).toBeGreaterThan(0);
     }
   });
 });

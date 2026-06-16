@@ -10385,3 +10385,199 @@ export function tuningFamilyConsensusNarratives(
         : tuningConsensusNarrative(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q504 — tuningMasterReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine the full Pareto+correlation report and consensus narrative into one
+ * master report object.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns An object containing paretoCorrelationReport, consensusNarrative,
+ *          and a combined masterNarrative string.
+ */
+export function tuningMasterReport(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  paretoCorrelationReport: ReturnType<typeof tuningFullParetoCorrelationReport>;
+  consensusNarrative: ReturnType<typeof tuningConsensusNarrative>;
+  masterNarrative: string;
+} {
+  const paretoCorrelationReport =
+    rootHz !== undefined
+      ? tuningFullParetoCorrelationReport(tuning, spectrum, rootHz)
+      : tuningFullParetoCorrelationReport(tuning, spectrum);
+  const consensusNarrative =
+    rootHz !== undefined
+      ? tuningConsensusNarrative(tuning, spectrum, rootHz)
+      : tuningConsensusNarrative(tuning, spectrum);
+  return {
+    paretoCorrelationReport,
+    consensusNarrative,
+    masterNarrative: paretoCorrelationReport.combinedNarrative + ' ' + consensusNarrative.narrative,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q506 — tuningFamilyMasterReports
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a master report for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and masterReport result.
+ */
+export function tuningFamilyMasterReports(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; masterReport: ReturnType<typeof tuningMasterReport> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    masterReport:
+      rootHz !== undefined
+        ? tuningMasterReport(t, spectrum, rootHz)
+        : tuningMasterReport(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q507 — tuningModeComprehensiveMetricBundle
+// ---------------------------------------------------------------------------
+
+type ModeMetricStats = {
+  value: number;
+  mean: number;
+  stdDev: number;
+  zScore: number;
+  isOutlier: boolean;
+};
+
+type ModeComprehensiveMetricBundleEntry = {
+  mode: ReturnType<typeof tuningModeComprehensiveBundle>[number]['mode'];
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+  metricProfile: {
+    entropy: ModeMetricStats;
+    consistency: ModeMetricStats;
+    volatility: ModeMetricStats;
+    diversity: ModeMetricStats;
+    smoothnessRatio: ModeMetricStats;
+  };
+};
+
+/**
+ * Combine the per-mode comprehensive bundle and metric profile into a single
+ * array with all available per-mode data.
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array of per-mode entries with raw metrics and detailed metric profiles.
+ */
+export function tuningModeComprehensiveMetricBundle(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): ModeComprehensiveMetricBundleEntry[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  const profiles =
+    rootHz !== undefined
+      ? tuningModeMetricProfile(tuning, spectrum, rootHz)
+      : tuningModeMetricProfile(tuning, spectrum);
+
+  const profileMap = new Map(profiles.map((p) => [p.mode.id, p]));
+
+  return bundle.map((entry) => {
+    const profile = profileMap.get(entry.mode.id);
+    return {
+      mode: entry.mode,
+      entropy: entry.entropy,
+      consistency: entry.consistency,
+      volatility: entry.volatility,
+      diversity: entry.diversity,
+      smoothnessRatio: entry.smoothnessRatio,
+      metricProfile: {
+        entropy: {
+          value: profile?.metrics.entropy.value ?? entry.entropy,
+          mean: profile?.metrics.entropy.mean ?? 0,
+          stdDev: profile?.metrics.entropy.stdDev ?? 0,
+          zScore: profile?.metrics.entropy.zScore ?? 0,
+          isOutlier: profile?.metrics.entropy.isOutlier ?? false,
+        },
+        consistency: {
+          value: profile?.metrics.consistency.value ?? entry.consistency,
+          mean: profile?.metrics.consistency.mean ?? 0,
+          stdDev: profile?.metrics.consistency.stdDev ?? 0,
+          zScore: profile?.metrics.consistency.zScore ?? 0,
+          isOutlier: profile?.metrics.consistency.isOutlier ?? false,
+        },
+        volatility: {
+          value: profile?.metrics.volatility.value ?? entry.volatility,
+          mean: profile?.metrics.volatility.mean ?? 0,
+          stdDev: profile?.metrics.volatility.stdDev ?? 0,
+          zScore: profile?.metrics.volatility.zScore ?? 0,
+          isOutlier: profile?.metrics.volatility.isOutlier ?? false,
+        },
+        diversity: {
+          value: profile?.metrics.diversity.value ?? entry.diversity,
+          mean: profile?.metrics.diversity.mean ?? 0,
+          stdDev: profile?.metrics.diversity.stdDev ?? 0,
+          zScore: profile?.metrics.diversity.zScore ?? 0,
+          isOutlier: profile?.metrics.diversity.isOutlier ?? false,
+        },
+        smoothnessRatio: {
+          value: profile?.metrics.smoothnessRatio.value ?? entry.smoothnessRatio,
+          mean: profile?.metrics.smoothnessRatio.mean ?? 0,
+          stdDev: profile?.metrics.smoothnessRatio.stdDev ?? 0,
+          zScore: profile?.metrics.smoothnessRatio.zScore ?? 0,
+          isOutlier: profile?.metrics.smoothnessRatio.isOutlier ?? false,
+        },
+      },
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q509 — tuningFamilyModeComprehensiveMetricBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a comprehensive metric bundle for every tuning in a family.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and modeComprehensiveMetricBundles array.
+ */
+export function tuningFamilyModeComprehensiveMetricBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  modeComprehensiveMetricBundles: ReturnType<typeof tuningModeComprehensiveMetricBundle>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeComprehensiveMetricBundles:
+      rootHz !== undefined
+        ? tuningModeComprehensiveMetricBundle(t, spectrum, rootHz)
+        : tuningModeComprehensiveMetricBundle(t, spectrum),
+  }));
+}
