@@ -50,6 +50,8 @@ import {
   tuningModeDissonanceHistograms,
   tuningModeDualHistograms,
   tuningModeHistogramSummaries,
+  tuningModeAnalysisFull,
+  tuningHarmonicSpectralScore,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2880,4 +2882,99 @@ export function presetModeHistogramSummaries(
   }
   const tuning = loadTuningPreset(preset);
   return tuningModeHistogramSummaries(tuning, bins);
+}
+
+// ---------------------------------------------------------------------------
+// Q397 — presetModeAnalysisFull
+// ---------------------------------------------------------------------------
+
+/**
+ * Get full chord map analysis for all modes of a preset tuning in one call.
+ *
+ * Socratic Q397: "If I can get full mode analysis for a tuning, can I do it for a preset by
+ * id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeAnalysisFull(tuning, spectrum, rootHz)` → per-mode full analysis.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{mode, analysisFull}`, one per mode.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum();
+ * const result = presetModeAnalysisFull('12-tet', spec);
+ * for (const { mode, analysisFull } of result) {
+ *   console.log(mode.id, analysisFull.rankedBundle.entropy);
+ * }
+ */
+export function presetModeAnalysisFull(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeAnalysisFull> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeAnalysisFull: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeAnalysisFull(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q400 — presetHarmonicSpectralScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute harmonic-spectral score for a preset tuning in one call.
+ *
+ * Socratic Q400: "If I can compute harmonic spectral score for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningHarmonicSpectralScore(tuning, spectrum, rootHz, tol)` → combined score.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param tol      - Tolerance for harmonicity proximity (optional).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{harmonicDensity, spectralFit, combinedScore}`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const score = presetHarmonicSpectralScore('12-tet', spec);
+ * console.log(score.harmonicDensity, score.spectralFit, score.combinedScore);
+ */
+export function presetHarmonicSpectralScore(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  tol?: number,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningHarmonicSpectralScore> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetHarmonicSpectralScore: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  if (rootHz !== undefined) {
+    return tol !== undefined
+      ? tuningHarmonicSpectralScore(tuning, spectrum, rootHz, tol)
+      : tuningHarmonicSpectralScore(tuning, spectrum, rootHz);
+  }
+  return tuningHarmonicSpectralScore(tuning, spectrum);
 }

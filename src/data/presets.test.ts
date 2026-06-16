@@ -56,6 +56,8 @@ import {
   presetModeDissonanceHistograms,
   presetModeDualHistograms,
   presetModeHistogramSummaries,
+  presetModeAnalysisFull,
+  presetHarmonicSpectralScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1649,5 +1651,85 @@ describe('presetModeHistogramSummaries (Q392)', () => {
   it('accepts optional presets pool', () => {
     const summaries = presetModeHistogramSummaries('12-tet', 10, [TWELVE_TET]);
     expect(summaries.length).toBe(12);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q397 — presetModeAnalysisFull
+// ---------------------------------------------------------------------------
+
+describe('presetModeAnalysisFull (Q397)', () => {
+  it('returns one entry per mode for 12-tet', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAnalysisFull('12-tet', spec);
+    expect(result.length).toBe(12);
+  });
+
+  it('each entry has mode and analysisFull with all keys', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAnalysisFull('12-tet', spec);
+    for (const { mode, analysisFull } of result) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(analysisFull).toHaveProperty('dualHistogram');
+      expect(analysisFull).toHaveProperty('histogramSummary');
+      expect(analysisFull).toHaveProperty('rankedBundle');
+      expect(analysisFull).toHaveProperty('volatilityBundle');
+    }
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeAnalysisFull('not-a-preset', spec)).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAnalysisFull('12-tet', spec, 261.63);
+    expect(result.length).toBe(12);
+    expect(result[0]!.analysisFull).toHaveProperty('rankedBundle');
+  });
+
+  it('accepts optional presets pool', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAnalysisFull('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBe(12);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q400 — presetHarmonicSpectralScore
+// ---------------------------------------------------------------------------
+
+describe('presetHarmonicSpectralScore (Q400)', () => {
+  it('returns harmonicDensity, spectralFit, combinedScore for 12-tet', () => {
+    const spec = harmonicSpectrum(6);
+    const score = presetHarmonicSpectralScore('12-tet', spec);
+    expect(typeof score.harmonicDensity).toBe('number');
+    expect(typeof score.spectralFit).toBe('number');
+    expect(typeof score.combinedScore).toBe('number');
+    expect(score.combinedScore).toBeCloseTo((score.harmonicDensity + score.spectralFit) / 2, 10);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetHarmonicSpectralScore('not-a-preset', spec)).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const score = presetHarmonicSpectralScore('12-tet', spec, 261.63);
+    expect(typeof score.combinedScore).toBe('number');
+  });
+
+  it('accepts optional tol', () => {
+    const spec = harmonicSpectrum(6);
+    const score = presetHarmonicSpectralScore('12-tet', spec, 440, 0.02);
+    expect(typeof score.combinedScore).toBe('number');
+  });
+
+  it('accepts optional presets pool', () => {
+    const spec = harmonicSpectrum(6);
+    const score = presetHarmonicSpectralScore('12-tet', spec, undefined, undefined, [TWELVE_TET]);
+    expect(typeof score.combinedScore).toBe('number');
   });
 });
