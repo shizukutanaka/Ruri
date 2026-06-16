@@ -78,6 +78,8 @@ import {
   tuningModeMetricProfile,
   tuningModeMetricRadarData,
   tuningModeMetricCluster,
+  tuningClusterSummary,
+  tuningModeRadarRanking,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4191,4 +4193,64 @@ export function presetModeMetricCluster(
   return rootHz !== undefined
     ? tuningModeMetricCluster(tuning, spectrum, rootHz)
     : tuningModeMetricCluster(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q481 — presetClusterSummary
+// ---------------------------------------------------------------------------
+
+/**
+ * Summarise cluster counts and list modes in each bucket for a named preset.
+ *
+ * @param presetId - The preset identifier.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Cluster summary with highCount, midCount, lowCount, high, mid, low arrays.
+ */
+export function presetClusterSummary(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningClusterSummary> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetClusterSummary: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningClusterSummary(tuning, spectrum, rootHz)
+    : tuningClusterSummary(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q484 — presetModeRadarRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank modes by mean radar score for a named preset.
+ *
+ * @param presetId - The preset identifier.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of {mode, meanScore, rank} sorted descending by meanScore.
+ */
+export function presetModeRadarRanking(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeRadarRanking> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeRadarRanking: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeRadarRanking(tuning, spectrum, rootHz)
+    : tuningModeRadarRanking(tuning, spectrum);
 }
