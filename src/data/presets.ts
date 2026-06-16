@@ -70,6 +70,8 @@ import {
   tuningBestParetoRankedMode,
   tuningParetoFrontGap,
   tuningParetoFrontCoverage,
+  tuningCorrelationMatrixNarrative,
+  tuningParetoFrontNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3869,4 +3871,95 @@ export function presetParetoFrontCoverage(
   return rootHz !== undefined
     ? tuningParetoFrontCoverage(tuning, spectrum, rootHz)
     : tuningParetoFrontCoverage(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q457 — presetCorrelationMatrixNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a correlation matrix narrative for a curated tuning preset.
+ *
+ * Delegates to `tuningCorrelationMatrixNarrative` after resolving the preset.
+ *
+ * @param presetId - Identifier of the preset (e.g. '12-tet').
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Override preset pool (default ALL_PRESETS).
+ * @returns `{narrative, topCorrelation, antiCorrelation, strongPairCount}`.
+ * @throws {RangeError} if the preset is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const result = presetCorrelationMatrixNarrative('12-tet', spec);
+ * console.log(result.narrative);
+ */
+export function presetCorrelationMatrixNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  narrative: string;
+  topCorrelation: { metricA: string; metricB: string; correlation: number };
+  antiCorrelation: { metricA: string; metricB: string; correlation: number };
+  strongPairCount: number;
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetCorrelationMatrixNarrative: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningCorrelationMatrixNarrative(tuning, spectrum, rootHz)
+    : tuningCorrelationMatrixNarrative(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q460 — presetParetoFrontNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a Pareto front narrative for a curated tuning preset.
+ *
+ * Delegates to `tuningParetoFrontNarrative` after resolving the preset.
+ *
+ * @param presetId - Identifier of the preset (e.g. '12-tet').
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Override preset pool (default ALL_PRESETS).
+ * @returns `{narrative, paretoSize, bestMode, coverage}`.
+ * @throws {RangeError} if the preset is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const result = presetParetoFrontNarrative('12-tet', spec);
+ * console.log(result.narrative);
+ */
+export function presetParetoFrontNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  narrative: string;
+  paretoSize: number;
+  bestMode: { mode: Scale; score: number };
+  coverage: {
+    paretoSize: number;
+    totalModes: number;
+    topRank: number;
+    coverageInTopK: number;
+  };
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetParetoFrontNarrative: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningParetoFrontNarrative(tuning, spectrum, rootHz)
+    : tuningParetoFrontNarrative(tuning, spectrum);
 }

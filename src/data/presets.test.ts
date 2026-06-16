@@ -77,6 +77,8 @@ import {
   presetBestParetoRankedMode,
   presetParetoFrontGap,
   presetParetoFrontCoverage,
+  presetCorrelationMatrixNarrative,
+  presetParetoFrontNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2453,5 +2455,56 @@ describe('presetParetoFrontCoverage (Q454)', () => {
     const spec = harmonicSpectrum(6);
     const { coverageInTopK } = presetParetoFrontCoverage('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(coverageInTopK).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q457 — presetCorrelationMatrixNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetCorrelationMatrixNarrative', () => {
+  it('returns narrative with metric correlations', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetCorrelationMatrixNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.narrative.includes('correlation')).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetCorrelationMatrixNarrative('not-real', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetCorrelationMatrixNarrative('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(typeof result.narrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q460 — presetParetoFrontNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetParetoFrontNarrative', () => {
+  it('returns narrative with Pareto info', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetParetoFrontNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.narrative.includes('Pareto') || result.narrative.includes('optimal')).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetParetoFrontNarrative('not-real', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('bestMode has mode id and score', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetParetoFrontNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.bestMode.mode.id).toBe('string');
+    expect(typeof result.bestMode.score).toBe('number');
   });
 });
