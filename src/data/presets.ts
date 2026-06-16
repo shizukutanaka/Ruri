@@ -49,6 +49,7 @@ import {
   tuningModeConsistencyEntropyProfiles,
   tuningModeDissonanceHistograms,
   tuningModeDualHistograms,
+  tuningModeHistogramSummaries,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2837,4 +2838,46 @@ export function presetModeDualHistograms(
   }
   const tuning = loadTuningPreset(preset);
   return tuningModeDualHistograms(tuning, bins);
+}
+
+// ---------------------------------------------------------------------------
+// Q392 — presetModeHistogramSummaries
+// ---------------------------------------------------------------------------
+
+/**
+ * Get histogram summaries for all modes of a preset tuning in one call.
+ *
+ * Socratic Q392: "If I can get histogram summaries for all modes of a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeHistogramSummaries(tuning, bins)` → per-mode histogram summaries.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param bins     - Number of histogram bins (default 10).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{mode, histogramSummary}`, one per mode.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const summaries = presetModeHistogramSummaries('12-tet');
+ * for (const { mode, histogramSummary } of summaries) {
+ *   console.log(mode.id, histogramSummary.peakDissonanceBin, histogramSummary.dissonanceSpread);
+ * }
+ */
+export function presetModeHistogramSummaries(
+  presetId: string,
+  bins = 10,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeHistogramSummaries> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeHistogramSummaries: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeHistogramSummaries(tuning, bins);
 }

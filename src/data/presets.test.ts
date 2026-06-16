@@ -55,6 +55,7 @@ import {
   presetModeConsistencyEntropyProfiles,
   presetModeDissonanceHistograms,
   presetModeDualHistograms,
+  presetModeHistogramSummaries,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1607,5 +1608,46 @@ describe('presetModeDualHistograms (Q388)', () => {
     for (const { mode } of hists) {
       expect(mode).toHaveProperty('degreeIndices');
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q392 — presetModeHistogramSummaries
+// ---------------------------------------------------------------------------
+
+describe('presetModeHistogramSummaries (Q392)', () => {
+  it('returns one entry per mode for 12-tet', () => {
+    const summaries = presetModeHistogramSummaries('12-tet');
+    expect(summaries.length).toBe(12);
+  });
+
+  it('each entry has mode and histogramSummary', () => {
+    const summaries = presetModeHistogramSummaries('12-tet');
+    for (const { mode, histogramSummary } of summaries) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(histogramSummary.dissonance.length).toBe(10);
+      expect(histogramSummary.harmonicity.length).toBe(10);
+      expect(histogramSummary.peakDissonanceBin).toBeGreaterThanOrEqual(0);
+      expect(histogramSummary.peakDissonanceBin).toBeLessThan(10);
+      expect(histogramSummary.dissonanceSpread).toBeGreaterThanOrEqual(0);
+      expect(histogramSummary.dissonanceSpread).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeHistogramSummaries('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('respects custom bins', () => {
+    const summaries = presetModeHistogramSummaries('12-tet', 5);
+    for (const { histogramSummary } of summaries) {
+      expect(histogramSummary.dissonance.length).toBe(5);
+      expect(histogramSummary.harmonicity.length).toBe(5);
+    }
+  });
+
+  it('accepts optional presets pool', () => {
+    const summaries = presetModeHistogramSummaries('12-tet', 10, [TWELVE_TET]);
+    expect(summaries.length).toBe(12);
   });
 });
