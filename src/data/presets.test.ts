@@ -66,6 +66,8 @@ import {
   presetBestModeComprehensive,
   presetModeScoreRanking,
   presetIntervalDiversityVsEntropy,
+  presetModeParetoFront,
+  presetModeCorrelationMatrix,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2112,5 +2114,100 @@ describe('presetIntervalDiversityVsEntropy (Q425)', () => {
   it('uses ALL_PRESETS when no pool provided', () => {
     const result = presetIntervalDiversityVsEntropy('12-tet');
     expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q427 — presetModeParetoFront
+// ---------------------------------------------------------------------------
+
+describe('presetModeParetoFront (Q427)', () => {
+  it('returns subset of modes with all 5 metrics', () => {
+    const spec = harmonicSpectrum(6);
+    const front = presetModeParetoFront('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(front.length).toBeGreaterThan(0);
+    for (const m of front) {
+      expect(typeof m.entropy).toBe('number');
+      expect(typeof m.consistency).toBe('number');
+      expect(typeof m.volatility).toBe('number');
+      expect(typeof m.diversity).toBe('number');
+      expect(typeof m.smoothnessRatio).toBe('number');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const front = presetModeParetoFront('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(front.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeParetoFront('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const spec = harmonicSpectrum(6);
+    const front = presetModeParetoFront('12-tet', spec);
+    expect(front.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q430 — presetModeCorrelationMatrix
+// ---------------------------------------------------------------------------
+
+describe('presetModeCorrelationMatrix (Q430)', () => {
+  it('returns 5x5 symmetric matrix', () => {
+    const spec = harmonicSpectrum(6);
+    const { metrics, matrix } = presetModeCorrelationMatrix('12-tet', spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(metrics.length).toBe(5);
+    expect(matrix.length).toBe(5);
+    expect(matrix[0]!.length).toBe(5);
+    // Diagonal should be 1, or 0 when the metric is constant across all modes
+    for (let i = 0; i < 5; i++) {
+      const diag = matrix[i]![i]!;
+      expect(diag === 1 || diag === 0).toBe(true);
+    }
+    for (let i = 0; i < 5; i++) {
+      for (let j = 0; j < 5; j++) {
+        expect(matrix[i]![j]!).toBeCloseTo(matrix[j]![i]!, 10);
+      }
+    }
+  });
+
+  it('metrics are in the expected order', () => {
+    const spec = harmonicSpectrum(6);
+    const { metrics } = presetModeCorrelationMatrix('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(metrics).toEqual([
+      'entropy',
+      'consistency',
+      'volatility',
+      'diversity',
+      'smoothnessRatio',
+    ]);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const { matrix } = presetModeCorrelationMatrix('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(matrix.length).toBe(5);
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeCorrelationMatrix('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const spec = harmonicSpectrum(6);
+    const { metrics } = presetModeCorrelationMatrix('12-tet', spec);
+    expect(metrics.length).toBe(5);
   });
 });

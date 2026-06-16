@@ -60,6 +60,8 @@ import {
   tuningBestModeComprehensive,
   tuningModeScoreRanking,
   tuningIntervalDiversityVsEntropy,
+  tuningModeParetoFront,
+  tuningModeCorrelationMatrix,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3372,4 +3374,101 @@ export function presetIntervalDiversityVsEntropy(
   return rootHz !== undefined
     ? tuningIntervalDiversityVsEntropy(tuning, undefined, rootHz)
     : tuningIntervalDiversityVsEntropy(tuning);
+}
+
+// ---------------------------------------------------------------------------
+// Q427 — presetModeParetoFront
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the Pareto-optimal modes of a preset tuning across five metrics in one call.
+ *
+ * Socratic Q427: "If I can find the Pareto front for a tuning, can I do it for a preset by id?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningModeParetoFront(tuning, spectrum, rootHz)` → Pareto-optimal modes.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Pareto-optimal modal rotations, each with all five metrics.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const front = presetModeParetoFront('12-tet', spec);
+ * front.forEach(({ mode }) => console.log(mode.id));
+ */
+export function presetModeParetoFront(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+}[] {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeParetoFront: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeParetoFront(tuning, spectrum, rootHz)
+    : tuningModeParetoFront(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q430 — presetModeCorrelationMatrix
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the Pearson correlation matrix between five per-mode metrics for a preset in one call.
+ *
+ * Socratic Q430: "If I can compute the mode correlation matrix for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningModeCorrelationMatrix(tuning, spectrum, rootHz)` → 5×5 correlation matrix.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{metrics, matrix}` with a 5×5 symmetric correlation matrix.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { metrics, matrix } = presetModeCorrelationMatrix('12-tet', spec);
+ * console.log(metrics, matrix[0]);
+ */
+export function presetModeCorrelationMatrix(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { metrics: string[]; matrix: number[][] } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeCorrelationMatrix: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeCorrelationMatrix(tuning, spectrum, rootHz)
+    : tuningModeCorrelationMatrix(tuning, spectrum);
 }
