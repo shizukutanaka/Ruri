@@ -26,6 +26,7 @@ import {
   scaleFullAnalysisBundle,
   scaleSpectralNarrativeBundle,
   scaleProgressionSclBundle,
+  scaleFullSclBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -1143,5 +1144,62 @@ describe('scaleProgressionSclBundle (Q371)', () => {
     const { chords, smoothedChords } = scaleProgressionSclBundle(scale, t12);
     expect(smoothedChords.length).toBeGreaterThanOrEqual(0);
     expect(chords.length).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q375 — scaleFullSclBundle
+// ---------------------------------------------------------------------------
+
+describe('scaleFullSclBundle (Q375)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns scl, rankedBundle, volatilityBundle, progressionSclBundle', () => {
+    const bundle = scaleFullSclBundle(scale, t12, harmonicSpectrum());
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.scl.length).toBeGreaterThan(0);
+    expect(bundle.rankedBundle).toHaveProperty('spectralRanking');
+    expect(bundle.rankedBundle).toHaveProperty('entropy');
+    expect(bundle.volatilityBundle).toHaveProperty('volatility');
+    expect(bundle.volatilityBundle).toHaveProperty('entropy');
+    expect(bundle.volatilityBundle).toHaveProperty('consistency');
+    expect(bundle.progressionSclBundle).toHaveProperty('chords');
+    expect(bundle.progressionSclBundle).toHaveProperty('smoothedChords');
+    expect(bundle.progressionSclBundle).toHaveProperty('smoothnessRatio');
+    expect(bundle.progressionSclBundle).toHaveProperty('narrative');
+  });
+
+  it('scl has valid Scala header', () => {
+    const { scl } = scaleFullSclBundle(scale, t12, harmonicSpectrum());
+    expect(scl).toContain('!');
+    expect(scl).toContain('Major');
+  });
+
+  it('scl matches the scl in rankedBundle', () => {
+    const bundle = scaleFullSclBundle(scale, t12, harmonicSpectrum());
+    expect(bundle.scl).toBe(bundle.rankedBundle.scl);
+  });
+
+  it('rankedBundle entropy is a finite number', () => {
+    const { rankedBundle } = scaleFullSclBundle(scale, t12, harmonicSpectrum());
+    expect(Number.isFinite(rankedBundle.entropy)).toBe(true);
+  });
+
+  it('progressionSclBundle smoothnessRatio is finite and >= 0', () => {
+    const { progressionSclBundle } = scaleFullSclBundle(scale, t12, harmonicSpectrum());
+    expect(Number.isFinite(progressionSclBundle.smoothnessRatio)).toBe(true);
+    expect(progressionSclBundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('accepts optional rootHz and name', () => {
+    const bundle = scaleFullSclBundle(scale, t12, harmonicSpectrum(), 261.63, 'Custom Name');
+    expect(bundle.scl).toContain('Custom Name');
+    expect(typeof bundle.scl).toBe('string');
   });
 });

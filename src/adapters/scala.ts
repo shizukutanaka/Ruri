@@ -1034,3 +1034,63 @@ export function scaleProgressionSclBundle(
     narrative: bundle.narrative,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Q375 — scaleFullSclBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine all SCL-adjacent scale analysis into one call: ranked bundle, volatility bundle,
+ * and progression SCL bundle.
+ *
+ * Socratic Q375: "If I can get ranked bundle and progression SCL bundle separately, can I
+ * combine all SCL-adjacent analysis into one?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleRankedBundle(scale, tuning, spectrum, rootHz, name)` → rankedBundle.
+ * 2. `scaleVolatilityBundle(scale, tuning, spectrum, rootHz, name)` → volatilityBundle.
+ * 3. `scaleProgressionSclBundle(scale, tuning, rootHz, spectrum, name)` → progressionSclBundle.
+ * 4. Return the shared `scl` (from rankedBundle) plus all three bundles.
+ *
+ * Note: `spectrum` is required (non-optional) because `scaleRankedBundle` needs it for
+ * spectral ranking computation.
+ *
+ * @param scale    - The scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, rankedBundle, volatilityBundle, progressionSclBundle }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scl, rankedBundle, volatilityBundle, progressionSclBundle } =
+ *   scaleFullSclBundle(major, t12, harmonicSpectrum());
+ * fs.writeFileSync('major.scl', scl);
+ * console.log(rankedBundle.entropy, volatilityBundle.volatility, progressionSclBundle.smoothnessRatio);
+ */
+export function scaleFullSclBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+  name?: string,
+): {
+  scl: string;
+  rankedBundle: ReturnType<typeof scaleRankedBundle>;
+  volatilityBundle: ReturnType<typeof scaleVolatilityBundle>;
+  progressionSclBundle: ReturnType<typeof scaleProgressionSclBundle>;
+} {
+  const rankedBundle = scaleRankedBundle(scale, tuning, spectrum, rootHz, name);
+  const volatilityBundle = scaleVolatilityBundle(scale, tuning, spectrum, rootHz, name);
+  const progressionSclBundle = scaleProgressionSclBundle(scale, tuning, rootHz, spectrum, name);
+  return {
+    scl: rankedBundle.scl,
+    rankedBundle,
+    volatilityBundle,
+    progressionSclBundle,
+  };
+}
