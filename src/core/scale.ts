@@ -11411,3 +11411,131 @@ export function tuningFamilyModeAllQuadrantsBundles(
         : tuningModeAllQuadrantsBundle(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q546 — tuningModeAllQuadrantsNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningModeAllQuadrantsNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropyDiversityQuadrant: string;
+  consistencyVolatilityQuadrant: string;
+  smoothnessEntropyQuadrant: string;
+  diversityVolatilityQuadrant: string;
+  narrative: string;
+}[] {
+  return tuningModeAllQuadrantsBundle(tuning, spectrum, rootHz).map((entry) => {
+    const {
+      mode,
+      entropyDiversityQuadrant,
+      consistencyVolatilityQuadrant,
+      smoothnessEntropyQuadrant,
+      diversityVolatilityQuadrant,
+    } = entry;
+    const tokens = [
+      ...entropyDiversityQuadrant.split('-'),
+      ...consistencyVolatilityQuadrant.split('-'),
+      ...smoothnessEntropyQuadrant.split('-'),
+      ...diversityVolatilityQuadrant.split('-'),
+    ];
+    const positiveWords = new Set(['rich', 'complex', 'stable', 'consistent', 'fluid', 'diverse']);
+    const positiveCount = tokens.filter((t) => positiveWords.has(t)).length;
+    const character =
+      positiveCount >= 5
+        ? 'versatile and expressive'
+        : positiveCount >= 3
+          ? 'moderately varied'
+          : 'focused and specialized';
+    const narrative =
+      `"${mode.name}" spans all quadrant maps: entropy-diversity="${entropyDiversityQuadrant}", ` +
+      `consistency-volatility="${consistencyVolatilityQuadrant}", ` +
+      `smoothness-entropy="${smoothnessEntropyQuadrant}", ` +
+      `diversity-volatility="${diversityVolatilityQuadrant}". ` +
+      `Overall character: ${character}.`;
+    return { ...entry, narrative };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q548 — tuningFamilyModeAllQuadrantsNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeAllQuadrantsNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; allQuadrantsNarrative: ReturnType<typeof tuningModeAllQuadrantsNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    allQuadrantsNarrative: tuningModeAllQuadrantsNarrative(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q549 — tuningModeQuadrantConsensus
+// ---------------------------------------------------------------------------
+
+export function tuningModeQuadrantConsensus(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  quadrantVotes: Record<string, number>;
+  dominantToken: string;
+  consensus: 'versatile' | 'specialized' | 'balanced';
+}[] {
+  return tuningModeAllQuadrantsBundle(tuning, spectrum, rootHz).map((entry) => {
+    const {
+      mode,
+      entropyDiversityQuadrant,
+      consistencyVolatilityQuadrant,
+      smoothnessEntropyQuadrant,
+      diversityVolatilityQuadrant,
+    } = entry;
+    const tokens = [
+      ...entropyDiversityQuadrant.split('-'),
+      ...consistencyVolatilityQuadrant.split('-'),
+      ...smoothnessEntropyQuadrant.split('-'),
+      ...diversityVolatilityQuadrant.split('-'),
+    ];
+    const votes: Record<string, number> = {};
+    for (const t of tokens) {
+      votes[t] = (votes[t] ?? 0) + 1;
+    }
+    const positiveWords = new Set(['rich', 'complex', 'stable', 'consistent', 'fluid', 'diverse']);
+    const negativeWords = new Set([
+      'uniform',
+      'volatile',
+      'rough',
+      'simple',
+      'varied',
+      'inconsistent',
+    ]);
+    const posCount = tokens.filter((t) => positiveWords.has(t)).length;
+    const negCount = tokens.filter((t) => negativeWords.has(t)).length;
+    const consensus: 'versatile' | 'specialized' | 'balanced' =
+      posCount > negCount + 1 ? 'versatile' : negCount > posCount + 1 ? 'specialized' : 'balanced';
+    const dominantToken = Object.entries(votes).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
+    return { mode, quadrantVotes: votes, dominantToken, consensus };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q551 — tuningFamilyModeQuadrantConsensus
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeQuadrantConsensus(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; quadrantConsensus: ReturnType<typeof tuningModeQuadrantConsensus> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    quadrantConsensus: tuningModeQuadrantConsensus(t, spectrum, rootHz),
+  }));
+}

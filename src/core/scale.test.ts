@@ -263,6 +263,10 @@ import {
   tuningFamilyModeDiversityVolatilityMaps,
   tuningModeAllQuadrantsBundle,
   tuningFamilyModeAllQuadrantsBundles,
+  tuningModeAllQuadrantsNarrative,
+  tuningFamilyModeAllQuadrantsNarratives,
+  tuningModeQuadrantConsensus,
+  tuningFamilyModeQuadrantConsensus,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10069,6 +10073,108 @@ describe('tuningFamilyModeAllQuadrantsBundles (Q545)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.allQuadrantsBundle.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q546 — tuningModeAllQuadrantsNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningModeAllQuadrantsNarrative (Q546)', () => {
+  it('returns one entry per mode with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAllQuadrantsNarrative(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.narrative).toBe('string');
+      expect(entry.narrative.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('narrative contains all four quadrant labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAllQuadrantsNarrative(t12, spec);
+    const entry = result[0]!;
+    expect(entry.narrative).toContain(entry.entropyDiversityQuadrant);
+    expect(entry.narrative).toContain(entry.consistencyVolatilityQuadrant);
+    expect(entry.narrative).toContain(entry.smoothnessEntropyQuadrant);
+    expect(entry.narrative).toContain(entry.diversityVolatilityQuadrant);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAllQuadrantsNarrative(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q548 — tuningFamilyModeAllQuadrantsNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeAllQuadrantsNarratives (Q548)', () => {
+  it('returns one entry per tuning with id and allQuadrantsNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeAllQuadrantsNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.allQuadrantsNarrative.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q549 — tuningModeQuadrantConsensus
+// ---------------------------------------------------------------------------
+
+describe('tuningModeQuadrantConsensus (Q549)', () => {
+  it('returns one entry per mode with consensus field', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeQuadrantConsensus(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    const valid = ['versatile', 'specialized', 'balanced'];
+    for (const entry of result) {
+      expect(valid).toContain(entry.consensus);
+    }
+  });
+
+  it('quadrantVotes contains at least one token per quadrant pair', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeQuadrantConsensus(t12, spec);
+    const entry = result[0]!;
+    const totalVotes = Object.values(entry.quadrantVotes).reduce((a, b) => a + b, 0);
+    expect(totalVotes).toBe(8); // 4 quadrants × 2 tokens each
+  });
+
+  it('dominantToken is one of the token strings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeQuadrantConsensus(t12, spec);
+    const entry = result[0]!;
+    expect(typeof entry.dominantToken).toBe('string');
+    expect(entry.dominantToken.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeQuadrantConsensus(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q551 — tuningFamilyModeQuadrantConsensus
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeQuadrantConsensus (Q551)', () => {
+  it('returns one entry per tuning with id and quadrantConsensus', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeQuadrantConsensus([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.quadrantConsensus.length).toBeGreaterThan(0);
     }
   });
 });
