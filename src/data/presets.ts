@@ -32,6 +32,7 @@ import {
   tuningModeComparison,
   tuningModeRankingBundle,
   tuningFullAnalysis,
+  tuningModeNarratives,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -47,6 +48,7 @@ import {
   type ChordProgressionToWavOptions,
   tuningEntropyBestModeWav,
   tuningBestModeProgressionBundle,
+  tuningFullWavBundle,
 } from '../adapters/wav.js';
 import { tuningToFullBundle } from '../adapters/tun.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
@@ -1907,4 +1909,92 @@ export function presetBestModeProgressionBundle(
   }
   const tuning = loadTuningPreset(preset);
   return tuningBestModeProgressionBundle(tuning, metric, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q326 — presetModeNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a narrative string for every mode of a preset tuning in one call.
+ *
+ * Socratic Q326: "If I can get mode narratives for a tuning, can I get them for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeNarratives(tuning, rootHz, spectrum)` → `{ mode, narrative }[]`.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode, narrative }` in allModes order.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const narratives = presetModeNarratives('12-tet');
+ * for (const { mode, narrative } of narratives) {
+ *   console.log(mode.id, narrative);
+ * }
+ */
+export function presetModeNarratives(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeNarratives> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeNarratives: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeNarratives(tuning, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q328 — presetFullWavBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the full WAV bundle (report card + best mode WAVs by all three metrics) for a preset in one call.
+ *
+ * Socratic Q328: "If I can get full WAV bundle for a tuning, can I do it for a preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningFullWavBundle(tuning, rootHz, spectrum, opts)` → full bundle.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param opts     - Optional Karplus-Strong synthesis options.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ reportCardBundle, bestEntropyBundle, bestConsistencyWav, bestVolatilityWav }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundle = presetFullWavBundle('12-tet');
+ * await fs.writeFile('report.wav', bundle.reportCardBundle.wav);
+ * await fs.writeFile('entropy.wav', bundle.bestEntropyBundle.wav);
+ */
+export function presetFullWavBundle(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  opts?: Parameters<typeof tuningFullWavBundle>[3],
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningFullWavBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetFullWavBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningFullWavBundle(tuning, rootHz, spectrum, opts);
 }

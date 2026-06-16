@@ -35,6 +35,8 @@ import {
   presetModeRankingBundle,
   presetFullAnalysis,
   presetBestModeProgressionBundle,
+  presetModeNarratives,
+  presetFullWavBundle,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -800,5 +802,70 @@ describe('presetBestModeProgressionBundle (Q319)', () => {
       TWELVE_TET,
     ]);
     expect(bundle.mode).toHaveProperty('degreeIndices');
+  });
+});
+
+describe('presetModeNarratives (Q326)', () => {
+  it('returns one narrative per mode', () => {
+    const narratives = presetModeNarratives('12-tet');
+    expect(narratives.length).toBeGreaterThan(0);
+    for (const { mode, narrative } of narratives) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(typeof narrative).toBe('string');
+      expect(narrative.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('throws for unknown preset', () => {
+    expect(() => presetModeNarratives('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const narratives = presetModeNarratives('12-tet', 261.63, harmonicSpectrum());
+    expect(narratives.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const narratives = presetModeNarratives('12-tet', 440, undefined, [TWELVE_TET]);
+    expect(narratives.length).toBeGreaterThan(0);
+  });
+});
+
+describe('presetFullWavBundle (Q328)', () => {
+  it('returns all four bundle fields', () => {
+    const bundle = presetFullWavBundle('12-tet');
+    expect(bundle.reportCardBundle).toHaveProperty('wav');
+    expect(bundle.reportCardBundle).toHaveProperty('reportCard');
+    expect(bundle.bestEntropyBundle).toHaveProperty('wav');
+    expect(bundle.bestEntropyBundle).toHaveProperty('entropy');
+    expect(bundle.bestEntropyBundle).toHaveProperty('mode');
+    expect(bundle.bestConsistencyWav).toBeInstanceOf(Uint8Array);
+    expect(bundle.bestVolatilityWav).toBeInstanceOf(Uint8Array);
+  });
+
+  it('report card wav has RIFF header', () => {
+    const { reportCardBundle } = presetFullWavBundle('12-tet');
+    expect(
+      String.fromCharCode(
+        reportCardBundle.wav[0]!,
+        reportCardBundle.wav[1]!,
+        reportCardBundle.wav[2]!,
+        reportCardBundle.wav[3]!,
+      ),
+    ).toBe('RIFF');
+  });
+
+  it('throws for unknown preset', () => {
+    expect(() => presetFullWavBundle('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = presetFullWavBundle('12-tet', 261.63, harmonicSpectrum());
+    expect(bundle.reportCardBundle.wav.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional presets pool', () => {
+    const bundle = presetFullWavBundle('12-tet', 440, undefined, undefined, [TWELVE_TET]);
+    expect(bundle.bestConsistencyWav.length).toBeGreaterThan(0);
   });
 });
