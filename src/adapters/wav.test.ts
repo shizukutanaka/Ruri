@@ -38,6 +38,8 @@ import {
   progressionFullBundle,
   smoothProgressionWav,
   modeVolatilityWav,
+  smoothProgressionBundle,
+  tuningFamilyWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1752,5 +1754,74 @@ describe('modeVolatilityWav (Q271)', () => {
     expect(leastVolatile).toBeInstanceOf(Uint8Array);
     expect(mostVolatile.length).toBeGreaterThan(44);
     expect(leastVolatile.length).toBeGreaterThan(44);
+  });
+});
+
+describe('smoothProgressionBundle (Q276)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 3).map((e) => e.chord);
+
+  it('returns wav, smf, and narrative', () => {
+    const bundle = smoothProgressionBundle(chords, t12);
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.narrative).toBe('string');
+  });
+  it('wav is a valid WAV file', () => {
+    const { wav } = smoothProgressionBundle(chords, t12);
+    expect(wav.length).toBeGreaterThan(44);
+    expect(wav[0]).toBe(0x52);
+  });
+});
+
+describe('tuningFamilyWav (Q277)', () => {
+  const t12 = equalTemperament12(440);
+  const t19 = edo(19);
+
+  it('returns one WAV per tuning', () => {
+    const wavs = tuningFamilyWav([t12, t19]);
+    expect(wavs).toHaveLength(2);
+    wavs.forEach((w) => {
+      expect(w).toBeInstanceOf(Uint8Array);
+      expect(w.length).toBeGreaterThan(44);
+    });
+  });
+  it('returns empty array for no tunings', () => {
+    expect(tuningFamilyWav([])).toEqual([]);
+  });
+});
+
+describe('smoothProgressionBundle (Q276)', () => {
+  const t12 = equalTemperament12(440);
+  const chords = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12)
+    .slice(0, 3)
+    .map((e) => e.chord);
+
+  it('returns wav, smf, and narrative', () => {
+    const bundle = smoothProgressionBundle(chords, t12);
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.narrative).toBe('string');
+  });
+  it('wav is a valid WAV file', () => {
+    expect(smoothProgressionBundle(chords, t12).wav.length).toBeGreaterThan(44);
+  });
+});
+
+describe('tuningFamilyWav (Q277)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns one WAV per tuning', () => {
+    const wavs = tuningFamilyWav([t12, edo(19)]);
+    expect(wavs).toHaveLength(2);
+    wavs.forEach((w) => {
+      expect(w).toBeInstanceOf(Uint8Array);
+      expect(w.length).toBeGreaterThan(44);
+    });
+  });
+  it('returns empty array for no tunings', () => {
+    expect(tuningFamilyWav([])).toEqual([]);
   });
 });

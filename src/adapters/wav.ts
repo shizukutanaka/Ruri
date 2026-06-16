@@ -45,7 +45,13 @@ import {
   optimalChordOrder,
 } from '../core/chord-search.js';
 import { type Chord, realizeChordFreqs } from '../core/chord.js';
-import { chordToSmf, type ChordToSmfOptions, progressionToSmf } from './smf.js';
+import {
+  chordToSmf,
+  type ChordToSmfOptions,
+  progressionToSmf,
+  smoothProgressionSmf,
+  type SmfOptions,
+} from './smf.js';
 import { chordProgressionToMts } from './mts.js';
 
 const writeStr = (view: DataView, offset: number, s: string): void => {
@@ -1609,4 +1615,99 @@ export function modeVolatilityWav(
     mostVolatile: pluckScaleWav(mostVolatileEntry.mode, tuning, opts),
     leastVolatile: pluckScaleWav(leastVolatileEntry.mode, tuning, opts),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Q276 — smoothProgressionBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a smoothed progression WAV, SMF, and narrative description in one call.
+ *
+ * Socratic Q276: "If I can get a smoothed progression WAV (`smoothProgressionWav`) and a
+ * smoothed progression SMF (`smoothProgressionSmf`), can I get both in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordProgressionSmooth(chords, rootHz ?? tuning.referenceHz, spectrum)` → smoothed ordering.
+ * 2. `chordProgressionToWav(smoothed, effectiveRootHz, spectrum ?? harmonicSpectrum(), wavOpts)` → WAV.
+ * 3. `smoothProgressionSmf(smoothed, tuning, rootHz, spectrum, smfOpts)` → SMF.
+ * 4. `progressionNarrative(smoothed, effectiveRootHz, spectrum)` → narrative.
+ * 5. Return `{ wav, smf, narrative }`.
+ *
+ * Note: `chordProgressionSmooth` is called once; the result is passed to both encoders to
+ * avoid double-smoothing.
+ *
+ * @param chords   - The chord progression to smooth and export.
+ * @param tuning   - The `TuningSystem` context (used for default root Hz and SMF encoding).
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param wavOpts  - Optional chord progression WAV options.
+ * @param smfOpts  - Optional SMF encoding options.
+ * @returns `{ wav: Uint8Array, smf: Uint8Array, narrative: string }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { wav, smf, narrative } = smoothProgressionBundle(chords, t12);
+ * await fs.writeFile('smooth.wav', wav);
+ * await fs.writeFile('smooth.mid', smf);
+ * console.log(narrative);
+ */
+export function smoothProgressionBundle(
+  chords: readonly Chord[],
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  wavOpts?: ChordProgressionToWavOptions,
+  smfOpts?: SmfOptions,
+): { wav: Uint8Array; smf: Uint8Array; narrative: string } {
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const smoothed = chordProgressionSmooth(chords, effectiveRootHz, spectrum);
+  const wav =
+    smoothed.length === 0
+      ? encodeWav(
+          new Float32Array(0),
+          wavOpts?.sampleRate ?? DEFAULT_CHORD_PROGRESSION_WAV.sampleRate,
+        )
+      : chordProgressionToWav(
+          smoothed,
+          effectiveRootHz,
+          spectrum ?? harmonicSpectrum(),
+          wavOpts ?? DEFAULT_CHORD_PROGRESSION_WAV,
+        );
+  const smf = smoothProgressionSmf(smoothed, tuning, rootHz, spectrum, smfOpts);
+  const narrative = progressionNarrative(smoothed, effectiveRootHz, spectrum);
+  return { wav, smf, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q277 — tuningFamilyWav
+// ---------------------------------------------------------------------------
+
+/**
+ * Render all tunings in a family as individual WAV buffers in one call.
+ *
+ * Socratic Q277: "If I have a tuning family report and can render any tuning as WAV, can I
+ * render all tunings in the family as WAV in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning in `tunings`, call `bestModeWav(t, t.referenceHz, spectrum, opts)`.
+ * 2. Return the resulting array of WAV buffers.
+ *
+ * @param tunings  - Array of `TuningSystem`s to render (e.g. from a family report).
+ * @param spectrum - Optional instrument spectrum for mode selection and synthesis.
+ * @param opts     - Optional Karplus-Strong + per-note duration options.
+ * @returns `Uint8Array[]` — one WAV buffer per tuning in input order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const wavs = tuningFamilyWav([t12, t19]);
+ * wavs.forEach((w, i) => fs.writeFileSync(`tuning-${i}.wav`, w));
+ */
+export function tuningFamilyWav(
+  tunings: readonly TuningSystem[],
+  spectrum?: Spectrum,
+  opts?: PluckScaleWavOptions,
+): Uint8Array[] {
+  return tunings.map((t) => bestModeWav(t, t.referenceHz, spectrum, opts));
 }
