@@ -28,6 +28,7 @@ import {
   chordMapConsistencyScore,
   chordMapEntropyScore,
   tuningEntropyProfile,
+  tuningConsistencyEntropyDelta,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1688,4 +1689,46 @@ export function presetBestEntropyModeWav(
   }
   const tuning = loadTuningPreset(preset);
   return tuningEntropyBestModeWav(tuning, rootHz, spectrum, opts);
+}
+
+// ---------------------------------------------------------------------------
+// Q301 — presetConsistencyEntropyDelta
+// ---------------------------------------------------------------------------
+
+/**
+ * Measure how much consistency and entropy rankings disagree for a preset tuning's modes.
+ *
+ * Socratic Q301: "If I can compare consistency vs entropy for a tuning, can I do it
+ * for a preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningConsistencyEntropyDelta(tuning, spectrum, rootHz)` → scalar divergence.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Optional instrument spectrum for computation.
+ * @param rootHz   - Root frequency in Hz.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Mean absolute difference in [0, 1] between normalized consistency and entropy rankings.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const delta = presetConsistencyEntropyDelta('12-tet');
+ * // delta ∈ [0, 1]; 0 means profiles agree perfectly
+ */
+export function presetConsistencyEntropyDelta(
+  presetId: string,
+  spectrum?: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): number {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetConsistencyEntropyDelta: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningConsistencyEntropyDelta(tuning, spectrum, rootHz);
 }

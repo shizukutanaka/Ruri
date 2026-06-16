@@ -30,6 +30,7 @@ import {
   presetEntropyLeague,
   presetEntropyProfile,
   presetBestEntropyModeWav,
+  presetConsistencyEntropyDelta,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -648,5 +649,22 @@ describe('presetBestEntropyModeWav (Q299)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetBestEntropyModeWav('not-a-preset')).toThrow(RangeError);
+  });
+});
+
+describe('presetConsistencyEntropyDelta (Q301)', () => {
+  it('returns a number in [0, 1]', () => {
+    const delta = presetConsistencyEntropyDelta('12-tet');
+    expect(typeof delta).toBe('number');
+    expect(delta).toBeGreaterThanOrEqual(0);
+    expect(delta).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(delta)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetConsistencyEntropyDelta('not-a-preset')).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const delta = presetConsistencyEntropyDelta('12-tet', harmonicSpectrum(), 261.63);
+    expect(Number.isFinite(delta)).toBe(true);
   });
 });
