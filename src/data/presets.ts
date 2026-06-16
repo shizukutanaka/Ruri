@@ -46,6 +46,8 @@ import {
   tuningModeNarrativeCompare,
   tuningModeBestProgressionNarratives,
   tuningBestSmoothMode,
+  tuningModeConsistencyEntropyProfiles,
+  tuningModeDissonanceHistograms,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -2706,4 +2708,90 @@ export function presetFullSclBundle(
   const tuning = loadTuningPreset(preset);
   const scale = tuningToScale(tuning);
   return scaleFullSclBundle(scale, tuning, spectrum, rootHz, name);
+}
+
+// ---------------------------------------------------------------------------
+// Q379 — presetModeConsistencyEntropyProfiles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get per-mode entropy, consistency, and their normalized delta for a preset tuning in one call.
+ *
+ * Socratic Q379: "If I can get per-mode consistency-entropy profiles for a tuning, can I do it
+ * for a preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeConsistencyEntropyProfiles(tuning, spectrum, rootHz)` → profiles.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{mode, entropy, consistency, delta}`, one per mode.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const profiles = presetModeConsistencyEntropyProfiles('12-tet');
+ * for (const { mode, entropy, consistency, delta } of profiles) {
+ *   console.log(mode.id, entropy, consistency, delta);
+ * }
+ */
+export function presetModeConsistencyEntropyProfiles(
+  presetId: string,
+  spectrum?: Spectrum,
+  rootHz = 440,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeConsistencyEntropyProfiles> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeConsistencyEntropyProfiles: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeConsistencyEntropyProfiles(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q383 — presetModeDissonanceHistograms
+// ---------------------------------------------------------------------------
+
+/**
+ * Get dissonance histograms for all modes of a preset tuning in one call.
+ *
+ * Socratic Q383: "If I can get dissonance histograms for all modes of a tuning, can I do it
+ * for a preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeDissonanceHistograms(tuning, bins)` → per-mode histograms.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param bins     - Number of histogram bins (default 10).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{mode, histogram}`, one per mode.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const hists = presetModeDissonanceHistograms('12-tet');
+ * for (const { mode, histogram } of hists) {
+ *   console.log(mode.id, histogram);
+ * }
+ */
+export function presetModeDissonanceHistograms(
+  presetId: string,
+  bins = 10,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeDissonanceHistograms> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeDissonanceHistograms: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeDissonanceHistograms(tuning, bins);
 }

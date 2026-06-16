@@ -52,6 +52,8 @@ import {
   presetBestSmoothModeWav,
   presetModeProgressionWavBundles,
   presetFullSclBundle,
+  presetModeConsistencyEntropyProfiles,
+  presetModeDissonanceHistograms,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -1498,5 +1500,68 @@ describe('presetFullSclBundle (Q376)', () => {
   it('accepts optional presets pool', () => {
     const bundle = presetFullSclBundle('12-tet', harmonicSpectrum(), 440, undefined, [TWELVE_TET]);
     expect(typeof bundle.scl).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q379 — presetModeConsistencyEntropyProfiles
+// ---------------------------------------------------------------------------
+
+describe('presetModeConsistencyEntropyProfiles (Q379)', () => {
+  it('returns one entry per mode for 12-tet with delta >= 0', () => {
+    const profiles = presetModeConsistencyEntropyProfiles('12-tet');
+    expect(profiles.length).toBe(12);
+    for (const { mode, entropy, consistency, delta } of profiles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(entropy).toBeGreaterThanOrEqual(0);
+      expect(consistency).toBeGreaterThanOrEqual(0);
+      expect(delta).toBeGreaterThanOrEqual(0);
+      expect(delta).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeConsistencyEntropyProfiles('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const profiles = presetModeConsistencyEntropyProfiles('12-tet', harmonicSpectrum(), 261.63);
+    expect(profiles.length).toBe(12);
+  });
+
+  it('accepts optional presets pool', () => {
+    const profiles = presetModeConsistencyEntropyProfiles('12-tet', undefined, 440, [TWELVE_TET]);
+    expect(profiles.length).toBe(12);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q383 — presetModeDissonanceHistograms
+// ---------------------------------------------------------------------------
+
+describe('presetModeDissonanceHistograms (Q383)', () => {
+  it('returns one entry per mode for 12-tet', () => {
+    const hists = presetModeDissonanceHistograms('12-tet');
+    expect(hists.length).toBe(12);
+    for (const { mode, histogram } of hists) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(histogram.length).toBe(10);
+    }
+  });
+
+  it('throws RangeError for unknown preset id', () => {
+    expect(() => presetModeDissonanceHistograms('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('respects custom bins', () => {
+    const hists = presetModeDissonanceHistograms('12-tet', 5);
+    for (const { histogram } of hists) {
+      expect(histogram.length).toBe(5);
+    }
+  });
+
+  it('accepts optional presets pool', () => {
+    const hists = presetModeDissonanceHistograms('12-tet', 10, [TWELVE_TET]);
+    expect(hists.length).toBe(12);
   });
 });
