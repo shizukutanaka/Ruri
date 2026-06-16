@@ -86,6 +86,8 @@ import {
   tuningBestConsensusMode,
   tuningUltimateBestMode,
   tuningConsensusNarrative,
+  tuningMasterReport,
+  tuningModeComprehensiveMetricBundle,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4437,4 +4439,67 @@ export function presetConsensusNarrative(
   return rootHz !== undefined
     ? tuningConsensusNarrative(tuning, spectrum, rootHz)
     : tuningConsensusNarrative(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q505 — presetMasterReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a master report for a preset by delegating to
+ * {@link tuningMasterReport}.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Combined master report with paretoCorrelationReport, consensusNarrative,
+ *          and masterNarrative.
+ */
+export function presetMasterReport(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningMasterReport> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetMasterReport: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningMasterReport(tuning, spectrum, rootHz)
+    : tuningMasterReport(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q508 — presetModeComprehensiveMetricBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a comprehensive metric bundle for all modes of a preset by
+ * delegating to {@link tuningModeComprehensiveMetricBundle}.
+ *
+ * @param presetId - Preset identifier string.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @param presets  - Optional override preset pool (defaults to ALL_PRESETS).
+ * @returns Array of per-mode entries with raw metrics and detailed metric profiles.
+ */
+export function presetModeComprehensiveMetricBundle(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeComprehensiveMetricBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeComprehensiveMetricBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeComprehensiveMetricBundle(tuning, spectrum, rootHz)
+    : tuningModeComprehensiveMetricBundle(tuning, spectrum);
 }

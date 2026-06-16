@@ -93,6 +93,8 @@ import {
   presetBestConsensusMode,
   presetUltimateBestMode,
   presetConsensusNarrative,
+  presetMasterReport,
+  presetModeComprehensiveMetricBundle,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2853,5 +2855,51 @@ describe('presetConsensusNarrative (Q502)', () => {
     const spec = harmonicSpectrum(6);
     const result = presetConsensusNarrative('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(typeof result.narrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetMasterReport (Q505)', () => {
+  it('returns master report with all narrative fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetMasterReport('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.masterNarrative.length).toBeGreaterThan(0);
+    expect(result.paretoCorrelationReport.combinedNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetMasterReport('not-real', spec, undefined, [TWELVE_TET])).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetMasterReport('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(typeof result.masterNarrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetModeComprehensiveMetricBundle (Q508)', () => {
+  it('returns mode bundles with metricProfile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeComprehensiveMetricBundle('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.metricProfile.entropy.isOutlier).toBe('boolean');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeComprehensiveMetricBundle('not-real', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeComprehensiveMetricBundle('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
   });
 });
