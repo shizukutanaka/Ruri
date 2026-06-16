@@ -16,6 +16,8 @@ import {
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
+import { chordMapToMts } from './mts.js';
+import { chordMapToWav } from './wav.js';
 
 /** One scale degree, tagged by its original textual form. */
 export type ScalaDegree =
@@ -553,4 +555,45 @@ export function topNModesScls(
   void thresholds; // accepted for API forward-compatibility; rankModesByStability ignores it internally
   const modes = rankModesByStability(tuning, rootHz ?? tuning.referenceHz, spectrum);
   return modes.slice(0, n).map((entry) => scaleToSubsetSclText(entry.scale, tuning));
+}
+
+/**
+ * Export a chord map as SCL text + TUN text + MTS SysEx + WAV audio simultaneously in one call.
+ *
+ * Socratic Q243: "If a chord map represents the harmonic vocabulary of a scale, getting
+ * WAV + SCL + MTS should be one call — can it?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapBundle(chordMap, tuning, name)` → `{ scl: ScalaScale, tun: string }`.
+ * 2. `writeScl(scl)` → `.scl` text string.
+ * 3. `chordMapToMts(chordMap, name ?? tuning.id)` → MTS SysEx bytes.
+ * 4. `chordMapToWav(chordMap, rootHz ?? tuning.referenceHz, spectrum)` → WAV bytes.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`). Must be non-empty.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz for WAV and MTS rendering. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum for WAV synthesis.
+ * @param name     - Optional name for the SCL/TUN header. Defaults to `tuning.id`.
+ * @returns `{ scl, tun, mts, wav }` — all four formats simultaneously.
+ *
+ * @throws {RangeError} if `chordMap` is empty.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const { scl, tun, mts, wav } = chordMapToFullBundle(chordMap, t12);
+ */
+export function chordMapToFullBundle(
+  chordMap: readonly ScaleChordMapEntry[],
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  name?: string,
+): { scl: string; tun: string; mts: Uint8Array; wav: Uint8Array } {
+  const { scl: sclObj, tun } = chordMapBundle(chordMap, tuning, name);
+  const scl = writeScl(sclObj);
+  const mts = chordMapToMts(chordMap, name ?? tuning.id);
+  const wav = chordMapToWav(chordMap, rootHz ?? tuning.referenceHz, spectrum);
+  return { scl, tun, mts, wav };
 }

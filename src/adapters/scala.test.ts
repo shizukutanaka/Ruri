@@ -17,6 +17,7 @@ import {
   bestModeSclText,
   worstModeSclText,
   topNModesScls,
+  chordMapToFullBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -783,5 +784,30 @@ describe('topNModesScls (Q230)', () => {
 
   it('throws for n <= 0', () => {
     expect(() => topNModesScls(t12, 0)).toThrow(RangeError);
+  });
+});
+
+describe('chordMapToFullBundle (Q243)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const chordMap = scaleToChordMap(scale, t12);
+
+  it('returns scl, tun, mts, wav', () => {
+    const bundle = chordMapToFullBundle(chordMap, t12);
+    expect(typeof bundle.scl).toBe('string');
+    expect(typeof bundle.tun).toBe('string');
+    expect(bundle.mts).toBeInstanceOf(Uint8Array);
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+  });
+  it('scl contains !', () => {
+    expect(chordMapToFullBundle(chordMap, t12).scl).toContain('!');
+  });
+  it('wav length > 44', () => {
+    expect(chordMapToFullBundle(chordMap, t12).wav.length).toBeGreaterThan(44);
   });
 });
