@@ -6202,3 +6202,217 @@ export function tuningModeBestProgressionNarratives(
     return { mode, narrative, smoothnessRatio };
   });
 }
+
+// ---------------------------------------------------------------------------
+// Q360 — tuningModeSmoothProgressionRatios
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the smoothness ratio for every mode's best progression in one call.
+ *
+ * Socratic Q360: "If I can get smoothness ratio for one mode's best progression, can I get it
+ * for every mode at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeBestProgressionNarratives(tuning, rootHz, spectrum)` → per-mode results.
+ * 2. Map to `{ mode, smoothnessRatio }`.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ mode, smoothnessRatio }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const ratios = tuningModeSmoothProgressionRatios(t12);
+ * for (const { mode, smoothnessRatio } of ratios) {
+ *   console.log(mode.id, smoothnessRatio);
+ * }
+ */
+export function tuningModeSmoothProgressionRatios(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; smoothnessRatio: number }[] {
+  return tuningModeBestProgressionNarratives(tuning, rootHz, spectrum).map(
+    ({ mode, smoothnessRatio }) => ({ mode, smoothnessRatio }),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Q361 — tuningBestSmoothMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the mode of a tuning with the highest progression smoothness ratio in one call.
+ *
+ * Socratic Q361: "If I can get smoothness ratios for all modes, can I find the smoothest mode
+ * in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeSmoothProgressionRatios(tuning, rootHz, spectrum)` → per-mode ratios.
+ * 2. Find the entry with the maximum smoothnessRatio.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ mode, smoothnessRatio }` for the mode with the highest ratio.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const best = tuningBestSmoothMode(t12);
+ * console.log(best.mode.id, best.smoothnessRatio);
+ */
+export function tuningBestSmoothMode(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; smoothnessRatio: number } {
+  const ratios = tuningModeSmoothProgressionRatios(tuning, rootHz, spectrum);
+  if (ratios.length === 0) throw new RangeError('tuningBestSmoothMode: tuning has no modes');
+  let best = ratios[0]!;
+  for (const r of ratios) {
+    if (r.smoothnessRatio > best.smoothnessRatio) best = r;
+  }
+  return best;
+}
+
+// ---------------------------------------------------------------------------
+// Q363 — tuningFamilyBestSmoothModes
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the smoothest mode for every tuning in a family in one call.
+ *
+ * Socratic Q363: "If I can find the smoothest mode for one tuning and iterate a family, can I
+ * do it for a whole family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. tunings.map(t → `{ id: t.id, bestSmoothMode: tuningBestSmoothMode(t, rootHz, spectrum) }`).
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ id, bestSmoothMode }`, one per tuning, in input order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilyBestSmoothModes([t12, t19]);
+ * console.log(result[0]!.id, result[0]!.bestSmoothMode.smoothnessRatio);
+ */
+export function tuningFamilyBestSmoothModes(
+  tunings: TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { id: string; bestSmoothMode: { mode: Scale; smoothnessRatio: number } }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    bestSmoothMode: tuningBestSmoothMode(t, rootHz, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q364 — scaleProgressionFullBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get both raw and smoothed chords together with full metrics for a scale in one call.
+ *
+ * Socratic Q364: "If I can get raw chords and smoothed chords separately, can I return both
+ * together with full metrics?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → chordMap.
+ * 2. `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → rawChords.
+ * 3. `chordProgressionSmooth(rawChords, rootHz, spectrum)` → smoothedChords.
+ * 4. `progressionSmoothnessRatio(smoothedChords, rootHz, spectrum)` → smoothnessRatio.
+ * 5. `progressionNarrative(smoothedChords, tuning, rootHz, spectrum)` → narrative.
+ * 6. `chordMapVolatilityBundle(chordMap, spectrum, rootHz)` → `{ volatility, entropy, consistency }`.
+ * Return all eight values.
+ *
+ * @param scale    - The scale (mode) to analyse.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ chords, smoothedChords, smoothnessRatio, narrative, volatility, entropy, consistency }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const bundle = scaleProgressionFullBundle(scale, t12);
+ * console.log(bundle.smoothnessRatio, bundle.narrative, bundle.volatility);
+ */
+export function scaleProgressionFullBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  chords: Chord[];
+  smoothedChords: Chord[];
+  smoothnessRatio: number;
+  narrative: string;
+  volatility: number;
+  entropy: number;
+  consistency: number;
+} {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const chords = chordMapProgressionBridge(chordMap, rootHz, spectrum);
+  const smoothedChords = chordProgressionSmooth(chords, rootHz, spectrum);
+  const smoothnessRatio = progressionSmoothnessRatio(smoothedChords, rootHz, spectrum);
+  const narrative = progressionNarrative(smoothedChords, rootHz, spectrum);
+  const { volatility, entropy, consistency } = chordMapVolatilityBundle(chordMap, spectrum, rootHz);
+  return { chords, smoothedChords, smoothnessRatio, narrative, volatility, entropy, consistency };
+}
+
+// ---------------------------------------------------------------------------
+// Q365 — tuningModeProgressionFullBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the full progression bundle for every mode of a tuning in one call.
+ *
+ * Socratic Q365: "If I can get full progression bundle for one scale, can I get it for every
+ * mode at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `allModes(tuning)` → all modal rotations via `scaleModeSeries(tuningToScale(tuning), tuning)`.
+ * 2. For each mode: `scaleProgressionFullBundle(mode, tuning, rootHz, spectrum)`.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ mode, chords, smoothedChords, smoothnessRatio, narrative, volatility,
+ *   entropy, consistency }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundles = tuningModeProgressionFullBundles(t12);
+ * for (const b of bundles) {
+ *   console.log(b.mode.id, b.smoothnessRatio, b.volatility);
+ * }
+ */
+export function tuningModeProgressionFullBundles(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  mode: Scale;
+  chords: Chord[];
+  smoothedChords: Chord[];
+  smoothnessRatio: number;
+  narrative: string;
+  volatility: number;
+  entropy: number;
+  consistency: number;
+}[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => ({
+    mode,
+    ...scaleProgressionFullBundle(mode, tuning, rootHz, spectrum),
+  }));
+}

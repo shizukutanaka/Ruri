@@ -145,6 +145,11 @@ import {
   tuningFamilyNarrativeCompare,
   scaleBestProgressionNarrative,
   tuningModeBestProgressionNarratives,
+  tuningModeSmoothProgressionRatios,
+  tuningBestSmoothMode,
+  tuningFamilyBestSmoothModes,
+  scaleProgressionFullBundle,
+  tuningModeProgressionFullBundles,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5985,5 +5990,181 @@ describe('tuningModeBestProgressionNarratives (Q358)', () => {
     const results = tuningModeBestProgressionNarratives(t12local, 261.63, harmonicSpectrum());
     expect(results.length).toBeGreaterThan(0);
     expect(typeof results[0]!.narrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q360 — tuningModeSmoothProgressionRatios
+// ---------------------------------------------------------------------------
+
+describe('tuningModeSmoothProgressionRatios (Q360)', () => {
+  it('returns one entry per mode with mode and smoothnessRatio', () => {
+    const t12local = equalTemperament12(440);
+    const ratios = tuningModeSmoothProgressionRatios(t12local);
+    expect(ratios.length).toBeGreaterThan(0);
+    const first = ratios[0]!;
+    expect(first.mode).toHaveProperty('degreeIndices');
+    expect(first.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('returns correct number of modes for 12-TET', () => {
+    const t12local = equalTemperament12(440);
+    const ratios = tuningModeSmoothProgressionRatios(t12local);
+    expect(ratios.length).toBe(t12local.degrees.length);
+  });
+
+  it('does not include narrative field', () => {
+    const t12local = equalTemperament12(440);
+    const ratios = tuningModeSmoothProgressionRatios(t12local);
+    const first = ratios[0]!;
+    expect(first).not.toHaveProperty('narrative');
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const ratios = tuningModeSmoothProgressionRatios(t12local, 261.63, harmonicSpectrum());
+    expect(ratios.length).toBeGreaterThan(0);
+    expect(ratios[0]!.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q361 — tuningBestSmoothMode
+// ---------------------------------------------------------------------------
+
+describe('tuningBestSmoothMode (Q361)', () => {
+  it('returns mode and smoothnessRatio', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestSmoothMode(t12local);
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('smoothnessRatio is the maximum among all modes', () => {
+    const t12local = equalTemperament12(440);
+    const ratios = tuningModeSmoothProgressionRatios(t12local);
+    const best = tuningBestSmoothMode(t12local);
+    const max = Math.max(...ratios.map((r) => r.smoothnessRatio));
+    expect(best.smoothnessRatio).toBe(max);
+  });
+
+  it('throws RangeError for empty tuning', () => {
+    const empty = { ...equalTemperament12(440), degrees: [] };
+    expect(() => tuningBestSmoothMode(empty)).toThrow(RangeError);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningBestSmoothMode(t12local, 261.63, harmonicSpectrum());
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q363 — tuningFamilyBestSmoothModes
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyBestSmoothModes (Q363)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19);
+    const result = tuningFamilyBestSmoothModes([t12local, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and bestSmoothMode', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyBestSmoothModes([t12local]);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('bestSmoothMode');
+    expect(result[0]!.bestSmoothMode).toHaveProperty('mode');
+    expect(result[0]!.bestSmoothMode).toHaveProperty('smoothnessRatio');
+  });
+
+  it('returns empty array for empty family', () => {
+    expect(tuningFamilyBestSmoothModes([])).toEqual([]);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyBestSmoothModes([t12local], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+    expect(result[0]!.bestSmoothMode.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q364 — scaleProgressionFullBundle
+// ---------------------------------------------------------------------------
+
+describe('scaleProgressionFullBundle (Q364)', () => {
+  it('returns chords, smoothedChords, and all metrics', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const bundle = scaleProgressionFullBundle(scale, t12local);
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(Array.isArray(bundle.smoothedChords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+    expect(typeof bundle.narrative).toBe('string');
+    expect(typeof bundle.volatility).toBe('number');
+    expect(typeof bundle.entropy).toBe('number');
+    expect(typeof bundle.consistency).toBe('number');
+  });
+
+  it('narrative is a non-empty string', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const bundle = scaleProgressionFullBundle(scale, t12local);
+    expect(bundle.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('smoothnessRatio is non-negative', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const bundle = scaleProgressionFullBundle(scale, t12local);
+    expect(bundle.smoothnessRatio).toBeGreaterThanOrEqual(0);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const bundle = scaleProgressionFullBundle(scale, t12local, 261.63, harmonicSpectrum());
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(Array.isArray(bundle.smoothedChords)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q365 — tuningModeProgressionFullBundles
+// ---------------------------------------------------------------------------
+
+describe('tuningModeProgressionFullBundles (Q365)', () => {
+  it('returns one entry per mode with all bundle fields', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeProgressionFullBundles(t12local);
+    expect(bundles.length).toBeGreaterThan(0);
+    const first = bundles[0]!;
+    expect(first.mode).toHaveProperty('degreeIndices');
+    expect(Array.isArray(first.chords)).toBe(true);
+    expect(Array.isArray(first.smoothedChords)).toBe(true);
+    expect(typeof first.smoothnessRatio).toBe('number');
+    expect(typeof first.narrative).toBe('string');
+    expect(typeof first.volatility).toBe('number');
+    expect(typeof first.entropy).toBe('number');
+    expect(typeof first.consistency).toBe('number');
+  });
+
+  it('returns correct number of modes for 12-TET', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeProgressionFullBundles(t12local);
+    expect(bundles.length).toBe(t12local.degrees.length);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const bundles = tuningModeProgressionFullBundles(t12local, 261.63, harmonicSpectrum());
+    expect(bundles.length).toBeGreaterThan(0);
+    expect(typeof bundles[0]!.narrative).toBe('string');
   });
 });
