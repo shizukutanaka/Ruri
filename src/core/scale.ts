@@ -7191,3 +7191,212 @@ export function tuningFamilyHarmonicSpectralScores(
         : tuningHarmonicSpectralScore(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q402 — tuningComprehensiveReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine full analysis, harmonic-spectral score, stability score, and progression variety
+ * for a tuning in a single call.
+ *
+ * Socratic Q402: "If I can get full analysis, harmonic-spectral score, stability score, and
+ * progression variety separately, can I combine them all in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningFullAnalysis(tuning, rootHz, spectrum)` → fullAnalysis.
+ * 2. `tuningHarmonicSpectralScore(tuning, spectrum, rootHz)` → harmonicSpectralScore.
+ * 3. `tuningStabilityScore(tuning, rootHz, spectrum)` → stabilityScore.
+ * 4. `tuningProgressionVariety(tuning)` → progressionVariety.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{fullAnalysis, harmonicSpectralScore, stabilityScore, progressionVariety}`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum(6);
+ * const report = tuningComprehensiveReport(t12, spec);
+ * console.log(report.stabilityScore, report.progressionVariety);
+ */
+export function tuningComprehensiveReport(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  fullAnalysis: {
+    reportCard: string;
+    tripleMode: { byEntropy: Scale; byConsistency: Scale; byVolatility: Scale; allAgree: boolean };
+    consistencyEntropyDelta: number;
+    harmonicDensity: number;
+  };
+  harmonicSpectralScore: { harmonicDensity: number; spectralFit: number; combinedScore: number };
+  stabilityScore: number;
+  progressionVariety: number;
+} {
+  const fullAnalysis = tuningFullAnalysis(tuning, rootHz, spectrum);
+  const harmonicSpectralScore =
+    rootHz !== undefined
+      ? tuningHarmonicSpectralScore(tuning, spectrum, rootHz)
+      : tuningHarmonicSpectralScore(tuning, spectrum);
+  const stabilityScore =
+    rootHz !== undefined
+      ? tuningStabilityScore(tuning, rootHz, spectrum)
+      : tuningStabilityScore(tuning, undefined, spectrum);
+  const progressionVariety = tuningProgressionVariety(tuning);
+  return { fullAnalysis, harmonicSpectralScore, stabilityScore, progressionVariety };
+}
+
+// ---------------------------------------------------------------------------
+// Q404 — tuningFamilyComprehensiveReports
+// ---------------------------------------------------------------------------
+
+/**
+ * Get comprehensive report for every tuning in a family in one call.
+ *
+ * Socratic Q404: "If I can get comprehensive report for one tuning, can I get it for a whole
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{id: t.id, report: tuningComprehensiveReport(t, spectrum, rootHz)}`).
+ *
+ * @param tunings  - Array of tuning systems to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{id, report}`, one per tuning.
+ *
+ * @example
+ * const family = [equalTemperament12(440), edo(19, 440)];
+ * const spec = harmonicSpectrum(6);
+ * const reports = tuningFamilyComprehensiveReports(family, spec);
+ * for (const { id, report } of reports) {
+ *   console.log(id, report.stabilityScore);
+ * }
+ */
+export function tuningFamilyComprehensiveReports(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; report: ReturnType<typeof tuningComprehensiveReport> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    report: tuningComprehensiveReport(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q405 — scaleSimilarityRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all tunings by similarity to a specific target tuning in one call.
+ *
+ * Socratic Q405: "If I can compute a similarity matrix for a list of tunings, can I rank all
+ * tunings by similarity to a specific target tuning in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Append targetTuning to tunings list (ensures it's always present at last index).
+ * 2. `scaleSimilarityMatrix(allTunings, tol)` → matrix.
+ * 3. Extract row corresponding to targetTuning (last row).
+ * 4. Sort desc by similarity.
+ * 5. Return `{tuning, similarity}[]` excluding targetTuning itself.
+ *
+ * @param tunings      - Array of tuning systems to rank.
+ * @param targetTuning - The tuning to compare against.
+ * @param tol          - Tolerance for similarity computation (optional).
+ * @returns Array of `{tuning, similarity}` sorted descending by similarity.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const t31 = edo(31);
+ * const ranking = scaleSimilarityRanking([t19, t31], t12);
+ * console.log(ranking[0]!.tuning.id, ranking[0]!.similarity);
+ */
+export function scaleSimilarityRanking(
+  tunings: readonly TuningSystem[],
+  targetTuning: TuningSystem,
+  tol?: number,
+): { tuning: TuningSystem; similarity: number }[] {
+  const allTunings = [...tunings, targetTuning];
+  const matrix =
+    tol !== undefined
+      ? scaleSimilarityMatrix(allTunings, undefined, tol)
+      : scaleSimilarityMatrix(allTunings);
+  const targetIdx = allTunings.length - 1;
+  const row = matrix[targetIdx] ?? [];
+  return tunings
+    .map((t, i) => ({ tuning: t, similarity: row[i] ?? 0 }))
+    .sort((a, b) => b.similarity - a.similarity);
+}
+
+// ---------------------------------------------------------------------------
+// Q407 — tuningFamilySimilarityMatrix
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute similarity matrix for a family and find most and least similar pairs in one call.
+ *
+ * Socratic Q407: "If I have the similarity matrix, can I also find the most and least similar
+ * pairs in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleSimilarityMatrix(tunings, tol)` → matrix.
+ * 2. Find max off-diagonal (i < j) → mostSimilarPair.
+ * 3. Find min off-diagonal (i < j) → leastSimilarPair.
+ *
+ * @param tunings - Array of at least 2 tuning systems.
+ * @param tol     - Tolerance for similarity computation (optional).
+ * @returns `{tunings, matrix, mostSimilarPair, leastSimilarPair}`.
+ *
+ * @throws {RangeError} if fewer than 2 tunings are provided.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilySimilarityMatrix([t12, t19]);
+ * console.log(result.mostSimilarPair[0].id, result.mostSimilarPair[1].id);
+ */
+export function tuningFamilySimilarityMatrix(
+  tunings: TuningSystem[],
+  tol?: number,
+): {
+  tunings: TuningSystem[];
+  matrix: number[][];
+  mostSimilarPair: [TuningSystem, TuningSystem];
+  leastSimilarPair: [TuningSystem, TuningSystem];
+} {
+  if (tunings.length < 2) {
+    throw new RangeError('tuningFamilySimilarityMatrix: need at least 2 tunings');
+  }
+  const matrix =
+    tol !== undefined
+      ? scaleSimilarityMatrix(tunings, undefined, tol)
+      : scaleSimilarityMatrix(tunings);
+
+  let maxSim = -Infinity,
+    maxI = 0,
+    maxJ = 1;
+  let minSim = Infinity,
+    minI = 0,
+    minJ = 1;
+  for (let i = 0; i < tunings.length; i++) {
+    for (let j = i + 1; j < tunings.length; j++) {
+      const sim = matrix[i]?.[j] ?? 0;
+      if (sim > maxSim) {
+        maxSim = sim;
+        maxI = i;
+        maxJ = j;
+      }
+      if (sim < minSim) {
+        minSim = sim;
+        minI = i;
+        minJ = j;
+      }
+    }
+  }
+  const mostSimilarPair: [TuningSystem, TuningSystem] = [tunings[maxI]!, tunings[maxJ]!];
+  const leastSimilarPair: [TuningSystem, TuningSystem] = [tunings[minI]!, tunings[minJ]!];
+  return { tunings, matrix, mostSimilarPair, leastSimilarPair };
+}

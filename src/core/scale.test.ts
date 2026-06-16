@@ -168,6 +168,10 @@ import {
   tuningFamilyModeAnalysisFull,
   tuningHarmonicSpectralScore,
   tuningFamilyHarmonicSpectralScores,
+  tuningComprehensiveReport,
+  tuningFamilyComprehensiveReports,
+  scaleSimilarityRanking,
+  tuningFamilySimilarityMatrix,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -6913,5 +6917,193 @@ describe('tuningFamilyHarmonicSpectralScores (Q401)', () => {
     const spec = harmonicSpectrum(6);
     const scores = tuningFamilyHarmonicSpectralScores(family, spec, 440, 0.02);
     expect(typeof scores[0]!.score.combinedScore).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q402 — tuningComprehensiveReport
+// ---------------------------------------------------------------------------
+
+describe('tuningComprehensiveReport (Q402)', () => {
+  it('returns all four keys', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const report = tuningComprehensiveReport(t12local, spec);
+    expect(report).toHaveProperty('fullAnalysis');
+    expect(report).toHaveProperty('harmonicSpectralScore');
+    expect(report).toHaveProperty('stabilityScore');
+    expect(report).toHaveProperty('progressionVariety');
+  });
+
+  it('fullAnalysis has reportCard and tripleMode', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const report = tuningComprehensiveReport(t12local, spec);
+    expect(typeof report.fullAnalysis.reportCard).toBe('string');
+    expect(report.fullAnalysis.tripleMode).toHaveProperty('allAgree');
+  });
+
+  it('harmonicSpectralScore matches standalone call', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const report = tuningComprehensiveReport(t12local, spec);
+    const standalone = tuningHarmonicSpectralScore(t12local, spec);
+    expect(report.harmonicSpectralScore.combinedScore).toBeCloseTo(standalone.combinedScore, 10);
+  });
+
+  it('stabilityScore is a number in [0, 1]', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const report = tuningComprehensiveReport(t12local, spec);
+    expect(typeof report.stabilityScore).toBe('number');
+    expect(report.stabilityScore).toBeGreaterThanOrEqual(0);
+    expect(report.stabilityScore).toBeLessThanOrEqual(1);
+  });
+
+  it('progressionVariety is a number', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const report = tuningComprehensiveReport(t12local, spec);
+    expect(typeof report.progressionVariety).toBe('number');
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const report = tuningComprehensiveReport(t12local, spec, 261.63);
+    expect(typeof report.stabilityScore).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q404 — tuningFamilyComprehensiveReports
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyComprehensiveReports (Q404)', () => {
+  it('returns one entry per tuning', () => {
+    const family = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const reports = tuningFamilyComprehensiveReports(family, spec);
+    expect(reports.length).toBe(2);
+  });
+
+  it('each entry has id and report with all keys', () => {
+    const family = [equalTemperament12(440)];
+    const spec = harmonicSpectrum(6);
+    const reports = tuningFamilyComprehensiveReports(family, spec);
+    expect(reports[0]!.id).toBe(family[0]!.id);
+    expect(reports[0]!.report).toHaveProperty('fullAnalysis');
+    expect(reports[0]!.report).toHaveProperty('harmonicSpectralScore');
+    expect(reports[0]!.report).toHaveProperty('stabilityScore');
+    expect(reports[0]!.report).toHaveProperty('progressionVariety');
+  });
+
+  it('matches single tuningComprehensiveReport', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const family = [t12local];
+    const reports = tuningFamilyComprehensiveReports(family, spec);
+    const single = tuningComprehensiveReport(t12local, spec);
+    expect(reports[0]!.report.stabilityScore).toBeCloseTo(single.stabilityScore, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const family = [equalTemperament12(440)];
+    const spec = harmonicSpectrum(6);
+    const reports = tuningFamilyComprehensiveReports(family, spec, 261.63);
+    expect(typeof reports[0]!.report.stabilityScore).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q405 — scaleSimilarityRanking
+// ---------------------------------------------------------------------------
+
+describe('scaleSimilarityRanking (Q405)', () => {
+  it('ranks other tunings by similarity to target', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const t31 = edo(31, 440);
+    const ranking = scaleSimilarityRanking([t19, t31], t12local);
+    expect(ranking.length).toBe(2);
+    expect(typeof ranking[0]!.similarity).toBe('number');
+    expect(typeof ranking[0]!.tuning).toBe('object');
+  });
+
+  it('returns sorted descending by similarity when similarities are finite', () => {
+    // Use same-size tunings so Pearson correlation is well-defined
+    const t12a = equalTemperament12(440);
+    const t12b = equalTemperament12(261.63);
+    const t12c = equalTemperament12(330);
+    const ranking = scaleSimilarityRanking([t12b, t12c], t12a);
+    if (ranking.length >= 2) {
+      const s0 = ranking[0]!.similarity;
+      const s1 = ranking[1]!.similarity;
+      if (isFinite(s0) && isFinite(s1)) {
+        expect(s0).toBeGreaterThanOrEqual(s1);
+      }
+    }
+  });
+
+  it('handles single tuning in list', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const ranking = scaleSimilarityRanking([t19], t12local);
+    expect(ranking.length).toBe(1);
+  });
+
+  it('accepts optional tol', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const ranking = scaleSimilarityRanking([t19], t12local, 0.02);
+    expect(typeof ranking[0]!.similarity).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q407 — tuningFamilySimilarityMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySimilarityMatrix (Q407)', () => {
+  it('returns matrix, most and least similar pair', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const result = tuningFamilySimilarityMatrix([t12local, t19]);
+    expect(result.matrix.length).toBe(2);
+    expect(result.mostSimilarPair.length).toBe(2);
+    expect(result.leastSimilarPair.length).toBe(2);
+  });
+
+  it('throws RangeError for fewer than 2 tunings', () => {
+    expect(() => tuningFamilySimilarityMatrix([equalTemperament12(440)])).toThrow(RangeError);
+  });
+
+  it('throws RangeError for empty array', () => {
+    expect(() => tuningFamilySimilarityMatrix([])).toThrow(RangeError);
+  });
+
+  it('passes back the tunings array', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const result = tuningFamilySimilarityMatrix([t12local, t19]);
+    expect(result.tunings.length).toBe(2);
+  });
+
+  it('mostSimilarPair and leastSimilarPair are TuningSystem objects with ids', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const t31 = edo(31, 440);
+    const result = tuningFamilySimilarityMatrix([t12local, t19, t31]);
+    expect(typeof result.mostSimilarPair[0].id).toBe('string');
+    expect(typeof result.mostSimilarPair[1].id).toBe('string');
+    expect(typeof result.leastSimilarPair[0].id).toBe('string');
+    expect(typeof result.leastSimilarPair[1].id).toBe('string');
+  });
+
+  it('accepts optional tol', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const result = tuningFamilySimilarityMatrix([t12local, t19], 0.02);
+    expect(typeof result.matrix[0]?.[1]).toBe('number');
   });
 });
