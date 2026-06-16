@@ -33,6 +33,8 @@ import {
   presetConsistencyEntropyDelta,
   presetModeComparison,
   presetModeRankingBundle,
+  presetFullAnalysis,
+  presetBestModeProgressionBundle,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -725,5 +727,78 @@ describe('presetModeRankingBundle (Q316)', () => {
   it('accepts optional presets pool', () => {
     const bundle = presetModeRankingBundle('12-tet', undefined, undefined, [TWELVE_TET]);
     expect(bundle.byEntropy.length).toBeGreaterThan(0);
+  });
+});
+
+describe('presetFullAnalysis (Q321)', () => {
+  it('returns reportCard, tripleMode, consistencyEntropyDelta, harmonicDensity', () => {
+    const analysis = presetFullAnalysis('12-tet');
+    expect(typeof analysis.reportCard).toBe('string');
+    expect(analysis.reportCard.length).toBeGreaterThan(0);
+    expect(typeof analysis.consistencyEntropyDelta).toBe('number');
+    expect(typeof analysis.harmonicDensity).toBe('number');
+    expect(analysis.tripleMode).toHaveProperty('allAgree');
+  });
+  it('reportCard contains tuning id', () => {
+    const { reportCard } = presetFullAnalysis('12-tet');
+    expect(reportCard).toContain('12-tet');
+  });
+  it('tripleMode has all three best modes', () => {
+    const { tripleMode } = presetFullAnalysis('12-tet');
+    expect(tripleMode.byEntropy).toHaveProperty('degreeIndices');
+    expect(tripleMode.byConsistency).toHaveProperty('degreeIndices');
+    expect(tripleMode.byVolatility).toHaveProperty('degreeIndices');
+  });
+  it('consistencyEntropyDelta is in [0, 1]', () => {
+    const { consistencyEntropyDelta } = presetFullAnalysis('12-tet');
+    expect(consistencyEntropyDelta).toBeGreaterThanOrEqual(0);
+    expect(consistencyEntropyDelta).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFullAnalysis('not-a-preset')).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const analysis = presetFullAnalysis('12-tet', 261.63, harmonicSpectrum());
+    expect(typeof analysis.reportCard).toBe('string');
+  });
+  it('accepts optional presets pool', () => {
+    const analysis = presetFullAnalysis('12-tet', 440, undefined, [TWELVE_TET]);
+    expect(typeof analysis.reportCard).toBe('string');
+  });
+});
+
+describe('presetBestModeProgressionBundle (Q319)', () => {
+  it('returns mode, chords, smoothnessRatio, wav, smf, narrative', () => {
+    const bundle = presetBestModeProgressionBundle('12-tet', 'entropy');
+    expect(bundle.mode).toHaveProperty('degreeIndices');
+    expect(Array.isArray(bundle.chords)).toBe(true);
+    expect(typeof bundle.smoothnessRatio).toBe('number');
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.narrative).toBe('string');
+  });
+  it('wav is a valid WAV file', () => {
+    const { wav } = presetBestModeProgressionBundle('12-tet', 'entropy');
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+  });
+  it('works with all three metrics', () => {
+    for (const metric of ['entropy', 'consistency', 'volatility'] as const) {
+      const bundle = presetBestModeProgressionBundle('12-tet', metric);
+      expect(bundle.mode).toHaveProperty('degreeIndices');
+      expect(Number.isFinite(bundle.smoothnessRatio)).toBe(true);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetBestModeProgressionBundle('not-a-preset', 'entropy')).toThrow(RangeError);
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = presetBestModeProgressionBundle('12-tet', 'entropy', 261.63, harmonicSpectrum());
+    expect(bundle.mode).toHaveProperty('degreeIndices');
+  });
+  it('accepts optional presets pool', () => {
+    const bundle = presetBestModeProgressionBundle('12-tet', 'entropy', 440, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(bundle.mode).toHaveProperty('degreeIndices');
   });
 });

@@ -31,6 +31,7 @@ import {
   tuningConsistencyEntropyDelta,
   tuningModeComparison,
   tuningModeRankingBundle,
+  tuningFullAnalysis,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -45,6 +46,7 @@ import {
   chordProgressionToWav,
   type ChordProgressionToWavOptions,
   tuningEntropyBestModeWav,
+  tuningBestModeProgressionBundle,
 } from '../adapters/wav.js';
 import { tuningToFullBundle } from '../adapters/tun.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
@@ -1817,4 +1819,92 @@ export function presetModeRankingBundle(
   }
   const tuning = loadTuningPreset(preset);
   return tuningModeRankingBundle(tuning, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q321 — presetFullAnalysis
+// ---------------------------------------------------------------------------
+
+/**
+ * Get all high-level tuning summary metrics for a preset in one call.
+ *
+ * Socratic Q321: "If I can do full analysis for a tuning, can I do it for a preset by id?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningFullAnalysis(tuning, rootHz, spectrum)` → full analysis object.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ reportCard, tripleMode, consistencyEntropyDelta, harmonicDensity }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const analysis = presetFullAnalysis('12-tet');
+ * console.log(analysis.reportCard);
+ * console.log(analysis.tripleMode.allAgree);
+ */
+export function presetFullAnalysis(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningFullAnalysis> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetFullAnalysis: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningFullAnalysis(tuning, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q319 — presetBestModeProgressionBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the best mode's chord progression bundle (WAV + SMF + narrative) for a preset in one call.
+ *
+ * Socratic Q319: "If I can get best mode progression bundle for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningBestModeProgressionBundle(tuning, metric, rootHz, spectrum)` → full bundle.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param metric   - Which metric to select the best mode by.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{ mode, chords, smoothnessRatio, wav, smf, narrative }`.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundle = presetBestModeProgressionBundle('12-tet', 'entropy');
+ * await fs.writeFile('best-mode-prog.wav', bundle.wav);
+ * console.log(bundle.narrative);
+ */
+export function presetBestModeProgressionBundle(
+  presetId: string,
+  metric: 'entropy' | 'consistency' | 'volatility',
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningBestModeProgressionBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetBestModeProgressionBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningBestModeProgressionBundle(tuning, metric, rootHz, spectrum);
 }
