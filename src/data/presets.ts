@@ -23,9 +23,11 @@ import {
   scaleToChordMap,
   chordMapVolatility,
   tuningSpectralFit,
+  tuningFamilyReport,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
+  type TuningFamilyReport,
 } from '../core/scale.js';
 import { type Chord } from '../core/chord.js';
 import { type Spectrum, harmonicSpectrum } from '../core/spectrum.js';
@@ -1364,4 +1366,51 @@ export function presetSpectralFitRanking(
     return { presetId: p.id, spectralFit };
   });
   return entries.sort((a, b) => a.spectralFit - b.spectralFit);
+}
+
+// ---------------------------------------------------------------------------
+// Q275 — presetFamilyReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Comprehensive family report for a set of presets — individual tuning reports,
+ * similarity matrix, most/least similar pair, and mean similarity in one call.
+ *
+ * Socratic Q275: "If I can get a tuning family report for arbitrary tunings and convert
+ * presets to tunings, can I get a family report for any set of presets in one call?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. Resolve each preset id to a `TuningSystem` via `loadTuningPreset`.
+ * 2. `tuningFamilyReport(tunings, rootHz, spectrum)`.
+ *
+ * @param presetIds - Array of preset id strings to include in the family report.
+ * @param rootHz    - Root frequency for individual reports.
+ * @param spectrum  - Optional instrument spectrum.
+ * @param presets   - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `TuningFamilyReport` for the given preset family.
+ *
+ * @throws {RangeError} if any preset id is not found in the pool.
+ *
+ * @example
+ * const report = presetFamilyReport(['12-tet', 'just-5']);
+ * // report.ids === ['12-tet', 'just-5']; report.meanSimilarity ∈ [-1, 1]
+ */
+export { type TuningFamilyReport };
+
+export function presetFamilyReport(
+  presetIds: readonly string[],
+  rootHz?: number,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): TuningFamilyReport {
+  const pool = presets ?? ALL_PRESETS;
+  const tunings = presetIds.map((id) => {
+    const p = pool.find((pr) => pr.id === id);
+    if (p === undefined) {
+      throw new RangeError('presetFamilyReport: preset not found: ' + id);
+    }
+    return loadTuningPreset(p);
+  });
+  return tuningFamilyReport(tunings, rootHz, spectrum);
 }

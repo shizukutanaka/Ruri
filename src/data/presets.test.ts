@@ -23,6 +23,7 @@ import {
   presetModeIntervalSets,
   presetVolatilityRanking,
   presetSpectralFitRanking,
+  presetFamilyReport,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -545,5 +546,19 @@ describe('presetSpectralFitRanking (Q266)', () => {
     for (let i = 0; i + 1 < ranked.length; i++) {
       expect(ranked[i]!.spectralFit).toBeLessThanOrEqual(ranked[i + 1]!.spectralFit);
     }
+  });
+});
+
+describe('presetFamilyReport (Q275)', () => {
+  it('returns family report for two presets', () => {
+    const report = presetFamilyReport(['12-tet', 'just-5-limit']);
+    expect(report.ids).toHaveLength(2);
+    expect(report.reports).toHaveLength(2);
+    expect(typeof report.meanSimilarity === 'number' || Number.isNaN(report.meanSimilarity)).toBe(
+      true,
+    );
+  });
+  it('throws for unknown preset id', () => {
+    expect(() => presetFamilyReport(['nonexistent'])).toThrow(RangeError);
   });
 });
