@@ -23,6 +23,7 @@ import {
   chordEntryToMts,
   bestModeChordMapMts,
   progressionNarrativeMts,
+  topNModesMts,
 } from './mts.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
@@ -862,5 +863,23 @@ describe('progressionNarrativeMts (Q239)', () => {
   it('narrative contains progression info', () => {
     const { narrative } = progressionNarrativeMts(chords, t12);
     expect(narrative).toContain('Progression');
+  });
+});
+
+describe('topNModesMts (Q242)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns n MTS buffers', () => {
+    const bufs = topNModesMts(t12, 3);
+    expect(bufs).toHaveLength(3);
+    bufs.forEach((b) => expect(b).toBeInstanceOf(Uint8Array));
+  });
+  it('clamps to available modes', () => {
+    const bufs = topNModesMts(t12, 999);
+    expect(bufs.length).toBeGreaterThan(0);
+    expect(bufs.length).toBeLessThanOrEqual(t12.degrees.length);
+  });
+  it('throws for n <= 0', () => {
+    expect(() => topNModesMts(t12, 0)).toThrow(RangeError);
   });
 });

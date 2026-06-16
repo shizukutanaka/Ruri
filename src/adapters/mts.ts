@@ -35,6 +35,7 @@ import {
   bestModeForTuning,
   scaleToChordMap,
   progressionNarrative,
+  rankModesByStability,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 
@@ -627,4 +628,38 @@ export function progressionNarrativeMts(
   const narrative = progressionNarrative(chords, effectiveRootHz, spectrum);
   const mts = tuningToMts(tuning, undefined, opts ?? {});
   return { mts, narrative };
+}
+
+/**
+ * Get the top-N stability-ranked modes of a tuning as MTS bulk dump SysEx messages in one call.
+ *
+ * Socratic Q242: "If I can get top-N mode SMFs and also get MTS for any tuning, can I get
+ * top-N mode MTS dumps in one call?" → No → implement.
+ *
+ * @param tuning   - The parent `TuningSystem`. Must have at least one degree.
+ * @param n        - Number of top modes to return (must be > 0).
+ * @param spectrum - Optional instrument spectrum for timbre-aware mode ranking.
+ * @param rootHz   - Root frequency in Hz for stability ranking. Defaults to `tuning.referenceHz`.
+ * @param opts     - Optional MTS encoding options forwarded to `scaleToMts`.
+ * @returns Array of 408-byte MTS SysEx `Uint8Array`s, one per top-ranked mode, in stability order.
+ *
+ * @throws {RangeError} if `n` <= 0.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bufs = topNModesMts(t12, 3);
+ * bufs.forEach((mts, i) => port.send(mts)); // retune synth to top-3 modes
+ */
+export function topNModesMts(
+  tuning: TuningSystem,
+  n: number,
+  spectrum?: Spectrum,
+  rootHz?: number,
+  opts?: TuningToMtsOptions,
+): Uint8Array[] {
+  if (n <= 0) throw new RangeError('topNModesMts: n must be positive');
+  const modes = rankModesByStability(tuning, rootHz ?? tuning.referenceHz, spectrum);
+  return modes
+    .slice(0, n)
+    .map((entry) => scaleToMts(entry.scale, tuning, entry.scale.id, opts ?? {}));
 }
