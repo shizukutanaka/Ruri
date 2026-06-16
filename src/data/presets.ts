@@ -34,6 +34,7 @@ import {
   tuningFullAnalysis,
   tuningModeNarratives,
   tuningModeFullBundle,
+  tuningModeProgressionBundles,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -2085,5 +2086,97 @@ export function presetFamilyAnalysis(
     }
     const tuning = loadTuningPreset(preset);
     return { id, fullAnalysis: tuningFullAnalysis(tuning, rootHz, spectrum) };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q338 — presetModeProgressionBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the chord progression bundle for every mode of a preset tuning in one call.
+ *
+ * Socratic Q338: "If I can get all mode progression bundles for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeProgressionBundles(tuning, rootHz, spectrum)` → per-mode bundles.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode, chords, smoothnessRatio }` in allModes order.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundles = presetModeProgressionBundles('12-tet');
+ * for (const { mode, chords, smoothnessRatio } of bundles) {
+ *   console.log(mode.id, chords.length, smoothnessRatio);
+ * }
+ */
+export function presetModeProgressionBundles(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeProgressionBundles> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeProgressionBundles: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeProgressionBundles(tuning, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q341 — presetFamilyModeRankings
+// ---------------------------------------------------------------------------
+
+/**
+ * Get mode rankings by all three metrics for each preset in a list of preset ids in one call.
+ *
+ * Socratic Q341: "If I can get mode rankings for a family of TuningSystems, can I do it for
+ * a list of preset ids?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each id: find preset in pool; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeRankingBundle(tuning, spectrum, rootHz)` → `{byEntropy, byConsistency, byVolatility}`.
+ * 4. Return `{id, rankings}`.
+ *
+ * @param presetIds - Array of preset ids to rank.
+ * @param rootHz    - Root frequency in Hz (default 440).
+ * @param spectrum  - Optional instrument spectrum for dissonance computation.
+ * @param presets   - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ id, rankings }` where `rankings` has `byEntropy`, `byConsistency`, `byVolatility`.
+ *
+ * @throws {RangeError} if any preset id is not found.
+ *
+ * @example
+ * const result = presetFamilyModeRankings(['12-tet', 'just-5-limit']);
+ * console.log(result[0]!.id, result[0]!.rankings.byEntropy[0]!.id);
+ */
+export function presetFamilyModeRankings(
+  presetIds: string[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): {
+  id: string;
+  rankings: { byEntropy: Scale[]; byConsistency: Scale[]; byVolatility: Scale[] };
+}[] {
+  const pool = presets ?? ALL_PRESETS;
+  return presetIds.map((id) => {
+    const preset = pool.find((p) => p.id === id);
+    if (preset === undefined) {
+      throw new RangeError('presetFamilyModeRankings: preset not found: ' + id);
+    }
+    const tuning = loadTuningPreset(preset);
+    return { id, rankings: tuningModeRankingBundle(tuning, spectrum, rootHz) };
   });
 }
