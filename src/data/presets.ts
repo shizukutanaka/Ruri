@@ -33,6 +33,7 @@ import {
   tuningModeRankingBundle,
   tuningFullAnalysis,
   tuningModeNarratives,
+  tuningModeFullBundle,
   type Scale,
   type TuningReportType,
   type ChordMapAnalysisEntry,
@@ -1997,4 +1998,92 @@ export function presetFullWavBundle(
   }
   const tuning = loadTuningPreset(preset);
   return tuningFullWavBundle(tuning, rootHz, spectrum, opts);
+}
+
+// ---------------------------------------------------------------------------
+// Q332 — presetModeFullBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get entropy, consistency, volatility, narrative, and chord-map summary for every mode of a
+ * preset tuning in one call.
+ *
+ * Socratic Q332: "If I can get the full mode bundle for a tuning, can I do it for a preset by id?"
+ * → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningModeFullBundle(tuning, rootHz, spectrum)` → per-mode bundle array.
+ *
+ * @param presetId - Id of the preset to look up.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation and synthesis.
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ mode, entropy, consistency, volatility, narrative, summary }` in allModes order.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const bundle = presetModeFullBundle('12-tet');
+ * console.log(bundle[0]!.narrative, bundle[0]!.summary.count);
+ */
+export function presetModeFullBundle(
+  presetId: string,
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): ReturnType<typeof tuningModeFullBundle> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeFullBundle: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return tuningModeFullBundle(tuning, rootHz, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q335 — presetFamilyAnalysis
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a full analysis for each preset in a list of preset ids in one call.
+ *
+ * Socratic Q335: "If I can do full analysis for one preset by id, can I do it for a list of
+ * preset ids?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each id: find preset in pool; throw `RangeError` if not found.
+ * 2. `loadTuningPreset(preset)` → `TuningSystem`.
+ * 3. `tuningFullAnalysis(tuning, rootHz, spectrum)` → full analysis object.
+ * 4. Return `{id, fullAnalysis}`.
+ *
+ * @param presetIds - Array of preset ids to analyse.
+ * @param rootHz    - Root frequency in Hz (default 440).
+ * @param spectrum  - Optional instrument spectrum for timbre-aware analysis.
+ * @param presets   - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns Array of `{ id, fullAnalysis }`, one per preset id, in input order.
+ *
+ * @throws {RangeError} if any preset id is not found.
+ *
+ * @example
+ * const result = presetFamilyAnalysis(['12-tet', '19-edo']);
+ * console.log(result[0]!.id, result[0]!.fullAnalysis.reportCard);
+ */
+export function presetFamilyAnalysis(
+  presetIds: string[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+  presets?: readonly TuningPreset[],
+): { id: string; fullAnalysis: ReturnType<typeof tuningFullAnalysis> }[] {
+  const pool = presets ?? ALL_PRESETS;
+  return presetIds.map((id) => {
+    const preset = pool.find((p) => p.id === id);
+    if (preset === undefined) {
+      throw new RangeError('presetFamilyAnalysis: preset not found: ' + id);
+    }
+    const tuning = loadTuningPreset(preset);
+    return { id, fullAnalysis: tuningFullAnalysis(tuning, rootHz, spectrum) };
+  });
 }

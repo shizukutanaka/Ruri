@@ -37,6 +37,8 @@ import {
   presetBestModeProgressionBundle,
   presetModeNarratives,
   presetFullWavBundle,
+  presetModeFullBundle,
+  presetFamilyAnalysis,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -867,5 +869,86 @@ describe('presetFullWavBundle (Q328)', () => {
   it('accepts optional presets pool', () => {
     const bundle = presetFullWavBundle('12-tet', 440, undefined, undefined, [TWELVE_TET]);
     expect(bundle.bestConsistencyWav.length).toBeGreaterThan(0);
+  });
+});
+
+describe('presetModeFullBundle (Q332)', () => {
+  it('returns full bundle for 12-tet', () => {
+    const bundle = presetModeFullBundle('12-tet');
+    expect(bundle.length).toBeGreaterThan(0);
+    expect(bundle[0]!).toHaveProperty('narrative');
+    expect(bundle[0]!).toHaveProperty('summary');
+  });
+
+  it('all entries have required fields', () => {
+    const bundle = presetModeFullBundle('12-tet');
+    for (const entry of bundle) {
+      expect(entry).toHaveProperty('mode');
+      expect(typeof entry.entropy).toBe('number');
+      expect(typeof entry.consistency).toBe('number');
+      expect(typeof entry.volatility).toBe('number');
+      expect(typeof entry.narrative).toBe('string');
+      expect(entry.summary).toHaveProperty('count');
+    }
+  });
+
+  it('throws for unknown preset', () => {
+    expect(() => presetModeFullBundle('not-a-preset')).toThrow(RangeError);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = presetModeFullBundle('12-tet', 261.63, harmonicSpectrum());
+    expect(bundle.length).toBeGreaterThan(0);
+    expect(typeof bundle[0]!.entropy).toBe('number');
+  });
+
+  it('accepts optional presets pool', () => {
+    const bundle = presetModeFullBundle('12-tet', 440, undefined, [TWELVE_TET]);
+    expect(bundle.length).toBeGreaterThan(0);
+  });
+});
+
+describe('presetFamilyAnalysis (Q335)', () => {
+  it('returns analysis for each preset id', () => {
+    const result = presetFamilyAnalysis(['12-tet', 'just-5-limit']);
+    expect(result.length).toBe(2);
+    expect(result[0]!.id).toBe('12-tet');
+    expect(result[0]!.fullAnalysis).toHaveProperty('reportCard');
+  });
+
+  it('fullAnalysis has all expected fields', () => {
+    const result = presetFamilyAnalysis(['12-tet']);
+    const { fullAnalysis } = result[0]!;
+    expect(typeof fullAnalysis.reportCard).toBe('string');
+    expect(fullAnalysis.tripleMode).toHaveProperty('byEntropy');
+    expect(fullAnalysis.tripleMode).toHaveProperty('byConsistency');
+    expect(fullAnalysis.tripleMode).toHaveProperty('byVolatility');
+    expect(typeof fullAnalysis.consistencyEntropyDelta).toBe('number');
+    expect(typeof fullAnalysis.harmonicDensity).toBe('number');
+  });
+
+  it('throws for unknown preset id', () => {
+    expect(() => presetFamilyAnalysis(['not-a-preset'])).toThrow(RangeError);
+  });
+
+  it('throws for mix of valid and invalid preset ids', () => {
+    expect(() => presetFamilyAnalysis(['12-tet', 'not-a-preset'])).toThrow(RangeError);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = presetFamilyAnalysis([]);
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const result = presetFamilyAnalysis(['12-tet'], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+    expect(typeof result[0]!.fullAnalysis.reportCard).toBe('string');
+  });
+
+  it('accepts optional presets pool', () => {
+    const result = presetFamilyAnalysis(['12-tet'], 440, undefined, [TWELVE_TET]);
+    expect(result.length).toBe(1);
+    expect(result[0]!.id).toBe('12-tet');
   });
 });
