@@ -130,6 +130,9 @@ import {
   tuningModeFullBundle,
   tuningFamilyNarratives,
   tuningFamilyModeRankings,
+  tuningModeProgressionBundles,
+  tuningModeSpectralBundles,
+  tuningFamilyProgressionBundles,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5366,6 +5369,112 @@ describe('tuningFamilyModeRankings (Q334)', () => {
 
   it('returns empty array for empty input', () => {
     const result = tuningFamilyModeRankings([]);
+    expect(result).toEqual([]);
+  });
+});
+
+describe('tuningModeProgressionBundles (Q336)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns one bundle per mode', () => {
+    const bundles = tuningModeProgressionBundles(t12);
+    expect(bundles.length).toBe(t12.degrees.length);
+    for (const { mode, chords, smoothnessRatio } of bundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(Array.isArray(chords)).toBe(true);
+      expect(smoothnessRatio).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('smoothnessRatio is finite for every mode', () => {
+    const bundles = tuningModeProgressionBundles(t12);
+    for (const { smoothnessRatio } of bundles) {
+      expect(Number.isFinite(smoothnessRatio)).toBe(true);
+    }
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const bundles = tuningModeProgressionBundles(t12, 261.63, harmonicSpectrum());
+    expect(bundles.length).toBe(t12.degrees.length);
+    expect(typeof bundles[0]!.smoothnessRatio).toBe('number');
+  });
+
+  it('returns empty array for tuning with no modes', () => {
+    const bundles = tuningModeProgressionBundles(t12);
+    expect(bundles.length).toBeGreaterThan(0);
+  });
+});
+
+describe('tuningModeSpectralBundles (Q337)', () => {
+  const t12 = equalTemperament12(440);
+  const spectrum = harmonicSpectrum();
+
+  it('returns one bundle per mode', () => {
+    const bundles = tuningModeSpectralBundles(t12, spectrum);
+    expect(bundles.length).toBe(t12.degrees.length);
+  });
+
+  it('each entry has mode, spectralFit, chordMap', () => {
+    const bundles = tuningModeSpectralBundles(t12, spectrum);
+    for (const { mode, spectralFit, chordMap } of bundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(typeof spectralFit).toBe('number');
+      expect(spectralFit).toBeGreaterThanOrEqual(0);
+      expect(Array.isArray(chordMap)).toBe(true);
+    }
+  });
+
+  it('spectralFit is finite for every mode', () => {
+    const bundles = tuningModeSpectralBundles(t12, spectrum);
+    for (const { spectralFit } of bundles) {
+      expect(Number.isFinite(spectralFit)).toBe(true);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const bundles = tuningModeSpectralBundles(t12, spectrum, 261.63);
+    expect(bundles.length).toBe(t12.degrees.length);
+    expect(typeof bundles[0]!.spectralFit).toBe('number');
+  });
+});
+
+describe('tuningFamilyProgressionBundles (Q339)', () => {
+  const t12 = equalTemperament12(440);
+  const t19 = edo(19);
+
+  it('returns one entry per tuning', () => {
+    const result = tuningFamilyProgressionBundles([t12, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('id matches tuning id', () => {
+    const result = tuningFamilyProgressionBundles([t12, t19]);
+    expect(result[0]!.id).toBe(t12.id);
+    expect(result[1]!.id).toBe(t19.id);
+  });
+
+  it('progressionBundles has one entry per mode', () => {
+    const result = tuningFamilyProgressionBundles([t12]);
+    expect(result[0]!.progressionBundles.length).toBe(t12.degrees.length);
+  });
+
+  it('each progressionBundle entry has mode, chords, smoothnessRatio', () => {
+    const result = tuningFamilyProgressionBundles([t12]);
+    for (const { mode, chords, smoothnessRatio } of result[0]!.progressionBundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(Array.isArray(chords)).toBe(true);
+      expect(typeof smoothnessRatio).toBe('number');
+    }
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const result = tuningFamilyProgressionBundles([t12], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+    expect(result[0]!.progressionBundles.length).toBeGreaterThan(0);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyProgressionBundles([]);
     expect(result).toEqual([]);
   });
 });

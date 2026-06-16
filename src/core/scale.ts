@@ -5524,3 +5524,128 @@ export function tuningFamilyModeRankings(
     rankings: tuningModeRankingBundle(tuning, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q336 — tuningModeProgressionBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the chord progression bundle for every mode of a tuning in one call.
+ *
+ * Socratic Q336: "If I can get progression bundle for one mode and iterate all modes,
+ * can I get all mode progression bundles at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `allModes(tuning)` → all modal rotations.
+ * 2. For each mode: `modeProgressionBundle(mode, tuning, rootHz, spectrum)` → `{chords, smoothnessRatio}`.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @returns Array of `{ mode, chords, smoothnessRatio }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundles = tuningModeProgressionBundles(t12);
+ * for (const { mode, chords, smoothnessRatio } of bundles) {
+ *   console.log(mode.id, chords.length, smoothnessRatio);
+ * }
+ */
+export function tuningModeProgressionBundles(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; chords: Chord[]; smoothnessRatio: number }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const { chords, smoothnessRatio } = modeProgressionBundle(mode, tuning, rootHz, spectrum);
+    return { mode, chords, smoothnessRatio };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q337 — tuningModeSpectralBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the mean spectral fit and chord map for every mode of a tuning in one call.
+ *
+ * Socratic Q337: "If I can get spectral fit per chord map and iterate modes,
+ * can I get spectral fit for every mode at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `allModes(tuning)` → all modal rotations.
+ * 2. For each mode: `scaleToChordMap(mode, tuning)` → chordMap.
+ * 3. `chordMapSpectralProfile(chordMap, spectrum, rootHz)` → per-entry spectral fits.
+ * 4. Mean of spectralFit values → per-mode spectralFit.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param spectrum - Instrument spectrum (required for spectral fit computation).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{ mode, spectralFit, chordMap }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const bundles = tuningModeSpectralBundles(t12, harmonicSpectrum());
+ * for (const { mode, spectralFit } of bundles) {
+ *   console.log(mode.id, spectralFit);
+ * }
+ */
+export function tuningModeSpectralBundles(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+): { mode: Scale; spectralFit: number; chordMap: ScaleChordMapEntry[] }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const profile = chordMapSpectralProfile(chordMap, spectrum, rootHz);
+    const spectralFit =
+      profile.length === 0
+        ? 0
+        : profile.reduce((sum, e) => sum + e.spectralFit, 0) / profile.length;
+    return { mode, spectralFit, chordMap };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q339 — tuningFamilyProgressionBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get all mode progression bundles for every tuning in a family in one call.
+ *
+ * Socratic Q339: "If I can get all mode progression bundles for one tuning and iterate a family,
+ * can I get them all at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `tuningModeProgressionBundles(tuning, rootHz, spectrum)` → per-mode bundles.
+ * 2. Return `{id: tuning.id, progressionBundles: ...}`.
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @returns Array of `{ id, progressionBundles }` where each `progressionBundles` has
+ *          `{ mode, chords, smoothnessRatio }[]`, one per tuning.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilyProgressionBundles([t12, t19]);
+ * console.log(result[0]!.id, result[0]!.progressionBundles.length);
+ */
+export function tuningFamilyProgressionBundles(
+  tunings: TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  id: string;
+  progressionBundles: { mode: Scale; chords: Chord[]; smoothnessRatio: number }[];
+}[] {
+  return tunings.map((tuning) => ({
+    id: tuning.id,
+    progressionBundles: tuningModeProgressionBundles(tuning, rootHz, spectrum),
+  }));
+}
