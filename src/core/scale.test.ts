@@ -215,6 +215,10 @@ import {
   tuningFamilyModeMetricOutlierSummaries,
   tuningModeMetricProfile,
   tuningFamilyModeMetricProfiles,
+  tuningModeMetricRadarData,
+  tuningFamilyModeMetricRadarData,
+  tuningModeMetricCluster,
+  tuningFamilyModeMetricClusters,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -8711,6 +8715,149 @@ describe('tuningFamilyModeMetricProfiles (Q473)', () => {
       expect(typeof entry.id).toBe('string');
       expect(Array.isArray(entry.modeProfiles)).toBe(true);
       expect(entry.modeProfiles.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q474 — tuningModeMetricRadarData
+// ---------------------------------------------------------------------------
+
+describe('tuningModeMetricRadarData (Q474)', () => {
+  it('returns one entry per mode with radar values in [0,1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricRadarData(equalTemperament12(440), spec);
+    expect(result.length).toBe(equalTemperament12(440).degrees.length);
+    for (const entry of result) {
+      expect(entry.radar.entropy).toBeGreaterThanOrEqual(0);
+      expect(entry.radar.entropy).toBeLessThanOrEqual(1);
+      expect(entry.radar.consistency).toBeGreaterThanOrEqual(0);
+      expect(entry.radar.consistency).toBeLessThanOrEqual(1);
+      expect(entry.radar.volatility).toBeGreaterThanOrEqual(0);
+      expect(entry.radar.volatility).toBeLessThanOrEqual(1);
+      expect(entry.radar.diversity).toBeGreaterThanOrEqual(0);
+      expect(entry.radar.diversity).toBeLessThanOrEqual(1);
+      expect(entry.radar.smoothnessRatio).toBeGreaterThanOrEqual(0);
+      expect(entry.radar.smoothnessRatio).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('at least one mode has at least one non-0 radar value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricRadarData(equalTemperament12(440), spec);
+    const allZero = result.every(
+      (e) =>
+        e.radar.entropy === 0 &&
+        e.radar.consistency === 0 &&
+        e.radar.volatility === 0 &&
+        e.radar.diversity === 0 &&
+        e.radar.smoothnessRatio === 0,
+    );
+    expect(allZero).toBe(false);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricRadarData(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+    for (const entry of result) {
+      expect(entry.radar.entropy).toBeGreaterThanOrEqual(0);
+      expect(entry.radar.entropy).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q476 — tuningFamilyModeMetricRadarData
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeMetricRadarData (Q476)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricRadarData(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and radarData array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricRadarData(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(Array.isArray(entry.radarData)).toBe(true);
+      expect(entry.radarData.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q477 — tuningModeMetricCluster
+// ---------------------------------------------------------------------------
+
+describe('tuningModeMetricCluster (Q477)', () => {
+  it('returns one entry per mode with cluster label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricCluster(equalTemperament12(440), spec);
+    expect(result.length).toBe(equalTemperament12(440).degrees.length);
+    for (const entry of result) {
+      expect(['high', 'mid', 'low']).toContain(entry.cluster);
+    }
+  });
+
+  it('meanScore is in [0,1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricCluster(equalTemperament12(440), spec);
+    for (const entry of result) {
+      expect(entry.meanScore).toBeGreaterThanOrEqual(0);
+      expect(entry.meanScore).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('cluster is consistent with meanScore', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricCluster(equalTemperament12(440), spec);
+    for (const entry of result) {
+      if (entry.meanScore >= 0.67) {
+        expect(entry.cluster).toBe('high');
+      } else if (entry.meanScore <= 0.33) {
+        expect(entry.cluster).toBe('low');
+      } else {
+        expect(entry.cluster).toBe('mid');
+      }
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricCluster(equalTemperament12(440), spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+    for (const entry of result) {
+      expect(['high', 'mid', 'low']).toContain(entry.cluster);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q479 — tuningFamilyModeMetricClusters
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeMetricClusters (Q479)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricClusters(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and clusters array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricClusters(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(Array.isArray(entry.clusters)).toBe(true);
+      expect(entry.clusters.length).toBeGreaterThan(0);
     }
   });
 });

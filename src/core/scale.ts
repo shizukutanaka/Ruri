@@ -9570,3 +9570,191 @@ export function tuningFamilyModeMetricProfiles(
         : tuningModeMetricProfile(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q474 — tuningModeMetricRadarData
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalise per-mode metric values to [0,1] for radar-chart display.
+ *
+ * For each of the 5 metrics (entropy, consistency, volatility, diversity,
+ * smoothnessRatio) the raw value is min-max normalised across all modes.
+ * When all modes share the same value the normalised result is 0.5.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per mode with normalised radar values in [0,1].
+ */
+export function tuningModeMetricRadarData(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  radar: {
+    entropy: number;
+    consistency: number;
+    volatility: number;
+    diversity: number;
+    smoothnessRatio: number;
+  };
+}[] {
+  const profiles =
+    rootHz !== undefined
+      ? tuningModeMetricProfile(tuning, spectrum, rootHz)
+      : tuningModeMetricProfile(tuning, spectrum);
+
+  const metricKeys = [
+    'entropy',
+    'consistency',
+    'volatility',
+    'diversity',
+    'smoothnessRatio',
+  ] as const;
+
+  // Collect min/max per metric across all modes
+  const minMax: Record<string, { min: number; max: number }> = {};
+  for (const key of metricKeys) {
+    let min = Infinity;
+    let max = -Infinity;
+    for (const p of profiles) {
+      const v = p.metrics[key].value;
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+    minMax[key] = { min, max };
+  }
+
+  return profiles.map((p) => {
+    const radar: {
+      entropy: number;
+      consistency: number;
+      volatility: number;
+      diversity: number;
+      smoothnessRatio: number;
+    } = {
+      entropy: 0,
+      consistency: 0,
+      volatility: 0,
+      diversity: 0,
+      smoothnessRatio: 0,
+    };
+    for (const key of metricKeys) {
+      const { min, max } = minMax[key]!;
+      const v = p.metrics[key].value;
+      radar[key] = max === min ? 0.5 : (v - min) / (max - min);
+    }
+    return { mode: p.mode, radar };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q476 — tuningFamilyModeMetricRadarData
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce normalised radar data for a whole family of tunings.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and radarData array.
+ */
+export function tuningFamilyModeMetricRadarData(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  radarData: {
+    mode: Scale;
+    radar: {
+      entropy: number;
+      consistency: number;
+      volatility: number;
+      diversity: number;
+      smoothnessRatio: number;
+    };
+  }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    radarData:
+      rootHz !== undefined
+        ? tuningModeMetricRadarData(t, spectrum, rootHz)
+        : tuningModeMetricRadarData(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q477 — tuningModeMetricCluster
+// ---------------------------------------------------------------------------
+
+/**
+ * Cluster modes into High/Mid/Low buckets by their mean normalised radar value.
+ *
+ * Uses `tuningModeMetricRadarData` to obtain normalised values, then computes
+ * the mean of the 5 metrics for each mode and assigns a cluster label:
+ *   - `meanScore >= 0.67` → 'high'
+ *   - `meanScore <= 0.33` → 'low'
+ *   - otherwise          → 'mid'
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per mode with meanScore and cluster label.
+ */
+export function tuningModeMetricCluster(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; meanScore: number; cluster: 'high' | 'mid' | 'low' }[] {
+  const radarData =
+    rootHz !== undefined
+      ? tuningModeMetricRadarData(tuning, spectrum, rootHz)
+      : tuningModeMetricRadarData(tuning, spectrum);
+
+  return radarData.map(({ mode, radar }) => {
+    const meanScore =
+      (radar.entropy +
+        radar.consistency +
+        radar.volatility +
+        radar.diversity +
+        radar.smoothnessRatio) /
+      5;
+    const cluster: 'high' | 'mid' | 'low' =
+      meanScore >= 0.67 ? 'high' : meanScore <= 0.33 ? 'low' : 'mid';
+    return { mode, meanScore, cluster };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q479 — tuningFamilyModeMetricClusters
+// ---------------------------------------------------------------------------
+
+/**
+ * Cluster modes for a whole family of tunings.
+ *
+ * @param tunings  - Array of tuning systems.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and clusters array.
+ */
+export function tuningFamilyModeMetricClusters(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  clusters: { mode: Scale; meanScore: number; cluster: 'high' | 'mid' | 'low' }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    clusters:
+      rootHz !== undefined
+        ? tuningModeMetricCluster(t, spectrum, rootHz)
+        : tuningModeMetricCluster(t, spectrum),
+  }));
+}
