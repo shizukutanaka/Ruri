@@ -5649,3 +5649,199 @@ export function tuningFamilyProgressionBundles(
     progressionBundles: tuningModeProgressionBundles(tuning, rootHz, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q342 — tuningFamilySpectralBundles
+// ---------------------------------------------------------------------------
+
+/**
+ * Get per-mode spectral fits for every tuning in a family in one call.
+ *
+ * Socratic Q342: "If I can get spectral bundles for one tuning and iterate a family, can I get
+ * per-mode spectral fits for an entire family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `tuningModeSpectralBundles(t, spectrum, rootHz)` → per-mode bundles.
+ * 2. Strip `chordMap` (heavy) — keep only `{mode, spectralFit}`.
+ * 3. Return `{id: tuning.id, modeBundles: ...}`.
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param spectrum - Instrument spectrum (required for spectral fit computation).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{ id, modeBundles }` where `modeBundles` is `{ mode, spectralFit }[]`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilySpectralBundles([t12, t19], harmonicSpectrum());
+ * console.log(result[0]!.id, result[0]!.modeBundles[0]!.spectralFit);
+ */
+export function tuningFamilySpectralBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz = 440,
+): { id: string; modeBundles: { mode: Scale; spectralFit: number }[] }[] {
+  return tunings.map((tuning) => ({
+    id: tuning.id,
+    modeBundles: tuningModeSpectralBundles(tuning, spectrum, rootHz).map(
+      ({ mode, spectralFit }) => ({ mode, spectralFit }),
+    ),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q343 — tuningFamilyFullBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get full analysis and mode full bundle for every tuning in a family in one call.
+ *
+ * Socratic Q343: "If I can get full analysis and mode full bundle for each tuning in a family,
+ * can I combine them?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `tuningFullAnalysis(t, rootHz, spectrum)` → full analysis.
+ * 2. For each tuning: `tuningModeFullBundle(t, rootHz, spectrum)` → per-mode bundle array.
+ * 3. Return `{id, fullAnalysis, modeFullBundle}`.
+ *
+ * @param tunings  - Array of `TuningSystem`s in the family.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ id, fullAnalysis, modeFullBundle }`, one per tuning.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const t19 = edo(19);
+ * const result = tuningFamilyFullBundle([t12, t19]);
+ * console.log(result[0]!.fullAnalysis.reportCard);
+ * console.log(result[0]!.modeFullBundle[0]!.narrative);
+ */
+export function tuningFamilyFullBundle(
+  tunings: TuningSystem[],
+  rootHz = 440,
+  spectrum?: Spectrum,
+): {
+  id: string;
+  fullAnalysis: {
+    reportCard: string;
+    tripleMode: { byEntropy: Scale; byConsistency: Scale; byVolatility: Scale; allAgree: boolean };
+    consistencyEntropyDelta: number;
+    harmonicDensity: number;
+  };
+  modeFullBundle: {
+    mode: Scale;
+    entropy: number;
+    consistency: number;
+    volatility: number;
+    narrative: string;
+    summary: ReturnType<typeof scaleToChordMapSummary>;
+  }[];
+}[] {
+  return tunings.map((tuning) => ({
+    id: tuning.id,
+    fullAnalysis: tuningFullAnalysis(tuning, rootHz, spectrum),
+    modeFullBundle: tuningModeFullBundle(tuning, rootHz, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q345 — chordMapFullBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Get ranked bundle, volatility bundle, and progression with smoothness for a chord map in one call.
+ *
+ * Socratic Q345: "If I can get ranked bundle, volatility bundle, and normalized scores for a
+ * chord map, can I also get its progression smoothness and combine all into one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapRankedBundle(chordMap, spectrum, rootHz)` → rankedBundle.
+ * 2. `chordMapVolatilityBundle(chordMap, spectrum, rootHz)` → volatilityBundle.
+ * 3. `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → chords.
+ * 4. `progressionSmoothnessRatio(chords, rootHz, spectrum)` → smoothnessRatio.
+ *
+ * Note: `rankedBundle.normalizedScores` already covers normalized scores.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @returns `{ rankedBundle, volatilityBundle, progression: { chords, smoothnessRatio } }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const chordMap = scaleToChordMap(major, t12);
+ * const bundle = chordMapFullBundle(chordMap, harmonicSpectrum());
+ * console.log(bundle.rankedBundle.entropy, bundle.volatilityBundle.volatility);
+ * console.log(bundle.progression.smoothnessRatio);
+ */
+export function chordMapFullBundle(
+  chordMap: readonly ScaleChordMapEntry[],
+  spectrum: Spectrum,
+  rootHz = 440,
+): {
+  rankedBundle: {
+    spectralRanking: ScaleChordMapEntry[];
+    normalizedScores: {
+      entry: ScaleChordMapEntry;
+      normalizedDissonance: number;
+      normalizedHarmonicity: number;
+    }[];
+    entropy: number;
+    consistency: number;
+  };
+  volatilityBundle: { volatility: number; entropy: number; consistency: number };
+  progression: { chords: Chord[]; smoothnessRatio: number };
+} {
+  const rankedBundle = chordMapRankedBundle(chordMap, spectrum, rootHz);
+  const volatilityBundle = chordMapVolatilityBundle(chordMap, spectrum, rootHz);
+  const chords = chordMapProgressionBridge(chordMap, rootHz, spectrum);
+  const smoothnessRatio = progressionSmoothnessRatio(chords, rootHz, spectrum);
+  return { rankedBundle, volatilityBundle, progression: { chords, smoothnessRatio } };
+}
+
+// ---------------------------------------------------------------------------
+// Q346 — scaleModeSpectralRankings
+// ---------------------------------------------------------------------------
+
+/**
+ * Get spectral ranking and normalized scores for a scale's chord map in one call.
+ *
+ * Socratic Q346: "If I can get spectral ranking and normalized scores for a chord map, can I
+ * get both at once for a scale?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → chordMap.
+ * 2. `chordMapSpectralRanking(chordMap, spectrum, rootHz)` → spectralRanking.
+ * 3. `chordMapNormalizedScores(chordMap, spectrum, rootHz)` → normalizedScores.
+ *
+ * @param scale    - The scale (mode) to rank.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Instrument spectrum (required for spectral ranking).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{ spectralRanking, normalizedScores }`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { spectralRanking, normalizedScores } = scaleModeSpectralRankings(major, t12, harmonicSpectrum());
+ * console.log(spectralRanking[0]!.chord.name, normalizedScores[0]!.normalizedDissonance);
+ */
+export function scaleModeSpectralRankings(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+): {
+  spectralRanking: ScaleChordMapEntry[];
+  normalizedScores: {
+    entry: ScaleChordMapEntry;
+    normalizedDissonance: number;
+    normalizedHarmonicity: number;
+  }[];
+} {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const spectralRanking = chordMapSpectralRanking(chordMap, spectrum, rootHz);
+  const normalizedScores = chordMapNormalizedScores(chordMap, spectrum, rootHz);
+  return { spectralRanking, normalizedScores };
+}

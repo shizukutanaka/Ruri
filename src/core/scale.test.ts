@@ -133,6 +133,10 @@ import {
   tuningModeProgressionBundles,
   tuningModeSpectralBundles,
   tuningFamilyProgressionBundles,
+  tuningFamilySpectralBundles,
+  tuningFamilyFullBundle,
+  chordMapFullBundle,
+  scaleModeSpectralRankings,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5476,5 +5480,201 @@ describe('tuningFamilyProgressionBundles (Q339)', () => {
   it('returns empty array for empty input', () => {
     const result = tuningFamilyProgressionBundles([]);
     expect(result).toEqual([]);
+  });
+});
+
+describe('tuningFamilySpectralBundles (Q342)', () => {
+  it('returns one entry per tuning with per-mode spectral fits', () => {
+    const t12local = equalTemperament12(440);
+    const t19local = edo(19);
+    const result = tuningFamilySpectralBundles([t12local, t19local], harmonicSpectrum());
+    expect(result.length).toBe(2);
+    expect(result[0]!.modeBundles.length).toBe(t12local.degrees.length);
+    for (const { mode, spectralFit } of result[0]!.modeBundles) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(spectralFit).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const t19local = edo(19);
+    const result = tuningFamilySpectralBundles([t12local, t19local], harmonicSpectrum());
+    expect(result[0]!.id).toBe(t12local.id);
+    expect(result[1]!.id).toBe(t19local.id);
+  });
+
+  it('spectralFit is finite for every entry', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilySpectralBundles([t12local], harmonicSpectrum());
+    for (const { spectralFit } of result[0]!.modeBundles) {
+      expect(Number.isFinite(spectralFit)).toBe(true);
+    }
+  });
+
+  it('modeBundles does not include chordMap', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilySpectralBundles([t12local], harmonicSpectrum());
+    const first = result[0]!.modeBundles[0]!;
+    expect(Object.keys(first)).not.toContain('chordMap');
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilySpectralBundles([t12local], harmonicSpectrum(), 261.63);
+    expect(result.length).toBe(1);
+    expect(result[0]!.modeBundles.length).toBe(t12local.degrees.length);
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySpectralBundles([], harmonicSpectrum());
+    expect(result).toEqual([]);
+  });
+});
+
+describe('tuningFamilyFullBundle (Q343)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19local = edo(19);
+    const result = tuningFamilyFullBundle([t12local, t19local]);
+    expect(result.length).toBe(2);
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const t19local = edo(19);
+    const result = tuningFamilyFullBundle([t12local, t19local]);
+    expect(result[0]!.id).toBe(t12local.id);
+    expect(result[1]!.id).toBe(t19local.id);
+  });
+
+  it('fullAnalysis has expected keys', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyFullBundle([t12local]);
+    const { fullAnalysis } = result[0]!;
+    expect(typeof fullAnalysis.reportCard).toBe('string');
+    expect(fullAnalysis).toHaveProperty('tripleMode');
+    expect(typeof fullAnalysis.consistencyEntropyDelta).toBe('number');
+    expect(typeof fullAnalysis.harmonicDensity).toBe('number');
+  });
+
+  it('modeFullBundle has one entry per mode', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyFullBundle([t12local]);
+    expect(result[0]!.modeFullBundle.length).toBe(t12local.degrees.length);
+  });
+
+  it('each modeFullBundle entry has required keys', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyFullBundle([t12local]);
+    for (const entry of result[0]!.modeFullBundle) {
+      expect(entry).toHaveProperty('mode');
+      expect(typeof entry.entropy).toBe('number');
+      expect(typeof entry.consistency).toBe('number');
+      expect(typeof entry.volatility).toBe('number');
+      expect(typeof entry.narrative).toBe('string');
+      expect(entry).toHaveProperty('summary');
+    }
+  });
+
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilyFullBundle([]);
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyFullBundle([t12local], 261.63, harmonicSpectrum());
+    expect(result.length).toBe(1);
+  });
+});
+
+describe('chordMapFullBundle (Q345)', () => {
+  const t12local = equalTemperament12(440);
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns rankedBundle, volatilityBundle, progression', () => {
+    const chordMap = scaleToChordMap(major12, t12local);
+    const bundle = chordMapFullBundle(chordMap, harmonicSpectrum());
+    expect(bundle).toHaveProperty('rankedBundle');
+    expect(bundle).toHaveProperty('volatilityBundle');
+    expect(bundle).toHaveProperty('progression');
+  });
+
+  it('rankedBundle has spectralRanking, normalizedScores, entropy, consistency', () => {
+    const chordMap = scaleToChordMap(major12, t12local);
+    const { rankedBundle } = chordMapFullBundle(chordMap, harmonicSpectrum());
+    expect(Array.isArray(rankedBundle.spectralRanking)).toBe(true);
+    expect(Array.isArray(rankedBundle.normalizedScores)).toBe(true);
+    expect(typeof rankedBundle.entropy).toBe('number');
+    expect(typeof rankedBundle.consistency).toBe('number');
+  });
+
+  it('volatilityBundle has volatility, entropy, consistency', () => {
+    const chordMap = scaleToChordMap(major12, t12local);
+    const { volatilityBundle } = chordMapFullBundle(chordMap, harmonicSpectrum());
+    expect(typeof volatilityBundle.volatility).toBe('number');
+    expect(typeof volatilityBundle.entropy).toBe('number');
+    expect(typeof volatilityBundle.consistency).toBe('number');
+  });
+
+  it('progression has chords and smoothnessRatio', () => {
+    const chordMap = scaleToChordMap(major12, t12local);
+    const { progression } = chordMapFullBundle(chordMap, harmonicSpectrum());
+    expect(Array.isArray(progression.chords)).toBe(true);
+    expect(typeof progression.smoothnessRatio).toBe('number');
+  });
+
+  it('accepts optional rootHz', () => {
+    const chordMap = scaleToChordMap(major12, t12local);
+    const bundle = chordMapFullBundle(chordMap, harmonicSpectrum(), 261.63);
+    expect(bundle.rankedBundle.spectralRanking.length).toBeGreaterThan(0);
+  });
+});
+
+describe('scaleModeSpectralRankings (Q346)', () => {
+  const t12local = equalTemperament12(440);
+  const major12: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns spectralRanking and normalizedScores', () => {
+    const result = scaleModeSpectralRankings(major12, t12local, harmonicSpectrum());
+    expect(Array.isArray(result.spectralRanking)).toBe(true);
+    expect(Array.isArray(result.normalizedScores)).toBe(true);
+  });
+
+  it('spectralRanking is non-empty for a valid scale', () => {
+    const result = scaleModeSpectralRankings(major12, t12local, harmonicSpectrum());
+    expect(result.spectralRanking.length).toBeGreaterThan(0);
+  });
+
+  it('normalizedScores entries have normalizedDissonance and normalizedHarmonicity', () => {
+    const result = scaleModeSpectralRankings(major12, t12local, harmonicSpectrum());
+    for (const score of result.normalizedScores) {
+      expect(score).toHaveProperty('entry');
+      expect(typeof score.normalizedDissonance).toBe('number');
+      expect(typeof score.normalizedHarmonicity).toBe('number');
+    }
+  });
+
+  it('spectralRanking entries have degreeIndices in chord', () => {
+    const result = scaleModeSpectralRankings(major12, t12local, harmonicSpectrum());
+    for (const entry of result.spectralRanking) {
+      expect(entry).toHaveProperty('chord');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = scaleModeSpectralRankings(major12, t12local, harmonicSpectrum(), 261.63);
+    expect(result.spectralRanking.length).toBeGreaterThan(0);
   });
 });
