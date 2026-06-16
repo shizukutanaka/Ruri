@@ -7964,3 +7964,221 @@ export function tuningIntervalDiversityVsEntropy(
     };
   });
 }
+
+// ---------------------------------------------------------------------------
+// Q426 — tuningModeParetoFront
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the Pareto-optimal modes of a tuning across five metrics in one call.
+ *
+ * Socratic Q426: "If I have 5 metrics per mode, can I find the Pareto-optimal modes (no other
+ * mode dominates on all metrics) in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz)` → per-mode five-metric bundles.
+ * 2. For each mode, check whether any other mode dominates it.
+ *    Dominance: mode B dominates mode A if B is at least as good on all metrics and strictly
+ *    better on at least one. Higher is better for entropy, consistency, diversity, smoothnessRatio;
+ *    lower is better for volatility.
+ * 3. Return modes not dominated by any other.
+ *
+ * @param tuning   - The `TuningSystem` to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Pareto-optimal modal rotations, each with all five metrics.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum(6);
+ * const front = tuningModeParetoFront(t12, spec);
+ * front.forEach(({ mode }) => console.log(mode.id));
+ */
+export function tuningModeParetoFront(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+}[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  return bundle.filter(
+    (a) =>
+      !bundle.some((b) => {
+        // b dominates a if b is at least as good on all metrics and strictly better on one
+        const bDomA =
+          b.entropy >= a.entropy &&
+          b.consistency >= a.consistency &&
+          b.volatility <= a.volatility &&
+          b.diversity >= a.diversity &&
+          b.smoothnessRatio >= a.smoothnessRatio &&
+          (b.entropy > a.entropy ||
+            b.consistency > a.consistency ||
+            b.volatility < a.volatility ||
+            b.diversity > a.diversity ||
+            b.smoothnessRatio > a.smoothnessRatio);
+        return bDomA;
+      }),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Q428 — tuningFamilyModeParetoFronts
+// ---------------------------------------------------------------------------
+
+/**
+ * Find Pareto-optimal modes for every tuning in a family in one call.
+ *
+ * Socratic Q428: "If I can find the Pareto front for one tuning, can I do it for all tunings in a
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning: `{id: t.id, paretoFront: tuningModeParetoFront(t, spectrum, rootHz)}`.
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and Pareto-optimal modes.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyModeParetoFronts([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, paretoFront }) => console.log(id, paretoFront.length));
+ */
+export function tuningFamilyModeParetoFronts(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  paretoFront: {
+    mode: Scale;
+    entropy: number;
+    consistency: number;
+    volatility: number;
+    diversity: number;
+    smoothnessRatio: number;
+  }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    paretoFront:
+      rootHz !== undefined
+        ? tuningModeParetoFront(t, spectrum, rootHz)
+        : tuningModeParetoFront(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Pearson correlation helper (unexported)
+// ---------------------------------------------------------------------------
+
+function pearsonCorrelation(x: number[], y: number[]): number {
+  const n = x.length;
+  if (n === 0) return 0;
+  const mx = x.reduce((s, v) => s + v, 0) / n;
+  const my = y.reduce((s, v) => s + v, 0) / n;
+  let num = 0;
+  let dx2 = 0;
+  let dy2 = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = (x[i] ?? 0) - mx;
+    const dy = (y[i] ?? 0) - my;
+    num += dx * dy;
+    dx2 += dx * dx;
+    dy2 += dy * dy;
+  }
+  const denom = Math.sqrt(dx2 * dy2);
+  return denom === 0 ? 0 : num / denom;
+}
+
+// ---------------------------------------------------------------------------
+// Q429 — tuningModeCorrelationMatrix
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the Pearson correlation matrix between the five per-mode metrics in one call.
+ *
+ * Socratic Q429: "If I have 5 metrics per mode, can I compute the correlation matrix between
+ * them?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz)` → per-mode five-metric bundles.
+ * 2. Extract five arrays (one per metric).
+ * 3. Compute pairwise Pearson correlations. If either vector has zero standard deviation,
+ *    correlation is 0.
+ *
+ * @param tuning   - The `TuningSystem` to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns `{metrics, matrix}` where `metrics` is the ordered metric names and `matrix` is a 5×5
+ *          symmetric correlation matrix with diagonal ≈ 1.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum(6);
+ * const { metrics, matrix } = tuningModeCorrelationMatrix(t12, spec);
+ * console.log(metrics, matrix[0]);
+ */
+export function tuningModeCorrelationMatrix(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { metrics: string[]; matrix: number[][] } {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  const metrics = ['entropy', 'consistency', 'volatility', 'diversity', 'smoothnessRatio'] as const;
+  const vecs = metrics.map((m) => bundle.map((b) => b[m]));
+  const matrix = metrics.map((_, i) =>
+    metrics.map((_, j) => pearsonCorrelation(vecs[i] ?? [], vecs[j] ?? [])),
+  );
+  return { metrics: [...metrics], matrix };
+}
+
+// ---------------------------------------------------------------------------
+// Q431 — tuningFamilyModeCorrelationMatrices
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the five-metric correlation matrix for every tuning in a family in one call.
+ *
+ * Socratic Q431: "If I can compute the mode correlation matrix for one tuning, can I do it for
+ * all tunings in a family?" → No → implement.
+ *
+ * Algorithm:
+ * 1. For each tuning:
+ *    `{id: t.id, correlationMatrix: tuningModeCorrelationMatrix(t, spectrum, rootHz)}`.
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and correlation matrix.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyModeCorrelationMatrices([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, correlationMatrix }) => console.log(id, correlationMatrix.metrics));
+ */
+export function tuningFamilyModeCorrelationMatrices(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; correlationMatrix: { metrics: string[]; matrix: number[][] } }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    correlationMatrix:
+      rootHz !== undefined
+        ? tuningModeCorrelationMatrix(t, spectrum, rootHz)
+        : tuningModeCorrelationMatrix(t, spectrum),
+  }));
+}

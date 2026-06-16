@@ -184,6 +184,10 @@ import {
   tuningFamilyModeScoreRankings,
   tuningModeComprehensiveTop,
   tuningIntervalDiversityVsEntropy,
+  tuningModeParetoFront,
+  tuningFamilyModeParetoFronts,
+  tuningModeCorrelationMatrix,
+  tuningFamilyModeCorrelationMatrices,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -7666,5 +7670,182 @@ describe('tuningIntervalDiversityVsEntropy (Q424)', () => {
     for (const r of result) {
       expect(['aligned', 'opposed', 'neutral']).toContain(r.correlation);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q426 — tuningModeParetoFront
+// ---------------------------------------------------------------------------
+
+describe('tuningModeParetoFront (Q426)', () => {
+  it('returns subset of modes', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const front = tuningModeParetoFront(t12local, spec);
+    expect(front.length).toBeGreaterThan(0);
+    expect(front.length).toBeLessThanOrEqual(t12local.degrees.length);
+  });
+
+  it('each mode has all 5 metrics', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const front = tuningModeParetoFront(t12local, spec);
+    for (const m of front) {
+      expect(typeof m.entropy).toBe('number');
+      expect(typeof m.consistency).toBe('number');
+      expect(typeof m.volatility).toBe('number');
+      expect(typeof m.diversity).toBe('number');
+      expect(typeof m.smoothnessRatio).toBe('number');
+    }
+  });
+
+  it('no mode in front is dominated by another', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const front = tuningModeParetoFront(t12local, spec);
+    for (const a of front) {
+      for (const b of front) {
+        if (a === b) continue;
+        const bDomA =
+          b.entropy >= a.entropy &&
+          b.consistency >= a.consistency &&
+          b.volatility <= a.volatility &&
+          b.diversity >= a.diversity &&
+          b.smoothnessRatio >= a.smoothnessRatio &&
+          (b.entropy > a.entropy ||
+            b.consistency > a.consistency ||
+            b.volatility < a.volatility ||
+            b.diversity > a.diversity ||
+            b.smoothnessRatio > a.smoothnessRatio);
+        expect(bDomA).toBe(false);
+      }
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const front = tuningModeParetoFront(t12local, spec, 261.63);
+    expect(front.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q428 — tuningFamilyModeParetoFronts
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeParetoFronts (Q428)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const results = tuningFamilyModeParetoFronts(tunings, spec);
+    expect(results.length).toBe(2);
+  });
+
+  it('each entry has id and non-empty paretoFront', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const results = tuningFamilyModeParetoFronts(tunings, spec);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.paretoFront.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440)];
+    const results = tuningFamilyModeParetoFronts(tunings, spec, 261.63);
+    expect(results[0]!.paretoFront.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q429 — tuningModeCorrelationMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningModeCorrelationMatrix (Q429)', () => {
+  it('returns 5x5 symmetric matrix', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { metrics, matrix } = tuningModeCorrelationMatrix(t12local, spec);
+    expect(metrics.length).toBe(5);
+    expect(matrix.length).toBe(5);
+    expect(matrix[0]!.length).toBe(5);
+    // Diagonal should be 1, or 0 when the metric is constant across all modes
+    for (let i = 0; i < 5; i++) {
+      const diag = matrix[i]![i]!;
+      expect(diag === 1 || diag === 0).toBe(true);
+    }
+    // Symmetric
+    for (let i = 0; i < 5; i++) {
+      for (let j = 0; j < 5; j++) {
+        expect(matrix[i]![j]!).toBeCloseTo(matrix[j]![i]!, 10);
+      }
+    }
+  });
+
+  it('metrics are in the expected order', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { metrics } = tuningModeCorrelationMatrix(t12local, spec);
+    expect(metrics).toEqual([
+      'entropy',
+      'consistency',
+      'volatility',
+      'diversity',
+      'smoothnessRatio',
+    ]);
+  });
+
+  it('all values are in [-1, 1]', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { matrix } = tuningModeCorrelationMatrix(t12local, spec);
+    for (const row of matrix) {
+      for (const v of row) {
+        expect(v).toBeGreaterThanOrEqual(-1 - 1e-10);
+        expect(v).toBeLessThanOrEqual(1 + 1e-10);
+      }
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const { metrics, matrix } = tuningModeCorrelationMatrix(t12local, spec, 261.63);
+    expect(metrics.length).toBe(5);
+    expect(matrix.length).toBe(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q431 — tuningFamilyModeCorrelationMatrices
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeCorrelationMatrices (Q431)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const results = tuningFamilyModeCorrelationMatrices(tunings, spec);
+    expect(results.length).toBe(2);
+  });
+
+  it('each entry has id and 5x5 matrix', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const results = tuningFamilyModeCorrelationMatrices(tunings, spec);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.correlationMatrix.metrics.length).toBe(5);
+      expect(r.correlationMatrix.matrix.length).toBe(5);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440)];
+    const results = tuningFamilyModeCorrelationMatrices(tunings, spec, 261.63);
+    expect(results[0]!.correlationMatrix.matrix.length).toBe(5);
   });
 });
