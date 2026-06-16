@@ -195,6 +195,10 @@ import {
   tuningFamilyAntiCorrelations,
   tuningParetoFrontSummary,
   tuningFamilyParetoFrontSummaries,
+  tuningParetoFrontVsRanking,
+  tuningParetoFrontRankPosition,
+  tuningBestParetoRankedMode,
+  tuningFamilyParetoRankPositions,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -8102,6 +8106,135 @@ describe('tuningFamilyParetoFrontSummaries', () => {
     for (const entry of results) {
       expect(typeof entry.id).toBe('string');
       expect(entry.summary.paretoSize).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q444 — tuningParetoFrontVsRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningParetoFrontVsRanking', () => {
+  it('returns all modes with inParetoFront annotation', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const results = tuningParetoFrontVsRanking(tuning, spec);
+    expect(results.length).toBe(tuning.degrees.length);
+    for (const entry of results) {
+      expect(entry).toHaveProperty('mode');
+      expect(typeof entry.score).toBe('number');
+      expect(typeof entry.inParetoFront).toBe('boolean');
+    }
+  });
+
+  it('at least one mode is in Pareto front', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const results = tuningParetoFrontVsRanking(tuning, spec);
+    const inFront = results.filter((r) => r.inParetoFront);
+    expect(inFront.length).toBeGreaterThan(0);
+  });
+
+  it('Pareto front modes match tuningModeParetoFront ids', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const front = tuningModeParetoFront(tuning, spec);
+    const frontIds = new Set(front.map((f) => f.mode.id));
+    const results = tuningParetoFrontVsRanking(tuning, spec);
+    const annotatedIds = new Set(results.filter((r) => r.inParetoFront).map((r) => r.mode.id));
+    expect(annotatedIds).toEqual(frontIds);
+  });
+
+  it('accepts optional rootHz', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const results = tuningParetoFrontVsRanking(tuning, spec, 261.63);
+    expect(results.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q445 — tuningParetoFrontRankPosition
+// ---------------------------------------------------------------------------
+
+describe('tuningParetoFrontRankPosition', () => {
+  it('returns only Pareto modes with rank', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const results = tuningParetoFrontRankPosition(tuning, spec);
+    for (const entry of results) {
+      expect(entry).toHaveProperty('mode');
+      expect(typeof entry.score).toBe('number');
+      expect(typeof entry.rank).toBe('number');
+      expect(entry.rank).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('ranks are 1-based and increasing', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const results = tuningParetoFrontRankPosition(tuning, spec);
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i]!.rank).toBeGreaterThan(results[i - 1]!.rank);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const results = tuningParetoFrontRankPosition(tuning, spec, 261.63);
+    expect(results.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q446 — tuningBestParetoRankedMode
+// ---------------------------------------------------------------------------
+
+describe('tuningBestParetoRankedMode', () => {
+  it('returns single mode with rank 1 or higher', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestParetoRankedMode(tuning, spec);
+    expect(result.rank).toBeGreaterThanOrEqual(1);
+  });
+
+  it('result is in the Pareto front', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const ranked = tuningParetoFrontRankPosition(tuning, spec);
+    const result = tuningBestParetoRankedMode(tuning, spec);
+    const ids = ranked.map((r) => r.mode.id);
+    expect(ids).toContain(result.mode.id);
+  });
+
+  it('accepts optional rootHz', () => {
+    const tuning = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningBestParetoRankedMode(tuning, spec, 261.63);
+    expect(result.rank).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q447 — tuningFamilyParetoRankPositions
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyParetoRankPositions', () => {
+  it('returns one entry per tuning', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyParetoRankPositions(tunings, spec);
+    expect(results).toHaveLength(2);
+  });
+
+  it('each entry has id and non-empty paretoRanks', () => {
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyParetoRankPositions(tunings, spec);
+    for (const entry of results) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.paretoRanks.length).toBeGreaterThan(0);
     }
   });
 });

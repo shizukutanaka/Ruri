@@ -8546,3 +8546,176 @@ export function tuningFamilyParetoFrontSummaries(
         : tuningParetoFrontSummary(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q444 — tuningParetoFrontVsRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Annotate the score ranking with Pareto-front membership.
+ *
+ * Socratic Q444: "If I have the Pareto front AND the score ranking, can I see which ranked modes
+ * are in the Pareto front?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeParetoFront(tuning, spectrum, rootHz?)` → front
+ * 2. `tuningModeScoreRanking(tuning, spectrum, rootHz?)` → ranking
+ * 3. Build a Set of mode ids in the front
+ * 4. Return the ranking annotated with `inParetoFront: boolean`
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns The score ranking annotated with `inParetoFront: boolean`, in score-descending order.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningParetoFrontVsRanking(equalTemperament12(440), spec);
+ * results.forEach(({ mode, score, inParetoFront }) => console.log(mode.id, score, inParetoFront));
+ */
+export function tuningParetoFrontVsRanking(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; score: number; inParetoFront: boolean }[] {
+  const front =
+    rootHz !== undefined
+      ? tuningModeParetoFront(tuning, spectrum, rootHz)
+      : tuningModeParetoFront(tuning, spectrum);
+  const ranking =
+    rootHz !== undefined
+      ? tuningModeScoreRanking(tuning, spectrum, rootHz)
+      : tuningModeScoreRanking(tuning, spectrum);
+  const frontIds = new Set(front.map((f) => f.mode.id));
+  return ranking.map((r) => ({
+    mode: r.mode,
+    score: r.score,
+    inParetoFront: frontIds.has(r.mode.id),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q445 — tuningParetoFrontRankPosition
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract the rank positions (1-based) of Pareto-optimal modes from the score ranking.
+ *
+ * Socratic Q445: "If I know which ranked modes are in the Pareto front, can I extract the rank
+ * positions (1-based) of the Pareto modes?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningParetoFrontVsRanking(tuning, spectrum, rootHz?)` → annotated ranking
+ * 2. Return only entries where `inParetoFront === true`, each augmented with `rank` (1-based)
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Pareto-front modes with their 1-based rank positions.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const ranked = tuningParetoFrontRankPosition(equalTemperament12(440), spec);
+ * ranked.forEach(({ mode, score, rank }) => console.log(rank, mode.id, score));
+ */
+export function tuningParetoFrontRankPosition(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; score: number; rank: number }[] {
+  const annotated =
+    rootHz !== undefined
+      ? tuningParetoFrontVsRanking(tuning, spectrum, rootHz)
+      : tuningParetoFrontVsRanking(tuning, spectrum);
+  const result: { mode: Scale; score: number; rank: number }[] = [];
+  for (let i = 0; i < annotated.length; i++) {
+    const entry = annotated[i];
+    if (entry !== undefined && entry.inParetoFront) {
+      result.push({ mode: entry.mode, score: entry.score, rank: i + 1 });
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q446 — tuningBestParetoRankedMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Pick the Pareto-optimal mode with the best (lowest) rank in the score ranking.
+ *
+ * Socratic Q446: "If I know the rank positions of Pareto modes, can I pick the one with the best
+ * (lowest) rank?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningParetoFrontRankPosition(tuning, spectrum, rootHz?)` → ranked Pareto modes
+ * 2. Return the entry with the lowest `rank` (i.e., highest score), or throw if list is empty
+ *
+ * @param tuning   - Tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns The Pareto mode with rank 1 (or lowest available rank).
+ * @throws {RangeError} If no Pareto modes exist.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const best = tuningBestParetoRankedMode(equalTemperament12(440), spec);
+ * console.log(best.mode.id, best.rank);
+ */
+export function tuningBestParetoRankedMode(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; score: number; rank: number } {
+  const ranked =
+    rootHz !== undefined
+      ? tuningParetoFrontRankPosition(tuning, spectrum, rootHz)
+      : tuningParetoFrontRankPosition(tuning, spectrum);
+  if (ranked.length === 0) {
+    throw new RangeError('tuningBestParetoRankedMode: no Pareto modes found');
+  }
+  let best = ranked[0]!;
+  for (let i = 1; i < ranked.length; i++) {
+    const entry = ranked[i]!;
+    if (entry.rank < best.rank) {
+      best = entry;
+    }
+  }
+  return best;
+}
+
+// ---------------------------------------------------------------------------
+// Q447 — tuningFamilyParetoRankPositions
+// ---------------------------------------------------------------------------
+
+/**
+ * Get rank positions of Pareto-optimal modes for every tuning in a family.
+ *
+ * Socratic Q447: "If I can get rank positions for one tuning, can I do it for a whole family?"
+ * → No → implement.
+ *
+ * Algorithm: `tunings.map(t => ({id: t.id, paretoRanks: tuningParetoFrontRankPosition(t, ...)}))`
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns One entry per tuning with its id and Pareto modes ranked.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyParetoRankPositions([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, paretoRanks }) => console.log(id, paretoRanks[0]?.rank));
+ */
+export function tuningFamilyParetoRankPositions(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; paretoRanks: { mode: Scale; score: number; rank: number }[] }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    paretoRanks:
+      rootHz !== undefined
+        ? tuningParetoFrontRankPosition(t, spectrum, rootHz)
+        : tuningParetoFrontRankPosition(t, spectrum),
+  }));
+}
