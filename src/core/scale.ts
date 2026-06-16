@@ -3939,3 +3939,153 @@ export function tuningHarmonicDensity(tuning: TuningSystem, tol = 0.0136): numbe
   const half = sorted.slice(0, Math.ceil(sorted.length / 2));
   return half.reduce((s, v) => s + v, 0) / half.length;
 }
+
+/**
+ * Amplitude-weighted mean harmonicity of a tuning over a given spectrum.
+ *
+ * Socratic Q264: "If harmonicity measures how well a spectrum fits a tuning, and harmonic
+ * density summarises the top-half, can I get a scalar 'spectral fit' score for a
+ * tuning+spectrum pair in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningHarmonicityProfile(tuning, tol)` → per-degree harmonicity values.
+ * 2. Multiply each degree's harmonicity by the corresponding spectral partial amplitude
+ *    (cycling through the spectrum with `i % spectrum.length`).
+ * 3. Divide the weighted sum by `totalAmp * profile.length`.
+ *
+ * Returns 0 for tunings with no degrees, empty spectra, or zero total amplitude.
+ *
+ * @param tuning   - The tuning system to evaluate.
+ * @param spectrum - The instrument spectrum to weight against.
+ * @param tol      - Continued-fraction tolerance for harmonicity. Default 0.0136.
+ * @returns Amplitude-weighted mean harmonicity (≥ 0). Lower = better spectral fit.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const fit = tuningSpectralFit(t12, harmonicSpectrum());
+ */
+export function tuningSpectralFit(tuning: TuningSystem, spectrum: Spectrum, tol?: number): number {
+  if (tuning.degrees.length === 0) return 0;
+  if (!spectrum || spectrum.length === 0) return 0;
+  const profile = tuningHarmonicityProfile(tuning, tol);
+  if (profile.length === 0) return 0;
+  const totalAmp = spectrum.reduce((s, p) => s + p.amplitude, 0);
+  if (totalAmp === 0) return 0;
+  const weighted = profile.map((h, i) => h * (spectrum[i % spectrum.length]?.amplitude ?? 0));
+  return weighted.reduce((s, v) => s + v, 0) / (totalAmp * profile.length);
+}
+
+/**
+ * Greedy nearest-neighbour reordering of a chord progression to minimise dissonance jumps.
+ *
+ * Socratic Q265: "If I can score a progression's smoothness (progressionScoreSummary), can
+ * I get a reordered progression that minimises dissonance jumps in one call?" → No → implement.
+ *
+ * Algorithm: nearest-neighbour greedy reordering starting from index 0, always picking the
+ * next chord that minimises |arc[current] - arc[next]| where `arc` is the progression energy
+ * arc (per-chord dissonance trajectory).
+ *
+ * @param chords   - The chord progression to reorder.
+ * @param rootHz   - Absolute frequency of the chord root in Hz.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @returns Reordered chord progression (same chords, minimised dissonance jumps).
+ *
+ * @example
+ * const smoothed = chordProgressionSmooth(chords, 261.63, harmonicSpectrum());
+ */
+export function chordProgressionSmooth(
+  chords: readonly Chord[],
+  rootHz: number,
+  spectrum?: Spectrum,
+): Chord[] {
+  if (chords.length <= 1) return [...chords];
+  const arc = progressionEnergyArc(chords, rootHz, spectrum);
+  const remaining = new Set(chords.map((_, i) => i));
+  const result: Chord[] = [];
+  let current = 0;
+  remaining.delete(0);
+  result.push(chords[0]!);
+
+  while (remaining.size > 0) {
+    let bestIdx = -1;
+    let bestDist = Infinity;
+    for (const idx of remaining) {
+      const dist = Math.abs((arc[current] ?? 0) - (arc[idx] ?? 0));
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = idx;
+      }
+    }
+    if (bestIdx === -1) break;
+    result.push(chords[bestIdx]!);
+    remaining.delete(bestIdx);
+    current = bestIdx;
+  }
+  return result;
+}
+
+/**
+ * Coefficient of variation of dissonance for the chord map derived from a scale.
+ *
+ * Socratic Q267: "If I can compute chord map volatility for a flat chord map and derive the
+ * chord map from a scale, can I go Scale → volatility in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → diatonic chord map.
+ * 2. `chordMapVolatility(chordMap, spectrum, rootHz)` → volatility score.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Reference frequency for chord realization (default 440 Hz).
+ * @returns Coefficient of variation of dissonance (≥ 0).
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const v = scaleChordMapVolatility(major, t12);
+ */
+export function scaleChordMapVolatility(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): number {
+  const chordMap = scaleToChordMap(scale, tuning);
+  return chordMapVolatility(chordMap, spectrum, rootHz);
+}
+
+/**
+ * Volatility of every modal rotation of a scale in one call.
+ *
+ * Socratic Q268: "If I can compute chord map volatility for one scale, can I get the
+ * volatility for every modal rotation in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 2. For each mode: `scaleChordMapVolatility(mode, tuning, spectrum, rootHz)`.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum. Defaults to `harmonicSpectrum()`.
+ * @param rootHz   - Reference frequency for chord realization (default 440 Hz).
+ * @returns Array of `{ mode, volatility }` — one entry per modal rotation.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const profile = modeVolatilityProfile(major, t12);
+ * // profile.length === 7 (one entry per mode of the major scale)
+ */
+export function modeVolatilityProfile(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+): { mode: Scale; volatility: number }[] {
+  const allModes = scaleModeSeries(scale, tuning);
+  return allModes.map((mode) => ({
+    mode,
+    volatility: scaleChordMapVolatility(mode, tuning, spectrum, rootHz),
+  }));
+}

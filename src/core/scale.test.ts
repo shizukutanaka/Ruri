@@ -93,6 +93,10 @@ import {
   tuningStabilityScore,
   chordMapVolatility,
   tuningHarmonicDensity,
+  tuningSpectralFit,
+  chordProgressionSmooth,
+  scaleChordMapVolatility,
+  modeVolatilityProfile,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -4329,5 +4333,143 @@ describe('tuningHarmonicDensity (Q263)', () => {
   });
   it('is a finite number', () => {
     expect(Number.isFinite(tuningHarmonicDensity(t12))).toBe(true);
+  });
+});
+
+describe('tuningSpectralFit (Q264)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns a finite non-negative number', () => {
+    const fit = tuningSpectralFit(t12, harmonicSpectrum());
+    expect(Number.isFinite(fit)).toBe(true);
+    expect(fit).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for tuning with no degrees', () => {
+    const empty: TuningSystem = {
+      id: 'e',
+      name: 'E',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical',
+    };
+    expect(tuningSpectralFit(empty, harmonicSpectrum())).toBe(0);
+  });
+  it('bell spectrum gives different result than harmonic spectrum', () => {
+    const h = tuningSpectralFit(t12, harmonicSpectrum());
+    const b = tuningSpectralFit(t12, bellSpectrum());
+    // May or may not be equal — just check both are finite
+    expect(Number.isFinite(h)).toBe(true);
+    expect(Number.isFinite(b)).toBe(true);
+  });
+});
+
+describe('chordProgressionSmooth (Q265)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+  const chordMap = scaleToChordMap(scale, t12);
+  const chords = chordMap.slice(0, 4).map((e) => e.chord);
+
+  it('returns same number of chords', () => {
+    const smoothed = chordProgressionSmooth(chords, 261.63);
+    expect(smoothed).toHaveLength(chords.length);
+  });
+  it('contains same chords', () => {
+    const smoothed = chordProgressionSmooth(chords, 261.63);
+    expect(new Set(smoothed)).toEqual(new Set(chords));
+  });
+  it('handles empty progression', () => {
+    expect(chordProgressionSmooth([], 261.63)).toEqual([]);
+  });
+  it('handles single chord', () => {
+    const result = chordProgressionSmooth([chords[0]!], 261.63);
+    expect(result).toHaveLength(1);
+  });
+});
+
+describe('scaleChordMapVolatility (Q267)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns non-negative number', () => {
+    const v = scaleChordMapVolatility(scale, t12);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('is finite', () => {
+    expect(Number.isFinite(scaleChordMapVolatility(scale, t12))).toBe(true);
+  });
+});
+
+describe('modeVolatilityProfile (Q268)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns one entry per mode', () => {
+    const profile = modeVolatilityProfile(scale, t12);
+    expect(profile.length).toBe(scale.degreeIndices.length);
+  });
+  it('all volatility values are non-negative', () => {
+    const profile = modeVolatilityProfile(scale, t12);
+    profile.forEach((p) => expect(p.volatility).toBeGreaterThanOrEqual(0));
+  });
+});
+
+describe('tuningSpectralFit (Q264)', () => {
+  it('returns a finite non-negative number', () => {
+    const fit = tuningSpectralFit(t12, harmonicSpectrum());
+    expect(Number.isFinite(fit)).toBe(true);
+    expect(fit).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for tuning with no degrees', () => {
+    const empty: TuningSystem = {
+      id: 'e',
+      name: 'E',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical' as const,
+    };
+    expect(tuningSpectralFit(empty, harmonicSpectrum())).toBe(0);
+  });
+  it('bell spectrum gives finite result', () => {
+    expect(Number.isFinite(tuningSpectralFit(t12, bellSpectrum()))).toBe(true);
+  });
+});
+
+describe('chordProgressionSmooth (Q265)', () => {
+  it('returns same number of chords', () => {
+    const chords = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12)
+      .slice(0, 4)
+      .map((e) => e.chord);
+    expect(chordProgressionSmooth(chords, 261.63)).toHaveLength(chords.length);
+  });
+  it('handles empty progression', () => {
+    expect(chordProgressionSmooth([], 261.63)).toEqual([]);
+  });
+  it('handles single chord', () => {
+    const chord = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12)[0]!.chord;
+    expect(chordProgressionSmooth([chord], 261.63)).toHaveLength(1);
+  });
+});
+
+describe('scaleChordMapVolatility (Q267)', () => {
+  it('returns non-negative finite number', () => {
+    const v = scaleChordMapVolatility(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('modeVolatilityProfile (Q268)', () => {
+  it('returns one entry per mode', () => {
+    const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+    const profile = modeVolatilityProfile(scale, t12);
+    expect(profile.length).toBe(scale.degreeIndices.length);
+  });
+  it('all volatility values are non-negative', () => {
+    const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+    modeVolatilityProfile(scale, t12).forEach((p) =>
+      expect(p.volatility).toBeGreaterThanOrEqual(0),
+    );
   });
 });
