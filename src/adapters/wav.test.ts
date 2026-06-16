@@ -40,6 +40,7 @@ import {
   modeVolatilityWav,
   smoothProgressionBundle,
   tuningFamilyWav,
+  progressionBundleFromScale,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -1823,5 +1824,18 @@ describe('tuningFamilyWav (Q277)', () => {
   });
   it('returns empty array for no tunings', () => {
     expect(tuningFamilyWav([])).toEqual([]);
+  });
+});
+
+describe('progressionBundleFromScale (Q284)', () => {
+  const t12 = equalTemperament12(440);
+  const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+
+  it('returns wav, smf, narrative', () => {
+    const bundle = progressionBundleFromScale(scale, t12);
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.narrative).toBe('string');
+    expect(bundle.wav.length).toBeGreaterThan(44);
   });
 });

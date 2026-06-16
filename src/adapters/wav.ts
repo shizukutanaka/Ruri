@@ -35,6 +35,7 @@ import {
   progressionNarrative,
   chordProgressionSmooth,
   modeVolatilityProfile,
+  chordMapProgressionBridge,
 } from '../core/scale.js';
 import { ALL_PRESETS, getTuningById } from '../data/presets.js';
 import { type TuningPreset } from '../data/tuning-data.js';
@@ -1710,4 +1711,50 @@ export function tuningFamilyWav(
   opts?: PluckScaleWavOptions,
 ): Uint8Array[] {
   return tunings.map((t) => bestModeWav(t, t.referenceHz, spectrum, opts));
+}
+
+// ---------------------------------------------------------------------------
+// Q284 — progressionBundleFromScale
+// ---------------------------------------------------------------------------
+
+/**
+ * Go from a Scale to a full progression bundle (WAV + SMF + narrative) in one call.
+ *
+ * Socratic Q284: "If I have a Scale and can generate a chord map progression and bundle it as
+ * WAV+SMF+narrative, can I go Scale → full progression bundle in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → all diatonic chords.
+ * 2. `chordMapProgressionBridge(chordMap, rootHz ?? tuning.referenceHz, spectrum)` → ordered `Chord[]`.
+ * 3. `smoothProgressionBundle(chords, tuning, rootHz, spectrum, wavOpts, smfOpts)` → `{ wav, smf, narrative }`.
+ *
+ * @param scale    - The parent scale.
+ * @param tuning   - The parent `TuningSystem`.
+ * @param rootHz   - Root frequency in Hz. Defaults to `tuning.referenceHz`.
+ * @param spectrum - Optional instrument spectrum.
+ * @param wavOpts  - Optional chord progression WAV options.
+ * @param smfOpts  - Optional SMF encoding options.
+ * @returns `{ wav: Uint8Array, smf: Uint8Array, narrative: string }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning` or the scale has no degrees.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
+ * const bundle = progressionBundleFromScale(scale, t12);
+ * await fs.writeFile('scale-prog.wav', bundle.wav);
+ * console.log(bundle.narrative);
+ */
+export function progressionBundleFromScale(
+  scale: Scale,
+  tuning: TuningSystem,
+  rootHz?: number,
+  spectrum?: Spectrum,
+  wavOpts?: ChordProgressionToWavOptions,
+  smfOpts?: SmfOptions,
+): { wav: Uint8Array; smf: Uint8Array; narrative: string } {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const effectiveRootHz = rootHz ?? tuning.referenceHz;
+  const chords = chordMapProgressionBridge(chordMap, effectiveRootHz, spectrum);
+  return smoothProgressionBundle(chords, tuning, rootHz, spectrum, wavOpts, smfOpts);
 }
