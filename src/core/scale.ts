@@ -9112,3 +9112,239 @@ export function tuningFamilyParetoNarratives(
         : tuningParetoFrontNarrative(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q462 — tuningFullParetoCorrelationReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine the Pareto narrative and the correlation narrative into one comprehensive report.
+ *
+ * Socratic Q462: "If I have the Pareto narrative AND the correlation narrative, can I combine them
+ * into one complete report?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningParetoFrontNarrative(tuning, spectrum, rootHz?)` → paretoNarrative
+ * 2. `tuningCorrelationMatrixNarrative(tuning, spectrum, rootHz?)` → correlationNarrative
+ * 3. Combine into a return object with all fields plus combinedNarrative.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Object with paretoNarrative, correlationNarrative, and combinedNarrative.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const report = tuningFullParetoCorrelationReport(equalTemperament12(440), spec);
+ * console.log(report.combinedNarrative);
+ */
+export function tuningFullParetoCorrelationReport(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  paretoNarrative: {
+    narrative: string;
+    paretoSize: number;
+    bestMode: { mode: Scale; score: number };
+    coverage: {
+      paretoSize: number;
+      totalModes: number;
+      topRank: number;
+      coverageInTopK: number;
+    };
+  };
+  correlationNarrative: {
+    narrative: string;
+    topCorrelation: { metricA: string; metricB: string; correlation: number };
+    antiCorrelation: { metricA: string; metricB: string; correlation: number };
+    strongPairCount: number;
+  };
+  combinedNarrative: string;
+} {
+  const paretoNarrative =
+    rootHz !== undefined
+      ? tuningParetoFrontNarrative(tuning, spectrum, rootHz)
+      : tuningParetoFrontNarrative(tuning, spectrum);
+  const correlationNarrative =
+    rootHz !== undefined
+      ? tuningCorrelationMatrixNarrative(tuning, spectrum, rootHz)
+      : tuningCorrelationMatrixNarrative(tuning, spectrum);
+  const combinedNarrative = paretoNarrative.narrative + ' ' + correlationNarrative.narrative;
+  return { paretoNarrative, correlationNarrative, combinedNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q464 — tuningFamilyFullParetoCorrelationReports
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate full Pareto+correlation reports for a family of tuning systems.
+ *
+ * Socratic Q464: "If I can generate a full report for one tuning, can I do it for a whole family?"
+ * → No → implement.
+ *
+ * Algorithm: `tunings.map(t => ({id: t.id, report: tuningFullParetoCorrelationReport(t, spectrum, rootHz?)}))`
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and full Pareto+correlation report.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyFullParetoCorrelationReports([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, report }) => console.log(id, report.combinedNarrative));
+ */
+export function tuningFamilyFullParetoCorrelationReports(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  report: {
+    paretoNarrative: {
+      narrative: string;
+      paretoSize: number;
+      bestMode: { mode: Scale; score: number };
+      coverage: {
+        paretoSize: number;
+        totalModes: number;
+        topRank: number;
+        coverageInTopK: number;
+      };
+    };
+    correlationNarrative: {
+      narrative: string;
+      topCorrelation: { metricA: string; metricB: string; correlation: number };
+      antiCorrelation: { metricA: string; metricB: string; correlation: number };
+      strongPairCount: number;
+    };
+    combinedNarrative: string;
+  };
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    report:
+      rootHz !== undefined
+        ? tuningFullParetoCorrelationReport(t, spectrum, rootHz)
+        : tuningFullParetoCorrelationReport(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q465 — tuningModeMetricOutliers
+// ---------------------------------------------------------------------------
+
+/**
+ * Find modes that are extreme outliers on any single metric from the comprehensive bundle.
+ *
+ * Socratic Q465: "If I have all five metrics per mode, can I find modes that are extreme outliers
+ * on any single metric?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz?)` → bundle
+ * 2. For each of the 5 metrics, compute mean and stdDev across modes.
+ * 3. A mode is an outlier on metric M if |value - mean| > 1.5 * stdDev.
+ * 4. Return array of `{mode, metric, value, mean, stdDev, zScore}` sorted by |zScore| descending.
+ *
+ * @param tuning   - The tuning system to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns Array of outlier entries sorted by |zScore| descending (may be empty).
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const outliers = tuningModeMetricOutliers(equalTemperament12(440), spec);
+ * outliers.forEach(o => console.log(o.mode.id, o.metric, o.zScore));
+ */
+export function tuningModeMetricOutliers(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; metric: string; value: number; mean: number; stdDev: number; zScore: number }[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+
+  const metricNames: (keyof Omit<(typeof bundle)[0], 'mode'>)[] = [
+    'entropy',
+    'consistency',
+    'volatility',
+    'diversity',
+    'smoothnessRatio',
+  ];
+
+  const outliers: {
+    mode: Scale;
+    metric: string;
+    value: number;
+    mean: number;
+    stdDev: number;
+    zScore: number;
+  }[] = [];
+
+  for (const metric of metricNames) {
+    const values = bundle.map((b) => b[metric] as number);
+    const mean = values.reduce((s, v) => s + v, 0) / values.length;
+    const stdDev = Math.sqrt(values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length);
+    if (stdDev === 0) continue;
+    for (const b of bundle) {
+      const value = b[metric] as number;
+      const zScore = (value - mean) / stdDev;
+      if (Math.abs(zScore) > 1.5) {
+        outliers.push({ mode: b.mode, metric, value, mean, stdDev, zScore });
+      }
+    }
+  }
+
+  outliers.sort((a, b) => Math.abs(b.zScore) - Math.abs(a.zScore));
+  return outliers;
+}
+
+// ---------------------------------------------------------------------------
+// Q467 — tuningFamilyModeMetricOutliers
+// ---------------------------------------------------------------------------
+
+/**
+ * Find metric outlier modes for a family of tuning systems.
+ *
+ * Socratic Q467: "If I can find outlier modes for one tuning, can I do it for a whole family?"
+ * → No → implement.
+ *
+ * Algorithm: `tunings.map(t => ({id: t.id, outliers: tuningModeMetricOutliers(t, spectrum, rootHz?)}))`
+ *
+ * @param tunings  - Array of `TuningSystem` objects to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Optional root frequency in Hz.
+ * @returns One entry per tuning with its id and outlier entries array.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const results = tuningFamilyModeMetricOutliers([equalTemperament12(440), edo(19, 440)], spec);
+ * results.forEach(({ id, outliers }) => console.log(id, outliers.length));
+ */
+export function tuningFamilyModeMetricOutliers(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  outliers: {
+    mode: Scale;
+    metric: string;
+    value: number;
+    mean: number;
+    stdDev: number;
+    zScore: number;
+  }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    outliers:
+      rootHz !== undefined
+        ? tuningModeMetricOutliers(t, spectrum, rootHz)
+        : tuningModeMetricOutliers(t, spectrum),
+  }));
+}

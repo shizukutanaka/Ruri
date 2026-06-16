@@ -207,6 +207,10 @@ import {
   tuningFamilyCorrelationNarratives,
   tuningParetoFrontNarrative,
   tuningFamilyParetoNarratives,
+  tuningFullParetoCorrelationReport,
+  tuningFamilyFullParetoCorrelationReports,
+  tuningModeMetricOutliers,
+  tuningFamilyModeMetricOutliers,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -8482,6 +8486,121 @@ describe('tuningFamilyParetoNarratives', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(typeof entry.paretoNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q462 — tuningFullParetoCorrelationReport
+// ---------------------------------------------------------------------------
+
+describe('tuningFullParetoCorrelationReport (Q462)', () => {
+  it('returns paretoNarrative, correlationNarrative, combinedNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFullParetoCorrelationReport(equalTemperament12(440), spec);
+    expect(result).toHaveProperty('paretoNarrative');
+    expect(result).toHaveProperty('correlationNarrative');
+    expect(result).toHaveProperty('combinedNarrative');
+  });
+
+  it('combinedNarrative is concatenation of both', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFullParetoCorrelationReport(equalTemperament12(440), spec);
+    expect(result.combinedNarrative).toBe(
+      result.paretoNarrative.narrative + ' ' + result.correlationNarrative.narrative,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFullParetoCorrelationReport(equalTemperament12(440), spec, 261.63);
+    expect(typeof result.combinedNarrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q464 — tuningFamilyFullParetoCorrelationReports
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyFullParetoCorrelationReports (Q464)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyFullParetoCorrelationReports(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and report.combinedNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyFullParetoCorrelationReports(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.report.combinedNarrative).toBe('string');
+      expect(entry.report.combinedNarrative.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q465 — tuningModeMetricOutliers
+// ---------------------------------------------------------------------------
+
+describe('tuningModeMetricOutliers (Q465)', () => {
+  it('returns array (possibly empty) of outlier entries', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricOutliers(equalTemperament12(440), spec);
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('each outlier entry has required fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricOutliers(equalTemperament12(440), spec);
+    if (result.length > 0) {
+      const first = result[0]!;
+      expect(typeof first.mode.id).toBe('string');
+      expect(typeof first.metric).toBe('string');
+      expect(typeof first.value).toBe('number');
+      expect(typeof first.mean).toBe('number');
+      expect(typeof first.stdDev).toBe('number');
+      expect(typeof first.zScore).toBe('number');
+    }
+  });
+
+  it('outliers are sorted by |zScore| descending', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricOutliers(equalTemperament12(440), spec);
+    if (result.length >= 2) {
+      expect(Math.abs(result[0]!.zScore)).toBeGreaterThanOrEqual(Math.abs(result[1]!.zScore));
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeMetricOutliers(equalTemperament12(440), spec, 261.63);
+    expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q467 — tuningFamilyModeMetricOutliers
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeMetricOutliers (Q467)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricOutliers(tunings, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and outliers array', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [equalTemperament12(440), edo(19, 440)];
+    const result = tuningFamilyModeMetricOutliers(tunings, spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(Array.isArray(entry.outliers)).toBe(true);
     }
   });
 });
