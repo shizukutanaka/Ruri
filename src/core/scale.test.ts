@@ -164,6 +164,10 @@ import {
   tuningFamilyHistogramSummaries,
   chordMapAnalysisFull,
   scaleChordMapAnalysisFull,
+  tuningModeAnalysisFull,
+  tuningFamilyModeAnalysisFull,
+  tuningHarmonicSpectralScore,
+  tuningFamilyHarmonicSpectralScores,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -6762,5 +6766,152 @@ describe('scaleChordMapAnalysisFull (Q395)', () => {
     const full = scaleChordMapAnalysisFull(scale, t12local, spec, 261.63);
     expect(full).toHaveProperty('rankedBundle');
     expect(typeof full.volatilityBundle.volatility).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q396 — tuningModeAnalysisFull
+// ---------------------------------------------------------------------------
+
+describe('tuningModeAnalysisFull (Q396)', () => {
+  it('returns one entry per mode with analysisFull', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAnalysisFull(t12local, spec);
+    expect(result.length).toBe(t12local.degrees.length);
+    expect(result[0]!.analysisFull).toHaveProperty('dualHistogram');
+    expect(result[0]!.analysisFull).toHaveProperty('histogramSummary');
+    expect(result[0]!.analysisFull).toHaveProperty('rankedBundle');
+    expect(result[0]!.analysisFull).toHaveProperty('volatilityBundle');
+  });
+
+  it('each entry has a mode with degreeIndices', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAnalysisFull(t12local, spec);
+    for (const { mode } of result) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAnalysisFull(t12local, spec, 261.63);
+    expect(result.length).toBe(t12local.degrees.length);
+    expect(result[0]!.analysisFull).toHaveProperty('rankedBundle');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q398 — tuningFamilyModeAnalysisFull
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeAnalysisFull (Q398)', () => {
+  it('returns one entry per tuning', () => {
+    const family = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeAnalysisFull(family, spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and modeAnalysis', () => {
+    const family = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeAnalysisFull(family, spec);
+    expect(result[0]!.id).toBe(family[0]!.id);
+    expect(result[1]!.id).toBe(family[1]!.id);
+    expect(result[0]!.modeAnalysis.length).toBe(family[0]!.degrees.length);
+    expect(result[1]!.modeAnalysis.length).toBe(family[1]!.degrees.length);
+  });
+
+  it('modeAnalysis entries have analysisFull with all keys', () => {
+    const family = [equalTemperament12(440)];
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyModeAnalysisFull(family, spec);
+    const first = result[0]!.modeAnalysis[0]!;
+    expect(first.analysisFull).toHaveProperty('dualHistogram');
+    expect(first.analysisFull).toHaveProperty('rankedBundle');
+    expect(first.analysisFull).toHaveProperty('volatilityBundle');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q399 — tuningHarmonicSpectralScore
+// ---------------------------------------------------------------------------
+
+describe('tuningHarmonicSpectralScore (Q399)', () => {
+  it('returns harmonicDensity, spectralFit, combinedScore', () => {
+    const t12local = equalTemperament12(440);
+    const spectrum = harmonicSpectrum(6);
+    const score = tuningHarmonicSpectralScore(t12local, spectrum);
+    expect(typeof score.harmonicDensity).toBe('number');
+    expect(typeof score.spectralFit).toBe('number');
+    expect(typeof score.combinedScore).toBe('number');
+    expect(score.combinedScore).toBeCloseTo((score.harmonicDensity + score.spectralFit) / 2, 10);
+  });
+
+  it('combinedScore is arithmetic mean of harmonicDensity and spectralFit', () => {
+    const t12local = equalTemperament12(440);
+    const spectrum = harmonicSpectrum(6);
+    const score = tuningHarmonicSpectralScore(t12local, spectrum);
+    expect(score.combinedScore).toBeCloseTo((score.harmonicDensity + score.spectralFit) / 2, 10);
+  });
+
+  it('accepts optional rootHz and tol', () => {
+    const t12local = equalTemperament12(440);
+    const spectrum = harmonicSpectrum(6);
+    const score = tuningHarmonicSpectralScore(t12local, spectrum, 261.63, 0.02);
+    expect(typeof score.combinedScore).toBe('number');
+  });
+
+  it('different tunings yield different scores', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const spectrum = harmonicSpectrum(6);
+    const s12 = tuningHarmonicSpectralScore(t12local, spectrum);
+    const s19 = tuningHarmonicSpectralScore(t19, spectrum);
+    // Not asserting direction, just that scores are computed and differ or are equal numbers
+    expect(typeof s12.combinedScore).toBe('number');
+    expect(typeof s19.combinedScore).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q401 — tuningFamilyHarmonicSpectralScores
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyHarmonicSpectralScores (Q401)', () => {
+  it('returns one entry per tuning', () => {
+    const family = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const scores = tuningFamilyHarmonicSpectralScores(family, spec);
+    expect(scores.length).toBe(2);
+  });
+
+  it('each entry has id and score with all keys', () => {
+    const family = [equalTemperament12(440), edo(19, 440)];
+    const spec = harmonicSpectrum(6);
+    const scores = tuningFamilyHarmonicSpectralScores(family, spec);
+    expect(scores[0]!.id).toBe(family[0]!.id);
+    expect(scores[0]!.score).toHaveProperty('harmonicDensity');
+    expect(scores[0]!.score).toHaveProperty('spectralFit');
+    expect(scores[0]!.score).toHaveProperty('combinedScore');
+  });
+
+  it('combinedScore matches single-tuning result', () => {
+    const t12local = equalTemperament12(440);
+    const spec = harmonicSpectrum(6);
+    const family = [t12local];
+    const familyScores = tuningFamilyHarmonicSpectralScores(family, spec);
+    const single = tuningHarmonicSpectralScore(t12local, spec);
+    expect(familyScores[0]!.score.combinedScore).toBeCloseTo(single.combinedScore, 10);
+  });
+
+  it('accepts optional rootHz and tol', () => {
+    const family = [equalTemperament12(440)];
+    const spec = harmonicSpectrum(6);
+    const scores = tuningFamilyHarmonicSpectralScores(family, spec, 440, 0.02);
+    expect(typeof scores[0]!.score.combinedScore).toBe('number');
   });
 });

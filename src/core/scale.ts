@@ -7028,3 +7028,166 @@ export function tuningModeProgressionFullBundles(
     ...scaleProgressionFullBundle(mode, tuning, rootHz, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q396 — tuningModeAnalysisFull
+// ---------------------------------------------------------------------------
+
+/**
+ * Get full chord map analysis for every mode of a tuning in one call.
+ *
+ * Socratic Q396: "If I can get full chord map analysis for one scale, can I get it for every
+ * mode of a tuning at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `allModes(tuning)` → all modal rotations.
+ * 2. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapAnalysisFull(chordMap, spectrum, rootHz)`.
+ *
+ * @param tuning   - The tuning system whose modes to process.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{mode, analysisFull}`, one per mode, in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum();
+ * const result = tuningModeAnalysisFull(t12, spec);
+ * for (const { mode, analysisFull } of result) {
+ *   console.log(mode.id, analysisFull.rankedBundle.entropy, analysisFull.volatilityBundle.volatility);
+ * }
+ */
+export function tuningModeAnalysisFull(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { mode: Scale; analysisFull: ReturnType<typeof chordMapAnalysisFull> }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const analysisFull = chordMapAnalysisFull(chordMap, spectrum, rootHz);
+    return { mode, analysisFull };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q398 — tuningFamilyModeAnalysisFull
+// ---------------------------------------------------------------------------
+
+/**
+ * Get full mode analysis for every tuning in a family in one call.
+ *
+ * Socratic Q398: "If I can get full mode analysis for one tuning, can I do it for a whole
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{id: t.id, modeAnalysis: tuningModeAnalysisFull(t, spectrum, rootHz)}`).
+ *
+ * @param tunings  - Array of tuning systems to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @returns Array of `{id, modeAnalysis}`, one per tuning.
+ *
+ * @example
+ * const family = [equalTemperament12(440), edo(19, 440)];
+ * const spec = harmonicSpectrum();
+ * const result = tuningFamilyModeAnalysisFull(family, spec);
+ * for (const { id, modeAnalysis } of result) {
+ *   console.log(id, modeAnalysis.length);
+ * }
+ */
+export function tuningFamilyModeAnalysisFull(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; modeAnalysis: ReturnType<typeof tuningModeAnalysisFull> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeAnalysis: tuningModeAnalysisFull(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q399 — tuningHarmonicSpectralScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Combine harmonic density and spectral fit into a single score for a tuning.
+ *
+ * Socratic Q399: "If I can compute harmonic density and spectral fit separately, can I combine
+ * them into a single score?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningHarmonicDensity(tuning, tol?)` → harmonicDensity.
+ * 2. `tuningSpectralFit(tuning, spectrum, tol?)` → spectralFit.
+ * 3. `combinedScore = (harmonicDensity + spectralFit) / 2` — arithmetic mean.
+ *
+ * @param tuning   - The tuning system to score.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440, reserved for future use).
+ * @param tol      - Tolerance for harmonicity proximity (optional).
+ * @returns `{harmonicDensity, spectralFit, combinedScore}`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const spec = harmonicSpectrum(6);
+ * const score = tuningHarmonicSpectralScore(t12, spec);
+ * console.log(score.harmonicDensity, score.spectralFit, score.combinedScore);
+ */
+export function tuningHarmonicSpectralScore(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 440,
+  tol?: number,
+): { harmonicDensity: number; spectralFit: number; combinedScore: number } {
+  void rootHz; // reserved for future use; harmonic density and spectral fit are pitch-class invariant
+  const harmonicDensity =
+    tol !== undefined ? tuningHarmonicDensity(tuning, tol) : tuningHarmonicDensity(tuning);
+  const spectralFit =
+    tol !== undefined
+      ? tuningSpectralFit(tuning, spectrum, tol)
+      : tuningSpectralFit(tuning, spectrum);
+  return { harmonicDensity, spectralFit, combinedScore: (harmonicDensity + spectralFit) / 2 };
+}
+
+// ---------------------------------------------------------------------------
+// Q401 — tuningFamilyHarmonicSpectralScores
+// ---------------------------------------------------------------------------
+
+/**
+ * Get harmonic-spectral score for every tuning in a family in one call.
+ *
+ * Socratic Q401: "If I can get harmonic-spectral score for one tuning, can I get it for a whole
+ * family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{id: t.id, score: tuningHarmonicSpectralScore(t, spectrum, rootHz, tol)}`).
+ *
+ * @param tunings  - Array of tuning systems to score.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis (required).
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param tol      - Tolerance for harmonicity proximity (optional).
+ * @returns Array of `{id, score}`, one per tuning.
+ *
+ * @example
+ * const family = [equalTemperament12(440), edo(19, 440)];
+ * const spec = harmonicSpectrum(6);
+ * const scores = tuningFamilyHarmonicSpectralScores(family, spec);
+ * for (const { id, score } of scores) {
+ *   console.log(id, score.combinedScore);
+ * }
+ */
+export function tuningFamilyHarmonicSpectralScores(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  tol?: number,
+): { id: string; score: ReturnType<typeof tuningHarmonicSpectralScore> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    score:
+      rootHz !== undefined
+        ? tuningHarmonicSpectralScore(t, spectrum, rootHz, tol)
+        : tuningHarmonicSpectralScore(t, spectrum),
+  }));
+}
