@@ -99,6 +99,8 @@ import {
   presetTopClusterConsensusMode,
   presetModeConsensusOutlierBundle,
   presetModeInsightSummary,
+  presetFinalRecommendation,
+  presetModeEntropyDiversityMap,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2989,6 +2991,60 @@ describe('presetModeInsightSummary (Q520)', () => {
   it('accepts optional rootHz', () => {
     const spec = harmonicSpectrum(6);
     const result = presetModeInsightSummary('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q523 — presetFinalRecommendation
+// ---------------------------------------------------------------------------
+
+describe('presetFinalRecommendation (Q523)', () => {
+  it('returns recommendation with recommendedMode and masterNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFinalRecommendation('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.recommendation.length).toBeGreaterThan(0);
+    expect(typeof result.recommendedMode.mode.id).toBe('string');
+    expect(result.masterNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetFinalRecommendation('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFinalRecommendation('12-tet', spec);
+    expect(result.recommendation.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q526 — presetModeEntropyDiversityMap
+// ---------------------------------------------------------------------------
+
+describe('presetModeEntropyDiversityMap (Q526)', () => {
+  it('returns mode map with quadrant labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeEntropyDiversityMap('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const validQuadrants = ['rich-complex', 'varied-uniform', 'stable-diverse', 'stable-uniform'];
+    expect(validQuadrants).toContain(result[0]!.quadrant);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeEntropyDiversityMap('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeEntropyDiversityMap('12-tet', spec, 261.63, [TWELVE_TET]);
     expect(result.length).toBeGreaterThan(0);
   });
 });

@@ -92,6 +92,8 @@ import {
   tuningTopClusterConsensusMode,
   tuningModeConsensusOutlierBundle,
   tuningModeInsightSummary,
+  tuningFinalRecommendation,
+  tuningModeEntropyDiversityMap,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4630,4 +4632,46 @@ export function presetModeInsightSummary(
   return rootHz !== undefined
     ? tuningModeInsightSummary(tuning, spectrum, rootHz)
     : tuningModeInsightSummary(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q523 — presetFinalRecommendation
+// ---------------------------------------------------------------------------
+
+export function presetFinalRecommendation(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningFinalRecommendation> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetFinalRecommendation: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningFinalRecommendation(tuning, spectrum, rootHz)
+    : tuningFinalRecommendation(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q526 — presetModeEntropyDiversityMap
+// ---------------------------------------------------------------------------
+
+export function presetModeEntropyDiversityMap(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: TuningPreset[],
+): ReturnType<typeof tuningModeEntropyDiversityMap> {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeEntropyDiversityMap: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeEntropyDiversityMap(tuning, spectrum, rootHz)
+    : tuningModeEntropyDiversityMap(tuning, spectrum);
 }
