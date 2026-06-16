@@ -5233,6 +5233,86 @@ export function tuningFullAnalysis(
 }
 
 // ---------------------------------------------------------------------------
+// Q324 — tuningModeNarratives
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a narrative string for every mode of a tuning in one call.
+ *
+ * Socratic Q324: "If I can get progression and narrative for a single mode, can I get
+ * narratives for all modes of a tuning at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningToScale(tuning)` → full scale.
+ * 2. `scaleModeSeries(scale, tuning)` → all modal rotations.
+ * 3. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapProgressionBridge(chordMap, rootHz, spectrum)` → `progressionNarrative(chords, rootHz, spectrum)`.
+ *
+ * @param tuning   - The tuning system whose modes to narrate.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns Array of `{ mode, narrative }` in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const narratives = tuningModeNarratives(t12);
+ * for (const { mode, narrative } of narratives) {
+ *   console.log(mode.id, narrative);
+ * }
+ */
+export function tuningModeNarratives(
+  tuning: TuningSystem,
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; narrative: string }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const chords = chordMapProgressionBridge(chordMap, rootHz, spectrum);
+    const narrative = progressionNarrative(chords, rootHz, spectrum);
+    return { mode, narrative };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q325 — bestModeNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the narrative for the best mode of a tuning by a given metric in one call.
+ *
+ * Socratic Q325: "If I can get narratives for all modes and find the best mode by a metric,
+ * can I get the best mode's narrative in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `tuningBestModeProgression(tuning, metric, rootHz, spectrum)` → `{ mode, chords, smoothnessRatio }`.
+ * 2. `progressionNarrative(chords, rootHz, spectrum)` → narrative string.
+ *
+ * @param tuning   - The tuning system.
+ * @param metric   - Which metric to select the best mode by.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param spectrum - Optional instrument spectrum for timbre-aware analysis.
+ * @returns `{ mode, narrative }` for the best mode.
+ *
+ * @throws {RangeError} if the tuning has no modes.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const { mode, narrative } = bestModeNarrative(t12, 'entropy');
+ * console.log(mode.id, narrative);
+ */
+export function bestModeNarrative(
+  tuning: TuningSystem,
+  metric: 'entropy' | 'consistency' | 'volatility',
+  rootHz = 440,
+  spectrum?: Spectrum,
+): { mode: Scale; narrative: string } {
+  const { mode, chords } = tuningBestModeProgression(tuning, metric, rootHz, spectrum);
+  const narrative = progressionNarrative(chords, rootHz, spectrum);
+  return { mode, narrative };
+}
+
+// ---------------------------------------------------------------------------
 // Q322 — tuningFamilyFullReport
 // ---------------------------------------------------------------------------
 

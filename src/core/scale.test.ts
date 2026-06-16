@@ -124,6 +124,8 @@ import {
   tuningBestModeProgression,
   tuningFullAnalysis,
   tuningFamilyFullReport,
+  tuningModeNarratives,
+  bestModeNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -5175,5 +5177,54 @@ describe('tuningFamilyFullReport (Q322)', () => {
     const result = tuningFamilyFullReport([t12], 261.63, harmonicSpectrum());
     expect(result.perTuningAnalysis).toHaveLength(1);
     expect(typeof result.perTuningAnalysis[0]!.analysis.reportCard).toBe('string');
+  });
+});
+
+describe('tuningModeNarratives (Q324)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns one narrative per mode', () => {
+    const narratives = tuningModeNarratives(t12);
+    expect(narratives.length).toBe(t12.degrees.length);
+    for (const { mode, narrative } of narratives) {
+      expect(mode).toHaveProperty('degreeIndices');
+      expect(typeof narrative).toBe('string');
+      expect(narrative.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const narratives = tuningModeNarratives(t12, 261.63, harmonicSpectrum());
+    expect(narratives.length).toBe(t12.degrees.length);
+    expect(typeof narratives[0]!.narrative).toBe('string');
+  });
+});
+
+describe('bestModeNarrative (Q325)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns mode and narrative for entropy', () => {
+    const result = bestModeNarrative(t12, 'entropy');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('returns mode and narrative for consistency', () => {
+    const result = bestModeNarrative(t12, 'consistency');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.narrative).toBe('string');
+  });
+
+  it('returns mode and narrative for volatility', () => {
+    const result = bestModeNarrative(t12, 'volatility');
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.narrative).toBe('string');
+  });
+
+  it('accepts optional spectrum and rootHz', () => {
+    const result = bestModeNarrative(t12, 'entropy', 261.63, harmonicSpectrum());
+    expect(result.mode).toHaveProperty('degreeIndices');
+    expect(typeof result.narrative).toBe('string');
   });
 });
