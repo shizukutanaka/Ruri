@@ -13,6 +13,8 @@ import {
   tuningToScale,
   rankModeSeriesByHarmonicity,
   rankModesByStability,
+  chordMapConsistencyScore,
+  chordMapNormalizedScores,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -596,4 +598,56 @@ export function chordMapToFullBundle(
   const mts = chordMapToMts(chordMap, name ?? tuning.id);
   const wav = chordMapToWav(chordMap, rootHz ?? tuning.referenceHz, spectrum);
   return { scl, tun, mts, wav };
+}
+
+// ---------------------------------------------------------------------------
+// Q291 — scaleConsistencyBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Export a scale's subset `.scl` text, consistency score, and normalized chord scores in one call.
+ *
+ * Socratic Q291: "If I can get consistency normalized scores for a scale's chord map and export
+ * it as SCL, can I get both the SCL and the consistency scores in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → diatonic chord map.
+ * 2. `scaleToSubsetSclText(scale, tuning, name)` → `.scl` text string.
+ * 3. `chordMapConsistencyScore(chordMap, spectrum, rootHz)` → consistency score ∈ (0, 1].
+ * 4. `chordMapNormalizedScores(chordMap, spectrum, rootHz)` → per-entry normalized scores.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for dissonance and consistency computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, consistencyScore, normalizedScores }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scl, consistencyScore, normalizedScores } = scaleConsistencyBundle(major, t12);
+ */
+export function scaleConsistencyBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz = 440,
+  name?: string,
+): {
+  scl: string;
+  consistencyScore: number;
+  normalizedScores: {
+    entry: ScaleChordMapEntry;
+    normalizedDissonance: number;
+    normalizedHarmonicity: number;
+  }[];
+} {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const scl = scaleToSubsetSclText(scale, tuning, name);
+  const consistencyScore = chordMapConsistencyScore(chordMap, spectrum, rootHz);
+  const normalizedScores = chordMapNormalizedScores(chordMap, spectrum, rootHz);
+  return { scl, consistencyScore, normalizedScores };
 }
