@@ -11112,3 +11112,136 @@ export function tuningFamilyModeFiveDimMaps(
         : tuningModeFiveDimMap(t, spectrum),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q534 — tuningModeFiveDimNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Produce a per-mode narrative string describing all three 5-dim labels.
+ *
+ * Socratic Q534: "If I have the 5-dim map for every mode, can I produce a
+ * per-mode narrative string describing all three labels?"
+ *
+ * Algorithm:
+ * 1. `tuningModeFiveDimMap(tuning, spectrum, rootHz)` → map.
+ * 2. For each entry build:
+ *    `"[mode.id]: entropy-diversity=[edQuadrant], consistency-volatility=[cvQuadrant], cluster=[cluster]"`.
+ * 3. Return `{mode, entropyDiversityQuadrant, consistencyVolatilityQuadrant, cluster, narrative}[]`.
+ */
+export function tuningModeFiveDimNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropyDiversityQuadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform';
+  consistencyVolatilityQuadrant:
+    | 'stable-consistent'
+    | 'consistent-volatile'
+    | 'smooth-inconsistent'
+    | 'rough-inconsistent';
+  cluster: 'high' | 'mid' | 'low';
+  narrative: string;
+}[] {
+  const map =
+    rootHz !== undefined
+      ? tuningModeFiveDimMap(tuning, spectrum, rootHz)
+      : tuningModeFiveDimMap(tuning, spectrum);
+  return map.map((entry) => ({
+    mode: entry.mode,
+    entropyDiversityQuadrant: entry.entropyDiversityQuadrant,
+    consistencyVolatilityQuadrant: entry.consistencyVolatilityQuadrant,
+    cluster: entry.cluster,
+    narrative: `${entry.mode.id}: entropy-diversity=${entry.entropyDiversityQuadrant}, consistency-volatility=${entry.consistencyVolatilityQuadrant}, cluster=${entry.cluster}`,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q536 — tuningFamilyModeFiveDimNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeFiveDimNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; fiveDimNarratives: ReturnType<typeof tuningModeFiveDimNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    fiveDimNarratives:
+      rootHz !== undefined
+        ? tuningModeFiveDimNarrative(t, spectrum, rootHz)
+        : tuningModeFiveDimNarrative(t, spectrum),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q537 — tuningModeSmoothnessEntropyMap
+// ---------------------------------------------------------------------------
+
+/**
+ * Map modes on a smoothnessRatio×entropy plane for a fresh angle on which
+ * modes feel fluid vs. complex.
+ *
+ * Socratic Q537: "Can I map modes on a smoothnessRatio×entropy plane for a
+ * fresh angle on which modes feel fluid vs. complex?"
+ *
+ * Algorithm:
+ * 1. `tuningModeComprehensiveBundle(tuning, spectrum, rootHz)` → bundle.
+ * 2. meanSmoothness = mean of smoothnessRatio; meanEntropy = mean of entropy.
+ * 3. Quadrants:
+ *    - smoothnessRatio > mean AND entropy > mean → 'fluid-complex'
+ *    - smoothnessRatio > mean AND entropy <= mean → 'fluid-simple'
+ *    - smoothnessRatio <= mean AND entropy > mean → 'rough-complex'
+ *    - else → 'rough-simple'
+ */
+export function tuningModeSmoothnessEntropyMap(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  smoothnessRatio: number;
+  entropy: number;
+  quadrant: 'fluid-complex' | 'fluid-simple' | 'rough-complex' | 'rough-simple';
+}[] {
+  const bundle =
+    rootHz !== undefined
+      ? tuningModeComprehensiveBundle(tuning, spectrum, rootHz)
+      : tuningModeComprehensiveBundle(tuning, spectrum);
+  const n = bundle.length;
+  if (n === 0) return [];
+  const meanSmoothness = bundle.reduce((sum, b) => sum + b.smoothnessRatio, 0) / n;
+  const meanEntropy = bundle.reduce((sum, b) => sum + b.entropy, 0) / n;
+  return bundle.map((b) => {
+    let quadrant: 'fluid-complex' | 'fluid-simple' | 'rough-complex' | 'rough-simple';
+    if (b.smoothnessRatio > meanSmoothness && b.entropy > meanEntropy) {
+      quadrant = 'fluid-complex';
+    } else if (b.smoothnessRatio > meanSmoothness && b.entropy <= meanEntropy) {
+      quadrant = 'fluid-simple';
+    } else if (b.smoothnessRatio <= meanSmoothness && b.entropy > meanEntropy) {
+      quadrant = 'rough-complex';
+    } else {
+      quadrant = 'rough-simple';
+    }
+    return { mode: b.mode, smoothnessRatio: b.smoothnessRatio, entropy: b.entropy, quadrant };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q539 — tuningFamilyModeSmoothnessEntropyMaps
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeSmoothnessEntropyMaps(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; smoothnessEntropyMap: ReturnType<typeof tuningModeSmoothnessEntropyMap> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    smoothnessEntropyMap:
+      rootHz !== undefined
+        ? tuningModeSmoothnessEntropyMap(t, spectrum, rootHz)
+        : tuningModeSmoothnessEntropyMap(t, spectrum),
+  }));
+}

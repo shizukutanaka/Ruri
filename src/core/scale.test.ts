@@ -255,6 +255,10 @@ import {
   tuningFamilyModeConsistencyVolatilityMaps,
   tuningModeFiveDimMap,
   tuningFamilyModeFiveDimMaps,
+  tuningModeFiveDimNarrative,
+  tuningFamilyModeFiveDimNarratives,
+  tuningModeSmoothnessEntropyMap,
+  tuningFamilyModeSmoothnessEntropyMaps,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -9871,6 +9875,98 @@ describe('tuningFamilyModeFiveDimMaps (Q533)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.fiveDimMap.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q534 — tuningModeFiveDimNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningModeFiveDimNarrative (Q534)', () => {
+  it('returns one entry per mode with a non-empty narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeFiveDimNarrative(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    for (const entry of result) {
+      expect(typeof entry.narrative).toBe('string');
+      expect(entry.narrative.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('narrative includes mode.id and entropyDiversityQuadrant', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeFiveDimNarrative(t12, spec);
+    const first = result[0]!;
+    expect(first.narrative).toContain(first.mode.id);
+    expect(first.narrative).toContain(first.entropyDiversityQuadrant);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeFiveDimNarrative(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q536 — tuningFamilyModeFiveDimNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeFiveDimNarratives (Q536)', () => {
+  it('returns one entry per tuning with id and fiveDimNarratives', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeFiveDimNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.fiveDimNarratives.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q537 — tuningModeSmoothnessEntropyMap
+// ---------------------------------------------------------------------------
+
+describe('tuningModeSmoothnessEntropyMap (Q537)', () => {
+  it('returns one entry per mode with valid quadrant labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSmoothnessEntropyMap(t12, spec);
+    expect(result.length).toBe(t12.degrees.length);
+    const validQuadrants = ['fluid-complex', 'fluid-simple', 'rough-complex', 'rough-simple'];
+    for (const entry of result) {
+      expect(validQuadrants).toContain(entry.quadrant);
+    }
+  });
+
+  it('smoothnessRatio and entropy match comprehensive bundle for first mode', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSmoothnessEntropyMap(t12, spec);
+    const bundle = tuningModeComprehensiveBundle(t12, spec);
+    expect(result[0]!.smoothnessRatio).toBe(bundle[0]!.smoothnessRatio);
+    expect(result[0]!.entropy).toBe(bundle[0]!.entropy);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSmoothnessEntropyMap(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q539 — tuningFamilyModeSmoothnessEntropyMaps
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeSmoothnessEntropyMaps (Q539)', () => {
+  it('returns one entry per tuning with id and smoothnessEntropyMap', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeSmoothnessEntropyMaps([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.smoothnessEntropyMap.length).toBeGreaterThan(0);
     }
   });
 });
