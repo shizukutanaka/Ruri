@@ -154,6 +154,11 @@ import {
   tuningTopModesByDelta,
   chordMapDissonanceHistogram,
   tuningModeDissonanceHistograms,
+  chordMapHarmonicityHistogram,
+  tuningModeHarmonicityHistograms,
+  chordMapDualHistogram,
+  tuningModeDualHistograms,
+  tuningFamilyDualHistograms,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -6321,5 +6326,201 @@ describe('tuningModeDissonanceHistograms (Q382)', () => {
     for (const { mode } of hists) {
       expect(mode).toHaveProperty('degreeIndices');
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q384 — chordMapHarmonicityHistogram
+// ---------------------------------------------------------------------------
+
+describe('chordMapHarmonicityHistogram (Q384)', () => {
+  it('returns array of length bins (default 10)', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const hist = chordMapHarmonicityHistogram(cm);
+    expect(hist.length).toBe(10);
+  });
+
+  it('sum equals number of chord map entries', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const hist = chordMapHarmonicityHistogram(cm);
+    expect(hist.reduce((a, b) => a + b, 0)).toBe(cm.length);
+  });
+
+  it('uses custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const hist = chordMapHarmonicityHistogram(cm, 5);
+    expect(hist.length).toBe(5);
+  });
+
+  it('returns all zeros for empty chord map', () => {
+    const hist = chordMapHarmonicityHistogram([]);
+    expect(hist).toEqual(Array(10).fill(0));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q385 — tuningModeHarmonicityHistograms
+// ---------------------------------------------------------------------------
+
+describe('tuningModeHarmonicityHistograms (Q385)', () => {
+  it('returns one entry per mode', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeHarmonicityHistograms(t12local);
+    expect(hists.length).toBe(t12local.degrees.length);
+  });
+
+  it('each histogram has length equal to bins (default 10)', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeHarmonicityHistograms(t12local);
+    for (const { histogram } of hists) {
+      expect(histogram.length).toBe(10);
+    }
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeHarmonicityHistograms(t12local, 5);
+    for (const { histogram } of hists) {
+      expect(histogram.length).toBe(5);
+    }
+  });
+
+  it('each entry has mode with degreeIndices', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeHarmonicityHistograms(t12local);
+    for (const { mode } of hists) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q386 — chordMapDualHistogram
+// ---------------------------------------------------------------------------
+
+describe('chordMapDualHistogram (Q386)', () => {
+  it('returns dissonance and harmonicity arrays of length bins', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const { dissonance, harmonicity } = chordMapDualHistogram(cm);
+    expect(dissonance.length).toBe(10);
+    expect(harmonicity.length).toBe(10);
+    expect(dissonance.reduce((a, b) => a + b, 0)).toBe(cm.length);
+    expect(harmonicity.reduce((a, b) => a + b, 0)).toBe(cm.length);
+  });
+
+  it('uses custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const { dissonance } = chordMapDualHistogram(cm, 5);
+    expect(dissonance.length).toBe(5);
+  });
+
+  it('returns all zeros for empty chord map', () => {
+    const { dissonance, harmonicity } = chordMapDualHistogram([]);
+    expect(dissonance).toEqual(Array(10).fill(0));
+    expect(harmonicity).toEqual(Array(10).fill(0));
+  });
+
+  it('dissonance histogram matches standalone chordMapDissonanceHistogram', () => {
+    const t12local = equalTemperament12(440);
+    const scale = tuningToScale(t12local);
+    const cm = scaleToChordMap(scale, t12local);
+    const { dissonance } = chordMapDualHistogram(cm);
+    const standalone = chordMapDissonanceHistogram(cm);
+    expect(dissonance).toEqual(standalone);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q387 — tuningModeDualHistograms
+// ---------------------------------------------------------------------------
+
+describe('tuningModeDualHistograms (Q387)', () => {
+  it('returns one entry per mode', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDualHistograms(t12local);
+    expect(hists.length).toBe(t12local.degrees.length);
+  });
+
+  it('each entry has dissonance and harmonicity arrays of length bins', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDualHistograms(t12local);
+    for (const { dissonance, harmonicity } of hists) {
+      expect(dissonance.length).toBe(10);
+      expect(harmonicity.length).toBe(10);
+    }
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDualHistograms(t12local, 5);
+    for (const { dissonance, harmonicity } of hists) {
+      expect(dissonance.length).toBe(5);
+      expect(harmonicity.length).toBe(5);
+    }
+  });
+
+  it('each entry has mode with degreeIndices', () => {
+    const t12local = equalTemperament12(440);
+    const hists = tuningModeDualHistograms(t12local);
+    for (const { mode } of hists) {
+      expect(mode).toHaveProperty('degreeIndices');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q389 — tuningFamilyDualHistograms
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyDualHistograms (Q389)', () => {
+  it('returns one entry per tuning', () => {
+    const t12local = equalTemperament12(440);
+    const t19 = edo(19, 440);
+    const result = tuningFamilyDualHistograms([t12local, t19]);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has an id and modeDualHistograms array', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyDualHistograms([t12local]);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('modeDualHistograms');
+    expect(Array.isArray(result[0]?.modeDualHistograms)).toBe(true);
+  });
+
+  it('id matches tuning id', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyDualHistograms([t12local]);
+    expect(result[0]?.id).toBe(t12local.id);
+  });
+
+  it('modeDualHistograms length equals mode count', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyDualHistograms([t12local]);
+    expect(result[0]?.modeDualHistograms.length).toBe(t12local.degrees.length);
+  });
+
+  it('respects custom bins', () => {
+    const t12local = equalTemperament12(440);
+    const result = tuningFamilyDualHistograms([t12local], 5);
+    for (const { dissonance, harmonicity } of result[0]?.modeDualHistograms ?? []) {
+      expect(dissonance.length).toBe(5);
+      expect(harmonicity.length).toBe(5);
+    }
+  });
+
+  it('returns empty array for empty family', () => {
+    const result = tuningFamilyDualHistograms([]);
+    expect(result).toEqual([]);
   });
 });

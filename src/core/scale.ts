@@ -6551,6 +6551,205 @@ export function tuningModeDissonanceHistograms(
 }
 
 // ---------------------------------------------------------------------------
+// Q384 — chordMapHarmonicityHistogram
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a histogram of normalized harmonicity distribution from a chord map.
+ *
+ * Socratic Q384: "If I can build a dissonance histogram from normalized scores, can I build a
+ * harmonicity histogram the same way?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapNormalizedScores(chordMap)` → `.map(e => e.normalizedHarmonicity)`.
+ * 2. `bins` defaults to 10. Histogram is `bins`-length array, all 0.
+ * 3. For each value v (0..1): `idx = Math.min(Math.floor(v * bins), bins - 1)`. Increment histogram[idx].
+ * 4. Return histogram as `number[]`.
+ * If chordMap has no entries, return `Array(bins).fill(0)`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param bins     - Number of histogram bins (default 10).
+ * @returns `number[]` of length `bins` where each value is the count of chords in that harmonicity bucket.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const cm = scaleToChordMap(scale, t12);
+ * const hist = chordMapHarmonicityHistogram(cm);
+ * console.log(hist); // [count0, count1, ..., count9]
+ */
+export function chordMapHarmonicityHistogram(
+  chordMap: readonly ScaleChordMapEntry[],
+  bins = 10,
+): number[] {
+  const histogram = Array.from({ length: bins }, () => 0) as number[];
+  if (chordMap.length === 0) return histogram;
+  const scores = chordMapNormalizedScores(chordMap);
+  for (const { normalizedHarmonicity } of scores) {
+    const idx = Math.min(Math.floor(normalizedHarmonicity * bins), bins - 1);
+    histogram[idx] = (histogram[idx] ?? 0) + 1;
+  }
+  return histogram;
+}
+
+// ---------------------------------------------------------------------------
+// Q385 — tuningModeHarmonicityHistograms
+// ---------------------------------------------------------------------------
+
+/**
+ * Get harmonicity histograms for every mode of a tuning in one call.
+ *
+ * Socratic Q385: "If I can build a harmonicity histogram for one chord map, can I get histograms
+ * for every mode at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleModeSeries(tuningToScale(tuning), tuning)` → all modal rotations.
+ * 2. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapHarmonicityHistogram(chordMap, bins)`.
+ *
+ * @param tuning - The tuning system whose modes to process.
+ * @param bins   - Number of histogram bins (default 10).
+ * @returns Array of `{mode, histogram}`, one per mode, in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const hists = tuningModeHarmonicityHistograms(t12);
+ * for (const { mode, histogram } of hists) {
+ *   console.log(mode.id, histogram);
+ * }
+ */
+export function tuningModeHarmonicityHistograms(
+  tuning: TuningSystem,
+  bins = 10,
+): { mode: Scale; histogram: number[] }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const histogram = chordMapHarmonicityHistogram(chordMap, bins);
+    return { mode, histogram };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q386 — chordMapDualHistogram
+// ---------------------------------------------------------------------------
+
+/**
+ * Build dissonance and harmonicity histograms from a chord map in one pass.
+ *
+ * Socratic Q386: "If I can build dissonance and harmonicity histograms separately, can I get both
+ * at once in one call?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `chordMapNormalizedScores(chordMap)` → all normalized scores.
+ * 2. Single pass: for each entry, bin `normalizedDissonance` and `normalizedHarmonicity` simultaneously.
+ * 3. Return `{ dissonance, harmonicity }` each of length `bins`.
+ * If chordMap has no entries, return two zero arrays of length `bins`.
+ *
+ * @param chordMap - Diatonic chord map (e.g. from `scaleToChordMap`).
+ * @param bins     - Number of histogram bins (default 10).
+ * @returns `{ dissonance: number[], harmonicity: number[] }` each of length `bins`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const scale = tuningToScale(t12);
+ * const cm = scaleToChordMap(scale, t12);
+ * const { dissonance, harmonicity } = chordMapDualHistogram(cm);
+ * console.log(dissonance, harmonicity);
+ */
+export function chordMapDualHistogram(
+  chordMap: readonly ScaleChordMapEntry[],
+  bins = 10,
+): { dissonance: number[]; harmonicity: number[] } {
+  const dissonance = Array.from({ length: bins }, () => 0) as number[];
+  const harmonicity = Array.from({ length: bins }, () => 0) as number[];
+  if (chordMap.length === 0) return { dissonance, harmonicity };
+  const scores = chordMapNormalizedScores(chordMap);
+  for (const { normalizedDissonance, normalizedHarmonicity } of scores) {
+    const dIdx = Math.min(Math.floor(normalizedDissonance * bins), bins - 1);
+    const hIdx = Math.min(Math.floor(normalizedHarmonicity * bins), bins - 1);
+    dissonance[dIdx] = (dissonance[dIdx] ?? 0) + 1;
+    harmonicity[hIdx] = (harmonicity[hIdx] ?? 0) + 1;
+  }
+  return { dissonance, harmonicity };
+}
+
+// ---------------------------------------------------------------------------
+// Q387 — tuningModeDualHistograms
+// ---------------------------------------------------------------------------
+
+/**
+ * Get dual dissonance+harmonicity histograms for every mode of a tuning in one call.
+ *
+ * Socratic Q387: "If I can get dual histogram for one chord map, can I get it for every mode at
+ * once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleModeSeries(tuningToScale(tuning), tuning)` → all modal rotations.
+ * 2. For each mode: `scaleToChordMap(mode, tuning)` → `chordMapDualHistogram(chordMap, bins)`.
+ *
+ * @param tuning - The tuning system whose modes to process.
+ * @param bins   - Number of histogram bins (default 10).
+ * @returns Array of `{mode, dissonance, harmonicity}`, one per mode, in allModes order.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const hists = tuningModeDualHistograms(t12);
+ * for (const { mode, dissonance, harmonicity } of hists) {
+ *   console.log(mode.id, dissonance, harmonicity);
+ * }
+ */
+export function tuningModeDualHistograms(
+  tuning: TuningSystem,
+  bins = 10,
+): { mode: Scale; dissonance: number[]; harmonicity: number[] }[] {
+  const scale = tuningToScale(tuning);
+  const modes = scaleModeSeries(scale, tuning);
+  return modes.map((mode) => {
+    const chordMap = scaleToChordMap(mode, tuning);
+    const { dissonance, harmonicity } = chordMapDualHistogram(chordMap, bins);
+    return { mode, dissonance, harmonicity };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q389 — tuningFamilyDualHistograms
+// ---------------------------------------------------------------------------
+
+/**
+ * Get dual dissonance+harmonicity histograms for all modes of every tuning in a family.
+ *
+ * Socratic Q389: "If I can get dual histograms for all modes of one tuning, can I do it for an
+ * entire family?" → No → implement.
+ *
+ * Algorithm:
+ * tunings.map(t → `{id: t.id, modeDualHistograms: tuningModeDualHistograms(t, bins)}`).
+ *
+ * @param tunings - Array of tuning systems to analyse.
+ * @param bins    - Number of histogram bins (default 10).
+ * @returns Array of `{id, modeDualHistograms}`, one per tuning.
+ *
+ * @example
+ * const family = [equalTemperament12(440), edo(19, 440)];
+ * const result = tuningFamilyDualHistograms(family);
+ * for (const { id, modeDualHistograms } of result) {
+ *   console.log(id, modeDualHistograms.length);
+ * }
+ */
+export function tuningFamilyDualHistograms(
+  tunings: readonly TuningSystem[],
+  bins = 10,
+): {
+  id: string;
+  modeDualHistograms: { mode: Scale; dissonance: number[]; harmonicity: number[] }[];
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    modeDualHistograms: tuningModeDualHistograms(t, bins),
+  }));
+}
+
+// ---------------------------------------------------------------------------
 // Q365 — tuningModeProgressionFullBundles
 // ---------------------------------------------------------------------------
 
