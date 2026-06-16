@@ -17,6 +17,7 @@ import {
   chordMapNormalizedScores,
   chordMapEntropyScore,
   chordMapRankedBundle,
+  chordMapVolatilityBundle,
 } from '../core/scale.js';
 import { type Spectrum } from '../core/spectrum.js';
 import { writeTun } from './tun.js';
@@ -763,4 +764,48 @@ export function scaleRankedBundle(
     rootHz,
   );
   return { scl, spectralRanking, normalizedScores, entropy, consistency };
+}
+
+// ---------------------------------------------------------------------------
+// Q307 — scaleVolatilityBundle
+// ---------------------------------------------------------------------------
+
+/**
+ * Export a scale as SCL text bundled with its volatility, entropy, and consistency
+ * scores in one call.
+ *
+ * Socratic Q307: "If I can get volatility bundle for a chord map and SCL text for a scale,
+ * can I get both at once?" → No → implement.
+ *
+ * Algorithm:
+ * 1. `scaleToChordMap(scale, tuning)` → diatonic chord map.
+ * 2. `scaleToSubsetSclText(scale, tuning, name)` → `.scl` text string.
+ * 3. `chordMapVolatilityBundle(chordMap, spectrum, rootHz)` → `{ volatility, entropy, consistency }`.
+ *
+ * @param scale    - The parent scale (must be compatible with `tuning`).
+ * @param tuning   - The parent `TuningSystem`.
+ * @param spectrum - Optional instrument spectrum for dissonance computation.
+ * @param rootHz   - Root frequency in Hz (default 440 Hz).
+ * @param name     - Optional description for the `.scl` header. Defaults to `scale.name`.
+ * @returns `{ scl, volatility, entropy, consistency }`.
+ *
+ * @throws {RangeError} if `scale` is incompatible with `tuning`.
+ *
+ * @example
+ * const t12 = equalTemperament12(440);
+ * const major: Scale = { id: 'major', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0,2,4,5,7,9,11] };
+ * const { scl, volatility, entropy, consistency } = scaleVolatilityBundle(major, t12);
+ * // scl contains '!'; volatility >= 0; entropy >= 0; consistency > 0
+ */
+export function scaleVolatilityBundle(
+  scale: Scale,
+  tuning: TuningSystem,
+  spectrum?: Spectrum,
+  rootHz?: number,
+  name?: string,
+): { scl: string; volatility: number; entropy: number; consistency: number } {
+  const chordMap = scaleToChordMap(scale, tuning);
+  const scl = scaleToSubsetSclText(scale, tuning, name);
+  const { volatility, entropy, consistency } = chordMapVolatilityBundle(chordMap, spectrum, rootHz);
+  return { scl, volatility, entropy, consistency };
 }

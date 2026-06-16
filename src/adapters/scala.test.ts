@@ -21,6 +21,7 @@ import {
   scaleConsistencyBundle,
   scaleEntropyBundle,
   scaleRankedBundle,
+  scaleVolatilityBundle,
 } from './scala.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
 import { chordToMpe, DEFAULT_MPE } from './mpe.js';
@@ -900,5 +901,46 @@ describe('scaleRankedBundle (Q303)', () => {
   it('works with optional rootHz and name', () => {
     const bundle = scaleRankedBundle(scale, t12, harmonicSpectrum(), 261.63, 'Test Scale');
     expect(bundle.scl).toContain('Test Scale');
+  });
+});
+
+describe('scaleVolatilityBundle (Q307)', () => {
+  const t12 = equalTemperament12(440);
+  const scale: Scale = {
+    id: 'major',
+    name: 'Major',
+    tuningId: t12.id,
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('returns scl, volatility, entropy, consistency', () => {
+    const bundle = scaleVolatilityBundle(scale, t12);
+    expect(typeof bundle.scl).toBe('string');
+    expect(bundle.scl).toContain('!');
+    expect(typeof bundle.volatility).toBe('number');
+    expect(typeof bundle.entropy).toBe('number');
+    expect(typeof bundle.consistency).toBe('number');
+  });
+  it('volatility and entropy are non-negative', () => {
+    const bundle = scaleVolatilityBundle(scale, t12);
+    expect(bundle.volatility).toBeGreaterThanOrEqual(0);
+    expect(bundle.entropy).toBeGreaterThanOrEqual(0);
+  });
+  it('consistency is in (0, 1]', () => {
+    const bundle = scaleVolatilityBundle(scale, t12);
+    expect(bundle.consistency).toBeGreaterThan(0);
+    expect(bundle.consistency).toBeLessThanOrEqual(1);
+  });
+  it('scl contains scale name when name omitted', () => {
+    const bundle = scaleVolatilityBundle(scale, t12);
+    expect(bundle.scl).toContain('Major');
+  });
+  it('scl contains custom name when provided', () => {
+    const bundle = scaleVolatilityBundle(scale, t12, undefined, undefined, 'Custom');
+    expect(bundle.scl).toContain('Custom');
+  });
+  it('accepts optional spectrum and rootHz', () => {
+    const bundle = scaleVolatilityBundle(scale, t12, harmonicSpectrum(), 261.63);
+    expect(Number.isFinite(bundle.volatility)).toBe(true);
   });
 });
