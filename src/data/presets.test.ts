@@ -68,6 +68,9 @@ import {
   presetIntervalDiversityVsEntropy,
   presetModeParetoFront,
   presetModeCorrelationMatrix,
+  presetParetoFrontBestMode,
+  presetModeTopCorrelation,
+  presetModeAntiCorrelation,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -2209,5 +2212,87 @@ describe('presetModeCorrelationMatrix (Q430)', () => {
     const spec = harmonicSpectrum(6);
     const { metrics } = presetModeCorrelationMatrix('12-tet', spec);
     expect(metrics.length).toBe(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q433 — presetParetoFrontBestMode
+// ---------------------------------------------------------------------------
+
+describe('presetParetoFrontBestMode (Q433)', () => {
+  it('returns best Pareto mode with score', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetParetoFrontBestMode('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.mode.id).toBe('string');
+    expect(typeof result.score).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetParetoFrontBestMode('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('uses ALL_PRESETS when no pool provided', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetParetoFrontBestMode('12-tet', spec);
+    expect(result.mode).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q436 — presetModeTopCorrelation
+// ---------------------------------------------------------------------------
+
+describe('presetModeTopCorrelation (Q436)', () => {
+  it('returns top correlation pair', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeTopCorrelation('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.metricA).toBe('string');
+    expect(typeof result.metricB).toBe('string');
+    expect(typeof result.correlation).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeTopCorrelation('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeTopCorrelation('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.correlation).toBeGreaterThanOrEqual(-1 - 1e-10);
+    expect(result.correlation).toBeLessThanOrEqual(1 + 1e-10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q437 — presetModeAntiCorrelation
+// ---------------------------------------------------------------------------
+
+describe('presetModeAntiCorrelation (Q437)', () => {
+  it('returns anti-correlation pair', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAntiCorrelation('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.metricA).toBe('string');
+    expect(typeof result.metricB).toBe('string');
+    expect(typeof result.correlation).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeAntiCorrelation('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAntiCorrelation('12-tet', spec, 261.63, [TWELVE_TET]);
+    expect(result.correlation).toBeGreaterThanOrEqual(-1 - 1e-10);
+    expect(result.correlation).toBeLessThanOrEqual(1 + 1e-10);
   });
 });

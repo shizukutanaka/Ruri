@@ -62,6 +62,9 @@ import {
   tuningIntervalDiversityVsEntropy,
   tuningModeParetoFront,
   tuningModeCorrelationMatrix,
+  tuningParetoFrontBestMode,
+  tuningModeTopCorrelation,
+  tuningModeAntiCorrelation,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -3471,4 +3474,147 @@ export function presetModeCorrelationMatrix(
   return rootHz !== undefined
     ? tuningModeCorrelationMatrix(tuning, spectrum, rootHz)
     : tuningModeCorrelationMatrix(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q433 — presetParetoFrontBestMode
+// ---------------------------------------------------------------------------
+
+/**
+ * Pick the single best mode from the Pareto front for a preset in one call.
+ *
+ * Socratic Q433: "If I can find the best Pareto-front mode for a tuning, can I do it for a
+ * preset by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningParetoFrontBestMode(tuning, spectrum, rootHz)` → best mode with score.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns The best Pareto-front mode with all five metrics and composite score.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const best = presetParetoFrontBestMode('12-tet', spec);
+ * console.log(best.mode.id, best.score);
+ */
+export function presetParetoFrontBestMode(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): {
+  mode: Scale;
+  entropy: number;
+  consistency: number;
+  volatility: number;
+  diversity: number;
+  smoothnessRatio: number;
+  score: number;
+} {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetParetoFrontBestMode: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningParetoFrontBestMode(tuning, spectrum, rootHz)
+    : tuningParetoFrontBestMode(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q436 — presetModeTopCorrelation
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the metric pair with the highest positive Pearson r for a preset in one call.
+ *
+ * Socratic Q436: "If I can find the top correlation pair for a tuning, can I do it for a preset
+ * by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningModeTopCorrelation(tuning, spectrum, rootHz)` → top pair.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{metricA, metricB, correlation}` for the most positively correlated pair.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { metricA, metricB, correlation } = presetModeTopCorrelation('12-tet', spec);
+ * console.log(metricA, metricB, correlation);
+ */
+export function presetModeTopCorrelation(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { metricA: string; metricB: string; correlation: number } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeTopCorrelation: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeTopCorrelation(tuning, spectrum, rootHz)
+    : tuningModeTopCorrelation(tuning, spectrum);
+}
+
+// ---------------------------------------------------------------------------
+// Q437 — presetModeAntiCorrelation
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the metric pair with the strongest negative Pearson r for a preset in one call.
+ *
+ * Socratic Q437: "If I can find the anti-correlation pair for a tuning, can I do it for a preset
+ * by id?" → No → implement.
+ *
+ * Algorithm:
+ * 1. Find preset by id; throw `RangeError` if not found.
+ * 2. Load tuning via `loadTuningPreset`.
+ * 3. `tuningModeAntiCorrelation(tuning, spectrum, rootHz)` → anti-correlation pair.
+ *
+ * @param presetId - Id of the preset to analyse.
+ * @param spectrum - Instrument spectrum for timbre-aware analysis.
+ * @param rootHz   - Root frequency in Hz (default 440).
+ * @param presets  - Optional preset pool (defaults to `ALL_PRESETS`).
+ * @returns `{metricA, metricB, correlation}` for the most negatively correlated pair.
+ *
+ * @throws {RangeError} if the preset id is not found.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * const { metricA, metricB, correlation } = presetModeAntiCorrelation('12-tet', spec);
+ * console.log(metricA, metricB, correlation);
+ */
+export function presetModeAntiCorrelation(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets?: readonly TuningPreset[],
+): { metricA: string; metricB: string; correlation: number } {
+  const pool = presets ?? ALL_PRESETS;
+  const preset = pool.find((p) => p.id === presetId);
+  if (preset === undefined) {
+    throw new RangeError('presetModeAntiCorrelation: preset not found: ' + presetId);
+  }
+  const tuning = loadTuningPreset(preset);
+  return rootHz !== undefined
+    ? tuningModeAntiCorrelation(tuning, spectrum, rootHz)
+    : tuningModeAntiCorrelation(tuning, spectrum);
 }
