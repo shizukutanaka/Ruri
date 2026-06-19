@@ -110,6 +110,7 @@ import {
   tuningQuadrantCoverageNarrative,
   tuningDominantQuadrantProfile,
   tuningQuadrantProfileDiversity,
+  tuningQuadrantProfileDiversityNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4966,4 +4967,19 @@ export function presetQuadrantProfileDiversity(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningQuadrantProfileDiversity(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q577 — presetQuadrantProfileDiversityNarrative
+// ---------------------------------------------------------------------------
+
+export function presetQuadrantProfileDiversityNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningQuadrantProfileDiversityNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningQuadrantProfileDiversityNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }

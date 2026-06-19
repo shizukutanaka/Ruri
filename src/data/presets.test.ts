@@ -117,6 +117,7 @@ import {
   presetQuadrantCoverageNarrative,
   presetDominantQuadrantProfile,
   presetQuadrantProfileDiversity,
+  presetQuadrantProfileDiversityNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3422,6 +3423,26 @@ describe('presetQuadrantProfileDiversity (Q574)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetQuadrantProfileDiversity('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q577 — presetQuadrantProfileDiversityNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetQuadrantProfileDiversityNarrative (Q577)', () => {
+  it('returns diversity narrative for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetQuadrantProfileDiversityNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetQuadrantProfileDiversityNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
