@@ -13441,3 +13441,84 @@ export function tuningFamilyAmbassadorConvergenceScore(
   const convergenceScore = totalPairs > 0 ? samePairs / totalPairs : 0;
   return { samePairs, totalPairs, convergenceScore };
 }
+
+// ---------------------------------------------------------------------------
+// Q684 — tuningFamilyMostSimilarAmbassadorPair
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostSimilarAmbassadorPair(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilyAmbassadorSimilarityMatrix>[number] | null {
+  const matrix = tuningFamilyAmbassadorSimilarityMatrix(tunings, spectrum, rootHz);
+  if (matrix.length === 0) return null;
+  const bothMatch = matrix.find((p) => p.sameProfile && p.sameConsensus);
+  if (bothMatch !== undefined) return bothMatch;
+  const profileMatch = matrix.find((p) => p.sameProfile);
+  if (profileMatch !== undefined) return profileMatch;
+  return matrix[0] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Q685 — tuningFamilyLeastSimilarAmbassadorPair
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyLeastSimilarAmbassadorPair(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilyAmbassadorSimilarityMatrix>[number] | null {
+  const matrix = tuningFamilyAmbassadorSimilarityMatrix(tunings, spectrum, rootHz);
+  if (matrix.length === 0) return null;
+  const neitherMatch = matrix.find((p) => !p.sameProfile && !p.sameConsensus);
+  if (neitherMatch !== undefined) return neitherMatch;
+  const noProfileMatch = matrix.find((p) => !p.sameProfile);
+  if (noProfileMatch !== undefined) return noProfileMatch;
+  return matrix[matrix.length - 1] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Q686 — tuningFamilyAmbassadorConvergenceScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConvergenceScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  convergenceScore: ReturnType<typeof tuningFamilyAmbassadorConvergenceScore>;
+  convergenceNarrative: string;
+} {
+  const convergenceScore = tuningFamilyAmbassadorConvergenceScore(tunings, spectrum, rootHz);
+  let convergenceNarrative: string;
+  if (convergenceScore.totalPairs === 0) {
+    convergenceNarrative = 'No pairs to compare.';
+  } else {
+    convergenceNarrative = `Ambassador convergence: ${convergenceScore.samePairs}/${convergenceScore.totalPairs} pairs share the same profile (convergence score: ${(convergenceScore.convergenceScore * 100).toFixed(0)}%).`;
+    if (convergenceScore.convergenceScore >= 0.75) {
+      convergenceNarrative += ' Strong convergence — tunings share ambassador character.';
+    } else if (convergenceScore.convergenceScore >= 0.4) {
+      convergenceNarrative += ' Moderate convergence.';
+    } else {
+      convergenceNarrative += ' Low convergence — tunings have distinct ambassador characters.';
+    }
+  }
+  return { convergenceScore, convergenceNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q688 — tuningFamilyAmbassadorConsensusConvergenceScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConsensusConvergenceScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { samePairs: number; totalPairs: number; convergenceScore: number } {
+  const matrix = tuningFamilyAmbassadorSimilarityMatrix(tunings, spectrum, rootHz);
+  const totalPairs = matrix.length;
+  const samePairs = matrix.filter((p) => p.sameConsensus).length;
+  const convergenceScore = totalPairs > 0 ? samePairs / totalPairs : 0;
+  return { samePairs, totalPairs, convergenceScore };
+}
