@@ -14044,3 +14044,100 @@ export function tuningFamilySocraticProfiles(
     socraticProfile: tuningSocraticProfile(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q732 — tuningFamilySocraticProfileNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticProfileNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; socraticNarrative: string }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    socraticNarrative: tuningSocraticProfileNarrative(t, spectrum, rootHz).socraticNarrative,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q734 — tuningFamilySocraticComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticComparison(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mostDiverse: string | null;
+  leastDiverse: string | null;
+  mostUnique: string | null;
+  mostVersatile: string | null;
+} {
+  const profiles = tuningFamilySocraticProfiles(tunings, spectrum, rootHz);
+  if (profiles.length === 0) {
+    return { mostDiverse: null, leastDiverse: null, mostUnique: null, mostVersatile: null };
+  }
+
+  const mostDiverse = profiles.reduce((best, cur) =>
+    cur.socraticProfile.profileDiversity.normalized >
+    best.socraticProfile.profileDiversity.normalized
+      ? cur
+      : best,
+  ).id;
+
+  const leastDiverse = profiles.reduce((best, cur) =>
+    cur.socraticProfile.profileDiversity.normalized <
+    best.socraticProfile.profileDiversity.normalized
+      ? cur
+      : best,
+  ).id;
+
+  const mostUnique = profiles.reduce((best, cur) =>
+    cur.socraticProfile.soloRatio.soloRatio > best.socraticProfile.soloRatio.soloRatio ? cur : best,
+  ).id;
+
+  const versatileEntry = profiles.find(
+    (p) => p.socraticProfile.ambassador.consensus === 'versatile',
+  );
+  const mostVersatile = versatileEntry !== undefined ? versatileEntry.id : null;
+
+  return { mostDiverse, leastDiverse, mostUnique, mostVersatile };
+}
+
+// ---------------------------------------------------------------------------
+// Q736 — tuningFamilySocraticComparisonNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticComparisonNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  comparison: ReturnType<typeof tuningFamilySocraticComparison>;
+  comparisonNarrative: string;
+} {
+  const comparison = tuningFamilySocraticComparison(tunings, spectrum, rootHz);
+  const { mostDiverse, leastDiverse, mostUnique, mostVersatile } = comparison;
+
+  if (
+    mostDiverse === null &&
+    leastDiverse === null &&
+    mostUnique === null &&
+    mostVersatile === null
+  ) {
+    return { comparison, comparisonNarrative: 'No tunings to compare.' };
+  }
+
+  const lines: string[] = [`Family comparison (${tunings.length} tunings):`];
+  if (mostDiverse !== null) lines.push(`  Most diverse: ${mostDiverse}.`);
+  if (leastDiverse !== null) lines.push(`  Least diverse: ${leastDiverse}.`);
+  if (mostUnique !== null) lines.push(`  Most unique modes: ${mostUnique}.`);
+  if (mostVersatile !== null) {
+    lines.push(`  Most versatile ambassador: ${mostVersatile}.`);
+  } else {
+    lines.push('  No versatile ambassadors found.');
+  }
+
+  return { comparison, comparisonNarrative: lines.join('\n') };
+}

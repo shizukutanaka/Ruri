@@ -387,6 +387,9 @@ import {
   tuningSocraticProfile,
   tuningSocraticProfileNarrative,
   tuningFamilySocraticProfiles,
+  tuningFamilySocraticProfileNarratives,
+  tuningFamilySocraticComparison,
+  tuningFamilySocraticComparisonNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -13192,5 +13195,85 @@ describe('tuningFamilySocraticProfiles (Q730)', () => {
   it('returns empty array for empty tunings', () => {
     const spec = harmonicSpectrum(6);
     expect(tuningFamilySocraticProfiles([], spec)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q732 — tuningFamilySocraticProfileNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticProfileNarratives (Q732)', () => {
+  it('returns one narrative per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilySocraticProfileNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.socraticNarrative).toBe('string');
+      expect(r.socraticNarrative.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('returns empty array for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilySocraticProfileNarratives([], spec)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q734 — tuningFamilySocraticComparison
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticComparison (Q734)', () => {
+  it('returns comparison with four fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticComparison([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(typeof result.mostDiverse === 'string' || result.mostDiverse === null).toBe(true);
+    expect(typeof result.leastDiverse === 'string' || result.leastDiverse === null).toBe(true);
+    expect(typeof result.mostUnique === 'string' || result.mostUnique === null).toBe(true);
+    // mostVersatile can be null
+  });
+
+  it('returns all nulls for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticComparison([], spec);
+    expect(result.mostDiverse).toBeNull();
+    expect(result.leastDiverse).toBeNull();
+    expect(result.mostUnique).toBeNull();
+    expect(result.mostVersatile).toBeNull();
+  });
+
+  it('mostDiverse and leastDiverse are valid tuning IDs', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440)];
+    const result = tuningFamilySocraticComparison(tunings, spec);
+    const ids = tunings.map((t) => t.id);
+    if (result.mostDiverse) expect(ids).toContain(result.mostDiverse);
+    if (result.leastDiverse) expect(ids).toContain(result.leastDiverse);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q736 — tuningFamilySocraticComparisonNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticComparisonNarrative (Q736)', () => {
+  it('returns comparison and comparisonNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticComparisonNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.comparisonNarrative).toBe('string');
+    expect(result.comparisonNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticComparisonNarrative([], spec);
+    expect(result.comparisonNarrative).toContain('No tunings');
+  });
+
+  it('narrative contains Family comparison header', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticComparisonNarrative([t12, edo(19, 440)], spec);
+    expect(result.comparisonNarrative).toContain('Family comparison');
   });
 });
