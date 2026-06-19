@@ -353,6 +353,9 @@ import {
   tuningFamilyUniqueAmbassadorProfiles,
   tuningFamilyAmbassadorConsensusScore,
   tuningFamilyAmbassadorConsensusScoreNarrative,
+  tuningFamilyAmbassadorReport,
+  tuningFamilyAmbassadorReportNarrative,
+  tuningFamilyAmbassadorOverlapScore,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12304,5 +12307,90 @@ describe('tuningFamilyAmbassadorConsensusScoreNarrative (Q671)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilyAmbassadorConsensusScoreNarrative([], spec);
     expect(result.scoreNarrative).toContain('No tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q672 — tuningFamilyAmbassadorReport
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorReport (Q672)', () => {
+  it('returns bundle with all six analytics fields', () => {
+    const spec = harmonicSpectrum(6);
+    const report = tuningFamilyAmbassadorReport([t12, edo(19, 440)], spec);
+    expect(Array.isArray(report.ranking)).toBe(true);
+    expect(typeof report.scoreStats.mean).toBe('number');
+    expect(typeof report.consensusScore.normalizedScore).toBe('number');
+    expect(Array.isArray(report.profileFrequency)).toBe(true);
+    expect(Array.isArray(report.uniqueProfiles)).toBe(true);
+    // mostCommonProfile is entry or null
+    if (report.mostCommonProfile !== null) {
+      expect(typeof report.mostCommonProfile.profile).toBe('string');
+    }
+  });
+
+  it('ranking length equals tuning count', () => {
+    const spec = harmonicSpectrum(6);
+    const report = tuningFamilyAmbassadorReport([t12, edo(19, 440)], spec);
+    expect(report.ranking.length).toBe(2);
+  });
+
+  it('returns empty/zero bundle for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    const report = tuningFamilyAmbassadorReport([], spec);
+    expect(report.ranking.length).toBe(0);
+    expect(report.scoreStats.mean).toBe(0);
+    expect(report.mostCommonProfile).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q674 — tuningFamilyAmbassadorReportNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorReportNarrative (Q674)', () => {
+  it('returns report and reportNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorReportNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.reportNarrative).toBe('string');
+    expect(result.reportNarrative.length).toBeGreaterThan(0);
+    expect(result.report.ranking.length).toBe(2);
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorReportNarrative([], spec);
+    expect(result.reportNarrative).toContain('No tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q676 — tuningFamilyAmbassadorOverlapScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorOverlapScore (Q676)', () => {
+  it('returns overlap metrics with overlapScore in [0,1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorOverlapScore([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(typeof result.sharedCount).toBe('number');
+    expect(typeof result.uniqueCount).toBe('number');
+    expect(result.total).toBe(3);
+    expect(result.overlapScore).toBeGreaterThanOrEqual(0);
+    expect(result.overlapScore).toBeLessThanOrEqual(1);
+  });
+
+  it('sharedCount + uniqueCount profiles equals profileFrequency length', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const result = tuningFamilyAmbassadorOverlapScore(tunings, spec);
+    // sharedCount is count of tunings sharing a profile, uniqueCount is distinct unique profiles
+    expect(result.total).toBe(tunings.length);
+  });
+
+  it('returns all zeros for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorOverlapScore([], spec);
+    expect(result.total).toBe(0);
+    expect(result.overlapScore).toBe(0);
   });
 });

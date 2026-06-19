@@ -13255,3 +13255,87 @@ export function tuningFamilyAmbassadorConsensusScoreNarrative(
   }
   return { consensusScore, scoreNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q672 — tuningFamilyAmbassadorReport
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorReport(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  ranking: ReturnType<typeof tuningFamilyAmbassadorRanking>;
+  scoreStats: ReturnType<typeof tuningFamilyAmbassadorScoreStats>;
+  consensusScore: ReturnType<typeof tuningFamilyAmbassadorConsensusScore>;
+  profileFrequency: ReturnType<typeof tuningFamilyAmbassadorProfileFrequency>;
+  mostCommonProfile: ReturnType<typeof tuningFamilyMostCommonAmbassadorProfile>;
+  uniqueProfiles: ReturnType<typeof tuningFamilyUniqueAmbassadorProfiles>;
+} {
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  const scoreStats = tuningFamilyAmbassadorScoreStats(tunings, spectrum, rootHz);
+  const consensusScore = tuningFamilyAmbassadorConsensusScore(tunings, spectrum, rootHz);
+  const profileFrequency = tuningFamilyAmbassadorProfileFrequency(tunings, spectrum, rootHz);
+  const mostCommonProfile = tuningFamilyMostCommonAmbassadorProfile(tunings, spectrum, rootHz);
+  const uniqueProfiles = tuningFamilyUniqueAmbassadorProfiles(tunings, spectrum, rootHz);
+  return {
+    ranking,
+    scoreStats,
+    consensusScore,
+    profileFrequency,
+    mostCommonProfile,
+    uniqueProfiles,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q674 — tuningFamilyAmbassadorReportNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorReportNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { report: ReturnType<typeof tuningFamilyAmbassadorReport>; reportNarrative: string } {
+  const report = tuningFamilyAmbassadorReport(tunings, spectrum, rootHz);
+  const { statsNarrative } = tuningFamilyAmbassadorScoreStatsNarrative(tunings, spectrum, rootHz);
+  const { scoreNarrative } = tuningFamilyAmbassadorConsensusScoreNarrative(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  let reportNarrative: string;
+  if (tunings.length === 0) {
+    reportNarrative = 'No tunings in family.';
+  } else {
+    reportNarrative = `Ambassador family report (${tunings.length} tunings): ${scoreNarrative} ${statsNarrative}`;
+    if (report.uniqueProfiles.length > 0) {
+      reportNarrative += ` ${report.uniqueProfiles.length} tuning(s) have unique ambassador profiles.`;
+    }
+  }
+  return { report, reportNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q676 — tuningFamilyAmbassadorOverlapScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorOverlapScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { sharedCount: number; uniqueCount: number; total: number; overlapScore: number } {
+  const freq = tuningFamilyAmbassadorProfileFrequency(tunings, spectrum, rootHz);
+  let sharedCount = 0;
+  let uniqueCount = 0;
+  for (const entry of freq) {
+    if (entry.count > 1) {
+      sharedCount += entry.count;
+    } else {
+      uniqueCount++;
+    }
+  }
+  const total = tunings.length;
+  const overlapScore = total > 0 ? sharedCount / total : 0;
+  return { sharedCount, uniqueCount, total, overlapScore };
+}
