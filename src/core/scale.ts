@@ -13176,3 +13176,82 @@ export function tuningFamilyMostCommonAmbassadorProfile(
 ): { profile: string; count: number; tuningIds: string[] } | null {
   return tuningFamilyAmbassadorProfileFrequency(tunings, spectrum, rootHz)[0] ?? null;
 }
+
+// ---------------------------------------------------------------------------
+// Q666 — tuningFamilyLeastCommonAmbassadorProfile
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyLeastCommonAmbassadorProfile(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; count: number; tuningIds: string[] } | null {
+  const freq = tuningFamilyAmbassadorProfileFrequency(tunings, spectrum, rootHz);
+  return freq[freq.length - 1] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Q668 — tuningFamilyUniqueAmbassadorProfiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyUniqueAmbassadorProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; tuningId: string }[] {
+  const freq = tuningFamilyAmbassadorProfileFrequency(tunings, spectrum, rootHz);
+  return freq
+    .filter((entry) => entry.count === 1)
+    .map((entry) => ({ profile: entry.profile, tuningId: entry.tuningIds[0]! }));
+}
+
+// ---------------------------------------------------------------------------
+// Q669 — tuningFamilyAmbassadorConsensusScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConsensusScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { score: number; maxScore: number; normalizedScore: number } {
+  const { versatile, balanced, specialized, total } = tuningFamilyAmbassadorConsensusDistribution(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const score = versatile * 2 + balanced * 1 + specialized * 0;
+  const maxScore = total * 2;
+  const normalizedScore = maxScore > 0 ? score / maxScore : 0;
+  return { score, maxScore, normalizedScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q671 — tuningFamilyAmbassadorConsensusScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConsensusScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  consensusScore: ReturnType<typeof tuningFamilyAmbassadorConsensusScore>;
+  scoreNarrative: string;
+} {
+  const consensusScore = tuningFamilyAmbassadorConsensusScore(tunings, spectrum, rootHz);
+  const { score, maxScore, normalizedScore } = consensusScore;
+  const total = maxScore / 2;
+  let scoreNarrative: string;
+  if (total === 0) {
+    scoreNarrative = 'No tunings to score.';
+  } else {
+    scoreNarrative = `Ambassador consensus score: ${score}/${maxScore} (${(normalizedScore * 100).toFixed(0)}%).`;
+    if (normalizedScore >= 0.75) {
+      scoreNarrative += ' The family is predominantly versatile.';
+    } else if (normalizedScore >= 0.4) {
+      scoreNarrative += ' The family shows mixed versatility.';
+    } else {
+      scoreNarrative += ' The family leans specialized.';
+    }
+  }
+  return { consensusScore, scoreNarrative };
+}
