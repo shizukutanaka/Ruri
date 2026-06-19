@@ -13522,3 +13522,90 @@ export function tuningFamilyAmbassadorConsensusConvergenceScore(
   const convergenceScore = totalPairs > 0 ? samePairs / totalPairs : 0;
   return { samePairs, totalPairs, convergenceScore };
 }
+
+// ---------------------------------------------------------------------------
+// Q690 — tuningFamilyAmbassadorConsensusConvergenceScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConsensusConvergenceScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  consensusConvergenceScore: ReturnType<typeof tuningFamilyAmbassadorConsensusConvergenceScore>;
+  consensusConvergenceNarrative: string;
+} {
+  const consensusConvergenceScore = tuningFamilyAmbassadorConsensusConvergenceScore(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  let consensusConvergenceNarrative: string;
+  if (consensusConvergenceScore.totalPairs === 0) {
+    consensusConvergenceNarrative = 'No pairs to compare.';
+  } else {
+    consensusConvergenceNarrative = `Consensus convergence: ${consensusConvergenceScore.samePairs}/${consensusConvergenceScore.totalPairs} pairs share the same ambassador consensus (${(consensusConvergenceScore.convergenceScore * 100).toFixed(0)}%).`;
+    if (consensusConvergenceScore.convergenceScore >= 0.75) {
+      consensusConvergenceNarrative += ' Tunings strongly agree on ambassador character type.';
+    } else if (consensusConvergenceScore.convergenceScore >= 0.4) {
+      consensusConvergenceNarrative += ' Moderate consensus alignment.';
+    } else {
+      consensusConvergenceNarrative += ' Tunings diverge in ambassador character type.';
+    }
+  }
+  return { consensusConvergenceScore, consensusConvergenceNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q692 — tuningFamilyAmbassadorConvergenceBundle
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConvergenceBundle(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  profileConvergence: ReturnType<typeof tuningFamilyAmbassadorConvergenceScore>;
+  consensusConvergence: ReturnType<typeof tuningFamilyAmbassadorConsensusConvergenceScore>;
+} {
+  return {
+    profileConvergence: tuningFamilyAmbassadorConvergenceScore(tunings, spectrum, rootHz),
+    consensusConvergence: tuningFamilyAmbassadorConsensusConvergenceScore(
+      tunings,
+      spectrum,
+      rootHz,
+    ),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q694 — tuningFamilyAmbassadorConvergenceBundleNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConvergenceBundleNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  bundle: ReturnType<typeof tuningFamilyAmbassadorConvergenceBundle>;
+  bundleNarrative: string;
+} {
+  const bundle = tuningFamilyAmbassadorConvergenceBundle(tunings, spectrum, rootHz);
+  let bundleNarrative: string;
+  if (tunings.length === 0) {
+    bundleNarrative = 'No tunings in family.';
+  } else {
+    const profileNarrative = tuningFamilyAmbassadorConvergenceScoreNarrative(
+      tunings,
+      spectrum,
+      rootHz,
+    ).convergenceNarrative;
+    const consensusNarrative = tuningFamilyAmbassadorConsensusConvergenceScoreNarrative(
+      tunings,
+      spectrum,
+      rootHz,
+    ).consensusConvergenceNarrative;
+    bundleNarrative = profileNarrative + ' ' + consensusNarrative;
+  }
+  return { bundle, bundleNarrative };
+}

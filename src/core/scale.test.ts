@@ -364,6 +364,9 @@ import {
   tuningFamilyLeastSimilarAmbassadorPair,
   tuningFamilyAmbassadorConvergenceScoreNarrative,
   tuningFamilyAmbassadorConsensusConvergenceScore,
+  tuningFamilyAmbassadorConsensusConvergenceScoreNarrative,
+  tuningFamilyAmbassadorConvergenceBundle,
+  tuningFamilyAmbassadorConvergenceBundleNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12589,5 +12592,70 @@ describe('tuningFamilyAmbassadorConsensusConvergenceScore (Q688)', () => {
     const spec = harmonicSpectrum(6);
     expect(tuningFamilyAmbassadorConsensusConvergenceScore([], spec).totalPairs).toBe(0);
     expect(tuningFamilyAmbassadorConsensusConvergenceScore([t12], spec).totalPairs).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q690 — tuningFamilyAmbassadorConsensusConvergenceScoreNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorConsensusConvergenceScoreNarrative (Q690)', () => {
+  it('returns consensusConvergenceScore and narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConsensusConvergenceScoreNarrative(
+      [t12, edo(19, 440)],
+      spec,
+    );
+    expect(typeof result.consensusConvergenceNarrative).toBe('string');
+    expect(result.consensusConvergenceNarrative.length).toBeGreaterThan(0);
+    expect(typeof result.consensusConvergenceScore.convergenceScore).toBe('number');
+  });
+
+  it('narrative for empty list says no pairs', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConsensusConvergenceScoreNarrative([], spec);
+    expect(result.consensusConvergenceNarrative).toContain('No pairs');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q692 — tuningFamilyAmbassadorConvergenceBundle
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorConvergenceBundle (Q692)', () => {
+  it('returns profileConvergence and consensusConvergence together', () => {
+    const spec = harmonicSpectrum(6);
+    const bundle = tuningFamilyAmbassadorConvergenceBundle([t12, edo(19, 440)], spec);
+    expect(typeof bundle.profileConvergence.convergenceScore).toBe('number');
+    expect(typeof bundle.consensusConvergence.convergenceScore).toBe('number');
+    expect(bundle.profileConvergence.totalPairs).toBe(1);
+    expect(bundle.consensusConvergence.totalPairs).toBe(1);
+  });
+
+  it('returns all-zero for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const bundle = tuningFamilyAmbassadorConvergenceBundle([], spec);
+    expect(bundle.profileConvergence.totalPairs).toBe(0);
+    expect(bundle.consensusConvergence.totalPairs).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q694 — tuningFamilyAmbassadorConvergenceBundleNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorConvergenceBundleNarrative (Q694)', () => {
+  it('returns bundle and bundleNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConvergenceBundleNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.bundleNarrative).toBe('string');
+    expect(result.bundleNarrative.length).toBeGreaterThan(0);
+    expect(typeof result.bundle.profileConvergence.convergenceScore).toBe('number');
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConvergenceBundleNarrative([], spec);
+    expect(result.bundleNarrative).toContain('No tunings');
   });
 });
