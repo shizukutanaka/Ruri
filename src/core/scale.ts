@@ -13339,3 +13339,105 @@ export function tuningFamilyAmbassadorOverlapScore(
   const overlapScore = total > 0 ? sharedCount / total : 0;
   return { sharedCount, uniqueCount, total, overlapScore };
 }
+
+// ---------------------------------------------------------------------------
+// Q678 — tuningFamilyAmbassadorOverlapScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorOverlapScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  overlapScore: ReturnType<typeof tuningFamilyAmbassadorOverlapScore>;
+  overlapNarrative: string;
+} {
+  const overlapScore = tuningFamilyAmbassadorOverlapScore(tunings, spectrum, rootHz);
+  let overlapNarrative: string;
+  if (overlapScore.total === 0) {
+    overlapNarrative = 'No tunings to compare.';
+  } else {
+    const { sharedCount, total } = overlapScore;
+    overlapNarrative = `Ambassador profile overlap: ${sharedCount}/${total} tunings share a profile with at least one other (overlap score: ${(overlapScore.overlapScore * 100).toFixed(0)}%).`;
+    if (overlapScore.overlapScore >= 0.75) {
+      overlapNarrative +=
+        ' High convergence — most tunings cluster around common ambassador profiles.';
+    } else if (overlapScore.overlapScore >= 0.4) {
+      overlapNarrative += ' Moderate overlap across the family.';
+    } else {
+      overlapNarrative += ' Most tunings have distinctive ambassador profiles.';
+    }
+  }
+  return { overlapScore, overlapNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q680 — tuningPairAmbassadorSimilarity
+// ---------------------------------------------------------------------------
+
+export function tuningPairAmbassadorSimilarity(
+  tuningA: TuningSystem,
+  tuningB: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profileA: string; profileB: string; sameProfile: boolean; sameConsensus: boolean } {
+  const ambassadorA = tuningModeAmbassador(tuningA, spectrum, rootHz);
+  const ambassadorB = tuningModeAmbassador(tuningB, spectrum, rootHz);
+  const profileA = ambassadorA.quadrantProfile;
+  const profileB = ambassadorB.quadrantProfile;
+  const sameProfile = profileA === profileB;
+  const sameConsensus = ambassadorA.consensus === ambassadorB.consensus;
+  return { profileA, profileB, sameProfile, sameConsensus };
+}
+
+// ---------------------------------------------------------------------------
+// Q681 — tuningFamilyAmbassadorSimilarityMatrix
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorSimilarityMatrix(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  idA: string;
+  idB: string;
+  profileA: string;
+  profileB: string;
+  sameProfile: boolean;
+  sameConsensus: boolean;
+}[] {
+  const result: {
+    idA: string;
+    idB: string;
+    profileA: string;
+    profileB: string;
+    sameProfile: boolean;
+    sameConsensus: boolean;
+  }[] = [];
+  for (let i = 0; i < tunings.length; i++) {
+    for (let j = i + 1; j < tunings.length; j++) {
+      const tA = tunings[i];
+      const tB = tunings[j];
+      if (!tA || !tB) continue;
+      const similarity = tuningPairAmbassadorSimilarity(tA, tB, spectrum, rootHz);
+      result.push({ idA: tA.id, idB: tB.id, ...similarity });
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q682 — tuningFamilyAmbassadorConvergenceScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConvergenceScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { samePairs: number; totalPairs: number; convergenceScore: number } {
+  const matrix = tuningFamilyAmbassadorSimilarityMatrix(tunings, spectrum, rootHz);
+  const totalPairs = matrix.length;
+  const samePairs = matrix.filter((p) => p.sameProfile).length;
+  const convergenceScore = totalPairs > 0 ? samePairs / totalPairs : 0;
+  return { samePairs, totalPairs, convergenceScore };
+}

@@ -356,6 +356,10 @@ import {
   tuningFamilyAmbassadorReport,
   tuningFamilyAmbassadorReportNarrative,
   tuningFamilyAmbassadorOverlapScore,
+  tuningFamilyAmbassadorOverlapScoreNarrative,
+  tuningPairAmbassadorSimilarity,
+  tuningFamilyAmbassadorSimilarityMatrix,
+  tuningFamilyAmbassadorConvergenceScore,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12392,5 +12396,99 @@ describe('tuningFamilyAmbassadorOverlapScore (Q676)', () => {
     const result = tuningFamilyAmbassadorOverlapScore([], spec);
     expect(result.total).toBe(0);
     expect(result.overlapScore).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q678 — tuningFamilyAmbassadorOverlapScoreNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorOverlapScoreNarrative (Q678)', () => {
+  it('returns overlapScore and overlapNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorOverlapScoreNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.overlapNarrative).toBe('string');
+    expect(result.overlapNarrative.length).toBeGreaterThan(0);
+    expect(typeof result.overlapScore.overlapScore).toBe('number');
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorOverlapScoreNarrative([], spec);
+    expect(result.overlapNarrative).toContain('No tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q680 — tuningPairAmbassadorSimilarity
+// ---------------------------------------------------------------------------
+
+describe('tuningPairAmbassadorSimilarity (Q680)', () => {
+  it('returns similarity between two tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningPairAmbassadorSimilarity(t12, edo(19, 440), spec);
+    expect(typeof result.profileA).toBe('string');
+    expect(typeof result.profileB).toBe('string');
+    expect(typeof result.sameProfile).toBe('boolean');
+    expect(typeof result.sameConsensus).toBe('boolean');
+  });
+
+  it('comparing a tuning with itself returns sameProfile = true', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningPairAmbassadorSimilarity(t12, t12, spec);
+    expect(result.sameProfile).toBe(true);
+    expect(result.sameConsensus).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q681 — tuningFamilyAmbassadorSimilarityMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorSimilarityMatrix (Q681)', () => {
+  it('returns n*(n-1)/2 pairs for n tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const matrix = tuningFamilyAmbassadorSimilarityMatrix(tunings, spec);
+    expect(matrix.length).toBe(3); // 3 choose 2 = 3
+    for (const entry of matrix) {
+      expect(typeof entry.idA).toBe('string');
+      expect(typeof entry.idB).toBe('string');
+      expect(typeof entry.sameProfile).toBe('boolean');
+    }
+  });
+
+  it('returns empty array for 0 or 1 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorSimilarityMatrix([], spec)).toEqual([]);
+    expect(tuningFamilyAmbassadorSimilarityMatrix([t12], spec)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q682 — tuningFamilyAmbassadorConvergenceScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorConvergenceScore (Q682)', () => {
+  it('returns samePairs/totalPairs/convergenceScore', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConvergenceScore([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.totalPairs).toBe(3);
+    expect(result.convergenceScore).toBeGreaterThanOrEqual(0);
+    expect(result.convergenceScore).toBeLessThanOrEqual(1);
+    expect(result.samePairs + (result.totalPairs - result.samePairs)).toBe(result.totalPairs);
+  });
+
+  it('self-comparison (same tuning twice) has convergenceScore 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConvergenceScore([t12, t12], spec);
+    expect(result.convergenceScore).toBe(1);
+  });
+
+  it('returns zero for 0 or 1 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const empty = tuningFamilyAmbassadorConvergenceScore([], spec);
+    expect(empty.totalPairs).toBe(0);
+    expect(empty.convergenceScore).toBe(0);
   });
 });
