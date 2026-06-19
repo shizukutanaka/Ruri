@@ -141,6 +141,8 @@ import {
   tuningFamilyAmbassadorOverlapScore,
   tuningFamilyAmbassadorOverlapScoreNarrative,
   tuningFamilyAmbassadorConvergenceScore,
+  tuningFamilyAmbassadorConvergenceScoreNarrative,
+  tuningFamilyAmbassadorConsensusConvergenceScore,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5504,4 +5506,40 @@ export function presetFamilyAmbassadorConvergenceScore(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorConvergenceScore(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q687 — presetFamilyAmbassadorConvergenceScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorConvergenceScoreNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorConvergenceScoreNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorConvergenceScoreNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q689 — presetFamilyAmbassadorConsensusConvergenceScore
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorConsensusConvergenceScore(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorConsensusConvergenceScore> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorConsensusConvergenceScore(tunings, spectrum, rootHz);
 }

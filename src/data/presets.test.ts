@@ -148,6 +148,8 @@ import {
   presetFamilyAmbassadorOverlapScore,
   presetFamilyAmbassadorOverlapScoreNarrative,
   presetFamilyAmbassadorConvergenceScore,
+  presetFamilyAmbassadorConvergenceScoreNarrative,
+  presetFamilyAmbassadorConsensusConvergenceScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4111,6 +4113,54 @@ describe('presetFamilyAmbassadorConvergenceScore (Q683)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilyAmbassadorConvergenceScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q687 — presetFamilyAmbassadorConvergenceScoreNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorConvergenceScoreNarrative (Q687)', () => {
+  it('returns convergence narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorConvergenceScoreNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.convergenceNarrative).toBe('string');
+    expect(result.convergenceNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorConvergenceScoreNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q689 — presetFamilyAmbassadorConsensusConvergenceScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorConsensusConvergenceScore (Q689)', () => {
+  it('returns consensus convergence score for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorConsensusConvergenceScore(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.convergenceScore).toBe('number');
+    expect(result.convergenceScore).toBeGreaterThanOrEqual(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorConsensusConvergenceScore(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
     ).toThrow(RangeError);
   });
 });
