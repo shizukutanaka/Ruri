@@ -115,6 +115,8 @@ import {
   tuningProfileTransitionScore,
   tuningProfileTransitionScoreNarrative,
   tuningProfileRunSummary,
+  tuningProfileRunSummaryNarrative,
+  tuningProfileRunDensity,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5046,4 +5048,34 @@ export function presetProfileRunSummary(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningProfileRunSummary(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q607 — presetProfileRunSummaryNarrative
+// ---------------------------------------------------------------------------
+
+export function presetProfileRunSummaryNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileRunSummaryNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileRunSummaryNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q610 — presetProfileRunDensity
+// ---------------------------------------------------------------------------
+
+export function presetProfileRunDensity(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileRunDensity> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileRunDensity(loadTuningPreset(preset), spectrum, rootHz);
 }
