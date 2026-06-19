@@ -13086,3 +13086,93 @@ export function tuningFamilyAmbassadorScoreStatsNarrative(
   }
   return { stats, statsNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q660 — tuningFamilyAmbassadorConsensusDistribution
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConsensusDistribution(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { versatile: number; balanced: number; specialized: number; total: number } {
+  const ambassadors = tuningFamilyModeAmbassadors(tunings, spectrum, rootHz);
+  let versatile = 0;
+  let balanced = 0;
+  let specialized = 0;
+  for (const { ambassador } of ambassadors) {
+    if (ambassador.consensus === 'versatile') versatile++;
+    else if (ambassador.consensus === 'balanced') balanced++;
+    else if (ambassador.consensus === 'specialized') specialized++;
+  }
+  return { versatile, balanced, specialized, total: tunings.length };
+}
+
+// ---------------------------------------------------------------------------
+// Q662 — tuningFamilyAmbassadorConsensusDistributionNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorConsensusDistributionNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  distribution: ReturnType<typeof tuningFamilyAmbassadorConsensusDistribution>;
+  distributionNarrative: string;
+} {
+  const distribution = tuningFamilyAmbassadorConsensusDistribution(tunings, spectrum, rootHz);
+  const { versatile, balanced, specialized, total } = distribution;
+  let distributionNarrative: string;
+  if (total === 0) {
+    distributionNarrative = 'No tunings to analyze.';
+  } else {
+    distributionNarrative = `Ambassador consensus across ${total} tunings: ${versatile} versatile, ${balanced} balanced, ${specialized} specialized.`;
+    if (versatile === total) {
+      distributionNarrative += ' All ambassadors are versatile.';
+    } else if (specialized === total) {
+      distributionNarrative += ' All ambassadors are specialized.';
+    } else if (versatile > balanced && versatile > specialized) {
+      distributionNarrative += ' Versatile ambassadors dominate.';
+    } else if (specialized > balanced && specialized > versatile) {
+      distributionNarrative += ' Specialized ambassadors dominate.';
+    }
+  }
+  return { distribution, distributionNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q663 — tuningFamilyAmbassadorProfileFrequency
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorProfileFrequency(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; count: number; tuningIds: string[] }[] {
+  const ambassadors = tuningFamilyModeAmbassadors(tunings, spectrum, rootHz);
+  const profileMap = new Map<string, string[]>();
+  for (const { id, ambassador } of ambassadors) {
+    const profile = ambassador.quadrantProfile;
+    const existing = profileMap.get(profile);
+    if (existing !== undefined) {
+      existing.push(id);
+    } else {
+      profileMap.set(profile, [id]);
+    }
+  }
+  return Array.from(profileMap.entries())
+    .map(([profile, tuningIds]) => ({ profile, count: tuningIds.length, tuningIds }))
+    .sort((a, b) => b.count - a.count);
+}
+
+// ---------------------------------------------------------------------------
+// Q665 — tuningFamilyMostCommonAmbassadorProfile
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostCommonAmbassadorProfile(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; count: number; tuningIds: string[] } | null {
+  return tuningFamilyAmbassadorProfileFrequency(tunings, spectrum, rootHz)[0] ?? null;
+}

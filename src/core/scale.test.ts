@@ -345,6 +345,10 @@ import {
   tuningFamilyAmbassadorScoreStats,
   tuningFamilyAmbassadorGap,
   tuningFamilyAmbassadorScoreStatsNarrative,
+  tuningFamilyAmbassadorConsensusDistribution,
+  tuningFamilyAmbassadorConsensusDistributionNarrative,
+  tuningFamilyAmbassadorProfileFrequency,
+  tuningFamilyMostCommonAmbassadorProfile,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12103,5 +12107,101 @@ describe('tuningFamilyAmbassadorScoreStatsNarrative (Q657)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilyAmbassadorScoreStatsNarrative([], spec);
     expect(result.statsNarrative).toContain('No tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q660 — tuningFamilyAmbassadorConsensusDistribution
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorConsensusDistribution (Q660)', () => {
+  it('returns distribution with versatile/balanced/specialized counts', () => {
+    const spec = harmonicSpectrum(6);
+    const dist = tuningFamilyAmbassadorConsensusDistribution([t12, edo(19, 440)], spec);
+    expect(typeof dist.versatile).toBe('number');
+    expect(typeof dist.balanced).toBe('number');
+    expect(typeof dist.specialized).toBe('number');
+    expect(dist.total).toBe(2);
+    expect(dist.versatile + dist.balanced + dist.specialized).toBe(2);
+  });
+
+  it('returns all zeros for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    const dist = tuningFamilyAmbassadorConsensusDistribution([], spec);
+    expect(dist.total).toBe(0);
+    expect(dist.versatile + dist.balanced + dist.specialized).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q662 — tuningFamilyAmbassadorConsensusDistributionNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorConsensusDistributionNarrative (Q662)', () => {
+  it('returns distribution and distributionNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConsensusDistributionNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.distributionNarrative).toBe('string');
+    expect(result.distributionNarrative.length).toBeGreaterThan(0);
+    expect(result.distribution.total).toBe(2);
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorConsensusDistributionNarrative([], spec);
+    expect(result.distributionNarrative).toContain('No tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q663 — tuningFamilyAmbassadorProfileFrequency
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorProfileFrequency (Q663)', () => {
+  it('returns profile frequency entries sorted by count desc', () => {
+    const spec = harmonicSpectrum(6);
+    const freq = tuningFamilyAmbassadorProfileFrequency([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(Array.isArray(freq)).toBe(true);
+    for (const f of freq) {
+      expect(typeof f.profile).toBe('string');
+      expect(typeof f.count).toBe('number');
+      expect(Array.isArray(f.tuningIds)).toBe(true);
+      expect(f.count).toBe(f.tuningIds.length);
+    }
+    for (let i = 1; i < freq.length; i++) {
+      expect(freq[i - 1]!.count).toBeGreaterThanOrEqual(freq[i]!.count);
+    }
+  });
+
+  it('returns empty array for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorProfileFrequency([], spec)).toEqual([]);
+  });
+
+  it('total tuningIds across all profiles equals tuning count', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440)];
+    const freq = tuningFamilyAmbassadorProfileFrequency(tunings, spec);
+    const totalIds = freq.reduce((s, f) => s + f.count, 0);
+    expect(totalIds).toBe(tunings.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q665 — tuningFamilyMostCommonAmbassadorProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyMostCommonAmbassadorProfile (Q665)', () => {
+  it('returns the most frequent ambassador profile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyMostCommonAmbassadorProfile([t12, edo(19, 440)], spec);
+    expect(result).not.toBeNull();
+    expect(typeof result!.profile).toBe('string');
+    expect(result!.count).toBeGreaterThanOrEqual(1);
+  });
+
+  it('returns null for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyMostCommonAmbassadorProfile([], spec)).toBeNull();
   });
 });
