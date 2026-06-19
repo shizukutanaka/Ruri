@@ -390,6 +390,9 @@ import {
   tuningFamilySocraticProfileNarratives,
   tuningFamilySocraticComparison,
   tuningFamilySocraticComparisonNarrative,
+  tuningFamilySocraticInsight,
+  tuningFamilySocraticInsightNarrative,
+  tuningSocraticContrast,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -13275,5 +13278,111 @@ describe('tuningFamilySocraticComparisonNarrative (Q736)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticComparisonNarrative([t12, edo(19, 440)], spec);
     expect(result.comparisonNarrative).toContain('Family comparison');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q738 — tuningFamilySocraticInsight
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticInsight (Q738)', () => {
+  it('returns profiles and comparison fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsight([t12, edo(19, 440)], spec);
+    expect(Array.isArray(result.profiles)).toBe(true);
+    expect(result.profiles.length).toBe(2);
+    expect(
+      typeof result.comparison.mostDiverse === 'string' || result.comparison.mostDiverse === null,
+    ).toBe(true);
+    expect(
+      typeof result.comparison.leastDiverse === 'string' || result.comparison.leastDiverse === null,
+    ).toBe(true);
+  });
+
+  it('returns empty profiles and null comparison for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsight([], spec);
+    expect(result.profiles).toEqual([]);
+    expect(result.comparison.mostDiverse).toBeNull();
+    expect(result.comparison.leastDiverse).toBeNull();
+    expect(result.comparison.mostUnique).toBeNull();
+    expect(result.comparison.mostVersatile).toBeNull();
+  });
+
+  it('profiles contain id and socraticProfile fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsight([t12], spec);
+    expect(typeof result.profiles[0]!.id).toBe('string');
+    expect(typeof result.profiles[0]!.socraticProfile.ambassador.mode.id).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q740 — tuningFamilySocraticInsightNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticInsightNarrative (Q740)', () => {
+  it('returns profiles, comparison, and insightNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightNarrative([t12, edo(19, 440)], spec);
+    expect(Array.isArray(result.profiles)).toBe(true);
+    expect(typeof result.insightNarrative).toBe('string');
+    expect(result.insightNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('returns "No tunings to analyze." for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightNarrative([], spec);
+    expect(result.insightNarrative).toBe('No tunings to analyze.');
+  });
+
+  it('narrative contains Family insight header and Profile summaries section', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightNarrative([t12, edo(19, 440)], spec);
+    expect(result.insightNarrative).toContain('Family insight');
+    expect(result.insightNarrative).toContain('Profile summaries');
+  });
+
+  it('narrative contains tuning IDs', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightNarrative([t12], spec);
+    expect(result.insightNarrative).toContain(t12.id);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q742 — tuningSocraticContrast
+// ---------------------------------------------------------------------------
+
+describe('tuningSocraticContrast (Q742)', () => {
+  it('returns profileA, profileB, distance, sameConsensus, sameProfile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrast(t12, edo(19, 440), spec);
+    expect(typeof result.profileA.ambassador.mode.id).toBe('string');
+    expect(typeof result.profileB.ambassador.mode.id).toBe('string');
+    expect(typeof result.distance).toBe('number');
+    expect(typeof result.sameConsensus).toBe('boolean');
+    expect(typeof result.sameProfile).toBe('boolean');
+  });
+
+  it('distance is between 0 and 4', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrast(t12, edo(19, 440), spec);
+    expect(result.distance).toBeGreaterThanOrEqual(0);
+    expect(result.distance).toBeLessThanOrEqual(4);
+  });
+
+  it('same tuning produces distance 0 and sameConsensus/sameProfile true', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrast(t12, t12, spec);
+    expect(result.distance).toBe(0);
+    expect(result.sameConsensus).toBe(true);
+    expect(result.sameProfile).toBe(true);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrast(t12, edo(19, 440), spec, 261.63);
+    expect(typeof result.distance).toBe('number');
   });
 });

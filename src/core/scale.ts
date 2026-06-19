@@ -14141,3 +14141,69 @@ export function tuningFamilySocraticComparisonNarrative(
 
   return { comparison, comparisonNarrative: lines.join('\n') };
 }
+
+// ---------------------------------------------------------------------------
+// Q738 — tuningFamilySocraticInsight
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticInsight(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  profiles: ReturnType<typeof tuningFamilySocraticProfiles>;
+  comparison: ReturnType<typeof tuningFamilySocraticComparison>;
+} {
+  return {
+    profiles: tuningFamilySocraticProfiles(tunings, spectrum, rootHz),
+    comparison: tuningFamilySocraticComparison(tunings, spectrum, rootHz),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q740 — tuningFamilySocraticInsightNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticInsightNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticInsight> & { insightNarrative: string } {
+  const insight = tuningFamilySocraticInsight(tunings, spectrum, rootHz);
+  if (tunings.length === 0) {
+    return { ...insight, insightNarrative: 'No tunings to analyze.' };
+  }
+  const { comparisonNarrative } = tuningFamilySocraticComparisonNarrative(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const narratives = tuningFamilySocraticProfileNarratives(tunings, spectrum, rootHz);
+  const profileLines = narratives.map((n) => `  [${n.id}]: ${n.socraticNarrative}`).join('\n');
+  const insightNarrative = `Family insight (${tunings.length} tunings):\n${comparisonNarrative}\n\nProfile summaries:\n${profileLines}`;
+  return { ...insight, insightNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q742 — tuningSocraticContrast
+// ---------------------------------------------------------------------------
+
+export function tuningSocraticContrast(
+  tuningA: TuningSystem,
+  tuningB: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  profileA: ReturnType<typeof tuningSocraticProfile>;
+  profileB: ReturnType<typeof tuningSocraticProfile>;
+  distance: number;
+  sameConsensus: boolean;
+  sameProfile: boolean;
+} {
+  const profileA = tuningSocraticProfile(tuningA, spectrum, rootHz);
+  const profileB = tuningSocraticProfile(tuningB, spectrum, rootHz);
+  const distance = tuningAmbassadorProfileDistance(tuningA, tuningB, spectrum, rootHz);
+  const sameConsensus = profileA.ambassador.consensus === profileB.ambassador.consensus;
+  const sameProfile = profileA.ambassador.quadrantProfile === profileB.ambassador.quadrantProfile;
+  return { profileA, profileB, distance, sameConsensus, sameProfile };
+}
