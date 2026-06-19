@@ -13772,3 +13772,62 @@ export function tuningFamilyAmbassadorCentrality(
 ): { id: string; meanDistanceToOthers: number; rank: number } | null {
   return tuningFamilyAmbassadorCentralityScores(tunings, spectrum, rootHz)[0] ?? null;
 }
+
+// ---------------------------------------------------------------------------
+// Q708 — tuningFamilyAmbassadorOutlier
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorOutlier(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilyAmbassadorCentralityScores>[number] | null {
+  const scores = tuningFamilyAmbassadorCentralityScores(tunings, spectrum, rootHz);
+  return scores[scores.length - 1] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Q710 — tuningFamilyAmbassadorCentralityNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorCentralityNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  scores: ReturnType<typeof tuningFamilyAmbassadorCentralityScores>;
+  centralityNarrative: string;
+} {
+  const scores = tuningFamilyAmbassadorCentralityScores(tunings, spectrum, rootHz);
+  let centralityNarrative: string;
+  if (scores.length === 0) {
+    centralityNarrative = 'No tunings to analyze.';
+  } else if (scores.length === 1) {
+    centralityNarrative = `Single tuning "${scores[0]!.id}" — no centrality comparison possible.`;
+  } else {
+    const central = scores[0]!;
+    const outlier = scores[scores.length - 1]!;
+    centralityNarrative = `Most central: "${central.id}" (mean distance ${central.meanDistanceToOthers.toFixed(2)}). Most outlying: "${outlier.id}" (mean distance ${outlier.meanDistanceToOthers.toFixed(2)}).`;
+  }
+  return { scores, centralityNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q712 — tuningFamilyAmbassadorDistanceSpread
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorDistanceSpread(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  central: ReturnType<typeof tuningFamilyAmbassadorCentrality>;
+  outlier: ReturnType<typeof tuningFamilyAmbassadorOutlier>;
+  spread: number;
+} | null {
+  const central = tuningFamilyAmbassadorCentrality(tunings, spectrum, rootHz);
+  const outlier = tuningFamilyAmbassadorOutlier(tunings, spectrum, rootHz);
+  if (central === null && outlier === null) return null;
+  const spread = (outlier?.meanDistanceToOthers ?? 0) - (central?.meanDistanceToOthers ?? 0);
+  return { central, outlier, spread };
+}

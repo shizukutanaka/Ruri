@@ -375,6 +375,9 @@ import {
   tuningFamilyMostDistantAmbassadorPair,
   tuningFamilyAmbassadorCentralityScores,
   tuningFamilyAmbassadorCentrality,
+  tuningFamilyAmbassadorOutlier,
+  tuningFamilyAmbassadorCentralityNarrative,
+  tuningFamilyAmbassadorDistanceSpread,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12879,5 +12882,90 @@ describe('tuningFamilyAmbassadorCentrality (Q706)', () => {
   it('returns null for empty tunings', () => {
     const spec = harmonicSpectrum(6);
     expect(tuningFamilyAmbassadorCentrality([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q708 — tuningFamilyAmbassadorOutlier
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorOutlier (Q708)', () => {
+  it('returns the tuning with highest mean distance to others', () => {
+    const spec = harmonicSpectrum(6);
+    const outlier = tuningFamilyAmbassadorOutlier([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(outlier).not.toBeNull();
+    expect(typeof outlier!.id).toBe('string');
+    expect(typeof outlier!.meanDistanceToOthers).toBe('number');
+  });
+
+  it('returns null for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorOutlier([], spec)).toBeNull();
+  });
+
+  it('outlier meanDistance >= central meanDistance', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const central = tuningFamilyAmbassadorCentrality(tunings, spec);
+    const outlier = tuningFamilyAmbassadorOutlier(tunings, spec);
+    if (central && outlier) {
+      expect(outlier.meanDistanceToOthers).toBeGreaterThanOrEqual(central.meanDistanceToOthers);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q710 — tuningFamilyAmbassadorCentralityNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorCentralityNarrative (Q710)', () => {
+  it('returns scores and centralityNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorCentralityNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.centralityNarrative).toBe('string');
+    expect(result.centralityNarrative.length).toBeGreaterThan(0);
+    expect(result.scores.length).toBe(2);
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorCentralityNarrative([], spec);
+    expect(result.centralityNarrative).toContain('No tunings');
+  });
+
+  it('narrative for single tuning mentions single', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorCentralityNarrative([t12], spec);
+    expect(result.centralityNarrative).toContain('Single');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q712 — tuningFamilyAmbassadorDistanceSpread
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorDistanceSpread (Q712)', () => {
+  it('returns central/outlier/spread', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorDistanceSpread([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result).not.toBeNull();
+    expect(typeof result!.spread).toBe('number');
+    expect(result!.spread).toBeGreaterThanOrEqual(0);
+  });
+
+  it('spread = outlier.meanDistance - central.meanDistance', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const result = tuningFamilyAmbassadorDistanceSpread(tunings, spec);
+    if (result && result.central && result.outlier) {
+      expect(result.spread).toBeCloseTo(
+        result.outlier.meanDistanceToOthers - result.central.meanDistanceToOthers,
+      );
+    }
+  });
+
+  it('returns null for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorDistanceSpread([], spec)).toBeNull();
   });
 });
