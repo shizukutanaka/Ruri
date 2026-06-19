@@ -139,6 +139,8 @@ import {
   tuningFamilyAmbassadorReport,
   tuningFamilyAmbassadorReportNarrative,
   tuningFamilyAmbassadorOverlapScore,
+  tuningFamilyAmbassadorOverlapScoreNarrative,
+  tuningFamilyAmbassadorConvergenceScore,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5466,4 +5468,40 @@ export function presetFamilyAmbassadorOverlapScore(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorOverlapScore(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q679 — presetFamilyAmbassadorOverlapScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorOverlapScoreNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorOverlapScoreNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorOverlapScoreNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q683 — presetFamilyAmbassadorConvergenceScore
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorConvergenceScore(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorConvergenceScore> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorConvergenceScore(tunings, spectrum, rootHz);
 }
