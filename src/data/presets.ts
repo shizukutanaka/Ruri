@@ -156,6 +156,9 @@ import {
   tuningFamilyAmbassadorDistanceSpreadNarrative,
   tuningFamilyFullAmbassadorAnalytics,
   tuningFamilyFullAmbassadorAnalyticsNarrative,
+  tuningFamilyAmbassadorsSummaryTable,
+  tuningFamilyAmbassadorsSummaryNarrative,
+  tuningFamilyAmbassadorTopN,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5789,4 +5792,59 @@ export function presetFamilyFullAmbassadorAnalyticsNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilyFullAmbassadorAnalyticsNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q721 — presetFamilyAmbassadorsSummaryTable
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorsSummaryTable(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorsSummaryTable> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorsSummaryTable(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q723 — presetFamilyAmbassadorsSummaryNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorsSummaryNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorsSummaryNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorsSummaryNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q725 — presetFamilyAmbassadorTopN
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorTopN(
+  presetIds: string[],
+  spectrum: Spectrum,
+  n: number,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorTopN> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorTopN(tunings, spectrum, n, rootHz);
 }
