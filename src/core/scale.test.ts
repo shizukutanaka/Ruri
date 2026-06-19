@@ -321,6 +321,10 @@ import {
   tuningFamilyProfileTextureReports,
   tuningProfileTextureReportNarrative,
   tuningFamilyProfileTextureReportNarratives,
+  tuningModeRarestProfileGroup,
+  tuningModeSoloProfileModes,
+  tuningFamilyModeSoloProfileCounts,
+  tuningModeSoloProfileRatio,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -11498,6 +11502,117 @@ describe('tuningFamilyProfileTextureReportNarratives (Q623)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(typeof r.textureReportNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q624 — tuningModeRarestProfileGroup
+// ---------------------------------------------------------------------------
+
+describe('tuningModeRarestProfileGroup (Q624)', () => {
+  it('returns the group with the fewest modes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeRarestProfileGroup(t12, spec);
+    expect(result).not.toBeNull();
+    if (result !== null) {
+      const groups = tuningModeGroupByProfile(t12, spec);
+      for (const g of groups) {
+        expect(result.count).toBeLessThanOrEqual(g.count);
+      }
+    }
+  });
+
+  it('result is present in tuningModeGroupByProfile output', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeRarestProfileGroup(t12, spec);
+    const groups = tuningModeGroupByProfile(t12, spec);
+    if (result !== null) {
+      expect(groups.some((g) => g.profile === result.profile)).toBe(true);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeRarestProfileGroup(t12, spec, 261.63);
+    expect(result).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q626 — tuningModeSoloProfileModes
+// ---------------------------------------------------------------------------
+
+describe('tuningModeSoloProfileModes (Q626)', () => {
+  it('returns only modes that are sole occupants of their profile', () => {
+    const spec = harmonicSpectrum(6);
+    const soloModes = tuningModeSoloProfileModes(t12, spec);
+    const groups = tuningModeGroupByProfile(t12, spec);
+    for (const mode of soloModes) {
+      const group = groups.find((g) => g.modes.some((m) => m.id === mode.id));
+      expect(group?.count).toBe(1);
+    }
+  });
+
+  it('total solo count is <= total degree count', () => {
+    const spec = harmonicSpectrum(6);
+    const soloModes = tuningModeSoloProfileModes(t12, spec);
+    expect(soloModes.length).toBeLessThanOrEqual(t12.degrees.length);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileModes(t12, spec, 261.63);
+    expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q628 — tuningFamilyModeSoloProfileCounts
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeSoloProfileCounts (Q628)', () => {
+  it('returns one entry per tuning with soloModeCount and totalModes', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeSoloProfileCounts([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.soloModeCount).toBeLessThanOrEqual(r.totalModes);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q629 — tuningModeSoloProfileRatio
+// ---------------------------------------------------------------------------
+
+describe('tuningModeSoloProfileRatio (Q629)', () => {
+  it('returns soloRatio in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileRatio(t12, spec);
+    expect(result.soloRatio).toBeGreaterThanOrEqual(0);
+    expect(result.soloRatio).toBeLessThanOrEqual(1);
+  });
+
+  it('soloModeCount matches tuningModeSoloProfileModes length', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileRatio(t12, spec);
+    const soloModes = tuningModeSoloProfileModes(t12, spec);
+    expect(result.soloModeCount).toBe(soloModes.length);
+  });
+
+  it('totalModes matches degree count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileRatio(t12, spec);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+
+  it('soloRatio = soloModeCount / totalModes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileRatio(t12, spec);
+    if (result.totalModes > 0) {
+      expect(result.soloRatio).toBeCloseTo(result.soloModeCount / result.totalModes, 10);
     }
   });
 });

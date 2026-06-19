@@ -12630,3 +12630,65 @@ export function tuningFamilyProfileTextureReportNarratives(
     textureReportNarrative: tuningProfileTextureReportNarrative(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q624 — tuningModeRarestProfileGroup
+// ---------------------------------------------------------------------------
+
+export function tuningModeRarestProfileGroup(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; modes: Scale[]; count: number } | null {
+  const groups = tuningModeGroupByProfile(tuning, spectrum, rootHz);
+  if (groups.length === 0) return null;
+  return groups[groups.length - 1]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q626 — tuningModeSoloProfileModes
+// ---------------------------------------------------------------------------
+
+export function tuningModeSoloProfileModes(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): Scale[] {
+  return tuningModeGroupByProfile(tuning, spectrum, rootHz)
+    .filter((g) => g.count === 1)
+    .flatMap((g) => g.modes);
+}
+
+// ---------------------------------------------------------------------------
+// Q628 — tuningFamilyModeSoloProfileCounts
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeSoloProfileCounts(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; soloModeCount: number; totalModes: number }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    soloModeCount: tuningModeSoloProfileModes(t, spectrum, rootHz).length,
+    totalModes: t.degrees.length,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q629 — tuningModeSoloProfileRatio
+// ---------------------------------------------------------------------------
+
+export function tuningModeSoloProfileRatio(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { soloModeCount: number; totalModes: number; soloRatio: number } {
+  const soloModes = tuningModeSoloProfileModes(tuning, spectrum, rootHz);
+  const totalModes = tuning.degrees.length;
+  return {
+    soloModeCount: soloModes.length,
+    totalModes,
+    soloRatio: totalModes > 0 ? soloModes.length / totalModes : 0,
+  };
+}
