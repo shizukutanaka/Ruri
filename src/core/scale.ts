@@ -11981,3 +11981,118 @@ export function tuningFamilyLeastDiverseQuadrantProfile(
   if (ranking.length === 0) throw new RangeError('No tunings provided');
   return ranking[ranking.length - 1]!;
 }
+
+// ---------------------------------------------------------------------------
+// Q582 — tuningFamilyQuadrantProfileFrequency
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantProfileFrequency(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; tuningCount: number; tuningIds: string[] }[] {
+  const profileMap = new Map<string, string[]>();
+  for (const tuning of tunings) {
+    const groups = tuningModeGroupByProfile(tuning, spectrum, rootHz);
+    for (const group of groups) {
+      const existing = profileMap.get(group.profile);
+      if (existing) {
+        if (!existing.includes(tuning.id)) existing.push(tuning.id);
+      } else {
+        profileMap.set(group.profile, [tuning.id]);
+      }
+    }
+  }
+  return Array.from(profileMap.entries())
+    .map(([profile, tuningIds]) => ({ profile, tuningCount: tuningIds.length, tuningIds }))
+    .sort((a, b) => b.tuningCount - a.tuningCount);
+}
+
+// ---------------------------------------------------------------------------
+// Q583 — tuningFamilySharedQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySharedQuadrantProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; tuningCount: number; tuningIds: string[] }[] {
+  return tuningFamilyQuadrantProfileFrequency(tunings, spectrum, rootHz).filter(
+    (e) => e.tuningCount > 1,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Q584 — tuningFamilyUniqueQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyUniqueQuadrantProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; tuningId: string }[] {
+  return tuningFamilyQuadrantProfileFrequency(tunings, spectrum, rootHz)
+    .filter((e) => e.tuningCount === 1)
+    .map((e) => ({ profile: e.profile, tuningId: e.tuningIds[0] ?? '' }));
+}
+
+// ---------------------------------------------------------------------------
+// Q585 — tuningFamilyMostSharedQuadrantProfile
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostSharedQuadrantProfile(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; tuningCount: number; tuningIds: string[] } | null {
+  const freq = tuningFamilySharedQuadrantProfiles(tunings, spectrum, rootHz);
+  return freq.length > 0 ? freq[0]! : null;
+}
+
+// ---------------------------------------------------------------------------
+// Q586 — tuningFamilyQuadrantProfileOverlapScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantProfileOverlapScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  sharedCount: number;
+  uniqueCount: number;
+  totalProfiles: number;
+  overlapScore: number;
+} {
+  const freq = tuningFamilyQuadrantProfileFrequency(tunings, spectrum, rootHz);
+  const sharedCount = freq.filter((e) => e.tuningCount > 1).length;
+  const uniqueCount = freq.filter((e) => e.tuningCount === 1).length;
+  const totalProfiles = freq.length;
+  const overlapScore = totalProfiles > 0 ? sharedCount / totalProfiles : 0;
+  return { sharedCount, uniqueCount, totalProfiles, overlapScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q587 — tuningFamilyQuadrantProfileFrequencyNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantProfileFrequencyNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  sharedCount: number;
+  uniqueCount: number;
+  totalProfiles: number;
+  overlapScore: number;
+  narrative: string;
+} {
+  const overlap = tuningFamilyQuadrantProfileOverlapScore(tunings, spectrum, rootHz);
+  const { sharedCount, uniqueCount, totalProfiles, overlapScore } = overlap;
+  const level = overlapScore >= 0.5 ? 'high' : overlapScore >= 0.25 ? 'moderate' : 'low';
+  const narrative =
+    `Across ${tunings.length} tuning${tunings.length !== 1 ? 's' : ''}, ` +
+    `${totalProfiles} distinct quadrant profile${totalProfiles !== 1 ? 's' : ''} found: ` +
+    `${sharedCount} shared across multiple tunings, ${uniqueCount} unique to a single tuning. ` +
+    `Profile overlap is ${level} (overlap score: ${(overlapScore * 100).toFixed(1)}%).`;
+  return { ...overlap, narrative };
+}

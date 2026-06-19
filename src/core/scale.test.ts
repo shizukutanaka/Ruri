@@ -288,6 +288,12 @@ import {
   tuningFamilyQuadrantDiversityRanking,
   tuningFamilyMostDiverseQuadrantProfile,
   tuningFamilyLeastDiverseQuadrantProfile,
+  tuningFamilyQuadrantProfileFrequency,
+  tuningFamilySharedQuadrantProfiles,
+  tuningFamilyUniqueQuadrantProfiles,
+  tuningFamilyMostSharedQuadrantProfile,
+  tuningFamilyQuadrantProfileOverlapScore,
+  tuningFamilyQuadrantProfileFrequencyNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10690,5 +10696,151 @@ describe('tuningFamilyLeastDiverseQuadrantProfile (Q581)', () => {
   it('throws RangeError for empty tuning array', () => {
     const spec = harmonicSpectrum(6);
     expect(() => tuningFamilyLeastDiverseQuadrantProfile([], spec)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q582 — tuningFamilyQuadrantProfileFrequency
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantProfileFrequency (Q582)', () => {
+  it('returns profile frequency sorted by tuningCount descending', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const result = tuningFamilyQuadrantProfileFrequency(tunings, spec);
+    expect(result.length).toBeGreaterThan(0);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i - 1]!.tuningCount).toBeGreaterThanOrEqual(result[i]!.tuningCount);
+    }
+  });
+
+  it('tuningCount never exceeds number of tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440)];
+    const result = tuningFamilyQuadrantProfileFrequency(tunings, spec);
+    for (const entry of result) {
+      expect(entry.tuningCount).toBeLessThanOrEqual(tunings.length);
+    }
+  });
+
+  it('each profile splits into 4 parts', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyQuadrantProfileFrequency([t12, edo(19, 440)], spec);
+    for (const entry of result) {
+      expect(entry.profile.split('|').length).toBe(4);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q583 — tuningFamilySharedQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySharedQuadrantProfiles (Q583)', () => {
+  it('returns only profiles that appear in more than one tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySharedQuadrantProfiles([t12, edo(19, 440)], spec);
+    for (const entry of result) {
+      expect(entry.tuningCount).toBeGreaterThan(1);
+    }
+  });
+
+  it('is a subset of tuningFamilyQuadrantProfileFrequency', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440)];
+    const shared = tuningFamilySharedQuadrantProfiles(tunings, spec);
+    const freq = tuningFamilyQuadrantProfileFrequency(tunings, spec);
+    for (const entry of shared) {
+      expect(freq.some((f) => f.profile === entry.profile)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q584 — tuningFamilyUniqueQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyUniqueQuadrantProfiles (Q584)', () => {
+  it('returns only profiles unique to a single tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyUniqueQuadrantProfiles([t12, edo(19, 440)], spec);
+    for (const entry of result) {
+      expect(typeof entry.tuningId).toBe('string');
+      expect(typeof entry.profile).toBe('string');
+    }
+  });
+
+  it('shared + unique count equals total profile count', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440)];
+    const freq = tuningFamilyQuadrantProfileFrequency(tunings, spec);
+    const shared = tuningFamilySharedQuadrantProfiles(tunings, spec);
+    const unique = tuningFamilyUniqueQuadrantProfiles(tunings, spec);
+    expect(shared.length + unique.length).toBe(freq.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q585 — tuningFamilyMostSharedQuadrantProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyMostSharedQuadrantProfile (Q585)', () => {
+  it('returns the profile with highest tuningCount, or null if none shared', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyMostSharedQuadrantProfile([t12, edo(19, 440)], spec);
+    if (result !== null) {
+      expect(result.tuningCount).toBeGreaterThan(1);
+      expect(typeof result.profile).toBe('string');
+    }
+  });
+
+  it('returns null when only one tuning provided (no sharing possible)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyMostSharedQuadrantProfile([t12], spec);
+    expect(result).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q586 — tuningFamilyQuadrantProfileOverlapScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantProfileOverlapScore (Q586)', () => {
+  it('returns overlap score in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyQuadrantProfileOverlapScore([t12, edo(19, 440)], spec);
+    expect(result.overlapScore).toBeGreaterThanOrEqual(0);
+    expect(result.overlapScore).toBeLessThanOrEqual(1);
+  });
+
+  it('sharedCount + uniqueCount equals totalProfiles', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyQuadrantProfileOverlapScore([t12, edo(19, 440)], spec);
+    expect(result.sharedCount + result.uniqueCount).toBe(result.totalProfiles);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q587 — tuningFamilyQuadrantProfileFrequencyNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantProfileFrequencyNarrative (Q587)', () => {
+  it('returns overlap metrics with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyQuadrantProfileFrequencyNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains the overlap score percentage', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyQuadrantProfileFrequencyNarrative([t12, edo(19, 440)], spec);
+    expect(result.narrative).toContain('%');
+  });
+
+  it('narrative contains the total profiles count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyQuadrantProfileFrequencyNarrative([t12, edo(19, 440)], spec);
+    expect(result.narrative).toContain(String(result.totalProfiles));
   });
 });
