@@ -325,6 +325,11 @@ import {
   tuningModeSoloProfileModes,
   tuningFamilyModeSoloProfileCounts,
   tuningModeSoloProfileRatio,
+  tuningFamilyModeSoloProfileRatios,
+  tuningFamilySoloProfileRatioRanking,
+  tuningMostUniqueModesTuning,
+  tuningModeSoloProfileNarrative,
+  tuningFamilyModeSoloProfileNarratives,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -11613,6 +11618,106 @@ describe('tuningModeSoloProfileRatio (Q629)', () => {
     const result = tuningModeSoloProfileRatio(t12, spec);
     if (result.totalModes > 0) {
       expect(result.soloRatio).toBeCloseTo(result.soloModeCount / result.totalModes, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q630 — tuningFamilyModeSoloProfileRatios
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeSoloProfileRatios (Q630)', () => {
+  it('returns one entry per tuning with id and soloRatio', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeSoloProfileRatios([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.soloRatio.soloRatio).toBeGreaterThanOrEqual(0);
+      expect(r.soloRatio.soloRatio).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q631 — tuningFamilySoloProfileRatioRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySoloProfileRatioRanking (Q631)', () => {
+  it('returns ranked entries sorted by soloRatio descending', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilySoloProfileRatioRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(results.length).toBe(3);
+    expect(results[0]!.rank).toBe(1);
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i - 1]!.soloRatio.soloRatio).toBeGreaterThanOrEqual(
+        results[i]!.soloRatio.soloRatio,
+      );
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q632 — tuningMostUniqueModesTuning
+// ---------------------------------------------------------------------------
+
+describe('tuningMostUniqueModesTuning (Q632)', () => {
+  it('returns rank-1 tuning (most individual modes)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningMostUniqueModesTuning([t12, edo(19, 440)], spec);
+    expect(result.rank).toBe(1);
+    expect(typeof result.id).toBe('string');
+  });
+
+  it('throws RangeError for empty array', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => tuningMostUniqueModesTuning([], spec)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q633 — tuningModeSoloProfileNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningModeSoloProfileNarrative (Q633)', () => {
+  it('returns ratio with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileNarrative(t12, spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileNarrative(t12, spec);
+    expect(result.narrative).toContain(t12.name);
+  });
+
+  it('narrative contains the solo percentage', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileNarrative(t12, spec);
+    expect(result.narrative).toContain('%');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeSoloProfileNarrative(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q635 — tuningFamilyModeSoloProfileNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeSoloProfileNarratives (Q635)', () => {
+  it('returns one entry per tuning with id and soloNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeSoloProfileNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.soloNarrative.narrative).toBe('string');
     }
   });
 });

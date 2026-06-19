@@ -12692,3 +12692,81 @@ export function tuningModeSoloProfileRatio(
     soloRatio: totalModes > 0 ? soloModes.length / totalModes : 0,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Q630 — tuningFamilyModeSoloProfileRatios
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeSoloProfileRatios(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; soloRatio: ReturnType<typeof tuningModeSoloProfileRatio> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    soloRatio: tuningModeSoloProfileRatio(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q631 — tuningFamilySoloProfileRatioRanking
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySoloProfileRatioRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; soloRatio: ReturnType<typeof tuningModeSoloProfileRatio>; rank: number }[] {
+  return tuningFamilyModeSoloProfileRatios(tunings, spectrum, rootHz)
+    .slice()
+    .sort((a, b) => b.soloRatio.soloRatio - a.soloRatio.soloRatio)
+    .map((entry, i) => ({ ...entry, rank: i + 1 }));
+}
+
+// ---------------------------------------------------------------------------
+// Q632 — tuningMostUniqueModesTuning
+// ---------------------------------------------------------------------------
+
+export function tuningMostUniqueModesTuning(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; soloRatio: ReturnType<typeof tuningModeSoloProfileRatio>; rank: number } {
+  const ranking = tuningFamilySoloProfileRatioRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('No tunings provided');
+  return ranking[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q633 — tuningModeSoloProfileNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningModeSoloProfileNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { soloModeCount: number; totalModes: number; soloRatio: number; narrative: string } {
+  const ratio = tuningModeSoloProfileRatio(tuning, spectrum, rootHz);
+  const { soloModeCount, totalModes, soloRatio } = ratio;
+  const level = soloRatio >= 0.7 ? 'high' : soloRatio >= 0.3 ? 'moderate' : 'low';
+  const pct = (soloRatio * 100).toFixed(1);
+  const narrative =
+    `${soloModeCount} of ${totalModes} modes (${pct}%) in "${tuning.name}" have a unique quadrant profile — ` +
+    `${level} mode individuality.`;
+  return { ...ratio, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q635 — tuningFamilyModeSoloProfileNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeSoloProfileNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; soloNarrative: ReturnType<typeof tuningModeSoloProfileNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    soloNarrative: tuningModeSoloProfileNarrative(t, spectrum, rootHz),
+  }));
+}
