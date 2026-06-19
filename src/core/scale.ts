@@ -14207,3 +14207,86 @@ export function tuningSocraticContrast(
   const sameProfile = profileA.ambassador.quadrantProfile === profileB.ambassador.quadrantProfile;
   return { profileA, profileB, distance, sameConsensus, sameProfile };
 }
+
+// ---------------------------------------------------------------------------
+// Q744 — tuningSocraticContrastNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningSocraticContrastNarrative(
+  tuningA: TuningSystem,
+  tuningB: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningSocraticContrast> & { contrastNarrative: string } {
+  const contrast = tuningSocraticContrast(tuningA, tuningB, spectrum, rootHz);
+  const contrastNarrative =
+    `Contrast: ${tuningA.id} vs ${tuningB.id}\n` +
+    `  Profile A: ${contrast.profileA.dominantProfile} (${contrast.profileA.ambassador.consensus})\n` +
+    `  Profile B: ${contrast.profileB.dominantProfile} (${contrast.profileB.ambassador.consensus})\n` +
+    `  Distance: ${contrast.distance}/4\n` +
+    `  Same quadrant profile: ${contrast.sameProfile}.\n` +
+    `  Same consensus: ${contrast.sameConsensus}.`;
+  return { ...contrast, contrastNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q746 — tuningFamilySocraticRecommendation
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRecommendation(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  recommendedId: string | null;
+  reason: 'most-versatile' | 'most-central' | 'first' | null;
+  alternativeId: string | null;
+} {
+  if (tunings.length === 0) {
+    return { recommendedId: null, reason: null, alternativeId: null };
+  }
+  const comparison = tuningFamilySocraticComparison(tunings, spectrum, rootHz);
+  const centrality = tuningFamilyAmbassadorCentrality(tunings, spectrum, rootHz);
+
+  let recommendedId: string | null;
+  let reason: 'most-versatile' | 'most-central' | 'first' | null;
+  let alternativeId: string | null;
+
+  if (comparison.mostVersatile !== null) {
+    recommendedId = comparison.mostVersatile;
+    reason = 'most-versatile';
+    alternativeId =
+      centrality !== null && centrality.id !== recommendedId
+        ? centrality.id
+        : (tunings.find((t) => t.id !== recommendedId)?.id ?? null);
+  } else if (centrality !== null) {
+    recommendedId = centrality.id;
+    reason = 'most-central';
+    alternativeId = tunings.find((t) => t.id !== recommendedId)?.id ?? null;
+  } else {
+    recommendedId = tunings[0]!.id;
+    reason = 'first';
+    alternativeId = tunings[1]?.id ?? null;
+  }
+
+  return { recommendedId, reason, alternativeId };
+}
+
+// ---------------------------------------------------------------------------
+// Q748 — tuningFamilySocraticRecommendationNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRecommendationNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticRecommendation> & { recommendationNarrative: string } {
+  const rec = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
+  const recommendationNarrative =
+    tunings.length === 0
+      ? 'No tunings available for recommendation.'
+      : `Recommendation for family of ${tunings.length} tunings:\n` +
+        `  Recommended: ${rec.recommendedId ?? 'none'} (${rec.reason ?? 'n/a'}).\n` +
+        `  Alternative: ${rec.alternativeId ?? 'none'}.`;
+  return { ...rec, recommendationNarrative };
+}

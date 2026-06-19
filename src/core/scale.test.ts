@@ -393,6 +393,9 @@ import {
   tuningFamilySocraticInsight,
   tuningFamilySocraticInsightNarrative,
   tuningSocraticContrast,
+  tuningSocraticContrastNarrative,
+  tuningFamilySocraticRecommendation,
+  tuningFamilySocraticRecommendationNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -13384,5 +13387,135 @@ describe('tuningSocraticContrast (Q742)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningSocraticContrast(t12, edo(19, 440), spec, 261.63);
     expect(typeof result.distance).toBe('number');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q744 — tuningSocraticContrastNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningSocraticContrastNarrative (Q744)', () => {
+  it('returns all contrast fields plus contrastNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrastNarrative(t12, edo(19, 440), spec);
+    expect(typeof result.profileA.ambassador.mode.id).toBe('string');
+    expect(typeof result.profileB.ambassador.mode.id).toBe('string');
+    expect(typeof result.distance).toBe('number');
+    expect(typeof result.sameConsensus).toBe('boolean');
+    expect(typeof result.sameProfile).toBe('boolean');
+    expect(typeof result.contrastNarrative).toBe('string');
+    expect(result.contrastNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains both tuning IDs', () => {
+    const spec = harmonicSpectrum(6);
+    const t19 = edo(19, 440);
+    const result = tuningSocraticContrastNarrative(t12, t19, spec);
+    expect(result.contrastNarrative).toContain(t12.id);
+    expect(result.contrastNarrative).toContain(t19.id);
+  });
+
+  it('narrative contains distance and profile labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrastNarrative(t12, edo(19, 440), spec);
+    expect(result.contrastNarrative).toContain('Distance:');
+    expect(result.contrastNarrative).toContain('Profile A:');
+    expect(result.contrastNarrative).toContain('Profile B:');
+    expect(result.contrastNarrative).toContain('Same quadrant profile:');
+    expect(result.contrastNarrative).toContain('Same consensus:');
+  });
+
+  it('same tuning produces distance 0 and matching consensus/profile labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrastNarrative(t12, t12, spec);
+    expect(result.distance).toBe(0);
+    expect(result.sameConsensus).toBe(true);
+    expect(result.sameProfile).toBe(true);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticContrastNarrative(t12, edo(19, 440), spec, 261.63);
+    expect(typeof result.contrastNarrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q746 — tuningFamilySocraticRecommendation
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRecommendation (Q746)', () => {
+  it('returns null fields for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendation([], spec);
+    expect(result.recommendedId).toBeNull();
+    expect(result.reason).toBeNull();
+    expect(result.alternativeId).toBeNull();
+  });
+
+  it('returns a recommendedId and reason for a single tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendation([t12], spec);
+    expect(typeof result.recommendedId).toBe('string');
+    expect(result.reason).not.toBeNull();
+  });
+
+  it('returns a recommendedId and reason for multiple tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendation([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(typeof result.recommendedId).toBe('string');
+    expect(['most-versatile', 'most-central', 'first']).toContain(result.reason);
+  });
+
+  it('alternativeId differs from recommendedId when multiple tunings provided', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendation([t12, edo(19, 440)], spec);
+    if (result.alternativeId !== null) {
+      expect(result.alternativeId).not.toBe(result.recommendedId);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendation([t12, edo(19, 440)], spec, 261.63);
+    expect(typeof result.recommendedId).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q748 — tuningFamilySocraticRecommendationNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRecommendationNarrative (Q748)', () => {
+  it('returns recommendation fields plus recommendationNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendationNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.recommendedId).toBe('string');
+    expect(typeof result.reason).toBe('string');
+    expect(typeof result.recommendationNarrative).toBe('string');
+    expect(result.recommendationNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('returns fixed message for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendationNarrative([], spec);
+    expect(result.recommendationNarrative).toBe('No tunings available for recommendation.');
+    expect(result.recommendedId).toBeNull();
+    expect(result.reason).toBeNull();
+    expect(result.alternativeId).toBeNull();
+  });
+
+  it('narrative contains Recommendation header', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendationNarrative([t12, edo(19, 440)], spec);
+    expect(result.recommendationNarrative).toContain('Recommendation for family of');
+    expect(result.recommendationNarrative).toContain('Recommended:');
+    expect(result.recommendationNarrative).toContain('Alternative:');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRecommendationNarrative([t12], spec, 261.63);
+    expect(typeof result.recommendationNarrative).toBe('string');
   });
 });
