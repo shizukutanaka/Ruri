@@ -136,6 +136,9 @@ import {
   tuningFamilyAmbassadorProfileFrequency,
   tuningFamilyLeastCommonAmbassadorProfile,
   tuningFamilyAmbassadorConsensusScore,
+  tuningFamilyAmbassadorReport,
+  tuningFamilyAmbassadorReportNarrative,
+  tuningFamilyAmbassadorOverlapScore,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5409,4 +5412,58 @@ export function presetFamilyAmbassadorConsensusScore(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorConsensusScore(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q673 — presetFamilyAmbassadorReport
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorReport(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorReport> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorReport(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q675 — presetFamilyAmbassadorReportNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorReportNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorReportNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorReportNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q677 — presetFamilyAmbassadorOverlapScore
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorOverlapScore(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorOverlapScore> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorOverlapScore(tunings, spectrum, rootHz);
 }
