@@ -12389,3 +12389,85 @@ export function tuningFamilyProfileRunRanking(
     .sort((a, b) => b.runSummary.longestRun - a.runSummary.longestRun)
     .map((entry, i) => ({ ...entry, rank: i + 1 }));
 }
+
+// ---------------------------------------------------------------------------
+// Q606 — tuningProfileRunSummaryNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningProfileRunSummaryNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  runCount: number;
+  longestRun: number;
+  shortestRun: number;
+  meanRunLength: number;
+  totalModes: number;
+  narrative: string;
+} {
+  const summary = tuningProfileRunSummary(tuning, spectrum, rootHz);
+  const { runCount, longestRun, shortestRun, meanRunLength, totalModes } = summary;
+  const texture =
+    runCount === 1
+      ? 'All modes share a single profile — maximum consistency.'
+      : longestRun >= totalModes * 0.5
+        ? 'One dominant profile region covers over half the modes.'
+        : 'Profiles change frequently — high variety.';
+  const narrative =
+    `"${tuning.name}": ${runCount} profile run${runCount !== 1 ? 's' : ''} across ${totalModes} mode${totalModes !== 1 ? 's' : ''}. ` +
+    `Longest: ${longestRun}, shortest: ${shortestRun}, mean: ${meanRunLength.toFixed(1)}. ${texture}`;
+  return { ...summary, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q608 — tuningFamilyProfileRunSummaryNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileRunSummaryNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; runNarrative: ReturnType<typeof tuningProfileRunSummaryNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    runNarrative: tuningProfileRunSummaryNarrative(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q609 — tuningProfileRunDensity
+// ---------------------------------------------------------------------------
+
+export function tuningProfileRunDensity(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  runCount: number;
+  longestRun: number;
+  shortestRun: number;
+  meanRunLength: number;
+  totalModes: number;
+  changeDensity: number;
+} {
+  const summary = tuningProfileRunSummary(tuning, spectrum, rootHz);
+  const changeDensity =
+    summary.totalModes > 1 ? (summary.runCount - 1) / (summary.totalModes - 1) : 0;
+  return { ...summary, changeDensity };
+}
+
+// ---------------------------------------------------------------------------
+// Q611 — tuningFamilyProfileRunDensities
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileRunDensities(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; runDensity: ReturnType<typeof tuningProfileRunDensity> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    runDensity: tuningProfileRunDensity(t, spectrum, rootHz),
+  }));
+}

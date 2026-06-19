@@ -308,6 +308,10 @@ import {
   tuningProfileRunSummary,
   tuningFamilyProfileRunSummaries,
   tuningFamilyProfileRunRanking,
+  tuningProfileRunSummaryNarrative,
+  tuningFamilyProfileRunSummaryNarratives,
+  tuningProfileRunDensity,
+  tuningFamilyProfileRunDensities,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -11197,6 +11201,102 @@ describe('tuningFamilyProfileRunRanking (Q605)', () => {
       expect(results[i - 1]!.runSummary.longestRun).toBeGreaterThanOrEqual(
         results[i]!.runSummary.longestRun,
       );
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q606 — tuningProfileRunSummaryNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileRunSummaryNarrative (Q606)', () => {
+  it('returns run summary with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunSummaryNarrative(t12, spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunSummaryNarrative(t12, spec);
+    expect(result.narrative).toContain(t12.name);
+  });
+
+  it('narrative contains the run count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunSummaryNarrative(t12, spec);
+    expect(result.narrative).toContain(String(result.runCount));
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunSummaryNarrative(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q608 — tuningFamilyProfileRunSummaryNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyProfileRunSummaryNarratives (Q608)', () => {
+  it('returns one entry per tuning with id and runNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyProfileRunSummaryNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.runNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q609 — tuningProfileRunDensity
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileRunDensity (Q609)', () => {
+  it('returns run summary with changeDensity in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunDensity(t12, spec);
+    expect(result.changeDensity).toBeGreaterThanOrEqual(0);
+    expect(result.changeDensity).toBeLessThanOrEqual(1);
+  });
+
+  it('changeDensity is 0 when all modes share one profile (runCount = 1)', () => {
+    const spec = harmonicSpectrum(6);
+    const singleDeg: TuningSystem = { ...t12, degrees: t12.degrees.slice(0, 1) };
+    const result = tuningProfileRunDensity(singleDeg, spec);
+    expect(result.changeDensity).toBe(0);
+  });
+
+  it('changeDensity matches (runCount - 1) / (totalModes - 1)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunDensity(t12, spec);
+    const expected = result.totalModes > 1 ? (result.runCount - 1) / (result.totalModes - 1) : 0;
+    expect(result.changeDensity).toBeCloseTo(expected, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunDensity(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q611 — tuningFamilyProfileRunDensities
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyProfileRunDensities (Q611)', () => {
+  it('returns one entry per tuning with id and runDensity', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyProfileRunDensities([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.runDensity.changeDensity).toBeGreaterThanOrEqual(0);
     }
   });
 });
