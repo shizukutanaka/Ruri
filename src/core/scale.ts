@@ -12096,3 +12096,96 @@ export function tuningFamilyQuadrantProfileFrequencyNarrative(
     `Profile overlap is ${level} (overlap score: ${(overlapScore * 100).toFixed(1)}%).`;
   return { ...overlap, narrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q588 — tuningModeProfileTransitions
+// ---------------------------------------------------------------------------
+
+export function tuningModeProfileTransitions(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  fromMode: Scale;
+  toMode: Scale;
+  sameProfile: boolean;
+  fromProfile: string;
+  toProfile: string;
+}[] {
+  const profiles = tuningModeQuadrantProfile(tuning, spectrum, rootHz);
+  const result: {
+    fromMode: Scale;
+    toMode: Scale;
+    sameProfile: boolean;
+    fromProfile: string;
+    toProfile: string;
+  }[] = [];
+  for (let i = 0; i < profiles.length - 1; i++) {
+    const from = profiles[i]!;
+    const to = profiles[i + 1]!;
+    result.push({
+      fromMode: from.mode,
+      toMode: to.mode,
+      sameProfile: from.quadrantProfile === to.quadrantProfile,
+      fromProfile: from.quadrantProfile,
+      toProfile: to.quadrantProfile,
+    });
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q590 — tuningProfileTransitionScore
+// ---------------------------------------------------------------------------
+
+export function tuningProfileTransitionScore(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  sameCount: number;
+  differentCount: number;
+  totalTransitions: number;
+  stabilityScore: number;
+} {
+  const transitions = tuningModeProfileTransitions(tuning, spectrum, rootHz);
+  const sameCount = transitions.filter((t) => t.sameProfile).length;
+  const differentCount = transitions.length - sameCount;
+  const totalTransitions = transitions.length;
+  const stabilityScore = totalTransitions > 0 ? sameCount / totalTransitions : 1;
+  return { sameCount, differentCount, totalTransitions, stabilityScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q592 — tuningFamilyProfileTransitionScores
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileTransitionScores(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; transitionScore: ReturnType<typeof tuningProfileTransitionScore> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    transitionScore: tuningProfileTransitionScore(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q593 — tuningFamilyProfileTransitionRanking
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileTransitionRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  transitionScore: ReturnType<typeof tuningProfileTransitionScore>;
+  rank: number;
+}[] {
+  return tuningFamilyProfileTransitionScores(tunings, spectrum, rootHz)
+    .slice()
+    .sort((a, b) => b.transitionScore.stabilityScore - a.transitionScore.stabilityScore)
+    .map((entry, i) => ({ ...entry, rank: i + 1 }));
+}
