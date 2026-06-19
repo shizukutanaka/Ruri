@@ -303,6 +303,11 @@ import {
   tuningFamilyMostStableProfileTransition,
   tuningFamilyLeastStableProfileTransition,
   tuningProfileTransitionHeatMap,
+  tuningProfileTransitionRuns,
+  tuningProfileLongestRun,
+  tuningProfileRunSummary,
+  tuningFamilyProfileRunSummaries,
+  tuningFamilyProfileRunRanking,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -11071,5 +11076,127 @@ describe('tuningProfileTransitionHeatMap (Q599)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningProfileTransitionHeatMap(t12, spec, 261.63);
     expect(result.length).toBe(t12.degrees.length - 1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q600 — tuningProfileTransitionRuns
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileTransitionRuns (Q600)', () => {
+  it('returns at least one run', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionRuns(t12, spec);
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('all modes are covered across runs (total length = degree count)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionRuns(t12, spec);
+    const total = result.reduce((s, r) => s + r.length, 0);
+    expect(total).toBe(t12.degrees.length);
+  });
+
+  it('each run has at least 1 mode and a valid profile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionRuns(t12, spec);
+    for (const run of result) {
+      expect(run.length).toBeGreaterThan(0);
+      expect(run.profile.split('|').length).toBe(4);
+      expect(run.modes.length).toBe(run.length);
+    }
+  });
+
+  it('consecutive runs have different profiles', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionRuns(t12, spec);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i]!.profile).not.toBe(result[i - 1]!.profile);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionRuns(t12, spec, 261.63);
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q601 — tuningProfileLongestRun
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileLongestRun (Q601)', () => {
+  it('returns the run with the greatest length', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileLongestRun(t12, spec);
+    expect(result).not.toBeNull();
+    if (result !== null) {
+      const runs = tuningProfileTransitionRuns(t12, spec);
+      for (const run of runs) {
+        expect(result.length).toBeGreaterThanOrEqual(run.length);
+      }
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileLongestRun(t12, spec, 261.63);
+    expect(result).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q602 — tuningProfileRunSummary
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileRunSummary (Q602)', () => {
+  it('returns run statistics', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunSummary(t12, spec);
+    expect(result.runCount).toBeGreaterThan(0);
+    expect(result.totalModes).toBe(t12.degrees.length);
+    expect(result.longestRun).toBeGreaterThanOrEqual(result.shortestRun);
+    expect(result.meanRunLength).toBeCloseTo(result.totalModes / result.runCount, 5);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileRunSummary(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q604 — tuningFamilyProfileRunSummaries
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyProfileRunSummaries (Q604)', () => {
+  it('returns one entry per tuning with id and runSummary', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyProfileRunSummaries([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.runSummary.runCount).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q605 — tuningFamilyProfileRunRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyProfileRunRanking (Q605)', () => {
+  it('returns ranked entries sorted by longestRun descending', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyProfileRunRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(results.length).toBe(3);
+    expect(results[0]!.rank).toBe(1);
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i - 1]!.runSummary.longestRun).toBeGreaterThanOrEqual(
+        results[i]!.runSummary.longestRun,
+      );
+    }
   });
 });

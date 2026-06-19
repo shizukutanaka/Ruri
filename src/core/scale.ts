@@ -12279,3 +12279,113 @@ export function tuningProfileTransitionHeatMap(
     changed: !entry.sameProfile,
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q600 — tuningProfileTransitionRuns
+// ---------------------------------------------------------------------------
+
+export function tuningProfileTransitionRuns(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { startIndex: number; length: number; profile: string; modes: Scale[] }[] {
+  const profiles = tuningModeQuadrantProfile(tuning, spectrum, rootHz);
+  if (profiles.length === 0) return [];
+  const runs: { startIndex: number; length: number; profile: string; modes: Scale[] }[] = [];
+  let runStart = 0;
+  let runProfile = profiles[0]!.quadrantProfile;
+  let runModes: Scale[] = [profiles[0]!.mode];
+  for (let i = 1; i < profiles.length; i++) {
+    const current = profiles[i]!;
+    if (current.quadrantProfile === runProfile) {
+      runModes.push(current.mode);
+    } else {
+      runs.push({
+        startIndex: runStart,
+        length: runModes.length,
+        profile: runProfile,
+        modes: [...runModes],
+      });
+      runStart = i;
+      runProfile = current.quadrantProfile;
+      runModes = [current.mode];
+    }
+  }
+  runs.push({
+    startIndex: runStart,
+    length: runModes.length,
+    profile: runProfile,
+    modes: [...runModes],
+  });
+  return runs;
+}
+
+// ---------------------------------------------------------------------------
+// Q601 — tuningProfileLongestRun
+// ---------------------------------------------------------------------------
+
+export function tuningProfileLongestRun(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { startIndex: number; length: number; profile: string; modes: Scale[] } | null {
+  const runs = tuningProfileTransitionRuns(tuning, spectrum, rootHz);
+  if (runs.length === 0) return null;
+  return runs.reduce((best, run) => (run.length > best.length ? run : best), runs[0]!);
+}
+
+// ---------------------------------------------------------------------------
+// Q602 — tuningProfileRunSummary
+// ---------------------------------------------------------------------------
+
+export function tuningProfileRunSummary(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  runCount: number;
+  longestRun: number;
+  shortestRun: number;
+  meanRunLength: number;
+  totalModes: number;
+} {
+  const runs = tuningProfileTransitionRuns(tuning, spectrum, rootHz);
+  if (runs.length === 0)
+    return { runCount: 0, longestRun: 0, shortestRun: 0, meanRunLength: 0, totalModes: 0 };
+  const lengths = runs.map((r) => r.length);
+  const longestRun = Math.max(...lengths);
+  const shortestRun = Math.min(...lengths);
+  const totalModes = lengths.reduce((s, l) => s + l, 0);
+  const meanRunLength = totalModes / runs.length;
+  return { runCount: runs.length, longestRun, shortestRun, meanRunLength, totalModes };
+}
+
+// ---------------------------------------------------------------------------
+// Q604 — tuningFamilyProfileRunSummaries
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileRunSummaries(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; runSummary: ReturnType<typeof tuningProfileRunSummary> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    runSummary: tuningProfileRunSummary(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q605 — tuningFamilyProfileRunRanking
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileRunRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; runSummary: ReturnType<typeof tuningProfileRunSummary>; rank: number }[] {
+  return tuningFamilyProfileRunSummaries(tunings, spectrum, rootHz)
+    .slice()
+    .sort((a, b) => b.runSummary.longestRun - a.runSummary.longestRun)
+    .map((entry, i) => ({ ...entry, rank: i + 1 }));
+}
