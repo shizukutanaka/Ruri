@@ -139,6 +139,8 @@ import {
   presetFamilyAmbassadorScoreStats,
   presetFamilyWeakestAmbassador,
   presetFamilyAmbassadorGap,
+  presetFamilyAmbassadorConsensusDistribution,
+  presetFamilyAmbassadorProfileFrequency,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3908,5 +3910,48 @@ describe('presetFamilyAmbassadorGap (Q659)', () => {
   it('returns null for empty preset list', () => {
     const spec = harmonicSpectrum(6);
     expect(presetFamilyAmbassadorGap([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q661 — presetFamilyAmbassadorConsensusDistribution
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorConsensusDistribution (Q661)', () => {
+  it('returns consensus distribution for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const dist = presetFamilyAmbassadorConsensusDistribution(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(dist.total).toBe(1);
+    expect(dist.versatile + dist.balanced + dist.specialized).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorConsensusDistribution(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q664 — presetFamilyAmbassadorProfileFrequency
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorProfileFrequency (Q664)', () => {
+  it('returns profile frequency for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const freq = presetFamilyAmbassadorProfileFrequency(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(Array.isArray(freq)).toBe(true);
+    expect(freq.length).toBeGreaterThanOrEqual(1);
+    expect(typeof freq[0]!.profile).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorProfileFrequency(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
   });
 });

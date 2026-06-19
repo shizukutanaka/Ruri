@@ -132,6 +132,8 @@ import {
   tuningFamilyWeakestAmbassador,
   tuningFamilyAmbassadorScoreStats,
   tuningFamilyAmbassadorGap,
+  tuningFamilyAmbassadorConsensusDistribution,
+  tuningFamilyAmbassadorProfileFrequency,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5333,4 +5335,40 @@ export function presetFamilyAmbassadorGap(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorGap(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q661 — presetFamilyAmbassadorConsensusDistribution
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorConsensusDistribution(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorConsensusDistribution> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorConsensusDistribution(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q664 — presetFamilyAmbassadorProfileFrequency
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorProfileFrequency(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorProfileFrequency> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorProfileFrequency(tunings, spectrum, rootHz);
 }
