@@ -114,6 +114,7 @@ import {
   tuningModeProfileTransitions,
   tuningProfileTransitionScore,
   tuningProfileTransitionScoreNarrative,
+  tuningProfileRunSummary,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5030,4 +5031,19 @@ export function presetProfileTransitionScoreNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningProfileTransitionScoreNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q603 — presetProfileRunSummary
+// ---------------------------------------------------------------------------
+
+export function presetProfileRunSummary(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileRunSummary> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileRunSummary(loadTuningPreset(preset), spectrum, rootHz);
 }

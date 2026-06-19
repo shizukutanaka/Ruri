@@ -121,6 +121,7 @@ import {
   presetModeProfileTransitions,
   presetProfileTransitionScore,
   presetProfileTransitionScoreNarrative,
+  presetProfileRunSummary,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3508,5 +3509,25 @@ describe('presetProfileTransitionScoreNarrative (Q595)', () => {
     expect(() =>
       presetProfileTransitionScoreNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q603 — presetProfileRunSummary
+// ---------------------------------------------------------------------------
+
+describe('presetProfileRunSummary (Q603)', () => {
+  it('returns run summary for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetProfileRunSummary('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.runCount).toBeGreaterThan(0);
+    expect(result.totalModes).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetProfileRunSummary('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
   });
 });
