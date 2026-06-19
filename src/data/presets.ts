@@ -118,6 +118,8 @@ import {
   tuningProfileRunSummaryNarrative,
   tuningProfileRunDensity,
   tuningProfileRunDensityNarrative,
+  tuningProfileTextureReport,
+  tuningProfileTextureReportNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5094,4 +5096,34 @@ export function presetProfileRunDensityNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningProfileRunDensityNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q619 — presetProfileTextureReport
+// ---------------------------------------------------------------------------
+
+export function presetProfileTextureReport(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileTextureReport> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileTextureReport(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q622 — presetProfileTextureReportNarrative
+// ---------------------------------------------------------------------------
+
+export function presetProfileTextureReportNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileTextureReportNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileTextureReportNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }

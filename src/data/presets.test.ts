@@ -125,6 +125,8 @@ import {
   presetProfileRunSummaryNarrative,
   presetProfileRunDensity,
   presetProfileRunDensityNarrative,
+  presetProfileTextureReport,
+  presetProfileTextureReportNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3591,6 +3593,48 @@ describe('presetProfileRunDensityNarrative (Q616)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetProfileRunDensityNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q619 — presetProfileTextureReport
+// ---------------------------------------------------------------------------
+
+describe('presetProfileTextureReport (Q619)', () => {
+  it('returns all four sub-reports for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetProfileTextureReport('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.coverage.totalUniqueProfiles).toBe('number');
+    expect(typeof result.runSummary.runCount).toBe('number');
+    expect(typeof result.transitionScore.stabilityScore).toBe('number');
+    expect(typeof result.profileDiversity.normalized).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetProfileTextureReport('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q622 — presetProfileTextureReportNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetProfileTextureReportNarrative (Q622)', () => {
+  it('returns texture report with narrative for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetProfileTextureReportNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetProfileTextureReportNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
