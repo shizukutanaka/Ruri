@@ -11806,3 +11806,73 @@ export function tuningFamilyQuadrantCoverageNarratives(
     coverageNarrative: tuningQuadrantCoverageNarrative(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q570 — tuningDominantQuadrantProfile
+// ---------------------------------------------------------------------------
+
+export function tuningDominantQuadrantProfile(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: string; modes: Scale[]; count: number } {
+  const groups = tuningModeGroupByProfile(tuning, spectrum, rootHz);
+  if (groups.length === 0) throw new RangeError('No modes in tuning');
+  return groups[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q572 — tuningFamilyDominantQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyDominantQuadrantProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; dominantProfile: ReturnType<typeof tuningDominantQuadrantProfile> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    dominantProfile: tuningDominantQuadrantProfile(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q573 — tuningQuadrantProfileDiversity
+// ---------------------------------------------------------------------------
+
+export function tuningQuadrantProfileDiversity(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  profileCount: number;
+  totalModes: number;
+  entropy: number;
+  normalized: number;
+} {
+  const groups = tuningModeGroupByProfile(tuning, spectrum, rootHz);
+  const totalModes = groups.reduce((s, g) => s + g.count, 0);
+  if (totalModes === 0) return { profileCount: 0, totalModes: 0, entropy: 0, normalized: 0 };
+  const entropy = groups.reduce((h, g) => {
+    const p = g.count / totalModes;
+    return h - p * Math.log2(p);
+  }, 0);
+  const profileCount = groups.length;
+  const normalized = profileCount > 1 ? entropy / Math.log2(profileCount) : 1;
+  return { profileCount, totalModes, entropy, normalized };
+}
+
+// ---------------------------------------------------------------------------
+// Q575 — tuningFamilyQuadrantProfileDiversities
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantProfileDiversities(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; profileDiversity: ReturnType<typeof tuningQuadrantProfileDiversity> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    profileDiversity: tuningQuadrantProfileDiversity(t, spectrum, rootHz),
+  }));
+}

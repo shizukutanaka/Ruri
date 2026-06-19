@@ -279,6 +279,10 @@ import {
   tuningFamilyModeGroupByProfiles,
   tuningQuadrantCoverageNarrative,
   tuningFamilyQuadrantCoverageNarratives,
+  tuningDominantQuadrantProfile,
+  tuningFamilyDominantQuadrantProfiles,
+  tuningQuadrantProfileDiversity,
+  tuningFamilyQuadrantProfileDiversities,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10484,6 +10488,99 @@ describe('tuningFamilyQuadrantCoverageNarratives (Q569)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(typeof r.coverageNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q570 — tuningDominantQuadrantProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningDominantQuadrantProfile (Q570)', () => {
+  it('returns the most common quadrant profile group', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningDominantQuadrantProfile(t12, spec);
+    expect(typeof result.profile).toBe('string');
+    expect(result.profile.split('|').length).toBe(4);
+    expect(result.count).toBeGreaterThan(0);
+    expect(result.modes.length).toBe(result.count);
+  });
+
+  it('dominant profile has highest or equal count among all groups', () => {
+    const spec = harmonicSpectrum(6);
+    const dominant = tuningDominantQuadrantProfile(t12, spec);
+    const groups = tuningModeGroupByProfile(t12, spec);
+    for (const g of groups) {
+      expect(dominant.count).toBeGreaterThanOrEqual(g.count);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningDominantQuadrantProfile(t12, spec, 261.63);
+    expect(typeof result.profile).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q572 — tuningFamilyDominantQuadrantProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyDominantQuadrantProfiles (Q572)', () => {
+  it('returns one entry per tuning with id and dominantProfile', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyDominantQuadrantProfiles([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.dominantProfile.profile).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q573 — tuningQuadrantProfileDiversity
+// ---------------------------------------------------------------------------
+
+describe('tuningQuadrantProfileDiversity (Q573)', () => {
+  it('returns profileCount, totalModes, entropy, normalized', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantProfileDiversity(t12, spec);
+    expect(result.totalModes).toBe(t12.degrees.length);
+    expect(result.profileCount).toBeGreaterThan(0);
+    expect(result.entropy).toBeGreaterThanOrEqual(0);
+    expect(result.normalized).toBeGreaterThanOrEqual(0);
+    expect(result.normalized).toBeLessThanOrEqual(1);
+  });
+
+  it('entropy is 0 when all modes share one profile', () => {
+    // Create a tuning with only 1 degree (all modes identical)
+    const singleDeg: TuningSystem = { ...t12, degrees: t12.degrees.slice(0, 1) };
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantProfileDiversity(singleDeg, spec);
+    expect(result.entropy).toBe(0);
+    expect(result.normalized).toBe(1); // single profile → normalized = 1
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantProfileDiversity(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q575 — tuningFamilyQuadrantProfileDiversities
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantProfileDiversities (Q575)', () => {
+  it('returns one entry per tuning with id and profileDiversity', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyQuadrantProfileDiversities([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(r.profileDiversity.totalModes).toBeGreaterThan(0);
     }
   });
 });
