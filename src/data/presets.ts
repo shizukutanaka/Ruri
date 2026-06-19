@@ -123,6 +123,8 @@ import {
   tuningModeRarestProfileGroup,
   tuningModeSoloProfileModes,
   tuningModeSoloProfileNarrative,
+  tuningModeQuadrantIdentityBundle,
+  tuningModeQuadrantIdentityNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5174,4 +5176,34 @@ export function presetModeSoloProfileNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningModeSoloProfileNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q637 — presetModeQuadrantIdentityBundle
+// ---------------------------------------------------------------------------
+
+export function presetModeQuadrantIdentityBundle(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeQuadrantIdentityBundle> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeQuadrantIdentityBundle(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q640 — presetModeQuadrantIdentityNarrative
+// ---------------------------------------------------------------------------
+
+export function presetModeQuadrantIdentityNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeQuadrantIdentityNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeQuadrantIdentityNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }

@@ -130,6 +130,8 @@ import {
   presetModeRarestProfileGroup,
   presetModeSoloProfileModes,
   presetModeSoloProfileNarrative,
+  presetModeQuadrantIdentityBundle,
+  presetModeQuadrantIdentityNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3700,6 +3702,47 @@ describe('presetModeSoloProfileNarrative (Q634)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetModeSoloProfileNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q637 — presetModeQuadrantIdentityBundle
+// ---------------------------------------------------------------------------
+
+describe('presetModeQuadrantIdentityBundle (Q637)', () => {
+  it('returns identity bundle for each mode of a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeQuadrantIdentityBundle('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    const valid = ['versatile', 'specialized', 'balanced'];
+    expect(valid).toContain(result[0]!.consensus);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeQuadrantIdentityBundle('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q640 — presetModeQuadrantIdentityNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetModeQuadrantIdentityNarrative (Q640)', () => {
+  it('returns identity narrative for each mode of a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeQuadrantIdentityNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.narrative).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeQuadrantIdentityNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
