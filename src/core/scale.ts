@@ -12770,3 +12770,90 @@ export function tuningFamilyModeSoloProfileNarratives(
     soloNarrative: tuningModeSoloProfileNarrative(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q636 — tuningModeQuadrantIdentityBundle
+// ---------------------------------------------------------------------------
+
+export function tuningModeQuadrantIdentityBundle(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mode: Scale;
+  entropyDiversityQuadrant: string;
+  consistencyVolatilityQuadrant: string;
+  smoothnessEntropyQuadrant: string;
+  diversityVolatilityQuadrant: string;
+  quadrantProfile: string;
+  quadrantVotes: Record<string, number>;
+  dominantToken: string;
+  consensus: 'versatile' | 'specialized' | 'balanced';
+  isSoloProfile: boolean;
+}[] {
+  const allQuadrants = tuningModeQuadrantProfile(tuning, spectrum, rootHz);
+  const consensusData = tuningModeQuadrantConsensus(tuning, spectrum, rootHz);
+  const soloModeIds = new Set(
+    tuningModeSoloProfileModes(tuning, spectrum, rootHz).map((m) => m.id),
+  );
+  const consensusMap = new Map(consensusData.map((e) => [e.mode.id, e]));
+  return allQuadrants.map((entry) => {
+    const con = consensusMap.get(entry.mode.id);
+    return {
+      ...entry,
+      quadrantVotes: con?.quadrantVotes ?? {},
+      dominantToken: con?.dominantToken ?? '',
+      consensus: con?.consensus ?? 'balanced',
+      isSoloProfile: soloModeIds.has(entry.mode.id),
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q638 — tuningFamilyModeQuadrantIdentityBundles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeQuadrantIdentityBundles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; identityBundle: ReturnType<typeof tuningModeQuadrantIdentityBundle> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    identityBundle: tuningModeQuadrantIdentityBundle(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q639 — tuningModeQuadrantIdentityNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningModeQuadrantIdentityNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): (ReturnType<typeof tuningModeQuadrantIdentityBundle>[number] & { narrative: string })[] {
+  return tuningModeQuadrantIdentityBundle(tuning, spectrum, rootHz).map((entry) => {
+    const { mode, quadrantProfile, dominantToken, consensus, isSoloProfile } = entry;
+    const uniqueness = isSoloProfile ? 'unique fingerprint' : 'shared fingerprint';
+    const narrative =
+      `"${mode.name}": ${consensus} character, dominant token "${dominantToken}", ${uniqueness}. ` +
+      `Profile: ${quadrantProfile}.`;
+    return { ...entry, narrative };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q641 — tuningFamilyModeQuadrantIdentityNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeQuadrantIdentityNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; identityNarratives: ReturnType<typeof tuningModeQuadrantIdentityNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    identityNarratives: tuningModeQuadrantIdentityNarrative(t, spectrum, rootHz),
+  }));
+}
