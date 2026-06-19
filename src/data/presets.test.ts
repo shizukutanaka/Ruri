@@ -157,6 +157,9 @@ import {
   presetFamilyAmbassadorMeanProfileDistanceNarrative,
   presetFamilyAmbassadorProfileDistanceStats,
   presetFamilyAmbassadorCentrality,
+  presetFamilyAmbassadorOutlier,
+  presetFamilyAmbassadorCentralityNarrative,
+  presetFamilyAmbassadorDistanceSpread,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4336,5 +4339,78 @@ describe('presetFamilyAmbassadorCentrality (Q707)', () => {
   it('returns null for empty preset list', () => {
     const spec = harmonicSpectrum(6);
     expect(presetFamilyAmbassadorCentrality([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q709 — presetFamilyAmbassadorOutlier
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorOutlier (Q709)', () => {
+  it('returns the outlier for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorOutlier(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result).not.toBeNull();
+    expect(typeof result!.id).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorOutlier(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('returns null for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(presetFamilyAmbassadorOutlier([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q711 — presetFamilyAmbassadorCentralityNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorCentralityNarrative (Q711)', () => {
+  it('returns centrality narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorCentralityNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.centralityNarrative).toBe('string');
+    expect(result.centralityNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorCentralityNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q713 — presetFamilyAmbassadorDistanceSpread
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorDistanceSpread (Q713)', () => {
+  it('returns distance spread for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorDistanceSpread(['12-tet'], spec, undefined, [TWELVE_TET]);
+    // Single preset means central === outlier
+    expect(result).not.toBeNull();
+    expect(typeof result!.spread).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorDistanceSpread(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('returns null for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(presetFamilyAmbassadorDistanceSpread([], spec)).toBeNull();
   });
 });
