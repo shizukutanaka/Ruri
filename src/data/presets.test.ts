@@ -127,6 +127,8 @@ import {
   presetProfileRunDensityNarrative,
   presetProfileTextureReport,
   presetProfileTextureReportNarrative,
+  presetModeRarestProfileGroup,
+  presetModeSoloProfileModes,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3636,5 +3638,47 @@ describe('presetProfileTextureReportNarrative (Q622)', () => {
     expect(() =>
       presetProfileTextureReportNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q625 — presetModeRarestProfileGroup
+// ---------------------------------------------------------------------------
+
+describe('presetModeRarestProfileGroup (Q625)', () => {
+  it('returns the rarest profile group for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeRarestProfileGroup('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result).not.toBeNull();
+    if (result !== null) {
+      expect(typeof result.profile).toBe('string');
+      expect(result.count).toBeGreaterThan(0);
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeRarestProfileGroup('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q627 — presetModeSoloProfileModes
+// ---------------------------------------------------------------------------
+
+describe('presetModeSoloProfileModes (Q627)', () => {
+  it('returns an array of solo-profile modes for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeSoloProfileModes('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeSoloProfileModes('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
   });
 });

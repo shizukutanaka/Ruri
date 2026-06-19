@@ -120,6 +120,8 @@ import {
   tuningProfileRunDensityNarrative,
   tuningProfileTextureReport,
   tuningProfileTextureReportNarrative,
+  tuningModeRarestProfileGroup,
+  tuningModeSoloProfileModes,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5126,4 +5128,34 @@ export function presetProfileTextureReportNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningProfileTextureReportNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q625 — presetModeRarestProfileGroup
+// ---------------------------------------------------------------------------
+
+export function presetModeRarestProfileGroup(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeRarestProfileGroup> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeRarestProfileGroup(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q627 — presetModeSoloProfileModes
+// ---------------------------------------------------------------------------
+
+export function presetModeSoloProfileModes(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeSoloProfileModes> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeSoloProfileModes(loadTuningPreset(preset), spectrum, rootHz);
 }
