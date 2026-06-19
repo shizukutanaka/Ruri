@@ -338,6 +338,10 @@ import {
   tuningFamilyModeAmbassadors,
   tuningModeAmbassadorNarrative,
   tuningFamilyModeAmbassadorNarratives,
+  tuningFamilyAmbassadorRanking,
+  tuningFamilyBestAmbassador,
+  tuningFamilyWeakestAmbassador,
+  tuningFamilyAmbassadorRankingNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -11923,5 +11927,96 @@ describe('tuningFamilyModeAmbassadorNarratives (Q647)', () => {
       expect(typeof r.id).toBe('string');
       expect(typeof r.ambassadorNarrative.ambassadorNarrative).toBe('string');
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q648 — tuningFamilyAmbassadorRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorRanking (Q648)', () => {
+  it('returns one entry per tuning with score and rank', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyAmbassadorRanking([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    expect(results[0]!.rank).toBe(1);
+    expect(results[1]!.rank).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.score).toBe('number');
+      expect(r.score).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('is sorted by score descending', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyAmbassadorRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i - 1]!.score).toBeGreaterThanOrEqual(results[i]!.score);
+    }
+  });
+
+  it('returns empty array for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorRanking([], spec)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q650 — tuningFamilyBestAmbassador
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyBestAmbassador (Q650)', () => {
+  it('returns the top-ranked ambassador entry', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyBestAmbassador([t12, edo(19, 440)], spec);
+    expect(result).not.toBeNull();
+    expect(result!.rank).toBe(1);
+    expect(typeof result!.id).toBe('string');
+  });
+
+  it('returns null for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyBestAmbassador([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q651 — tuningFamilyWeakestAmbassador
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyWeakestAmbassador (Q651)', () => {
+  it('returns the lowest-ranked ambassador entry', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const ranking = tuningFamilyAmbassadorRanking(tunings, spec);
+    const weakest = tuningFamilyWeakestAmbassador(tunings, spec);
+    expect(weakest).not.toBeNull();
+    expect(weakest!.rank).toBe(ranking.length);
+  });
+
+  it('returns null for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyWeakestAmbassador([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q652 — tuningFamilyAmbassadorRankingNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorRankingNarrative (Q652)', () => {
+  it('returns ranking and rankingNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorRankingNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.rankingNarrative).toBe('string');
+    expect(result.rankingNarrative.length).toBeGreaterThan(0);
+    expect(result.ranking.length).toBe(2);
+  });
+
+  it('narrative mentions tuning count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorRankingNarrative([t12, edo(19, 440)], spec);
+    expect(result.rankingNarrative).toContain('2');
   });
 });

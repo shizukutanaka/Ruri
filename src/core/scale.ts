@@ -12924,3 +12924,96 @@ export function tuningFamilyModeAmbassadorNarratives(
     ambassadorNarrative: tuningModeAmbassadorNarrative(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q648 — tuningFamilyAmbassadorRanking
+// ---------------------------------------------------------------------------
+
+const POSITIVE_TOKENS = new Set(['rich', 'complex', 'stable', 'consistent', 'fluid', 'diverse']);
+
+function ambassadorScore(ambassador: ReturnType<typeof tuningModeAmbassador>): number {
+  const { consensus, isSoloProfile, quadrantProfile } = ambassador;
+  const consensusScore = consensus === 'versatile' ? 2 : consensus === 'balanced' ? 1 : 0;
+  const soloBonus = isSoloProfile ? 0.5 : 0;
+  const tokens = quadrantProfile.split(/[^a-z]+/).filter((t) => t.length > 0);
+  const positiveTokenCount = tokens.filter((t) => POSITIVE_TOKENS.has(t)).length;
+  return consensusScore + soloBonus + positiveTokenCount * 0.01;
+}
+
+export function tuningFamilyAmbassadorRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  ambassador: ReturnType<typeof tuningModeAmbassador>;
+  score: number;
+  rank: number;
+}[] {
+  const entries = tuningFamilyModeAmbassadors(tunings, spectrum, rootHz).map((e) => ({
+    id: e.id,
+    ambassador: e.ambassador,
+    score: ambassadorScore(e.ambassador),
+    rank: 0,
+  }));
+  entries.sort((a, b) => b.score - a.score);
+  for (let i = 0; i < entries.length; i++) {
+    entries[i]!.rank = i + 1;
+  }
+  return entries;
+}
+
+// ---------------------------------------------------------------------------
+// Q650 — tuningFamilyBestAmbassador
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyBestAmbassador(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  ambassador: ReturnType<typeof tuningModeAmbassador>;
+  score: number;
+  rank: number;
+} | null {
+  return tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz)[0] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Q651 — tuningFamilyWeakestAmbassador
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyWeakestAmbassador(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  ambassador: ReturnType<typeof tuningModeAmbassador>;
+  score: number;
+  rank: number;
+} | null {
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  return ranking[ranking.length - 1] ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Q652 — tuningFamilyAmbassadorRankingNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorRankingNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { ranking: ReturnType<typeof tuningFamilyAmbassadorRanking>; rankingNarrative: string } {
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  const entries = ranking
+    .map(
+      (e) =>
+        `${e.rank}. "${e.id}" (${e.ambassador.mode.name}, ${e.ambassador.consensus}, score ${e.score.toFixed(2)})`,
+    )
+    .join(', ');
+  const rankingNarrative = `Ambassador ranking across ${tunings.length} tunings: ${entries}`;
+  return { ranking, rankingNarrative };
+}
