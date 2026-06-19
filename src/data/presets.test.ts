@@ -175,6 +175,9 @@ import {
   presetFamilySocraticInsight,
   presetFamilySocraticInsightNarrative,
   presetSocraticContrast,
+  presetSocraticContrastNarrative,
+  presetFamilySocraticRecommendation,
+  presetFamilySocraticRecommendationNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4769,6 +4772,142 @@ describe('presetSocraticContrast (Q743)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetSocraticContrast('12-tet', 'not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q745 — presetSocraticContrastNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetSocraticContrastNarrative (Q745)', () => {
+  it('returns all contrast fields plus contrastNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticContrastNarrative(
+      '12-tet',
+      '12-tet',
+      spec,
+      undefined,
+      ALL_PRESETS,
+    );
+    expect(typeof result.profileA.ambassador.mode.id).toBe('string');
+    expect(typeof result.profileB.ambassador.mode.id).toBe('string');
+    expect(typeof result.distance).toBe('number');
+    expect(typeof result.sameConsensus).toBe('boolean');
+    expect(typeof result.sameProfile).toBe('boolean');
+    expect(typeof result.contrastNarrative).toBe('string');
+    expect(result.contrastNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('same preset yields distance 0 and true sameConsensus/sameProfile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticContrastNarrative('12-tet', '12-tet', spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.distance).toBe(0);
+    expect(result.sameConsensus).toBe(true);
+    expect(result.sameProfile).toBe(true);
+  });
+
+  it('narrative contains preset IDs', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticContrastNarrative('12-tet', '12-tet', spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.contrastNarrative).toContain('12-tet');
+  });
+
+  it('throws RangeError for unknown presetIdA', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetSocraticContrastNarrative('not-a-preset', '12-tet', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown presetIdB', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetSocraticContrastNarrative('12-tet', 'not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q747 — presetFamilySocraticRecommendation
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRecommendation (Q747)', () => {
+  it('returns null fields for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRecommendation([], spec, undefined, [TWELVE_TET]);
+    expect(result.recommendedId).toBeNull();
+    expect(result.reason).toBeNull();
+    expect(result.alternativeId).toBeNull();
+  });
+
+  it('returns a recommendedId and reason for a single preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRecommendation(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(typeof result.recommendedId).toBe('string');
+    expect(result.reason).not.toBeNull();
+  });
+
+  it('returns recommendedId and reason for multiple presets', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRecommendation(['12-tet', '12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.recommendedId).toBe('string');
+    expect(['most-versatile', 'most-central', 'first']).toContain(result.reason);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRecommendation(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q749 — presetFamilySocraticRecommendationNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRecommendationNarrative (Q749)', () => {
+  it('returns recommendation fields plus recommendationNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRecommendationNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.recommendedId).toBe('string');
+    expect(typeof result.reason).toBe('string');
+    expect(typeof result.recommendationNarrative).toBe('string');
+    expect(result.recommendationNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('returns fixed message for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRecommendationNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.recommendationNarrative).toBe('No tunings available for recommendation.');
+    expect(result.recommendedId).toBeNull();
+    expect(result.reason).toBeNull();
+    expect(result.alternativeId).toBeNull();
+  });
+
+  it('narrative contains Recommendation header and key labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRecommendationNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.recommendationNarrative).toContain('Recommendation for family of');
+    expect(result.recommendationNarrative).toContain('Recommended:');
+    expect(result.recommendationNarrative).toContain('Alternative:');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRecommendationNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
