@@ -162,6 +162,9 @@ import {
   tuningSocraticProfile,
   tuningSocraticProfileNarrative,
   tuningFamilySocraticProfiles,
+  tuningFamilySocraticProfileNarratives,
+  tuningFamilySocraticComparison,
+  tuningFamilySocraticComparisonNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5898,4 +5901,58 @@ export function presetFamilySocraticProfiles(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticProfiles(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q733 — presetFamilySocraticProfileNarratives
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticProfileNarratives(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticProfileNarratives> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticProfileNarratives(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q735 — presetFamilySocraticComparison
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticComparison(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticComparison> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticComparison(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q737 — presetFamilySocraticComparisonNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticComparisonNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticComparisonNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticComparisonNarrative(tunings, spectrum, rootHz);
 }

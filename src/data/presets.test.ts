@@ -169,6 +169,9 @@ import {
   presetSocraticProfile,
   presetSocraticProfileNarrative,
   presetFamilySocraticProfiles,
+  presetFamilySocraticProfileNarratives,
+  presetFamilySocraticComparison,
+  presetFamilySocraticComparisonNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4611,6 +4614,69 @@ describe('presetFamilySocraticProfiles (Q731)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticProfiles(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q733 — presetFamilySocraticProfileNarratives
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticProfileNarratives (Q733)', () => {
+  it('returns narratives for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const results = presetFamilySocraticProfileNarratives(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(results.length).toBe(1);
+    expect(typeof results[0]!.socraticNarrative).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticProfileNarratives(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q735 — presetFamilySocraticComparison
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticComparison (Q735)', () => {
+  it('returns comparison for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticComparison(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(typeof result.mostDiverse === 'string' || result.mostDiverse === null).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticComparison(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q737 — presetFamilySocraticComparisonNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticComparisonNarrative (Q737)', () => {
+  it('returns comparison narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticComparisonNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.comparisonNarrative).toBe('string');
+    expect(result.comparisonNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticComparisonNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
