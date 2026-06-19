@@ -12471,3 +12471,88 @@ export function tuningFamilyProfileRunDensities(
     runDensity: tuningProfileRunDensity(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q612 — tuningFamilyProfileRunDensityRanking
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileRunDensityRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; runDensity: ReturnType<typeof tuningProfileRunDensity>; rank: number }[] {
+  return tuningFamilyProfileRunDensities(tunings, spectrum, rootHz)
+    .slice()
+    .sort((a, b) => b.runDensity.changeDensity - a.runDensity.changeDensity)
+    .map((entry, i) => ({ ...entry, rank: i + 1 }));
+}
+
+// ---------------------------------------------------------------------------
+// Q613 — tuningFamilyMostChaoticProfileTransition
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostChaoticProfileTransition(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; runDensity: ReturnType<typeof tuningProfileRunDensity>; rank: number } {
+  const ranking = tuningFamilyProfileRunDensityRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('No tunings provided');
+  return ranking[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q614 — tuningFamilyMostConsistentProfileTransition
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostConsistentProfileTransition(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; runDensity: ReturnType<typeof tuningProfileRunDensity>; rank: number } {
+  const ranking = tuningFamilyProfileRunDensityRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('No tunings provided');
+  return ranking[ranking.length - 1]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q615 — tuningProfileRunDensityNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningProfileRunDensityNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  runCount: number;
+  longestRun: number;
+  shortestRun: number;
+  meanRunLength: number;
+  totalModes: number;
+  changeDensity: number;
+  narrative: string;
+} {
+  const density = tuningProfileRunDensity(tuning, spectrum, rootHz);
+  const { changeDensity, runCount, totalModes } = density;
+  const level =
+    changeDensity >= 0.7 ? 'chaotic' : changeDensity >= 0.4 ? 'moderately varied' : 'consistent';
+  const narrative =
+    `"${tuning.name}" profile change density: ${(changeDensity * 100).toFixed(1)}% of transitions — ${level}. ` +
+    `${runCount} run${runCount !== 1 ? 's' : ''} across ${totalModes} mode${totalModes !== 1 ? 's' : ''}.`;
+  return { ...density, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q617 — tuningFamilyProfileRunDensityNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileRunDensityNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; densityNarrative: ReturnType<typeof tuningProfileRunDensityNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    densityNarrative: tuningProfileRunDensityNarrative(t, spectrum, rootHz),
+  }));
+}
