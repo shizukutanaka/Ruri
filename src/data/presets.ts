@@ -122,6 +122,7 @@ import {
   tuningProfileTextureReportNarrative,
   tuningModeRarestProfileGroup,
   tuningModeSoloProfileModes,
+  tuningModeSoloProfileNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5158,4 +5159,19 @@ export function presetModeSoloProfileModes(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningModeSoloProfileModes(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q634 — presetModeSoloProfileNarrative
+// ---------------------------------------------------------------------------
+
+export function presetModeSoloProfileNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeSoloProfileNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeSoloProfileNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }

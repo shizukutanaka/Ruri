@@ -129,6 +129,7 @@ import {
   presetProfileTextureReportNarrative,
   presetModeRarestProfileGroup,
   presetModeSoloProfileModes,
+  presetModeSoloProfileNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3680,5 +3681,25 @@ describe('presetModeSoloProfileModes (Q627)', () => {
     expect(() => presetModeSoloProfileModes('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
       RangeError,
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q634 — presetModeSoloProfileNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetModeSoloProfileNarrative (Q634)', () => {
+  it('returns solo profile narrative for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeSoloProfileNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeSoloProfileNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
   });
 });
