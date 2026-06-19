@@ -13698,3 +13698,77 @@ export function tuningFamilyAmbassadorMeanProfileDistanceNarrative(
   }
   return { distanceStats, distanceNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q702 — tuningFamilyAmbassadorProfileDistanceStats
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorProfileDistanceStats(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { min: number; max: number; range: number; mean: number; stdDev: number; totalPairs: number } {
+  const matrix = tuningFamilyAmbassadorProfileDistanceMatrix(tunings, spectrum, rootHz);
+  if (matrix.length === 0) {
+    return { min: 0, max: 0, range: 0, mean: 0, stdDev: 0, totalPairs: 0 };
+  }
+  const distances = matrix.map((p) => p.distance);
+  const min = Math.min(...distances);
+  const max = Math.max(...distances);
+  const range = max - min;
+  const n = distances.length;
+  const mean = distances.reduce((s, d) => s + d, 0) / n;
+  const stdDev = Math.sqrt(distances.reduce((s, d) => s + (d - mean) ** 2, 0) / n);
+  return { min, max, range, mean, stdDev, totalPairs: n };
+}
+
+// ---------------------------------------------------------------------------
+// Q704 — tuningFamilyMostDistantAmbassadorPair
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostDistantAmbassadorPair(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilyAmbassadorProfileDistanceMatrix>[number] | null {
+  const matrix = tuningFamilyAmbassadorProfileDistanceMatrix(tunings, spectrum, rootHz);
+  if (matrix.length === 0) return null;
+  let best = matrix[0]!;
+  for (let i = 1; i < matrix.length; i++) {
+    const entry = matrix[i]!;
+    if (entry.distance > best.distance) best = entry;
+  }
+  return best;
+}
+
+// ---------------------------------------------------------------------------
+// Q705 — tuningFamilyAmbassadorCentralityScores
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorCentralityScores(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; meanDistanceToOthers: number; rank: number }[] {
+  const matrix = tuningFamilyAmbassadorProfileDistanceMatrix(tunings, spectrum, rootHz);
+  const scores = tunings.map((t) => {
+    const relevant = matrix.filter((p) => p.idA === t.id || p.idB === t.id);
+    const meanDistanceToOthers =
+      relevant.length > 0 ? relevant.reduce((s, p) => s + p.distance, 0) / relevant.length : 0;
+    return { id: t.id, meanDistanceToOthers };
+  });
+  scores.sort((a, b) => a.meanDistanceToOthers - b.meanDistanceToOthers);
+  return scores.map((s, i) => ({ ...s, rank: i + 1 }));
+}
+
+// ---------------------------------------------------------------------------
+// Q706 — tuningFamilyAmbassadorCentrality
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorCentrality(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; meanDistanceToOthers: number; rank: number } | null {
+  return tuningFamilyAmbassadorCentralityScores(tunings, spectrum, rootHz)[0] ?? null;
+}

@@ -371,6 +371,10 @@ import {
   tuningFamilyAmbassadorProfileDistanceMatrix,
   tuningFamilyAmbassadorMeanProfileDistance,
   tuningFamilyAmbassadorMeanProfileDistanceNarrative,
+  tuningFamilyAmbassadorProfileDistanceStats,
+  tuningFamilyMostDistantAmbassadorPair,
+  tuningFamilyAmbassadorCentralityScores,
+  tuningFamilyAmbassadorCentrality,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12761,5 +12765,119 @@ describe('tuningFamilyAmbassadorMeanProfileDistanceNarrative (Q700)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilyAmbassadorMeanProfileDistanceNarrative([], spec);
     expect(result.distanceNarrative).toContain('No pairs');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q702 — tuningFamilyAmbassadorProfileDistanceStats
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorProfileDistanceStats (Q702)', () => {
+  it('returns stats with min/max/range/mean/stdDev', () => {
+    const spec = harmonicSpectrum(6);
+    const stats = tuningFamilyAmbassadorProfileDistanceStats(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(typeof stats.min).toBe('number');
+    expect(typeof stats.max).toBe('number');
+    expect(stats.max).toBeGreaterThanOrEqual(stats.min);
+    expect(stats.range).toBeCloseTo(stats.max - stats.min);
+    expect(stats.totalPairs).toBe(3);
+  });
+
+  it('returns all zeros for empty or single tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const empty = tuningFamilyAmbassadorProfileDistanceStats([], spec);
+    expect(empty.totalPairs).toBe(0);
+    expect(empty.mean).toBe(0);
+  });
+
+  it('stdDev is 0 for all identical pairs', () => {
+    const spec = harmonicSpectrum(6);
+    const stats = tuningFamilyAmbassadorProfileDistanceStats([t12, t12], spec);
+    expect(stats.stdDev).toBeCloseTo(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q704 — tuningFamilyMostDistantAmbassadorPair
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyMostDistantAmbassadorPair (Q704)', () => {
+  it('returns the pair with maximum distance', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyMostDistantAmbassadorPair([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result).not.toBeNull();
+    expect(typeof result!.idA).toBe('string');
+    expect(typeof result!.idB).toBe('string');
+    expect(result!.distance).toBeGreaterThanOrEqual(0);
+  });
+
+  it('returns null for 0 or 1 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyMostDistantAmbassadorPair([], spec)).toBeNull();
+    expect(tuningFamilyMostDistantAmbassadorPair([t12], spec)).toBeNull();
+  });
+
+  it('distance is >= all other pairs', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const most = tuningFamilyMostDistantAmbassadorPair(tunings, spec);
+    const matrix = tuningFamilyAmbassadorProfileDistanceMatrix(tunings, spec);
+    for (const entry of matrix) {
+      expect(most!.distance).toBeGreaterThanOrEqual(entry.distance);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q705 — tuningFamilyAmbassadorCentralityScores
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorCentralityScores (Q705)', () => {
+  it('returns one entry per tuning with rank', () => {
+    const spec = harmonicSpectrum(6);
+    const scores = tuningFamilyAmbassadorCentralityScores([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(scores.length).toBe(3);
+    expect(scores[0]!.rank).toBe(1);
+    for (const s of scores) {
+      expect(typeof s.id).toBe('string');
+      expect(typeof s.meanDistanceToOthers).toBe('number');
+    }
+  });
+
+  it('sorted by meanDistanceToOthers ascending', () => {
+    const spec = harmonicSpectrum(6);
+    const scores = tuningFamilyAmbassadorCentralityScores([t12, edo(19, 440), edo(31, 440)], spec);
+    for (let i = 1; i < scores.length; i++) {
+      expect(scores[i - 1]!.meanDistanceToOthers).toBeLessThanOrEqual(
+        scores[i]!.meanDistanceToOthers,
+      );
+    }
+  });
+
+  it('returns empty array for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorCentralityScores([], spec)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q706 — tuningFamilyAmbassadorCentrality
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorCentrality (Q706)', () => {
+  it('returns the most central tuning (rank 1)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorCentrality([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result).not.toBeNull();
+    expect(result!.rank).toBe(1);
+    expect(typeof result!.id).toBe('string');
+  });
+
+  it('returns null for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorCentrality([], spec)).toBeNull();
   });
 });
