@@ -342,6 +342,9 @@ import {
   tuningFamilyBestAmbassador,
   tuningFamilyWeakestAmbassador,
   tuningFamilyAmbassadorRankingNarrative,
+  tuningFamilyAmbassadorScoreStats,
+  tuningFamilyAmbassadorGap,
+  tuningFamilyAmbassadorScoreStatsNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12018,5 +12021,87 @@ describe('tuningFamilyAmbassadorRankingNarrative (Q652)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilyAmbassadorRankingNarrative([t12, edo(19, 440)], spec);
     expect(result.rankingNarrative).toContain('2');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q654 — tuningFamilyAmbassadorScoreStats
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorScoreStats (Q654)', () => {
+  it('returns stats object with min/max/mean/range/stdDev', () => {
+    const spec = harmonicSpectrum(6);
+    const stats = tuningFamilyAmbassadorScoreStats([t12, edo(19, 440)], spec);
+    expect(typeof stats.min).toBe('number');
+    expect(typeof stats.max).toBe('number');
+    expect(typeof stats.mean).toBe('number');
+    expect(typeof stats.range).toBe('number');
+    expect(typeof stats.stdDev).toBe('number');
+    expect(stats.max).toBeGreaterThanOrEqual(stats.min);
+    expect(stats.range).toBeCloseTo(stats.max - stats.min);
+  });
+
+  it('returns all zeros for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    const stats = tuningFamilyAmbassadorScoreStats([], spec);
+    expect(stats.min).toBe(0);
+    expect(stats.max).toBe(0);
+    expect(stats.mean).toBe(0);
+    expect(stats.range).toBe(0);
+    expect(stats.stdDev).toBe(0);
+  });
+
+  it('stdDev is zero for single-tuning family', () => {
+    const spec = harmonicSpectrum(6);
+    const stats = tuningFamilyAmbassadorScoreStats([t12], spec);
+    expect(stats.stdDev).toBeCloseTo(0);
+    expect(stats.min).toBe(stats.max);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q656 — tuningFamilyAmbassadorGap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorGap (Q656)', () => {
+  it('returns gap object with best, weakest, scoreDiff', () => {
+    const spec = harmonicSpectrum(6);
+    const gap = tuningFamilyAmbassadorGap([t12, edo(19, 440)], spec);
+    expect(gap).not.toBeNull();
+    expect(typeof gap!.scoreDiff).toBe('number');
+    expect(gap!.scoreDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('returns null for empty tunings list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorGap([], spec)).toBeNull();
+  });
+
+  it('scoreDiff equals best.score - weakest.score', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const gap = tuningFamilyAmbassadorGap(tunings, spec);
+    expect(gap).not.toBeNull();
+    expect(gap!.scoreDiff).toBeCloseTo((gap!.best?.score ?? 0) - (gap!.weakest?.score ?? 0));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q657 — tuningFamilyAmbassadorScoreStatsNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorScoreStatsNarrative (Q657)', () => {
+  it('returns stats and statsNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorScoreStatsNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.statsNarrative).toBe('string');
+    expect(result.statsNarrative.length).toBeGreaterThan(0);
+    expect(typeof result.stats.mean).toBe('number');
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorScoreStatsNarrative([], spec);
+    expect(result.statsNarrative).toContain('No tunings');
   });
 });

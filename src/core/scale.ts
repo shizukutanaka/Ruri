@@ -13017,3 +13017,72 @@ export function tuningFamilyAmbassadorRankingNarrative(
   const rankingNarrative = `Ambassador ranking across ${tunings.length} tunings: ${entries}`;
   return { ranking, rankingNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q654 — tuningFamilyAmbassadorScoreStats
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorScoreStats(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { min: number; max: number; mean: number; range: number; stdDev: number } {
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) {
+    return { min: 0, max: 0, mean: 0, range: 0, stdDev: 0 };
+  }
+  const scores = ranking.map((r) => r.score);
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  const n = scores.length;
+  const mean = scores.reduce((a, b) => a + b, 0) / n;
+  const range = max - min;
+  const stdDev = Math.sqrt(scores.reduce((sum, x) => sum + (x - mean) ** 2, 0) / n);
+  return { min, max, mean, range, stdDev };
+}
+
+// ---------------------------------------------------------------------------
+// Q656 — tuningFamilyAmbassadorGap
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorGap(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  best: ReturnType<typeof tuningFamilyBestAmbassador>;
+  weakest: ReturnType<typeof tuningFamilyWeakestAmbassador>;
+  scoreDiff: number;
+} | null {
+  const best = tuningFamilyBestAmbassador(tunings, spectrum, rootHz);
+  const weakest = tuningFamilyWeakestAmbassador(tunings, spectrum, rootHz);
+  if (best === null && weakest === null) {
+    return null;
+  }
+  const scoreDiff = (best?.score ?? 0) - (weakest?.score ?? 0);
+  return { best, weakest, scoreDiff };
+}
+
+// ---------------------------------------------------------------------------
+// Q657 — tuningFamilyAmbassadorScoreStatsNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorScoreStatsNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { stats: ReturnType<typeof tuningFamilyAmbassadorScoreStats>; statsNarrative: string } {
+  const stats = tuningFamilyAmbassadorScoreStats(tunings, spectrum, rootHz);
+  let statsNarrative: string;
+  if (tunings.length === 0) {
+    statsNarrative = 'No tunings to compare.';
+  } else {
+    statsNarrative = `Ambassador score stats across ${tunings.length} tunings — mean: ${stats.mean.toFixed(2)}, range: ${stats.range.toFixed(2)}, stdDev: ${stats.stdDev.toFixed(2)}.`;
+    if (stats.stdDev < 0.1) {
+      statsNarrative += ' Scores are tightly clustered.';
+    } else if (stats.stdDev > 0.5) {
+      statsNarrative += ' Scores are highly dispersed.';
+    }
+  }
+  return { stats, statsNarrative };
+}
