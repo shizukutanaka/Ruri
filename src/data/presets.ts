@@ -113,6 +113,7 @@ import {
   tuningQuadrantProfileDiversityNarrative,
   tuningModeProfileTransitions,
   tuningProfileTransitionScore,
+  tuningProfileTransitionScoreNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5014,4 +5015,19 @@ export function presetProfileTransitionScore(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningProfileTransitionScore(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q595 — presetProfileTransitionScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function presetProfileTransitionScoreNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileTransitionScoreNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileTransitionScoreNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }
