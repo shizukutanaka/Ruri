@@ -367,6 +367,10 @@ import {
   tuningFamilyAmbassadorConsensusConvergenceScoreNarrative,
   tuningFamilyAmbassadorConvergenceBundle,
   tuningFamilyAmbassadorConvergenceBundleNarrative,
+  tuningAmbassadorProfileDistance,
+  tuningFamilyAmbassadorProfileDistanceMatrix,
+  tuningFamilyAmbassadorMeanProfileDistance,
+  tuningFamilyAmbassadorMeanProfileDistanceNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12657,5 +12661,105 @@ describe('tuningFamilyAmbassadorConvergenceBundleNarrative (Q694)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilyAmbassadorConvergenceBundleNarrative([], spec);
     expect(result.bundleNarrative).toContain('No tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q696 — tuningAmbassadorProfileDistance
+// ---------------------------------------------------------------------------
+
+describe('tuningAmbassadorProfileDistance (Q696)', () => {
+  it('returns 0 for identical tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningAmbassadorProfileDistance(t12, t12, spec)).toBe(0);
+  });
+
+  it('returns a number in [0,4] for different tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const dist = tuningAmbassadorProfileDistance(t12, edo(19, 440), spec);
+    expect(dist).toBeGreaterThanOrEqual(0);
+    expect(dist).toBeLessThanOrEqual(4);
+  });
+
+  it('distance is symmetric', () => {
+    const spec = harmonicSpectrum(6);
+    const t19 = edo(19, 440);
+    expect(tuningAmbassadorProfileDistance(t12, t19, spec)).toBe(
+      tuningAmbassadorProfileDistance(t19, t12, spec),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q697 — tuningFamilyAmbassadorProfileDistanceMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorProfileDistanceMatrix (Q697)', () => {
+  it('returns n*(n-1)/2 pairs', () => {
+    const spec = harmonicSpectrum(6);
+    const matrix = tuningFamilyAmbassadorProfileDistanceMatrix(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(matrix.length).toBe(3);
+    for (const entry of matrix) {
+      expect(typeof entry.idA).toBe('string');
+      expect(typeof entry.idB).toBe('string');
+      expect(entry.distance).toBeGreaterThanOrEqual(0);
+      expect(entry.distance).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it('returns empty array for 0 or 1 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorProfileDistanceMatrix([], spec)).toEqual([]);
+    expect(tuningFamilyAmbassadorProfileDistanceMatrix([t12], spec)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q698 — tuningFamilyAmbassadorMeanProfileDistance
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorMeanProfileDistance (Q698)', () => {
+  it('returns mean distance and maxPossible=4', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorMeanProfileDistance([t12, edo(19, 440)], spec);
+    expect(result.maxPossible).toBe(4);
+    expect(result.totalPairs).toBe(1);
+    expect(result.meanDistance).toBeGreaterThanOrEqual(0);
+    expect(result.meanDistance).toBeLessThanOrEqual(4);
+  });
+
+  it('returns meanDistance=0 for identical tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorMeanProfileDistance([t12, t12], spec);
+    expect(result.meanDistance).toBe(0);
+  });
+
+  it('returns all-zero for 0 or 1 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorMeanProfileDistance([], spec).totalPairs).toBe(0);
+    expect(tuningFamilyAmbassadorMeanProfileDistance([t12], spec).meanDistance).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q700 — tuningFamilyAmbassadorMeanProfileDistanceNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorMeanProfileDistanceNarrative (Q700)', () => {
+  it('returns distanceStats and distanceNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorMeanProfileDistanceNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.distanceNarrative).toBe('string');
+    expect(result.distanceNarrative.length).toBeGreaterThan(0);
+    expect(typeof result.distanceStats.meanDistance).toBe('number');
+  });
+
+  it('narrative for empty list says no pairs', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorMeanProfileDistanceNarrative([], spec);
+    expect(result.distanceNarrative).toContain('No pairs');
   });
 });

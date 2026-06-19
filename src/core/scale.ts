@@ -13609,3 +13609,92 @@ export function tuningFamilyAmbassadorConvergenceBundleNarrative(
   }
   return { bundle, bundleNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q696 — tuningAmbassadorProfileDistance
+// ---------------------------------------------------------------------------
+
+export function tuningAmbassadorProfileDistance(
+  tuningA: TuningSystem,
+  tuningB: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const profileA = tuningModeAmbassador(tuningA, spectrum, rootHz).quadrantProfile;
+  const profileB = tuningModeAmbassador(tuningB, spectrum, rootHz).quadrantProfile;
+  const labelsA = profileA.split('|');
+  const labelsB = profileB.split('|');
+  let distance = 0;
+  for (let i = 0; i < 4; i++) {
+    if (labelsA[i] !== labelsB[i]) distance++;
+  }
+  return distance;
+}
+
+// ---------------------------------------------------------------------------
+// Q697 — tuningFamilyAmbassadorProfileDistanceMatrix
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorProfileDistanceMatrix(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { idA: string; idB: string; distance: number }[] {
+  const result: { idA: string; idB: string; distance: number }[] = [];
+  for (let i = 0; i < tunings.length; i++) {
+    for (let j = i + 1; j < tunings.length; j++) {
+      const tA = tunings[i];
+      const tB = tunings[j];
+      if (!tA || !tB) continue;
+      const distance = tuningAmbassadorProfileDistance(tA, tB, spectrum, rootHz);
+      result.push({ idA: tA.id, idB: tB.id, distance });
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q698 — tuningFamilyAmbassadorMeanProfileDistance
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorMeanProfileDistance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { meanDistance: number; totalPairs: number; maxPossible: number } {
+  const matrix = tuningFamilyAmbassadorProfileDistanceMatrix(tunings, spectrum, rootHz);
+  const totalPairs = matrix.length;
+  const meanDistance = totalPairs > 0 ? matrix.reduce((s, p) => s + p.distance, 0) / totalPairs : 0;
+  const maxPossible = 4;
+  return { meanDistance, totalPairs, maxPossible };
+}
+
+// ---------------------------------------------------------------------------
+// Q700 — tuningFamilyAmbassadorMeanProfileDistanceNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorMeanProfileDistanceNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  distanceStats: ReturnType<typeof tuningFamilyAmbassadorMeanProfileDistance>;
+  distanceNarrative: string;
+} {
+  const distanceStats = tuningFamilyAmbassadorMeanProfileDistance(tunings, spectrum, rootHz);
+  const { meanDistance, totalPairs } = distanceStats;
+  let distanceNarrative: string;
+  if (totalPairs === 0) {
+    distanceNarrative = 'No pairs to compare.';
+  } else {
+    distanceNarrative = `Mean ambassador profile distance: ${meanDistance.toFixed(2)}/4 across ${totalPairs} pairs.`;
+    if (meanDistance < 1) {
+      distanceNarrative += ' Tunings share very similar ambassador profiles.';
+    } else if (meanDistance < 2.5) {
+      distanceNarrative += ' Moderate profile divergence.';
+    } else {
+      distanceNarrative += ' Tunings have highly diverse ambassador profiles.';
+    }
+  }
+  return { distanceStats, distanceNarrative };
+}
