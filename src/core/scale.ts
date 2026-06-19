@@ -12189,3 +12189,93 @@ export function tuningFamilyProfileTransitionRanking(
     .sort((a, b) => b.transitionScore.stabilityScore - a.transitionScore.stabilityScore)
     .map((entry, i) => ({ ...entry, rank: i + 1 }));
 }
+
+// ---------------------------------------------------------------------------
+// Q594 — tuningProfileTransitionScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningProfileTransitionScoreNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  sameCount: number;
+  differentCount: number;
+  totalTransitions: number;
+  stabilityScore: number;
+  narrative: string;
+} {
+  const score = tuningProfileTransitionScore(tuning, spectrum, rootHz);
+  const { sameCount, totalTransitions, stabilityScore } = score;
+  const level =
+    stabilityScore >= 0.8
+      ? 'highly stable'
+      : stabilityScore >= 0.5
+        ? 'moderately stable'
+        : 'highly varied';
+  const narrative =
+    `"${tuning.name}" has a ${level} profile sequence: ${sameCount} of ${totalTransitions} ` +
+    `consecutive mode pairs share the same quadrant profile ` +
+    `(stability: ${(stabilityScore * 100).toFixed(1)}%).`;
+  return { ...score, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q596 — tuningFamilyProfileTransitionScoreNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileTransitionScoreNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; transitionNarrative: ReturnType<typeof tuningProfileTransitionScoreNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    transitionNarrative: tuningProfileTransitionScoreNarrative(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q597 — tuningFamilyMostStableProfileTransition
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostStableProfileTransition(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; transitionScore: ReturnType<typeof tuningProfileTransitionScore>; rank: number } {
+  const ranking = tuningFamilyProfileTransitionRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('No tunings provided');
+  return ranking[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q598 — tuningFamilyLeastStableProfileTransition
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyLeastStableProfileTransition(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; transitionScore: ReturnType<typeof tuningProfileTransitionScore>; rank: number } {
+  const ranking = tuningFamilyProfileTransitionRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('No tunings provided');
+  return ranking[ranking.length - 1]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q599 — tuningProfileTransitionHeatMap
+// ---------------------------------------------------------------------------
+
+export function tuningProfileTransitionHeatMap(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { index: number; fromModeName: string; toModeName: string; changed: boolean }[] {
+  return tuningModeProfileTransitions(tuning, spectrum, rootHz).map((entry, i) => ({
+    index: i,
+    fromModeName: entry.fromMode.name,
+    toModeName: entry.toMode.name,
+    changed: !entry.sameProfile,
+  }));
+}

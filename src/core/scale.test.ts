@@ -298,6 +298,11 @@ import {
   tuningProfileTransitionScore,
   tuningFamilyProfileTransitionScores,
   tuningFamilyProfileTransitionRanking,
+  tuningProfileTransitionScoreNarrative,
+  tuningFamilyProfileTransitionScoreNarratives,
+  tuningFamilyMostStableProfileTransition,
+  tuningFamilyLeastStableProfileTransition,
+  tuningProfileTransitionHeatMap,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10943,5 +10948,128 @@ describe('tuningFamilyProfileTransitionRanking (Q593)', () => {
         results[i]!.transitionScore.stabilityScore,
       );
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q594 — tuningProfileTransitionScoreNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileTransitionScoreNarrative (Q594)', () => {
+  it('returns score with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionScoreNarrative(t12, spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionScoreNarrative(t12, spec);
+    expect(result.narrative).toContain(t12.name);
+  });
+
+  it('narrative contains the stability percentage', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionScoreNarrative(t12, spec);
+    expect(result.narrative).toContain('%');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionScoreNarrative(t12, spec, 261.63);
+    expect(result.totalTransitions).toBe(t12.degrees.length - 1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q596 — tuningFamilyProfileTransitionScoreNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyProfileTransitionScoreNarratives (Q596)', () => {
+  it('returns one entry per tuning with id and transitionNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyProfileTransitionScoreNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.transitionNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q597 — tuningFamilyMostStableProfileTransition
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyMostStableProfileTransition (Q597)', () => {
+  it('returns the rank-1 tuning (most stable profile transitions)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyMostStableProfileTransition([t12, edo(19, 440)], spec);
+    expect(result.rank).toBe(1);
+    expect(typeof result.id).toBe('string');
+  });
+
+  it('throws RangeError for empty tuning array', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => tuningFamilyMostStableProfileTransition([], spec)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q598 — tuningFamilyLeastStableProfileTransition
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyLeastStableProfileTransition (Q598)', () => {
+  it('returns the last-ranked tuning (most varied profile transitions)', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const result = tuningFamilyLeastStableProfileTransition(tunings, spec);
+    expect(result.rank).toBe(tunings.length);
+    expect(typeof result.id).toBe('string');
+  });
+
+  it('throws RangeError for empty tuning array', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => tuningFamilyLeastStableProfileTransition([], spec)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q599 — tuningProfileTransitionHeatMap
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileTransitionHeatMap (Q599)', () => {
+  it('returns n-1 entries with index, mode names, and changed flag', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionHeatMap(t12, spec);
+    expect(result.length).toBe(t12.degrees.length - 1);
+    for (const entry of result) {
+      expect(typeof entry.index).toBe('number');
+      expect(typeof entry.fromModeName).toBe('string');
+      expect(typeof entry.toModeName).toBe('string');
+      expect(typeof entry.changed).toBe('boolean');
+    }
+  });
+
+  it('index values are sequential from 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionHeatMap(t12, spec);
+    result.forEach((entry, i) => expect(entry.index).toBe(i));
+  });
+
+  it('changed matches tuningModeProfileTransitions sameProfile inverse', () => {
+    const spec = harmonicSpectrum(6);
+    const heatMap = tuningProfileTransitionHeatMap(t12, spec);
+    const transitions = tuningModeProfileTransitions(t12, spec);
+    for (let i = 0; i < transitions.length; i++) {
+      expect(heatMap[i]!.changed).toBe(!transitions[i]!.sameProfile);
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTransitionHeatMap(t12, spec, 261.63);
+    expect(result.length).toBe(t12.degrees.length - 1);
   });
 });
