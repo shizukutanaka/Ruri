@@ -159,6 +159,9 @@ import {
   tuningFamilyAmbassadorsSummaryTable,
   tuningFamilyAmbassadorsSummaryNarrative,
   tuningFamilyAmbassadorTopN,
+  tuningSocraticProfile,
+  tuningSocraticProfileNarrative,
+  tuningFamilySocraticProfiles,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5847,4 +5850,52 @@ export function presetFamilyAmbassadorTopN(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorTopN(tunings, spectrum, n, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q727 — presetSocraticProfile
+// ---------------------------------------------------------------------------
+
+export function presetSocraticProfile(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningSocraticProfile> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningSocraticProfile(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q729 — presetSocraticProfileNarrative
+// ---------------------------------------------------------------------------
+
+export function presetSocraticProfileNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningSocraticProfileNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningSocraticProfileNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q731 — presetFamilySocraticProfiles
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticProfiles(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticProfiles> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticProfiles(tunings, spectrum, rootHz);
 }

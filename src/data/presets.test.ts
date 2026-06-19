@@ -166,6 +166,9 @@ import {
   presetFamilyAmbassadorsSummaryTable,
   presetFamilyAmbassadorsSummaryNarrative,
   presetFamilyAmbassadorTopN,
+  presetSocraticProfile,
+  presetSocraticProfileNarrative,
+  presetFamilySocraticProfiles,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4547,6 +4550,67 @@ describe('presetFamilyAmbassadorTopN (Q725)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilyAmbassadorTopN(['not-a-preset'], spec, 3, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q727 — presetSocraticProfile
+// ---------------------------------------------------------------------------
+
+describe('presetSocraticProfile (Q727)', () => {
+  it('returns socratic profile for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const profile = presetSocraticProfile('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof profile.ambassador.mode.id).toBe('string');
+    expect(typeof profile.profileDiversity.normalized).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetSocraticProfile('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q729 — presetSocraticProfileNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetSocraticProfileNarrative (Q729)', () => {
+  it('returns socratic narrative for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticProfileNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.socraticNarrative).toBe('string');
+    expect(result.socraticNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetSocraticProfileNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q731 — presetFamilySocraticProfiles
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticProfiles (Q731)', () => {
+  it('returns socratic profiles for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const profiles = presetFamilySocraticProfiles(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(profiles.length).toBe(1);
+    expect(typeof profiles[0]!.id).toBe('string');
+    expect(typeof profiles[0]!.socraticProfile.ambassador.mode.id).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticProfiles(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
