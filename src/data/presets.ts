@@ -148,6 +148,8 @@ import {
   tuningFamilyAmbassadorConvergenceBundleNarrative,
   tuningFamilyAmbassadorMeanProfileDistance,
   tuningFamilyAmbassadorMeanProfileDistanceNarrative,
+  tuningFamilyAmbassadorProfileDistanceStats,
+  tuningFamilyAmbassadorCentrality,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5637,4 +5639,40 @@ export function presetFamilyAmbassadorMeanProfileDistanceNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorMeanProfileDistanceNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q703 — presetFamilyAmbassadorProfileDistanceStats
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorProfileDistanceStats(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorProfileDistanceStats> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorProfileDistanceStats(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q707 — presetFamilyAmbassadorCentrality
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorCentrality(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorCentrality> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorCentrality(tunings, spectrum, rootHz);
 }

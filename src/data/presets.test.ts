@@ -155,6 +155,8 @@ import {
   presetFamilyAmbassadorConvergenceBundleNarrative,
   presetFamilyAmbassadorMeanProfileDistance,
   presetFamilyAmbassadorMeanProfileDistanceNarrative,
+  presetFamilyAmbassadorProfileDistanceStats,
+  presetFamilyAmbassadorCentrality,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4286,5 +4288,53 @@ describe('presetFamilyAmbassadorMeanProfileDistanceNarrative (Q701)', () => {
         TWELVE_TET,
       ]),
     ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q703 — presetFamilyAmbassadorProfileDistanceStats
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorProfileDistanceStats (Q703)', () => {
+  it('returns distance stats for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const stats = presetFamilyAmbassadorProfileDistanceStats(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof stats.mean).toBe('number');
+    expect(stats.max).toBeLessThanOrEqual(4);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorProfileDistanceStats(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q707 — presetFamilyAmbassadorCentrality
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorCentrality (Q707)', () => {
+  it('returns centrality for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorCentrality(['12-tet'], spec, undefined, [TWELVE_TET]);
+    // Single preset → only one tuning, so rank 1
+    expect(result).not.toBeNull();
+    expect(result!.rank).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorCentrality(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('returns null for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(presetFamilyAmbassadorCentrality([], spec)).toBeNull();
   });
 });
