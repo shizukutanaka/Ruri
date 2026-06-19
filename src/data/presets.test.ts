@@ -132,6 +132,8 @@ import {
   presetModeSoloProfileNarrative,
   presetModeQuadrantIdentityBundle,
   presetModeQuadrantIdentityNarrative,
+  presetModeAmbassador,
+  presetModeAmbassadorNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3743,6 +3745,47 @@ describe('presetModeQuadrantIdentityNarrative (Q640)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetModeQuadrantIdentityNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q643 — presetModeAmbassador
+// ---------------------------------------------------------------------------
+
+describe('presetModeAmbassador (Q643)', () => {
+  it('returns the ambassador mode for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAmbassador('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.mode.id).toBe('string');
+    const valid = ['versatile', 'specialized', 'balanced'];
+    expect(valid).toContain(result.consensus);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => presetModeAmbassador('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
+      RangeError,
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q646 — presetModeAmbassadorNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetModeAmbassadorNarrative (Q646)', () => {
+  it('returns ambassador narrative for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeAmbassadorNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.ambassadorNarrative).toBe('string');
+    expect(result.ambassadorNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeAmbassadorNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

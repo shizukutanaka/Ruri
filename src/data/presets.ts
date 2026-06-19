@@ -125,6 +125,8 @@ import {
   tuningModeSoloProfileNarrative,
   tuningModeQuadrantIdentityBundle,
   tuningModeQuadrantIdentityNarrative,
+  tuningModeAmbassador,
+  tuningModeAmbassadorNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5206,4 +5208,34 @@ export function presetModeQuadrantIdentityNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningModeQuadrantIdentityNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q643 — presetModeAmbassador
+// ---------------------------------------------------------------------------
+
+export function presetModeAmbassador(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeAmbassador> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeAmbassador(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q646 — presetModeAmbassadorNarrative
+// ---------------------------------------------------------------------------
+
+export function presetModeAmbassadorNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeAmbassadorNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeAmbassadorNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }
