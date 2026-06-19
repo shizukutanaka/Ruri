@@ -11876,3 +11876,108 @@ export function tuningFamilyQuadrantProfileDiversities(
     profileDiversity: tuningQuadrantProfileDiversity(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q576 — tuningQuadrantProfileDiversityNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningQuadrantProfileDiversityNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  profileCount: number;
+  totalModes: number;
+  entropy: number;
+  normalized: number;
+  narrative: string;
+} {
+  const diversity = tuningQuadrantProfileDiversity(tuning, spectrum, rootHz);
+  const { profileCount, totalModes, entropy, normalized } = diversity;
+  const spread =
+    profileCount === 1
+      ? 'All modes share the same quadrant profile.'
+      : normalized >= 0.8
+        ? 'Modes are highly spread across distinct profiles.'
+        : normalized >= 0.5
+          ? 'Modes show moderate profile diversity.'
+          : 'Modes are concentrated in a few profiles.';
+  const narrative =
+    `"${tuning.name}" spreads its ${totalModes} mode${totalModes !== 1 ? 's' : ''} across ` +
+    `${profileCount} distinct quadrant profile${profileCount !== 1 ? 's' : ''}. ` +
+    `Profile entropy: ${entropy.toFixed(3)} bits (normalized: ${(normalized * 100).toFixed(1)}%). ${spread}`;
+  return { ...diversity, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q578 — tuningFamilyQuadrantProfileDiversityNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantProfileDiversityNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  diversityNarrative: ReturnType<typeof tuningQuadrantProfileDiversityNarrative>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    diversityNarrative: tuningQuadrantProfileDiversityNarrative(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q579 — tuningFamilyQuadrantDiversityRanking
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyQuadrantDiversityRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  profileDiversity: ReturnType<typeof tuningQuadrantProfileDiversity>;
+  rank: number;
+}[] {
+  return tuningFamilyQuadrantProfileDiversities(tunings, spectrum, rootHz)
+    .slice()
+    .sort((a, b) => b.profileDiversity.normalized - a.profileDiversity.normalized)
+    .map((entry, i) => ({ ...entry, rank: i + 1 }));
+}
+
+// ---------------------------------------------------------------------------
+// Q580 — tuningFamilyMostDiverseQuadrantProfile
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyMostDiverseQuadrantProfile(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  profileDiversity: ReturnType<typeof tuningQuadrantProfileDiversity>;
+  rank: number;
+} {
+  const ranking = tuningFamilyQuadrantDiversityRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('No tunings provided');
+  return ranking[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q581 — tuningFamilyLeastDiverseQuadrantProfile
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyLeastDiverseQuadrantProfile(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  profileDiversity: ReturnType<typeof tuningQuadrantProfileDiversity>;
+  rank: number;
+} {
+  const ranking = tuningFamilyQuadrantDiversityRanking(tunings, spectrum, rootHz);
+  if (ranking.length === 0) throw new RangeError('No tunings provided');
+  return ranking[ranking.length - 1]!;
+}

@@ -283,6 +283,11 @@ import {
   tuningFamilyDominantQuadrantProfiles,
   tuningQuadrantProfileDiversity,
   tuningFamilyQuadrantProfileDiversities,
+  tuningQuadrantProfileDiversityNarrative,
+  tuningFamilyQuadrantProfileDiversityNarratives,
+  tuningFamilyQuadrantDiversityRanking,
+  tuningFamilyMostDiverseQuadrantProfile,
+  tuningFamilyLeastDiverseQuadrantProfile,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -10582,5 +10587,108 @@ describe('tuningFamilyQuadrantProfileDiversities (Q575)', () => {
       expect(typeof r.id).toBe('string');
       expect(r.profileDiversity.totalModes).toBeGreaterThan(0);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q576 — tuningQuadrantProfileDiversityNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningQuadrantProfileDiversityNarrative (Q576)', () => {
+  it('returns diversity metrics with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantProfileDiversityNarrative(t12, spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantProfileDiversityNarrative(t12, spec);
+    expect(result.narrative).toContain(t12.name);
+  });
+
+  it('narrative contains the normalized percentage', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantProfileDiversityNarrative(t12, spec);
+    expect(result.narrative).toContain('%');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningQuadrantProfileDiversityNarrative(t12, spec, 261.63);
+    expect(result.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q578 — tuningFamilyQuadrantProfileDiversityNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantProfileDiversityNarratives (Q578)', () => {
+  it('returns one entry per tuning with id and diversityNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyQuadrantProfileDiversityNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.diversityNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q579 — tuningFamilyQuadrantDiversityRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyQuadrantDiversityRanking (Q579)', () => {
+  it('returns ranked entries sorted by normalized diversity descending', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyQuadrantDiversityRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(results.length).toBe(3);
+    expect(results[0]!.rank).toBe(1);
+    expect(results[results.length - 1]!.rank).toBe(results.length);
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i - 1]!.profileDiversity.normalized).toBeGreaterThanOrEqual(
+        results[i]!.profileDiversity.normalized,
+      );
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q580 — tuningFamilyMostDiverseQuadrantProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyMostDiverseQuadrantProfile (Q580)', () => {
+  it('returns the rank-1 tuning (most diverse profile distribution)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyMostDiverseQuadrantProfile([t12, edo(19, 440)], spec);
+    expect(result.rank).toBe(1);
+    expect(typeof result.id).toBe('string');
+  });
+
+  it('throws RangeError for empty tuning array', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => tuningFamilyMostDiverseQuadrantProfile([], spec)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q581 — tuningFamilyLeastDiverseQuadrantProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyLeastDiverseQuadrantProfile (Q581)', () => {
+  it('returns the last-ranked tuning (least diverse profile distribution)', () => {
+    const spec = harmonicSpectrum(6);
+    const tunings = [t12, edo(19, 440), edo(31, 440)];
+    const result = tuningFamilyLeastDiverseQuadrantProfile(tunings, spec);
+    expect(result.rank).toBe(tunings.length);
+    expect(typeof result.id).toBe('string');
+  });
+
+  it('throws RangeError for empty tuning array', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() => tuningFamilyLeastDiverseQuadrantProfile([], spec)).toThrow(RangeError);
   });
 });
