@@ -134,6 +134,8 @@ import {
   presetModeQuadrantIdentityNarrative,
   presetModeAmbassador,
   presetModeAmbassadorNarrative,
+  presetFamilyAmbassadorRanking,
+  presetFamilyBestAmbassador,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3787,5 +3789,51 @@ describe('presetModeAmbassadorNarrative (Q646)', () => {
     expect(() =>
       presetModeAmbassadorNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q649 — presetFamilyAmbassadorRanking
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorRanking (Q649)', () => {
+  it('returns ranking for a list of presets', () => {
+    const spec = harmonicSpectrum(6);
+    const results = presetFamilyAmbassadorRanking(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(results.length).toBe(1);
+    expect(results[0]!.rank).toBe(1);
+    expect(typeof results[0]!.id).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorRanking(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q653 — presetFamilyBestAmbassador
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyBestAmbassador (Q653)', () => {
+  it('returns the best ambassador for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyBestAmbassador(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result).not.toBeNull();
+    expect(result!.rank).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyBestAmbassador(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('returns null for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(presetFamilyBestAmbassador([], spec)).toBeNull();
   });
 });
