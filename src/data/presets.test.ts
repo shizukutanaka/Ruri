@@ -160,6 +160,9 @@ import {
   presetFamilyAmbassadorOutlier,
   presetFamilyAmbassadorCentralityNarrative,
   presetFamilyAmbassadorDistanceSpread,
+  presetFamilyAmbassadorDistanceSpreadNarrative,
+  presetFamilyFullAmbassadorAnalytics,
+  presetFamilyFullAmbassadorAnalyticsNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4412,5 +4415,73 @@ describe('presetFamilyAmbassadorDistanceSpread (Q713)', () => {
   it('returns null for empty preset list', () => {
     const spec = harmonicSpectrum(6);
     expect(presetFamilyAmbassadorDistanceSpread([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q715 — presetFamilyAmbassadorDistanceSpreadNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorDistanceSpreadNarrative (Q715)', () => {
+  it('returns spread narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorDistanceSpreadNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.spreadNarrative).toBe('string');
+    expect(result.spreadNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorDistanceSpreadNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q717 — presetFamilyFullAmbassadorAnalytics
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyFullAmbassadorAnalytics (Q717)', () => {
+  it('returns full ambassador analytics for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const analytics = presetFamilyFullAmbassadorAnalytics(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(Array.isArray(analytics.report.ranking)).toBe(true);
+    expect(typeof analytics.distanceStats.mean).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyFullAmbassadorAnalytics(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q719 — presetFamilyFullAmbassadorAnalyticsNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyFullAmbassadorAnalyticsNarrative (Q719)', () => {
+  it('returns full analytics narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyFullAmbassadorAnalyticsNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.analyticsNarrative).toBe('string');
+    expect(result.analyticsNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyFullAmbassadorAnalyticsNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
   });
 });

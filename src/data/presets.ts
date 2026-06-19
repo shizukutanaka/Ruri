@@ -153,6 +153,9 @@ import {
   tuningFamilyAmbassadorOutlier,
   tuningFamilyAmbassadorCentralityNarrative,
   tuningFamilyAmbassadorDistanceSpread,
+  tuningFamilyAmbassadorDistanceSpreadNarrative,
+  tuningFamilyFullAmbassadorAnalytics,
+  tuningFamilyFullAmbassadorAnalyticsNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5732,4 +5735,58 @@ export function presetFamilyAmbassadorDistanceSpread(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorDistanceSpread(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q715 — presetFamilyAmbassadorDistanceSpreadNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorDistanceSpreadNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorDistanceSpreadNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorDistanceSpreadNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q717 — presetFamilyFullAmbassadorAnalytics
+// ---------------------------------------------------------------------------
+
+export function presetFamilyFullAmbassadorAnalytics(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyFullAmbassadorAnalytics> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyFullAmbassadorAnalytics(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q719 — presetFamilyFullAmbassadorAnalyticsNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyFullAmbassadorAnalyticsNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyFullAmbassadorAnalyticsNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyFullAmbassadorAnalyticsNarrative(tunings, spectrum, rootHz);
 }
