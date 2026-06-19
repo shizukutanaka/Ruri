@@ -118,6 +118,8 @@ import {
   presetDominantQuadrantProfile,
   presetQuadrantProfileDiversity,
   presetQuadrantProfileDiversityNarrative,
+  presetModeProfileTransitions,
+  presetProfileTransitionScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3443,6 +3445,47 @@ describe('presetQuadrantProfileDiversityNarrative (Q577)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetQuadrantProfileDiversityNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q589 — presetModeProfileTransitions
+// ---------------------------------------------------------------------------
+
+describe('presetModeProfileTransitions (Q589)', () => {
+  it('returns n-1 transition entries for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetModeProfileTransitions('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]!.sameProfile).toBe('boolean');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetModeProfileTransitions('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q591 — presetProfileTransitionScore
+// ---------------------------------------------------------------------------
+
+describe('presetProfileTransitionScore (Q591)', () => {
+  it('returns transition score for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetProfileTransitionScore('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.stabilityScore).toBeGreaterThanOrEqual(0);
+    expect(result.stabilityScore).toBeLessThanOrEqual(1);
+    expect(result.sameCount + result.differentCount).toBe(result.totalTransitions);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetProfileTransitionScore('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

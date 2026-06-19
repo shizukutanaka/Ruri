@@ -111,6 +111,8 @@ import {
   tuningDominantQuadrantProfile,
   tuningQuadrantProfileDiversity,
   tuningQuadrantProfileDiversityNarrative,
+  tuningModeProfileTransitions,
+  tuningProfileTransitionScore,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4982,4 +4984,34 @@ export function presetQuadrantProfileDiversityNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningQuadrantProfileDiversityNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q589 — presetModeProfileTransitions
+// ---------------------------------------------------------------------------
+
+export function presetModeProfileTransitions(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningModeProfileTransitions> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningModeProfileTransitions(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q591 — presetProfileTransitionScore
+// ---------------------------------------------------------------------------
+
+export function presetProfileTransitionScore(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileTransitionScore> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileTransitionScore(loadTuningPreset(preset), spectrum, rootHz);
 }
