@@ -12556,3 +12556,77 @@ export function tuningFamilyProfileRunDensityNarratives(
     densityNarrative: tuningProfileRunDensityNarrative(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q618 — tuningProfileTextureReport
+// ---------------------------------------------------------------------------
+
+export function tuningProfileTextureReport(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  coverage: ReturnType<typeof tuningQuadrantCoverage>;
+  runSummary: ReturnType<typeof tuningProfileRunSummary>;
+  transitionScore: ReturnType<typeof tuningProfileTransitionScore>;
+  profileDiversity: ReturnType<typeof tuningQuadrantProfileDiversity>;
+} {
+  return {
+    coverage: tuningQuadrantCoverage(tuning, spectrum, rootHz),
+    runSummary: tuningProfileRunSummary(tuning, spectrum, rootHz),
+    transitionScore: tuningProfileTransitionScore(tuning, spectrum, rootHz),
+    profileDiversity: tuningQuadrantProfileDiversity(tuning, spectrum, rootHz),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q620 — tuningFamilyProfileTextureReports
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileTextureReports(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; textureReport: ReturnType<typeof tuningProfileTextureReport> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    textureReport: tuningProfileTextureReport(t, spectrum, rootHz),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q621 — tuningProfileTextureReportNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningProfileTextureReportNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningProfileTextureReport> & { narrative: string } {
+  const report = tuningProfileTextureReport(tuning, spectrum, rootHz);
+  const { coverage, runSummary, transitionScore, profileDiversity } = report;
+  const narrative =
+    `"${tuning.name}" texture: ${coverage.totalUniqueProfiles} unique quadrant profile${coverage.totalUniqueProfiles !== 1 ? 's' : ''} across ${coverage.totalModes} modes ` +
+    `(distribution entropy: ${profileDiversity.normalized.toFixed(2)}). ` +
+    `${runSummary.runCount} consecutive run${runSummary.runCount !== 1 ? 's' : ''}, longest ${runSummary.longestRun}. ` +
+    `Transition stability: ${(transitionScore.stabilityScore * 100).toFixed(1)}%.`;
+  return { ...report, narrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q623 — tuningFamilyProfileTextureReportNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyProfileTextureReportNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  textureReportNarrative: ReturnType<typeof tuningProfileTextureReportNarrative>;
+}[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    textureReportNarrative: tuningProfileTextureReportNarrative(t, spectrum, rootHz),
+  }));
+}

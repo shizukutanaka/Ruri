@@ -317,6 +317,10 @@ import {
   tuningFamilyMostConsistentProfileTransition,
   tuningProfileRunDensityNarrative,
   tuningFamilyProfileRunDensityNarratives,
+  tuningProfileTextureReport,
+  tuningFamilyProfileTextureReports,
+  tuningProfileTextureReportNarrative,
+  tuningFamilyProfileTextureReportNarratives,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -11404,6 +11408,96 @@ describe('tuningFamilyProfileRunDensityNarratives (Q617)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(typeof r.densityNarrative.narrative).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q618 — tuningProfileTextureReport
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileTextureReport (Q618)', () => {
+  it('returns all four sub-reports', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTextureReport(t12, spec);
+    expect(typeof result.coverage.totalUniqueProfiles).toBe('number');
+    expect(typeof result.runSummary.runCount).toBe('number');
+    expect(typeof result.transitionScore.stabilityScore).toBe('number');
+    expect(typeof result.profileDiversity.normalized).toBe('number');
+  });
+
+  it('coverage totalModes matches runSummary totalModes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTextureReport(t12, spec);
+    expect(result.coverage.totalModes).toBe(result.runSummary.totalModes);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTextureReport(t12, spec, 261.63);
+    expect(result.coverage.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q620 — tuningFamilyProfileTextureReports
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyProfileTextureReports (Q620)', () => {
+  it('returns one entry per tuning with id and textureReport', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyProfileTextureReports([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.textureReport.coverage.totalUniqueProfiles).toBe('number');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q621 — tuningProfileTextureReportNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningProfileTextureReportNarrative (Q621)', () => {
+  it('returns all sub-reports with narrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTextureReportNarrative(t12, spec);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTextureReportNarrative(t12, spec);
+    expect(result.narrative).toContain(t12.name);
+  });
+
+  it('narrative contains the stability percentage', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTextureReportNarrative(t12, spec);
+    expect(result.narrative).toContain('%');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningProfileTextureReportNarrative(t12, spec, 261.63);
+    expect(result.coverage.totalModes).toBe(t12.degrees.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q623 — tuningFamilyProfileTextureReportNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyProfileTextureReportNarratives (Q623)', () => {
+  it('returns one entry per tuning with id and textureReportNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyProfileTextureReportNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.textureReportNarrative.narrative).toBe('string');
     }
   });
 });
