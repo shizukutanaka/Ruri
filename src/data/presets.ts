@@ -108,6 +108,8 @@ import {
   tuningQuadrantCoverage,
   tuningModeGroupByProfile,
   tuningQuadrantCoverageNarrative,
+  tuningDominantQuadrantProfile,
+  tuningQuadrantProfileDiversity,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -4934,4 +4936,34 @@ export function presetQuadrantCoverageNarrative(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningQuadrantCoverageNarrative(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q571 — presetDominantQuadrantProfile
+// ---------------------------------------------------------------------------
+
+export function presetDominantQuadrantProfile(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningDominantQuadrantProfile> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningDominantQuadrantProfile(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q574 — presetQuadrantProfileDiversity
+// ---------------------------------------------------------------------------
+
+export function presetQuadrantProfileDiversity(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningQuadrantProfileDiversity> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningQuadrantProfileDiversity(loadTuningPreset(preset), spectrum, rootHz);
 }

@@ -115,6 +115,8 @@ import {
   presetQuadrantCoverage,
   presetModeGroupByProfile,
   presetQuadrantCoverageNarrative,
+  presetDominantQuadrantProfile,
+  presetQuadrantProfileDiversity,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3379,6 +3381,47 @@ describe('presetQuadrantCoverageNarrative (Q568)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetQuadrantCoverageNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q571 — presetDominantQuadrantProfile
+// ---------------------------------------------------------------------------
+
+describe('presetDominantQuadrantProfile (Q571)', () => {
+  it('returns the dominant quadrant profile for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetDominantQuadrantProfile('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.profile).toBe('string');
+    expect(result.count).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetDominantQuadrantProfile('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q574 — presetQuadrantProfileDiversity
+// ---------------------------------------------------------------------------
+
+describe('presetQuadrantProfileDiversity (Q574)', () => {
+  it('returns diversity metrics for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetQuadrantProfileDiversity('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.totalModes).toBeGreaterThan(0);
+    expect(result.normalized).toBeGreaterThanOrEqual(0);
+    expect(result.normalized).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetQuadrantProfileDiversity('not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
