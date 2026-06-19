@@ -143,6 +143,9 @@ import {
   tuningFamilyAmbassadorConvergenceScore,
   tuningFamilyAmbassadorConvergenceScoreNarrative,
   tuningFamilyAmbassadorConsensusConvergenceScore,
+  tuningFamilyAmbassadorConsensusConvergenceScoreNarrative,
+  tuningFamilyAmbassadorConvergenceBundle,
+  tuningFamilyAmbassadorConvergenceBundleNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5542,4 +5545,58 @@ export function presetFamilyAmbassadorConsensusConvergenceScore(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorConsensusConvergenceScore(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q691 — presetFamilyAmbassadorConsensusConvergenceScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorConsensusConvergenceScoreNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorConsensusConvergenceScoreNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorConsensusConvergenceScoreNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q693 — presetFamilyAmbassadorConvergenceBundle
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorConvergenceBundle(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorConvergenceBundle> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorConvergenceBundle(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q695 — presetFamilyAmbassadorConvergenceBundleNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorConvergenceBundleNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorConvergenceBundleNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorConvergenceBundleNarrative(tunings, spectrum, rootHz);
 }

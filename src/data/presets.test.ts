@@ -150,6 +150,9 @@ import {
   presetFamilyAmbassadorConvergenceScore,
   presetFamilyAmbassadorConvergenceScoreNarrative,
   presetFamilyAmbassadorConsensusConvergenceScore,
+  presetFamilyAmbassadorConsensusConvergenceScoreNarrative,
+  presetFamilyAmbassadorConvergenceBundle,
+  presetFamilyAmbassadorConvergenceBundleNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4159,6 +4162,79 @@ describe('presetFamilyAmbassadorConsensusConvergenceScore (Q689)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilyAmbassadorConsensusConvergenceScore(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q691 — presetFamilyAmbassadorConsensusConvergenceScoreNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorConsensusConvergenceScoreNarrative (Q691)', () => {
+  it('returns consensus convergence narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorConsensusConvergenceScoreNarrative(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof result.consensusConvergenceNarrative).toBe('string');
+    expect(result.consensusConvergenceNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorConsensusConvergenceScoreNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q693 — presetFamilyAmbassadorConvergenceBundle
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorConvergenceBundle (Q693)', () => {
+  it('returns convergence bundle for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const bundle = presetFamilyAmbassadorConvergenceBundle(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof bundle.profileConvergence.convergenceScore).toBe('number');
+    expect(typeof bundle.consensusConvergence.convergenceScore).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorConvergenceBundle(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q695 — presetFamilyAmbassadorConvergenceBundleNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorConvergenceBundleNarrative (Q695)', () => {
+  it('returns bundle narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorConvergenceBundleNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.bundleNarrative).toBe('string');
+    expect(result.bundleNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorConvergenceBundleNarrative(['not-a-preset'], spec, undefined, [
         TWELVE_TET,
       ]),
     ).toThrow(RangeError);
