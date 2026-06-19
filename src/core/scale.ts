@@ -13986,3 +13986,61 @@ export function tuningFamilyAmbassadorTopN(
   const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
   return ranking.slice(0, n);
 }
+
+// ---------------------------------------------------------------------------
+// Q726 — tuningSocraticProfile
+// ---------------------------------------------------------------------------
+
+export function tuningSocraticProfile(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  ambassador: ReturnType<typeof tuningModeAmbassador>;
+  dominantProfile: ReturnType<typeof tuningDominantQuadrantProfile>;
+  profileDiversity: ReturnType<typeof tuningQuadrantProfileDiversity>;
+  soloRatio: ReturnType<typeof tuningModeSoloProfileRatio>;
+  textureReport: ReturnType<typeof tuningProfileTextureReport>;
+} {
+  return {
+    ambassador: tuningModeAmbassador(tuning, spectrum, rootHz),
+    dominantProfile: tuningDominantQuadrantProfile(tuning, spectrum, rootHz),
+    profileDiversity: tuningQuadrantProfileDiversity(tuning, spectrum, rootHz),
+    soloRatio: tuningModeSoloProfileRatio(tuning, spectrum, rootHz),
+    textureReport: tuningProfileTextureReport(tuning, spectrum, rootHz),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q728 — tuningSocraticProfileNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningSocraticProfileNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { profile: ReturnType<typeof tuningSocraticProfile>; socraticNarrative: string } {
+  const profile = tuningSocraticProfile(tuning, spectrum, rootHz);
+  const socraticNarrative =
+    `Character of "${tuning.name}":` +
+    ` Ambassador: ${profile.ambassador.mode.name} (${profile.ambassador.consensus}, ${profile.ambassador.quadrantProfile}).` +
+    ` Dominant profile: ${profile.dominantProfile?.profile ?? 'none'}.` +
+    ` Profile diversity: ${profile.profileDiversity.normalized.toFixed(2)} (${profile.profileDiversity.profileCount} profiles / ${profile.profileDiversity.totalModes} modes).` +
+    ` Solo ratio: ${profile.soloRatio.soloRatio.toFixed(2)}.`;
+  return { profile, socraticNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q730 — tuningFamilySocraticProfiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticProfiles(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; socraticProfile: ReturnType<typeof tuningSocraticProfile> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    socraticProfile: tuningSocraticProfile(t, spectrum, rootHz),
+  }));
+}

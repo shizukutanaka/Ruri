@@ -384,6 +384,9 @@ import {
   tuningFamilyAmbassadorsSummaryTable,
   tuningFamilyAmbassadorsSummaryNarrative,
   tuningFamilyAmbassadorTopN,
+  tuningSocraticProfile,
+  tuningSocraticProfileNarrative,
+  tuningFamilySocraticProfiles,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -13123,5 +13126,71 @@ describe('tuningFamilyAmbassadorTopN (Q724)', () => {
   it('returns empty array for empty tunings', () => {
     const spec = harmonicSpectrum(6);
     expect(tuningFamilyAmbassadorTopN([], spec, 3)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q726 — tuningSocraticProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningSocraticProfile (Q726)', () => {
+  it('returns all five analytics fields', () => {
+    const spec = harmonicSpectrum(6);
+    const profile = tuningSocraticProfile(t12, spec);
+    expect(typeof profile.ambassador.mode.id).toBe('string');
+    expect(typeof profile.profileDiversity.normalized).toBe('number');
+    expect(typeof profile.soloRatio.soloRatio).toBe('number');
+    expect(typeof profile.textureReport.runSummary.totalModes).toBe('number');
+    // dominantProfile can be null for degenerate tuning
+    if (profile.dominantProfile !== null) {
+      expect(typeof profile.dominantProfile.profile).toBe('string');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const profile = tuningSocraticProfile(t12, spec, 261.63);
+    expect(typeof profile.ambassador.mode.id).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q728 — tuningSocraticProfileNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningSocraticProfileNarrative (Q728)', () => {
+  it('returns profile and socraticNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticProfileNarrative(t12, spec);
+    expect(typeof result.socraticNarrative).toBe('string');
+    expect(result.socraticNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name and ambassador mode name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticProfileNarrative(t12, spec);
+    expect(result.socraticNarrative).toContain(t12.name);
+    expect(result.socraticNarrative).toContain(result.profile.ambassador.mode.name);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q730 — tuningFamilySocraticProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticProfiles (Q730)', () => {
+  it('returns one entry per tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const profiles = tuningFamilySocraticProfiles([t12, edo(19, 440)], spec);
+    expect(profiles.length).toBe(2);
+    for (const p of profiles) {
+      expect(typeof p.id).toBe('string');
+      expect(typeof p.socraticProfile.ambassador.mode.id).toBe('string');
+    }
+  });
+
+  it('returns empty array for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilySocraticProfiles([], spec)).toEqual([]);
   });
 });
