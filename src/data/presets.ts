@@ -117,6 +117,7 @@ import {
   tuningProfileRunSummary,
   tuningProfileRunSummaryNarrative,
   tuningProfileRunDensity,
+  tuningProfileRunDensityNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5078,4 +5079,19 @@ export function presetProfileRunDensity(
   const preset = presets.find((p) => p.id === presetId);
   if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
   return tuningProfileRunDensity(loadTuningPreset(preset), spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q616 — presetProfileRunDensityNarrative
+// ---------------------------------------------------------------------------
+
+export function presetProfileRunDensityNarrative(
+  presetId: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningProfileRunDensityNarrative> {
+  const preset = presets.find((p) => p.id === presetId);
+  if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+  return tuningProfileRunDensityNarrative(loadTuningPreset(preset), spectrum, rootHz);
 }

@@ -124,6 +124,7 @@ import {
   presetProfileRunSummary,
   presetProfileRunSummaryNarrative,
   presetProfileRunDensity,
+  presetProfileRunDensityNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3571,5 +3572,25 @@ describe('presetProfileRunDensity (Q610)', () => {
     expect(() => presetProfileRunDensity('not-a-preset', spec, undefined, [TWELVE_TET])).toThrow(
       RangeError,
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q616 — presetProfileRunDensityNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetProfileRunDensityNarrative (Q616)', () => {
+  it('returns density narrative for a preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetProfileRunDensityNarrative('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.narrative).toBe('string');
+    expect(result.narrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetProfileRunDensityNarrative('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
   });
 });
