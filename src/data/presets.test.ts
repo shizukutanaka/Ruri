@@ -153,6 +153,8 @@ import {
   presetFamilyAmbassadorConsensusConvergenceScoreNarrative,
   presetFamilyAmbassadorConvergenceBundle,
   presetFamilyAmbassadorConvergenceBundleNarrative,
+  presetFamilyAmbassadorMeanProfileDistance,
+  presetFamilyAmbassadorMeanProfileDistanceNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4235,6 +4237,52 @@ describe('presetFamilyAmbassadorConvergenceBundleNarrative (Q695)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilyAmbassadorConvergenceBundleNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q699 — presetFamilyAmbassadorMeanProfileDistance
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorMeanProfileDistance (Q699)', () => {
+  it('returns mean profile distance for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorMeanProfileDistance(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.maxPossible).toBe(4);
+    expect(typeof result.meanDistance).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorMeanProfileDistance(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q701 — presetFamilyAmbassadorMeanProfileDistanceNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorMeanProfileDistanceNarrative (Q701)', () => {
+  it('returns distance narrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorMeanProfileDistanceNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.distanceNarrative).toBe('string');
+    expect(result.distanceNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorMeanProfileDistanceNarrative(['not-a-preset'], spec, undefined, [
         TWELVE_TET,
       ]),
     ).toThrow(RangeError);

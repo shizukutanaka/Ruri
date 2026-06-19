@@ -146,6 +146,8 @@ import {
   tuningFamilyAmbassadorConsensusConvergenceScoreNarrative,
   tuningFamilyAmbassadorConvergenceBundle,
   tuningFamilyAmbassadorConvergenceBundleNarrative,
+  tuningFamilyAmbassadorMeanProfileDistance,
+  tuningFamilyAmbassadorMeanProfileDistanceNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5599,4 +5601,40 @@ export function presetFamilyAmbassadorConvergenceBundleNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilyAmbassadorConvergenceBundleNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q699 — presetFamilyAmbassadorMeanProfileDistance
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorMeanProfileDistance(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorMeanProfileDistance> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorMeanProfileDistance(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q701 — presetFamilyAmbassadorMeanProfileDistanceNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorMeanProfileDistanceNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorMeanProfileDistanceNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorMeanProfileDistanceNarrative(tunings, spectrum, rootHz);
 }
