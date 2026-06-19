@@ -172,6 +172,9 @@ import {
   presetFamilySocraticProfileNarratives,
   presetFamilySocraticComparison,
   presetFamilySocraticComparisonNarrative,
+  presetFamilySocraticInsight,
+  presetFamilySocraticInsightNarrative,
+  presetSocraticContrast,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4677,6 +4680,95 @@ describe('presetFamilySocraticComparisonNarrative (Q737)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticComparisonNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q739 — presetFamilySocraticInsight
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticInsight (Q739)', () => {
+  it('returns profiles and comparison for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticInsight(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(Array.isArray(result.profiles)).toBe(true);
+    expect(result.profiles.length).toBe(1);
+    expect(typeof result.profiles[0]!.id).toBe('string');
+    expect(
+      typeof result.comparison.mostDiverse === 'string' || result.comparison.mostDiverse === null,
+    ).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticInsight(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q741 — presetFamilySocraticInsightNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticInsightNarrative (Q741)', () => {
+  it('returns profiles, comparison, and insightNarrative for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticInsightNarrative(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(Array.isArray(result.profiles)).toBe(true);
+    expect(typeof result.insightNarrative).toBe('string');
+    expect(result.insightNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains Family insight header', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticInsightNarrative(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.insightNarrative).toContain('Family insight');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticInsightNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q743 — presetSocraticContrast
+// ---------------------------------------------------------------------------
+
+describe('presetSocraticContrast (Q743)', () => {
+  it('returns contrast fields for two presets', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticContrast('12-tet', '12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.profileA.ambassador.mode.id).toBe('string');
+    expect(typeof result.profileB.ambassador.mode.id).toBe('string');
+    expect(typeof result.distance).toBe('number');
+    expect(typeof result.sameConsensus).toBe('boolean');
+    expect(typeof result.sameProfile).toBe('boolean');
+  });
+
+  it('same preset yields distance 0 and sameConsensus/sameProfile true', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticContrast('12-tet', '12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.distance).toBe(0);
+    expect(result.sameConsensus).toBe(true);
+    expect(result.sameProfile).toBe(true);
+  });
+
+  it('throws RangeError for unknown presetIdA', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetSocraticContrast('not-a-preset', '12-tet', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown presetIdB', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetSocraticContrast('12-tet', 'not-a-preset', spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

@@ -165,6 +165,9 @@ import {
   tuningFamilySocraticProfileNarratives,
   tuningFamilySocraticComparison,
   tuningFamilySocraticComparisonNarrative,
+  tuningFamilySocraticInsight,
+  tuningFamilySocraticInsightNarrative,
+  tuningSocraticContrast,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5955,4 +5958,63 @@ export function presetFamilySocraticComparisonNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticComparisonNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q739 — presetFamilySocraticInsight
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticInsight(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticInsight> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticInsight(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q741 — presetFamilySocraticInsightNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticInsightNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticInsightNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticInsightNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q743 — presetSocraticContrast
+// ---------------------------------------------------------------------------
+
+export function presetSocraticContrast(
+  presetIdA: string,
+  presetIdB: string,
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningSocraticContrast> {
+  const presetA = presets.find((p) => p.id === presetIdA);
+  if (!presetA) throw new RangeError(`Unknown preset: ${presetIdA}`);
+  const presetB = presets.find((p) => p.id === presetIdB);
+  if (!presetB) throw new RangeError(`Unknown preset: ${presetIdB}`);
+  return tuningSocraticContrast(
+    loadTuningPreset(presetA),
+    loadTuningPreset(presetB),
+    spectrum,
+    rootHz,
+  );
 }
