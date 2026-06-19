@@ -381,6 +381,9 @@ import {
   tuningFamilyAmbassadorDistanceSpreadNarrative,
   tuningFamilyFullAmbassadorAnalytics,
   tuningFamilyFullAmbassadorAnalyticsNarrative,
+  tuningFamilyAmbassadorsSummaryTable,
+  tuningFamilyAmbassadorsSummaryNarrative,
+  tuningFamilyAmbassadorTopN,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -13044,5 +13047,81 @@ describe('tuningFamilyFullAmbassadorAnalyticsNarrative (Q718)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilyFullAmbassadorAnalyticsNarrative([], spec);
     expect(result.analyticsNarrative).toContain('No tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q720 — tuningFamilyAmbassadorsSummaryTable
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorsSummaryTable (Q720)', () => {
+  it('returns compact summary rows with all fields', () => {
+    const spec = harmonicSpectrum(6);
+    const table = tuningFamilyAmbassadorsSummaryTable([t12, edo(19, 440)], spec);
+    expect(table.length).toBe(2);
+    for (const row of table) {
+      expect(typeof row.id).toBe('string');
+      expect(typeof row.ambassadorModeName).toBe('string');
+      expect(typeof row.profile).toBe('string');
+      expect(typeof row.consensus).toBe('string');
+      expect(typeof row.score).toBe('number');
+      expect(typeof row.rank).toBe('number');
+    }
+    expect(table[0]!.rank).toBe(1);
+  });
+
+  it('returns empty array for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorsSummaryTable([], spec)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q722 — tuningFamilyAmbassadorsSummaryNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorsSummaryNarrative (Q722)', () => {
+  it('returns table and multiline summaryNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorsSummaryNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.summaryNarrative).toBe('string');
+    expect(result.summaryNarrative.length).toBeGreaterThan(0);
+    expect(result.table.length).toBe(2);
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorsSummaryNarrative([], spec);
+    expect(result.summaryNarrative).toContain('No tunings');
+  });
+
+  it('narrative contains each tuning ID', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorsSummaryNarrative([t12, edo(19, 440)], spec);
+    expect(result.summaryNarrative).toContain(t12.id);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q724 — tuningFamilyAmbassadorTopN
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorTopN (Q724)', () => {
+  it('returns at most N entries', () => {
+    const spec = harmonicSpectrum(6);
+    const top2 = tuningFamilyAmbassadorTopN([t12, edo(19, 440), edo(31, 440)], spec, 2);
+    expect(top2.length).toBe(2);
+    expect(top2[0]!.rank).toBe(1);
+  });
+
+  it('returns all entries if N > family size', () => {
+    const spec = harmonicSpectrum(6);
+    const top10 = tuningFamilyAmbassadorTopN([t12, edo(19, 440)], spec, 10);
+    expect(top10.length).toBe(2);
+  });
+
+  it('returns empty array for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilyAmbassadorTopN([], spec, 3)).toEqual([]);
   });
 });

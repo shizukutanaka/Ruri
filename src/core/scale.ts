@@ -13920,3 +13920,69 @@ export function tuningFamilyFullAmbassadorAnalyticsNarrative(
   }
   return { analytics, analyticsNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q720 — tuningFamilyAmbassadorsSummaryTable
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorsSummaryTable(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  ambassadorModeName: string;
+  profile: string;
+  consensus: string;
+  score: number;
+  rank: number;
+}[] {
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  return ranking.map((r) => ({
+    id: r.id,
+    ambassadorModeName: r.ambassador.mode.name,
+    profile: r.ambassador.quadrantProfile,
+    consensus: r.ambassador.consensus,
+    score: r.score,
+    rank: r.rank,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q722 — tuningFamilyAmbassadorsSummaryNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorsSummaryNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { table: ReturnType<typeof tuningFamilyAmbassadorsSummaryTable>; summaryNarrative: string } {
+  const table = tuningFamilyAmbassadorsSummaryTable(tunings, spectrum, rootHz);
+  let summaryNarrative: string;
+  if (table.length === 0) {
+    summaryNarrative = 'No tunings to summarize.';
+  } else {
+    const lines: string[] = [`Ambassador summary (${table.length} tunings):`];
+    for (const entry of table) {
+      lines.push(
+        `  ${entry.rank}. ${entry.id} — ${entry.ambassadorModeName} (${entry.consensus}, score: ${entry.score.toFixed(2)})`,
+      );
+    }
+    summaryNarrative = lines.join('\n');
+  }
+  return { table, summaryNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q724 — tuningFamilyAmbassadorTopN
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorTopN(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  n: number,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilyAmbassadorRanking> {
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  return ranking.slice(0, n);
+}
