@@ -334,6 +334,10 @@ import {
   tuningFamilyModeQuadrantIdentityBundles,
   tuningModeQuadrantIdentityNarrative,
   tuningFamilyModeQuadrantIdentityNarratives,
+  tuningModeAmbassador,
+  tuningFamilyModeAmbassadors,
+  tuningModeAmbassadorNarrative,
+  tuningFamilyModeAmbassadorNarratives,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -11827,6 +11831,97 @@ describe('tuningFamilyModeQuadrantIdentityNarratives (Q641)', () => {
     for (const r of results) {
       expect(typeof r.id).toBe('string');
       expect(r.identityNarratives.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q642 — tuningModeAmbassador
+// ---------------------------------------------------------------------------
+
+describe('tuningModeAmbassador (Q642)', () => {
+  it('returns a single mode entry from the identity bundle', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAmbassador(t12, spec);
+    expect(typeof result.mode.id).toBe('string');
+    const valid = ['versatile', 'specialized', 'balanced'];
+    expect(valid).toContain(result.consensus);
+  });
+
+  it('ambassador is present in the identity bundle', () => {
+    const spec = harmonicSpectrum(6);
+    const ambassador = tuningModeAmbassador(t12, spec);
+    const bundle = tuningModeQuadrantIdentityBundle(t12, spec);
+    expect(bundle.some((e) => e.mode.id === ambassador.mode.id)).toBe(true);
+  });
+
+  it('throws RangeError if tuning has no modes', () => {
+    const spec = harmonicSpectrum(6);
+    const empty: TuningSystem = { ...t12, degrees: [] };
+    expect(() => tuningModeAmbassador(empty, spec)).toThrow(RangeError);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAmbassador(t12, spec, 261.63);
+    expect(typeof result.mode.id).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q644 — tuningFamilyModeAmbassadors
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeAmbassadors (Q644)', () => {
+  it('returns one entry per tuning with id and ambassador', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeAmbassadors([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.ambassador.mode.id).toBe('string');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q645 — tuningModeAmbassadorNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningModeAmbassadorNarrative (Q645)', () => {
+  it('returns ambassador with ambassadorNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAmbassadorNarrative(t12, spec);
+    expect(typeof result.ambassadorNarrative).toBe('string');
+    expect(result.ambassadorNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative contains tuning name and mode name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAmbassadorNarrative(t12, spec);
+    expect(result.ambassadorNarrative).toContain(t12.name);
+    expect(result.ambassadorNarrative).toContain(result.mode.name);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningModeAmbassadorNarrative(t12, spec, 261.63);
+    expect(typeof result.ambassadorNarrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q647 — tuningFamilyModeAmbassadorNarratives
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyModeAmbassadorNarratives (Q647)', () => {
+  it('returns one entry per tuning with id and ambassadorNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const results = tuningFamilyModeAmbassadorNarratives([t12, edo(19, 440)], spec);
+    expect(results.length).toBe(2);
+    for (const r of results) {
+      expect(typeof r.id).toBe('string');
+      expect(typeof r.ambassadorNarrative.ambassadorNarrative).toBe('string');
     }
   });
 });

@@ -12857,3 +12857,70 @@ export function tuningFamilyModeQuadrantIdentityNarratives(
     identityNarratives: tuningModeQuadrantIdentityNarrative(t, spectrum, rootHz),
   }));
 }
+
+// ---------------------------------------------------------------------------
+// Q642 — tuningModeAmbassador
+// ---------------------------------------------------------------------------
+
+export function tuningModeAmbassador(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningModeQuadrantIdentityBundle>[number] {
+  const bundle = tuningModeQuadrantIdentityBundle(tuning, spectrum, rootHz);
+  if (bundle.length === 0) throw new RangeError('No modes in tuning');
+  const dominantGroup = tuningDominantQuadrantProfile(tuning, spectrum, rootHz);
+  const dominantProfile = dominantGroup?.profile ?? '';
+  const dominantMatches = bundle.filter((e) => e.quadrantProfile === dominantProfile);
+  const versatileAndDominant = dominantMatches.filter((e) => e.consensus === 'versatile');
+  if (versatileAndDominant.length > 0) return versatileAndDominant[0]!;
+  if (dominantMatches.length > 0) return dominantMatches[0]!;
+  const versatile = bundle.filter((e) => e.consensus === 'versatile');
+  if (versatile.length > 0) return versatile[0]!;
+  return bundle[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// Q644 — tuningFamilyModeAmbassadors
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeAmbassadors(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; ambassador: ReturnType<typeof tuningModeAmbassador> }[] {
+  return tunings.map((t) => ({ id: t.id, ambassador: tuningModeAmbassador(t, spectrum, rootHz) }));
+}
+
+// ---------------------------------------------------------------------------
+// Q645 — tuningModeAmbassadorNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningModeAmbassadorNarrative(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningModeQuadrantIdentityBundle>[number] & { ambassadorNarrative: string } {
+  const ambassador = tuningModeAmbassador(tuning, spectrum, rootHz);
+  const { mode, quadrantProfile, consensus, isSoloProfile } = ambassador;
+  const uniqueness = isSoloProfile ? 'unique profile' : 'dominant profile';
+  const ambassadorNarrative =
+    `Ambassador of "${tuning.name}": "${mode.name}" — ${consensus} character, ${uniqueness}. ` +
+    `Fingerprint: ${quadrantProfile}.`;
+  return { ...ambassador, ambassadorNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q647 — tuningFamilyModeAmbassadorNarratives
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyModeAmbassadorNarratives(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; ambassadorNarrative: ReturnType<typeof tuningModeAmbassadorNarrative> }[] {
+  return tunings.map((t) => ({
+    id: t.id,
+    ambassadorNarrative: tuningModeAmbassadorNarrative(t, spectrum, rootHz),
+  }));
+}
