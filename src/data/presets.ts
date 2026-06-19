@@ -129,6 +129,9 @@ import {
   tuningModeAmbassadorNarrative,
   tuningFamilyAmbassadorRanking,
   tuningFamilyBestAmbassador,
+  tuningFamilyWeakestAmbassador,
+  tuningFamilyAmbassadorScoreStats,
+  tuningFamilyAmbassadorGap,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -5276,4 +5279,58 @@ export function presetFamilyBestAmbassador(
     return loadTuningPreset(preset);
   });
   return tuningFamilyBestAmbassador(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q655 — presetFamilyAmbassadorScoreStats
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorScoreStats(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorScoreStats> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorScoreStats(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q658 — presetFamilyWeakestAmbassador
+// ---------------------------------------------------------------------------
+
+export function presetFamilyWeakestAmbassador(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyWeakestAmbassador> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyWeakestAmbassador(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q659 — presetFamilyAmbassadorGap
+// ---------------------------------------------------------------------------
+
+export function presetFamilyAmbassadorGap(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilyAmbassadorGap> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilyAmbassadorGap(tunings, spectrum, rootHz);
 }

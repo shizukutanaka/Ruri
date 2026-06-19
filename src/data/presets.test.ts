@@ -136,6 +136,9 @@ import {
   presetModeAmbassadorNarrative,
   presetFamilyAmbassadorRanking,
   presetFamilyBestAmbassador,
+  presetFamilyAmbassadorScoreStats,
+  presetFamilyWeakestAmbassador,
+  presetFamilyAmbassadorGap,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3835,5 +3838,75 @@ describe('presetFamilyBestAmbassador (Q653)', () => {
   it('returns null for empty preset list', () => {
     const spec = harmonicSpectrum(6);
     expect(presetFamilyBestAmbassador([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q655 — presetFamilyAmbassadorScoreStats
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorScoreStats (Q655)', () => {
+  it('returns score stats for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const stats = presetFamilyAmbassadorScoreStats(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(typeof stats.mean).toBe('number');
+    expect(typeof stats.stdDev).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorScoreStats(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q658 — presetFamilyWeakestAmbassador
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyWeakestAmbassador (Q658)', () => {
+  it('returns the weakest ambassador for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyWeakestAmbassador(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result).not.toBeNull();
+    expect(typeof result!.id).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyWeakestAmbassador(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('returns null for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(presetFamilyWeakestAmbassador([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q659 — presetFamilyAmbassadorGap
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorGap (Q659)', () => {
+  it('returns gap for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const gap = presetFamilyAmbassadorGap(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(gap).not.toBeNull();
+    expect(typeof gap!.scoreDiff).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorGap(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('returns null for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(presetFamilyAmbassadorGap([], spec)).toBeNull();
   });
 });
