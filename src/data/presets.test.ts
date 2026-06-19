@@ -141,6 +141,8 @@ import {
   presetFamilyAmbassadorGap,
   presetFamilyAmbassadorConsensusDistribution,
   presetFamilyAmbassadorProfileFrequency,
+  presetFamilyLeastCommonAmbassadorProfile,
+  presetFamilyAmbassadorConsensusScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -3952,6 +3954,54 @@ describe('presetFamilyAmbassadorProfileFrequency (Q664)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilyAmbassadorProfileFrequency(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q667 — presetFamilyLeastCommonAmbassadorProfile
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyLeastCommonAmbassadorProfile (Q667)', () => {
+  it('returns the least common profile for a single preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyLeastCommonAmbassadorProfile(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result).not.toBeNull();
+    expect(typeof result!.profile).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyLeastCommonAmbassadorProfile(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+
+  it('returns null for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    expect(presetFamilyLeastCommonAmbassadorProfile([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q670 — presetFamilyAmbassadorConsensusScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilyAmbassadorConsensusScore (Q670)', () => {
+  it('returns consensus score for a preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilyAmbassadorConsensusScore(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(typeof result.normalizedScore).toBe('number');
+    expect(result.normalizedScore).toBeGreaterThanOrEqual(0);
+    expect(result.normalizedScore).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilyAmbassadorConsensusScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
