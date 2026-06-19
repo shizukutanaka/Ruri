@@ -378,6 +378,9 @@ import {
   tuningFamilyAmbassadorOutlier,
   tuningFamilyAmbassadorCentralityNarrative,
   tuningFamilyAmbassadorDistanceSpread,
+  tuningFamilyAmbassadorDistanceSpreadNarrative,
+  tuningFamilyFullAmbassadorAnalytics,
+  tuningFamilyFullAmbassadorAnalyticsNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -12967,5 +12970,79 @@ describe('tuningFamilyAmbassadorDistanceSpread (Q712)', () => {
   it('returns null for empty tunings', () => {
     const spec = harmonicSpectrum(6);
     expect(tuningFamilyAmbassadorDistanceSpread([], spec)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q714 — tuningFamilyAmbassadorDistanceSpreadNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyAmbassadorDistanceSpreadNarrative (Q714)', () => {
+  it('returns spread and spreadNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorDistanceSpreadNarrative(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(typeof result.spreadNarrative).toBe('string');
+    expect(result.spreadNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('narrative for empty list mentions 0 or 1 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorDistanceSpreadNarrative([], spec);
+    expect(result.spreadNarrative).toContain('No spread');
+  });
+
+  it('narrative for identical pair mentions equidistant', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyAmbassadorDistanceSpreadNarrative([t12, t12], spec);
+    expect(result.spreadNarrative).toContain('equidistant');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q716 — tuningFamilyFullAmbassadorAnalytics
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyFullAmbassadorAnalytics (Q716)', () => {
+  it('returns all five analytics fields', () => {
+    const spec = harmonicSpectrum(6);
+    const analytics = tuningFamilyFullAmbassadorAnalytics([t12, edo(19, 440)], spec);
+    expect(Array.isArray(analytics.report.ranking)).toBe(true);
+    expect(typeof analytics.convergenceBundle.profileConvergence.convergenceScore).toBe('number');
+    expect(typeof analytics.centralityNarrative.centralityNarrative).toBe('string');
+    expect(typeof analytics.distanceStats.mean).toBe('number');
+    // distanceSpread can be null for single tuning or non-null for 2+
+    if (analytics.distanceSpread !== null) {
+      expect(typeof analytics.distanceSpread.spread).toBe('number');
+    }
+  });
+
+  it('returns empty/null fields for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const analytics = tuningFamilyFullAmbassadorAnalytics([], spec);
+    expect(analytics.report.ranking.length).toBe(0);
+    expect(analytics.distanceSpread).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q718 — tuningFamilyFullAmbassadorAnalyticsNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilyFullAmbassadorAnalyticsNarrative (Q718)', () => {
+  it('returns analytics and analyticsNarrative string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyFullAmbassadorAnalyticsNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.analyticsNarrative).toBe('string');
+    expect(result.analyticsNarrative.length).toBeGreaterThan(0);
+    expect(result.analytics.report.ranking.length).toBe(2);
+  });
+
+  it('narrative for empty list says no tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilyFullAmbassadorAnalyticsNarrative([], spec);
+    expect(result.analyticsNarrative).toContain('No tunings');
   });
 });

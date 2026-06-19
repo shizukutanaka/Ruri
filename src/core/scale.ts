@@ -13831,3 +13831,92 @@ export function tuningFamilyAmbassadorDistanceSpread(
   const spread = (outlier?.meanDistanceToOthers ?? 0) - (central?.meanDistanceToOthers ?? 0);
   return { central, outlier, spread };
 }
+
+// ---------------------------------------------------------------------------
+// Q714 — tuningFamilyAmbassadorDistanceSpreadNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyAmbassadorDistanceSpreadNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { spread: ReturnType<typeof tuningFamilyAmbassadorDistanceSpread>; spreadNarrative: string } {
+  const spread = tuningFamilyAmbassadorDistanceSpread(tunings, spectrum, rootHz);
+  let spreadNarrative: string;
+  if (spread === null) {
+    spreadNarrative = 'No spread to compute (0 or 1 tunings).';
+  } else if (spread.spread === 0) {
+    spreadNarrative =
+      'All tunings are equidistant in ambassador profile space — no clear center or outlier.';
+  } else {
+    spreadNarrative = `Ambassador profile spread: ${spread.spread.toFixed(2)} (central: "${spread.central?.id ?? 'none'}", outlier: "${spread.outlier?.id ?? 'none'}").`;
+    if (spread.spread < 1) {
+      spreadNarrative += ' Tight cluster — tunings are closely related.';
+    } else if (spread.spread < 2) {
+      spreadNarrative += ' Moderate spread.';
+    } else {
+      spreadNarrative += ' Wide spread — tunings occupy very different profile regions.';
+    }
+  }
+  return { spread, spreadNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q716 — tuningFamilyFullAmbassadorAnalytics
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyFullAmbassadorAnalytics(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  report: ReturnType<typeof tuningFamilyAmbassadorReport>;
+  convergenceBundle: ReturnType<typeof tuningFamilyAmbassadorConvergenceBundle>;
+  centralityNarrative: ReturnType<typeof tuningFamilyAmbassadorCentralityNarrative>;
+  distanceStats: ReturnType<typeof tuningFamilyAmbassadorProfileDistanceStats>;
+  distanceSpread: ReturnType<typeof tuningFamilyAmbassadorDistanceSpread>;
+} {
+  const report = tuningFamilyAmbassadorReport(tunings, spectrum, rootHz);
+  const convergenceBundle = tuningFamilyAmbassadorConvergenceBundle(tunings, spectrum, rootHz);
+  const centralityNarrative = tuningFamilyAmbassadorCentralityNarrative(tunings, spectrum, rootHz);
+  const distanceStats = tuningFamilyAmbassadorProfileDistanceStats(tunings, spectrum, rootHz);
+  const distanceSpread = tuningFamilyAmbassadorDistanceSpread(tunings, spectrum, rootHz);
+  return { report, convergenceBundle, centralityNarrative, distanceStats, distanceSpread };
+}
+
+// ---------------------------------------------------------------------------
+// Q718 — tuningFamilyFullAmbassadorAnalyticsNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilyFullAmbassadorAnalyticsNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  analytics: ReturnType<typeof tuningFamilyFullAmbassadorAnalytics>;
+  analyticsNarrative: string;
+} {
+  const analytics = tuningFamilyFullAmbassadorAnalytics(tunings, spectrum, rootHz);
+  let analyticsNarrative: string;
+  if (tunings.length === 0) {
+    analyticsNarrative = 'No tunings in family.';
+  } else {
+    const reportNarrative = tuningFamilyAmbassadorReportNarrative(
+      tunings,
+      spectrum,
+      rootHz,
+    ).reportNarrative;
+    const bundleNarrative = tuningFamilyAmbassadorConvergenceBundleNarrative(
+      tunings,
+      spectrum,
+      rootHz,
+    ).bundleNarrative;
+    const spreadNarrative = tuningFamilyAmbassadorDistanceSpreadNarrative(
+      tunings,
+      spectrum,
+      rootHz,
+    ).spreadNarrative;
+    analyticsNarrative = [reportNarrative, bundleNarrative, spreadNarrative].join(' ');
+  }
+  return { analytics, analyticsNarrative };
+}
