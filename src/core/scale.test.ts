@@ -417,6 +417,12 @@ import {
   tuningFamilySocraticAxisAnalysis,
   tuningFamilySocraticAxisNarrative,
   tuningFamilySocraticSignature,
+  tuningFamilySocraticBenchmark,
+  tuningFamilySocraticBenchmarkNarrative,
+  tuningFamilySocraticSignatureComparison,
+  tuningFamilySocraticSignatureComparisonNarrative,
+  tuningFamilySocraticConsensusNarrative,
+  tuningFamilySocraticBenchmarkComparison,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -14366,5 +14372,216 @@ describe('tuningFamilySocraticSignature (Q790)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticSignature([t12, edo(19, 440)], spec, 440);
     expect(result.signature).toContain('n:');
+  });
+});
+
+// Q792 — tuningFamilySocraticBenchmark
+describe('tuningFamilySocraticBenchmark (Q792)', () => {
+  it('returns all four fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmark([t12, edo(19, 440)], spec);
+    expect(typeof result.benchmarkScore).toBe('number');
+    expect(typeof result.diversityComponent).toBe('number');
+    expect(typeof result.topologyComponent).toBe('number');
+    expect(typeof result.consensusComponent).toBe('number');
+  });
+
+  it('benchmarkScore is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmark([t12, edo(19, 440)], spec);
+    expect(result.benchmarkScore).toBeGreaterThanOrEqual(0);
+    expect(result.benchmarkScore).toBeLessThanOrEqual(1);
+  });
+
+  it('empty input returns all zeros', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmark([], spec);
+    expect(result.benchmarkScore).toBe(0);
+    expect(result.diversityComponent).toBe(0);
+    expect(result.topologyComponent).toBe(0);
+    expect(result.consensusComponent).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmark([t12, edo(19, 440)], spec, 440);
+    expect(result.benchmarkScore).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q794 — tuningFamilySocraticBenchmarkNarrative
+describe('tuningFamilySocraticBenchmarkNarrative (Q794)', () => {
+  it('narrative contains "Benchmark"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkNarrative([t12, edo(19, 440)], spec);
+    expect(result.benchmarkNarrative).toContain('Benchmark');
+  });
+
+  it('label appears in narrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkNarrative([t12, edo(19, 440)], spec);
+    const hasLabel =
+      result.benchmarkNarrative.includes('low') ||
+      result.benchmarkNarrative.includes('moderate') ||
+      result.benchmarkNarrative.includes('high') ||
+      result.benchmarkNarrative.includes('excellent');
+    expect(hasLabel).toBe(true);
+  });
+
+  it('empty input returns "No tunings to benchmark."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkNarrative([], spec);
+    expect(result.benchmarkNarrative).toBe('No tunings to benchmark.');
+  });
+
+  it('returns spread of benchmark fields plus benchmarkNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.benchmarkScore).toBe('number');
+    expect(typeof result.benchmarkNarrative).toBe('string');
+  });
+});
+
+// Q796 — tuningFamilySocraticSignatureComparison
+describe('tuningFamilySocraticSignatureComparison (Q796)', () => {
+  it('returns all five fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignatureComparison([t12], [edo(19, 440)], spec);
+    expect(typeof result.signatureA).toBe('string');
+    expect(typeof result.signatureB).toBe('string');
+    expect(typeof result.sameSize).toBe('boolean');
+    expect(typeof result.sameDiversity).toBe('boolean');
+    expect(typeof result.sameTopology).toBe('boolean');
+  });
+
+  it('same family yields sameSize, sameDiversity, and sameTopology all true', () => {
+    const spec = harmonicSpectrum(6);
+    const family = [t12, edo(19, 440)];
+    const result = tuningFamilySocraticSignatureComparison(family, family, spec);
+    expect(result.sameSize).toBe(true);
+    expect(result.sameDiversity).toBe(true);
+    expect(result.sameTopology).toBe(true);
+  });
+
+  it('different size families produce sameSize false', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignatureComparison([t12], [t12, edo(19, 440)], spec);
+    expect(result.sameSize).toBe(false);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignatureComparison([t12], [edo(19, 440)], spec, 440);
+    expect(typeof result.signatureA).toBe('string');
+  });
+});
+
+// Q798 — tuningFamilySocraticSignatureComparisonNarrative
+describe('tuningFamilySocraticSignatureComparisonNarrative (Q798)', () => {
+  it('returns all six fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignatureComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(typeof result.signatureA).toBe('string');
+    expect(typeof result.signatureB).toBe('string');
+    expect(typeof result.sameSize).toBe('boolean');
+    expect(typeof result.sameDiversity).toBe('boolean');
+    expect(typeof result.sameTopology).toBe('boolean');
+    expect(typeof result.signatureComparisonNarrative).toBe('string');
+  });
+
+  it('narrative contains "Signature comparison"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignatureComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(result.signatureComparisonNarrative).toContain('Signature comparison');
+  });
+
+  it('same family yields all three booleans true', () => {
+    const spec = harmonicSpectrum(6);
+    const family = [t12, edo(19, 440)];
+    const result = tuningFamilySocraticSignatureComparisonNarrative(family, family, spec);
+    expect(result.sameSize).toBe(true);
+    expect(result.sameDiversity).toBe(true);
+    expect(result.sameTopology).toBe(true);
+  });
+
+  it('both empty returns "Both families are empty."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignatureComparisonNarrative([], [], spec);
+    expect(result.signatureComparisonNarrative).toBe('Both families are empty.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignatureComparisonNarrative([t12], [edo(19, 440)], spec, 440);
+    expect(typeof result.signatureComparisonNarrative).toBe('string');
+  });
+});
+
+// Q800 — tuningFamilySocraticConsensusNarrative
+describe('tuningFamilySocraticConsensusNarrative (Q800)', () => {
+  it('returns distribution and socraticConsensusNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConsensusNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.socraticConsensusNarrative).toBe('string');
+    expect(typeof result.distribution.versatile).toBe('number');
+    expect(typeof result.distribution.balanced).toBe('number');
+    expect(typeof result.distribution.specialized).toBe('number');
+    expect(typeof result.distribution.total).toBe('number');
+  });
+
+  it('narrative contains "Consensus character"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConsensusNarrative([t12, edo(19, 440)], spec);
+    expect(result.socraticConsensusNarrative).toContain('Consensus character');
+  });
+
+  it('empty input returns "No modes to assess consensus."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConsensusNarrative([], spec);
+    expect(result.socraticConsensusNarrative).toBe('No modes to assess consensus.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConsensusNarrative([t12], spec, 440);
+    expect(typeof result.socraticConsensusNarrative).toBe('string');
+  });
+});
+
+// Q802 — tuningFamilySocraticBenchmarkComparison
+describe('tuningFamilySocraticBenchmarkComparison (Q802)', () => {
+  it('returns all four fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparison([t12], [edo(19, 440)], spec);
+    expect(typeof result.benchmarkA).toBe('number');
+    expect(typeof result.benchmarkB).toBe('number');
+    expect(typeof result.delta).toBe('number');
+    expect(typeof result.winner).toBe('string');
+  });
+
+  it('same family yields winner "tie" and |delta| < 0.01', () => {
+    const spec = harmonicSpectrum(6);
+    const family = [t12, edo(19, 440)];
+    const result = tuningFamilySocraticBenchmarkComparison(family, family, spec);
+    expect(result.winner).toBe('tie');
+    expect(Math.abs(result.delta)).toBeLessThan(0.01);
+  });
+
+  it('winner is A, B, or tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparison([t12], [edo(19, 440)], spec);
+    expect(['A', 'B', 'tie']).toContain(result.winner);
+  });
+
+  it('delta equals benchmarkA minus benchmarkB', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparison([t12], [edo(19, 440)], spec);
+    expect(result.delta).toBeCloseTo(result.benchmarkA - result.benchmarkB, 10);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparison([t12], [edo(19, 440)], spec, 440);
+    expect(typeof result.winner).toBe('string');
   });
 });

@@ -14765,10 +14765,18 @@ export function tuningFamilySocraticAxisNarrative(
   }
   const midX = 0.5;
   const midY = axes.reduce((s, a) => s + a.ambassadorScore, 0) / axes.length;
-  const highDiv_highScore = axes.filter((a) => a.diversityScore >= midX && a.ambassadorScore >= midY).length;
-  const highDiv_lowScore = axes.filter((a) => a.diversityScore >= midX && a.ambassadorScore < midY).length;
-  const lowDiv_highScore = axes.filter((a) => a.diversityScore < midX && a.ambassadorScore >= midY).length;
-  const lowDiv_lowScore = axes.filter((a) => a.diversityScore < midX && a.ambassadorScore < midY).length;
+  const highDiv_highScore = axes.filter(
+    (a) => a.diversityScore >= midX && a.ambassadorScore >= midY,
+  ).length;
+  const highDiv_lowScore = axes.filter(
+    (a) => a.diversityScore >= midX && a.ambassadorScore < midY,
+  ).length;
+  const lowDiv_highScore = axes.filter(
+    (a) => a.diversityScore < midX && a.ambassadorScore >= midY,
+  ).length;
+  const lowDiv_lowScore = axes.filter(
+    (a) => a.diversityScore < midX && a.ambassadorScore < midY,
+  ).length;
   const axisNarrative = `Axis analysis (${tunings.length} tunings, diversity × ambassador score):\n  High-diversity/high-score: ${highDiv_highScore}\n  High-diversity/low-score: ${highDiv_lowScore}\n  Low-diversity/high-score: ${lowDiv_highScore}\n  Low-diversity/low-score: ${lowDiv_lowScore}`;
   return { axes, axisNarrative };
 }
@@ -14790,4 +14798,171 @@ export function tuningFamilySocraticSignature(
   const rec = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
   const signature = `n:${tunings.length};d:${div.diversityIndex.toFixed(2)};t:${topo.topologyLabel[0]!.toUpperCase()};r:${rec.recommendedId ?? 'none'}`;
   return { signature };
+}
+
+// ---------------------------------------------------------------------------
+// Q792 — tuningFamilySocraticBenchmark
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticBenchmark(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  benchmarkScore: number;
+  diversityComponent: number;
+  topologyComponent: number;
+  consensusComponent: number;
+} {
+  if (tunings.length === 0) {
+    return {
+      benchmarkScore: 0,
+      diversityComponent: 0,
+      topologyComponent: 0,
+      consensusComponent: 0,
+    };
+  }
+  const div = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  const topo = tuningFamilySocraticTopologyScore(tunings, spectrum, rootHz);
+  const cons = tuningFamilyAmbassadorConsensusScore(tunings, spectrum, rootHz);
+  const diversityComponent = div.diversityIndex;
+  const topologyComponent =
+    topo.topologyLabel === 'distributed' ? 1.0 : topo.topologyLabel === 'centralized' ? 0.3 : 0.5;
+  const consensusComponent = cons.normalizedScore;
+  const benchmarkScore = (diversityComponent + topologyComponent + consensusComponent) / 3;
+  return { benchmarkScore, diversityComponent, topologyComponent, consensusComponent };
+}
+
+// ---------------------------------------------------------------------------
+// Q794 — tuningFamilySocraticBenchmarkNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticBenchmarkNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticBenchmark> & { benchmarkNarrative: string } {
+  const bench = tuningFamilySocraticBenchmark(tunings, spectrum, rootHz);
+  let benchmarkNarrative: string;
+  if (tunings.length === 0) {
+    benchmarkNarrative = 'No tunings to benchmark.';
+  } else {
+    const label =
+      bench.benchmarkScore < 0.25
+        ? 'low'
+        : bench.benchmarkScore < 0.5
+          ? 'moderate'
+          : bench.benchmarkScore < 0.75
+            ? 'high'
+            : 'excellent';
+    benchmarkNarrative = `Benchmark (${tunings.length} tunings): ${bench.benchmarkScore.toFixed(3)} (${label}). Diversity: ${bench.diversityComponent.toFixed(3)}, topology: ${bench.topologyComponent.toFixed(3)}, consensus: ${bench.consensusComponent.toFixed(3)}.`;
+  }
+  return { ...bench, benchmarkNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q796 — tuningFamilySocraticSignatureComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticSignatureComparison(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  signatureA: string;
+  signatureB: string;
+  sameSize: boolean;
+  sameDiversity: boolean;
+  sameTopology: boolean;
+} {
+  const sigA = tuningFamilySocraticSignature(familyA, spectrum, rootHz);
+  const sigB = tuningFamilySocraticSignature(familyB, spectrum, rootHz);
+  const sameSize = familyA.length === familyB.length;
+  const divA = tuningFamilySocraticDiversityIndex(familyA, spectrum, rootHz);
+  const divB = tuningFamilySocraticDiversityIndex(familyB, spectrum, rootHz);
+  const sameDiversity = Math.abs(divA.diversityIndex - divB.diversityIndex) < 0.05;
+  const topoA = tuningFamilySocraticTopologyScore(familyA, spectrum, rootHz);
+  const topoB = tuningFamilySocraticTopologyScore(familyB, spectrum, rootHz);
+  const sameTopology = topoA.topologyLabel === topoB.topologyLabel;
+  return {
+    signatureA: sigA.signature,
+    signatureB: sigB.signature,
+    sameSize,
+    sameDiversity,
+    sameTopology,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q798 — tuningFamilySocraticSignatureComparisonNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticSignatureComparisonNarrative(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticSignatureComparison> & {
+  signatureComparisonNarrative: string;
+} {
+  const comp = tuningFamilySocraticSignatureComparison(familyA, familyB, spectrum, rootHz);
+  let signatureComparisonNarrative: string;
+  if (familyA.length === 0 && familyB.length === 0) {
+    signatureComparisonNarrative = 'Both families are empty.';
+  } else {
+    signatureComparisonNarrative = `Signature comparison: [${comp.signatureA}] vs [${comp.signatureB}]. Same size: ${comp.sameSize}. Same diversity: ${comp.sameDiversity}. Same topology: ${comp.sameTopology}.`;
+  }
+  return { ...comp, signatureComparisonNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q800 — tuningFamilySocraticConsensusNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticConsensusNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  distribution: ReturnType<typeof tuningFamilyAmbassadorConsensusDistribution>;
+  socraticConsensusNarrative: string;
+} {
+  const dist = tuningFamilyAmbassadorConsensusDistribution(tunings, spectrum, rootHz);
+  let socraticConsensusNarrative: string;
+  if (dist.total === 0) {
+    socraticConsensusNarrative = 'No modes to assess consensus.';
+  } else {
+    const dominantType: 'versatile' | 'balanced' | 'specialized' =
+      dist.versatile > dist.balanced && dist.versatile > dist.specialized
+        ? 'versatile'
+        : dist.balanced > dist.specialized
+          ? 'balanced'
+          : 'specialized';
+    socraticConsensusNarrative = `Consensus character: ${dominantType}-dominant (${dist.versatile} versatile, ${dist.balanced} balanced, ${dist.specialized} specialized across ${dist.total} modes).`;
+  }
+  return { distribution: dist, socraticConsensusNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q802 — tuningFamilySocraticBenchmarkComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticBenchmarkComparison(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  benchmarkA: number;
+  benchmarkB: number;
+  delta: number;
+  winner: 'A' | 'B' | 'tie';
+} {
+  const bA = tuningFamilySocraticBenchmark(familyA, spectrum, rootHz);
+  const bB = tuningFamilySocraticBenchmark(familyB, spectrum, rootHz);
+  const delta = bA.benchmarkScore - bB.benchmarkScore;
+  const winner: 'A' | 'B' | 'tie' =
+    Math.abs(delta) < 0.01 ? 'tie' : delta > 0 ? 'A' : 'B';
+  return { benchmarkA: bA.benchmarkScore, benchmarkB: bB.benchmarkScore, delta, winner };
 }
