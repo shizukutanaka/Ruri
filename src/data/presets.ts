@@ -207,6 +207,12 @@ import {
   tuningFamilySocraticVersatilityRatioNarrative,
   tuningFamilySocraticArchetype,
   tuningFamilySocraticArchetypeNarrative,
+  tuningFamilySocraticArchetypeComparison,
+  tuningFamilySocraticMaturityScore,
+  tuningFamilySocraticMaturityScoreNarrative,
+  tuningFamilySocraticMaturityComparison,
+  tuningFamilySocraticMaturityComparisonNarrative,
+  tuningFamilySocraticFullReport,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -6784,4 +6790,130 @@ export function presetFamilySocraticArchetypeNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticArchetypeNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q823 — presetFamilySocraticArchetypeComparison
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticArchetypeComparison(
+  presetIdsA: string[],
+  presetIdsB: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticArchetypeComparison> {
+  const tuningsA = presetIdsA.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  const tuningsB = presetIdsB.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticArchetypeComparison(tuningsA, tuningsB, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q825 — presetFamilySocraticMaturityScore
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticMaturityScore(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticMaturityScore> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticMaturityScore(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q827 — presetFamilySocraticMaturityScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticMaturityScoreNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticMaturityScoreNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticMaturityScoreNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q829 — presetFamilySocraticMaturityComparison
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticMaturityComparison(
+  presetIdsA: string[],
+  presetIdsB: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticMaturityComparison> {
+  const tuningsA = presetIdsA.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  const tuningsB = presetIdsB.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticMaturityComparison(tuningsA, tuningsB, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q831 — presetFamilySocraticMaturityComparisonNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticMaturityComparisonNarrative(
+  presetIdsA: string[],
+  presetIdsB: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticMaturityComparisonNarrative> {
+  const tuningsA = presetIdsA.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  const tuningsB = presetIdsB.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticMaturityComparisonNarrative(tuningsA, tuningsB, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q833 — presetFamilySocraticFullReport
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticFullReport(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticFullReport> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticFullReport(tunings, spectrum, rootHz);
 }

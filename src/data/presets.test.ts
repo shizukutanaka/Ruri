@@ -214,6 +214,12 @@ import {
   presetFamilySocraticVersatilityRatioNarrative,
   presetFamilySocraticArchetype,
   presetFamilySocraticArchetypeNarrative,
+  presetFamilySocraticArchetypeComparison,
+  presetFamilySocraticMaturityScore,
+  presetFamilySocraticMaturityScoreNarrative,
+  presetFamilySocraticMaturityComparison,
+  presetFamilySocraticMaturityComparisonNarrative,
+  presetFamilySocraticFullReport,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -6583,6 +6589,354 @@ describe('presetFamilySocraticArchetypeNarrative (Q821)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticArchetypeNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q823 — presetFamilySocraticArchetypeComparison
+describe('presetFamilySocraticArchetypeComparison (Q823)', () => {
+  it('returns archetypeA, archetypeB, sameArchetype', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof result.archetypeA).toBe('string');
+    expect(typeof result.archetypeB).toBe('string');
+    expect(typeof result.sameArchetype).toBe('boolean');
+  });
+
+  it('sameArchetype is true when same preset used for both families', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.sameArchetype).toBe(true);
+  });
+
+  it('archetypeA is one of the 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(['explorer', 'specialist', 'harmonist', 'traditionalist', 'undefined']).toContain(
+      result.archetypeA,
+    );
+  });
+
+  it('empty families both return "undefined" and sameArchetype true', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeComparison([], [], spec, undefined, [TWELVE_TET]);
+    expect(result.archetypeA).toBe('undefined');
+    expect(result.archetypeB).toBe('undefined');
+    expect(result.sameArchetype).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset in familyA', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticArchetypeComparison(['not-a-preset'], ['12-tet'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in familyB', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticArchetypeComparison(['12-tet'], ['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q825 — presetFamilySocraticMaturityScore
+describe('presetFamilySocraticMaturityScore (Q825)', () => {
+  it('returns maturityScore and maturityLabel', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScore(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(typeof result.maturityScore).toBe('number');
+    expect(typeof result.maturityLabel).toBe('string');
+  });
+
+  it('maturityScore is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScore(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(result.maturityScore).toBeGreaterThanOrEqual(0);
+    expect(result.maturityScore).toBeLessThanOrEqual(1);
+  });
+
+  it('maturityLabel is one of the 4 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScore(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(['nascent', 'developing', 'mature', 'refined']).toContain(result.maturityLabel);
+  });
+
+  it('empty input returns nascent with score 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScore([], spec, undefined, [TWELVE_TET]);
+    expect(result.maturityScore).toBe(0);
+    expect(result.maturityLabel).toBe('nascent');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticMaturityScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q827 — presetFamilySocraticMaturityScoreNarrative
+describe('presetFamilySocraticMaturityScoreNarrative (Q827)', () => {
+  it('returns maturityScore, maturityLabel, and maturityNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScoreNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.maturityScore).toBe('number');
+    expect(typeof result.maturityLabel).toBe('string');
+    expect(typeof result.maturityNarrative).toBe('string');
+  });
+
+  it('maturityNarrative contains "Maturity" for non-empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScoreNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.maturityNarrative).toContain('Maturity');
+  });
+
+  it('empty input returns "No tunings to assess."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScoreNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.maturityNarrative).toBe('No tunings to assess.');
+  });
+
+  it('empty input has score 0 and nascent label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityScoreNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.maturityScore).toBe(0);
+    expect(result.maturityLabel).toBe('nascent');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticMaturityScoreNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q829 — presetFamilySocraticMaturityComparison
+describe('presetFamilySocraticMaturityComparison (Q829)', () => {
+  it('same preset returns tie winner', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.winner).toBe('tie');
+  });
+
+  it('returns all 6 fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.maturityA).toBe('number');
+    expect(typeof result.labelA).toBe('string');
+    expect(typeof result.maturityB).toBe('number');
+    expect(typeof result.labelB).toBe('string');
+    expect(typeof result.delta).toBe('number');
+    expect(['A', 'B', 'tie']).toContain(result.winner);
+  });
+
+  it('delta equals maturityA minus maturityB', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.delta).toBeCloseTo(result.maturityA - result.maturityB, 10);
+  });
+
+  it('empty families return tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparison([], [], spec, undefined, [TWELVE_TET]);
+    expect(result.winner).toBe('tie');
+  });
+
+  it('throws RangeError for unknown preset in familyA', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticMaturityComparison(['not-a-preset'], ['12-tet'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in familyB', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticMaturityComparison(['12-tet'], ['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q831 — presetFamilySocraticMaturityComparisonNarrative
+describe('presetFamilySocraticMaturityComparisonNarrative (Q831)', () => {
+  it('narrative contains "Maturity comparison"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.maturityComparisonNarrative).toContain('Maturity comparison');
+  });
+
+  it('narrative contains winner', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.maturityComparisonNarrative).toContain(result.winner);
+  });
+
+  it('returns all fields plus narrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.maturityA).toBe('number');
+    expect(typeof result.maturityB).toBe('number');
+    expect(typeof result.delta).toBe('number');
+    expect(typeof result.maturityComparisonNarrative).toBe('string');
+  });
+
+  it('empty input returns tie narrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticMaturityComparisonNarrative(
+      [],
+      [],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.maturityComparisonNarrative).toContain('tie');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticMaturityComparisonNarrative(
+        ['not-a-preset'],
+        ['12-tet'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q833 — presetFamilySocraticFullReport
+describe('presetFamilySocraticFullReport (Q833)', () => {
+  it('returns all 8 fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticFullReport(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.familyPortrait).toBe('string');
+    expect(typeof result.archetype).toBe('string');
+    expect(typeof result.maturityScore).toBe('number');
+    expect(typeof result.maturityLabel).toBe('string');
+    expect(typeof result.benchmarkScore).toBe('number');
+    expect(typeof result.diversityIndex).toBe('number');
+    expect(result).toHaveProperty('recommendedId');
+    expect(result).toHaveProperty('alternativeId');
+  });
+
+  it('empty input returns archetype "undefined"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticFullReport([], spec, undefined, [TWELVE_TET]);
+    expect(result.archetype).toBe('undefined');
+  });
+
+  it('empty input returns recommendedId null', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticFullReport([], spec, undefined, [TWELVE_TET]);
+    expect(result.recommendedId).toBeNull();
+  });
+
+  it('single preset returns valid maturityLabel', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticFullReport(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(['nascent', 'developing', 'mature', 'refined']).toContain(result.maturityLabel);
+  });
+
+  it('non-empty returns recommendedId as string or null', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticFullReport(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.recommendedId === null || typeof result.recommendedId === 'string').toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticFullReport(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
