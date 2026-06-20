@@ -189,6 +189,9 @@ import {
   tuningFamilySocraticFamilyPortrait,
   tuningFamilySocraticInsightDigest,
   tuningFamilySocraticInsightDigestNarrative,
+  tuningFamilySocraticAxisAnalysis,
+  tuningFamilySocraticAxisNarrative,
+  tuningFamilySocraticSignature,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -6418,4 +6421,58 @@ export function presetFamilySocraticInsightDigestNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticInsightDigestNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q787 — presetFamilySocraticAxisAnalysis
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticAxisAnalysis(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticAxisAnalysis> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticAxisAnalysis(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q789 — presetFamilySocraticAxisNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticAxisNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticAxisNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticAxisNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q791 — presetFamilySocraticSignature
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticSignature(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticSignature> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticSignature(tunings, spectrum, rootHz);
 }
