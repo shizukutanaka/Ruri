@@ -223,6 +223,9 @@ import {
   presetFamilySocraticFullReportNarrative,
   presetFamilySocraticRadarProfile,
   presetFamilySocraticRadarProfileNarrative,
+  presetFamilySocraticRadarComparison,
+  presetFamilySocraticRadarComparisonNarrative,
+  presetFamilySocraticRadarDominantAxis,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -6989,12 +6992,10 @@ describe('presetFamilySocraticRadarProfile (Q837)', () => {
 
   it('all 5 axis fields are between 0 and 1', () => {
     const spec = harmonicSpectrum(6);
-    const result = presetFamilySocraticRadarProfile(
-      ['12-tet', 'just-5-limit'],
-      spec,
-      undefined,
-      [TWELVE_TET, JUST_INTONATION_5L],
-    );
+    const result = presetFamilySocraticRadarProfile(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
     expect(result.diversity).toBeGreaterThanOrEqual(0);
     expect(result.diversity).toBeLessThanOrEqual(1);
     expect(result.versatility).toBeGreaterThanOrEqual(0);
@@ -7073,6 +7074,168 @@ describe('presetFamilySocraticRadarProfileNarrative (Q839)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarProfileNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q841 — presetFamilySocraticRadarComparison
+describe('presetFamilySocraticRadarComparison (Q841)', () => {
+  it('returns all 4 fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result).toHaveProperty('profileA');
+    expect(result).toHaveProperty('profileB');
+    expect(result).toHaveProperty('deltas');
+    expect(result).toHaveProperty('dominantAxis');
+  });
+
+  it('same preset family yields all deltas 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparison(['12-tet'], ['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.deltas.diversity).toBe(0);
+    expect(result.deltas.versatility).toBe(0);
+    expect(result.deltas.maturity).toBe(0);
+    expect(result.deltas.benchmark).toBe(0);
+    expect(result.deltas.convergence).toBe(0);
+  });
+
+  it('dominantAxis is one of 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarComparison(['not-a-preset'], ['12-tet'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+
+  it('empty families yield all deltas 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparison([], [], spec, undefined, [TWELVE_TET]);
+    expect(result.deltas.diversity).toBe(0);
+    expect(result.deltas.versatility).toBe(0);
+  });
+});
+
+// Q843 — presetFamilySocraticRadarComparisonNarrative
+describe('presetFamilySocraticRadarComparisonNarrative (Q843)', () => {
+  it('radarComparisonNarrative contains "Radar comparison"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.radarComparisonNarrative).toContain('Radar comparison');
+  });
+
+  it('radarComparisonNarrative contains "dominant axis"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.radarComparisonNarrative).toContain('dominant axis');
+  });
+
+  it('same preset family yields all deltas "+0.000"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparisonNarrative(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.radarComparisonNarrative).toContain('+0.000');
+  });
+
+  it('returns all comparison fields plus radarComparisonNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result).toHaveProperty('profileA');
+    expect(result).toHaveProperty('profileB');
+    expect(result).toHaveProperty('deltas');
+    expect(result).toHaveProperty('dominantAxis');
+    expect(typeof result.radarComparisonNarrative).toBe('string');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarComparisonNarrative(['not-a-preset'], ['12-tet'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q845 — presetFamilySocraticRadarDominantAxis
+describe('presetFamilySocraticRadarDominantAxis (Q845)', () => {
+  it('dominantAxis is one of 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarDominantAxis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+  });
+
+  it('dominantScore is a number between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarDominantAxis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.dominantScore).toBeGreaterThanOrEqual(0);
+    expect(result.dominantScore).toBeLessThanOrEqual(1);
+  });
+
+  it('empty presets returns valid result with dominantScore 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarDominantAxis([], spec, undefined, [TWELVE_TET]);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+    expect(result.dominantScore).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarDominantAxis(['12-tet'], spec, 440, [TWELVE_TET]);
+    expect(typeof result.dominantAxis).toBe('string');
+    expect(typeof result.dominantScore).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarDominantAxis(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
