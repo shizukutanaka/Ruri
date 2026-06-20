@@ -16119,3 +16119,88 @@ export function tuningFamilySocraticRadarFullAnalysis(
     overallLabel: overall.overallLabel,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Q894 — tuningFamilySocraticRadarFullAnalysisNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarFullAnalysisNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  radarProfile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  };
+  balanceScore: number;
+  balanceLabel: 'unbalanced' | 'moderate' | 'balanced';
+  centroid: number;
+  centroidLabel: 'low' | 'mid' | 'high';
+  topAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  bottomAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  healthScore: number;
+  healthLabel: 'poor' | 'fair' | 'good' | 'excellent';
+  axisDiversity: number;
+  axisDiversityLabel: 'uniform' | 'varied' | 'polarized';
+  overallScore: number;
+  overallLabel: 'poor' | 'fair' | 'good' | 'excellent';
+  fullAnalysisNarrative: string;
+} {
+  const base = tuningFamilySocraticRadarFullAnalysis(tunings, spectrum, rootHz);
+  const fullAnalysisNarrative = `Radar full analysis: overall ${base.overallLabel} (${base.overallScore.toFixed(2)}), balance ${base.balanceLabel} (${base.balanceScore.toFixed(2)}), centroid ${base.centroidLabel} (${base.centroid.toFixed(2)}), axis diversity ${base.axisDiversityLabel}. Strongest axis: ${base.topAxis}. Weakest axis: ${base.bottomAxis}.`;
+  return { ...base, fullAnalysisNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q896 — tuningFamilySocraticRadarProfileTier
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileTier(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  tier: 'emerging' | 'developing' | 'established' | 'exemplary';
+  tierScore: number;
+} {
+  const { overallScore } = tuningFamilySocraticRadarOverallScore(tunings, spectrum, rootHz);
+  const tier: 'emerging' | 'developing' | 'established' | 'exemplary' =
+    overallScore < 0.35
+      ? 'emerging'
+      : overallScore < 0.5
+        ? 'developing'
+        : overallScore < 0.7
+          ? 'established'
+          : 'exemplary';
+  return { tier, tierScore: overallScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q898 — tuningFamilySocraticRadarProfileTierNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileTierNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  tier: 'emerging' | 'developing' | 'established' | 'exemplary';
+  tierScore: number;
+  tierNarrative: string;
+} {
+  const { tier, tierScore } = tuningFamilySocraticRadarProfileTier(tunings, spectrum, rootHz);
+  const tierNarrative = `Profile tier: ${tier} (score: ${tierScore.toFixed(2)}). ${
+    tier === 'exemplary'
+      ? 'This tuning family demonstrates exceptional multi-dimensional maturity.'
+      : tier === 'established'
+        ? 'A well-developed profile with solid performance across dimensions.'
+        : tier === 'developing'
+          ? 'Solid foundations with growth opportunities in several dimensions.'
+          : 'Early-stage profile with significant potential for development.'
+  }`;
+  return { tier, tierScore, tierNarrative };
+}
