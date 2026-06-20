@@ -253,6 +253,9 @@ import {
   presetFamilySocraticRadarFullAnalysisNarrative,
   presetFamilySocraticRadarProfileTier,
   presetFamilySocraticRadarProfileTierNarrative,
+  presetFamilySocraticRadarTierComparison,
+  presetFamilySocraticRadarMomentum,
+  presetFamilySocraticRadarMomentumNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -9077,6 +9080,224 @@ describe('presetFamilySocraticRadarProfileTierNarrative (Q899)', () => {
       presetFamilySocraticRadarProfileTierNarrative(['not-a-preset'], spec, undefined, [
         TWELVE_TET,
       ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q901 — presetFamilySocraticRadarTierComparison
+describe('presetFamilySocraticRadarTierComparison (Q901)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarTierComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result).toHaveProperty('tierA');
+    expect(result).toHaveProperty('tierB');
+    expect(result).toHaveProperty('tierScoreA');
+    expect(result).toHaveProperty('tierScoreB');
+    expect(result).toHaveProperty('tierDiff');
+    expect(result).toHaveProperty('higherTier');
+  });
+
+  it('tierDiff is non-negative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarTierComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.tierDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('tierScoreA and tierScoreB are in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarTierComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.tierScoreA).toBeGreaterThanOrEqual(0);
+    expect(result.tierScoreA).toBeLessThanOrEqual(1);
+    expect(result.tierScoreB).toBeGreaterThanOrEqual(0);
+    expect(result.tierScoreB).toBeLessThanOrEqual(1);
+  });
+
+  it('tier labels are valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarTierComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const valid = ['emerging', 'developing', 'established', 'exemplary'];
+    expect(valid).toContain(result.tierA);
+    expect(valid).toContain(result.tierB);
+  });
+
+  it('same-input yields tie and diff is 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarTierComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.tierDiff).toBe(0);
+    expect(result.higherTier).toBe('tie');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarTierComparison(['12-tet'], ['12-tet'], spec, 440, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.tierScoreA).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset in A', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarTierComparison(['not-a-preset'], ['12-tet'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in B', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarTierComparison(['12-tet'], ['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q903 — presetFamilySocraticRadarMomentum
+describe('presetFamilySocraticRadarMomentum (Q903)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentum(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result).toHaveProperty('momentum');
+    expect(result).toHaveProperty('momentumLabel');
+  });
+
+  it('momentum is finite', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentum(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(isFinite(result.momentum)).toBe(true);
+  });
+
+  it('momentumLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentum(['12-tet'], spec, undefined, [TWELVE_TET]);
+    const valid = ['stagnant', 'neutral', 'growing', 'thriving'];
+    expect(valid).toContain(result.momentumLabel);
+  });
+
+  it('momentum threshold consistency', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentum(['12-tet'], spec, undefined, [TWELVE_TET]);
+    if (result.momentum < -0.15) {
+      expect(result.momentumLabel).toBe('stagnant');
+    } else if (result.momentum < 0.05) {
+      expect(result.momentumLabel).toBe('neutral');
+    } else if (result.momentum < 0.2) {
+      expect(result.momentumLabel).toBe('growing');
+    } else {
+      expect(result.momentumLabel).toBe('thriving');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentum(['12-tet'], spec, 440, [TWELVE_TET]);
+    expect(isFinite(result.momentum)).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarMomentum(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q905 — presetFamilySocraticRadarMomentumNarrative
+describe('presetFamilySocraticRadarMomentumNarrative (Q905)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentumNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result).toHaveProperty('momentum');
+    expect(result).toHaveProperty('momentumLabel');
+    expect(result).toHaveProperty('momentumNarrative');
+  });
+
+  it('momentum is finite', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentumNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(isFinite(result.momentum)).toBe(true);
+  });
+
+  it('momentumLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentumNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    const valid = ['stagnant', 'neutral', 'growing', 'thriving'];
+    expect(valid).toContain(result.momentumLabel);
+  });
+
+  it('momentumNarrative is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentumNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.momentumNarrative).toBe('string');
+    expect(result.momentumNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('momentum threshold consistency', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentumNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    if (result.momentum < -0.15) {
+      expect(result.momentumLabel).toBe('stagnant');
+    } else if (result.momentum < 0.05) {
+      expect(result.momentumLabel).toBe('neutral');
+    } else if (result.momentum < 0.2) {
+      expect(result.momentumLabel).toBe('growing');
+    } else {
+      expect(result.momentumLabel).toBe('thriving');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarMomentumNarrative(['12-tet'], spec, 440, [TWELVE_TET]);
+    expect(isFinite(result.momentum)).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarMomentumNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

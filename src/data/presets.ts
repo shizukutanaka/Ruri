@@ -246,6 +246,9 @@ import {
   tuningFamilySocraticRadarFullAnalysisNarrative,
   tuningFamilySocraticRadarProfileTier,
   tuningFamilySocraticRadarProfileTierNarrative,
+  tuningFamilySocraticRadarTierComparison,
+  tuningFamilySocraticRadarMomentum,
+  tuningFamilySocraticRadarMomentumNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -7579,4 +7582,64 @@ export function presetFamilySocraticRadarProfileTierNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarProfileTierNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q901 — presetFamilySocraticRadarTierComparison
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarTierComparison(
+  presetIdsA: string[],
+  presetIdsB: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTierComparison> {
+  const tuningsA = presetIdsA.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  const tuningsB = presetIdsB.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTierComparison(tuningsA, tuningsB, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q903 — presetFamilySocraticRadarMomentum
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarMomentum(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMomentum> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMomentum(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q905 — presetFamilySocraticRadarMomentumNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarMomentumNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMomentumNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMomentumNarrative(tunings, spectrum, rootHz);
 }
