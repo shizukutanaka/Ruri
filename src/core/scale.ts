@@ -15931,3 +15931,84 @@ export function tuningFamilySocraticRadarAxisDiversity(
     axisDiversity < 0.1 ? 'uniform' : axisDiversity < 0.2 ? 'varied' : 'polarized';
   return { axisDiversity, axisDiversityLabel };
 }
+
+// ---------------------------------------------------------------------------
+// Q882 — tuningFamilySocraticRadarAxisDiversityNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAxisDiversityNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  axisDiversity: number;
+  axisDiversityLabel: 'uniform' | 'varied' | 'polarized';
+  axisDiversityNarrative: string;
+} {
+  const { axisDiversity, axisDiversityLabel } = tuningFamilySocraticRadarAxisDiversity(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const axisDiversityNarrative = `Axis diversity is ${axisDiversityLabel} (std dev: ${axisDiversity.toFixed(3)}). ${axisDiversityLabel === 'uniform' ? 'All dimensions are evenly developed.' : axisDiversityLabel === 'varied' ? 'Moderate variation across radar axes.' : 'Strong polarization between dimensions.'}`;
+  return { axisDiversity, axisDiversityLabel, axisDiversityNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q884 — tuningFamilySocraticRadarAxisDiversityComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAxisDiversityComparison(
+  tuningsA: TuningSystem[],
+  tuningsB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  axisDiversityA: number;
+  axisDiversityB: number;
+  axisDiversityLabelA: 'uniform' | 'varied' | 'polarized';
+  axisDiversityLabelB: 'uniform' | 'varied' | 'polarized';
+  diversityDiff: number;
+  moreUniform: 'A' | 'B' | 'tie';
+} {
+  const a = tuningFamilySocraticRadarAxisDiversity(tuningsA, spectrum, rootHz);
+  const b = tuningFamilySocraticRadarAxisDiversity(tuningsB, spectrum, rootHz);
+  const diversityDiff = Math.abs(a.axisDiversity - b.axisDiversity);
+  const moreUniform: 'A' | 'B' | 'tie' =
+    diversityDiff < 0.01 ? 'tie' : a.axisDiversity < b.axisDiversity ? 'A' : 'B';
+  return {
+    axisDiversityA: a.axisDiversity,
+    axisDiversityB: b.axisDiversity,
+    axisDiversityLabelA: a.axisDiversityLabel,
+    axisDiversityLabelB: b.axisDiversityLabel,
+    diversityDiff,
+    moreUniform,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q886 — tuningFamilySocraticRadarOverallScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarOverallScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  overallScore: number;
+  overallLabel: 'poor' | 'fair' | 'good' | 'excellent';
+} {
+  const health = tuningFamilySocraticRadarProfileHealth(tunings, spectrum, rootHz);
+  const cent = tuningFamilySocraticRadarCentroid(tunings, spectrum, rootHz);
+  const bal = tuningFamilySocraticRadarBalance(tunings, spectrum, rootHz);
+  const overallScore = health.healthScore * 0.4 + cent.centroid * 0.3 + bal.balanceScore * 0.3;
+  const overallLabel: 'poor' | 'fair' | 'good' | 'excellent' =
+    overallScore < 0.35
+      ? 'poor'
+      : overallScore < 0.5
+        ? 'fair'
+        : overallScore < 0.7
+          ? 'good'
+          : 'excellent';
+  return { overallScore, overallLabel };
+}
