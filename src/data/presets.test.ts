@@ -247,6 +247,9 @@ import {
   presetFamilySocraticRadarAxisDiversityNarrative,
   presetFamilySocraticRadarAxisDiversityComparison,
   presetFamilySocraticRadarOverallScore,
+  presetFamilySocraticRadarOverallScoreNarrative,
+  presetFamilySocraticRadarOverallScoreComparison,
+  presetFamilySocraticRadarFullAnalysis,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -8602,6 +8605,283 @@ describe('presetFamilySocraticRadarOverallScore (Q887)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarOverallScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q889 — presetFamilySocraticRadarOverallScoreNarrative
+describe('presetFamilySocraticRadarOverallScoreNarrative (Q889)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result).toHaveProperty('overallScore');
+    expect(result).toHaveProperty('overallLabel');
+    expect(result).toHaveProperty('overallScoreNarrative');
+  });
+
+  it('overallScore is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.overallScore).toBeGreaterThanOrEqual(0);
+    expect(result.overallScore).toBeLessThanOrEqual(1);
+  });
+
+  it('overallLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabel);
+  });
+
+  it('overallScoreNarrative is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.overallScoreNarrative).toBe('string');
+    expect(result.overallScoreNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreNarrative(['12-tet'], spec, 440, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.overallScore).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarOverallScoreNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q891 — presetFamilySocraticRadarOverallScoreComparison
+describe('presetFamilySocraticRadarOverallScoreComparison (Q891)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result).toHaveProperty('overallScoreA');
+    expect(result).toHaveProperty('overallScoreB');
+    expect(result).toHaveProperty('overallLabelA');
+    expect(result).toHaveProperty('overallLabelB');
+    expect(result).toHaveProperty('overallDiff');
+    expect(result).toHaveProperty('overallWinner');
+  });
+
+  it('overallScoreA is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.overallScoreA).toBeGreaterThanOrEqual(0);
+    expect(result.overallScoreA).toBeLessThanOrEqual(1);
+  });
+
+  it('overallScoreB is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.overallScoreB).toBeGreaterThanOrEqual(0);
+    expect(result.overallScoreB).toBeLessThanOrEqual(1);
+  });
+
+  it('overallDiff is non-negative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.overallDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('overallLabelA is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabelA);
+  });
+
+  it('overallLabelB is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabelB);
+  });
+
+  it('overallWinner is one of A, B, tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const valid = ['A', 'B', 'tie'];
+    expect(valid).toContain(result.overallWinner);
+  });
+
+  it('same input yields tie and diff of 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.overallWinner).toBe('tie');
+    expect(result.overallDiff).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScoreComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      440,
+      [TWELVE_TET],
+    );
+    expect(typeof result.overallScoreA).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset in A', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarOverallScoreComparison(
+        ['not-a-preset'],
+        ['12-tet'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in B', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarOverallScoreComparison(
+        ['12-tet'],
+        ['not-a-preset'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q893 — presetFamilySocraticRadarFullAnalysis
+describe('presetFamilySocraticRadarFullAnalysis (Q893)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarFullAnalysis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result).toHaveProperty('radarProfile');
+    expect(result).toHaveProperty('balanceScore');
+    expect(result).toHaveProperty('balanceLabel');
+    expect(result).toHaveProperty('centroid');
+    expect(result).toHaveProperty('centroidLabel');
+    expect(result).toHaveProperty('topAxis');
+    expect(result).toHaveProperty('bottomAxis');
+    expect(result).toHaveProperty('healthScore');
+    expect(result).toHaveProperty('healthLabel');
+    expect(result).toHaveProperty('axisDiversity');
+    expect(result).toHaveProperty('axisDiversityLabel');
+    expect(result).toHaveProperty('overallScore');
+    expect(result).toHaveProperty('overallLabel');
+  });
+
+  it('radarProfile has all 5 axes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarFullAnalysis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.radarProfile).toHaveProperty('diversity');
+    expect(result.radarProfile).toHaveProperty('versatility');
+    expect(result.radarProfile).toHaveProperty('maturity');
+    expect(result.radarProfile).toHaveProperty('benchmark');
+    expect(result.radarProfile).toHaveProperty('convergence');
+  });
+
+  it('overallScore is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarFullAnalysis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.overallScore).toBeGreaterThanOrEqual(0);
+    expect(result.overallScore).toBeLessThanOrEqual(1);
+  });
+
+  it('balanceScore is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarFullAnalysis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.balanceScore).toBeGreaterThanOrEqual(0);
+    expect(result.balanceScore).toBeLessThanOrEqual(1);
+  });
+
+  it('healthScore is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarFullAnalysis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.healthScore).toBeGreaterThanOrEqual(0);
+    expect(result.healthScore).toBeLessThanOrEqual(1);
+  });
+
+  it('overallLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarFullAnalysis(['12-tet'], spec, undefined, [TWELVE_TET]);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabel);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarFullAnalysis(['12-tet'], spec, 440, [TWELVE_TET]);
+    expect(typeof result.overallScore).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarFullAnalysis(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
