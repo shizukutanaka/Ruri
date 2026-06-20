@@ -171,6 +171,9 @@ import {
   tuningSocraticContrastNarrative,
   tuningFamilySocraticRecommendation,
   tuningFamilySocraticRecommendationNarrative,
+  tuningFamilySocraticPairwiseContrasts,
+  tuningFamilySocraticPairwiseContrastStats,
+  tuningFamilySocraticPairwiseContrastStatsNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -6079,4 +6082,58 @@ export function presetFamilySocraticRecommendationNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRecommendationNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q751 — presetFamilySocraticPairwiseContrasts
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticPairwiseContrasts(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticPairwiseContrasts> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticPairwiseContrasts(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q753 — presetFamilySocraticPairwiseContrastStats
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticPairwiseContrastStats(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticPairwiseContrastStats> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticPairwiseContrastStats(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q755 — presetFamilySocraticPairwiseContrastStatsNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticPairwiseContrastStatsNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticPairwiseContrastStatsNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticPairwiseContrastStatsNarrative(tunings, spectrum, rootHz);
 }

@@ -178,6 +178,9 @@ import {
   presetSocraticContrastNarrative,
   presetFamilySocraticRecommendation,
   presetFamilySocraticRecommendationNarrative,
+  presetFamilySocraticPairwiseContrasts,
+  presetFamilySocraticPairwiseContrastStats,
+  presetFamilySocraticPairwiseContrastStatsNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -4908,6 +4911,158 @@ describe('presetFamilySocraticRecommendationNarrative (Q749)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRecommendationNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q751 — presetFamilySocraticPairwiseContrasts
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticPairwiseContrasts (Q751)', () => {
+  it('returns empty array for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrasts([], spec, undefined, [TWELVE_TET]);
+    expect(result).toEqual([]);
+  });
+
+  it('returns 1 pair for 2 presets', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrasts(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result).toHaveLength(1);
+  });
+
+  it('each entry has idA, idB, distance, sameConsensus, sameProfile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrasts(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const entry = result[0]!;
+    expect(typeof entry.idA).toBe('string');
+    expect(typeof entry.idB).toBe('string');
+    expect(typeof entry.distance).toBe('number');
+    expect(typeof entry.sameConsensus).toBe('boolean');
+    expect(typeof entry.sameProfile).toBe('boolean');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticPairwiseContrasts(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q753 — presetFamilySocraticPairwiseContrastStats
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticPairwiseContrastStats (Q753)', () => {
+  it('returns all-zero stats for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrastStats([], spec, undefined, [TWELVE_TET]);
+    expect(result.totalPairs).toBe(0);
+    expect(result.meanDistance).toBe(0);
+    expect(result.minDistance).toBe(0);
+    expect(result.maxDistance).toBe(0);
+    expect(result.sameConsensusCount).toBe(0);
+    expect(result.sameProfileCount).toBe(0);
+  });
+
+  it('returns all 6 fields for a valid preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrastStats(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect('totalPairs' in result).toBe(true);
+    expect('meanDistance' in result).toBe(true);
+    expect('minDistance' in result).toBe(true);
+    expect('maxDistance' in result).toBe(true);
+    expect('sameConsensusCount' in result).toBe(true);
+    expect('sameProfileCount' in result).toBe(true);
+  });
+
+  it('minDistance <= meanDistance <= maxDistance', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrastStats(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.minDistance).toBeLessThanOrEqual(result.meanDistance);
+    expect(result.meanDistance).toBeLessThanOrEqual(result.maxDistance);
+  });
+
+  it('sameConsensusCount <= totalPairs', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrastStats(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.sameConsensusCount).toBeLessThanOrEqual(result.totalPairs);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticPairwiseContrastStats(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q755 — presetFamilySocraticPairwiseContrastStatsNarrative
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticPairwiseContrastStatsNarrative (Q755)', () => {
+  it('returns No pairwise message for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrastStatsNarrative([], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.contrastStatsNarrative).toBe('No pairwise contrasts to analyze.');
+  });
+
+  it('narrative contains contrast stats for non-empty preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrastStatsNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.contrastStatsNarrative).toContain('contrast stats');
+  });
+
+  it('spreads all stats fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticPairwiseContrastStatsNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect('totalPairs' in result).toBe(true);
+    expect('contrastStatsNarrative' in result).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticPairwiseContrastStatsNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
     ).toThrow(RangeError);
   });
 });
