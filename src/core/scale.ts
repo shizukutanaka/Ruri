@@ -14553,11 +14553,7 @@ export function tuningFamilySocraticTopologyScore(
   }
   const topologyScore = spread.spread / 4;
   const topologyLabel: 'centralized' | 'distributed' | 'dispersed' =
-    topologyScore < 0.25
-      ? 'centralized'
-      : topologyScore < 0.60
-        ? 'distributed'
-        : 'dispersed';
+    topologyScore < 0.25 ? 'centralized' : topologyScore < 0.6 ? 'distributed' : 'dispersed';
   return { topologyScore, topologyLabel };
 }
 

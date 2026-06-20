@@ -13969,3 +13969,112 @@ describe('tuningFamilySocraticClusterMapNarrative (Q766)', () => {
     expect(result.clusterMapNarrative).toContain('Cluster map');
   });
 });
+
+// Q768 — tuningFamilySocraticTopologyScore
+describe('tuningFamilySocraticTopologyScore (Q768)', () => {
+  it('returns topologyScore and topologyLabel for two tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScore([t12, edo(19, 440)], spec);
+    expect(typeof result.topologyScore).toBe('number');
+    expect(['centralized', 'distributed', 'dispersed']).toContain(result.topologyLabel);
+  });
+
+  it('topologyScore is between 0 and 1 inclusive', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScore([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.topologyScore).toBeGreaterThanOrEqual(0);
+    expect(result.topologyScore).toBeLessThanOrEqual(1);
+  });
+
+  it('single tuning returns centralized with score 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScore([t12], spec);
+    expect(result.topologyScore).toBe(0);
+    expect(result.topologyLabel).toBe('centralized');
+  });
+
+  it('empty tunings returns centralized with score 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScore([], spec);
+    expect(result.topologyScore).toBe(0);
+    expect(result.topologyLabel).toBe('centralized');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScore([t12, edo(19, 440)], spec, 440);
+    expect(['centralized', 'distributed', 'dispersed']).toContain(result.topologyLabel);
+  });
+});
+
+// Q770 — tuningFamilySocraticTopologyScoreNarrative
+describe('tuningFamilySocraticTopologyScoreNarrative (Q770)', () => {
+  it('narrative contains "Topology" for two tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScoreNarrative([t12, edo(19, 440)], spec);
+    expect(result.topologyNarrative).toContain('Topology');
+  });
+
+  it('single tuning returns "requires at least 2" message', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScoreNarrative([t12], spec);
+    expect(result.topologyNarrative).toContain('requires at least 2');
+  });
+
+  it('returns topologyScore and topologyLabel in addition to narrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScoreNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.topologyScore).toBe('number');
+    expect(['centralized', 'distributed', 'dispersed']).toContain(result.topologyLabel);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticTopologyScoreNarrative([t12, edo(19, 440)], spec, 440);
+    expect(result.topologyNarrative).toContain('Topology');
+  });
+});
+
+// Q772 — tuningFamilySocraticSummaryBundle
+describe('tuningFamilySocraticSummaryBundle (Q772)', () => {
+  it('returns all three bundle keys', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundle([t12, edo(19, 440)], spec);
+    expect(result).toHaveProperty('clusterMap');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+  });
+
+  it('clusterMap has traditional, transitional, experimental', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundle([t12, edo(19, 440)], spec);
+    expect(Array.isArray(result.clusterMap.traditional)).toBe(true);
+    expect(Array.isArray(result.clusterMap.transitional)).toBe(true);
+    expect(Array.isArray(result.clusterMap.experimental)).toBe(true);
+  });
+
+  it('comparison has mostDiverse, leastDiverse, mostUnique, mostVersatile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundle([t12, edo(19, 440)], spec);
+    expect(result.comparison).toHaveProperty('mostDiverse');
+    expect(result.comparison).toHaveProperty('leastDiverse');
+    expect(result.comparison).toHaveProperty('mostUnique');
+    expect(result.comparison).toHaveProperty('mostVersatile');
+  });
+
+  it('recommendation has recommendedId, reason, alternativeId', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundle([t12, edo(19, 440)], spec);
+    expect(result.recommendation).toHaveProperty('recommendedId');
+    expect(result.recommendation).toHaveProperty('reason');
+    expect(result.recommendation).toHaveProperty('alternativeId');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundle([t12, edo(19, 440)], spec, 440);
+    expect(result).toHaveProperty('clusterMap');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+  });
+});
