@@ -414,6 +414,9 @@ import {
   tuningFamilySocraticFamilyPortrait,
   tuningFamilySocraticInsightDigest,
   tuningFamilySocraticInsightDigestNarrative,
+  tuningFamilySocraticAxisAnalysis,
+  tuningFamilySocraticAxisNarrative,
+  tuningFamilySocraticSignature,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -14273,5 +14276,95 @@ describe('tuningFamilySocraticInsightDigestNarrative (Q784)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticInsightDigestNarrative([t12, edo(19, 440)], spec, 440);
     expect(result.digestNarrative).toContain('Evolution');
+  });
+});
+
+// Q786 — tuningFamilySocraticAxisAnalysis
+describe('tuningFamilySocraticAxisAnalysis (Q786)', () => {
+  it('returns array with length matching input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisAnalysis([t12, edo(19, 440)], spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id, diversityScore, ambassadorScore', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisAnalysis([t12, edo(19, 440)], spec);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.diversityScore).toBe('number');
+      expect(typeof entry.ambassadorScore).toBe('number');
+    }
+  });
+
+  it('empty input returns empty array', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisAnalysis([], spec);
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisAnalysis([t12, edo(19, 440)], spec, 440);
+    expect(result.length).toBe(2);
+  });
+});
+
+// Q788 — tuningFamilySocraticAxisNarrative
+describe('tuningFamilySocraticAxisNarrative (Q788)', () => {
+  it('axisNarrative contains "Axis analysis"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisNarrative([t12, edo(19, 440)], spec);
+    expect(result.axisNarrative).toContain('Axis analysis');
+  });
+
+  it('axes array length matches input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisNarrative([t12, edo(19, 440)], spec);
+    expect(result.axes.length).toBe(2);
+  });
+
+  it('empty input returns No tunings to analyze.', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisNarrative([], spec);
+    expect(result.axisNarrative).toBe('No tunings to analyze.');
+    expect(result.axes).toEqual([]);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticAxisNarrative([t12, edo(19, 440)], spec, 440);
+    expect(result.axisNarrative).toContain('Axis analysis');
+  });
+});
+
+// Q790 — tuningFamilySocraticSignature
+describe('tuningFamilySocraticSignature (Q790)', () => {
+  it('signature is non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignature([t12, edo(19, 440)], spec);
+    expect(typeof result.signature).toBe('string');
+    expect(result.signature.length).toBeGreaterThan(0);
+  });
+
+  it('signature contains n:, d:, t:, r:', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignature([t12, edo(19, 440)], spec);
+    expect(result.signature).toContain('n:');
+    expect(result.signature).toContain('d:');
+    expect(result.signature).toContain('t:');
+    expect(result.signature).toContain('r:');
+  });
+
+  it('empty input returns "empty"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignature([], spec);
+    expect(result.signature).toBe('empty');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSignature([t12, edo(19, 440)], spec, 440);
+    expect(result.signature).toContain('n:');
   });
 });

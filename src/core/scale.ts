@@ -14676,7 +14676,11 @@ export function tuningFamilySocraticInsightDigest(
   familyPortrait: string;
   diversityIndex: number;
   topologyLabel: 'centralized' | 'distributed' | 'dispersed';
-  evolutionRanking: { id: string; evolutionRank: number; evolutionLabel: 'traditional' | 'transitional' | 'experimental' }[];
+  evolutionRanking: {
+    id: string;
+    evolutionRank: number;
+    evolutionLabel: 'traditional' | 'transitional' | 'experimental';
+  }[];
   comparison: ReturnType<typeof tuningFamilySocraticComparison>;
   recommendation: ReturnType<typeof tuningFamilySocraticRecommendation>;
   characterPortraits: { id: string; portrait: string }[];
@@ -14688,7 +14692,15 @@ export function tuningFamilySocraticInsightDigest(
   const comparison = tuningFamilySocraticComparison(tunings, spectrum, rootHz);
   const recommendation = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
   const characterPortraits = tuningFamilySocraticCharacterPortraits(tunings, spectrum, rootHz);
-  return { familyPortrait, diversityIndex, topologyLabel, evolutionRanking, comparison, recommendation, characterPortraits };
+  return {
+    familyPortrait,
+    diversityIndex,
+    topologyLabel,
+    evolutionRanking,
+    comparison,
+    recommendation,
+    characterPortraits,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -14707,9 +14719,75 @@ export function tuningFamilySocraticInsightDigestNarrative(
   } else {
     digestNarrative =
       `${digest.familyPortrait}\n\nEvolution:\n` +
-      digest.evolutionRanking.map((r) => `  ${r.evolutionRank}. [${r.evolutionLabel}] ${r.id}`).join('\n') +
+      digest.evolutionRanking
+        .map((r) => `  ${r.evolutionRank}. [${r.evolutionLabel}] ${r.id}`)
+        .join('\n') +
       `\n\nPortraits:\n` +
       digest.characterPortraits.map((p) => `  ${p.portrait}`).join('\n');
   }
   return { ...digest, digestNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q786 — tuningFamilySocraticAxisAnalysis
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticAxisAnalysis(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; diversityScore: number; ambassadorScore: number }[] {
+  const profiles = tuningFamilySocraticProfiles(tunings, spectrum, rootHz);
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  const scoreMap = new Map<string, number>(ranking.map((r) => [r.id, r.score]));
+  return profiles.map((p) => ({
+    id: p.id,
+    diversityScore: p.socraticProfile.profileDiversity.normalized,
+    ambassadorScore: scoreMap.get(p.id) ?? 0,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q788 — tuningFamilySocraticAxisNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticAxisNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  axes: { id: string; diversityScore: number; ambassadorScore: number }[];
+  axisNarrative: string;
+} {
+  const axes = tuningFamilySocraticAxisAnalysis(tunings, spectrum, rootHz);
+  if (axes.length === 0) {
+    return { axes: [], axisNarrative: 'No tunings to analyze.' };
+  }
+  const midX = 0.5;
+  const midY = axes.reduce((s, a) => s + a.ambassadorScore, 0) / axes.length;
+  const highDiv_highScore = axes.filter((a) => a.diversityScore >= midX && a.ambassadorScore >= midY).length;
+  const highDiv_lowScore = axes.filter((a) => a.diversityScore >= midX && a.ambassadorScore < midY).length;
+  const lowDiv_highScore = axes.filter((a) => a.diversityScore < midX && a.ambassadorScore >= midY).length;
+  const lowDiv_lowScore = axes.filter((a) => a.diversityScore < midX && a.ambassadorScore < midY).length;
+  const axisNarrative = `Axis analysis (${tunings.length} tunings, diversity × ambassador score):\n  High-diversity/high-score: ${highDiv_highScore}\n  High-diversity/low-score: ${highDiv_lowScore}\n  Low-diversity/high-score: ${lowDiv_highScore}\n  Low-diversity/low-score: ${lowDiv_lowScore}`;
+  return { axes, axisNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q790 — tuningFamilySocraticSignature
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticSignature(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { signature: string } {
+  if (tunings.length === 0) {
+    return { signature: 'empty' };
+  }
+  const div = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  const topo = tuningFamilySocraticTopologyScore(tunings, spectrum, rootHz);
+  const rec = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
+  const signature = `n:${tunings.length};d:${div.diversityIndex.toFixed(2)};t:${topo.topologyLabel[0]!.toUpperCase()};r:${rec.recommendedId ?? 'none'}`;
+  return { signature };
 }
