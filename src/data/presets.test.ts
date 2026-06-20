@@ -211,6 +211,9 @@ import {
   presetFamilySocraticScoreSpread,
   presetFamilySocraticScoreSpreadNarrative,
   presetFamilySocraticVersatilityRatio,
+  presetFamilySocraticVersatilityRatioNarrative,
+  presetFamilySocraticArchetype,
+  presetFamilySocraticArchetypeNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -6444,6 +6447,142 @@ describe('presetFamilySocraticVersatilityRatio (Q815)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticVersatilityRatio(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q817 — presetFamilySocraticVersatilityRatioNarrative
+describe('presetFamilySocraticVersatilityRatioNarrative (Q817)', () => {
+  it('returns all fields plus versatilityRatioNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticVersatilityRatioNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.versatileCount).toBe('number');
+    expect(typeof result.totalCount).toBe('number');
+    expect(typeof result.versatilityRatio).toBe('number');
+    expect(typeof result.versatilityRatioNarrative).toBe('string');
+  });
+
+  it('narrative contains "Versatility"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticVersatilityRatioNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.versatilityRatioNarrative).toContain('Versatility');
+  });
+
+  it('empty input returns "No tunings to assess versatility."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticVersatilityRatioNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.versatilityRatioNarrative).toBe('No tunings to assess versatility.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticVersatilityRatioNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q819 — presetFamilySocraticArchetype
+describe('presetFamilySocraticArchetype (Q819)', () => {
+  it('returns an archetype field', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetype(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(typeof result.archetype).toBe('string');
+  });
+
+  it('archetype is one of the 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetype(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(['explorer', 'specialist', 'harmonist', 'traditionalist', 'undefined']).toContain(
+      result.archetype,
+    );
+  });
+
+  it('empty input returns "undefined" archetype', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetype([], spec, undefined, [TWELVE_TET]);
+    expect(result.archetype).toBe('undefined');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticArchetype(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q821 — presetFamilySocraticArchetypeNarrative
+describe('presetFamilySocraticArchetypeNarrative (Q821)', () => {
+  it('returns archetype and archetypeNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.archetype).toBe('string');
+    expect(typeof result.archetypeNarrative).toBe('string');
+  });
+
+  it('archetypeNarrative is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.archetypeNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('archetypeNarrative matches one of the 5 descriptions', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const descriptions = [
+      'Explorer family: high diversity and wide dispersion — pushes into new sonic territory.',
+      'Harmonist family: majority versatile ambassadors — balanced across many musical contexts.',
+      'Traditionalist family: anchored in central tunings — stable and conservative character.',
+      'Specialist family: tightly focused profiles — deep expertise in a narrow tonal range.',
+      'Undefined archetype: no tunings provided.',
+    ];
+    expect(descriptions).toContain(result.archetypeNarrative);
+  });
+
+  it('empty input returns "Undefined archetype: no tunings provided."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticArchetypeNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.archetypeNarrative).toBe('Undefined archetype: no tunings provided.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticArchetypeNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

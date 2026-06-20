@@ -204,6 +204,9 @@ import {
   tuningFamilySocraticScoreSpread,
   tuningFamilySocraticScoreSpreadNarrative,
   tuningFamilySocraticVersatilityRatio,
+  tuningFamilySocraticVersatilityRatioNarrative,
+  tuningFamilySocraticArchetype,
+  tuningFamilySocraticArchetypeNarrative,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -6727,4 +6730,58 @@ export function presetFamilySocraticVersatilityRatio(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticVersatilityRatio(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q817 — presetFamilySocraticVersatilityRatioNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticVersatilityRatioNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticVersatilityRatioNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticVersatilityRatioNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q819 — presetFamilySocraticArchetype
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticArchetype(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticArchetype> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticArchetype(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q821 — presetFamilySocraticArchetypeNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticArchetypeNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticArchetypeNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticArchetypeNarrative(tunings, spectrum, rootHz);
 }
