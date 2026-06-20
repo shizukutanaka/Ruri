@@ -471,6 +471,9 @@ import {
   tuningFamilySocraticRadarFullAnalysisNarrative,
   tuningFamilySocraticRadarProfileTier,
   tuningFamilySocraticRadarProfileTierNarrative,
+  tuningFamilySocraticRadarTierComparison,
+  tuningFamilySocraticRadarMomentum,
+  tuningFamilySocraticRadarMomentumNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -16776,5 +16779,143 @@ describe('tuningFamilySocraticRadarProfileTierNarrative (Q898)', () => {
   it('accepts optional rootHz', () => {
     const result = tuningFamilySocraticRadarProfileTierNarrative([t12], spec, 440);
     expect(typeof result.tierScore).toBe('number');
+  });
+});
+
+// Q900 — tuningFamilySocraticRadarTierComparison
+describe('tuningFamilySocraticRadarTierComparison (Q900)', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('all fields are present', () => {
+    const result = tuningFamilySocraticRadarTierComparison([t12], [t12], spec);
+    expect(result).toHaveProperty('tierA');
+    expect(result).toHaveProperty('tierB');
+    expect(result).toHaveProperty('tierScoreA');
+    expect(result).toHaveProperty('tierScoreB');
+    expect(result).toHaveProperty('tierDiff');
+    expect(result).toHaveProperty('higherTier');
+  });
+
+  it('tierDiff is non-negative', () => {
+    const result = tuningFamilySocraticRadarTierComparison([t12], [t12], spec);
+    expect(result.tierDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('tierScoreA and tierScoreB are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarTierComparison([t12], [t12], spec);
+    expect(result.tierScoreA).toBeGreaterThanOrEqual(0);
+    expect(result.tierScoreA).toBeLessThanOrEqual(1);
+    expect(result.tierScoreB).toBeGreaterThanOrEqual(0);
+    expect(result.tierScoreB).toBeLessThanOrEqual(1);
+  });
+
+  it('tier labels are valid', () => {
+    const result = tuningFamilySocraticRadarTierComparison([t12], [t12], spec);
+    const valid = ['emerging', 'developing', 'established', 'exemplary'];
+    expect(valid).toContain(result.tierA);
+    expect(valid).toContain(result.tierB);
+  });
+
+  it('higherTier is valid', () => {
+    const result = tuningFamilySocraticRadarTierComparison([t12], [t12], spec);
+    expect(['A', 'B', 'tie']).toContain(result.higherTier);
+  });
+
+  it('same-input yields tie and diff is 0', () => {
+    const result = tuningFamilySocraticRadarTierComparison([t12], [t12], spec);
+    expect(result.tierDiff).toBe(0);
+    expect(result.higherTier).toBe('tie');
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = tuningFamilySocraticRadarTierComparison([t12], [t12], spec, 440);
+    expect(typeof result.tierScoreA).toBe('number');
+  });
+});
+
+// Q902 — tuningFamilySocraticRadarMomentum
+describe('tuningFamilySocraticRadarMomentum (Q902)', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('all fields are present', () => {
+    const result = tuningFamilySocraticRadarMomentum([t12], spec);
+    expect(result).toHaveProperty('momentum');
+    expect(result).toHaveProperty('momentumLabel');
+  });
+
+  it('momentum is finite', () => {
+    const result = tuningFamilySocraticRadarMomentum([t12], spec);
+    expect(isFinite(result.momentum)).toBe(true);
+  });
+
+  it('momentumLabel is valid', () => {
+    const result = tuningFamilySocraticRadarMomentum([t12], spec);
+    const valid = ['stagnant', 'neutral', 'growing', 'thriving'];
+    expect(valid).toContain(result.momentumLabel);
+  });
+
+  it('momentum threshold consistency', () => {
+    const result = tuningFamilySocraticRadarMomentum([t12], spec);
+    if (result.momentum < -0.15) {
+      expect(result.momentumLabel).toBe('stagnant');
+    } else if (result.momentum < 0.05) {
+      expect(result.momentumLabel).toBe('neutral');
+    } else if (result.momentum < 0.2) {
+      expect(result.momentumLabel).toBe('growing');
+    } else {
+      expect(result.momentumLabel).toBe('thriving');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = tuningFamilySocraticRadarMomentum([t12], spec, 440);
+    expect(isFinite(result.momentum)).toBe(true);
+  });
+});
+
+// Q904 — tuningFamilySocraticRadarMomentumNarrative
+describe('tuningFamilySocraticRadarMomentumNarrative (Q904)', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('all fields are present', () => {
+    const result = tuningFamilySocraticRadarMomentumNarrative([t12], spec);
+    expect(result).toHaveProperty('momentum');
+    expect(result).toHaveProperty('momentumLabel');
+    expect(result).toHaveProperty('momentumNarrative');
+  });
+
+  it('momentum is finite', () => {
+    const result = tuningFamilySocraticRadarMomentumNarrative([t12], spec);
+    expect(isFinite(result.momentum)).toBe(true);
+  });
+
+  it('momentumLabel is valid', () => {
+    const result = tuningFamilySocraticRadarMomentumNarrative([t12], spec);
+    const valid = ['stagnant', 'neutral', 'growing', 'thriving'];
+    expect(valid).toContain(result.momentumLabel);
+  });
+
+  it('momentumNarrative is a non-empty string', () => {
+    const result = tuningFamilySocraticRadarMomentumNarrative([t12], spec);
+    expect(typeof result.momentumNarrative).toBe('string');
+    expect(result.momentumNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('momentum threshold consistency', () => {
+    const result = tuningFamilySocraticRadarMomentumNarrative([t12], spec);
+    if (result.momentum < -0.15) {
+      expect(result.momentumLabel).toBe('stagnant');
+    } else if (result.momentum < 0.05) {
+      expect(result.momentumLabel).toBe('neutral');
+    } else if (result.momentum < 0.2) {
+      expect(result.momentumLabel).toBe('growing');
+    } else {
+      expect(result.momentumLabel).toBe('thriving');
+    }
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = tuningFamilySocraticRadarMomentumNarrative([t12], spec, 440);
+    expect(isFinite(result.momentum)).toBe(true);
   });
 });

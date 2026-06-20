@@ -16204,3 +16204,87 @@ export function tuningFamilySocraticRadarProfileTierNarrative(
   }`;
   return { tier, tierScore, tierNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q900 — tuningFamilySocraticRadarTierComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarTierComparison(
+  tuningsA: TuningSystem[],
+  tuningsB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  tierA: 'emerging' | 'developing' | 'established' | 'exemplary';
+  tierB: 'emerging' | 'developing' | 'established' | 'exemplary';
+  tierScoreA: number;
+  tierScoreB: number;
+  tierDiff: number;
+  higherTier: 'A' | 'B' | 'tie';
+} {
+  const { tier: tierA, tierScore: tierScoreA } = tuningFamilySocraticRadarProfileTier(
+    tuningsA,
+    spectrum,
+    rootHz,
+  );
+  const { tier: tierB, tierScore: tierScoreB } = tuningFamilySocraticRadarProfileTier(
+    tuningsB,
+    spectrum,
+    rootHz,
+  );
+  const tierDiff = Math.abs(tierScoreA - tierScoreB);
+  const higherTier: 'A' | 'B' | 'tie' =
+    tierDiff < 0.02 ? 'tie' : tierScoreA > tierScoreB ? 'A' : 'B';
+  return { tierA, tierB, tierScoreA, tierScoreB, tierDiff, higherTier };
+}
+
+// ---------------------------------------------------------------------------
+// Q902 — tuningFamilySocraticRadarMomentum
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarMomentum(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  momentum: number;
+  momentumLabel: 'stagnant' | 'neutral' | 'growing' | 'thriving';
+} {
+  const { centroid } = tuningFamilySocraticRadarCentroid(tunings, spectrum, rootHz);
+  const momentum = centroid - 0.5;
+  const momentumLabel: 'stagnant' | 'neutral' | 'growing' | 'thriving' =
+    momentum < -0.15
+      ? 'stagnant'
+      : momentum < 0.05
+        ? 'neutral'
+        : momentum < 0.2
+          ? 'growing'
+          : 'thriving';
+  return { momentum, momentumLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q904 — tuningFamilySocraticRadarMomentumNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarMomentumNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  momentum: number;
+  momentumLabel: 'stagnant' | 'neutral' | 'growing' | 'thriving';
+  momentumNarrative: string;
+} {
+  const { momentum, momentumLabel } = tuningFamilySocraticRadarMomentum(tunings, spectrum, rootHz);
+  const momentumNarrative = `Radar momentum is ${momentumLabel} (${momentum >= 0 ? '+' : ''}${momentum.toFixed(3)} from midpoint). ${
+    momentumLabel === 'thriving'
+      ? 'The profile strongly exceeds the midpoint across all dimensions.'
+      : momentumLabel === 'growing'
+        ? 'Positive momentum — the profile is above average overall.'
+        : momentumLabel === 'neutral'
+          ? 'The profile sits near the midpoint with balanced potential.'
+          : 'The profile trails the midpoint, suggesting areas needing development.'
+  }`;
+  return { momentum, momentumLabel, momentumNarrative };
+}
