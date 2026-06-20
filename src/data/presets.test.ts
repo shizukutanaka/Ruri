@@ -190,6 +190,12 @@ import {
   presetFamilySocraticTopologyScore,
   presetFamilySocraticTopologyScoreNarrative,
   presetFamilySocraticSummaryBundle,
+  presetFamilySocraticSummaryBundleNarrative,
+  presetSocraticCharacterPortrait,
+  presetFamilySocraticCharacterPortraits,
+  presetFamilySocraticFamilyPortrait,
+  presetFamilySocraticInsightDigest,
+  presetFamilySocraticInsightDigestNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -5497,6 +5503,193 @@ describe('presetFamilySocraticSummaryBundle (Q773)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticSummaryBundle(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q775 — presetFamilySocraticSummaryBundleNarrative
+describe('presetFamilySocraticSummaryBundleNarrative (Q775)', () => {
+  it('summaryBundleNarrative contains Summary', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSummaryBundleNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.summaryBundleNarrative).toContain('Summary');
+  });
+
+  it('has all bundle keys', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSummaryBundleNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result).toHaveProperty('clusterMap');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+    expect(result).toHaveProperty('summaryBundleNarrative');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticSummaryBundleNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q777 — presetSocraticCharacterPortrait
+describe('presetSocraticCharacterPortrait (Q777)', () => {
+  it('portrait is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticCharacterPortrait('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(typeof result.portrait).toBe('string');
+    expect(result.portrait.length).toBeGreaterThan(0);
+  });
+
+  it('portrait contains ambassador', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetSocraticCharacterPortrait('12-tet', spec, undefined, [TWELVE_TET]);
+    expect(result.portrait).toContain('ambassador');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetSocraticCharacterPortrait('not-a-preset', spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q779 — presetFamilySocraticCharacterPortraits
+describe('presetFamilySocraticCharacterPortraits (Q779)', () => {
+  it('array length matches input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticCharacterPortraits(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and portrait', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticCharacterPortraits(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    for (const entry of result) {
+      expect(entry).toHaveProperty('id');
+      expect(entry).toHaveProperty('portrait');
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticCharacterPortraits(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q781 — presetFamilySocraticFamilyPortrait
+describe('presetFamilySocraticFamilyPortrait (Q781)', () => {
+  it('familyPortrait is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticFamilyPortrait(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.familyPortrait).toBe('string');
+    expect(result.familyPortrait.length).toBeGreaterThan(0);
+  });
+
+  it('empty presetIds returns Empty family.', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticFamilyPortrait([], spec, undefined, [TWELVE_TET]);
+    expect(result.familyPortrait).toBe('Empty family.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticFamilyPortrait(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q783 — presetFamilySocraticInsightDigest
+describe('presetFamilySocraticInsightDigest (Q783)', () => {
+  it('has all 7 keys', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticInsightDigest(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result).toHaveProperty('familyPortrait');
+    expect(result).toHaveProperty('diversityIndex');
+    expect(result).toHaveProperty('topologyLabel');
+    expect(result).toHaveProperty('evolutionRanking');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+    expect(result).toHaveProperty('characterPortraits');
+  });
+
+  it('characterPortraits.length equals presetIds.length', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticInsightDigest(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.characterPortraits.length).toBe(2);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticInsightDigest(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q785 — presetFamilySocraticInsightDigestNarrative
+describe('presetFamilySocraticInsightDigestNarrative (Q785)', () => {
+  it('digestNarrative contains Evolution and Portraits', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticInsightDigestNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.digestNarrative).toContain('Evolution');
+    expect(result.digestNarrative).toContain('Portraits');
+  });
+
+  it('empty presetIds returns No tunings to digest.', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticInsightDigestNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.digestNarrative).toBe('No tunings to digest.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticInsightDigestNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
