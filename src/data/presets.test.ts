@@ -241,6 +241,9 @@ import {
   presetFamilySocraticRadarAxisScoreRankNarrative,
   presetFamilySocraticRadarProfileSnapshot,
   presetFamilySocraticRadarProfileHealth,
+  presetFamilySocraticRadarProfileHealthNarrative,
+  presetFamilySocraticRadarProfileHealthComparison,
+  presetFamilySocraticRadarAxisDiversity,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -8111,6 +8114,265 @@ describe('presetFamilySocraticRadarProfileHealth (Q875)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarProfileHealth(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q877 — presetFamilySocraticRadarProfileHealthNarrative
+describe('presetFamilySocraticRadarProfileHealthNarrative (Q877)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result).toHaveProperty('healthScore');
+    expect(result).toHaveProperty('healthLabel');
+    expect(result).toHaveProperty('healthNarrative');
+  });
+
+  it('healthScore is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.healthScore).toBeGreaterThanOrEqual(0);
+    expect(result.healthScore).toBeLessThanOrEqual(1);
+  });
+
+  it('healthLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.healthLabel);
+  });
+
+  it('healthNarrative is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.healthNarrative).toBe('string');
+    expect(result.healthNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthNarrative(['12-tet'], spec, 440, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.healthScore).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarProfileHealthNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q879 — presetFamilySocraticRadarProfileHealthComparison
+describe('presetFamilySocraticRadarProfileHealthComparison (Q879)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result).toHaveProperty('healthScoreA');
+    expect(result).toHaveProperty('healthScoreB');
+    expect(result).toHaveProperty('healthLabelA');
+    expect(result).toHaveProperty('healthLabelB');
+    expect(result).toHaveProperty('healthDiff');
+    expect(result).toHaveProperty('healthWinner');
+  });
+
+  it('healthScoreA is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.healthScoreA).toBeGreaterThanOrEqual(0);
+    expect(result.healthScoreA).toBeLessThanOrEqual(1);
+  });
+
+  it('healthScoreB is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.healthScoreB).toBeGreaterThanOrEqual(0);
+    expect(result.healthScoreB).toBeLessThanOrEqual(1);
+  });
+
+  it('healthDiff is non-negative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.healthDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('healthLabelA is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.healthLabelA);
+  });
+
+  it('healthLabelB is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.healthLabelB);
+  });
+
+  it('healthWinner is one of A, B, tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const valid = ['A', 'B', 'tie'];
+    expect(valid).toContain(result.healthWinner);
+  });
+
+  it('same preset yields tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.healthWinner).toBe('tie');
+    expect(result.healthDiff).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarProfileHealthComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      440,
+      [TWELVE_TET],
+    );
+    expect(typeof result.healthScoreA).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset in A', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarProfileHealthComparison(
+        ['not-a-preset'],
+        ['12-tet'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in B', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarProfileHealthComparison(
+        ['12-tet'],
+        ['not-a-preset'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q881 — presetFamilySocraticRadarAxisDiversity
+describe('presetFamilySocraticRadarAxisDiversity (Q881)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversity(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result).toHaveProperty('axisDiversity');
+    expect(result).toHaveProperty('axisDiversityLabel');
+  });
+
+  it('axisDiversity is a finite non-negative number', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversity(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(Number.isFinite(result.axisDiversity)).toBe(true);
+    expect(result.axisDiversity).toBeGreaterThanOrEqual(0);
+  });
+
+  it('axisDiversityLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversity(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    const valid = ['uniform', 'varied', 'polarized'];
+    expect(valid).toContain(result.axisDiversityLabel);
+  });
+
+  it('axisDiversityLabel matches axisDiversity thresholds', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversity(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    const { axisDiversity, axisDiversityLabel } = result;
+    if (axisDiversity < 0.1) expect(axisDiversityLabel).toBe('uniform');
+    else if (axisDiversity < 0.2) expect(axisDiversityLabel).toBe('varied');
+    else expect(axisDiversityLabel).toBe('polarized');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversity(['12-tet'], spec, 440, [TWELVE_TET]);
+    expect(typeof result.axisDiversity).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAxisDiversity(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
