@@ -15382,10 +15382,18 @@ export function tuningFamilySocraticRadarProfile(
     return { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
   }
   const diversity = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz).diversityIndex;
-  const versatility = tuningFamilySocraticVersatilityRatio(tunings, spectrum, rootHz).versatilityRatio;
+  const versatility = tuningFamilySocraticVersatilityRatio(
+    tunings,
+    spectrum,
+    rootHz,
+  ).versatilityRatio;
   const maturity = tuningFamilySocraticMaturityScore(tunings, spectrum, rootHz).maturityScore;
   const benchmark = tuningFamilySocraticBenchmark(tunings, spectrum, rootHz).benchmarkScore;
-  const convergence = tuningFamilyAmbassadorConvergenceScore(tunings, spectrum, rootHz).convergenceScore;
+  const convergence = tuningFamilyAmbassadorConvergenceScore(
+    tunings,
+    spectrum,
+    rootHz,
+  ).convergenceScore;
   return { diversity, versatility, maturity, benchmark, convergence };
 }
 
@@ -15406,4 +15414,80 @@ export function tuningFamilySocraticRadarProfileNarrative(
     radarNarrative = `Radar profile (${tunings.length} tunings):\n  Diversity:    ${r.diversity.toFixed(3)}\n  Versatility:  ${r.versatility.toFixed(3)}\n  Maturity:     ${r.maturity.toFixed(3)}\n  Benchmark:    ${r.benchmark.toFixed(3)}\n  Convergence:  ${r.convergence.toFixed(3)}`;
   }
   return { ...r, radarNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q840 — tuningFamilySocraticRadarComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarComparison(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  profileA: ReturnType<typeof tuningFamilySocraticRadarProfile>;
+  profileB: ReturnType<typeof tuningFamilySocraticRadarProfile>;
+  deltas: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  };
+  dominantAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+} {
+  const profileA = tuningFamilySocraticRadarProfile(familyA, spectrum, rootHz);
+  const profileB = tuningFamilySocraticRadarProfile(familyB, spectrum, rootHz);
+  const deltas = {
+    diversity: profileA.diversity - profileB.diversity,
+    versatility: profileA.versatility - profileB.versatility,
+    maturity: profileA.maturity - profileB.maturity,
+    benchmark: profileA.benchmark - profileB.benchmark,
+    convergence: profileA.convergence - profileB.convergence,
+  };
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const dominantAxis = axes.reduce(
+    (best, axis) => (Math.abs(deltas[axis]) > Math.abs(deltas[best]) ? axis : best),
+    axes[0]!,
+  );
+  return { profileA, profileB, deltas, dominantAxis };
+}
+
+// ---------------------------------------------------------------------------
+// Q842 — tuningFamilySocraticRadarComparisonNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarComparisonNarrative(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticRadarComparison> & { radarComparisonNarrative: string } {
+  const comp = tuningFamilySocraticRadarComparison(familyA, familyB, spectrum, rootHz);
+  const radarComparisonNarrative = `Radar comparison (A vs B, dominant axis: ${comp.dominantAxis}):\n  Diversity: ${comp.deltas.diversity >= 0 ? '+' : ''}${comp.deltas.diversity.toFixed(3)}\n  Versatility: ${comp.deltas.versatility >= 0 ? '+' : ''}${comp.deltas.versatility.toFixed(3)}\n  Maturity: ${comp.deltas.maturity >= 0 ? '+' : ''}${comp.deltas.maturity.toFixed(3)}\n  Benchmark: ${comp.deltas.benchmark >= 0 ? '+' : ''}${comp.deltas.benchmark.toFixed(3)}\n  Convergence: ${comp.deltas.convergence >= 0 ? '+' : ''}${comp.deltas.convergence.toFixed(3)}`;
+  return { ...comp, radarComparisonNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q844 — tuningFamilySocraticRadarDominantAxis
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarDominantAxis(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  dominantAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  dominantScore: number;
+} {
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const dominantAxis = axes.reduce(
+    (best, axis) => (profile[axis] > profile[best] ? axis : best),
+    axes[0]!,
+  );
+  return { dominantAxis, dominantScore: profile[dominantAxis] };
 }

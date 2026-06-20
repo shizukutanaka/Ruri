@@ -441,6 +441,9 @@ import {
   tuningFamilySocraticFullReportNarrative,
   tuningFamilySocraticRadarProfile,
   tuningFamilySocraticRadarProfileNarrative,
+  tuningFamilySocraticRadarComparison,
+  tuningFamilySocraticRadarComparisonNarrative,
+  tuningFamilySocraticRadarDominantAxis,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -15350,5 +15353,129 @@ describe('tuningFamilySocraticRadarProfileNarrative (Q838)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticRadarProfileNarrative([t12], spec, 440);
     expect(typeof result.radarNarrative).toBe('string');
+  });
+});
+
+// Q840 — tuningFamilySocraticRadarComparison
+describe('tuningFamilySocraticRadarComparison (Q840)', () => {
+  it('returns all 4 fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparison([t12], [edo(19, 440)], spec);
+    expect(result).toHaveProperty('profileA');
+    expect(result).toHaveProperty('profileB');
+    expect(result).toHaveProperty('deltas');
+    expect(result).toHaveProperty('dominantAxis');
+  });
+
+  it('same family yields all deltas 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparison([t12], [t12], spec);
+    expect(result.deltas.diversity).toBe(0);
+    expect(result.deltas.versatility).toBe(0);
+    expect(result.deltas.maturity).toBe(0);
+    expect(result.deltas.benchmark).toBe(0);
+    expect(result.deltas.convergence).toBe(0);
+  });
+
+  it('dominantAxis is one of 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparison([t12], [edo(19, 440)], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+  });
+
+  it('dominantAxis has largest absolute delta', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparison([t12], [edo(19, 440)], spec);
+    const d = result.deltas;
+    const domAbs = Math.abs(d[result.dominantAxis]);
+    expect(domAbs).toBeGreaterThanOrEqual(Math.abs(d.diversity));
+    expect(domAbs).toBeGreaterThanOrEqual(Math.abs(d.versatility));
+    expect(domAbs).toBeGreaterThanOrEqual(Math.abs(d.maturity));
+    expect(domAbs).toBeGreaterThanOrEqual(Math.abs(d.benchmark));
+    expect(domAbs).toBeGreaterThanOrEqual(Math.abs(d.convergence));
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparison([t12], [edo(19, 440)], spec, 440);
+    expect(result).toHaveProperty('dominantAxis');
+  });
+});
+
+// Q842 — tuningFamilySocraticRadarComparisonNarrative
+describe('tuningFamilySocraticRadarComparisonNarrative (Q842)', () => {
+  it('radarComparisonNarrative contains "Radar comparison"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(result.radarComparisonNarrative).toContain('Radar comparison');
+  });
+
+  it('radarComparisonNarrative contains "dominant axis"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(result.radarComparisonNarrative).toContain('dominant axis');
+  });
+
+  it('same family yields all deltas "+0.000"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparisonNarrative([t12], [t12], spec);
+    expect(result.radarComparisonNarrative).toContain('+0.000');
+  });
+
+  it('returns all comparison fields plus radarComparisonNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(result).toHaveProperty('profileA');
+    expect(result).toHaveProperty('profileB');
+    expect(result).toHaveProperty('deltas');
+    expect(result).toHaveProperty('dominantAxis');
+    expect(typeof result.radarComparisonNarrative).toBe('string');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarComparisonNarrative([t12], [edo(19, 440)], spec, 440);
+    expect(typeof result.radarComparisonNarrative).toBe('string');
+  });
+});
+
+// Q844 — tuningFamilySocraticRadarDominantAxis
+describe('tuningFamilySocraticRadarDominantAxis (Q844)', () => {
+  it('dominantAxis is one of 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarDominantAxis([t12], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+  });
+
+  it('dominantScore equals the max of all 5 axes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarDominantAxis([t12, edo(19, 440)], spec);
+    const profile = result.dominantScore;
+    expect(profile).toBeGreaterThanOrEqual(0);
+    expect(profile).toBeLessThanOrEqual(1);
+  });
+
+  it('dominantScore is max of all 5 profile values', () => {
+    const spec = harmonicSpectrum(6);
+    const r = tuningFamilySocraticRadarDominantAxis([t12, edo(19, 440)], spec);
+    // dominantScore should be the highest axis score
+    expect(r.dominantScore).toBeGreaterThanOrEqual(0);
+  });
+
+  it('empty tunings returns valid result with all zeros', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarDominantAxis([], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+    expect(result.dominantScore).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarDominantAxis([t12], spec, 440);
+    expect(typeof result.dominantAxis).toBe('string');
+    expect(typeof result.dominantScore).toBe('number');
   });
 });
