@@ -244,6 +244,9 @@ import {
   presetFamilySocraticRadarProfileHealthNarrative,
   presetFamilySocraticRadarProfileHealthComparison,
   presetFamilySocraticRadarAxisDiversity,
+  presetFamilySocraticRadarAxisDiversityNarrative,
+  presetFamilySocraticRadarAxisDiversityComparison,
+  presetFamilySocraticRadarOverallScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -8373,6 +8376,232 @@ describe('presetFamilySocraticRadarAxisDiversity (Q881)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarAxisDiversity(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q883 — presetFamilySocraticRadarAxisDiversityNarrative
+describe('presetFamilySocraticRadarAxisDiversityNarrative (Q883)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result).toHaveProperty('axisDiversity');
+    expect(result).toHaveProperty('axisDiversityLabel');
+    expect(result).toHaveProperty('axisDiversityNarrative');
+  });
+
+  it('axisDiversity is a finite non-negative number', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(Number.isFinite(result.axisDiversity)).toBe(true);
+    expect(result.axisDiversity).toBeGreaterThanOrEqual(0);
+  });
+
+  it('axisDiversityLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    const valid = ['uniform', 'varied', 'polarized'];
+    expect(valid).toContain(result.axisDiversityLabel);
+  });
+
+  it('axisDiversityNarrative is non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.axisDiversityNarrative).toBe('string');
+    expect(result.axisDiversityNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityNarrative(['12-tet'], spec, 440, [
+      TWELVE_TET,
+    ]);
+    expect(typeof result.axisDiversity).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAxisDiversityNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q885 — presetFamilySocraticRadarAxisDiversityComparison
+describe('presetFamilySocraticRadarAxisDiversityComparison (Q885)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result).toHaveProperty('axisDiversityA');
+    expect(result).toHaveProperty('axisDiversityB');
+    expect(result).toHaveProperty('axisDiversityLabelA');
+    expect(result).toHaveProperty('axisDiversityLabelB');
+    expect(result).toHaveProperty('diversityDiff');
+    expect(result).toHaveProperty('moreUniform');
+  });
+
+  it('diversityDiff is non-negative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.diversityDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('axisDiversityLabelA is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const valid = ['uniform', 'varied', 'polarized'];
+    expect(valid).toContain(result.axisDiversityLabelA);
+  });
+
+  it('axisDiversityLabelB is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const valid = ['uniform', 'varied', 'polarized'];
+    expect(valid).toContain(result.axisDiversityLabelB);
+  });
+
+  it('moreUniform is one of A, B, tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const valid = ['A', 'B', 'tie'];
+    expect(valid).toContain(result.moreUniform);
+  });
+
+  it('same input yields tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(result.moreUniform).toBe('tie');
+    expect(result.diversityDiff).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarAxisDiversityComparison(
+      ['12-tet'],
+      ['12-tet'],
+      spec,
+      440,
+      [TWELVE_TET],
+    );
+    expect(typeof result.axisDiversityA).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset in A', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAxisDiversityComparison(
+        ['not-a-preset'],
+        ['12-tet'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in B', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAxisDiversityComparison(
+        ['12-tet'],
+        ['not-a-preset'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q887 — presetFamilySocraticRadarOverallScore
+describe('presetFamilySocraticRadarOverallScore (Q887)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScore(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result).toHaveProperty('overallScore');
+    expect(result).toHaveProperty('overallLabel');
+  });
+
+  it('overallScore is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScore(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.overallScore).toBeGreaterThanOrEqual(0);
+    expect(result.overallScore).toBeLessThanOrEqual(1);
+  });
+
+  it('overallLabel is valid', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScore(['12-tet'], spec, undefined, [TWELVE_TET]);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabel);
+  });
+
+  it('overallLabel matches threshold', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScore(['12-tet'], spec, undefined, [TWELVE_TET]);
+    const { overallScore, overallLabel } = result;
+    if (overallScore < 0.35) expect(overallLabel).toBe('poor');
+    else if (overallScore < 0.5) expect(overallLabel).toBe('fair');
+    else if (overallScore < 0.7) expect(overallLabel).toBe('good');
+    else expect(overallLabel).toBe('excellent');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticRadarOverallScore(['12-tet'], spec, 440, [TWELVE_TET]);
+    expect(typeof result.overallScore).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarOverallScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
