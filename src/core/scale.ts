@@ -15769,3 +15769,89 @@ export function tuningFamilySocraticRadarAxisScoreRank(
   const bottomAxis = ranked[ranked.length - 1]!.axis;
   return { ranked, topAxis, bottomAxis };
 }
+
+// ---------------------------------------------------------------------------
+// Q870 — tuningFamilySocraticRadarAxisScoreRankNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAxisScoreRankNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  ranked: Array<{
+    axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+    score: number;
+  }>;
+  topAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  bottomAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  rankNarrative: string;
+} {
+  const { ranked, topAxis, bottomAxis } = tuningFamilySocraticRadarAxisScoreRank(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const rankNarrative = `Axis ranking (highest to lowest): ${ranked.map((r) => `${r.axis} (${r.score.toFixed(2)})`).join(', ')}. Top: ${topAxis}, Bottom: ${bottomAxis}.`;
+  return { ranked, topAxis, bottomAxis, rankNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q872 — tuningFamilySocraticRadarProfileSnapshot
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileSnapshot(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  balanceScore: number;
+  balanceLabel: 'unbalanced' | 'moderate' | 'balanced';
+  gap: number;
+  gapLabel: 'tight' | 'moderate' | 'wide';
+  centroid: number;
+  centroidLabel: 'low' | 'mid' | 'high';
+  topAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  bottomAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+} {
+  const bal = tuningFamilySocraticRadarBalance(tunings, spectrum, rootHz);
+  const g = tuningFamilySocraticRadarGap(tunings, spectrum, rootHz);
+  const cent = tuningFamilySocraticRadarCentroid(tunings, spectrum, rootHz);
+  const rank = tuningFamilySocraticRadarAxisScoreRank(tunings, spectrum, rootHz);
+  return {
+    balanceScore: bal.balanceScore,
+    balanceLabel: bal.balanceLabel,
+    gap: g.gap,
+    gapLabel: g.gapLabel,
+    centroid: cent.centroid,
+    centroidLabel: cent.centroidLabel,
+    topAxis: rank.topAxis,
+    bottomAxis: rank.bottomAxis,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q874 — tuningFamilySocraticRadarProfileHealth
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileHealth(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  healthScore: number;
+  healthLabel: 'poor' | 'fair' | 'good' | 'excellent';
+} {
+  const balance = tuningFamilySocraticRadarBalance(tunings, spectrum, rootHz);
+  const cent = tuningFamilySocraticRadarCentroid(tunings, spectrum, rootHz);
+  const healthScore = balance.balanceScore * 0.5 + cent.centroid * 0.5;
+  const healthLabel: 'poor' | 'fair' | 'good' | 'excellent' =
+    healthScore < 0.35
+      ? 'poor'
+      : healthScore < 0.5
+        ? 'fair'
+        : healthScore < 0.7
+          ? 'good'
+          : 'excellent';
+  return { healthScore, healthLabel };
+}
