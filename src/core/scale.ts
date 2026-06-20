@@ -14290,3 +14290,102 @@ export function tuningFamilySocraticRecommendationNarrative(
         `  Alternative: ${rec.alternativeId ?? 'none'}.`;
   return { ...rec, recommendationNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q750 — tuningFamilySocraticPairwiseContrasts
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticPairwiseContrasts(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { idA: string; idB: string; distance: number; sameConsensus: boolean; sameProfile: boolean }[] {
+  const results: {
+    idA: string;
+    idB: string;
+    distance: number;
+    sameConsensus: boolean;
+    sameProfile: boolean;
+  }[] = [];
+  for (let i = 0; i < tunings.length; i++) {
+    for (let j = i + 1; j < tunings.length; j++) {
+      const { distance, sameConsensus, sameProfile } = tuningSocraticContrast(
+        tunings[i]!,
+        tunings[j]!,
+        spectrum,
+        rootHz,
+      );
+      results.push({
+        idA: tunings[i]!.id,
+        idB: tunings[j]!.id,
+        distance,
+        sameConsensus,
+        sameProfile,
+      });
+    }
+  }
+  return results;
+}
+
+// ---------------------------------------------------------------------------
+// Q752 — tuningFamilySocraticPairwiseContrastStats
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticPairwiseContrastStats(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  totalPairs: number;
+  meanDistance: number;
+  minDistance: number;
+  maxDistance: number;
+  sameConsensusCount: number;
+  sameProfileCount: number;
+} {
+  const contrasts = tuningFamilySocraticPairwiseContrasts(tunings, spectrum, rootHz);
+  if (contrasts.length === 0) {
+    return {
+      totalPairs: 0,
+      meanDistance: 0,
+      minDistance: 0,
+      maxDistance: 0,
+      sameConsensusCount: 0,
+      sameProfileCount: 0,
+    };
+  }
+  const totalPairs = contrasts.length;
+  const distances = contrasts.map((c) => c.distance);
+  const meanDistance = distances.reduce((s, d) => s + d, 0) / totalPairs;
+  const minDistance = Math.min(...distances);
+  const maxDistance = Math.max(...distances);
+  const sameConsensusCount = contrasts.filter((c) => c.sameConsensus).length;
+  const sameProfileCount = contrasts.filter((c) => c.sameProfile).length;
+  return {
+    totalPairs,
+    meanDistance,
+    minDistance,
+    maxDistance,
+    sameConsensusCount,
+    sameProfileCount,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q754 — tuningFamilySocraticPairwiseContrastStatsNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticPairwiseContrastStatsNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticPairwiseContrastStats> & {
+  contrastStatsNarrative: string;
+} {
+  const stats = tuningFamilySocraticPairwiseContrastStats(tunings, spectrum, rootHz);
+  const contrastStatsNarrative =
+    stats.totalPairs === 0
+      ? 'No pairwise contrasts to analyze.'
+      : `Pairwise contrast stats (${stats.totalPairs} pairs): mean distance ${stats.meanDistance.toFixed(2)}/4, range ${stats.minDistance}–${stats.maxDistance}. ${stats.sameConsensusCount} pairs share consensus; ${stats.sameProfileCount} share the same quadrant profile.`;
+  return { ...stats, contrastStatsNarrative };
+}

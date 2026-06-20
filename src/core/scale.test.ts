@@ -396,6 +396,9 @@ import {
   tuningSocraticContrastNarrative,
   tuningFamilySocraticRecommendation,
   tuningFamilySocraticRecommendationNarrative,
+  tuningFamilySocraticPairwiseContrasts,
+  tuningFamilySocraticPairwiseContrastStats,
+  tuningFamilySocraticPairwiseContrastStatsNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -13517,5 +13520,160 @@ describe('tuningFamilySocraticRecommendationNarrative (Q748)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticRecommendationNarrative([t12], spec, 261.63);
     expect(typeof result.recommendationNarrative).toBe('string');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q750 — tuningFamilySocraticPairwiseContrasts
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticPairwiseContrasts (Q750)', () => {
+  it('returns empty array for fewer than 2 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    expect(tuningFamilySocraticPairwiseContrasts([], spec)).toEqual([]);
+    expect(tuningFamilySocraticPairwiseContrasts([t12], spec)).toEqual([]);
+  });
+
+  it('returns 1 pair for 2 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrasts([t12, edo(19, 440)], spec);
+    expect(result).toHaveLength(1);
+  });
+
+  it('returns 3 pairs for 3 tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrasts([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result).toHaveLength(3);
+  });
+
+  it('each entry has idA, idB, distance, sameConsensus, sameProfile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrasts([t12, edo(19, 440)], spec);
+    const entry = result[0]!;
+    expect(typeof entry.idA).toBe('string');
+    expect(typeof entry.idB).toBe('string');
+    expect(typeof entry.distance).toBe('number');
+    expect(typeof entry.sameConsensus).toBe('boolean');
+    expect(typeof entry.sameProfile).toBe('boolean');
+  });
+
+  it('idA and idB correspond to the tuning ids', () => {
+    const spec = harmonicSpectrum(6);
+    const t19 = edo(19, 440);
+    const result = tuningFamilySocraticPairwiseContrasts([t12, t19], spec);
+    expect(result[0]!.idA).toBe(t12.id);
+    expect(result[0]!.idB).toBe(t19.id);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrasts([t12, edo(19, 440)], spec, 261.63);
+    expect(result).toHaveLength(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q752 — tuningFamilySocraticPairwiseContrastStats
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticPairwiseContrastStats (Q752)', () => {
+  it('returns all-zero stats for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStats([], spec);
+    expect(result.totalPairs).toBe(0);
+    expect(result.meanDistance).toBe(0);
+    expect(result.minDistance).toBe(0);
+    expect(result.maxDistance).toBe(0);
+    expect(result.sameConsensusCount).toBe(0);
+    expect(result.sameProfileCount).toBe(0);
+  });
+
+  it('returns all 6 fields for a valid family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStats([t12, edo(19, 440)], spec);
+    expect('totalPairs' in result).toBe(true);
+    expect('meanDistance' in result).toBe(true);
+    expect('minDistance' in result).toBe(true);
+    expect('maxDistance' in result).toBe(true);
+    expect('sameConsensusCount' in result).toBe(true);
+    expect('sameProfileCount' in result).toBe(true);
+  });
+
+  it('totalPairs equals number of pairs', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStats(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(result.totalPairs).toBe(3);
+  });
+
+  it('minDistance <= meanDistance <= maxDistance', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStats(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(result.minDistance).toBeLessThanOrEqual(result.meanDistance);
+    expect(result.meanDistance).toBeLessThanOrEqual(result.maxDistance);
+  });
+
+  it('sameConsensusCount and sameProfileCount are within [0, totalPairs]', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStats(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(result.sameConsensusCount).toBeGreaterThanOrEqual(0);
+    expect(result.sameConsensusCount).toBeLessThanOrEqual(result.totalPairs);
+    expect(result.sameProfileCount).toBeGreaterThanOrEqual(0);
+    expect(result.sameProfileCount).toBeLessThanOrEqual(result.totalPairs);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStats([t12, edo(19, 440)], spec, 261.63);
+    expect(result.totalPairs).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q754 — tuningFamilySocraticPairwiseContrastStatsNarrative
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticPairwiseContrastStatsNarrative (Q754)', () => {
+  it('returns No pairwise message for empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStatsNarrative([], spec);
+    expect(result.contrastStatsNarrative).toBe('No pairwise contrasts to analyze.');
+  });
+
+  it('narrative contains contrast stats for non-empty family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStatsNarrative([t12, edo(19, 440)], spec);
+    expect(result.contrastStatsNarrative).toContain('contrast stats');
+  });
+
+  it('spreads all stats fields into the return value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStatsNarrative([t12, edo(19, 440)], spec);
+    expect('totalPairs' in result).toBe(true);
+    expect('meanDistance' in result).toBe(true);
+    expect('minDistance' in result).toBe(true);
+    expect('maxDistance' in result).toBe(true);
+    expect('sameConsensusCount' in result).toBe(true);
+    expect('sameProfileCount' in result).toBe(true);
+  });
+
+  it('narrative mentions pair count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStatsNarrative(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(result.contrastStatsNarrative).toContain('3 pairs');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticPairwiseContrastStatsNarrative([t12], spec, 261.63);
+    expect(result.contrastStatsNarrative).toBe('No pairwise contrasts to analyze.');
   });
 });
