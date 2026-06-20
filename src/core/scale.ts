@@ -15855,3 +15855,79 @@ export function tuningFamilySocraticRadarProfileHealth(
           : 'excellent';
   return { healthScore, healthLabel };
 }
+
+// ---------------------------------------------------------------------------
+// Q876 — tuningFamilySocraticRadarProfileHealthNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileHealthNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  healthScore: number;
+  healthLabel: 'poor' | 'fair' | 'good' | 'excellent';
+  healthNarrative: string;
+} {
+  const { healthScore, healthLabel } = tuningFamilySocraticRadarProfileHealth(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const healthNarrative = `Overall radar health is ${healthLabel} (${healthScore.toFixed(2)}). ${healthLabel === 'excellent' ? 'This tuning family excels across all radar dimensions.' : healthLabel === 'good' ? 'Strong performance with room to grow in some areas.' : healthLabel === 'fair' ? 'Moderate profile with clear opportunities for improvement.' : 'Significant development needed across radar dimensions.'}`;
+  return { healthScore, healthLabel, healthNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q878 — tuningFamilySocraticRadarProfileHealthComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileHealthComparison(
+  tuningsA: TuningSystem[],
+  tuningsB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  healthScoreA: number;
+  healthScoreB: number;
+  healthLabelA: 'poor' | 'fair' | 'good' | 'excellent';
+  healthLabelB: 'poor' | 'fair' | 'good' | 'excellent';
+  healthDiff: number;
+  healthWinner: 'A' | 'B' | 'tie';
+} {
+  const a = tuningFamilySocraticRadarProfileHealth(tuningsA, spectrum, rootHz);
+  const b = tuningFamilySocraticRadarProfileHealth(tuningsB, spectrum, rootHz);
+  const healthDiff = Math.abs(a.healthScore - b.healthScore);
+  const healthWinner: 'A' | 'B' | 'tie' =
+    healthDiff < 0.02 ? 'tie' : a.healthScore > b.healthScore ? 'A' : 'B';
+  return {
+    healthScoreA: a.healthScore,
+    healthScoreB: b.healthScore,
+    healthLabelA: a.healthLabel,
+    healthLabelB: b.healthLabel,
+    healthDiff,
+    healthWinner,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q880 — tuningFamilySocraticRadarAxisDiversity
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAxisDiversity(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  axisDiversity: number;
+  axisDiversityLabel: 'uniform' | 'varied' | 'polarized';
+} {
+  const p = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const scores = [p.diversity, p.versatility, p.maturity, p.benchmark, p.convergence];
+  const mean = scores.reduce((a, b) => a + b, 0) / 5;
+  const variance = scores.reduce((s, x) => s + (x - mean) ** 2, 0) / 5;
+  const axisDiversity = Math.sqrt(variance);
+  const axisDiversityLabel: 'uniform' | 'varied' | 'polarized' =
+    axisDiversity < 0.1 ? 'uniform' : axisDiversity < 0.2 ? 'varied' : 'polarized';
+  return { axisDiversity, axisDiversityLabel };
+}
