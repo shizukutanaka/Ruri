@@ -15178,3 +15178,168 @@ export function tuningFamilySocraticArchetypeNarrative(
   const archetypeNarrative = descriptions[result.archetype];
   return { ...result, archetypeNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q822 — tuningFamilySocraticArchetypeComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticArchetypeComparison(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  archetypeA: 'explorer' | 'harmonist' | 'traditionalist' | 'specialist' | 'undefined';
+  archetypeB: 'explorer' | 'harmonist' | 'traditionalist' | 'specialist' | 'undefined';
+  sameArchetype: boolean;
+} {
+  const a = tuningFamilySocraticArchetype(familyA, spectrum, rootHz);
+  const b = tuningFamilySocraticArchetype(familyB, spectrum, rootHz);
+  return {
+    archetypeA: a.archetype,
+    archetypeB: b.archetype,
+    sameArchetype: a.archetype === b.archetype,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q824 — tuningFamilySocraticMaturityScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticMaturityScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  maturityScore: number;
+  maturityLabel: 'nascent' | 'developing' | 'mature' | 'refined';
+} {
+  if (tunings.length === 0) {
+    return { maturityScore: 0, maturityLabel: 'nascent' };
+  }
+  const bench = tuningFamilySocraticBenchmark(tunings, spectrum, rootHz);
+  const vr = tuningFamilySocraticVersatilityRatio(tunings, spectrum, rootHz);
+  const div = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  const evo = tuningFamilySocraticEvolutionRanking(tunings, spectrum, rootHz);
+  const experimentalFraction =
+    evo.filter((e) => e.evolutionLabel === 'experimental').length / Math.max(evo.length, 1);
+  const maturityScore =
+    bench.benchmarkScore * 0.4 +
+    vr.versatilityRatio * 0.3 +
+    div.diversityIndex * 0.2 +
+    experimentalFraction * 0.1;
+  let maturityLabel: 'nascent' | 'developing' | 'mature' | 'refined';
+  if (maturityScore < 0.25) {
+    maturityLabel = 'nascent';
+  } else if (maturityScore < 0.5) {
+    maturityLabel = 'developing';
+  } else if (maturityScore < 0.75) {
+    maturityLabel = 'mature';
+  } else {
+    maturityLabel = 'refined';
+  }
+  return { maturityScore, maturityLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q826 — tuningFamilySocraticMaturityScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticMaturityScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticMaturityScore> & { maturityNarrative: string } {
+  const mat = tuningFamilySocraticMaturityScore(tunings, spectrum, rootHz);
+  let maturityNarrative: string;
+  if (tunings.length === 0) {
+    maturityNarrative = 'No tunings to assess.';
+  } else {
+    maturityNarrative = `Maturity: ${mat.maturityScore.toFixed(3)} (${mat.maturityLabel}) for ${tunings.length} tunings.`;
+  }
+  return { ...mat, maturityNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q828 — tuningFamilySocraticMaturityComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticMaturityComparison(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  maturityA: number;
+  labelA: 'nascent' | 'developing' | 'mature' | 'refined';
+  maturityB: number;
+  labelB: 'nascent' | 'developing' | 'mature' | 'refined';
+  delta: number;
+  winner: 'A' | 'B' | 'tie';
+} {
+  const a = tuningFamilySocraticMaturityScore(familyA, spectrum, rootHz);
+  const b = tuningFamilySocraticMaturityScore(familyB, spectrum, rootHz);
+  const delta = a.maturityScore - b.maturityScore;
+  const winner: 'A' | 'B' | 'tie' = Math.abs(delta) < 0.01 ? 'tie' : delta > 0 ? 'A' : 'B';
+  return {
+    maturityA: a.maturityScore,
+    labelA: a.maturityLabel,
+    maturityB: b.maturityScore,
+    labelB: b.maturityLabel,
+    delta,
+    winner,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q830 — tuningFamilySocraticMaturityComparisonNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticMaturityComparisonNarrative(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticMaturityComparison> & {
+  maturityComparisonNarrative: string;
+} {
+  const comp = tuningFamilySocraticMaturityComparison(familyA, familyB, spectrum, rootHz);
+  const maturityComparisonNarrative = `Maturity comparison: A=${comp.maturityA.toFixed(3)} (${comp.labelA}) vs B=${comp.maturityB.toFixed(3)} (${comp.labelB}). Winner: ${comp.winner}.`;
+  return { ...comp, maturityComparisonNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q832 — tuningFamilySocraticFullReport
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticFullReport(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  familyPortrait: string;
+  archetype: 'explorer' | 'harmonist' | 'traditionalist' | 'specialist' | 'undefined';
+  maturityScore: number;
+  maturityLabel: 'nascent' | 'developing' | 'mature' | 'refined';
+  benchmarkScore: number;
+  diversityIndex: number;
+  recommendedId: string | null;
+  alternativeId: string | null;
+} {
+  const portrait = tuningFamilySocraticFamilyPortrait(tunings, spectrum, rootHz);
+  const archRes = tuningFamilySocraticArchetype(tunings, spectrum, rootHz);
+  const mat = tuningFamilySocraticMaturityScore(tunings, spectrum, rootHz);
+  const bench = tuningFamilySocraticBenchmark(tunings, spectrum, rootHz);
+  const div = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  const rec = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
+  return {
+    familyPortrait: portrait.familyPortrait,
+    archetype: archRes.archetype,
+    maturityScore: mat.maturityScore,
+    maturityLabel: mat.maturityLabel,
+    benchmarkScore: bench.benchmarkScore,
+    diversityIndex: div.diversityIndex,
+    recommendedId: rec.recommendedId,
+    alternativeId: rec.alternativeId,
+  };
+}
