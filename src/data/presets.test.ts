@@ -199,6 +199,12 @@ import {
   presetFamilySocraticAxisAnalysis,
   presetFamilySocraticAxisNarrative,
   presetFamilySocraticSignature,
+  presetFamilySocraticBenchmark,
+  presetFamilySocraticBenchmarkNarrative,
+  presetFamilySocraticSignatureComparison,
+  presetFamilySocraticSignatureComparisonNarrative,
+  presetFamilySocraticConsensusNarrative,
+  presetFamilySocraticBenchmarkComparison,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -5695,23 +5701,19 @@ describe('presetFamilySocraticInsightDigestNarrative (Q785)', () => {
 describe('presetFamilySocraticAxisAnalysis (Q787)', () => {
   it('returns array with length matching presetIds', () => {
     const spec = harmonicSpectrum(6);
-    const result = presetFamilySocraticAxisAnalysis(
-      ['12-tet', 'just-5-limit'],
-      spec,
-      undefined,
-      [TWELVE_TET, JUST_INTONATION_5L],
-    );
+    const result = presetFamilySocraticAxisAnalysis(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
     expect(result.length).toBe(2);
   });
 
   it('each entry has id, diversityScore, ambassadorScore', () => {
     const spec = harmonicSpectrum(6);
-    const result = presetFamilySocraticAxisAnalysis(
-      ['12-tet', 'just-5-limit'],
-      spec,
-      undefined,
-      [TWELVE_TET, JUST_INTONATION_5L],
-    );
+    const result = presetFamilySocraticAxisAnalysis(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(typeof entry.diversityScore).toBe('number');
@@ -5737,23 +5739,19 @@ describe('presetFamilySocraticAxisAnalysis (Q787)', () => {
 describe('presetFamilySocraticAxisNarrative (Q789)', () => {
   it('axisNarrative contains "Axis analysis"', () => {
     const spec = harmonicSpectrum(6);
-    const result = presetFamilySocraticAxisNarrative(
-      ['12-tet', 'just-5-limit'],
-      spec,
-      undefined,
-      [TWELVE_TET, JUST_INTONATION_5L],
-    );
+    const result = presetFamilySocraticAxisNarrative(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
     expect(result.axisNarrative).toContain('Axis analysis');
   });
 
   it('axes array length matches presetIds.length', () => {
     const spec = harmonicSpectrum(6);
-    const result = presetFamilySocraticAxisNarrative(
-      ['12-tet', 'just-5-limit'],
-      spec,
-      undefined,
-      [TWELVE_TET, JUST_INTONATION_5L],
-    );
+    const result = presetFamilySocraticAxisNarrative(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
     expect(result.axes.length).toBe(2);
   });
 
@@ -5776,24 +5774,20 @@ describe('presetFamilySocraticAxisNarrative (Q789)', () => {
 describe('presetFamilySocraticSignature (Q791)', () => {
   it('signature is non-empty string', () => {
     const spec = harmonicSpectrum(6);
-    const result = presetFamilySocraticSignature(
-      ['12-tet', 'just-5-limit'],
-      spec,
-      undefined,
-      [TWELVE_TET, JUST_INTONATION_5L],
-    );
+    const result = presetFamilySocraticSignature(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
     expect(typeof result.signature).toBe('string');
     expect(result.signature.length).toBeGreaterThan(0);
   });
 
   it('signature contains n:, d:, t:, r:', () => {
     const spec = harmonicSpectrum(6);
-    const result = presetFamilySocraticSignature(
-      ['12-tet', 'just-5-limit'],
-      spec,
-      undefined,
-      [TWELVE_TET, JUST_INTONATION_5L],
-    );
+    const result = presetFamilySocraticSignature(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
     expect(result.signature).toContain('n:');
     expect(result.signature).toContain('d:');
     expect(result.signature).toContain('t:');
@@ -5810,6 +5804,348 @@ describe('presetFamilySocraticSignature (Q791)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticSignature(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q793 — presetFamilySocraticBenchmark
+describe('presetFamilySocraticBenchmark (Q793)', () => {
+  it('returns all four fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmark(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(typeof result.benchmarkScore).toBe('number');
+    expect(typeof result.diversityComponent).toBe('number');
+    expect(typeof result.topologyComponent).toBe('number');
+    expect(typeof result.consensusComponent).toBe('number');
+  });
+
+  it('benchmarkScore is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmark(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(result.benchmarkScore).toBeGreaterThanOrEqual(0);
+    expect(result.benchmarkScore).toBeLessThanOrEqual(1);
+  });
+
+  it('empty presetIds returns all zeros', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmark([], spec, undefined, [TWELVE_TET]);
+    expect(result.benchmarkScore).toBe(0);
+    expect(result.diversityComponent).toBe(0);
+    expect(result.topologyComponent).toBe(0);
+    expect(result.consensusComponent).toBe(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticBenchmark(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q795 — presetFamilySocraticBenchmarkNarrative
+describe('presetFamilySocraticBenchmarkNarrative (Q795)', () => {
+  it('narrative contains "Benchmark"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmarkNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.benchmarkNarrative).toContain('Benchmark');
+  });
+
+  it('label appears in narrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmarkNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const hasLabel =
+      result.benchmarkNarrative.includes('low') ||
+      result.benchmarkNarrative.includes('moderate') ||
+      result.benchmarkNarrative.includes('high') ||
+      result.benchmarkNarrative.includes('excellent');
+    expect(hasLabel).toBe(true);
+  });
+
+  it('empty presetIds returns "No tunings to benchmark."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmarkNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.benchmarkNarrative).toBe('No tunings to benchmark.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticBenchmarkNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q797 — presetFamilySocraticSignatureComparison
+describe('presetFamilySocraticSignatureComparison (Q797)', () => {
+  it('returns all five fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSignatureComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.signatureA).toBe('string');
+    expect(typeof result.signatureB).toBe('string');
+    expect(typeof result.sameSize).toBe('boolean');
+    expect(typeof result.sameDiversity).toBe('boolean');
+    expect(typeof result.sameTopology).toBe('boolean');
+  });
+
+  it('same preset list yields sameSize, sameDiversity, and sameTopology all true', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSignatureComparison(
+      ['12-tet', 'just-5-limit'],
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.sameSize).toBe(true);
+    expect(result.sameDiversity).toBe(true);
+    expect(result.sameTopology).toBe(true);
+  });
+
+  it('different size preset lists produce sameSize false', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSignatureComparison(
+      ['12-tet'],
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.sameSize).toBe(false);
+  });
+
+  it('throws RangeError for unknown preset in A', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticSignatureComparison(['not-a-preset'], ['12-tet'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in B', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticSignatureComparison(['12-tet'], ['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q799 — presetFamilySocraticSignatureComparisonNarrative
+describe('presetFamilySocraticSignatureComparisonNarrative (Q799)', () => {
+  it('returns all six fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSignatureComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.signatureA).toBe('string');
+    expect(typeof result.signatureB).toBe('string');
+    expect(typeof result.sameSize).toBe('boolean');
+    expect(typeof result.sameDiversity).toBe('boolean');
+    expect(typeof result.sameTopology).toBe('boolean');
+    expect(typeof result.signatureComparisonNarrative).toBe('string');
+  });
+
+  it('narrative contains "Signature comparison"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSignatureComparisonNarrative(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.signatureComparisonNarrative).toContain('Signature comparison');
+  });
+
+  it('same preset list yields all three booleans true', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSignatureComparisonNarrative(
+      ['12-tet', 'just-5-limit'],
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.sameSize).toBe(true);
+    expect(result.sameDiversity).toBe(true);
+    expect(result.sameTopology).toBe(true);
+  });
+
+  it('both empty returns "Both families are empty."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSignatureComparisonNarrative([], [], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.signatureComparisonNarrative).toBe('Both families are empty.');
+  });
+
+  it('throws RangeError for unknown preset in A', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticSignatureComparisonNarrative(
+        ['not-a-preset'],
+        ['12-tet'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in B', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticSignatureComparisonNarrative(
+        ['12-tet'],
+        ['not-a-preset'],
+        spec,
+        undefined,
+        [TWELVE_TET],
+      ),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q801 — presetFamilySocraticConsensusNarrative
+describe('presetFamilySocraticConsensusNarrative (Q801)', () => {
+  it('returns distribution and socraticConsensusNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticConsensusNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.socraticConsensusNarrative).toBe('string');
+    expect(typeof result.distribution.versatile).toBe('number');
+    expect(typeof result.distribution.balanced).toBe('number');
+    expect(typeof result.distribution.specialized).toBe('number');
+    expect(typeof result.distribution.total).toBe('number');
+  });
+
+  it('narrative contains "Consensus character"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticConsensusNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.socraticConsensusNarrative).toContain('Consensus character');
+  });
+
+  it('empty preset list returns "No modes to assess consensus."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticConsensusNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.socraticConsensusNarrative).toBe('No modes to assess consensus.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticConsensusNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q803 — presetFamilySocraticBenchmarkComparison
+describe('presetFamilySocraticBenchmarkComparison (Q803)', () => {
+  it('returns all four fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmarkComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.benchmarkA).toBe('number');
+    expect(typeof result.benchmarkB).toBe('number');
+    expect(typeof result.delta).toBe('number');
+    expect(typeof result.winner).toBe('string');
+  });
+
+  it('same preset list yields winner "tie" and |delta| < 0.01', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmarkComparison(
+      ['12-tet', 'just-5-limit'],
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.winner).toBe('tie');
+    expect(Math.abs(result.delta)).toBeLessThan(0.01);
+  });
+
+  it('winner is A, B, or tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmarkComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(['A', 'B', 'tie']).toContain(result.winner);
+  });
+
+  it('delta equals benchmarkA minus benchmarkB', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticBenchmarkComparison(
+      ['12-tet'],
+      ['just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.delta).toBeCloseTo(result.benchmarkA - result.benchmarkB, 10);
+  });
+
+  it('throws RangeError for unknown preset in A', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticBenchmarkComparison(['not-a-preset'], ['12-tet'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+
+  it('throws RangeError for unknown preset in B', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticBenchmarkComparison(['12-tet'], ['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
     ).toThrow(RangeError);
   });
 });
