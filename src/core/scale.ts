@@ -15343,3 +15343,67 @@ export function tuningFamilySocraticFullReport(
     alternativeId: rec.alternativeId,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Q834 — tuningFamilySocraticFullReportNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticFullReportNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticFullReport> & { fullReportNarrative: string } {
+  const report = tuningFamilySocraticFullReport(tunings, spectrum, rootHz);
+  let fullReportNarrative: string;
+  if (tunings.length === 0) {
+    fullReportNarrative = 'No tunings to report.';
+  } else {
+    fullReportNarrative = `${report.familyPortrait}\nArchetype: ${report.archetype}. Maturity: ${report.maturityLabel} (${report.maturityScore.toFixed(3)}). Benchmark: ${report.benchmarkScore.toFixed(3)}. Diversity: ${report.diversityIndex.toFixed(3)}.\nRecommended: ${report.recommendedId ?? 'none'}${report.alternativeId ? `, alternative: ${report.alternativeId}` : ''}.`;
+  }
+  return { ...report, fullReportNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q836 — tuningFamilySocraticRadarProfile
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfile(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  diversity: number;
+  versatility: number;
+  maturity: number;
+  benchmark: number;
+  convergence: number;
+} {
+  if (tunings.length === 0) {
+    return { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  }
+  const diversity = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz).diversityIndex;
+  const versatility = tuningFamilySocraticVersatilityRatio(tunings, spectrum, rootHz).versatilityRatio;
+  const maturity = tuningFamilySocraticMaturityScore(tunings, spectrum, rootHz).maturityScore;
+  const benchmark = tuningFamilySocraticBenchmark(tunings, spectrum, rootHz).benchmarkScore;
+  const convergence = tuningFamilyAmbassadorConvergenceScore(tunings, spectrum, rootHz).convergenceScore;
+  return { diversity, versatility, maturity, benchmark, convergence };
+}
+
+// ---------------------------------------------------------------------------
+// Q838 — tuningFamilySocraticRadarProfileNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticRadarProfile> & { radarNarrative: string } {
+  const r = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  let radarNarrative: string;
+  if (tunings.length === 0) {
+    radarNarrative = 'No tunings for radar profile.';
+  } else {
+    radarNarrative = `Radar profile (${tunings.length} tunings):\n  Diversity:    ${r.diversity.toFixed(3)}\n  Versatility:  ${r.versatility.toFixed(3)}\n  Maturity:     ${r.maturity.toFixed(3)}\n  Benchmark:    ${r.benchmark.toFixed(3)}\n  Convergence:  ${r.convergence.toFixed(3)}`;
+  }
+  return { ...r, radarNarrative };
+}

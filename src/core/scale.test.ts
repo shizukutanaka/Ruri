@@ -438,6 +438,9 @@ import {
   tuningFamilySocraticMaturityComparison,
   tuningFamilySocraticMaturityComparisonNarrative,
   tuningFamilySocraticFullReport,
+  tuningFamilySocraticFullReportNarrative,
+  tuningFamilySocraticRadarProfile,
+  tuningFamilySocraticRadarProfileNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -15166,7 +15169,12 @@ describe('tuningFamilySocraticMaturityComparisonNarrative (Q830)', () => {
 
   it('accepts optional rootHz', () => {
     const spec = harmonicSpectrum(6);
-    const result = tuningFamilySocraticMaturityComparisonNarrative([t12], [edo(19, 440)], spec, 440);
+    const result = tuningFamilySocraticMaturityComparisonNarrative(
+      [t12],
+      [edo(19, 440)],
+      spec,
+      440,
+    );
     expect(typeof result.maturityComparisonNarrative).toBe('string');
   });
 });
@@ -15214,5 +15222,133 @@ describe('tuningFamilySocraticFullReport (Q832)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticFullReport([t12], spec, 440);
     expect(typeof result.familyPortrait).toBe('string');
+  });
+});
+
+// Q834 — tuningFamilySocraticFullReportNarrative
+describe('tuningFamilySocraticFullReportNarrative (Q834)', () => {
+  it('fullReportNarrative contains Archetype', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFullReportNarrative([t12, edo(19, 440)], spec);
+    expect(result.fullReportNarrative).toContain('Archetype');
+  });
+
+  it('fullReportNarrative contains Maturity', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFullReportNarrative([t12, edo(19, 440)], spec);
+    expect(result.fullReportNarrative).toContain('Maturity');
+  });
+
+  it('fullReportNarrative contains Benchmark', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFullReportNarrative([t12, edo(19, 440)], spec);
+    expect(result.fullReportNarrative).toContain('Benchmark');
+  });
+
+  it('empty returns No tunings to report.', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFullReportNarrative([], spec);
+    expect(result.fullReportNarrative).toBe('No tunings to report.');
+  });
+
+  it('returns all base report fields plus fullReportNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFullReportNarrative([t12], spec);
+    expect(typeof result.familyPortrait).toBe('string');
+    expect(typeof result.archetype).toBe('string');
+    expect(typeof result.maturityScore).toBe('number');
+    expect(typeof result.fullReportNarrative).toBe('string');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFullReportNarrative([t12], spec, 440);
+    expect(typeof result.fullReportNarrative).toBe('string');
+  });
+});
+
+// Q836 — tuningFamilySocraticRadarProfile
+describe('tuningFamilySocraticRadarProfile (Q836)', () => {
+  it('empty returns all zeros', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfile([], spec);
+    expect(result.diversity).toBe(0);
+    expect(result.versatility).toBe(0);
+    expect(result.maturity).toBe(0);
+    expect(result.benchmark).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+
+  it('all 5 axis fields are between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfile([t12, edo(19, 440)], spec);
+    expect(result.diversity).toBeGreaterThanOrEqual(0);
+    expect(result.diversity).toBeLessThanOrEqual(1);
+    expect(result.versatility).toBeGreaterThanOrEqual(0);
+    expect(result.versatility).toBeLessThanOrEqual(1);
+    expect(result.maturity).toBeGreaterThanOrEqual(0);
+    expect(result.maturity).toBeLessThanOrEqual(1);
+    expect(result.benchmark).toBeGreaterThanOrEqual(0);
+    expect(result.benchmark).toBeLessThanOrEqual(1);
+    expect(result.convergence).toBeGreaterThanOrEqual(0);
+    expect(result.convergence).toBeLessThanOrEqual(1);
+  });
+
+  it('single tuning returns valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfile([t12], spec);
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.versatility).toBe('number');
+    expect(typeof result.maturity).toBe('number');
+    expect(typeof result.benchmark).toBe('number');
+    expect(typeof result.convergence).toBe('number');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfile([t12], spec, 440);
+    expect(typeof result.diversity).toBe('number');
+  });
+});
+
+// Q838 — tuningFamilySocraticRadarProfileNarrative
+describe('tuningFamilySocraticRadarProfileNarrative (Q838)', () => {
+  it('radarNarrative contains Radar profile', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfileNarrative([t12, edo(19, 440)], spec);
+    expect(result.radarNarrative).toContain('Radar profile');
+  });
+
+  it('radarNarrative contains all 5 labels', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfileNarrative([t12, edo(19, 440)], spec);
+    expect(result.radarNarrative).toContain('Diversity');
+    expect(result.radarNarrative).toContain('Versatility');
+    expect(result.radarNarrative).toContain('Maturity');
+    expect(result.radarNarrative).toContain('Benchmark');
+    expect(result.radarNarrative).toContain('Convergence');
+  });
+
+  it('empty returns No tunings for radar', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfileNarrative([], spec);
+    expect(result.radarNarrative).toContain('No tunings for radar');
+  });
+
+  it('returns all 5 axis fields plus radarNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfileNarrative([t12], spec);
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.versatility).toBe('number');
+    expect(typeof result.maturity).toBe('number');
+    expect(typeof result.benchmark).toBe('number');
+    expect(typeof result.convergence).toBe('number');
+    expect(typeof result.radarNarrative).toBe('string');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarProfileNarrative([t12], spec, 440);
+    expect(typeof result.radarNarrative).toBe('string');
   });
 });
