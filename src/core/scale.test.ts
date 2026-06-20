@@ -408,6 +408,12 @@ import {
   tuningFamilySocraticTopologyScore,
   tuningFamilySocraticTopologyScoreNarrative,
   tuningFamilySocraticSummaryBundle,
+  tuningFamilySocraticSummaryBundleNarrative,
+  tuningSocraticCharacterPortrait,
+  tuningFamilySocraticCharacterPortraits,
+  tuningFamilySocraticFamilyPortrait,
+  tuningFamilySocraticInsightDigest,
+  tuningFamilySocraticInsightDigestNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -14076,5 +14082,196 @@ describe('tuningFamilySocraticSummaryBundle (Q772)', () => {
     expect(result).toHaveProperty('clusterMap');
     expect(result).toHaveProperty('comparison');
     expect(result).toHaveProperty('recommendation');
+  });
+});
+
+// Q774 — tuningFamilySocraticSummaryBundleNarrative
+describe('tuningFamilySocraticSummaryBundleNarrative (Q774)', () => {
+  it('contains Summary in narrative for non-empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundleNarrative([t12, edo(19, 440)], spec);
+    expect(result.summaryBundleNarrative).toContain('Summary');
+  });
+
+  it('returns all bundle keys alongside narrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundleNarrative([t12, edo(19, 440)], spec);
+    expect(result).toHaveProperty('clusterMap');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+    expect(result).toHaveProperty('summaryBundleNarrative');
+  });
+
+  it('empty tunings returns No tunings to summarize', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundleNarrative([], spec);
+    expect(result.summaryBundleNarrative).toBe('No tunings to summarize.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticSummaryBundleNarrative([t12, edo(19, 440)], spec, 440);
+    expect(result.summaryBundleNarrative).toContain('Summary');
+  });
+});
+
+// Q776 — tuningSocraticCharacterPortrait
+describe('tuningSocraticCharacterPortrait (Q776)', () => {
+  it('portrait is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticCharacterPortrait(t12, spec);
+    expect(typeof result.portrait).toBe('string');
+    expect(result.portrait.length).toBeGreaterThan(0);
+  });
+
+  it('portrait contains tuning name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticCharacterPortrait(t12, spec);
+    expect(result.portrait).toContain(t12.name);
+  });
+
+  it('portrait contains ambassador', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticCharacterPortrait(t12, spec);
+    expect(result.portrait).toContain('ambassador');
+  });
+
+  it('portrait contains tuning id', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticCharacterPortrait(t12, spec);
+    expect(result.portrait).toContain(t12.id);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningSocraticCharacterPortrait(t12, spec, 440);
+    expect(result.portrait.length).toBeGreaterThan(0);
+  });
+});
+
+// Q778 — tuningFamilySocraticCharacterPortraits
+describe('tuningFamilySocraticCharacterPortraits (Q778)', () => {
+  it('array length matches input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticCharacterPortraits([t12, edo(19, 440)], spec);
+    expect(result.length).toBe(2);
+  });
+
+  it('each entry has id and portrait', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticCharacterPortraits([t12, edo(19, 440)], spec);
+    for (const entry of result) {
+      expect(entry).toHaveProperty('id');
+      expect(entry).toHaveProperty('portrait');
+    }
+  });
+
+  it('empty input returns empty array', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticCharacterPortraits([], spec);
+    expect(result).toEqual([]);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticCharacterPortraits([t12, edo(19, 440)], spec, 440);
+    expect(result.length).toBe(2);
+  });
+});
+
+// Q780 — tuningFamilySocraticFamilyPortrait
+describe('tuningFamilySocraticFamilyPortrait (Q780)', () => {
+  it('familyPortrait is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFamilyPortrait([t12, edo(19, 440)], spec);
+    expect(typeof result.familyPortrait).toBe('string');
+    expect(result.familyPortrait.length).toBeGreaterThan(0);
+  });
+
+  it('familyPortrait contains tuning count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFamilyPortrait([t12, edo(19, 440)], spec);
+    expect(result.familyPortrait).toContain('2');
+  });
+
+  it('empty tunings returns Empty family.', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFamilyPortrait([], spec);
+    expect(result.familyPortrait).toBe('Empty family.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticFamilyPortrait([t12, edo(19, 440)], spec, 440);
+    expect(result.familyPortrait.length).toBeGreaterThan(0);
+  });
+});
+
+// Q782 — tuningFamilySocraticInsightDigest
+describe('tuningFamilySocraticInsightDigest (Q782)', () => {
+  it('has all 7 keys', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigest([t12, edo(19, 440)], spec);
+    expect(result).toHaveProperty('familyPortrait');
+    expect(result).toHaveProperty('diversityIndex');
+    expect(result).toHaveProperty('topologyLabel');
+    expect(result).toHaveProperty('evolutionRanking');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+    expect(result).toHaveProperty('characterPortraits');
+  });
+
+  it('characterPortraits.length equals tunings.length', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigest([t12, edo(19, 440)], spec);
+    expect(result.characterPortraits.length).toBe(2);
+  });
+
+  it('works with empty tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigest([], spec);
+    expect(result.characterPortraits.length).toBe(0);
+    expect(result.familyPortrait).toBe('Empty family.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigest([t12, edo(19, 440)], spec, 440);
+    expect(result.characterPortraits.length).toBe(2);
+  });
+});
+
+// Q784 — tuningFamilySocraticInsightDigestNarrative
+describe('tuningFamilySocraticInsightDigestNarrative (Q784)', () => {
+  it('digestNarrative contains Evolution and Portraits', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigestNarrative([t12, edo(19, 440)], spec);
+    expect(result.digestNarrative).toContain('Evolution');
+    expect(result.digestNarrative).toContain('Portraits');
+  });
+
+  it('empty tunings returns No tunings to digest.', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigestNarrative([], spec);
+    expect(result.digestNarrative).toBe('No tunings to digest.');
+  });
+
+  it('has all digest keys plus digestNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigestNarrative([t12, edo(19, 440)], spec);
+    expect(result).toHaveProperty('familyPortrait');
+    expect(result).toHaveProperty('diversityIndex');
+    expect(result).toHaveProperty('topologyLabel');
+    expect(result).toHaveProperty('evolutionRanking');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+    expect(result).toHaveProperty('characterPortraits');
+    expect(result).toHaveProperty('digestNarrative');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticInsightDigestNarrative([t12, edo(19, 440)], spec, 440);
+    expect(result.digestNarrative).toContain('Evolution');
   });
 });

@@ -14594,3 +14594,122 @@ export function tuningFamilySocraticSummaryBundle(
   const recommendation = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
   return { clusterMap, comparison, recommendation };
 }
+
+// ---------------------------------------------------------------------------
+// Q774 — tuningFamilySocraticSummaryBundleNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticSummaryBundleNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticSummaryBundle> & { summaryBundleNarrative: string } {
+  const bundle = tuningFamilySocraticSummaryBundle(tunings, spectrum, rootHz);
+  let summaryBundleNarrative: string;
+  if (tunings.length === 0) {
+    summaryBundleNarrative = 'No tunings to summarize.';
+  } else {
+    summaryBundleNarrative = `Summary (${tunings.length} tunings):\n  Recommended: ${bundle.recommendation.recommendedId ?? 'none'} (${bundle.recommendation.reason ?? 'n/a'}).\n  Most diverse: ${bundle.comparison.mostDiverse ?? 'n/a'}; least diverse: ${bundle.comparison.leastDiverse ?? 'n/a'}.\n  Clusters — traditional: ${bundle.clusterMap.traditional.length}, transitional: ${bundle.clusterMap.transitional.length}, experimental: ${bundle.clusterMap.experimental.length}.`;
+  }
+  return { ...bundle, summaryBundleNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q776 — tuningSocraticCharacterPortrait
+// ---------------------------------------------------------------------------
+
+export function tuningSocraticCharacterPortrait(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { portrait: string } {
+  const profile = tuningSocraticProfile(tuning, spectrum, rootHz);
+  const amb = profile.ambassador;
+  const ambScore = ambassadorScore(amb);
+  const portrait = `${tuning.name} [${tuning.id}]: ${amb.mode.name} ambassador (${amb.consensus}, score ${ambScore.toFixed(2)}). Profile: ${profile.dominantProfile?.profile ?? 'none'}. Texture: ${amb.quadrantProfile}. Profile diversity: ${profile.profileDiversity.normalized.toFixed(3)}; solo ratio: ${profile.soloRatio.soloRatio.toFixed(3)}.`;
+  return { portrait };
+}
+
+// ---------------------------------------------------------------------------
+// Q778 — tuningFamilySocraticCharacterPortraits
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticCharacterPortraits(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; portrait: string }[] {
+  return tunings.map((tuning) => ({
+    id: tuning.id,
+    portrait: tuningSocraticCharacterPortrait(tuning, spectrum, rootHz).portrait,
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Q780 — tuningFamilySocraticFamilyPortrait
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticFamilyPortrait(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { familyPortrait: string } {
+  if (tunings.length === 0) {
+    return { familyPortrait: 'Empty family.' };
+  }
+  const diversity = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  const topology = tuningFamilySocraticTopologyScore(tunings, spectrum, rootHz);
+  const rec = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
+  const familyPortrait = `A family of ${tunings.length} tunings. Diversity: ${diversity.diversityIndex.toFixed(3)} (${topology.topologyLabel}). Flagship: ${rec.recommendedId ?? 'none'} (${rec.reason ?? 'n/a'}). Alternative: ${rec.alternativeId ?? 'none'}.`;
+  return { familyPortrait };
+}
+
+// ---------------------------------------------------------------------------
+// Q782 — tuningFamilySocraticInsightDigest
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticInsightDigest(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  familyPortrait: string;
+  diversityIndex: number;
+  topologyLabel: 'centralized' | 'distributed' | 'dispersed';
+  evolutionRanking: { id: string; evolutionRank: number; evolutionLabel: 'traditional' | 'transitional' | 'experimental' }[];
+  comparison: ReturnType<typeof tuningFamilySocraticComparison>;
+  recommendation: ReturnType<typeof tuningFamilySocraticRecommendation>;
+  characterPortraits: { id: string; portrait: string }[];
+} {
+  const { familyPortrait } = tuningFamilySocraticFamilyPortrait(tunings, spectrum, rootHz);
+  const { diversityIndex } = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  const { topologyLabel } = tuningFamilySocraticTopologyScore(tunings, spectrum, rootHz);
+  const evolutionRanking = tuningFamilySocraticEvolutionRanking(tunings, spectrum, rootHz);
+  const comparison = tuningFamilySocraticComparison(tunings, spectrum, rootHz);
+  const recommendation = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
+  const characterPortraits = tuningFamilySocraticCharacterPortraits(tunings, spectrum, rootHz);
+  return { familyPortrait, diversityIndex, topologyLabel, evolutionRanking, comparison, recommendation, characterPortraits };
+}
+
+// ---------------------------------------------------------------------------
+// Q784 — tuningFamilySocraticInsightDigestNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticInsightDigestNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticInsightDigest> & { digestNarrative: string } {
+  const digest = tuningFamilySocraticInsightDigest(tunings, spectrum, rootHz);
+  let digestNarrative: string;
+  if (tunings.length === 0) {
+    digestNarrative = 'No tunings to digest.';
+  } else {
+    digestNarrative =
+      `${digest.familyPortrait}\n\nEvolution:\n` +
+      digest.evolutionRanking.map((r) => `  ${r.evolutionRank}. [${r.evolutionLabel}] ${r.id}`).join('\n') +
+      `\n\nPortraits:\n` +
+      digest.characterPortraits.map((p) => `  ${p.portrait}`).join('\n');
+  }
+  return { ...digest, digestNarrative };
+}
