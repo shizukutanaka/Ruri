@@ -16012,3 +16012,110 @@ export function tuningFamilySocraticRadarOverallScore(
           : 'excellent';
   return { overallScore, overallLabel };
 }
+
+// ---------------------------------------------------------------------------
+// Q888 — tuningFamilySocraticRadarOverallScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarOverallScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  overallScore: number;
+  overallLabel: 'poor' | 'fair' | 'good' | 'excellent';
+  overallScoreNarrative: string;
+} {
+  const { overallScore, overallLabel } = tuningFamilySocraticRadarOverallScore(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const overallScoreNarrative = `Overall radar score is ${overallLabel} at ${overallScore.toFixed(2)}, combining health, centroid, and balance metrics. ${overallLabel === 'excellent' ? 'Exceptional multi-dimensional performance.' : overallLabel === 'good' ? 'Solid performance with minor gaps.' : overallLabel === 'fair' ? 'Moderate profile with improvement potential.' : 'Requires significant development across dimensions.'}`;
+  return { overallScore, overallLabel, overallScoreNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q890 — tuningFamilySocraticRadarOverallScoreComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarOverallScoreComparison(
+  tuningsA: TuningSystem[],
+  tuningsB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  overallScoreA: number;
+  overallScoreB: number;
+  overallLabelA: 'poor' | 'fair' | 'good' | 'excellent';
+  overallLabelB: 'poor' | 'fair' | 'good' | 'excellent';
+  overallDiff: number;
+  overallWinner: 'A' | 'B' | 'tie';
+} {
+  const a = tuningFamilySocraticRadarOverallScore(tuningsA, spectrum, rootHz);
+  const b = tuningFamilySocraticRadarOverallScore(tuningsB, spectrum, rootHz);
+  const overallDiff = Math.abs(a.overallScore - b.overallScore);
+  const overallWinner: 'A' | 'B' | 'tie' =
+    overallDiff < 0.02 ? 'tie' : a.overallScore > b.overallScore ? 'A' : 'B';
+  return {
+    overallScoreA: a.overallScore,
+    overallScoreB: b.overallScore,
+    overallLabelA: a.overallLabel,
+    overallLabelB: b.overallLabel,
+    overallDiff,
+    overallWinner,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q892 — tuningFamilySocraticRadarFullAnalysis
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarFullAnalysis(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  radarProfile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  };
+  balanceScore: number;
+  balanceLabel: 'unbalanced' | 'moderate' | 'balanced';
+  centroid: number;
+  centroidLabel: 'low' | 'mid' | 'high';
+  topAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  bottomAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  healthScore: number;
+  healthLabel: 'poor' | 'fair' | 'good' | 'excellent';
+  axisDiversity: number;
+  axisDiversityLabel: 'uniform' | 'varied' | 'polarized';
+  overallScore: number;
+  overallLabel: 'poor' | 'fair' | 'good' | 'excellent';
+} {
+  const radarProfile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const bal = tuningFamilySocraticRadarBalance(tunings, spectrum, rootHz);
+  const cent = tuningFamilySocraticRadarCentroid(tunings, spectrum, rootHz);
+  const rank = tuningFamilySocraticRadarAxisScoreRank(tunings, spectrum, rootHz);
+  const health = tuningFamilySocraticRadarProfileHealth(tunings, spectrum, rootHz);
+  const axDiv = tuningFamilySocraticRadarAxisDiversity(tunings, spectrum, rootHz);
+  const overall = tuningFamilySocraticRadarOverallScore(tunings, spectrum, rootHz);
+  return {
+    radarProfile,
+    balanceScore: bal.balanceScore,
+    balanceLabel: bal.balanceLabel,
+    centroid: cent.centroid,
+    centroidLabel: cent.centroidLabel,
+    topAxis: rank.topAxis,
+    bottomAxis: rank.bottomAxis,
+    healthScore: health.healthScore,
+    healthLabel: health.healthLabel,
+    axisDiversity: axDiv.axisDiversity,
+    axisDiversityLabel: axDiv.axisDiversityLabel,
+    overallScore: overall.overallScore,
+    overallLabel: overall.overallLabel,
+  };
+}

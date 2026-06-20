@@ -465,6 +465,9 @@ import {
   tuningFamilySocraticRadarAxisDiversityNarrative,
   tuningFamilySocraticRadarAxisDiversityComparison,
   tuningFamilySocraticRadarOverallScore,
+  tuningFamilySocraticRadarOverallScoreNarrative,
+  tuningFamilySocraticRadarOverallScoreComparison,
+  tuningFamilySocraticRadarFullAnalysis,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -16454,6 +16457,186 @@ describe('tuningFamilySocraticRadarOverallScore (Q886)', () => {
 
   it('accepts optional rootHz', () => {
     const result = tuningFamilySocraticRadarOverallScore([t12], spec, 440);
+    expect(typeof result.overallScore).toBe('number');
+  });
+});
+
+// Q888 — tuningFamilySocraticRadarOverallScoreNarrative
+describe('tuningFamilySocraticRadarOverallScoreNarrative (Q888)', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('all fields are present', () => {
+    const result = tuningFamilySocraticRadarOverallScoreNarrative([t12], spec);
+    expect(result).toHaveProperty('overallScore');
+    expect(result).toHaveProperty('overallLabel');
+    expect(result).toHaveProperty('overallScoreNarrative');
+  });
+
+  it('overallScore is in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarOverallScoreNarrative([t12], spec);
+    expect(result.overallScore).toBeGreaterThanOrEqual(0);
+    expect(result.overallScore).toBeLessThanOrEqual(1);
+  });
+
+  it('overallLabel is valid', () => {
+    const result = tuningFamilySocraticRadarOverallScoreNarrative([t12], spec);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabel);
+  });
+
+  it('overallScoreNarrative is a non-empty string', () => {
+    const result = tuningFamilySocraticRadarOverallScoreNarrative([t12], spec);
+    expect(typeof result.overallScoreNarrative).toBe('string');
+    expect(result.overallScoreNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = tuningFamilySocraticRadarOverallScoreNarrative([t12], spec, 440);
+    expect(typeof result.overallScore).toBe('number');
+  });
+});
+
+// Q890 — tuningFamilySocraticRadarOverallScoreComparison
+describe('tuningFamilySocraticRadarOverallScoreComparison (Q890)', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('all fields are present', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    expect(result).toHaveProperty('overallScoreA');
+    expect(result).toHaveProperty('overallScoreB');
+    expect(result).toHaveProperty('overallLabelA');
+    expect(result).toHaveProperty('overallLabelB');
+    expect(result).toHaveProperty('overallDiff');
+    expect(result).toHaveProperty('overallWinner');
+  });
+
+  it('overallScoreA is in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    expect(result.overallScoreA).toBeGreaterThanOrEqual(0);
+    expect(result.overallScoreA).toBeLessThanOrEqual(1);
+  });
+
+  it('overallScoreB is in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    expect(result.overallScoreB).toBeGreaterThanOrEqual(0);
+    expect(result.overallScoreB).toBeLessThanOrEqual(1);
+  });
+
+  it('overallDiff is non-negative', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    expect(result.overallDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('overallLabelA is valid', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabelA);
+  });
+
+  it('overallLabelB is valid', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabelB);
+  });
+
+  it('overallWinner is one of A, B, tie', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    const valid = ['A', 'B', 'tie'];
+    expect(valid).toContain(result.overallWinner);
+  });
+
+  it('same input yields tie and diff of 0', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec);
+    expect(result.overallWinner).toBe('tie');
+    expect(result.overallDiff).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = tuningFamilySocraticRadarOverallScoreComparison([t12], [t12], spec, 440);
+    expect(typeof result.overallScoreA).toBe('number');
+  });
+});
+
+// Q892 — tuningFamilySocraticRadarFullAnalysis
+describe('tuningFamilySocraticRadarFullAnalysis (Q892)', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('all fields are present', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    expect(result).toHaveProperty('radarProfile');
+    expect(result).toHaveProperty('balanceScore');
+    expect(result).toHaveProperty('balanceLabel');
+    expect(result).toHaveProperty('centroid');
+    expect(result).toHaveProperty('centroidLabel');
+    expect(result).toHaveProperty('topAxis');
+    expect(result).toHaveProperty('bottomAxis');
+    expect(result).toHaveProperty('healthScore');
+    expect(result).toHaveProperty('healthLabel');
+    expect(result).toHaveProperty('axisDiversity');
+    expect(result).toHaveProperty('axisDiversityLabel');
+    expect(result).toHaveProperty('overallScore');
+    expect(result).toHaveProperty('overallLabel');
+  });
+
+  it('radarProfile has all 5 axes', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    expect(result.radarProfile).toHaveProperty('diversity');
+    expect(result.radarProfile).toHaveProperty('versatility');
+    expect(result.radarProfile).toHaveProperty('maturity');
+    expect(result.radarProfile).toHaveProperty('benchmark');
+    expect(result.radarProfile).toHaveProperty('convergence');
+  });
+
+  it('overallScore is in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    expect(result.overallScore).toBeGreaterThanOrEqual(0);
+    expect(result.overallScore).toBeLessThanOrEqual(1);
+  });
+
+  it('balanceScore is in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    expect(result.balanceScore).toBeGreaterThanOrEqual(0);
+    expect(result.balanceScore).toBeLessThanOrEqual(1);
+  });
+
+  it('healthScore is in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    expect(result.healthScore).toBeGreaterThanOrEqual(0);
+    expect(result.healthScore).toBeLessThanOrEqual(1);
+  });
+
+  it('balanceLabel is valid', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    const valid = ['unbalanced', 'moderate', 'balanced'];
+    expect(valid).toContain(result.balanceLabel);
+  });
+
+  it('centroidLabel is valid', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    const valid = ['low', 'mid', 'high'];
+    expect(valid).toContain(result.centroidLabel);
+  });
+
+  it('healthLabel is valid', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.healthLabel);
+  });
+
+  it('axisDiversityLabel is valid', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    const valid = ['uniform', 'varied', 'polarized'];
+    expect(valid).toContain(result.axisDiversityLabel);
+  });
+
+  it('overallLabel is valid', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec);
+    const valid = ['poor', 'fair', 'good', 'excellent'];
+    expect(valid).toContain(result.overallLabel);
+  });
+
+  it('accepts optional rootHz', () => {
+    const result = tuningFamilySocraticRadarFullAnalysis([t12], spec, 440);
     expect(typeof result.overallScore).toBe('number');
   });
 });
