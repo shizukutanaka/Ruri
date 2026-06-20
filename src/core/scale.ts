@@ -14389,3 +14389,212 @@ export function tuningFamilySocraticPairwiseContrastStatsNarrative(
       : `Pairwise contrast stats (${stats.totalPairs} pairs): mean distance ${stats.meanDistance.toFixed(2)}/4, range ${stats.minDistance}–${stats.maxDistance}. ${stats.sameConsensusCount} pairs share consensus; ${stats.sameProfileCount} share the same quadrant profile.`;
   return { ...stats, contrastStatsNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q756 — tuningFamilySocraticDiversityIndex
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticDiversityIndex(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  diversityIndex: number;
+  meanDistNorm: number;
+  antiConvergence: number;
+} {
+  if (tunings.length < 2) {
+    return { diversityIndex: 0, meanDistNorm: 0, antiConvergence: 0 };
+  }
+  const mpdResult = tuningFamilyAmbassadorMeanProfileDistance(tunings, spectrum, rootHz);
+  const convResult = tuningFamilyAmbassadorConvergenceScore(tunings, spectrum, rootHz);
+  const meanDistNorm = mpdResult.meanDistance / 4;
+  const antiConvergence = 1 - convResult.convergenceScore;
+  const diversityIndex = (meanDistNorm + antiConvergence) / 2;
+  return { diversityIndex, meanDistNorm, antiConvergence };
+}
+
+// ---------------------------------------------------------------------------
+// Q758 — tuningFamilySocraticDiversityIndexNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticDiversityIndexNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticDiversityIndex> & { diversityIndexNarrative: string } {
+  const idx = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  let label: string;
+  if (idx.diversityIndex < 0.25) {
+    label = 'homogeneous';
+  } else if (idx.diversityIndex < 0.5) {
+    label = 'varied';
+  } else if (idx.diversityIndex < 0.75) {
+    label = 'diverse';
+  } else {
+    label = 'heterogeneous';
+  }
+  const diversityIndexNarrative =
+    tunings.length < 2
+      ? 'Diversity index requires at least 2 tunings.'
+      : `Diversity index: ${idx.diversityIndex.toFixed(3)} (${label}) for ${tunings.length} tunings. Mean profile distance: ${(idx.meanDistNorm * 4).toFixed(2)}/4; anti-convergence: ${idx.antiConvergence.toFixed(3)}.`;
+  return { ...idx, diversityIndexNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q760 — tuningFamilySocraticEvolutionRanking
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticEvolutionRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  id: string;
+  evolutionRank: number;
+  evolutionLabel: 'traditional' | 'transitional' | 'experimental';
+}[] {
+  if (tunings.length === 0) return [];
+  const scores = tuningFamilyAmbassadorCentralityScores(tunings, spectrum, rootHz);
+  const n = scores.length;
+  return scores.map((entry, index) => {
+    let evolutionLabel: 'traditional' | 'transitional' | 'experimental';
+    if (index < Math.floor(n / 3)) {
+      evolutionLabel = 'traditional';
+    } else if (index < Math.floor((2 * n) / 3)) {
+      evolutionLabel = 'transitional';
+    } else {
+      evolutionLabel = 'experimental';
+    }
+    return { id: entry.id, evolutionRank: index + 1, evolutionLabel };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q762 — tuningFamilySocraticEvolutionRankingNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticEvolutionRankingNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  ranking: {
+    id: string;
+    evolutionRank: number;
+    evolutionLabel: 'traditional' | 'transitional' | 'experimental';
+  }[];
+  evolutionNarrative: string;
+} {
+  const ranking = tuningFamilySocraticEvolutionRanking(tunings, spectrum, rootHz);
+  let evolutionNarrative: string;
+  if (ranking.length === 0) {
+    evolutionNarrative = 'No tunings to rank.';
+  } else {
+    evolutionNarrative =
+      `Evolution ranking (${tunings.length} tunings, traditional→experimental):\n` +
+      ranking.map((r) => `  ${r.evolutionRank}. [${r.evolutionLabel}] ${r.id}`).join('\n');
+  }
+  return { ranking, evolutionNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q764 — tuningFamilySocraticClusterMap
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticClusterMap(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  traditional: string[];
+  transitional: string[];
+  experimental: string[];
+} {
+  const ranking = tuningFamilySocraticEvolutionRanking(tunings, spectrum, rootHz);
+  const traditional = ranking.filter((r) => r.evolutionLabel === 'traditional').map((r) => r.id);
+  const transitional = ranking.filter((r) => r.evolutionLabel === 'transitional').map((r) => r.id);
+  const experimental = ranking.filter((r) => r.evolutionLabel === 'experimental').map((r) => r.id);
+  return { traditional, transitional, experimental };
+}
+
+// ---------------------------------------------------------------------------
+// Q766 — tuningFamilySocraticClusterMapNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticClusterMapNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticClusterMap> & { clusterMapNarrative: string } {
+  const map = tuningFamilySocraticClusterMap(tunings, spectrum, rootHz);
+  const clusterMapNarrative =
+    tunings.length === 0
+      ? 'No tunings to cluster.'
+      : `Cluster map (${tunings.length} tunings):\n  Traditional (${map.traditional.length}): ${map.traditional.join(', ') || 'none'}\n  Transitional (${map.transitional.length}): ${map.transitional.join(', ') || 'none'}\n  Experimental (${map.experimental.length}): ${map.experimental.join(', ') || 'none'}`;
+  return { ...map, clusterMapNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q768 — tuningFamilySocraticTopologyScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticTopologyScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  topologyScore: number;
+  topologyLabel: 'centralized' | 'distributed' | 'dispersed';
+} {
+  const spread = tuningFamilyAmbassadorDistanceSpread(tunings, spectrum, rootHz);
+  if (spread === null) {
+    return { topologyScore: 0, topologyLabel: 'centralized' };
+  }
+  const topologyScore = spread.spread / 4;
+  const topologyLabel: 'centralized' | 'distributed' | 'dispersed' =
+    topologyScore < 0.25
+      ? 'centralized'
+      : topologyScore < 0.60
+        ? 'distributed'
+        : 'dispersed';
+  return { topologyScore, topologyLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q770 — tuningFamilySocraticTopologyScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticTopologyScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticTopologyScore> & { topologyNarrative: string } {
+  const topo = tuningFamilySocraticTopologyScore(tunings, spectrum, rootHz);
+  let topologyNarrative: string;
+  if (tunings.length < 2) {
+    topologyNarrative = 'Topology requires at least 2 tunings.';
+  } else {
+    topologyNarrative = `Topology: ${topo.topologyLabel} (score ${topo.topologyScore.toFixed(3)}). The tuning family's ambassador profiles are ${topo.topologyLabel === 'centralized' ? 'tightly clustered' : topo.topologyLabel === 'distributed' ? 'moderately spread' : 'widely dispersed'}.`;
+  }
+  return { ...topo, topologyNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q772 — tuningFamilySocraticSummaryBundle
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticSummaryBundle(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  clusterMap: ReturnType<typeof tuningFamilySocraticClusterMap>;
+  comparison: ReturnType<typeof tuningFamilySocraticComparison>;
+  recommendation: ReturnType<typeof tuningFamilySocraticRecommendation>;
+} {
+  const clusterMap = tuningFamilySocraticClusterMap(tunings, spectrum, rootHz);
+  const comparison = tuningFamilySocraticComparison(tunings, spectrum, rootHz);
+  const recommendation = tuningFamilySocraticRecommendation(tunings, spectrum, rootHz);
+  return { clusterMap, comparison, recommendation };
+}

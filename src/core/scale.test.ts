@@ -399,6 +399,15 @@ import {
   tuningFamilySocraticPairwiseContrasts,
   tuningFamilySocraticPairwiseContrastStats,
   tuningFamilySocraticPairwiseContrastStatsNarrative,
+  tuningFamilySocraticDiversityIndex,
+  tuningFamilySocraticDiversityIndexNarrative,
+  tuningFamilySocraticEvolutionRanking,
+  tuningFamilySocraticEvolutionRankingNarrative,
+  tuningFamilySocraticClusterMap,
+  tuningFamilySocraticClusterMapNarrative,
+  tuningFamilySocraticTopologyScore,
+  tuningFamilySocraticTopologyScoreNarrative,
+  tuningFamilySocraticSummaryBundle,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -13675,5 +13684,288 @@ describe('tuningFamilySocraticPairwiseContrastStatsNarrative (Q754)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticPairwiseContrastStatsNarrative([t12], spec, 261.63);
     expect(result.contrastStatsNarrative).toBe('No pairwise contrasts to analyze.');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q756 — tuningFamilySocraticDiversityIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticDiversityIndex (Q756)', () => {
+  it('returns all zeros for a single tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndex([t12], spec);
+    expect(result.diversityIndex).toBe(0);
+    expect(result.meanDistNorm).toBe(0);
+    expect(result.antiConvergence).toBe(0);
+  });
+
+  it('returns all zeros for empty tuning list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndex([], spec);
+    expect(result.diversityIndex).toBe(0);
+    expect(result.meanDistNorm).toBe(0);
+    expect(result.antiConvergence).toBe(0);
+  });
+
+  it('returns all 3 fields for a 2-tuning family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndex([t12, edo(19, 440)], spec);
+    expect('diversityIndex' in result).toBe(true);
+    expect('meanDistNorm' in result).toBe(true);
+    expect('antiConvergence' in result).toBe(true);
+  });
+
+  it('diversityIndex is between 0 and 1 for a 2-tuning family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndex([t12, edo(19, 440)], spec);
+    expect(result.diversityIndex).toBeGreaterThanOrEqual(0);
+    expect(result.diversityIndex).toBeLessThanOrEqual(1);
+  });
+
+  it('diversityIndex is between 0 and 1 for a 3-tuning family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndex([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.diversityIndex).toBeGreaterThanOrEqual(0);
+    expect(result.diversityIndex).toBeLessThanOrEqual(1);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndex([t12, edo(19, 440)], spec, 440);
+    expect(result.diversityIndex).toBeGreaterThanOrEqual(0);
+    expect(result.diversityIndex).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q758 — tuningFamilySocraticDiversityIndexNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticDiversityIndexNarrative (Q758)', () => {
+  it('returns "requires at least 2 tunings" for empty list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndexNarrative([], spec);
+    expect(result.diversityIndexNarrative).toBe('Diversity index requires at least 2 tunings.');
+  });
+
+  it('returns "requires at least 2 tunings" for single tuning', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndexNarrative([t12], spec);
+    expect(result.diversityIndexNarrative).toBe('Diversity index requires at least 2 tunings.');
+  });
+
+  it('narrative contains the label for a 2-tuning family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndexNarrative([t12, edo(19, 440)], spec);
+    const labels = ['homogeneous', 'varied', 'diverse', 'heterogeneous'];
+    expect(labels.some((label) => result.diversityIndexNarrative.includes(label))).toBe(true);
+  });
+
+  it('spreads all diversity index fields into the return value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndexNarrative([t12, edo(19, 440)], spec);
+    expect('diversityIndex' in result).toBe(true);
+    expect('meanDistNorm' in result).toBe(true);
+    expect('antiConvergence' in result).toBe(true);
+    expect('diversityIndexNarrative' in result).toBe(true);
+  });
+
+  it('narrative mentions tuning count for 3-tuning family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticDiversityIndexNarrative(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(result.diversityIndexNarrative).toContain('3 tunings');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q760 — tuningFamilySocraticEvolutionRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticEvolutionRanking (Q760)', () => {
+  it('returns empty array for empty tuning list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRanking([], spec);
+    expect(result).toEqual([]);
+  });
+
+  it('returns array of length equal to input tunings', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.length).toBe(3);
+  });
+
+  it('evolutionRank starts at 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result[0]!.evolutionRank).toBe(1);
+  });
+
+  it('evolutionRank is sequential', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    result.forEach((entry, i) => {
+      expect(entry.evolutionRank).toBe(i + 1);
+    });
+  });
+
+  it('evolutionLabel is one of the 3 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const valid = ['traditional', 'transitional', 'experimental'];
+    const result = tuningFamilySocraticEvolutionRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    result.forEach((entry) => {
+      expect(valid).toContain(entry.evolutionLabel);
+    });
+  });
+
+  it('first entry is "traditional" for a 3-tuning family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRanking([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result[0]!.evolutionLabel).toBe('traditional');
+  });
+
+  it('returns id field for each entry', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRanking([t12, edo(19, 440)], spec);
+    result.forEach((entry) => {
+      expect(typeof entry.id).toBe('string');
+    });
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRanking([t12, edo(19, 440)], spec, 440);
+    expect(result.length).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q762 — tuningFamilySocraticEvolutionRankingNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticEvolutionRankingNarrative (Q762)', () => {
+  it('returns ranking array and evolutionNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRankingNarrative([t12, edo(19, 440)], spec);
+    expect(Array.isArray(result.ranking)).toBe(true);
+    expect(typeof result.evolutionNarrative).toBe('string');
+  });
+
+  it('evolutionNarrative contains "Evolution ranking" for non-empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRankingNarrative([t12, edo(19, 440)], spec);
+    expect(result.evolutionNarrative).toContain('Evolution ranking');
+  });
+
+  it('returns "No tunings to rank." for empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRankingNarrative([], spec);
+    expect(result.evolutionNarrative).toBe('No tunings to rank.');
+    expect(result.ranking.length).toBe(0);
+  });
+
+  it('ranking array length matches tunings length', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRankingNarrative(
+      [t12, edo(19, 440), edo(31, 440)],
+      spec,
+    );
+    expect(result.ranking.length).toBe(3);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticEvolutionRankingNarrative([t12, edo(19, 440)], spec, 440);
+    expect(result.ranking.length).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q764 — tuningFamilySocraticClusterMap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticClusterMap (Q764)', () => {
+  it('returns traditional, transitional, experimental arrays', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMap([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(Array.isArray(result.traditional)).toBe(true);
+    expect(Array.isArray(result.transitional)).toBe(true);
+    expect(Array.isArray(result.experimental)).toBe(true);
+  });
+
+  it('total length equals input length', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMap([t12, edo(19, 440), edo(31, 440)], spec);
+    const total =
+      result.traditional.length + result.transitional.length + result.experimental.length;
+    expect(total).toBe(3);
+  });
+
+  it('no IDs duplicated across clusters', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMap([t12, edo(19, 440), edo(31, 440)], spec);
+    const allIds = [...result.traditional, ...result.transitional, ...result.experimental];
+    const uniqueIds = new Set(allIds);
+    expect(uniqueIds.size).toBe(allIds.length);
+  });
+
+  it('returns empty clusters for empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMap([], spec);
+    expect(result.traditional.length).toBe(0);
+    expect(result.transitional.length).toBe(0);
+    expect(result.experimental.length).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMap([t12, edo(19, 440)], spec, 440);
+    const total =
+      result.traditional.length + result.transitional.length + result.experimental.length;
+    expect(total).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q766 — tuningFamilySocraticClusterMapNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticClusterMapNarrative (Q766)', () => {
+  it('returns cluster arrays and clusterMapNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMapNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.clusterMapNarrative).toBe('string');
+    expect(Array.isArray(result.traditional)).toBe(true);
+    expect(Array.isArray(result.transitional)).toBe(true);
+    expect(Array.isArray(result.experimental)).toBe(true);
+  });
+
+  it('clusterMapNarrative contains "Cluster map" for non-empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMapNarrative([t12, edo(19, 440)], spec);
+    expect(result.clusterMapNarrative).toContain('Cluster map');
+  });
+
+  it('narrative contains each cluster label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMapNarrative([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.clusterMapNarrative).toContain('Traditional');
+    expect(result.clusterMapNarrative).toContain('Transitional');
+    expect(result.clusterMapNarrative).toContain('Experimental');
+  });
+
+  it('returns "No tunings to cluster." for empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMapNarrative([], spec);
+    expect(result.clusterMapNarrative).toBe('No tunings to cluster.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticClusterMapNarrative([t12, edo(19, 440)], spec, 440);
+    expect(result.clusterMapNarrative).toContain('Cluster map');
   });
 });
