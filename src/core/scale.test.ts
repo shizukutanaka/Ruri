@@ -423,6 +423,12 @@ import {
   tuningFamilySocraticSignatureComparisonNarrative,
   tuningFamilySocraticConsensusNarrative,
   tuningFamilySocraticBenchmarkComparison,
+  tuningFamilySocraticBenchmarkComparisonNarrative,
+  tuningFamilySocraticBestAndWorst,
+  tuningFamilySocraticBestAndWorstNarrative,
+  tuningFamilySocraticScoreSpread,
+  tuningFamilySocraticScoreSpreadNarrative,
+  tuningFamilySocraticVersatilityRatio,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -14512,7 +14518,12 @@ describe('tuningFamilySocraticSignatureComparisonNarrative (Q798)', () => {
 
   it('accepts optional rootHz', () => {
     const spec = harmonicSpectrum(6);
-    const result = tuningFamilySocraticSignatureComparisonNarrative([t12], [edo(19, 440)], spec, 440);
+    const result = tuningFamilySocraticSignatureComparisonNarrative(
+      [t12],
+      [edo(19, 440)],
+      spec,
+      440,
+    );
     expect(typeof result.signatureComparisonNarrative).toBe('string');
   });
 });
@@ -14583,5 +14594,245 @@ describe('tuningFamilySocraticBenchmarkComparison (Q802)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticBenchmarkComparison([t12], [edo(19, 440)], spec, 440);
     expect(typeof result.winner).toBe('string');
+  });
+});
+
+// Q804 — tuningFamilySocraticBenchmarkComparisonNarrative
+describe('tuningFamilySocraticBenchmarkComparisonNarrative (Q804)', () => {
+  it('returns all fields plus benchmarkComparisonNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(typeof result.benchmarkA).toBe('number');
+    expect(typeof result.benchmarkB).toBe('number');
+    expect(typeof result.delta).toBe('number');
+    expect(typeof result.winner).toBe('string');
+    expect(typeof result.benchmarkComparisonNarrative).toBe('string');
+  });
+
+  it('narrative contains "Benchmark comparison"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(result.benchmarkComparisonNarrative).toContain('Benchmark comparison');
+  });
+
+  it('same family yields winner "tie"', () => {
+    const spec = harmonicSpectrum(6);
+    const family = [t12, edo(19, 440)];
+    const result = tuningFamilySocraticBenchmarkComparisonNarrative(family, family, spec);
+    expect(result.winner).toBe('tie');
+  });
+
+  it('narrative contains winner value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparisonNarrative([t12], [edo(19, 440)], spec);
+    expect(result.benchmarkComparisonNarrative).toContain(`Winner: ${result.winner}.`);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBenchmarkComparisonNarrative(
+      [t12],
+      [edo(19, 440)],
+      spec,
+      440,
+    );
+    expect(typeof result.benchmarkComparisonNarrative).toBe('string');
+  });
+});
+
+// Q806 — tuningFamilySocraticBestAndWorst
+describe('tuningFamilySocraticBestAndWorst (Q806)', () => {
+  it('returns all four fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorst([t12, edo(19, 440)], spec);
+    expect(typeof result.bestId).toBe('string');
+    expect(typeof result.bestScore).toBe('number');
+    expect(typeof result.worstId).toBe('string');
+    expect(typeof result.worstScore).toBe('number');
+  });
+
+  it('bestScore >= worstScore', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorst([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.bestScore).toBeGreaterThanOrEqual(result.worstScore);
+  });
+
+  it('single tuning yields same id for best and worst', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorst([t12], spec);
+    expect(result.bestId).toBe(result.worstId);
+    expect(result.bestId).toBe(t12.id);
+  });
+
+  it('empty input returns both ids null and scores 0', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorst([], spec);
+    expect(result.bestId).toBeNull();
+    expect(result.worstId).toBeNull();
+    expect(result.bestScore).toBe(0);
+    expect(result.worstScore).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorst([t12, edo(19, 440)], spec, 440);
+    expect(typeof result.bestId).toBe('string');
+  });
+});
+
+// Q808 — tuningFamilySocraticBestAndWorstNarrative
+describe('tuningFamilySocraticBestAndWorstNarrative (Q808)', () => {
+  it('returns all fields plus bestAndWorstNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorstNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.bestId).toBe('string');
+    expect(typeof result.bestScore).toBe('number');
+    expect(typeof result.worstId).toBe('string');
+    expect(typeof result.worstScore).toBe('number');
+    expect(typeof result.bestAndWorstNarrative).toBe('string');
+  });
+
+  it('narrative contains "Best:" and "Worst:"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorstNarrative([t12, edo(19, 440)], spec);
+    expect(result.bestAndWorstNarrative).toContain('Best:');
+    expect(result.bestAndWorstNarrative).toContain('Worst:');
+  });
+
+  it('empty input returns "No tunings to rank."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorstNarrative([], spec);
+    expect(result.bestAndWorstNarrative).toBe('No tunings to rank.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticBestAndWorstNarrative([t12], spec, 440);
+    expect(typeof result.bestAndWorstNarrative).toBe('string');
+  });
+});
+
+// Q810 — tuningFamilySocraticScoreSpread
+describe('tuningFamilySocraticScoreSpread (Q810)', () => {
+  it('returns all 5 fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpread([t12, edo(19, 440)], spec);
+    expect(typeof result.min).toBe('number');
+    expect(typeof result.max).toBe('number');
+    expect(typeof result.range).toBe('number');
+    expect(typeof result.mean).toBe('number');
+    expect(typeof result.spreadLabel).toBe('string');
+  });
+
+  it('min <= mean <= max', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpread([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.min).toBeLessThanOrEqual(result.mean);
+    expect(result.mean).toBeLessThanOrEqual(result.max);
+  });
+
+  it('range equals max - min', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpread([t12, edo(19, 440)], spec);
+    expect(result.range).toBeCloseTo(result.max - result.min, 10);
+  });
+
+  it('spreadLabel is valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpread([t12, edo(19, 440)], spec);
+    expect(['uniform', 'moderate', 'wide']).toContain(result.spreadLabel);
+  });
+
+  it('empty input returns all zeros and uniform label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpread([], spec);
+    expect(result.min).toBe(0);
+    expect(result.max).toBe(0);
+    expect(result.range).toBe(0);
+    expect(result.mean).toBe(0);
+    expect(result.spreadLabel).toBe('uniform');
+  });
+
+  it('single tuning returns range 0 and uniform label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpread([t12], spec);
+    expect(result.range).toBe(0);
+    expect(result.spreadLabel).toBe('uniform');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpread([t12, edo(19, 440)], spec, 440);
+    expect(typeof result.mean).toBe('number');
+  });
+});
+
+// Q812 — tuningFamilySocraticScoreSpreadNarrative
+describe('tuningFamilySocraticScoreSpreadNarrative (Q812)', () => {
+  it('returns all fields plus scoreSpreadNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpreadNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.min).toBe('number');
+    expect(typeof result.max).toBe('number');
+    expect(typeof result.range).toBe('number');
+    expect(typeof result.mean).toBe('number');
+    expect(typeof result.spreadLabel).toBe('string');
+    expect(typeof result.scoreSpreadNarrative).toBe('string');
+  });
+
+  it('narrative contains "Score spread"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpreadNarrative([t12, edo(19, 440)], spec);
+    expect(result.scoreSpreadNarrative).toContain('Score spread');
+  });
+
+  it('empty input returns "No tunings to analyze."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpreadNarrative([], spec);
+    expect(result.scoreSpreadNarrative).toBe('No tunings to analyze.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticScoreSpreadNarrative([t12], spec, 440);
+    expect(typeof result.scoreSpreadNarrative).toBe('string');
+  });
+});
+
+// Q814 — tuningFamilySocraticVersatilityRatio
+describe('tuningFamilySocraticVersatilityRatio (Q814)', () => {
+  it('returns versatileCount, totalCount, versatilityRatio', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatio([t12, edo(19, 440)], spec);
+    expect(typeof result.versatileCount).toBe('number');
+    expect(typeof result.totalCount).toBe('number');
+    expect(typeof result.versatilityRatio).toBe('number');
+  });
+
+  it('versatilityRatio is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatio([t12, edo(19, 440), edo(31, 440)], spec);
+    expect(result.versatilityRatio).toBeGreaterThanOrEqual(0);
+    expect(result.versatilityRatio).toBeLessThanOrEqual(1);
+  });
+
+  it('versatileCount <= totalCount', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatio([t12, edo(19, 440)], spec);
+    expect(result.versatileCount).toBeLessThanOrEqual(result.totalCount);
+  });
+
+  it('empty input returns all zeros', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatio([], spec);
+    expect(result.versatileCount).toBe(0);
+    expect(result.totalCount).toBe(0);
+    expect(result.versatilityRatio).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatio([t12], spec, 440);
+    expect(typeof result.versatilityRatio).toBe('number');
   });
 });

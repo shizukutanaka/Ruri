@@ -14962,7 +14962,131 @@ export function tuningFamilySocraticBenchmarkComparison(
   const bA = tuningFamilySocraticBenchmark(familyA, spectrum, rootHz);
   const bB = tuningFamilySocraticBenchmark(familyB, spectrum, rootHz);
   const delta = bA.benchmarkScore - bB.benchmarkScore;
-  const winner: 'A' | 'B' | 'tie' =
-    Math.abs(delta) < 0.01 ? 'tie' : delta > 0 ? 'A' : 'B';
+  const winner: 'A' | 'B' | 'tie' = Math.abs(delta) < 0.01 ? 'tie' : delta > 0 ? 'A' : 'B';
   return { benchmarkA: bA.benchmarkScore, benchmarkB: bB.benchmarkScore, delta, winner };
+}
+
+// ---------------------------------------------------------------------------
+// Q804 — tuningFamilySocraticBenchmarkComparisonNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticBenchmarkComparisonNarrative(
+  familyA: TuningSystem[],
+  familyB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticBenchmarkComparison> & {
+  benchmarkComparisonNarrative: string;
+} {
+  const comp = tuningFamilySocraticBenchmarkComparison(familyA, familyB, spectrum, rootHz);
+  const benchmarkComparisonNarrative = `Benchmark comparison: A=${comp.benchmarkA.toFixed(3)} vs B=${comp.benchmarkB.toFixed(3)}. Delta: ${comp.delta.toFixed(3)}. Winner: ${comp.winner}.`;
+  return { ...comp, benchmarkComparisonNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q806 — tuningFamilySocraticBestAndWorst
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticBestAndWorst(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { bestId: string | null; bestScore: number; worstId: string | null; worstScore: number } {
+  if (tunings.length === 0) {
+    return { bestId: null, bestScore: 0, worstId: null, worstScore: 0 };
+  }
+  const scores = tunings.map((t) => ({
+    id: t.id,
+    score: tuningFamilySocraticBenchmark([t], spectrum, rootHz).benchmarkScore,
+  }));
+  const best = scores.reduce((acc, curr) => (curr.score > acc.score ? curr : acc), scores[0]!);
+  const worst = scores.reduce((acc, curr) => (curr.score < acc.score ? curr : acc), scores[0]!);
+  return { bestId: best.id, bestScore: best.score, worstId: worst.id, worstScore: worst.score };
+}
+
+// ---------------------------------------------------------------------------
+// Q808 — tuningFamilySocraticBestAndWorstNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticBestAndWorstNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticBestAndWorst> & { bestAndWorstNarrative: string } {
+  const bw = tuningFamilySocraticBestAndWorst(tunings, spectrum, rootHz);
+  let bestAndWorstNarrative: string;
+  if (tunings.length === 0) {
+    bestAndWorstNarrative = 'No tunings to rank.';
+  } else {
+    bestAndWorstNarrative = `Best: ${bw.bestId ?? 'none'} (score ${bw.bestScore.toFixed(3)}). Worst: ${bw.worstId ?? 'none'} (score ${bw.worstScore.toFixed(3)}).`;
+  }
+  return { ...bw, bestAndWorstNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q810 — tuningFamilySocraticScoreSpread
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticScoreSpread(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  min: number;
+  max: number;
+  range: number;
+  mean: number;
+  spreadLabel: 'uniform' | 'moderate' | 'wide';
+} {
+  if (tunings.length === 0) {
+    return { min: 0, max: 0, range: 0, mean: 0, spreadLabel: 'uniform' };
+  }
+  const scores = tunings.map(
+    (t) => tuningFamilySocraticBenchmark([t], spectrum, rootHz).benchmarkScore,
+  );
+  const min = Math.min(...scores);
+  const max = Math.max(...scores);
+  const range = max - min;
+  const mean = scores.reduce((s, v) => s + v, 0) / scores.length;
+  const spreadLabel: 'uniform' | 'moderate' | 'wide' =
+    range < 0.1 ? 'uniform' : range < 0.3 ? 'moderate' : 'wide';
+  return { min, max, range, mean, spreadLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q812 — tuningFamilySocraticScoreSpreadNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticScoreSpreadNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticScoreSpread> & { scoreSpreadNarrative: string } {
+  const spread = tuningFamilySocraticScoreSpread(tunings, spectrum, rootHz);
+  let scoreSpreadNarrative: string;
+  if (tunings.length === 0) {
+    scoreSpreadNarrative = 'No tunings to analyze.';
+  } else {
+    scoreSpreadNarrative = `Score spread (${tunings.length} tunings): range ${spread.range.toFixed(3)}, mean ${spread.mean.toFixed(3)} — ${spread.spreadLabel}.`;
+  }
+  return { ...spread, scoreSpreadNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q814 — tuningFamilySocraticVersatilityRatio
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticVersatilityRatio(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { versatileCount: number; totalCount: number; versatilityRatio: number } {
+  if (tunings.length === 0) {
+    return { versatileCount: 0, totalCount: 0, versatilityRatio: 0 };
+  }
+  const ranking = tuningFamilyAmbassadorRanking(tunings, spectrum, rootHz);
+  const versatileCount = ranking.filter((r) => r.ambassador.consensus === 'versatile').length;
+  const totalCount = ranking.length;
+  const versatilityRatio = totalCount > 0 ? versatileCount / totalCount : 0;
+  return { versatileCount, totalCount, versatilityRatio };
 }
