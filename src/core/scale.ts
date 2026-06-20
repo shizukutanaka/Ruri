@@ -15090,3 +15090,91 @@ export function tuningFamilySocraticVersatilityRatio(
   const versatilityRatio = totalCount > 0 ? versatileCount / totalCount : 0;
   return { versatileCount, totalCount, versatilityRatio };
 }
+
+// ---------------------------------------------------------------------------
+// Q816 — tuningFamilySocraticVersatilityRatioNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticVersatilityRatioNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticVersatilityRatio> & { versatilityRatioNarrative: string } {
+  const vr = tuningFamilySocraticVersatilityRatio(tunings, spectrum, rootHz);
+  let versatilityRatioNarrative: string;
+  if (tunings.length === 0) {
+    versatilityRatioNarrative = 'No tunings to assess versatility.';
+  } else {
+    const label =
+      vr.versatilityRatio === 0
+        ? 'none'
+        : vr.versatilityRatio < 0.33
+          ? 'low'
+          : vr.versatilityRatio < 0.67
+            ? 'moderate'
+            : 'high';
+    versatilityRatioNarrative = `Versatility: ${vr.versatileCount}/${vr.totalCount} tunings (${(vr.versatilityRatio * 100).toFixed(1)}%) are versatile — ${label}.`;
+  }
+  return { ...vr, versatilityRatioNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q818 — tuningFamilySocraticArchetype
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticArchetype(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { archetype: 'explorer' | 'specialist' | 'harmonist' | 'traditionalist' | 'undefined' } {
+  if (tunings.length === 0) {
+    return { archetype: 'undefined' };
+  }
+  const div = tuningFamilySocraticDiversityIndex(tunings, spectrum, rootHz);
+  const topo = tuningFamilySocraticTopologyScore(tunings, spectrum, rootHz);
+  const vr = tuningFamilySocraticVersatilityRatio(tunings, spectrum, rootHz);
+  const evo = tuningFamilySocraticEvolutionRanking(tunings, spectrum, rootHz);
+  const traditionalFraction =
+    evo.filter((e) => e.evolutionLabel === 'traditional').length / Math.max(evo.length, 1);
+  let archetype: 'explorer' | 'specialist' | 'harmonist' | 'traditionalist' | 'undefined';
+  if (div.diversityIndex > 0.6 && topo.topologyLabel === 'dispersed') {
+    archetype = 'explorer';
+  } else if (vr.versatilityRatio > 0.5) {
+    archetype = 'harmonist';
+  } else if (traditionalFraction > 0.6) {
+    archetype = 'traditionalist';
+  } else if (div.diversityIndex < 0.3) {
+    archetype = 'specialist';
+  } else {
+    archetype = 'harmonist';
+  }
+  return { archetype };
+}
+
+// ---------------------------------------------------------------------------
+// Q820 — tuningFamilySocraticArchetypeNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticArchetypeNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticArchetype> & { archetypeNarrative: string } {
+  const result = tuningFamilySocraticArchetype(tunings, spectrum, rootHz);
+  const descriptions: Record<
+    'explorer' | 'specialist' | 'harmonist' | 'traditionalist' | 'undefined',
+    string
+  > = {
+    explorer:
+      'Explorer family: high diversity and wide dispersion — pushes into new sonic territory.',
+    harmonist:
+      'Harmonist family: majority versatile ambassadors — balanced across many musical contexts.',
+    traditionalist:
+      'Traditionalist family: anchored in central tunings — stable and conservative character.',
+    specialist:
+      'Specialist family: tightly focused profiles — deep expertise in a narrow tonal range.',
+    undefined: 'Undefined archetype: no tunings provided.',
+  };
+  const archetypeNarrative = descriptions[result.archetype];
+  return { ...result, archetypeNarrative };
+}

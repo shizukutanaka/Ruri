@@ -429,6 +429,9 @@ import {
   tuningFamilySocraticScoreSpread,
   tuningFamilySocraticScoreSpreadNarrative,
   tuningFamilySocraticVersatilityRatio,
+  tuningFamilySocraticVersatilityRatioNarrative,
+  tuningFamilySocraticArchetype,
+  tuningFamilySocraticArchetypeNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -14834,5 +14837,125 @@ describe('tuningFamilySocraticVersatilityRatio (Q814)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticVersatilityRatio([t12], spec, 440);
     expect(typeof result.versatilityRatio).toBe('number');
+  });
+});
+
+// Q816 — tuningFamilySocraticVersatilityRatioNarrative
+describe('tuningFamilySocraticVersatilityRatioNarrative (Q816)', () => {
+  it('returns all fields plus versatilityRatioNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatioNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.versatileCount).toBe('number');
+    expect(typeof result.totalCount).toBe('number');
+    expect(typeof result.versatilityRatio).toBe('number');
+    expect(typeof result.versatilityRatioNarrative).toBe('string');
+  });
+
+  it('narrative contains "Versatility"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatioNarrative([t12, edo(19, 440)], spec);
+    expect(result.versatilityRatioNarrative).toContain('Versatility');
+  });
+
+  it('empty input returns "No tunings to assess versatility."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatioNarrative([], spec);
+    expect(result.versatilityRatioNarrative).toBe('No tunings to assess versatility.');
+  });
+
+  it('narrative contains percentage', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatioNarrative([t12, edo(19, 440)], spec);
+    expect(result.versatilityRatioNarrative).toMatch(/\d+\.\d+%/);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticVersatilityRatioNarrative([t12], spec, 440);
+    expect(typeof result.versatilityRatioNarrative).toBe('string');
+  });
+});
+
+// Q818 — tuningFamilySocraticArchetype
+describe('tuningFamilySocraticArchetype (Q818)', () => {
+  it('returns an archetype field', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetype([t12, edo(19, 440)], spec);
+    expect(typeof result.archetype).toBe('string');
+  });
+
+  it('archetype is one of the 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetype([t12, edo(19, 440)], spec);
+    expect(['explorer', 'specialist', 'harmonist', 'traditionalist', 'undefined']).toContain(
+      result.archetype,
+    );
+  });
+
+  it('empty input returns "undefined" archetype', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetype([], spec);
+    expect(result.archetype).toBe('undefined');
+  });
+
+  it('single tuning returns a valid archetype', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetype([t12], spec);
+    expect(['explorer', 'specialist', 'harmonist', 'traditionalist', 'undefined']).toContain(
+      result.archetype,
+    );
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetype([t12, edo(19, 440)], spec, 440);
+    expect(typeof result.archetype).toBe('string');
+  });
+});
+
+// Q820 — tuningFamilySocraticArchetypeNarrative
+describe('tuningFamilySocraticArchetypeNarrative (Q820)', () => {
+  it('returns archetype and archetypeNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetypeNarrative([t12, edo(19, 440)], spec);
+    expect(typeof result.archetype).toBe('string');
+    expect(typeof result.archetypeNarrative).toBe('string');
+  });
+
+  it('archetypeNarrative is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetypeNarrative([t12, edo(19, 440)], spec);
+    expect(result.archetypeNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('archetypeNarrative matches one of the 5 descriptions', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetypeNarrative([t12, edo(19, 440)], spec);
+    const descriptions = [
+      'Explorer family: high diversity and wide dispersion — pushes into new sonic territory.',
+      'Harmonist family: majority versatile ambassadors — balanced across many musical contexts.',
+      'Traditionalist family: anchored in central tunings — stable and conservative character.',
+      'Specialist family: tightly focused profiles — deep expertise in a narrow tonal range.',
+      'Undefined archetype: no tunings provided.',
+    ];
+    expect(descriptions).toContain(result.archetypeNarrative);
+  });
+
+  it('empty input returns "Undefined archetype: no tunings provided."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetypeNarrative([], spec);
+    expect(result.archetypeNarrative).toBe('Undefined archetype: no tunings provided.');
+  });
+
+  it('empty input narrative contains "Undefined"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetypeNarrative([], spec);
+    expect(result.archetypeNarrative).toContain('Undefined');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticArchetypeNarrative([t12], spec, 440);
+    expect(typeof result.archetypeNarrative).toBe('string');
   });
 });
