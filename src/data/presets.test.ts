@@ -187,6 +187,9 @@ import {
   presetFamilySocraticEvolutionRankingNarrative,
   presetFamilySocraticClusterMap,
   presetFamilySocraticClusterMapNarrative,
+  presetFamilySocraticTopologyScore,
+  presetFamilySocraticTopologyScoreNarrative,
+  presetFamilySocraticSummaryBundle,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -5374,6 +5377,126 @@ describe('presetFamilySocraticClusterMapNarrative (Q767)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticClusterMapNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q769 — presetFamilySocraticTopologyScore
+describe('presetFamilySocraticTopologyScore (Q769)', () => {
+  it('returns topologyScore and topologyLabel', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticTopologyScore(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(typeof result.topologyScore).toBe('number');
+    expect(['centralized', 'distributed', 'dispersed']).toContain(result.topologyLabel);
+  });
+
+  it('topologyScore is between 0 and 1 inclusive', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticTopologyScore(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(result.topologyScore).toBeGreaterThanOrEqual(0);
+    expect(result.topologyScore).toBeLessThanOrEqual(1);
+  });
+
+  it('single preset returns centralized', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticTopologyScore(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.topologyLabel).toBe('centralized');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticTopologyScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q771 — presetFamilySocraticTopologyScoreNarrative
+describe('presetFamilySocraticTopologyScoreNarrative (Q771)', () => {
+  it('narrative contains "Topology" for two presets', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticTopologyScoreNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.topologyNarrative).toContain('Topology');
+  });
+
+  it('single preset returns "requires at least 2" message', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticTopologyScoreNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.topologyNarrative).toContain('requires at least 2');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticTopologyScoreNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q773 — presetFamilySocraticSummaryBundle
+describe('presetFamilySocraticSummaryBundle (Q773)', () => {
+  it('returns all three bundle keys', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSummaryBundle(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(result).toHaveProperty('clusterMap');
+    expect(result).toHaveProperty('comparison');
+    expect(result).toHaveProperty('recommendation');
+  });
+
+  it('clusterMap has traditional, transitional, experimental', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSummaryBundle(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(Array.isArray(result.clusterMap.traditional)).toBe(true);
+    expect(Array.isArray(result.clusterMap.transitional)).toBe(true);
+    expect(Array.isArray(result.clusterMap.experimental)).toBe(true);
+  });
+
+  it('comparison has expected sub-fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSummaryBundle(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(result.comparison).toHaveProperty('mostDiverse');
+    expect(result.comparison).toHaveProperty('leastDiverse');
+    expect(result.comparison).toHaveProperty('mostUnique');
+    expect(result.comparison).toHaveProperty('mostVersatile');
+  });
+
+  it('recommendation has expected sub-fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticSummaryBundle(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(result.recommendation).toHaveProperty('recommendedId');
+    expect(result.recommendation).toHaveProperty('reason');
+    expect(result.recommendation).toHaveProperty('alternativeId');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticSummaryBundle(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

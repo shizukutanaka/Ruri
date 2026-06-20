@@ -180,6 +180,9 @@ import {
   tuningFamilySocraticEvolutionRankingNarrative,
   tuningFamilySocraticClusterMap,
   tuningFamilySocraticClusterMapNarrative,
+  tuningFamilySocraticTopologyScore,
+  tuningFamilySocraticTopologyScoreNarrative,
+  tuningFamilySocraticSummaryBundle,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -6250,4 +6253,58 @@ export function presetFamilySocraticClusterMapNarrative(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticClusterMapNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q769 — presetFamilySocraticTopologyScore
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticTopologyScore(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticTopologyScore> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticTopologyScore(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q771 — presetFamilySocraticTopologyScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticTopologyScoreNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticTopologyScoreNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticTopologyScoreNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q773 — presetFamilySocraticSummaryBundle
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticSummaryBundle(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticSummaryBundle> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticSummaryBundle(tunings, spectrum, rootHz);
 }
