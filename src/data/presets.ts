@@ -228,6 +228,9 @@ import {
   tuningFamilySocraticRadarGapNarrative,
   tuningFamilySocraticRadarBalanceGapSummary,
   tuningFamilySocraticRadarCentroid,
+  tuningFamilySocraticRadarCentroidNarrative,
+  tuningFamilySocraticRadarCentroidComparison,
+  tuningFamilySocraticRadarAxisScoreRank,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -7213,4 +7216,64 @@ export function presetFamilySocraticRadarCentroid(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarCentroid(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q865 — presetFamilySocraticRadarCentroidNarrative
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarCentroidNarrative(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCentroidNarrative> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCentroidNarrative(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q867 — presetFamilySocraticRadarCentroidComparison
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarCentroidComparison(
+  presetIdsA: string[],
+  presetIdsB: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCentroidComparison> {
+  const tuningsA = presetIdsA.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  const tuningsB = presetIdsB.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCentroidComparison(tuningsA, tuningsB, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q869 — presetFamilySocraticRadarAxisScoreRank
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarAxisScoreRank(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarAxisScoreRank> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarAxisScoreRank(tunings, spectrum, rootHz);
 }
