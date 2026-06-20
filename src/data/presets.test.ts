@@ -181,6 +181,12 @@ import {
   presetFamilySocraticPairwiseContrasts,
   presetFamilySocraticPairwiseContrastStats,
   presetFamilySocraticPairwiseContrastStatsNarrative,
+  presetFamilySocraticDiversityIndex,
+  presetFamilySocraticDiversityIndexNarrative,
+  presetFamilySocraticEvolutionRanking,
+  presetFamilySocraticEvolutionRankingNarrative,
+  presetFamilySocraticClusterMap,
+  presetFamilySocraticClusterMapNarrative,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -5063,6 +5069,311 @@ describe('presetFamilySocraticPairwiseContrastStatsNarrative (Q755)', () => {
       presetFamilySocraticPairwiseContrastStatsNarrative(['not-a-preset'], spec, undefined, [
         TWELVE_TET,
       ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q757 — presetFamilySocraticDiversityIndex
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticDiversityIndex (Q757)', () => {
+  it('returns all zeros for a single preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndex(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(result.diversityIndex).toBe(0);
+    expect(result.meanDistNorm).toBe(0);
+    expect(result.antiConvergence).toBe(0);
+  });
+
+  it('returns all zeros for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndex([], spec, undefined, [TWELVE_TET]);
+    expect(result.diversityIndex).toBe(0);
+    expect(result.meanDistNorm).toBe(0);
+    expect(result.antiConvergence).toBe(0);
+  });
+
+  it('returns all 3 fields for a 2-preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndex(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect('diversityIndex' in result).toBe(true);
+    expect('meanDistNorm' in result).toBe(true);
+    expect('antiConvergence' in result).toBe(true);
+  });
+
+  it('diversityIndex is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndex(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(result.diversityIndex).toBeGreaterThanOrEqual(0);
+    expect(result.diversityIndex).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticDiversityIndex(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q759 — presetFamilySocraticDiversityIndexNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticDiversityIndexNarrative (Q759)', () => {
+  it('returns "requires at least 2 tunings" for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndexNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.diversityIndexNarrative).toBe('Diversity index requires at least 2 tunings.');
+  });
+
+  it('returns "requires at least 2 tunings" for single preset', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndexNarrative(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(result.diversityIndexNarrative).toBe('Diversity index requires at least 2 tunings.');
+  });
+
+  it('narrative contains a label for a 2-preset family', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndexNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    const labels = ['homogeneous', 'varied', 'diverse', 'heterogeneous'];
+    expect(labels.some((label) => result.diversityIndexNarrative.includes(label))).toBe(true);
+  });
+
+  it('spreads all diversity index fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticDiversityIndexNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect('diversityIndex' in result).toBe(true);
+    expect('meanDistNorm' in result).toBe(true);
+    expect('antiConvergence' in result).toBe(true);
+    expect('diversityIndexNarrative' in result).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticDiversityIndexNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q761 — presetFamilySocraticEvolutionRanking
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticEvolutionRanking (Q761)', () => {
+  it('returns empty array for empty preset list', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticEvolutionRanking([], spec, undefined, [TWELVE_TET]);
+    expect(result).toEqual([]);
+  });
+
+  it('returns array of length equal to input presets', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticEvolutionRanking(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.length).toBe(2);
+  });
+
+  it('evolutionRank starts at 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticEvolutionRanking(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result[0]!.evolutionRank).toBe(1);
+  });
+
+  it('evolutionLabel is one of the 3 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const valid = ['traditional', 'transitional', 'experimental'];
+    const result = presetFamilySocraticEvolutionRanking(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    result.forEach((entry) => {
+      expect(valid).toContain(entry.evolutionLabel);
+    });
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticEvolutionRanking(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q763 — presetFamilySocraticEvolutionRankingNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticEvolutionRankingNarrative (Q763)', () => {
+  it('returns ranking array and evolutionNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticEvolutionRankingNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(Array.isArray(result.ranking)).toBe(true);
+    expect(typeof result.evolutionNarrative).toBe('string');
+  });
+
+  it('evolutionNarrative contains "Evolution ranking" for non-empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticEvolutionRankingNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.evolutionNarrative).toContain('Evolution ranking');
+  });
+
+  it('returns "No tunings to rank." for empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticEvolutionRankingNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.evolutionNarrative).toBe('No tunings to rank.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticEvolutionRankingNarrative(['not-a-preset'], spec, undefined, [
+        TWELVE_TET,
+      ]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q765 — presetFamilySocraticClusterMap
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticClusterMap (Q765)', () => {
+  it('returns traditional, transitional, experimental arrays', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticClusterMap(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    expect(Array.isArray(result.traditional)).toBe(true);
+    expect(Array.isArray(result.transitional)).toBe(true);
+    expect(Array.isArray(result.experimental)).toBe(true);
+  });
+
+  it('total length equals input length', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticClusterMap(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    const total =
+      result.traditional.length + result.transitional.length + result.experimental.length;
+    expect(total).toBe(2);
+  });
+
+  it('no IDs duplicated across clusters', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticClusterMap(['12-tet', 'just-5-limit'], spec, undefined, [
+      TWELVE_TET,
+      JUST_INTONATION_5L,
+    ]);
+    const allIds = [...result.traditional, ...result.transitional, ...result.experimental];
+    const uniqueIds = new Set(allIds);
+    expect(uniqueIds.size).toBe(allIds.length);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticClusterMap(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q767 — presetFamilySocraticClusterMapNarrative
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticClusterMapNarrative (Q767)', () => {
+  it('returns cluster arrays and clusterMapNarrative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticClusterMapNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(typeof result.clusterMapNarrative).toBe('string');
+    expect(Array.isArray(result.traditional)).toBe(true);
+    expect(Array.isArray(result.transitional)).toBe(true);
+    expect(Array.isArray(result.experimental)).toBe(true);
+  });
+
+  it('clusterMapNarrative contains "Cluster map" for non-empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticClusterMapNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.clusterMapNarrative).toContain('Cluster map');
+  });
+
+  it('narrative contains each cluster label', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticClusterMapNarrative(
+      ['12-tet', 'just-5-limit'],
+      spec,
+      undefined,
+      [TWELVE_TET, JUST_INTONATION_5L],
+    );
+    expect(result.clusterMapNarrative).toContain('Traditional');
+    expect(result.clusterMapNarrative).toContain('Transitional');
+    expect(result.clusterMapNarrative).toContain('Experimental');
+  });
+
+  it('returns "No tunings to cluster." for empty input', () => {
+    const spec = harmonicSpectrum(6);
+    const result = presetFamilySocraticClusterMapNarrative([], spec, undefined, [TWELVE_TET]);
+    expect(result.clusterMapNarrative).toBe('No tunings to cluster.');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticClusterMapNarrative(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
