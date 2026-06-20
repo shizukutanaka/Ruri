@@ -444,6 +444,15 @@ import {
   tuningFamilySocraticRadarComparison,
   tuningFamilySocraticRadarComparisonNarrative,
   tuningFamilySocraticRadarDominantAxis,
+  tuningFamilySocraticRadarWeakestAxis,
+  tuningFamilySocraticRadarStrengthWeaknessReport,
+  tuningFamilySocraticConvergencePortrait,
+  tuningFamilySocraticRadarBalance,
+  tuningFamilySocraticRadarBalanceNarrative,
+  tuningFamilySocraticRadarGap,
+  tuningFamilySocraticRadarGapNarrative,
+  tuningFamilySocraticRadarBalanceGapSummary,
+  tuningFamilySocraticRadarCentroid,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -15477,5 +15486,371 @@ describe('tuningFamilySocraticRadarDominantAxis (Q844)', () => {
     const result = tuningFamilySocraticRadarDominantAxis([t12], spec, 440);
     expect(typeof result.dominantAxis).toBe('string');
     expect(typeof result.dominantScore).toBe('number');
+  });
+});
+
+// Q846 — tuningFamilySocraticRadarWeakestAxis
+describe('tuningFamilySocraticRadarWeakestAxis (Q846)', () => {
+  it('weakestAxis is one of 5 valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarWeakestAxis([t12], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.weakestAxis);
+  });
+
+  it('weakestScore equals the min of all 5 axes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarWeakestAxis([t12, edo(19, 440)], spec);
+    expect(result.weakestScore).toBeGreaterThanOrEqual(0);
+    expect(result.weakestScore).toBeLessThanOrEqual(1);
+  });
+
+  it('weakestScore is min of all 5 profile values', () => {
+    const spec = harmonicSpectrum(6);
+    const r = tuningFamilySocraticRadarWeakestAxis([t12, edo(19, 440)], spec);
+    const profile = tuningFamilySocraticRadarProfile([t12, edo(19, 440)], spec);
+    const min = Math.min(
+      profile.diversity,
+      profile.versatility,
+      profile.maturity,
+      profile.benchmark,
+      profile.convergence,
+    );
+    expect(r.weakestScore).toBeCloseTo(min, 10);
+  });
+
+  it('empty tunings returns valid result with all zeros', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarWeakestAxis([], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.weakestAxis);
+    expect(result.weakestScore).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarWeakestAxis([t12], spec, 440);
+    expect(typeof result.weakestAxis).toBe('string');
+    expect(typeof result.weakestScore).toBe('number');
+  });
+});
+
+// Q848 — tuningFamilySocraticRadarStrengthWeaknessReport
+describe('tuningFamilySocraticRadarStrengthWeaknessReport (Q848)', () => {
+  it('returns all 5 fields', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarStrengthWeaknessReport([t12], spec);
+    expect(result).toHaveProperty('dominantAxis');
+    expect(result).toHaveProperty('dominantScore');
+    expect(result).toHaveProperty('weakestAxis');
+    expect(result).toHaveProperty('weakestScore');
+    expect(result).toHaveProperty('strengthWeaknessNarrative');
+  });
+
+  it('narrative contains Strength and Weakness', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarStrengthWeaknessReport([t12, edo(19, 440)], spec);
+    expect(result.strengthWeaknessNarrative).toContain('Strength');
+    expect(result.strengthWeaknessNarrative).toContain('Weakness');
+  });
+
+  it('empty tunings returns "No tunings to assess."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarStrengthWeaknessReport([], spec);
+    expect(result.strengthWeaknessNarrative).toBe('No tunings to assess.');
+  });
+
+  it('dominantAxis and weakestAxis are valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarStrengthWeaknessReport([t12], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+    expect(valid).toContain(result.weakestAxis);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarStrengthWeaknessReport([t12], spec, 440);
+    expect(typeof result.strengthWeaknessNarrative).toBe('string');
+  });
+});
+
+// Q850 — tuningFamilySocraticConvergencePortrait
+describe('tuningFamilySocraticConvergencePortrait (Q850)', () => {
+  it('convergencePortrait is non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConvergencePortrait([t12], spec);
+    expect(typeof result.convergencePortrait).toBe('string');
+    expect(result.convergencePortrait.length).toBeGreaterThan(0);
+  });
+
+  it('portrait contains tuning count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConvergencePortrait([t12, edo(19, 440)], spec);
+    expect(result.convergencePortrait).toContain('2');
+  });
+
+  it('portrait contains archetype name', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConvergencePortrait([t12], spec);
+    const archetypes = ['explorer', 'harmonist', 'traditionalist', 'specialist', 'undefined'];
+    const hasArchetype = archetypes.some((a) => result.convergencePortrait.includes(a));
+    expect(hasArchetype).toBe(true);
+  });
+
+  it('empty tunings returns "Empty family."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConvergencePortrait([], spec);
+    expect(result.convergencePortrait).toBe('Empty family.');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticConvergencePortrait([t12], spec, 440);
+    expect(typeof result.convergencePortrait).toBe('string');
+  });
+});
+
+// Q852 — tuningFamilySocraticRadarBalance
+describe('tuningFamilySocraticRadarBalance (Q852)', () => {
+  it('balanceScore is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalance([t12], spec);
+    expect(result.balanceScore).toBeGreaterThanOrEqual(0);
+    expect(result.balanceScore).toBeLessThanOrEqual(1);
+  });
+
+  it('balanceLabel is a valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalance([t12], spec);
+    const valid = ['unbalanced', 'moderate', 'balanced'];
+    expect(valid).toContain(result.balanceLabel);
+  });
+
+  it('empty tunings returns balanceScore 0 and label unbalanced', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalance([], spec);
+    expect(result.balanceScore).toBe(0);
+    expect(result.balanceLabel).toBe('unbalanced');
+  });
+
+  it('multi-tuning returns valid balance', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalance([t12, edo(19, 440)], spec);
+    expect(result.balanceScore).toBeGreaterThanOrEqual(0);
+    expect(result.balanceScore).toBeLessThanOrEqual(1);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalance([t12], spec, 440);
+    expect(typeof result.balanceScore).toBe('number');
+  });
+});
+
+// Q854 — tuningFamilySocraticRadarBalanceNarrative
+describe('tuningFamilySocraticRadarBalanceNarrative (Q854)', () => {
+  it('balanceNarrative contains "balance"', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceNarrative([t12], spec);
+    expect(result.balanceNarrative).toContain('balance');
+  });
+
+  it('empty tunings returns "No tunings to assess balance."', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceNarrative([], spec);
+    expect(result.balanceNarrative).toBe('No tunings to assess balance.');
+  });
+
+  it('includes balanceScore and balanceLabel from Q852', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceNarrative([t12], spec);
+    expect(result).toHaveProperty('balanceScore');
+    expect(result).toHaveProperty('balanceLabel');
+    expect(result).toHaveProperty('balanceNarrative');
+  });
+
+  it('narrative contains tuning count', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceNarrative([t12, edo(19, 440)], spec);
+    expect(result.balanceNarrative).toContain('2');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceNarrative([t12], spec, 440);
+    expect(typeof result.balanceNarrative).toBe('string');
+  });
+});
+
+// Q856 — tuningFamilySocraticRadarGap
+describe('tuningFamilySocraticRadarGap (Q856)', () => {
+  it('gap is non-negative (dominantScore - weakestScore >= 0)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGap([t12], spec);
+    expect(result.gap).toBeGreaterThanOrEqual(0);
+  });
+
+  it('all 4 fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGap([t12], spec);
+    expect(result).toHaveProperty('gap');
+    expect(result).toHaveProperty('gapLabel');
+    expect(result).toHaveProperty('dominantAxis');
+    expect(result).toHaveProperty('weakestAxis');
+  });
+
+  it('gapLabel is a valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGap([t12], spec);
+    const valid = ['tight', 'moderate', 'wide'];
+    expect(valid).toContain(result.gapLabel);
+  });
+
+  it('dominantAxis and weakestAxis are valid axis names', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGap([t12, edo(19, 440)], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+    expect(valid).toContain(result.weakestAxis);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGap([t12], spec, 440);
+    expect(typeof result.gap).toBe('number');
+  });
+});
+
+// Q858 — tuningFamilySocraticRadarGapNarrative
+describe('tuningFamilySocraticRadarGapNarrative (Q858)', () => {
+  it('all 5 fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGapNarrative([t12], spec);
+    expect(result).toHaveProperty('gap');
+    expect(result).toHaveProperty('gapLabel');
+    expect(result).toHaveProperty('dominantAxis');
+    expect(result).toHaveProperty('weakestAxis');
+    expect(result).toHaveProperty('gapNarrative');
+  });
+
+  it('gap is non-negative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGapNarrative([t12], spec);
+    expect(result.gap).toBeGreaterThanOrEqual(0);
+  });
+
+  it('gapLabel is a valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGapNarrative([t12], spec);
+    const valid = ['tight', 'moderate', 'wide'];
+    expect(valid).toContain(result.gapLabel);
+  });
+
+  it('dominantAxis and weakestAxis are valid axis names', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGapNarrative([t12, edo(19, 440)], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+    expect(valid).toContain(result.weakestAxis);
+  });
+
+  it('gapNarrative is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGapNarrative([t12], spec);
+    expect(typeof result.gapNarrative).toBe('string');
+    expect(result.gapNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarGapNarrative([t12], spec, 440);
+    expect(typeof result.gap).toBe('number');
+  });
+});
+
+// Q860 — tuningFamilySocraticRadarBalanceGapSummary
+describe('tuningFamilySocraticRadarBalanceGapSummary (Q860)', () => {
+  it('all 7 fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceGapSummary([t12], spec);
+    expect(result).toHaveProperty('balanceScore');
+    expect(result).toHaveProperty('balanceLabel');
+    expect(result).toHaveProperty('gap');
+    expect(result).toHaveProperty('gapLabel');
+    expect(result).toHaveProperty('dominantAxis');
+    expect(result).toHaveProperty('weakestAxis');
+    expect(result).toHaveProperty('summary');
+  });
+
+  it('balanceLabel is a valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceGapSummary([t12], spec);
+    const valid = ['unbalanced', 'moderate', 'balanced'];
+    expect(valid).toContain(result.balanceLabel);
+  });
+
+  it('gapLabel is a valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceGapSummary([t12], spec);
+    const valid = ['tight', 'moderate', 'wide'];
+    expect(valid).toContain(result.gapLabel);
+  });
+
+  it('dominantAxis and weakestAxis are valid axis names', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceGapSummary([t12, edo(19, 440)], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(valid).toContain(result.dominantAxis);
+    expect(valid).toContain(result.weakestAxis);
+  });
+
+  it('summary is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceGapSummary([t12], spec);
+    expect(typeof result.summary).toBe('string');
+    expect(result.summary.length).toBeGreaterThan(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarBalanceGapSummary([t12], spec, 440);
+    expect(typeof result.balanceScore).toBe('number');
+  });
+});
+
+// Q862 — tuningFamilySocraticRadarCentroid
+describe('tuningFamilySocraticRadarCentroid (Q862)', () => {
+  it('both fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroid([t12], spec);
+    expect(result).toHaveProperty('centroid');
+    expect(result).toHaveProperty('centroidLabel');
+  });
+
+  it('centroid is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroid([t12], spec);
+    expect(result.centroid).toBeGreaterThanOrEqual(0);
+    expect(result.centroid).toBeLessThanOrEqual(1);
+  });
+
+  it('centroidLabel is a valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroid([t12], spec);
+    const valid = ['low', 'mid', 'high'];
+    expect(valid).toContain(result.centroidLabel);
+  });
+
+  it('centroid is consistent with profile axes', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroid([t12, edo(19, 440)], spec);
+    expect(typeof result.centroid).toBe('number');
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroid([t12], spec, 440);
+    expect(typeof result.centroid).toBe('number');
   });
 });

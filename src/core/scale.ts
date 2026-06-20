@@ -15491,3 +15491,206 @@ export function tuningFamilySocraticRadarDominantAxis(
   );
   return { dominantAxis, dominantScore: profile[dominantAxis] };
 }
+
+// ---------------------------------------------------------------------------
+// Q846 — tuningFamilySocraticRadarWeakestAxis
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarWeakestAxis(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  weakestAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  weakestScore: number;
+} {
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const weakestAxis = axes.reduce(
+    (worst, axis) => (profile[axis] < profile[worst] ? axis : worst),
+    axes[0]!,
+  );
+  return { weakestAxis, weakestScore: profile[weakestAxis] };
+}
+
+// ---------------------------------------------------------------------------
+// Q848 — tuningFamilySocraticRadarStrengthWeaknessReport
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarStrengthWeaknessReport(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  dominantAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  dominantScore: number;
+  weakestAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  weakestScore: number;
+  strengthWeaknessNarrative: string;
+} {
+  const dom = tuningFamilySocraticRadarDominantAxis(tunings, spectrum, rootHz);
+  const weak = tuningFamilySocraticRadarWeakestAxis(tunings, spectrum, rootHz);
+  let strengthWeaknessNarrative: string;
+  if (tunings.length === 0) {
+    strengthWeaknessNarrative = 'No tunings to assess.';
+  } else {
+    strengthWeaknessNarrative = `Strength: ${dom.dominantAxis} (${dom.dominantScore.toFixed(3)}). Weakness: ${weak.weakestAxis} (${weak.weakestScore.toFixed(3)}).`;
+  }
+  return {
+    dominantAxis: dom.dominantAxis,
+    dominantScore: dom.dominantScore,
+    weakestAxis: weak.weakestAxis,
+    weakestScore: weak.weakestScore,
+    strengthWeaknessNarrative,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q850 — tuningFamilySocraticConvergencePortrait
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticConvergencePortrait(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { convergencePortrait: string } {
+  if (tunings.length === 0) {
+    return { convergencePortrait: 'Empty family.' };
+  }
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const arch = tuningFamilySocraticArchetype(tunings, spectrum, rootHz);
+  const convergenceLabel =
+    profile.convergence < 0.25
+      ? 'divergent'
+      : profile.convergence < 0.5
+        ? 'loosely aligned'
+        : profile.convergence < 0.75
+          ? 'well-aligned'
+          : 'unified';
+  const convergencePortrait = `${arch.archetype} family of ${tunings.length}: ${convergenceLabel} (convergence ${profile.convergence.toFixed(3)}), diversity ${profile.diversity.toFixed(3)}.`;
+  return { convergencePortrait };
+}
+
+// ---------------------------------------------------------------------------
+// Q852 — tuningFamilySocraticRadarBalance
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarBalance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  balanceScore: number;
+  balanceLabel: 'unbalanced' | 'moderate' | 'balanced';
+} {
+  const p = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const balanceScore = (p.diversity + p.versatility + p.maturity + p.benchmark + p.convergence) / 5;
+  const balanceLabel: 'unbalanced' | 'moderate' | 'balanced' =
+    balanceScore < 0.25 ? 'unbalanced' : balanceScore < 0.5 ? 'moderate' : 'balanced';
+  return { balanceScore, balanceLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q854 — tuningFamilySocraticRadarBalanceNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarBalanceNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): ReturnType<typeof tuningFamilySocraticRadarBalance> & { balanceNarrative: string } {
+  const bal = tuningFamilySocraticRadarBalance(tunings, spectrum, rootHz);
+  const balanceNarrative =
+    tunings.length === 0
+      ? 'No tunings to assess balance.'
+      : `Radar balance: ${bal.balanceScore.toFixed(3)} (${bal.balanceLabel}) across ${tunings.length} tunings.`;
+  return { ...bal, balanceNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q856 — tuningFamilySocraticRadarGap
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarGap(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  gap: number;
+  gapLabel: 'tight' | 'moderate' | 'wide';
+  dominantAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  weakestAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+} {
+  const dom = tuningFamilySocraticRadarDominantAxis(tunings, spectrum, rootHz);
+  const weak = tuningFamilySocraticRadarWeakestAxis(tunings, spectrum, rootHz);
+  const gap = dom.dominantScore - weak.weakestScore;
+  const gapLabel: 'tight' | 'moderate' | 'wide' =
+    gap < 0.2 ? 'tight' : gap < 0.5 ? 'moderate' : 'wide';
+  return { gap, gapLabel, dominantAxis: dom.dominantAxis, weakestAxis: weak.weakestAxis };
+}
+
+// ---------------------------------------------------------------------------
+// Q858 — tuningFamilySocraticRadarGapNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarGapNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  gap: number;
+  gapLabel: 'tight' | 'moderate' | 'wide';
+  dominantAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  weakestAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  gapNarrative: string;
+} {
+  const g = tuningFamilySocraticRadarGap(tunings, spectrum, rootHz);
+  const { gap, gapLabel, dominantAxis, weakestAxis } = g;
+  const gapNarrative = `The radar gap is ${gapLabel} (${gap.toFixed(2)}), spanning from ${dominantAxis} (dominant) to ${weakestAxis} (weakest). This indicates a ${gapLabel === 'tight' ? 'well-balanced profile' : gapLabel === 'moderate' ? 'moderate spread' : 'high specialization'} across dimensions.`;
+  return { gap, gapLabel, dominantAxis, weakestAxis, gapNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q860 — tuningFamilySocraticRadarBalanceGapSummary
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarBalanceGapSummary(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  balanceScore: number;
+  balanceLabel: 'unbalanced' | 'moderate' | 'balanced';
+  gap: number;
+  gapLabel: 'tight' | 'moderate' | 'wide';
+  dominantAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  weakestAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  summary: string;
+} {
+  const bal = tuningFamilySocraticRadarBalance(tunings, spectrum, rootHz);
+  const g = tuningFamilySocraticRadarGap(tunings, spectrum, rootHz);
+  const { balanceScore, balanceLabel } = bal;
+  const { gap, gapLabel, dominantAxis, weakestAxis } = g;
+  const summary = `Balance: ${balanceLabel} (${balanceScore.toFixed(2)}). Gap: ${gapLabel} (${gap.toFixed(2)}) between ${dominantAxis} and ${weakestAxis}.`;
+  return { balanceScore, balanceLabel, gap, gapLabel, dominantAxis, weakestAxis, summary };
+}
+
+// ---------------------------------------------------------------------------
+// Q862 — tuningFamilySocraticRadarCentroid
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarCentroid(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  centroid: number;
+  centroidLabel: 'low' | 'mid' | 'high';
+} {
+  const p = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const centroid = (p.diversity + p.versatility + p.maturity + p.benchmark + p.convergence) / 5;
+  const centroidLabel: 'low' | 'mid' | 'high' =
+    centroid < 0.35 ? 'low' : centroid < 0.65 ? 'mid' : 'high';
+  return { centroid, centroidLabel };
+}
