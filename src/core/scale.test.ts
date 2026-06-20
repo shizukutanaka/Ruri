@@ -453,6 +453,9 @@ import {
   tuningFamilySocraticRadarGapNarrative,
   tuningFamilySocraticRadarBalanceGapSummary,
   tuningFamilySocraticRadarCentroid,
+  tuningFamilySocraticRadarCentroidNarrative,
+  tuningFamilySocraticRadarCentroidComparison,
+  tuningFamilySocraticRadarAxisScoreRank,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -15852,5 +15855,163 @@ describe('tuningFamilySocraticRadarCentroid (Q862)', () => {
     const spec = harmonicSpectrum(6);
     const result = tuningFamilySocraticRadarCentroid([t12], spec, 440);
     expect(typeof result.centroid).toBe('number');
+  });
+});
+
+// Q864 — tuningFamilySocraticRadarCentroidNarrative
+describe('tuningFamilySocraticRadarCentroidNarrative (Q864)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidNarrative([t12], spec);
+    expect(result).toHaveProperty('centroid');
+    expect(result).toHaveProperty('centroidLabel');
+    expect(result).toHaveProperty('centroidNarrative');
+  });
+
+  it('centroid is between 0 and 1', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidNarrative([t12], spec);
+    expect(result.centroid).toBeGreaterThanOrEqual(0);
+    expect(result.centroid).toBeLessThanOrEqual(1);
+  });
+
+  it('centroidLabel is a valid value', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidNarrative([t12], spec);
+    const valid = ['low', 'mid', 'high'];
+    expect(valid).toContain(result.centroidLabel);
+  });
+
+  it('centroidNarrative is a non-empty string', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidNarrative([t12], spec);
+    expect(typeof result.centroidNarrative).toBe('string');
+    expect(result.centroidNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('centroidNarrative contains centroidLabel', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidNarrative([t12], spec);
+    expect(result.centroidNarrative).toContain(result.centroidLabel);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidNarrative([t12], spec, 440);
+    expect(typeof result.centroid).toBe('number');
+  });
+});
+
+// Q866 — tuningFamilySocraticRadarCentroidComparison
+describe('tuningFamilySocraticRadarCentroidComparison (Q866)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidComparison([t12], [edo(19, 440)], spec);
+    expect(result).toHaveProperty('centroidA');
+    expect(result).toHaveProperty('centroidB');
+    expect(result).toHaveProperty('centroidLabelA');
+    expect(result).toHaveProperty('centroidLabelB');
+    expect(result).toHaveProperty('centroidDiff');
+    expect(result).toHaveProperty('winner');
+  });
+
+  it('centroidDiff is non-negative', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidComparison([t12], [edo(19, 440)], spec);
+    expect(result.centroidDiff).toBeGreaterThanOrEqual(0);
+  });
+
+  it('centroidDiff equals Math.abs(centroidA - centroidB)', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidComparison([t12], [edo(19, 440)], spec);
+    expect(result.centroidDiff).toBeCloseTo(Math.abs(result.centroidA - result.centroidB), 10);
+  });
+
+  it('centroidLabels are valid values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidComparison([t12], [edo(19, 440)], spec);
+    const valid = ['low', 'mid', 'high'];
+    expect(valid).toContain(result.centroidLabelA);
+    expect(valid).toContain(result.centroidLabelB);
+  });
+
+  it('winner is one of A, B, tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidComparison([t12], [edo(19, 440)], spec);
+    const valid = ['A', 'B', 'tie'];
+    expect(valid).toContain(result.winner);
+  });
+
+  it('same tunings produce tie', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidComparison([t12], [t12], spec);
+    expect(result.winner).toBe('tie');
+    expect(result.centroidDiff).toBe(0);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarCentroidComparison([t12], [edo(19, 440)], spec, 440);
+    expect(typeof result.centroidA).toBe('number');
+  });
+});
+
+// Q868 — tuningFamilySocraticRadarAxisScoreRank
+describe('tuningFamilySocraticRadarAxisScoreRank (Q868)', () => {
+  it('all fields are present', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec);
+    expect(result).toHaveProperty('ranked');
+    expect(result).toHaveProperty('topAxis');
+    expect(result).toHaveProperty('bottomAxis');
+  });
+
+  it('ranked has exactly 5 entries', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec);
+    expect(result.ranked.length).toBe(5);
+  });
+
+  it('ranked is sorted descending by score', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec);
+    for (let i = 0; i < result.ranked.length - 1; i++) {
+      expect(result.ranked[i]!.score).toBeGreaterThanOrEqual(result.ranked[i + 1]!.score);
+    }
+  });
+
+  it('topAxis matches first ranked entry', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec);
+    expect(result.topAxis).toBe(result.ranked[0]!.axis);
+  });
+
+  it('bottomAxis matches last ranked entry', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec);
+    expect(result.bottomAxis).toBe(result.ranked[result.ranked.length - 1]!.axis);
+  });
+
+  it('all axes are valid AxisKey values', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    for (const entry of result.ranked) {
+      expect(valid).toContain(entry.axis);
+    }
+  });
+
+  it('all five axes appear exactly once', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec);
+    const axes = result.ranked.map((e) => e.axis);
+    const unique = new Set(axes);
+    expect(unique.size).toBe(5);
+  });
+
+  it('accepts optional rootHz', () => {
+    const spec = harmonicSpectrum(6);
+    const result = tuningFamilySocraticRadarAxisScoreRank([t12], spec, 440);
+    expect(result.ranked.length).toBe(5);
   });
 });

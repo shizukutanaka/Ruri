@@ -15694,3 +15694,78 @@ export function tuningFamilySocraticRadarCentroid(
     centroid < 0.35 ? 'low' : centroid < 0.65 ? 'mid' : 'high';
   return { centroid, centroidLabel };
 }
+
+// ---------------------------------------------------------------------------
+// Q864 — tuningFamilySocraticRadarCentroidNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarCentroidNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  centroid: number;
+  centroidLabel: 'low' | 'mid' | 'high';
+  centroidNarrative: string;
+} {
+  const { centroid, centroidLabel } = tuningFamilySocraticRadarCentroid(tunings, spectrum, rootHz);
+  const centroidNarrative = `The radar centroid is ${centroidLabel} at ${centroid.toFixed(2)}, indicating an overall ${centroidLabel === 'high' ? 'strong' : centroidLabel === 'mid' ? 'moderate' : 'developing'} profile across all five dimensions.`;
+  return { centroid, centroidLabel, centroidNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q866 — tuningFamilySocraticRadarCentroidComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarCentroidComparison(
+  tuningsA: TuningSystem[],
+  tuningsB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  centroidA: number;
+  centroidB: number;
+  centroidLabelA: 'low' | 'mid' | 'high';
+  centroidLabelB: 'low' | 'mid' | 'high';
+  centroidDiff: number;
+  winner: 'A' | 'B' | 'tie';
+} {
+  const a = tuningFamilySocraticRadarCentroid(tuningsA, spectrum, rootHz);
+  const b = tuningFamilySocraticRadarCentroid(tuningsB, spectrum, rootHz);
+  const centroidDiff = Math.abs(a.centroid - b.centroid);
+  const winner: 'A' | 'B' | 'tie' =
+    centroidDiff < 0.02 ? 'tie' : a.centroid > b.centroid ? 'A' : 'B';
+  return {
+    centroidA: a.centroid,
+    centroidB: b.centroid,
+    centroidLabelA: a.centroidLabel,
+    centroidLabelB: b.centroidLabel,
+    centroidDiff,
+    winner,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q868 — tuningFamilySocraticRadarAxisScoreRank
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAxisScoreRank(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  ranked: Array<{
+    axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+    score: number;
+  }>;
+  topAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  bottomAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const p = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const ranked = axes.map((axis) => ({ axis, score: p[axis] })).sort((a, b) => b.score - a.score);
+  const topAxis = ranked[0]!.axis;
+  const bottomAxis = ranked[ranked.length - 1]!.axis;
+  return { ranked, topAxis, bottomAxis };
+}
