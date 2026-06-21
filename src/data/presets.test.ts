@@ -322,6 +322,12 @@ import {
   presetFamilySocraticRadarDiversityLeadership,
   presetFamilySocraticRadarVersatilityQuotient,
   presetFamilySocraticRadarWeightedScore,
+  presetFamilySocraticRadarNormalizedProfile,
+  presetFamilySocraticRadarGeometricMean,
+  presetFamilySocraticRadarHarmonicMean,
+  presetFamilySocraticRadarTrimmedMean,
+  presetFamilySocraticRadarRobustMedian,
+  presetFamilySocraticRadarPercentileRank,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -11183,6 +11189,169 @@ describe('presetFamilySocraticRadarWeightedScore (Q1037)', () => {
         undefined,
         [TWELVE_TET],
       ),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1039 — presetFamilySocraticRadarNormalizedProfile
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarNormalizedProfile (Q1039)', () => {
+  it('normalizedProfile values sum to 1', () => {
+    const spec = harmonicSpectrum(6);
+    const { normalizedProfile } = presetFamilySocraticRadarNormalizedProfile(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const sum = Object.values(normalizedProfile).reduce((s, v) => s + v, 0);
+    expect(sum).toBeCloseTo(1.0, 10);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarNormalizedProfile(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1041 — presetFamilySocraticRadarGeometricMean
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarGeometricMean (Q1041)', () => {
+  it('geometricMean values are numbers in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { geometricMean } = presetFamilySocraticRadarGeometricMean(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    for (const v of Object.values(geometricMean)) {
+      expect(typeof v).toBe('number');
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarGeometricMean(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1043 — presetFamilySocraticRadarHarmonicMean
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarHarmonicMean (Q1043)', () => {
+  it('harmonicMean values are numbers in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { harmonicMean } = presetFamilySocraticRadarHarmonicMean(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    for (const v of Object.values(harmonicMean)) {
+      expect(typeof v).toBe('number');
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarHarmonicMean(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1045 — presetFamilySocraticRadarTrimmedMean
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTrimmedMean (Q1045)', () => {
+  it('trimmedMean values are numbers in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { trimmedMean } = presetFamilySocraticRadarTrimmedMean(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    for (const v of Object.values(trimmedMean)) {
+      expect(typeof v).toBe('number');
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarTrimmedMean(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1047 — presetFamilySocraticRadarRobustMedian
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRobustMedian (Q1047)', () => {
+  it('median and mad values are numbers', () => {
+    const spec = harmonicSpectrum(6);
+    const { median, mad } = presetFamilySocraticRadarRobustMedian(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    for (const v of Object.values(median)) expect(typeof v).toBe('number');
+    for (const v of Object.values(mad)) expect(typeof v).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarRobustMedian(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1049 — presetFamilySocraticRadarPercentileRank
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarPercentileRank (Q1049)', () => {
+  const queryProfile = { diversity: 0.5, versatility: 0.5, maturity: 0.5, benchmark: 0.5, convergence: 0.5 };
+
+  it('percentileRank is a number in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { percentileRank } = presetFamilySocraticRadarPercentileRank(
+      ['12-tet'],
+      spec,
+      queryProfile,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof percentileRank).toBe('number');
+    expect(percentileRank).toBeGreaterThanOrEqual(0);
+    expect(percentileRank).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarPercentileRank(['not-a-preset'], spec, queryProfile, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

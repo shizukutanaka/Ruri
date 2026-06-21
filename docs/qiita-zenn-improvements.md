@@ -268,3 +268,10 @@
 - T2: complementScale — 補音階（使用外のPC集合）
 - T3: scaleTranspositions — 全12移調の列挙
 - T4: computeDissonanceCurve — ルートから各度数への不協和カーブ
+
+## Round 12 — PC集合演算 (U1–U4)
+
+- U1: isSubsetOf — PC部分集合判定
+- U2: pcSetIntersection — PC集合の積集合
+- U3: pcSetUnion — PC集合の和集合
+- U4: scaleDistance — ジャカード距離（音階類似度）

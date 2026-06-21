@@ -541,6 +541,12 @@ import {
   tuningFamilySocraticRadarDiversityLeadership,
   tuningFamilySocraticRadarVersatilityQuotient,
   tuningFamilySocraticRadarWeightedScore,
+  tuningFamilySocraticRadarNormalizedProfile,
+  tuningFamilySocraticRadarGeometricMean,
+  tuningFamilySocraticRadarHarmonicMean,
+  tuningFamilySocraticRadarTrimmedMean,
+  tuningFamilySocraticRadarRobustMedian,
+  tuningFamilySocraticRadarPercentileRank,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -569,6 +575,10 @@ import {
   complementScale,
   scaleTranspositions,
   computeDissonanceCurve,
+  isSubsetOf,
+  pcSetIntersection,
+  pcSetUnion,
+  scaleDistance,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -19753,5 +19763,235 @@ describe('computeDissonanceCurve (T4)', () => {
     const rootPitch = t12.degrees[0]!;
     const rootFreq = centsToFreq(pitchToCents(rootPitch), 110);
     expect(curve[0]).toBeCloseTo(chordDissonance([rootFreq, rootFreq], spec), 8);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1038 — tuningFamilySocraticRadarNormalizedProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarNormalizedProfile', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_normalizedProfile_values_sum_to_one', () => {
+    const { normalizedProfile } = tuningFamilySocraticRadarNormalizedProfile([t12], spec, 440);
+    const sum = Object.values(normalizedProfile).reduce((s, v) => s + v, 0);
+    expect(sum).toBeCloseTo(1.0, 10);
+  });
+
+  it('test_normalizedProfile_values_are_nonnegative', () => {
+    const { normalizedProfile } = tuningFamilySocraticRadarNormalizedProfile([t12], spec, 440);
+    for (const v of Object.values(normalizedProfile)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('test_empty_tunings_normalizedProfile_is_uniform', () => {
+    const { normalizedProfile } = tuningFamilySocraticRadarNormalizedProfile([], spec, 440);
+    for (const v of Object.values(normalizedProfile)) {
+      expect(v).toBeCloseTo(0.2, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1040 — tuningFamilySocraticRadarGeometricMean
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarGeometricMean', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_geometricMean_values_are_numbers', () => {
+    const { geometricMean } = tuningFamilySocraticRadarGeometricMean([t12], spec, 440);
+    for (const v of Object.values(geometricMean)) {
+      expect(typeof v).toBe('number');
+    }
+  });
+
+  it('test_geometricMean_values_are_in_range_0_1', () => {
+    const { geometricMean } = tuningFamilySocraticRadarGeometricMean([t12], spec, 440);
+    for (const v of Object.values(geometricMean)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('test_empty_tunings_geometricMean_is_zero', () => {
+    const { geometricMean } = tuningFamilySocraticRadarGeometricMean([], spec, 440);
+    for (const v of Object.values(geometricMean)) {
+      expect(v).toBe(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1042 — tuningFamilySocraticRadarHarmonicMean
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarHarmonicMean', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_harmonicMean_values_are_numbers', () => {
+    const { harmonicMean } = tuningFamilySocraticRadarHarmonicMean([t12], spec, 440);
+    for (const v of Object.values(harmonicMean)) {
+      expect(typeof v).toBe('number');
+    }
+  });
+
+  it('test_harmonicMean_values_are_in_range_0_1', () => {
+    const { harmonicMean } = tuningFamilySocraticRadarHarmonicMean([t12], spec, 440);
+    for (const v of Object.values(harmonicMean)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('test_empty_tunings_harmonicMean_is_zero', () => {
+    const { harmonicMean } = tuningFamilySocraticRadarHarmonicMean([], spec, 440);
+    for (const v of Object.values(harmonicMean)) {
+      expect(v).toBe(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1044 — tuningFamilySocraticRadarTrimmedMean
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarTrimmedMean', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_trimmedMean_values_are_numbers', () => {
+    const { trimmedMean } = tuningFamilySocraticRadarTrimmedMean([t12], spec, 440);
+    for (const v of Object.values(trimmedMean)) {
+      expect(typeof v).toBe('number');
+    }
+  });
+
+  it('test_trimmedMean_values_are_in_range_0_1', () => {
+    const { trimmedMean } = tuningFamilySocraticRadarTrimmedMean([t12], spec, 440);
+    for (const v of Object.values(trimmedMean)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('test_empty_tunings_trimmedMean_is_zero', () => {
+    const { trimmedMean } = tuningFamilySocraticRadarTrimmedMean([], spec, 440);
+    for (const v of Object.values(trimmedMean)) {
+      expect(v).toBe(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1046 — tuningFamilySocraticRadarRobustMedian
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarRobustMedian', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_median_and_mad_are_numbers', () => {
+    const { median, mad } = tuningFamilySocraticRadarRobustMedian([t12], spec, 440);
+    for (const v of Object.values(median)) expect(typeof v).toBe('number');
+    for (const v of Object.values(mad)) expect(typeof v).toBe('number');
+  });
+
+  it('test_single_tuning_mad_is_zero', () => {
+    const { mad } = tuningFamilySocraticRadarRobustMedian([t12], spec, 440);
+    for (const v of Object.values(mad)) expect(v).toBe(0);
+  });
+
+  it('test_empty_tunings_median_and_mad_are_zero', () => {
+    const { median, mad } = tuningFamilySocraticRadarRobustMedian([], spec, 440);
+    for (const v of Object.values(median)) expect(v).toBe(0);
+    for (const v of Object.values(mad)) expect(v).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1048 — tuningFamilySocraticRadarPercentileRank
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarPercentileRank', () => {
+  const spec = harmonicSpectrum(6);
+  const queryProfile = { diversity: 0.5, versatility: 0.5, maturity: 0.5, benchmark: 0.5, convergence: 0.5 };
+
+  it('test_percentileRank_is_in_range_0_1', () => {
+    const { percentileRank } = tuningFamilySocraticRadarPercentileRank([t12], spec, queryProfile, 440);
+    expect(percentileRank).toBeGreaterThanOrEqual(0);
+    expect(percentileRank).toBeLessThanOrEqual(1);
+  });
+
+  it('test_aboveAxes_and_belowAxes_are_arrays', () => {
+    const { aboveAxes, belowAxes } = tuningFamilySocraticRadarPercentileRank([t12], spec, queryProfile, 440);
+    expect(Array.isArray(aboveAxes)).toBe(true);
+    expect(Array.isArray(belowAxes)).toBe(true);
+  });
+
+  it('test_aboveAxes_length_equals_percentileRank_times_5', () => {
+    const { percentileRank, aboveAxes } = tuningFamilySocraticRadarPercentileRank([t12], spec, queryProfile, 440);
+    expect(aboveAxes.length / 5).toBeCloseTo(percentileRank, 10);
+  });
+});
+
+describe('isSubsetOf (U1)', () => {
+  it('test_C_triad_in_major_scale', () => {
+    expect(isSubsetOf([0, 4, 7], [0, 2, 4, 5, 7, 9, 11])).toBe(true);
+  });
+  it('test_empty_is_always_subset', () => {
+    expect(isSubsetOf([], [0, 4, 7])).toBe(true);
+  });
+  it('test_not_a_subset', () => {
+    expect(isSubsetOf([0, 1], [0, 2, 4])).toBe(false);
+  });
+  it('test_equal_sets_are_subsets', () => {
+    expect(isSubsetOf([0, 4, 7], [0, 4, 7])).toBe(true);
+  });
+});
+
+describe('pcSetIntersection (U2)', () => {
+  it('test_common_notes', () => {
+    expect(pcSetIntersection([0, 4, 7], [0, 3, 7])).toEqual([0, 7]);
+  });
+  it('test_disjoint_sets_return_empty', () => {
+    expect(pcSetIntersection([0, 4], [1, 5])).toEqual([]);
+  });
+  it('test_identical_sets_return_same', () => {
+    expect(pcSetIntersection([0, 4, 7], [0, 4, 7])).toEqual([0, 4, 7]);
+  });
+  it('test_result_is_sorted', () => {
+    expect(pcSetIntersection([7, 0, 4], [4, 0, 7])).toEqual([0, 4, 7]);
+  });
+});
+
+describe('pcSetUnion (U3)', () => {
+  it('test_union_of_disjoint_sets', () => {
+    expect(pcSetUnion([0, 4], [7, 11])).toEqual([0, 4, 7, 11]);
+  });
+  it('test_union_of_overlapping_sets', () => {
+    expect(pcSetUnion([0, 4, 7], [0, 3, 7])).toEqual([0, 3, 4, 7]);
+  });
+  it('test_union_of_identical_sets', () => {
+    expect(pcSetUnion([0, 4, 7], [0, 4, 7])).toEqual([0, 4, 7]);
+  });
+  it('test_empty_union', () => {
+    expect(pcSetUnion([], [])).toEqual([]);
+  });
+});
+
+describe('scaleDistance (U4)', () => {
+  it('test_identical_sets_distance_zero', () => {
+    expect(scaleDistance([0, 4, 7], [0, 4, 7])).toBe(0);
+  });
+  it('test_completely_different_sets_distance_one', () => {
+    expect(scaleDistance([0, 4, 7], [1, 5, 8])).toBe(1);
+  });
+  it('test_partial_overlap', () => {
+    // A=[0,4,7], B=[0,3,7]: union=[0,3,4,7] size 4, intersection=[0,7] size 2, symDiff=2, dist=2/4=0.5
+    expect(scaleDistance([0, 4, 7], [0, 3, 7])).toBeCloseTo(0.5, 10);
+  });
+  it('test_empty_vs_empty_is_zero', () => {
+    expect(scaleDistance([], [])).toBe(0);
   });
 });

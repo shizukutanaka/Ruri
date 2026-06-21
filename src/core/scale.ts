@@ -18864,6 +18864,244 @@ export function tuningFamilySocraticRadarWeightedScore(
 }
 
 // ---------------------------------------------------------------------------
+// Q1038 — tuningFamilySocraticRadarNormalizedProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the mean radar profile normalized to sum to 1.0 (probability distribution over axes).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { normalizedProfile } where values sum to 1 (or uniform 0.2 if sum is 0).
+ */
+export function tuningFamilySocraticRadarNormalizedProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { normalizedProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const total = axes.reduce((s, ax) => s + meanProfile[ax], 0);
+  const normalizedProfile = {} as Record<AxisKey, number>;
+  if (total === 0) {
+    for (const ax of axes) normalizedProfile[ax] = 0.2;
+  } else {
+    for (const ax of axes) normalizedProfile[ax] = meanProfile[ax] / total;
+  }
+  return { normalizedProfile };
+}
+
+// ---------------------------------------------------------------------------
+// Q1040 — tuningFamilySocraticRadarGeometricMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Geometric mean per axis across family members.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { geometricMean } per axis.
+ */
+export function tuningFamilySocraticRadarGeometricMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { geometricMean: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const geometricMean = {} as Record<AxisKey, number>;
+  if (profiles.length === 0) {
+    for (const ax of axes) geometricMean[ax] = 0;
+    return { geometricMean };
+  }
+  const n = profiles.length;
+  for (const ax of axes) {
+    const hasZero = profiles.some((p) => p[ax] === 0);
+    if (hasZero) {
+      geometricMean[ax] = 0;
+    } else {
+      const logSum = profiles.reduce((s, p) => s + Math.log(p[ax]), 0);
+      geometricMean[ax] = Math.exp(logSum / n);
+    }
+  }
+  return { geometricMean };
+}
+
+// ---------------------------------------------------------------------------
+// Q1042 — tuningFamilySocraticRadarHarmonicMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Harmonic mean per axis across family members.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { harmonicMean } per axis.
+ */
+export function tuningFamilySocraticRadarHarmonicMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { harmonicMean: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const harmonicMean = {} as Record<AxisKey, number>;
+  if (profiles.length === 0) {
+    for (const ax of axes) harmonicMean[ax] = 0;
+    return { harmonicMean };
+  }
+  const n = profiles.length;
+  for (const ax of axes) {
+    const hasZero = profiles.some((p) => p[ax] === 0);
+    if (hasZero) {
+      harmonicMean[ax] = 0;
+    } else {
+      const reciprocalSum = profiles.reduce((s, p) => s + 1 / p[ax], 0);
+      harmonicMean[ax] = n / reciprocalSum;
+    }
+  }
+  return { harmonicMean };
+}
+
+// ---------------------------------------------------------------------------
+// Q1044 — tuningFamilySocraticRadarTrimmedMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Trimmed mean per axis: removes 1 min and 1 max value per axis when n >= 3.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { trimmedMean } per axis.
+ */
+export function tuningFamilySocraticRadarTrimmedMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { trimmedMean: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const trimmedMean = {} as Record<AxisKey, number>;
+  if (profiles.length === 0) {
+    for (const ax of axes) trimmedMean[ax] = 0;
+    return { trimmedMean };
+  }
+  const n = profiles.length;
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    if (n < 3) {
+      trimmedMean[ax] = scores.reduce((s, v) => s + v, 0) / n;
+    } else {
+      const inner = scores.slice(1, n - 1);
+      trimmedMean[ax] = inner.reduce((s, v) => s + v, 0) / inner.length;
+    }
+  }
+  return { trimmedMean };
+}
+
+// ---------------------------------------------------------------------------
+// Q1046 — tuningFamilySocraticRadarRobustMedian
+// ---------------------------------------------------------------------------
+
+/**
+ * Median and MAD (median absolute deviation) per axis as robust variability measures.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { median, mad } per axis.
+ */
+export function tuningFamilySocraticRadarRobustMedian(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  median: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>;
+  mad: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>;
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const median = {} as Record<AxisKey, number>;
+  const mad = {} as Record<AxisKey, number>;
+
+  const calcMedian = (sorted: number[]): number => {
+    const m = sorted.length;
+    if (m === 0) return 0;
+    const mid = Math.floor(m / 2);
+    return m % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
+  };
+
+  if (profiles.length === 0) {
+    for (const ax of axes) { median[ax] = 0; mad[ax] = 0; }
+    return { median, mad };
+  }
+
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    const med = calcMedian(scores);
+    median[ax] = med;
+    const absDevs = scores.map((v) => Math.abs(v - med)).sort((a, b) => a - b);
+    mad[ax] = calcMedian(absDevs);
+  }
+  return { median, mad };
+}
+
+// ---------------------------------------------------------------------------
+// Q1048 — tuningFamilySocraticRadarPercentileRank
+// ---------------------------------------------------------------------------
+
+/**
+ * Given a query profile, compute the percentile rank of this family mean profile relative to the query.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param queryProfile - A reference profile to compare against.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { percentileRank, aboveAxes, belowAxes }
+ */
+export function tuningFamilySocraticRadarPercentileRank(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  queryProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>,
+  rootHz?: number,
+): {
+  percentileRank: number;
+  aboveAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+  belowAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const aboveAxes: AxisKey[] = [];
+  const belowAxes: AxisKey[] = [];
+  for (const ax of axes) {
+    if (meanProfile[ax] > queryProfile[ax]) aboveAxes.push(ax);
+    else if (meanProfile[ax] < queryProfile[ax]) belowAxes.push(ax);
+  }
+  const percentileRank = aboveAxes.length / 5;
+  return { percentileRank, aboveAxes, belowAxes };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -19951,4 +20189,114 @@ export function computeDissonanceCurve(
     const degFreq = centsToFreq(pitchToCents(pitch), rootHz);
     return chordDissonance([rootFreq, degFreq], spectrum);
   });
+}
+
+// ---------------------------------------------------------------------------
+// Round 12 — PC集合演算 (U1–U4)
+// ---------------------------------------------------------------------------
+
+/**
+ * Test if one pitch-class set is a subset of another.
+ *
+ * Both inputs are normalized mod 12 and deduplicated before comparison.
+ * An empty set is always a subset of any set.
+ *
+ * @param subset - Pitch classes that must all appear in superset.
+ * @param superset - Pitch classes to test membership against.
+ * @returns true if every PC in subset exists in superset.
+ *
+ * @example
+ * isSubsetOf([0, 4, 7], [0, 2, 4, 5, 7, 9, 11]); // true — C-major triad in C-major scale
+ * isSubsetOf([0, 1], [0, 2, 4]); // false
+ */
+export function isSubsetOf(
+  subset: readonly number[],
+  superset: readonly number[],
+): boolean {
+  const superSet = new Set(superset.map((x) => ((x % 12) + 12) % 12));
+  for (const pc of subset) {
+    if (!superSet.has(((pc % 12) + 12) % 12)) return false;
+  }
+  return true;
+}
+
+/**
+ * Return the intersection of two pitch-class sets.
+ *
+ * Both inputs are normalized mod 12 and deduplicated. The result contains
+ * pitch classes present in both a AND b, sorted ascending.
+ *
+ * @param a - First pitch-class set.
+ * @param b - Second pitch-class set.
+ * @returns Sorted array of pitch classes in both sets.
+ *
+ * @example
+ * pcSetIntersection([0, 4, 7], [0, 3, 7]); // [0, 7]
+ */
+export function pcSetIntersection(
+  a: readonly number[],
+  b: readonly number[],
+): number[] {
+  const setA = new Set(a.map((x) => ((x % 12) + 12) % 12));
+  const setB = new Set(b.map((x) => ((x % 12) + 12) % 12));
+  const result: number[] = [];
+  for (const pc of setA) {
+    if (setB.has(pc)) result.push(pc);
+  }
+  return result.sort((x, y) => x - y);
+}
+
+/**
+ * Return the union of two pitch-class sets.
+ *
+ * Both inputs are normalized mod 12 and deduplicated. The result contains
+ * pitch classes present in a OR b, sorted ascending.
+ *
+ * @param a - First pitch-class set.
+ * @param b - Second pitch-class set.
+ * @returns Sorted array of pitch classes in either set.
+ *
+ * @example
+ * pcSetUnion([0, 4], [7, 11]); // [0, 4, 7, 11]
+ */
+export function pcSetUnion(
+  a: readonly number[],
+  b: readonly number[],
+): number[] {
+  const combined = new Set([
+    ...a.map((x) => ((x % 12) + 12) % 12),
+    ...b.map((x) => ((x % 12) + 12) % 12),
+  ]);
+  return Array.from(combined).sort((x, y) => x - y);
+}
+
+/**
+ * Compute the Jaccard distance between two pitch-class sets.
+ *
+ * Jaccard distance = |A △ B| / |A ∪ B|, where A △ B is the symmetric
+ * set difference. Result is 0 for identical sets and 1 for completely
+ * disjoint sets. Empty vs empty returns 0.
+ *
+ * @param degreesA - First pitch-class set.
+ * @param degreesB - Second pitch-class set.
+ * @returns Jaccard distance in range [0, 1].
+ *
+ * @example
+ * scaleDistance([0, 4, 7], [0, 4, 7]); // 0 — identical
+ * scaleDistance([0, 4, 7], [1, 5, 8]); // 1 — completely different
+ */
+export function scaleDistance(
+  degreesA: readonly number[],
+  degreesB: readonly number[],
+): number {
+  const setA = new Set(degreesA.map((x) => ((x % 12) + 12) % 12));
+  const setB = new Set(degreesB.map((x) => ((x % 12) + 12) % 12));
+  if (setA.size === 0 && setB.size === 0) return 0;
+  const union = new Set([...setA, ...setB]);
+  let intersection = 0;
+  for (const pc of setA) {
+    if (setB.has(pc)) intersection++;
+  }
+  const symmetricDiff = union.size - intersection;
+  return symmetricDiff / union.size;
 }
