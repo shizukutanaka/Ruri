@@ -16727,3 +16727,371 @@ export function tuningFamilySocraticRadarConsistencyScore(
     consistencyScore < 0.15 ? 'uniform' : consistencyScore < 0.3 ? 'moderate' : 'diverse';
   return { consistencyScore, consistencyLabel };
 }
+
+// ---------------------------------------------------------------------------
+// Q930 — tuningFamilySocraticRadarProfileEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Shannon entropy of the radar profile across 5 axes.
+ * Uses the family's mean profile (average across all member tunings).
+ * normalizedEntropy = entropy / log2(5) ∈ [0,1].
+ */
+export function tuningFamilySocraticRadarProfileEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { entropy: number; normalizedEntropy: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  // Compute mean profile across all tunings
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const total = axes.reduce((s, ax) => s + meanProfile[ax], 0);
+  if (total <= 0) {
+    return { entropy: 0, normalizedEntropy: 0 };
+  }
+  let entropy = 0;
+  for (const ax of axes) {
+    const p = meanProfile[ax] / total;
+    if (p > 0) {
+      entropy -= p * Math.log2(p);
+    }
+  }
+  const normalizedEntropy = entropy / Math.log2(5);
+  return { entropy, normalizedEntropy };
+}
+
+// ---------------------------------------------------------------------------
+// Q932 — tuningFamilySocraticRadarAxisInteractions
+// ---------------------------------------------------------------------------
+
+/**
+ * For each pair of axes, compute the product (interaction score).
+ * Returns all 10 combinations from ['benchmark','convergence','diversity','maturity','versatility'],
+ * sorted alphabetically, as keys "axis1_axis2".
+ */
+export function tuningFamilySocraticRadarAxisInteractions(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { interactions: Record<string, number> } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'];
+  // Compute mean profile across all tunings
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const interactions: Record<string, number> = {};
+  for (let i = 0; i < axes.length; i++) {
+    for (let j = i + 1; j < axes.length; j++) {
+      const axI = axes[i]!;
+      const axJ = axes[j]!;
+      interactions[`${axI}_${axJ}`] = meanProfile[axI] * meanProfile[axJ];
+    }
+  }
+  return { interactions };
+}
+
+// ---------------------------------------------------------------------------
+// Q934 — tuningFamilySocraticRadarPolarizationIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * How many axes are "extreme" (< 0.2 or > 0.8) vs moderate.
+ * polarizationIndex = extremeCount / 5 ∈ [0,1].
+ */
+export function tuningFamilySocraticRadarPolarizationIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  polarizationIndex: number;
+  polarizationLabel: 'neutral' | 'moderate' | 'polarized';
+  extremeAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  // Compute mean profile
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const extremeAxes: AxisKey[] = axes.filter((ax) => meanProfile[ax] < 0.2 || meanProfile[ax] > 0.8);
+  const polarizationIndex = extremeAxes.length / 5;
+  const polarizationLabel: 'neutral' | 'moderate' | 'polarized' =
+    polarizationIndex < 0.4 ? 'neutral' : polarizationIndex < 0.7 ? 'moderate' : 'polarized';
+  return { polarizationIndex, polarizationLabel, extremeAxes };
+}
+
+// ---------------------------------------------------------------------------
+// Q936 — tuningFamilySocraticRadarSignatureDistance
+// ---------------------------------------------------------------------------
+
+/**
+ * Euclidean distance between two family mean profiles.
+ * normalizedDistance = distance / sqrt(5).
+ */
+export function tuningFamilySocraticRadarSignatureDistance(
+  tuningsA: readonly TuningSystem[],
+  tuningsB: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { distance: number; normalizedDistance: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profilesA = tuningsA.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const profilesB = tuningsB.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanA = {} as Record<AxisKey, number>;
+  const meanB = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanA[ax] = profilesA.reduce((s, p) => s + p[ax], 0) / profilesA.length;
+    meanB[ax] = profilesB.reduce((s, p) => s + p[ax], 0) / profilesB.length;
+  }
+  const distance = Math.sqrt(axes.reduce((s, ax) => s + (meanA[ax] - meanB[ax]) ** 2, 0));
+  const normalizedDistance = distance / Math.sqrt(5);
+  return { distance, normalizedDistance };
+}
+
+// ---------------------------------------------------------------------------
+// Q938 — tuningFamilySocraticRadarClusterability
+// ---------------------------------------------------------------------------
+
+/**
+ * How "clusterable" a list of tunings is: ratio of within-cluster cohesion.
+ * clusterability = 1 - avgDistance / sqrt(5) ∈ [0,1].
+ */
+export function tuningFamilySocraticRadarClusterability(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { clusterability: number; avgDistance: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length === 0) {
+    return { clusterability: 1, avgDistance: 0 };
+  }
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const avgDistance =
+    profiles.reduce(
+      (s, p) => s + Math.sqrt(axes.reduce((ss, ax) => ss + (p[ax] - meanProfile[ax]) ** 2, 0)),
+      0,
+    ) / profiles.length;
+  const maxPossibleDistance = Math.sqrt(5);
+  const clusterability = 1 - avgDistance / maxPossibleDistance;
+  return { clusterability, avgDistance };
+}
+
+// ---------------------------------------------------------------------------
+// Q940 — tuningFamilySocraticRadarDominanceMap
+// ---------------------------------------------------------------------------
+
+/**
+ * For each axis, which tuning in the family is the "dominant" (highest score)?
+ * Returns the 0-based index into the tunings array. Ties resolved by first (lowest index).
+ */
+export function tuningFamilySocraticRadarDominanceMap(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  dominanceMap: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const dominanceMap = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    let bestIdx = 0;
+    let bestVal = profiles.length > 0 ? (profiles[0]?.[ax] ?? 0) : 0;
+    for (let i = 1; i < profiles.length; i++) {
+      const val = profiles[i]?.[ax] ?? 0;
+      if (val > bestVal) {
+        bestVal = val;
+        bestIdx = i;
+      }
+    }
+    dominanceMap[ax] = bestIdx;
+  }
+  return { dominanceMap };
+}
+
+// ---------------------------------------------------------------------------
+// M1 — melodicContour
+// ---------------------------------------------------------------------------
+
+/**
+ * Melodic contour analysis (Adams/Marvin 1995 contour theory).
+ *
+ * Encodes the melodic motion between consecutive pitch classes as a string of:
+ *   - 'U' (Up)   — interval ascending (shortest path mod 12, i.e. < 6 semitones up)
+ *   - 'D' (Down) — interval descending (shortest path mod 12, i.e. > 6 semitones down)
+ *   - 'R' (Repeat) — same pitch class
+ *   - Ambiguous tritone (diff == 6) is treated as 'U'
+ *
+ * @param pitchClasses - Array of pitch class integers (0–11). Values are taken mod 12.
+ * @returns String of length `pitchClasses.length - 1`, or "" for empty / single-note input.
+ *
+ * @example
+ * melodicContour([0, 4, 2, 7, 5]); // "UDUD"
+ * melodicContour([0, 2, 4, 7]);    // "UUU"
+ * melodicContour([]);               // ""
+ */
+export function melodicContour(pitchClasses: readonly number[]): string {
+  if (pitchClasses.length < 2) return '';
+  let result = '';
+  for (let i = 0; i < pitchClasses.length - 1; i++) {
+    const a = ((pitchClasses[i]! % 12) + 12) % 12;
+    const b = ((pitchClasses[i + 1]! % 12) + 12) % 12;
+    if (a === b) {
+      result += 'R';
+    } else {
+      // Shortest-path interval: ascending direction (mod 12)
+      const up = ((b - a) + 12) % 12; // 1..11
+      // up < 6 → ascending, up > 6 → descending, up === 6 → tritone → treat as U
+      result += up <= 6 ? 'U' : 'D';
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// M2 — harmonicRhythm
+// ---------------------------------------------------------------------------
+
+/**
+ * Harmonic rhythm analysis — detects where chords change in a progression
+ * and computes change density metrics.
+ *
+ * Two chords are "the same" if they share identical sorted pitch classes mod 12.
+ *
+ * @param chords - Array of chords (each chord is an array of pitch class integers).
+ * @param beatDurations - Duration (in beats) of each chord slot; must have same length as `chords`.
+ * @returns
+ *   - `changePositions`: 0-based beat-slot indices where the chord differs from the previous slot
+ *   - `avgDuration`: totalDuration / changeCount (or totalDuration if no changes)
+ *   - `density`: changeCount / totalDuration (changes per beat)
+ *
+ * @throws RangeError if `chords.length !== beatDurations.length`
+ *
+ * @example
+ * harmonicRhythm([[0,4,7],[0,4,7],[2,5,9]], [1,1,1]);
+ * // { changePositions: [2], avgDuration: 3, density: 1/3 }
+ */
+export function harmonicRhythm(
+  chords: readonly (readonly number[])[],
+  beatDurations: readonly number[],
+): { changePositions: number[]; avgDuration: number; density: number } {
+  if (chords.length !== beatDurations.length) {
+    throw new RangeError(
+      `harmonicRhythm: chords.length (${chords.length}) !== beatDurations.length (${beatDurations.length})`,
+    );
+  }
+  if (chords.length === 0) {
+    return { changePositions: [], avgDuration: 0, density: 0 };
+  }
+
+  const normalizeChord = (chord: readonly number[]): string =>
+    chord
+      .map((pc) => ((pc % 12) + 12) % 12)
+      .sort((a, b) => a - b)
+      .join(',');
+
+  const totalDuration = beatDurations.reduce((s, d) => s + d, 0);
+  const changePositions: number[] = [];
+
+  let prevKey = normalizeChord(chords[0]!);
+  for (let i = 1; i < chords.length; i++) {
+    const key = normalizeChord(chords[i]!);
+    if (key !== prevKey) {
+      changePositions.push(i);
+      prevKey = key;
+    }
+  }
+
+  const changeCount = changePositions.length;
+  const avgDuration = changeCount > 0 ? totalDuration / changeCount : totalDuration;
+  const density = totalDuration > 0 ? changeCount / totalDuration : 0;
+
+  return { changePositions, avgDuration, density };
+}
+
+// ---------------------------------------------------------------------------
+// M3 — scaleRotations
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate all rotations of a scale (modes), each normalized to start at 0.
+ *
+ * Given a sorted array of degree values (e.g. pitch classes or semitone offsets),
+ * returns `degrees.length` rotations. Each rotation takes `degrees[i]` as the
+ * new root, subtracts it from all elements (mod 12), and sorts the result.
+ *
+ * @param degrees - Sorted array of scale degrees (integers, typically 0–11 pitch classes).
+ * @returns Array of `degrees.length` rotations, each sorted and normalized to start at 0.
+ *          Returns `[[]]` for empty input.
+ *
+ * @example
+ * scaleRotations([0, 2, 4, 5, 7, 9, 11]);
+ * // [
+ * //   [0, 2, 4, 5, 7, 9, 11],   // Ionian (original)
+ * //   [0, 2, 3, 5, 7, 9, 10],   // Dorian
+ * //   ...
+ * // ]
+ */
+export function scaleRotations(degrees: readonly number[]): number[][] {
+  if (degrees.length === 0) return [[]];
+  const result: number[][] = [];
+  for (let i = 0; i < degrees.length; i++) {
+    const root = degrees[i]!;
+    const rotation = degrees.map((d) => ((d - root) % 12 + 12) % 12).sort((a, b) => a - b);
+    result.push(rotation);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// M4 — chordProgressionTension
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the sensory dissonance score for each chord in a progression.
+ *
+ * Pitch classes are converted to absolute frequencies as:
+ *   freq = rootHz * 2^(pc / 12)
+ *
+ * Uses the Sethares/Plomp-Levelt model via the existing `chordDissonance` function.
+ *
+ * @param chords - Array of chords (each chord is an array of pitch class integers).
+ * @param spectrum - Timbre spectrum (array of `{ ratio, amplitude }` partials).
+ * @param rootHz - Fundamental frequency for pitch class 0 (default: 220 Hz).
+ * @returns Array of dissonance scores (one per chord); higher = more tense/dissonant.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * chordProgressionTension([[0, 4, 7], [0, 5, 9], [2, 5, 9]], spec, 220);
+ * // [majorDissonance, minorDissonance, ...]
+ */
+export function chordProgressionTension(
+  chords: readonly (readonly number[])[],
+  spectrum: Spectrum,
+  rootHz = 220,
+): number[] {
+  return chords.map((chord) => {
+    const freqs = chord.map((pc) => rootHz * Math.pow(2, pc / 12));
+    return chordDissonance(freqs, spectrum);
+  });
+}

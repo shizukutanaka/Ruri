@@ -487,7 +487,17 @@ import {
   tuningFamilySocraticRadarDimensionalRanking,
   tuningFamilySocraticRadarGrowthVector,
   tuningFamilySocraticRadarConsistencyScore,
+  tuningFamilySocraticRadarProfileEntropy,
+  tuningFamilySocraticRadarAxisInteractions,
+  tuningFamilySocraticRadarPolarizationIndex,
+  tuningFamilySocraticRadarSignatureDistance,
+  tuningFamilySocraticRadarClusterability,
+  tuningFamilySocraticRadarDominanceMap,
   snapHzToScaleDegree,
+  melodicContour,
+  harmonicRhythm,
+  scaleRotations,
+  chordProgressionTension,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -17290,5 +17300,335 @@ describe('tuningFamilySocraticRadarConsistencyScore', () => {
   it('test_consistency_score_non_negative', () => {
     const { consistencyScore } = tuningFamilySocraticRadarConsistencyScore([t12, t12], spec, 440);
     expect(consistencyScore).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q930 — tuningFamilySocraticRadarProfileEntropy
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarProfileEntropy', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_entropy_is_non_negative', () => {
+    const { entropy } = tuningFamilySocraticRadarProfileEntropy([t12], spec, 440);
+    expect(entropy).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_normalizedEntropy_in_0_1', () => {
+    const { normalizedEntropy } = tuningFamilySocraticRadarProfileEntropy([t12], spec, 440);
+    expect(normalizedEntropy).toBeGreaterThanOrEqual(0);
+    expect(normalizedEntropy).toBeLessThanOrEqual(1);
+  });
+
+  it('test_entropy_max_log2_5', () => {
+    const { entropy } = tuningFamilySocraticRadarProfileEntropy([t12], spec, 440);
+    expect(entropy).toBeLessThanOrEqual(Math.log2(5) + 1e-9);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q932 — tuningFamilySocraticRadarAxisInteractions
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAxisInteractions', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_interactions_has_10_pairs', () => {
+    const { interactions } = tuningFamilySocraticRadarAxisInteractions([t12], spec, 440);
+    expect(Object.keys(interactions)).toHaveLength(10);
+  });
+
+  it('test_all_interaction_values_non_negative', () => {
+    const { interactions } = tuningFamilySocraticRadarAxisInteractions([t12], spec, 440);
+    for (const v of Object.values(interactions)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('test_keys_sorted_alphabetically', () => {
+    const { interactions } = tuningFamilySocraticRadarAxisInteractions([t12], spec, 440);
+    const keys = Object.keys(interactions);
+    for (const key of keys) {
+      const [a, b] = key.split('_');
+      expect(a! <= b!).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q934 — tuningFamilySocraticRadarPolarizationIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarPolarizationIndex', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_polarizationIndex_in_0_1', () => {
+    const { polarizationIndex } = tuningFamilySocraticRadarPolarizationIndex([t12], spec, 440);
+    expect(polarizationIndex).toBeGreaterThanOrEqual(0);
+    expect(polarizationIndex).toBeLessThanOrEqual(1);
+  });
+
+  it('test_polarizationLabel_is_valid', () => {
+    const { polarizationLabel } = tuningFamilySocraticRadarPolarizationIndex([t12], spec, 440);
+    expect(['neutral', 'moderate', 'polarized']).toContain(polarizationLabel);
+  });
+
+  it('test_extremeAxes_subset_of_valid_axes', () => {
+    const { extremeAxes } = tuningFamilySocraticRadarPolarizationIndex([t12], spec, 440);
+    const valid = new Set(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']);
+    for (const ax of extremeAxes) {
+      expect(valid.has(ax)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q936 — tuningFamilySocraticRadarSignatureDistance
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSignatureDistance', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_distance_is_zero_for_identical_families', () => {
+    const { distance } = tuningFamilySocraticRadarSignatureDistance([t12], [t12], spec, 440);
+    expect(distance).toBeCloseTo(0, 10);
+  });
+
+  it('test_normalizedDistance_in_0_1', () => {
+    const { normalizedDistance } = tuningFamilySocraticRadarSignatureDistance([t12], [t12], spec, 440);
+    expect(normalizedDistance).toBeGreaterThanOrEqual(0);
+    expect(normalizedDistance).toBeLessThanOrEqual(1 + 1e-9);
+  });
+
+  it('test_distance_non_negative', () => {
+    const { distance } = tuningFamilySocraticRadarSignatureDistance([t12], [t12], spec, 440);
+    expect(distance).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q938 — tuningFamilySocraticRadarClusterability
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarClusterability', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_clusterability_in_0_1', () => {
+    const { clusterability } = tuningFamilySocraticRadarClusterability([t12], spec, 440);
+    expect(clusterability).toBeGreaterThanOrEqual(0);
+    expect(clusterability).toBeLessThanOrEqual(1);
+  });
+
+  it('test_single_tuning_has_zero_avgDistance', () => {
+    const { avgDistance } = tuningFamilySocraticRadarClusterability([t12], spec, 440);
+    expect(avgDistance).toBeCloseTo(0, 10);
+  });
+
+  it('test_identical_tunings_have_full_clusterability', () => {
+    const { clusterability } = tuningFamilySocraticRadarClusterability([t12, t12, t12], spec, 440);
+    expect(clusterability).toBeCloseTo(1, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q940 — tuningFamilySocraticRadarDominanceMap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDominanceMap', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_dominanceMap_has_all_5_axes', () => {
+    const { dominanceMap } = tuningFamilySocraticRadarDominanceMap([t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    for (const ax of axes) {
+      expect(dominanceMap).toHaveProperty(ax);
+    }
+  });
+
+  it('test_single_tuning_all_dominance_indices_are_zero', () => {
+    const { dominanceMap } = tuningFamilySocraticRadarDominanceMap([t12], spec, 440);
+    for (const idx of Object.values(dominanceMap)) {
+      expect(idx).toBe(0);
+    }
+  });
+
+  it('test_dominance_indices_are_valid_indices', () => {
+    const tunings = [t12, t12];
+    const { dominanceMap } = tuningFamilySocraticRadarDominanceMap(tunings, spec, 440);
+    for (const idx of Object.values(dominanceMap)) {
+      expect(idx).toBeGreaterThanOrEqual(0);
+      expect(idx).toBeLessThan(tunings.length);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M1 — melodicContour
+// ---------------------------------------------------------------------------
+
+describe('melodicContour (M1)', () => {
+  it('test_ascending_returns_all_U', () => {
+    expect(melodicContour([0, 2, 4, 7])).toBe('UUU');
+  });
+
+  it('test_descending_returns_all_D', () => {
+    // 7→4: down 3 semitones (shortest path up = 9 > 6, so D)
+    // 4→2: down 2 semitones (shortest path up = 10 > 6, so D)
+    // 2→0: down 2 semitones (shortest path up = 10 > 6, so D)
+    expect(melodicContour([7, 4, 2, 0])).toBe('DDD');
+  });
+
+  it('test_empty_returns_empty_string', () => {
+    expect(melodicContour([])).toBe('');
+  });
+
+  it('test_single_note_returns_empty_string', () => {
+    expect(melodicContour([0])).toBe('');
+  });
+
+  it('test_repeat_same_pitch', () => {
+    expect(melodicContour([0, 0, 0])).toBe('RR');
+  });
+
+  it('test_mixed_contour', () => {
+    // 0→4: up 4 → U
+    // 4→2: up would be 10 > 6, so D
+    // 2→7: up 5 → U
+    // 7→5: up would be 10 > 6, so D
+    expect(melodicContour([0, 4, 2, 7, 5])).toBe('UDUD');
+  });
+
+  it('test_tritone_is_U', () => {
+    // 0→6: up == 6, ambiguous → U
+    expect(melodicContour([0, 6])).toBe('U');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M2 — harmonicRhythm
+// ---------------------------------------------------------------------------
+
+describe('harmonicRhythm (M2)', () => {
+  it('test_no_changes_returns_empty_changePositions', () => {
+    const { changePositions, avgDuration, density } = harmonicRhythm(
+      [[0, 4, 7], [0, 4, 7], [0, 4, 7]],
+      [1, 1, 1],
+    );
+    expect(changePositions).toEqual([]);
+    expect(avgDuration).toBe(3);
+    expect(density).toBeCloseTo(0);
+  });
+
+  it('test_change_at_index_2', () => {
+    const { changePositions } = harmonicRhythm(
+      [[0, 4, 7], [0, 4, 7], [2, 5, 9]],
+      [1, 1, 1],
+    );
+    expect(changePositions).toEqual([2]);
+  });
+
+  it('test_density_equals_changes_over_total_duration', () => {
+    const { density, avgDuration } = harmonicRhythm(
+      [[0, 4, 7], [0, 5, 9], [2, 5, 9]],
+      [2, 2, 2],
+    );
+    // 2 changes over 6 beats
+    expect(density).toBeCloseTo(2 / 6);
+    expect(avgDuration).toBeCloseTo(6 / 2);
+  });
+
+  it('test_throws_on_length_mismatch', () => {
+    expect(() => harmonicRhythm([[0, 4, 7]], [1, 1])).toThrow(RangeError);
+  });
+
+  it('test_empty_input_returns_zero_metrics', () => {
+    const { changePositions, avgDuration, density } = harmonicRhythm([], []);
+    expect(changePositions).toEqual([]);
+    expect(avgDuration).toBe(0);
+    expect(density).toBe(0);
+  });
+
+  it('test_pitch_class_wrap_same_chord', () => {
+    // [0, 4, 7] and [12, 16, 19] are the same after mod 12
+    const { changePositions } = harmonicRhythm([[0, 4, 7], [12, 16, 19]], [1, 1]);
+    expect(changePositions).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M3 — scaleRotations
+// ---------------------------------------------------------------------------
+
+describe('scaleRotations (M3)', () => {
+  it('test_major_scale_returns_7_rotations', () => {
+    const rotations = scaleRotations([0, 2, 4, 5, 7, 9, 11]);
+    expect(rotations).toHaveLength(7);
+  });
+
+  it('test_first_rotation_is_original_normalized', () => {
+    const rotations = scaleRotations([0, 2, 4, 5, 7, 9, 11]);
+    expect(rotations[0]).toEqual([0, 2, 4, 5, 7, 9, 11]);
+  });
+
+  it('test_each_rotation_starts_at_0', () => {
+    const rotations = scaleRotations([0, 2, 4, 5, 7, 9, 11]);
+    for (const rotation of rotations) {
+      expect(rotation[0]).toBe(0);
+    }
+  });
+
+  it('test_dorian_is_second_rotation_of_major', () => {
+    const rotations = scaleRotations([0, 2, 4, 5, 7, 9, 11]);
+    // Dorian: W-H-W-W-W-H-W = [0,2,3,5,7,9,10]
+    expect(rotations[1]).toEqual([0, 2, 3, 5, 7, 9, 10]);
+  });
+
+  it('test_empty_input_returns_empty_rotation', () => {
+    expect(scaleRotations([])).toEqual([[]]);
+  });
+
+  it('test_single_degree_returns_one_rotation', () => {
+    expect(scaleRotations([0])).toEqual([[0]]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// M4 — chordProgressionTension
+// ---------------------------------------------------------------------------
+
+describe('chordProgressionTension (M4)', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_array_same_length_as_chords', () => {
+    const chords = [[0, 4, 7], [0, 5, 9], [2, 5, 9]] as const;
+    const scores = chordProgressionTension(chords, spec, 220);
+    expect(scores).toHaveLength(3);
+  });
+
+  it('test_all_scores_are_non_negative', () => {
+    const chords = [[0, 4, 7], [0, 3, 7], [0, 4, 7, 11]] as const;
+    const scores = chordProgressionTension(chords, spec, 220);
+    for (const s of scores) {
+      expect(s).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('test_empty_progression_returns_empty_array', () => {
+    expect(chordProgressionTension([], spec)).toEqual([]);
+  });
+
+  it('test_default_rootHz_is_220', () => {
+    const chord = [[0, 4, 7]] as const;
+    const withDefault = chordProgressionTension(chord, spec);
+    const with220 = chordProgressionTension(chord, spec, 220);
+    expect(withDefault[0]).toBeCloseTo(with220[0]!);
+  });
+
+  it('test_unison_is_less_dissonant_than_cluster', () => {
+    // [0, 0] (unison, both at same freq) vs [0, 1] (minor second, very dissonant)
+    const [unisonScore] = chordProgressionTension([[0, 0]], spec, 220);
+    const [clusterScore] = chordProgressionTension([[0, 1]], spec, 220);
+    expect(unisonScore!).toBeLessThan(clusterScore!);
   });
 });
