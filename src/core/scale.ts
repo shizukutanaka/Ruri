@@ -17707,6 +17707,233 @@ export function tuningFamilySocraticRadarHealthIndex(
 }
 
 // ---------------------------------------------------------------------------
+// Q978 — tuningFamilySocraticRadarAdaptabilityScore
+// ---------------------------------------------------------------------------
+
+/**
+ * How well can the family adapt to different musical contexts?
+ * Measures the number of axes with "balanced" scores (neither too low nor too high):
+ * a score ∈ [0.3, 0.7] is considered balanced.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { adaptabilityScore, adaptableAxes }
+ *   adaptableAxes: axes where mean profile score ∈ [0.3, 0.7]
+ *   adaptabilityScore = adaptableAxes.length / 5
+ */
+export function tuningFamilySocraticRadarAdaptabilityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { adaptabilityScore: number; adaptableAxes: AxisKey[] } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const adaptableAxes = axes.filter((ax) => meanProfile[ax] >= 0.3 && meanProfile[ax] <= 0.7);
+  const adaptabilityScore = adaptableAxes.length / 5;
+  return { adaptabilityScore, adaptableAxes };
+}
+
+// ---------------------------------------------------------------------------
+// Q980 — tuningFamilySocraticRadarPurityScore
+// ---------------------------------------------------------------------------
+
+/**
+ * How "pure" (unimodal/consistent) is each axis distribution?
+ * Uses coefficient of variation (CV = std/mean, or 0 if mean=0).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { purityScore, axisCVs }
+ *   axisCVs: per-axis coefficient of variation
+ *   purityScore = 1 - (mean CV across all 5 axes), clamped to [0,1]
+ *   Higher purity → members agree more closely on all axes
+ *   Single tuning: all CVs = 0, purityScore = 1
+ */
+export function tuningFamilySocraticRadarPurityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { purityScore: number; axisCVs: Record<AxisKey, number> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const axisCVs = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.length === 0 ? 0 : vals.reduce((s, v) => s + v, 0) / vals.length;
+    if (mean === 0 || vals.length <= 1) {
+      axisCVs[ax] = 0;
+    } else {
+      const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length;
+      axisCVs[ax] = Math.sqrt(variance) / mean;
+    }
+  }
+  const meanCV = axes.reduce((s, ax) => s + axisCVs[ax], 0) / 5;
+  const purityScore = Math.max(0, Math.min(1, 1 - meanCV));
+  return { purityScore, axisCVs };
+}
+
+// ---------------------------------------------------------------------------
+// Q982 — tuningFamilySocraticRadarExtremeProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the profiles of the "most extreme" members —
+ * the one closest to [1,1,1,1,1] and the one closest to [0,0,0,0,0].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { highestIndex, lowestIndex, highestProfile, lowestProfile }
+ *   highestIndex: tuning with highest sum of all 5 axis scores
+ *   lowestIndex: tuning with lowest sum of all 5 axis scores
+ *   Single tuning: both indices = 0
+ */
+export function tuningFamilySocraticRadarExtremeProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  highestIndex: number;
+  lowestIndex: number;
+  highestProfile: Record<AxisKey, number>;
+  lowestProfile: Record<AxisKey, number>;
+} {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length === 0) {
+    const empty = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+    return { highestIndex: 0, lowestIndex: 0, highestProfile: empty, lowestProfile: empty };
+  }
+  const sums = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0));
+  let highestIndex = 0;
+  let lowestIndex = 0;
+  for (let i = 1; i < sums.length; i++) {
+    if (sums[i]! > sums[highestIndex]!) highestIndex = i;
+    if (sums[i]! < sums[lowestIndex]!) lowestIndex = i;
+  }
+  return {
+    highestIndex,
+    lowestIndex,
+    highestProfile: profiles[highestIndex]! as Record<AxisKey, number>,
+    lowestProfile: profiles[lowestIndex]! as Record<AxisKey, number>,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q984 — tuningFamilySocraticRadarIntersectionProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * The "intersection" profile: for each axis, the MINIMUM score across all members (the floor).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { intersectionProfile }
+ *   intersectionProfile[ax] = min over all tunings of their score on that axis
+ */
+export function tuningFamilySocraticRadarIntersectionProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { intersectionProfile: Record<AxisKey, number> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const intersectionProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    if (profiles.length === 0) {
+      intersectionProfile[ax] = 0;
+    } else {
+      intersectionProfile[ax] = profiles.reduce(
+        (mn, p) => Math.min(mn, p[ax]),
+        profiles[0]![ax],
+      );
+    }
+  }
+  return { intersectionProfile };
+}
+
+// ---------------------------------------------------------------------------
+// Q986 — tuningFamilySocraticRadarUnionProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * The "union" profile: for each axis, the MAXIMUM score across all members (the ceiling).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { unionProfile }
+ *   unionProfile[ax] = max over all tunings of their score on that axis
+ */
+export function tuningFamilySocraticRadarUnionProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { unionProfile: Record<AxisKey, number> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const unionProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    if (profiles.length === 0) {
+      unionProfile[ax] = 0;
+    } else {
+      unionProfile[ax] = profiles.reduce(
+        (mx, p) => Math.max(mx, p[ax]),
+        profiles[0]![ax],
+      );
+    }
+  }
+  return { unionProfile };
+}
+
+// ---------------------------------------------------------------------------
+// Q988 — tuningFamilySocraticRadarSpreadProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * For each axis, compute the spread (unionProfile[ax] - intersectionProfile[ax]).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { spreadProfile, maxSpreadAxis, minSpreadAxis }
+ *   maxSpreadAxis: axis with largest spread (first one if tie)
+ *   minSpreadAxis: axis with smallest spread (first one if tie)
+ */
+export function tuningFamilySocraticRadarSpreadProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { spreadProfile: Record<AxisKey, number>; maxSpreadAxis: AxisKey; minSpreadAxis: AxisKey } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const { intersectionProfile } = tuningFamilySocraticRadarIntersectionProfile(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const { unionProfile } = tuningFamilySocraticRadarUnionProfile(tunings, spectrum, rootHz);
+  const spreadProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    spreadProfile[ax] = unionProfile[ax] - intersectionProfile[ax];
+  }
+  let maxSpreadAxis: AxisKey = axes[0]!;
+  let minSpreadAxis: AxisKey = axes[0]!;
+  for (let i = 1; i < axes.length; i++) {
+    if (spreadProfile[axes[i]!]! > spreadProfile[maxSpreadAxis]) maxSpreadAxis = axes[i]!;
+    if (spreadProfile[axes[i]!]! < spreadProfile[minSpreadAxis]) minSpreadAxis = axes[i]!;
+  }
+  return { spreadProfile, maxSpreadAxis, minSpreadAxis };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -18184,4 +18411,165 @@ export function harmonicField(
     });
     return chord.sort((a, b) => a - b);
   });
+}
+
+// ---------------------------------------------------------------------------
+// P1 — chordInversion
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the nth inversion of a chord (working with pitch classes 0–11).
+ *
+ * Inversion is achieved by rotating the sorted chord by `inversion` steps and
+ * re-normalising so the lowest pitch class becomes 0.
+ *
+ * - Inversion 0 → root position (sorted, normalised to start at 0)
+ * - Inversion 1 → first inversion (rotate left by 1, re-normalise)
+ * - `inversion` is taken mod `chord.length` so any integer is valid
+ *
+ * @param chord - Array of pitch classes (0–11).
+ * @param inversion - Which inversion to return (0 = root position).
+ * @returns Normalised pitch-class array for the requested inversion, or [] for empty input.
+ *
+ * @example
+ * chordInversion([0, 4, 7], 0); // [0, 4, 7]  root position
+ * chordInversion([0, 4, 7], 1); // [0, 3, 7]  first inversion (E–G–C → re-root at E)
+ * chordInversion([0, 4, 7], 3); // [0, 4, 7]  back to root (mod 3)
+ */
+export function chordInversion(chord: readonly number[], inversion: number): number[] {
+  if (chord.length === 0) return [];
+  const sorted = [...chord].sort((a, b) => a - b);
+  const n = sorted.length;
+  const rot = ((inversion % n) + n) % n;
+  // Rotate: elements from index `rot` onwards, then elements before `rot`
+  const rotated = [...sorted.slice(rot), ...sorted.slice(0, rot)];
+  // Re-normalise: subtract minimum so lowest PC = 0
+  const min = rotated[0]!;
+  return rotated.map((pc) => ((pc - min) % 12 + 12) % 12);
+}
+
+// ---------------------------------------------------------------------------
+// P2 — diatonicTransposition
+// ---------------------------------------------------------------------------
+
+/**
+ * Transpose pitch classes up/down by `steps` scale degrees within a given scale.
+ *
+ * For each pitch class in the input, finds its index in `scaleDegrees` (or the
+ * index of the nearest degree by mod-12 distance), then moves that index by
+ * `steps` (wrapping around the scale length) and returns the resulting degree.
+ *
+ * @param pitchClasses - Array of pitch classes (0–11) to transpose.
+ * @param scaleDegrees - Scale degrees as pitch-class offsets (0-based, mod 12).
+ * @param steps - Number of scale degrees to transpose (positive = up, negative = down).
+ * @returns Array of transposed pitch classes in the same order as input.
+ *
+ * @example
+ * // Major scale: transpose C (0) up 2 steps → E (4)
+ * diatonicTransposition([0], [0,2,4,5,7,9,11], 2); // [4]
+ */
+export function diatonicTransposition(
+  pitchClasses: readonly number[],
+  scaleDegrees: readonly number[],
+  steps: number,
+): number[] {
+  if (scaleDegrees.length === 0) return pitchClasses.map(() => 0);
+  const n = scaleDegrees.length;
+
+  return pitchClasses.map((pc) => {
+    const normalized = ((pc % 12) + 12) % 12;
+    // Find the closest scale degree index by mod-12 distance
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    for (let i = 0; i < n; i++) {
+      const sd = ((scaleDegrees[i]! % 12) + 12) % 12;
+      const dist = Math.min(Math.abs(normalized - sd), 12 - Math.abs(normalized - sd));
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx = i;
+      }
+    }
+    const newIdx = ((bestIdx + steps) % n + n) % n;
+    return ((scaleDegrees[newIdx]! % 12) + 12) % 12;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// P3 — enharmonicEquivalents
+// ---------------------------------------------------------------------------
+
+const _SHARP_NAMES_P3 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
+const _FLAT_NAMES_P3 = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'] as const;
+
+/**
+ * Return all enharmonic spellings of a MIDI note number.
+ *
+ * White-key notes (no accidental) produce a single name; black-key notes
+ * produce two names (sharp and flat). MIDI 60 = C4, MIDI 69 = A4.
+ *
+ * @param midi - MIDI note number (any integer; standard range 0–127).
+ * @returns Array of note-name strings with octave, e.g. `["C4"]` or `["C#4", "Db4"]`.
+ *
+ * @example
+ * enharmonicEquivalents(60); // ["C4"]
+ * enharmonicEquivalents(61); // ["C#4", "Db4"]
+ * enharmonicEquivalents(69); // ["A4"]
+ */
+export function enharmonicEquivalents(midi: number): string[] {
+  const octave = Math.floor(midi / 12) - 1;
+  const pc = ((midi % 12) + 12) % 12;
+  const sharpName = _SHARP_NAMES_P3[pc]!;
+  const flatName = _FLAT_NAMES_P3[pc]!;
+  if (sharpName === flatName) {
+    // Natural note — only one spelling
+    return [`${sharpName}${octave}`];
+  }
+  return [`${sharpName}${octave}`, `${flatName}${octave}`];
+}
+
+// ---------------------------------------------------------------------------
+// P4 — chordComplexity
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute a chord complexity score in [0, 1] combining structural and spectral dimensions.
+ *
+ * - Structural component: `uniquePitchClasses / 12` (0 = empty, 1 = all 12 used)
+ * - Spectral component: `chordDissonance(chord) / referenceDissonance`, clamped to [0, 1]
+ *   where the reference is the dissonance of all 12 chromatic pitch classes.
+ * - Final score: `(structural + spectral) / 2`
+ *
+ * @param chord - Array of pitch classes (0–11).
+ * @param spectrum - Timbre spectrum used for dissonance calculation.
+ * @param rootHz - Root frequency in Hz (default 220).
+ * @returns Complexity in [0, 1]. Returns 0 for an empty chord.
+ *
+ * @example
+ * // Single note → low complexity
+ * chordComplexity([0], harmonicSpectrum(6), 220); // ~0.08
+ * // All 12 chromatic PCs → maximum complexity
+ * chordComplexity([0,1,2,3,4,5,6,7,8,9,10,11], harmonicSpectrum(6), 220); // ~1.0
+ */
+export function chordComplexity(
+  chord: readonly number[],
+  spectrum: Spectrum,
+  rootHz = 220,
+): number {
+  if (chord.length === 0) return 0;
+
+  // Structural: unique pitch classes / 12
+  const uniquePCs = new Set(chord.map((pc) => ((pc % 12) + 12) % 12));
+  const structural = uniquePCs.size / 12;
+
+  // Spectral: dissonance normalised by the chromatic reference
+  const toFreq = (pc: number) => rootHz * Math.pow(2, ((pc % 12 + 12) % 12) / 12);
+  const chordFreqs = [...uniquePCs].map(toFreq);
+  const chromaticPCs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  const refFreqs = chromaticPCs.map(toFreq);
+
+  const chordDiss = chordDissonance(chordFreqs, spectrum);
+  const refDiss = chordDissonance(refFreqs, spectrum);
+  const spectral = refDiss > 0 ? Math.min(chordDiss / refDiss, 1) : 0;
+
+  return (structural + spectral) / 2;
 }

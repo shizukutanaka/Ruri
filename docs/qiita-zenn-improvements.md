@@ -240,3 +240,10 @@
 - O2: chromaticSaturation — 半音階飽和度（使用音程クラス比率）
 - O3: modalInterchange — 旋法借用音（借用音抽出）
 - O4: harmonicField — 音階の和声フィールド（機能和声コード列）
+
+## Round 8 — 転回形・音階内移調・異名同音・和音複雑度 (P1–P4)
+
+- P1: chordInversion — n次転回形の生成
+- P2: diatonicTransposition — 音階内度数移調
+- P3: enharmonicEquivalents — 異名同音表記の列挙
+- P4: chordComplexity — 和音複雑度（構造+スペクトル）
