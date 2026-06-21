@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import fc from 'fast-check';
 import {
   type Scale,
   scaleToCents,
@@ -477,6 +478,7 @@ import {
   tuningFamilySocraticRadarMomentumComparison,
   tuningFamilySocraticRadarResilienceScore,
   tuningFamilySocraticRadarResilienceScoreNarrative,
+  snapHzToScaleDegree,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
@@ -16920,5 +16922,85 @@ describe('tuningFamilySocraticRadarMomentumNarrative (Q904)', () => {
   it('accepts optional rootHz', () => {
     const result = tuningFamilySocraticRadarMomentumNarrative([t12], spec, 440);
     expect(isFinite(result.momentum)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// I1 — snapHzToScaleDegree
+// ---------------------------------------------------------------------------
+
+describe('snapHzToScaleDegree (I1)', () => {
+  // 12-TET tuning: degree 0 = 0¢, degree 9 = 900¢ (A), referenceHz = 440
+  // Degree 9 = A4 = 440 Hz when reference is 440 Hz.
+  const t12 = equalTemperament12(440);
+
+  it('test_snap_A4_440hz_to_degree9_octave0', () => {
+    const result = snapHzToScaleDegree(440, t12);
+    expect(result.degreeIndex).toBe(9);
+    expect(result.octave).toBe(0);
+    expect(result.centsError).toBeCloseTo(0, 6);
+  });
+
+  it('test_snap_A5_880hz_is_octave1', () => {
+    const result = snapHzToScaleDegree(880, t12);
+    expect(result.degreeIndex).toBe(9);
+    expect(result.octave).toBe(1);
+    expect(result.centsError).toBeCloseTo(0, 6);
+  });
+
+  it('test_snap_slightly_sharp_442hz_gives_positive_centsError', () => {
+    // 442 Hz vs 440 Hz: cents diff ≈ 1200 * log2(442/440) ≈ +7.85¢
+    const result = snapHzToScaleDegree(442, t12);
+    expect(result.degreeIndex).toBe(9);
+    expect(result.centsError).toBeGreaterThan(0);
+    expect(result.centsError).toBeCloseTo(1200 * Math.log2(442 / 440), 2);
+  });
+
+  it('test_snap_with_scale_restricts_to_scale_degrees', () => {
+    // Major scale degreeIndices: [0, 2, 4, 5, 7, 9, 11]
+    // Use C4 = 261.63 Hz; that maps to degree 0 in 12-TET (C when ref = A4=440).
+    // Actually: degree 0 = 440 Hz (A4), degree 4 = E, degree 7 = G, degree 9 = A (440 Hz).
+    // D# / Eb = degree 3 (not in major scale). Test that a pitch closest to degree 3
+    // snaps to degree 2 (D) instead when restricted to major scale.
+    const majorScale: Scale = {
+      id: 'major',
+      name: 'Major',
+      tuningId: '12-tet',
+      degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+    };
+    // 440 * 2^(3.5/12) ≈ midpoint between D# and D, but a pitch at degree 3 (Eb/D#)
+    // without scale → degree 3, with scale → degree 2 (D) or degree 4 (E), whichever is closer.
+    // degree 3 = 300¢, degree 2 = 200¢, degree 4 = 400¢: nearest major-scale degree is degree 2 or 4 (tie at 100¢).
+    // Let's use a frequency just slightly below degree 3:
+    const hz = 440 * 2 ** (280 / 1200); // 280¢ above A4 = between D(200¢) and D#(300¢)
+    const withoutScale = snapHzToScaleDegree(hz, t12);
+    const withScale = snapHzToScaleDegree(hz, t12, majorScale);
+    // Without scale: closest is degree 3 (300¢, dist=20¢) over degree 2 (200¢, dist=80¢)
+    expect(withoutScale.degreeIndex).toBe(3);
+    // With scale: degree 3 excluded, nearest is degree 2 (200¢, dist=80¢)
+    expect(withScale.degreeIndex).toBe(2);
+  });
+
+  it('test_snap_hz_zero_throws_RangeError', () => {
+    expect(() => snapHzToScaleDegree(0, t12)).toThrow(RangeError);
+  });
+
+  it('test_snap_hz_negative_throws_RangeError', () => {
+    expect(() => snapHzToScaleDegree(-440, t12)).toThrow(RangeError);
+  });
+
+  it('property_centsError_within_half_step_for_any_exact_degree_hz', () => {
+    // For any hz that is exactly a degree frequency, centsError should be 0.
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 0, max: 11 }),
+        fc.integer({ min: -2, max: 2 }),
+        (degIdx, period) => {
+          const hz = degreeToFreq(t12, degIdx, period);
+          const result = snapHzToScaleDegree(hz, t12);
+          expect(Math.abs(result.centsError)).toBeLessThan(1e-6);
+        },
+      ),
+    );
   });
 });

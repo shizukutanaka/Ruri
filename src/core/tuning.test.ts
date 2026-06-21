@@ -8,6 +8,8 @@ import {
   tuningIntervalMatrix,
   tuningToIntervalVector,
   tuningDistance,
+  tuningDeviationReport,
+  approximateEdoForIntervals,
   type TuningSystem,
 } from './tuning.js';
 import { cents, fromRatio } from './cents.js';
@@ -321,5 +323,129 @@ describe('tuningDistance (Q88)', () => {
     // Total sum = 600, count = 12 + 24 = 36, average = 600 / 36 ≈ 16.667c.
     const t24 = edo(24, 440);
     expect(tuningDistance(t12, t24)).toBeCloseTo(600 / 36, 6);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// I2 — tuningDeviationReport
+// ---------------------------------------------------------------------------
+
+describe('tuningDeviationReport (I2)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_12tet_vs_12tet_all_delta_zero', () => {
+    const report = tuningDeviationReport(t12, equalTemperament12(440));
+    expect(report.length).toBe(12);
+    for (const entry of report) {
+      expect(entry.deltaCents).toBeCloseTo(0, 9);
+    }
+  });
+
+  it('test_ji_vs_12tet_major_third_delta_approx_minus_13_7', () => {
+    // JI major third = 5:4 ≈ 386.31¢; 12-TET major third (degree 4) = 400¢.
+    // deltaCents = candCents(12-TET) - refCents(JI) = 400 - 386.31 ≈ +13.69¢
+    // BUT: comparing reference=12-TET, candidate=JI → delta = JI - 12-TET ≈ -13.69¢
+    const ji: TuningSystem = {
+      id: 'ji',
+      name: '5-limit JI',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [
+        cents(0),
+        fromRatio(ratio(16, 15)), // minor second ~111.73¢
+        fromRatio(ratio(9, 8)), // major second ~203.91¢
+        fromRatio(ratio(6, 5)), // minor third ~315.64¢
+        fromRatio(ratio(5, 4)), // major third ~386.31¢
+        fromRatio(ratio(4, 3)), // perfect fourth ~498.04¢
+        fromRatio(ratio(45, 32)), // tritone ~590.22¢
+        fromRatio(ratio(3, 2)), // perfect fifth ~701.96¢
+        fromRatio(ratio(8, 5)), // minor sixth ~813.69¢
+        fromRatio(ratio(5, 3)), // major sixth ~884.36¢
+        fromRatio(ratio(9, 5)), // minor seventh ~1017.60¢
+        fromRatio(ratio(15, 8)), // major seventh ~1088.27¢
+      ],
+      source: 'theoretical',
+    };
+    // reference = 12-TET, candidate = JI
+    const report = tuningDeviationReport(t12, ji);
+    // degree 4 (major third): ref=400¢, cand≈386.31¢, delta≈-13.69¢
+    const deg4 = report[4]!;
+    expect(deg4.deltaCents).toBeCloseTo(-13.69, 0);
+  });
+
+  it('test_different_degree_counts_returns_min_length', () => {
+    const t7 = edo(7, 440);
+    const report = tuningDeviationReport(t12, t7);
+    expect(report.length).toBe(7);
+  });
+
+  it('test_result_is_in_degreeIndex_order', () => {
+    const report = tuningDeviationReport(t12, t12);
+    for (let i = 0; i < report.length; i++) {
+      expect(report[i]!.degreeIndex).toBe(i);
+    }
+  });
+
+  it('test_throws_on_empty_reference', () => {
+    const empty: TuningSystem = {
+      id: 'empty',
+      name: 'empty',
+      referenceHz: 440,
+      periodCents: 1200,
+      degrees: [],
+      source: 'theoretical',
+    };
+    // defineTuning would throw on empty, so build a mock directly
+    // Instead test via a known-empty-like scenario: since defineTuning prevents
+    // construction, we cast to bypass validation for this error-path test.
+    const emptyUnsafe = { ...empty } as TuningSystem;
+    expect(() => tuningDeviationReport(emptyUnsafe, t12)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// I4 — approximateEdoForIntervals
+// ---------------------------------------------------------------------------
+
+describe('approximateEdoForIntervals (I4)', () => {
+  it('test_JI_intervals_best_fit_in_cluster_19_31_53', () => {
+    // JI major 3rd, P4, P5: well-approximated by 19, 31, or 53 EDO
+    const targets = [386.31, 498.04, 701.96];
+    const results = approximateEdoForIntervals(targets, 5, 53);
+    // Best fit should be one of the known good EDOs
+    const best = results[0]!.n;
+    expect([19, 31, 53]).toContain(best);
+  });
+
+  it('test_perInterval_length_matches_targetCents_length', () => {
+    const targets = [386.31, 498.04, 701.96];
+    const results = approximateEdoForIntervals(targets, 5, 20);
+    for (const entry of results) {
+      expect(entry.perInterval.length).toBe(targets.length);
+    }
+  });
+
+  it('test_results_sorted_by_rmsCents_ascending', () => {
+    const targets = [386.31, 701.96];
+    const results = approximateEdoForIntervals(targets, 5, 53);
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i - 1]!.rmsCents).toBeLessThanOrEqual(results[i]!.rmsCents);
+    }
+  });
+
+  it('test_throws_on_empty_targetCents', () => {
+    expect(() => approximateEdoForIntervals([])).toThrow(RangeError);
+  });
+
+  it('test_throws_on_minN_less_than_2', () => {
+    expect(() => approximateEdoForIntervals([700], 1, 53)).toThrow(RangeError);
+  });
+
+  it('test_target_zero_gives_rmsCents_zero_for_all_n', () => {
+    // 0 cents → nearest step in any EDO is 0 → delta = 0 for all N
+    const results = approximateEdoForIntervals([0], 5, 53);
+    for (const entry of results) {
+      expect(entry.rmsCents).toBeCloseTo(0, 9);
+    }
   });
 });

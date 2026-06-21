@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
 import { ratio, multiplyRatio, ratioToCents, CENTS_PER_OCTAVE } from './ratio.js';
 import { centsToFreq, freqToCents } from './cents.js';
-import { freqToMpe, mpeToFreq, midiToFreq, freqToMidiFloat } from './midi.js';
+import { freqToMpe, mpeToFreq, midiToFreq, freqToMidiFloat, pitchHzClassify } from './midi.js';
 
 const posInt = fc.integer({ min: 1, max: 4096 });
 const hz = fc.double({ min: 20, max: 20000, noNaN: true, noDefaultInfinity: true });
@@ -83,5 +83,48 @@ describe('mpe pitch-bend (I7 high-risk)', () => {
         expect(bend14).toBeLessThanOrEqual(16383);
       }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// I3 — pitchHzClassify
+// ---------------------------------------------------------------------------
+
+describe('pitchHzClassify (I3)', () => {
+  it('test_440hz_is_A4', () => {
+    const result = pitchHzClassify(440);
+    expect(result.midiNearest).toBe(69);
+    expect(result.noteName).toBe('A');
+    expect(result.octave).toBe(4);
+    expect(result.centsOff).toBeCloseTo(0, 6);
+  });
+
+  it('test_261_63hz_is_C4', () => {
+    // Middle C ≈ 261.626 Hz = MIDI 60
+    const result = pitchHzClassify(261.626);
+    expect(result.midiNearest).toBe(60);
+    expect(result.noteName).toBe('C');
+    expect(result.octave).toBe(4);
+    expect(result.centsOff).toBeCloseTo(0, 1);
+  });
+
+  it('test_444hz_is_sharp_of_A4', () => {
+    // 444 Hz vs 440 Hz (A4): centsOff = 1200*log2(444/440)*... actually via midiFloat
+    // midiFloat = 69 + 12*log2(444/440); centsOff = (midiFloat - 69) * 100
+    const midiFloat = 69 + 12 * Math.log2(444 / 440);
+    const expected = (midiFloat - 69) * 100;
+    const result = pitchHzClassify(444);
+    expect(result.midiNearest).toBe(69);
+    expect(result.noteName).toBe('A');
+    expect(result.centsOff).toBeCloseTo(expected, 4);
+    expect(result.centsOff).toBeGreaterThan(0);
+  });
+
+  it('test_throws_on_hz_zero', () => {
+    expect(() => pitchHzClassify(0)).toThrow(RangeError);
+  });
+
+  it('test_throws_on_NaN', () => {
+    expect(() => pitchHzClassify(NaN)).toThrow(RangeError);
   });
 });
