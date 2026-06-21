@@ -17418,6 +17418,295 @@ export function tuningFamilySocraticRadarMomentumScore(
 }
 
 // ---------------------------------------------------------------------------
+// Q966 — tuningFamilySocraticRadarDiversityGap
+// ---------------------------------------------------------------------------
+
+/**
+ * The gap between the highest and lowest axis scores in the mean profile.
+ *
+ * diversityGap = max(profile) - min(profile) over the 5 axes of mean profile.
+ * Labels: < 0.2 → 'narrow', < 0.5 → 'moderate', ≥ 0.5 → 'wide'.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { diversityGap, gapLabel }
+ */
+export function tuningFamilySocraticRadarDiversityGap(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { diversityGap: number; gapLabel: 'narrow' | 'moderate' | 'wide' } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const vals = axes.map((ax) => meanProfile[ax]);
+  const diversityGap = Math.max(...vals) - Math.min(...vals);
+  const gapLabel: 'narrow' | 'moderate' | 'wide' =
+    diversityGap < 0.2 ? 'narrow' : diversityGap < 0.5 ? 'moderate' : 'wide';
+  return { diversityGap, gapLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q968 — tuningFamilySocraticRadarQuartileProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute per-axis quartile statistics (Q1, median, Q3) across family members.
+ *
+ * For each axis, sort all member scores and compute Q1 (25th percentile), median,
+ * Q3 (75th percentile) using linear interpolation for non-integer percentile positions:
+ *   position = (n-1) * percentile; lower = floor(position); upper = ceil(position)
+ *   value = scores[lower] + (position - lower) * (scores[upper] - scores[lower])
+ * Single tuning: q1 = median = q3 = that tuning's score.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { q1, median, q3 }
+ */
+export function tuningFamilySocraticRadarQuartileProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { q1: Record<AxisKey, number>; median: Record<AxisKey, number>; q3: Record<AxisKey, number> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+
+  function percentile(sorted: number[], p: number): number {
+    if (sorted.length === 0) return 0;
+    if (sorted.length === 1) return sorted[0]!;
+    const pos = (sorted.length - 1) * p;
+    const lower = Math.floor(pos);
+    const upper = Math.ceil(pos);
+    if (lower === upper) return sorted[lower]!;
+    return sorted[lower]! + (pos - lower) * (sorted[upper]! - sorted[lower]!);
+  }
+
+  const q1 = {} as Record<AxisKey, number>;
+  const median = {} as Record<AxisKey, number>;
+  const q3 = {} as Record<AxisKey, number>;
+
+  if (n === 0) {
+    for (const ax of axes) {
+      q1[ax] = 0;
+      median[ax] = 0;
+      q3[ax] = 0;
+    }
+  } else {
+    for (const ax of axes) {
+      const sorted = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+      q1[ax] = percentile(sorted, 0.25);
+      median[ax] = percentile(sorted, 0.5);
+      q3[ax] = percentile(sorted, 0.75);
+    }
+  }
+
+  return { q1, median, q3 };
+}
+
+// ---------------------------------------------------------------------------
+// Q970 — tuningFamilySocraticRadarIQRScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Interquartile range (Q3-Q1) per axis, and the mean IQR across all 5 axes.
+ * Single tuning: all IQRs = 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { iqrPerAxis, meanIQR }
+ */
+export function tuningFamilySocraticRadarIQRScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { iqrPerAxis: Record<AxisKey, number>; meanIQR: number } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) {
+    return {
+      iqrPerAxis: Object.fromEntries(axes.map((ax) => [ax, 0])) as Record<AxisKey, number>,
+      meanIQR: 0,
+    };
+  }
+  const { q1, q3 } = tuningFamilySocraticRadarQuartileProfile(tunings, spectrum, rootHz);
+  const iqrPerAxis = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    iqrPerAxis[ax] = q3[ax] - q1[ax];
+  }
+  const meanIQR = axes.reduce((s, ax) => s + iqrPerAxis[ax], 0) / 5;
+  return { iqrPerAxis, meanIQR };
+}
+
+// ---------------------------------------------------------------------------
+// Q972 — tuningFamilySocraticRadarBimodalityScore
+// ---------------------------------------------------------------------------
+
+/**
+ * For each axis, test whether the distribution of scores is bimodal (has two clusters).
+ * Uses Sarle's coefficient of bimodality: (skewness² + 1) / kurtosis > 0.555
+ * kurtosis < 1 is treated as bimodal-like if skewness is also low.
+ * Fewer than 3 tunings: bimodalAxes=[], bimodalityScore=0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { bimodalAxes, bimodalityScore }
+ */
+export function tuningFamilySocraticRadarBimodalityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { bimodalAxes: AxisKey[]; bimodalityScore: number } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length < 3) return { bimodalAxes: [], bimodalityScore: 0 };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+
+  const bimodalAxes: AxisKey[] = [];
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / n;
+    const m2 = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    const m3 = vals.reduce((s, v) => s + (v - mean) ** 3, 0) / n;
+    const m4 = vals.reduce((s, v) => s + (v - mean) ** 4, 0) / n;
+    const std = Math.sqrt(m2);
+    if (std === 0) continue;
+    const skewness = m3 / std ** 3;
+    const kurtosis = m4 / m2 ** 2; // raw (Pearson) kurtosis
+    if (kurtosis < 1) {
+      // near-uniform: treat as bimodal-like if skewness is also low
+      if (Math.abs(skewness) < 0.5) bimodalAxes.push(ax);
+    } else {
+      const bc = (skewness ** 2 + 1) / kurtosis;
+      if (bc > 0.555) bimodalAxes.push(ax);
+    }
+  }
+  const bimodalityScore = bimodalAxes.length / 5;
+  return { bimodalAxes, bimodalityScore };
+}
+
+// ---------------------------------------------------------------------------
+// Q974 — tuningFamilySocraticRadarDependenceMatrix
+// ---------------------------------------------------------------------------
+
+/**
+ * For each pair of axes, compute Spearman rank correlation coefficient.
+ * Keys: "axis1_axis2" (10 pairs, alphabetically sorted).
+ * Single tuning: all correlations = 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { dependenceMatrix }
+ */
+export function tuningFamilySocraticRadarDependenceMatrix(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { dependenceMatrix: Record<string, number> } {
+  const axes: AxisKey[] = ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'];
+  const dependenceMatrix: Record<string, number> = {};
+  for (let i = 0; i < axes.length; i++) {
+    for (let j = i + 1; j < axes.length; j++) {
+      dependenceMatrix[`${axes[i]!}_${axes[j]!}`] = 0;
+    }
+  }
+  if (tunings.length <= 1) return { dependenceMatrix };
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+
+  function rankArray(vals: number[]): number[] {
+    const indexed = vals.map((v, idx) => ({ v, idx }));
+    indexed.sort((a, b) => a.v - b.v);
+    const ranks = new Array<number>(n);
+    let k = 0;
+    while (k < n) {
+      let m = k;
+      while (m < n - 1 && indexed[m + 1]!.v === indexed[m]!.v) m++;
+      const avgRank = (k + m) / 2 + 1; // 1-based average rank for ties
+      for (let ti = k; ti <= m; ti++) ranks[indexed[ti]!.idx] = avgRank;
+      k = m + 1;
+    }
+    return ranks;
+  }
+
+  function spearman(ax1: AxisKey, ax2: AxisKey): number {
+    const v1 = profiles.map((p) => p[ax1]);
+    const v2 = profiles.map((p) => p[ax2]);
+    const r1 = rankArray(v1);
+    const r2 = rankArray(v2);
+    const mean1 = r1.reduce((s, v) => s + v, 0) / n;
+    const mean2 = r2.reduce((s, v) => s + v, 0) / n;
+    let cov = 0;
+    let var1 = 0;
+    let var2 = 0;
+    for (let i = 0; i < n; i++) {
+      const d1 = r1[i]! - mean1;
+      const d2 = r2[i]! - mean2;
+      cov += d1 * d2;
+      var1 += d1 * d1;
+      var2 += d2 * d2;
+    }
+    if (var1 === 0 || var2 === 0) return 0;
+    return cov / Math.sqrt(var1 * var2);
+  }
+
+  for (let i = 0; i < axes.length; i++) {
+    for (let j = i + 1; j < axes.length; j++) {
+      dependenceMatrix[`${axes[i]!}_${axes[j]!}`] = spearman(axes[i]!, axes[j]!);
+    }
+  }
+  return { dependenceMatrix };
+}
+
+// ---------------------------------------------------------------------------
+// Q976 — tuningFamilySocraticRadarHealthIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * A composite "health" score for the radar profile, combining:
+ * - balance (from Q916's approach: 1 - std/0.5, clamped to [0,1])
+ * - saturation (from Q958: fraction of axes ≥ 0.9)
+ * - mean score (arithmetic mean of all 5 axis scores)
+ *
+ * healthIndex = (balance + saturation + mean) / 3  ∈ [0,1]
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { healthIndex, components }
+ */
+export function tuningFamilySocraticRadarHealthIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { healthIndex: number; components: { balance: number; saturation: number; mean: number } } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const vals = axes.map((ax) => meanProfile[ax]);
+  const meanScore = vals.reduce((s, v) => s + v, 0) / 5;
+  const variance = vals.reduce((s, v) => s + (v - meanScore) ** 2, 0) / 5;
+  const balance = Math.max(0, Math.min(1, 1 - Math.sqrt(variance) / 0.5));
+  const saturation = vals.filter((v) => v >= 0.9).length / 5;
+  const mean = meanScore;
+  const healthIndex = (balance + saturation + mean) / 3;
+  return { healthIndex, components: { balance, saturation, mean } };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -17717,4 +18006,182 @@ export function fundamentalBassNote(
   }
 
   return bestPc;
+}
+
+// ---------------------------------------------------------------------------
+// O1 — voiceLeadingDistance
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the optimal voice-leading distance (parsimony) between two chords.
+ *
+ * For each permutation of chordB, computes the total semitone movement from
+ * chordA using the minimum of upward or downward distance mod 12.
+ * Returns the minimum total distance over all permutations of chordB.
+ *
+ * For different-length chords, uses min(len(A), len(B)) voices (drops extras).
+ * Permutations are tried only for small chords (≤ 4 notes); for larger chords
+ * sorted matching is used.
+ *
+ * @param chordA - First chord as pitch class integers (0–11).
+ * @param chordB - Second chord as pitch class integers (0–11).
+ * @returns Minimum total semitone movement (voice-leading distance).
+ *
+ * @example
+ * voiceLeadingDistance([0, 4, 7], [0, 4, 7]); // 0
+ * voiceLeadingDistance([0, 4, 7], [0, 3, 9]); // small number (parsimony)
+ */
+export function voiceLeadingDistance(
+  chordA: readonly number[],
+  chordB: readonly number[],
+): number {
+  if (chordA.length === 0 || chordB.length === 0) return 0;
+
+  const voices = Math.min(chordA.length, chordB.length);
+  const a = chordA.slice(0, voices).map((pc) => ((pc % 12) + 12) % 12);
+  const b = chordB.slice(0, voices).map((pc) => ((pc % 12) + 12) % 12);
+
+  function pcDist(x: number, y: number): number {
+    const diff = Math.abs(y - x) % 12;
+    return Math.min(diff, 12 - diff);
+  }
+
+  function totalDist(perm: number[]): number {
+    let total = 0;
+    for (let i = 0; i < voices; i++) {
+      total += pcDist(a[i]!, perm[i]!);
+    }
+    return total;
+  }
+
+  if (voices <= 4) {
+    // Try all permutations of b
+    function permutations(arr: number[]): number[][] {
+      if (arr.length <= 1) return [arr];
+      const result: number[][] = [];
+      for (let i = 0; i < arr.length; i++) {
+        const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+        for (const perm of permutations(rest)) {
+          result.push([arr[i]!, ...perm]);
+        }
+      }
+      return result;
+    }
+
+    let minDist = Infinity;
+    for (const perm of permutations(b)) {
+      const d = totalDist(perm);
+      if (d < minDist) minDist = d;
+    }
+    return minDist;
+  } else {
+    // Sorted matching for larger chords
+    const sortedA = [...a].sort((x, y) => x - y);
+    const sortedB = [...b].sort((x, y) => x - y);
+    return totalDist(sortedB.map((_, i) => sortedB[i]!));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// O2 — chromaticSaturation
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the chromatic saturation of a set of pitch classes.
+ *
+ * Returns the fraction of the 12 chromatic pitch classes that are covered
+ * after deduplication. Result is clamped to [0, 1].
+ *
+ * @param pitchClasses - Array of pitch class integers (any range, mod 12 applied).
+ * @returns Fraction in [0, 1] representing how many of the 12 PCs are used.
+ *
+ * @example
+ * chromaticSaturation([0, 2, 4, 5, 7, 9, 11]); // 7/12 ≈ 0.583
+ * chromaticSaturation([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]); // 1.0
+ */
+export function chromaticSaturation(pitchClasses: readonly number[]): number {
+  const unique = new Set(pitchClasses.map((pc) => ((pc % 12) + 12) % 12));
+  return Math.min(1, Math.max(0, unique.size / 12));
+}
+
+// ---------------------------------------------------------------------------
+// O3 — modalInterchange
+// ---------------------------------------------------------------------------
+
+/**
+ * Find "borrowed" notes — pitch classes in mode2 that are NOT in mode1
+ * (modal interchange / modal borrowing).
+ *
+ * Both modes are expressed as relative degree offsets from rootPc.
+ * Absolute pitch classes are computed as (rootPc + degree) % 12.
+ *
+ * @param rootPc - Root pitch class (0–11).
+ * @param mode1Degrees - Scale degrees (0-based offsets mod 12) for the home mode.
+ * @param mode2Degrees - Scale degrees (0-based offsets mod 12) for the borrowed mode.
+ * @returns Sorted array of pitch classes present in mode2 but not in mode1.
+ *
+ * @example
+ * // C major vs C minor: borrowed notes from minor
+ * modalInterchange(0, [0,2,4,5,7,9,11], [0,2,3,5,7,8,10]);
+ * // returns [3, 8, 10] (Eb, Ab, Bb)
+ */
+export function modalInterchange(
+  rootPc: number,
+  mode1Degrees: readonly number[],
+  mode2Degrees: readonly number[],
+): number[] {
+  const root = ((rootPc % 12) + 12) % 12;
+  const set1 = new Set(mode1Degrees.map((d) => (root + ((d % 12 + 12) % 12)) % 12));
+  const borrowed: number[] = [];
+  for (const d of mode2Degrees) {
+    const pc = (root + ((d % 12 + 12) % 12)) % 12;
+    if (!set1.has(pc)) {
+      borrowed.push(pc);
+    }
+  }
+  // Deduplicate and sort
+  return [...new Set(borrowed)].sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// O4 — harmonicField
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate the harmonic field (diatonic chords) for a scale.
+ *
+ * For each degree in scaleDegrees, builds a chord by stacking every other
+ * degree (diatonic thirds). Converts to absolute pitch classes using rootPc.
+ *
+ * For chordSize=3: [degree[i], degree[i+2], degree[i+4]] (wrap around)
+ * For chordSize=4: [degree[i], degree[i+2], degree[i+4], degree[i+6]] (wrap around)
+ *
+ * @param rootPc - Root pitch class (0–11).
+ * @param scaleDegrees - Scale degrees as relative offsets (0-based, mod 12).
+ * @param chordSize - Number of notes per chord (3 or 4).
+ * @returns Array of n chords, each sorted by pitch class.
+ *
+ * @example
+ * // Major scale harmonic field (triads)
+ * harmonicField(0, [0,2,4,5,7,9,11], 3);
+ * // [[0,4,7], [2,5,9], [4,7,11], [0,5,9], [2,7,11], [0,4,9], [2,5,11]]
+ */
+export function harmonicField(
+  rootPc: number,
+  scaleDegrees: readonly number[],
+  chordSize: 3 | 4,
+): number[][] {
+  const root = ((rootPc % 12) + 12) % 12;
+  const n = scaleDegrees.length;
+  if (n === 0) return [];
+
+  const stepsNeeded = chordSize === 3 ? [0, 2, 4] : [0, 2, 4, 6];
+
+  return scaleDegrees.map((_, i) => {
+    const chord = stepsNeeded.map((step) => {
+      const degree = scaleDegrees[(i + step) % n]!;
+      return (root + ((degree % 12 + 12) % 12)) % 12;
+    });
+    return chord.sort((a, b) => a - b);
+  });
 }

@@ -233,3 +233,10 @@
 - N2: midiNoteToName — MIDIノート番号→音名変換 (C4/A#4/Bb4形式)
 - N3: scaleSubsets — スケール音の部分集合列挙 (コード抽出)
 - N4: fundamentalBassNote — 最低不協和バスノートの最適化
+
+## Round 7 — 声部進行・色彩飽和・旋法借用・和声フィールド (O1–O4)
+
+- O1: voiceLeadingDistance — 最小声部進行距離（パルシモニー）
+- O2: chromaticSaturation — 半音階飽和度（使用音程クラス比率）
+- O3: modalInterchange — 旋法借用音（借用音抽出）
+- O4: harmonicField — 音階の和声フィールド（機能和声コード列）

@@ -505,6 +505,12 @@ import {
   tuningFamilySocraticRadarVolatilityIndex,
   tuningFamilySocraticRadarCoherenceScore,
   tuningFamilySocraticRadarMomentumScore,
+  tuningFamilySocraticRadarDiversityGap,
+  tuningFamilySocraticRadarQuartileProfile,
+  tuningFamilySocraticRadarIQRScore,
+  tuningFamilySocraticRadarBimodalityScore,
+  tuningFamilySocraticRadarDependenceMatrix,
+  tuningFamilySocraticRadarHealthIndex,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -513,6 +519,10 @@ import {
   midiNoteToName,
   scaleSubsets,
   fundamentalBassNote,
+  voiceLeadingDistance,
+  chromaticSaturation,
+  modalInterchange,
+  harmonicField,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -17849,6 +17859,181 @@ describe('tuningFamilySocraticRadarMomentumScore', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Q966 — tuningFamilySocraticRadarDiversityGap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDiversityGap', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_diversityGap_is_non_negative', () => {
+    const { diversityGap } = tuningFamilySocraticRadarDiversityGap([t12], spec, 440);
+    expect(diversityGap).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_gapLabel_is_valid_string', () => {
+    const { gapLabel } = tuningFamilySocraticRadarDiversityGap([t12], spec, 440);
+    expect(['narrow', 'moderate', 'wide']).toContain(gapLabel);
+  });
+
+  it('test_identical_tunings_same_result_as_single', () => {
+    const single = tuningFamilySocraticRadarDiversityGap([t12], spec, 440);
+    const doubled = tuningFamilySocraticRadarDiversityGap([t12, t12], spec, 440);
+    expect(doubled.diversityGap).toBeCloseTo(single.diversityGap, 10);
+    expect(doubled.gapLabel).toBe(single.gapLabel);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q968 — tuningFamilySocraticRadarQuartileProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarQuartileProfile', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_q1_median_q3_are_equal', () => {
+    const { q1, median, q3 } = tuningFamilySocraticRadarQuartileProfile([t12], spec, 440);
+    for (const ax of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(q1[ax]).toBeCloseTo(median[ax], 10);
+      expect(median[ax]).toBeCloseTo(q3[ax], 10);
+    }
+  });
+
+  it('test_q1_le_median_le_q3', () => {
+    const { q1, median, q3 } = tuningFamilySocraticRadarQuartileProfile([t12, t12], spec, 440);
+    for (const ax of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(q1[ax]).toBeLessThanOrEqual(median[ax]);
+      expect(median[ax]).toBeLessThanOrEqual(q3[ax]);
+    }
+  });
+
+  it('test_all_values_in_0_1_range', () => {
+    const { q1, median, q3 } = tuningFamilySocraticRadarQuartileProfile([t12], spec, 440);
+    for (const ax of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(q1[ax]).toBeGreaterThanOrEqual(0);
+      expect(q1[ax]).toBeLessThanOrEqual(1);
+      expect(median[ax]).toBeGreaterThanOrEqual(0);
+      expect(median[ax]).toBeLessThanOrEqual(1);
+      expect(q3[ax]).toBeGreaterThanOrEqual(0);
+      expect(q3[ax]).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q970 — tuningFamilySocraticRadarIQRScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarIQRScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_all_iqr_are_0', () => {
+    const { iqrPerAxis, meanIQR } = tuningFamilySocraticRadarIQRScore([t12], spec, 440);
+    for (const ax of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(iqrPerAxis[ax]).toBe(0);
+    }
+    expect(meanIQR).toBe(0);
+  });
+
+  it('test_identical_tunings_all_iqr_are_0', () => {
+    const { meanIQR } = tuningFamilySocraticRadarIQRScore([t12, t12], spec, 440);
+    expect(meanIQR).toBeCloseTo(0, 10);
+  });
+
+  it('test_iqr_per_axis_are_non_negative', () => {
+    const { iqrPerAxis } = tuningFamilySocraticRadarIQRScore([t12, t12], spec, 440);
+    for (const ax of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(iqrPerAxis[ax]).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q972 — tuningFamilySocraticRadarBimodalityScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarBimodalityScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_fewer_than_3_tunings_returns_empty_and_zero', () => {
+    const { bimodalAxes, bimodalityScore } = tuningFamilySocraticRadarBimodalityScore([t12, t12], spec, 440);
+    expect(bimodalAxes).toEqual([]);
+    expect(bimodalityScore).toBe(0);
+  });
+
+  it('test_bimodalityScore_in_0_1_range', () => {
+    const { bimodalityScore } = tuningFamilySocraticRadarBimodalityScore([t12, t12, t12], spec, 440);
+    expect(bimodalityScore).toBeGreaterThanOrEqual(0);
+    expect(bimodalityScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_bimodalAxes_are_valid_axis_keys', () => {
+    const { bimodalAxes } = tuningFamilySocraticRadarBimodalityScore([t12, t12, t12], spec, 440);
+    const valid = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    for (const ax of bimodalAxes) {
+      expect(valid).toContain(ax);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q974 — tuningFamilySocraticRadarDependenceMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDependenceMatrix', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_all_correlations_are_0', () => {
+    const { dependenceMatrix } = tuningFamilySocraticRadarDependenceMatrix([t12], spec, 440);
+    for (const val of Object.values(dependenceMatrix)) {
+      expect(val).toBe(0);
+    }
+  });
+
+  it('test_returns_10_pairs', () => {
+    const { dependenceMatrix } = tuningFamilySocraticRadarDependenceMatrix([t12], spec, 440);
+    expect(Object.keys(dependenceMatrix)).toHaveLength(10);
+  });
+
+  it('test_all_correlations_in_minus1_to_1_range', () => {
+    const { dependenceMatrix } = tuningFamilySocraticRadarDependenceMatrix([t12, t12], spec, 440);
+    for (const val of Object.values(dependenceMatrix)) {
+      expect(val).toBeGreaterThanOrEqual(-1);
+      expect(val).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q976 — tuningFamilySocraticRadarHealthIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarHealthIndex', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_healthIndex_in_0_1_range', () => {
+    const { healthIndex } = tuningFamilySocraticRadarHealthIndex([t12], spec, 440);
+    expect(healthIndex).toBeGreaterThanOrEqual(0);
+    expect(healthIndex).toBeLessThanOrEqual(1);
+  });
+
+  it('test_components_each_in_0_1_range', () => {
+    const { components } = tuningFamilySocraticRadarHealthIndex([t12], spec, 440);
+    expect(components.balance).toBeGreaterThanOrEqual(0);
+    expect(components.balance).toBeLessThanOrEqual(1);
+    expect(components.saturation).toBeGreaterThanOrEqual(0);
+    expect(components.saturation).toBeLessThanOrEqual(1);
+    expect(components.mean).toBeGreaterThanOrEqual(0);
+    expect(components.mean).toBeLessThanOrEqual(1);
+  });
+
+  it('test_healthIndex_equals_average_of_components', () => {
+    const { healthIndex, components } = tuningFamilySocraticRadarHealthIndex([t12], spec, 440);
+    const expected = (components.balance + components.saturation + components.mean) / 3;
+    expect(healthIndex).toBeCloseTo(expected, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -18123,5 +18308,120 @@ describe('fundamentalBassNote (N4)', () => {
     const withDefault = fundamentalBassNote(chord, spec);
     const with220 = fundamentalBassNote(chord, spec, 220);
     expect(withDefault).toBe(with220);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// O1 — voiceLeadingDistance
+// ---------------------------------------------------------------------------
+
+describe('voiceLeadingDistance (O1)', () => {
+  it('test_same_chord_is_zero', () => {
+    expect(voiceLeadingDistance([0, 4, 7], [0, 4, 7])).toBe(0);
+  });
+
+  it('test_C_to_Am_is_small', () => {
+    // C major [0,4,7] → A minor [0,3,9]: optimal voice leading
+    expect(voiceLeadingDistance([0, 4, 7], [0, 3, 9])).toBeLessThanOrEqual(3);
+  });
+
+  it('test_returns_non_negative', () => {
+    expect(voiceLeadingDistance([0, 4, 7], [2, 5, 9])).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_empty_chords_return_zero', () => {
+    expect(voiceLeadingDistance([], [0, 4, 7])).toBe(0);
+    expect(voiceLeadingDistance([0, 4, 7], [])).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// O2 — chromaticSaturation
+// ---------------------------------------------------------------------------
+
+describe('chromaticSaturation (O2)', () => {
+  it('test_full_chromatic_is_1', () => {
+    expect(chromaticSaturation([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])).toBe(1);
+  });
+
+  it('test_major_scale_is_7_over_12', () => {
+    expect(chromaticSaturation([0, 2, 4, 5, 7, 9, 11])).toBeCloseTo(7 / 12);
+  });
+
+  it('test_duplicates_do_not_increase_saturation', () => {
+    expect(chromaticSaturation([0, 0, 0])).toBeCloseTo(1 / 12);
+  });
+
+  it('test_empty_is_zero', () => {
+    expect(chromaticSaturation([])).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// O3 — modalInterchange
+// ---------------------------------------------------------------------------
+
+describe('modalInterchange (O3)', () => {
+  it('test_same_mode_returns_empty', () => {
+    const major = [0, 2, 4, 5, 7, 9, 11];
+    expect(modalInterchange(0, major, major)).toEqual([]);
+  });
+
+  it('test_C_major_vs_C_minor_borrowed_notes', () => {
+    const major = [0, 2, 4, 5, 7, 9, 11];
+    const minor = [0, 2, 3, 5, 7, 8, 10];
+    // Borrowed from minor (not in major): Eb(3), Ab(8), Bb(10)
+    const result = modalInterchange(0, major, minor);
+    expect(result).toEqual([3, 8, 10]);
+  });
+
+  it('test_result_is_sorted', () => {
+    const major = [0, 2, 4, 5, 7, 9, 11];
+    const minor = [0, 2, 3, 5, 7, 8, 10];
+    const result = modalInterchange(0, major, minor);
+    expect(result).toEqual([...result].sort((a, b) => a - b));
+  });
+
+  it('test_with_non_zero_root', () => {
+    // G major vs G minor: root=7
+    const major = [0, 2, 4, 5, 7, 9, 11];
+    const minor = [0, 2, 3, 5, 7, 8, 10];
+    const result = modalInterchange(7, major, minor);
+    // Borrowed notes should be 3 semitones above G(7)=10, etc.
+    expect(result.length).toBeGreaterThan(0);
+    result.forEach((pc) => {
+      expect(pc).toBeGreaterThanOrEqual(0);
+      expect(pc).toBeLessThanOrEqual(11);
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// O4 — harmonicField
+// ---------------------------------------------------------------------------
+
+describe('harmonicField (O4)', () => {
+  it('test_returns_n_chords_for_n_degree_scale', () => {
+    const major = [0, 2, 4, 5, 7, 9, 11];
+    const field = harmonicField(0, major, 3);
+    expect(field).toHaveLength(7);
+  });
+
+  it('test_I_chord_of_C_major_is_C_major_triad', () => {
+    const major = [0, 2, 4, 5, 7, 9, 11];
+    const field = harmonicField(0, major, 3);
+    // First chord: degrees 0,4,7 → pitch classes 0,4,7
+    expect(field[0]).toEqual([0, 4, 7]);
+  });
+
+  it('test_seventh_chords_have_4_notes', () => {
+    const major = [0, 2, 4, 5, 7, 9, 11];
+    const field = harmonicField(0, major, 4);
+    expect(field).toHaveLength(7);
+    field.forEach((chord) => expect(chord).toHaveLength(4));
+  });
+
+  it('test_empty_scale_returns_empty', () => {
+    expect(harmonicField(0, [], 3)).toEqual([]);
   });
 });
