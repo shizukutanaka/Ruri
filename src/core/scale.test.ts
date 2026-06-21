@@ -523,6 +523,12 @@ import {
   tuningFamilySocraticRadarWeakMembers,
   tuningFamilySocraticRadarStrengthMap,
   tuningFamilySocraticRadarSummaryReport,
+  tuningFamilySocraticRadarMilestoneScore,
+  tuningFamilySocraticRadarFocusIndex,
+  tuningFamilySocraticRadarLeaderboardRank,
+  tuningFamilySocraticRadarCapacityScore,
+  tuningFamilySocraticRadarAnchorAxis,
+  tuningFamilySocraticRadarConvexHullVolume,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -543,6 +549,10 @@ import {
   scaleDegreeToSolfege,
   pitchClassSet,
   chordName,
+  ambitus,
+  melodicLeaps,
+  generateChordProgression,
+  transposePitchClasses,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -18442,6 +18452,167 @@ describe('tuningFamilySocraticRadarSummaryReport', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Q1002 — tuningFamilySocraticRadarMilestoneScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMilestoneScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_milestoneScore_is_number_in_0_to_1', () => {
+    const { milestoneScore } = tuningFamilySocraticRadarMilestoneScore([t12], spec, 440);
+    expect(milestoneScore).toBeGreaterThanOrEqual(0);
+    expect(milestoneScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_milestonesReached_is_subset_of_known_milestones', () => {
+    const { milestonesReached } = tuningFamilySocraticRadarMilestoneScore([t12], spec, 440);
+    const valid = new Set(['any_25', 'any_50', 'any_75', 'all_25', 'all_50', 'all_75']);
+    for (const m of milestonesReached) {
+      expect(valid.has(m)).toBe(true);
+    }
+  });
+
+  it('test_empty_tunings_no_milestones', () => {
+    const { milestoneScore, milestonesReached } = tuningFamilySocraticRadarMilestoneScore([], spec, 440);
+    expect(milestoneScore).toBe(0);
+    expect(milestonesReached).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1004 — tuningFamilySocraticRadarFocusIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarFocusIndex', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_focusIndex_is_number_in_valid_range', () => {
+    const { focusIndex } = tuningFamilySocraticRadarFocusIndex([t12], spec, 440);
+    expect(focusIndex).toBeGreaterThanOrEqual(0.2);
+    expect(focusIndex).toBeLessThanOrEqual(1.0);
+  });
+
+  it('test_focusLabel_is_valid', () => {
+    const { focusLabel } = tuningFamilySocraticRadarFocusIndex([t12], spec, 440);
+    expect(['diffuse', 'moderate', 'focused']).toContain(focusLabel);
+  });
+
+  it('test_empty_tunings_returns_diffuse', () => {
+    const { focusIndex, focusLabel } = tuningFamilySocraticRadarFocusIndex([], spec, 440);
+    expect(focusIndex).toBeCloseTo(0.2);
+    expect(focusLabel).toBe('diffuse');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1006 — tuningFamilySocraticRadarLeaderboardRank
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarLeaderboardRank', () => {
+  const spec = harmonicSpectrum(6);
+  const midBenchmark = { diversity: 0.5, versatility: 0.5, maturity: 0.5, benchmark: 0.5, convergence: 0.5 } as const;
+
+  it('test_returns_familyMeanScore_and_benchmarkScore', () => {
+    const { familyMeanScore, benchmarkScore } = tuningFamilySocraticRadarLeaderboardRank([t12], spec, midBenchmark, 440);
+    expect(typeof familyMeanScore).toBe('number');
+    expect(benchmarkScore).toBeCloseTo(0.5);
+  });
+
+  it('test_rankRelative_is_valid', () => {
+    const { rankRelative } = tuningFamilySocraticRadarLeaderboardRank([t12], spec, midBenchmark, 440);
+    expect(['above', 'below', 'tied']).toContain(rankRelative);
+  });
+
+  it('test_zero_benchmark_gives_above_or_tied', () => {
+    const zeroBenchmark = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 } as const;
+    const { rankRelative } = tuningFamilySocraticRadarLeaderboardRank([t12], spec, zeroBenchmark, 440);
+    expect(['above', 'tied']).toContain(rankRelative);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1008 — tuningFamilySocraticRadarCapacityScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCapacityScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_capacityScore_in_0_to_1', () => {
+    const { capacityScore } = tuningFamilySocraticRadarCapacityScore([t12], spec, 440);
+    expect(capacityScore).toBeGreaterThanOrEqual(0);
+    expect(capacityScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_capacityMap_has_all_5_axes', () => {
+    const { capacityMap } = tuningFamilySocraticRadarCapacityScore([t12], spec, 440);
+    for (const ax of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']) {
+      expect(capacityMap).toHaveProperty(ax);
+    }
+  });
+
+  it('test_empty_tunings_capacity_is_1', () => {
+    const { capacityScore, capacityMap } = tuningFamilySocraticRadarCapacityScore([], spec, 440);
+    expect(capacityScore).toBe(1);
+    for (const v of Object.values(capacityMap)) {
+      expect(v).toBe(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1010 — tuningFamilySocraticRadarAnchorAxis
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAnchorAxis', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_returns_default_axes', () => {
+    const { anchorAxis, wildcardAxis, anchorStd, wildcardStd } = tuningFamilySocraticRadarAnchorAxis([t12], spec, 440);
+    expect(anchorAxis).toBe('diversity');
+    expect(wildcardAxis).toBe('convergence');
+    expect(anchorStd).toBe(0);
+    expect(wildcardStd).toBe(0);
+  });
+
+  it('test_anchorAxis_is_valid_axis', () => {
+    const t2 = equalTemperament12(220);
+    const { anchorAxis } = tuningFamilySocraticRadarAnchorAxis([t12, t2], spec, 440);
+    expect(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']).toContain(anchorAxis);
+  });
+
+  it('test_anchorStd_lte_wildcardStd', () => {
+    const t2 = equalTemperament12(220);
+    const { anchorStd, wildcardStd } = tuningFamilySocraticRadarAnchorAxis([t12, t2], spec, 440);
+    expect(anchorStd).toBeLessThanOrEqual(wildcardStd);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1012 — tuningFamilySocraticRadarConvexHullVolume
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarConvexHullVolume', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_convexHullVolume_is_non_negative', () => {
+    const { convexHullVolume } = tuningFamilySocraticRadarConvexHullVolume([t12], spec, 440);
+    expect(convexHullVolume).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_empty_tunings_volume_is_zero', () => {
+    const { convexHullVolume } = tuningFamilySocraticRadarConvexHullVolume([], spec, 440);
+    expect(convexHullVolume).toBe(0);
+  });
+
+  it('test_convexHullVolume_at_most_max_pentagon', () => {
+    // Max volume when all axes = 1: 0.5 * sin(72°) * 5 ≈ 2.378
+    const maxVolume = 0.5 * Math.sin((72 * Math.PI) / 180) * 5;
+    const { convexHullVolume } = tuningFamilySocraticRadarConvexHullVolume([t12], spec, 440);
+    expect(convexHullVolume).toBeLessThanOrEqual(maxVolume + 1e-9);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -19080,5 +19251,102 @@ describe('chordName (R4)', () => {
 
   it('test_unknown_chord', () => {
     expect(chordName([0, 1, 6])).toBe('unknown');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 10 — S1–S4
+// ---------------------------------------------------------------------------
+
+describe('ambitus (S1)', () => {
+  it('test_empty_returns_0', () => {
+    expect(ambitus([])).toBe(0);
+  });
+
+  it('test_single_note_returns_0', () => {
+    expect(ambitus([0])).toBe(0);
+  });
+
+  it('test_ascending_scale_c_to_b', () => {
+    // [0,2,4,5,7,9,11] spans 11 semitones
+    expect(ambitus([0, 2, 4, 5, 7, 9, 11])).toBe(11);
+  });
+
+  it('test_repeated_notes_returns_0', () => {
+    expect(ambitus([3, 3, 3])).toBe(0);
+  });
+});
+
+describe('melodicLeaps (S2)', () => {
+  it('test_no_leaps_stepwise', () => {
+    // all intervals ≤ 2 → no leaps
+    const result = melodicLeaps([0, 1, 2, 3]);
+    expect(result.leaps).toEqual([]);
+    expect(result.avgLeap).toBe(0);
+    expect(result.maxLeap).toBe(0);
+  });
+
+  it('test_single_leap', () => {
+    // 0→7: distance min(7,5)=5
+    const result = melodicLeaps([0, 7]);
+    expect(result.leaps).toEqual([5]);
+    expect(result.avgLeap).toBe(5);
+    expect(result.maxLeap).toBe(5);
+  });
+
+  it('test_multiple_leaps', () => {
+    // 0→7: 5, 7→2: min(5,7)=5
+    const result = melodicLeaps([0, 7, 2]);
+    expect(result.leaps).toEqual([5, 5]);
+    expect(result.avgLeap).toBe(5);
+    expect(result.maxLeap).toBe(5);
+  });
+
+  it('test_empty_returns_zeros', () => {
+    const result = melodicLeaps([]);
+    expect(result.leaps).toEqual([]);
+    expect(result.avgLeap).toBe(0);
+    expect(result.maxLeap).toBe(0);
+  });
+});
+
+describe('generateChordProgression (S3)', () => {
+  it('test_triad_C_major', () => {
+    expect(generateChordProgression([0], 3)).toEqual([[0, 4, 7]]);
+  });
+
+  it('test_major7_C', () => {
+    expect(generateChordProgression([0], 4)).toEqual([[0, 4, 7, 11]]);
+  });
+
+  it('test_progression_multiple_roots', () => {
+    // roots 0, 5, 7 → C, F, G major triads
+    expect(generateChordProgression([0, 5, 7], 3)).toEqual([
+      [0, 4, 7],
+      [0, 5, 9],
+      [2, 7, 11],
+    ]);
+  });
+
+  it('test_empty_roots', () => {
+    expect(generateChordProgression([], 3)).toEqual([]);
+  });
+});
+
+describe('transposePitchClasses (S4)', () => {
+  it('test_transpose_by_0', () => {
+    expect(transposePitchClasses([0, 4, 7], 0)).toEqual([0, 4, 7]);
+  });
+
+  it('test_transpose_up', () => {
+    expect(transposePitchClasses([0, 4, 7], 5)).toEqual([5, 9, 0]);
+  });
+
+  it('test_transpose_wraps', () => {
+    expect(transposePitchClasses([11], 2)).toEqual([1]);
+  });
+
+  it('test_transpose_negative', () => {
+    expect(transposePitchClasses([0, 4, 7], -1)).toEqual([11, 3, 6]);
   });
 });

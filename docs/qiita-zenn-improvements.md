@@ -254,3 +254,10 @@
 - R2: scaleDegreeToSolfege — 音階度数→ソルフェージュ変換
 - R3: pitchClassSet — ピッチクラス集合の正規化
 - R4: chordName — インターバル構造から和音名判定
+
+## Round 10 — 音域・跳躍分析・コード進行生成・ピッチ移調 (S1–S4)
+
+- S1: ambitus — 旋律音域（アンビトゥス）の半音数
+- S2: melodicLeaps — 跳躍（3半音以上）の分析
+- S3: generateChordProgression — ルートから和音進行を生成
+- S4: transposePitchClasses — ピッチクラス群の半音移調

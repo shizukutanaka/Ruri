@@ -18171,6 +18171,253 @@ export function tuningFamilySocraticRadarSummaryReport(
 }
 
 // ---------------------------------------------------------------------------
+// Q1002 — tuningFamilySocraticRadarMilestoneScore
+// ---------------------------------------------------------------------------
+
+/**
+ * How many "milestone" thresholds has the family mean profile crossed?
+ *
+ * Milestones are:
+ *   'any_25' — any axis ≥ 0.25
+ *   'any_50' — any axis ≥ 0.50
+ *   'any_75' — any axis ≥ 0.75
+ *   'all_25' — ALL axes ≥ 0.25
+ *   'all_50' — ALL axes ≥ 0.50
+ *   'all_75' — ALL axes ≥ 0.75
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { milestoneScore, milestonesReached }
+ *   milestoneScore = milestonesReached.length / 6
+ */
+export function tuningFamilySocraticRadarMilestoneScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { milestoneScore: number; milestonesReached: string[] } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const vals = axes.map((ax) => meanProfile[ax]);
+  const milestonesReached: string[] = [];
+  if (vals.some((v) => v >= 0.25)) milestonesReached.push('any_25');
+  if (vals.some((v) => v >= 0.5)) milestonesReached.push('any_50');
+  if (vals.some((v) => v >= 0.75)) milestonesReached.push('any_75');
+  if (vals.every((v) => v >= 0.25)) milestonesReached.push('all_25');
+  if (vals.every((v) => v >= 0.5)) milestonesReached.push('all_50');
+  if (vals.every((v) => v >= 0.75)) milestonesReached.push('all_75');
+  return { milestoneScore: milestonesReached.length / 6, milestonesReached };
+}
+
+// ---------------------------------------------------------------------------
+// Q1004 — tuningFamilySocraticRadarFocusIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * The "focus" of the profile: how concentrated the scores are on a small number
+ * of strong axes vs spread evenly.
+ *
+ * Uses Herfindahl-Hirschman Index (HHI): sum of squared shares.
+ *   shares[ax] = profile[ax] / sum(all 5 axis scores)  (or 0.2 each if sum=0)
+ *   focusIndex = sum(shares[ax]^2)  ∈ [0.2, 1.0]
+ *   Labels: < 0.3 → 'diffuse', < 0.5 → 'moderate', ≥ 0.5 → 'focused'
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { focusIndex, focusLabel }
+ */
+export function tuningFamilySocraticRadarFocusIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { focusIndex: number; focusLabel: 'diffuse' | 'moderate' | 'focused' } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const total = axes.reduce((s, ax) => s + meanProfile[ax], 0);
+  let focusIndex: number;
+  if (total === 0) {
+    // Equal shares of 0.2 each → HHI = 5 * 0.04 = 0.2
+    focusIndex = 0.2;
+  } else {
+    focusIndex = axes.reduce((s, ax) => {
+      const share = meanProfile[ax] / total;
+      return s + share * share;
+    }, 0);
+  }
+  const focusLabel: 'diffuse' | 'moderate' | 'focused' =
+    focusIndex < 0.3 ? 'diffuse' : focusIndex < 0.5 ? 'moderate' : 'focused';
+  return { focusIndex, focusLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q1006 — tuningFamilySocraticRadarLeaderboardRank
+// ---------------------------------------------------------------------------
+
+/**
+ * Given a benchmark profile (passed as parameter), compute where this family would rank.
+ *
+ * familyMeanScore = mean of all 5 family mean axis scores
+ * benchmarkScore  = mean of all 5 benchmark axis scores
+ * rankRelative: familyMeanScore > benchmarkScore + 0.02 → 'above',
+ *               familyMeanScore < benchmarkScore - 0.02 → 'below',
+ *               else 'tied'
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param benchmark - Benchmark profile (all 5 axes).
+ * @param rootHz - Reference frequency (optional).
+ * @returns { familyMeanScore, benchmarkScore, rankRelative }
+ */
+export function tuningFamilySocraticRadarLeaderboardRank(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  benchmark: Record<AxisKey, number>,
+  rootHz?: number,
+): { familyMeanScore: number; benchmarkScore: number; rankRelative: 'above' | 'below' | 'tied' } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const familyMeanScore = axes.reduce((s, ax) => s + meanProfile[ax], 0) / axes.length;
+  const benchmarkScore = axes.reduce((s, ax) => s + benchmark[ax], 0) / axes.length;
+  const diff = familyMeanScore - benchmarkScore;
+  const rankRelative: 'above' | 'below' | 'tied' =
+    diff > 0.02 ? 'above' : diff < -0.02 ? 'below' : 'tied';
+  return { familyMeanScore, benchmarkScore, rankRelative };
+}
+
+// ---------------------------------------------------------------------------
+// Q1008 — tuningFamilySocraticRadarCapacityScore
+// ---------------------------------------------------------------------------
+
+/**
+ * "Capacity" = how much room to improve. 1 - mean profile = unused capacity per axis.
+ *
+ * capacityMap[ax] = 1 - meanProfile[ax]   (headroom per axis)
+ * capacityScore   = mean of all 5 capacities
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { capacityScore, capacityMap }
+ */
+export function tuningFamilySocraticRadarCapacityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { capacityScore: number; capacityMap: Record<AxisKey, number> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const capacityMap = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    capacityMap[ax] = 1 - meanProfile[ax];
+  }
+  const capacityScore = axes.reduce((s, ax) => s + capacityMap[ax], 0) / axes.length;
+  return { capacityScore, capacityMap };
+}
+
+// ---------------------------------------------------------------------------
+// Q1010 — tuningFamilySocraticRadarAnchorAxis
+// ---------------------------------------------------------------------------
+
+/**
+ * Which axis is the "anchor" (most stable across members) and which is the "wildcard" (most variable)?
+ *
+ * anchorAxis:   axis with smallest std dev across members
+ * wildcardAxis: axis with largest std dev across members
+ * Single tuning: all stds = 0, anchorAxis = 'diversity', wildcardAxis = 'convergence'
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { anchorAxis, wildcardAxis, anchorStd, wildcardStd }
+ */
+export function tuningFamilySocraticRadarAnchorAxis(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { anchorAxis: AxisKey; wildcardAxis: AxisKey; anchorStd: number; wildcardStd: number } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length <= 1) {
+    return { anchorAxis: 'diversity', wildcardAxis: 'convergence', anchorStd: 0, wildcardStd: 0 };
+  }
+  const stds = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+    const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length;
+    stds[ax] = Math.sqrt(variance);
+  }
+  let anchorAxis = axes[0]!;
+  let wildcardAxis = axes[0]!;
+  for (const ax of axes) {
+    if (stds[ax] < stds[anchorAxis]) anchorAxis = ax;
+    if (stds[ax] > stds[wildcardAxis]) wildcardAxis = ax;
+  }
+  return { anchorAxis, wildcardAxis, anchorStd: stds[anchorAxis], wildcardStd: stds[wildcardAxis] };
+}
+
+// ---------------------------------------------------------------------------
+// Q1012 — tuningFamilySocraticRadarConvexHullVolume
+// ---------------------------------------------------------------------------
+
+/**
+ * The "volume" of the radar polygon, approximated as the sum of triangle areas from origin.
+ *
+ * For the 5-axis mean profile arranged at angles 0, 72, 144, 216, 288 degrees:
+ * Total area = 0.5 * sin(72°) * sum(r_i * r_{i+1}) where i wraps around
+ * axis order: diversity, versatility, maturity, benchmark, convergence
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { convexHullVolume }
+ */
+export function tuningFamilySocraticRadarConvexHullVolume(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { convexHullVolume: number } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const radii = axes.map((ax) => meanProfile[ax]);
+  const sin72 = Math.sin((72 * Math.PI) / 180);
+  let pairSum = 0;
+  for (let i = 0; i < radii.length; i++) {
+    const r1 = radii[i]!;
+    const r2 = radii[(i + 1) % radii.length]!;
+    pairSum += r1 * r2;
+  }
+  const convexHullVolume = 0.5 * sin72 * pairSum;
+  return { convexHullVolume };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -19021,4 +19268,141 @@ export function chordName(chord: readonly number[]): string {
   }
 
   return 'unknown';
+}
+
+// ---------------------------------------------------------------------------
+// Round 10 — 音域・跳躍分析・コード進行生成・ピッチ移調 (S1–S4)
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the ambitus (melodic range) of a sequence of pitch classes in semitones.
+ *
+ * Each successive pitch class is "unfolded" to be within ±6 semitones of the
+ * previous one (choosing the nearest equivalent), producing an absolute pitch
+ * sequence. The ambitus is `max(unfolded) - min(unfolded)`.
+ *
+ * @param pitchClasses - Ordered sequence of pitch classes (0–11).
+ * @param anchorPc - Reference pitch class for the first note (default: first element).
+ * @returns Range in semitones; 0 for empty or single-note input.
+ *
+ * @example
+ * ambitus([0, 2, 4, 5, 7, 9, 11]); // 11
+ * ambitus([]);                       // 0
+ */
+export function ambitus(
+  pitchClasses: readonly number[],
+  anchorPc?: number,
+): number {
+  if (pitchClasses.length === 0) return 0;
+
+  const first = pitchClasses[0]!;
+  const anchor = anchorPc !== undefined ? ((anchorPc % 12) + 12) % 12 : ((first % 12) + 12) % 12;
+
+  // Unfold: keep each pitch class to be within ±6 semitones of the previous absolute pitch
+  const unfolded: number[] = [];
+  let prev = anchor;
+
+  for (const pc of pitchClasses) {
+    const normalized = ((pc % 12) + 12) % 12;
+    // Candidate: pick the nearest octave of normalized relative to prev
+    let diff = (normalized - ((prev % 12) + 12) % 12 + 12) % 12;
+    if (diff > 6) diff -= 12;
+    const current = prev + diff;
+    unfolded.push(current);
+    prev = current;
+  }
+
+  const min = Math.min(...unfolded);
+  const max = Math.max(...unfolded);
+  return max - min;
+}
+
+/**
+ * Analyze melodic leaps (intervals > 2 semitones) in a pitch-class sequence.
+ *
+ * Consecutive intervals are computed using the mod-12 shortest-path distance
+ * (same convention as melodicContour). Only intervals with size > 2 semitones
+ * are considered leaps.
+ *
+ * @param pitchClasses - Ordered sequence of pitch classes (0–11).
+ * @returns Object with `leaps` (array of leap sizes), `avgLeap`, and `maxLeap`.
+ *
+ * @example
+ * melodicLeaps([0, 7, 2]);
+ * // intervals: |7-0|→7 (leap), |2-7|→5 (leap) → { leaps: [7,5], avgLeap: 6, maxLeap: 7 }
+ */
+export function melodicLeaps(pitchClasses: readonly number[]): {
+  leaps: number[];
+  avgLeap: number;
+  maxLeap: number;
+} {
+  const leaps: number[] = [];
+
+  for (let i = 1; i < pitchClasses.length; i++) {
+    const prev = ((pitchClasses[i - 1]! % 12) + 12) % 12;
+    const curr = ((pitchClasses[i]! % 12) + 12) % 12;
+    const raw = Math.abs(curr - prev);
+    const size = Math.min(raw, 12 - raw); // shortest-path distance mod 12
+    if (size > 2) {
+      leaps.push(size);
+    }
+  }
+
+  const avgLeap =
+    leaps.length > 0 ? leaps.reduce((s, v) => s + v, 0) / leaps.length : 0;
+  const maxLeap = leaps.length > 0 ? Math.max(...leaps) : 0;
+
+  return { leaps, avgLeap, maxLeap };
+}
+
+/**
+ * Generate a chord progression from a series of root pitch classes.
+ *
+ * For each root PC, builds a major triad (chordSize=3) or major 7th chord
+ * (chordSize=4). Each chord is returned as a sorted array of pitch classes (mod 12).
+ *
+ * - Major triad: [root, root+4, root+7] mod 12
+ * - Major 7th:  [root, root+4, root+7, root+11] mod 12
+ *
+ * @param rootPcs - Root pitch classes for each chord.
+ * @param chordSize - 3 for triads, 4 for seventh chords.
+ * @returns Array of chords (one per root PC), each sorted ascending.
+ *
+ * @example
+ * generateChordProgression([0, 5, 7], 3);
+ * // [[0,4,7], [0,5,9], [2,7,11]]
+ */
+export function generateChordProgression(
+  rootPcs: readonly number[],
+  chordSize: 3 | 4,
+): number[][] {
+  return rootPcs.map((root) => {
+    const r = ((root % 12) + 12) % 12;
+    const pcs =
+      chordSize === 3
+        ? [r, (r + 4) % 12, (r + 7) % 12]
+        : [r, (r + 4) % 12, (r + 7) % 12, (r + 11) % 12];
+    return pcs.slice().sort((a, b) => a - b);
+  });
+}
+
+/**
+ * Transpose all pitch classes by a given number of semitones.
+ *
+ * Each pitch class is shifted by `semitones` and wrapped to [0, 11].
+ * Negative semitones are handled correctly.
+ *
+ * @param pitchClasses - Array of pitch classes to transpose.
+ * @param semitones - Number of semitones to shift (may be negative).
+ * @returns New array of transposed pitch classes, preserving order.
+ *
+ * @example
+ * transposePitchClasses([0, 4, 7], 5);  // [5, 9, 0]
+ * transposePitchClasses([11], 2);        // [1]
+ */
+export function transposePitchClasses(
+  pitchClasses: readonly number[],
+  semitones: number,
+): number[] {
+  return pitchClasses.map((pc) => ((pc + semitones) % 12 + 12) % 12);
 }
