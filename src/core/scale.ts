@@ -19321,6 +19321,270 @@ export function tuningFamilySocraticRadarL2Norm(
 }
 
 // ---------------------------------------------------------------------------
+// Q1062 — tuningFamilySocraticRadarZScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Z-score normalize the mean profile using a given population mean and std.
+ * zScoreProfile[ax] = (meanProfile[ax] - populationMean) / populationStd
+ * If populationStd = 0: return all 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param populationMean - Population mean for normalization.
+ * @param populationStd - Population standard deviation for normalization.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { zScoreProfile }
+ */
+export function tuningFamilySocraticRadarZScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  populationMean: number,
+  populationStd: number,
+  rootHz?: number,
+): { zScoreProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const zScoreProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    zScoreProfile[ax] = populationStd === 0 ? 0 : (meanProfile[ax] - populationMean) / populationStd;
+  }
+  return { zScoreProfile };
+}
+
+// ---------------------------------------------------------------------------
+// Q1064 — tuningFamilySocraticRadarRelativeStrength
+// ---------------------------------------------------------------------------
+
+/**
+ * For each axis, how much stronger is this family than the "average" (0.5) profile?
+ * relativeStrength[ax] = meanProfile[ax] - 0.5 (negative = weaker than average).
+ * strongerAxes: axes with relativeStrength > 0.
+ * weakerAxes: axes with relativeStrength < 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { relativeStrength, strongerAxes, weakerAxes }
+ */
+export function tuningFamilySocraticRadarRelativeStrength(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  relativeStrength: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>;
+  strongerAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+  weakerAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const relativeStrength = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    relativeStrength[ax] = meanProfile[ax] - 0.5;
+  }
+  const strongerAxes = axes.filter((ax) => relativeStrength[ax] > 0);
+  const weakerAxes = axes.filter((ax) => relativeStrength[ax] < 0);
+  return { relativeStrength, strongerAxes, weakerAxes };
+}
+
+// ---------------------------------------------------------------------------
+// Q1066 — tuningFamilySocraticRadarImbalanceIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * The maximum absolute deviation between any pair of axes.
+ * imbalanceIndex = max over all pairs of |profile[axA] - profile[axB]|.
+ * mostImbalancedPair: the pair with the largest absolute difference (alphabetically first if tie).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { imbalanceIndex, mostImbalancedPair }
+ */
+export function tuningFamilySocraticRadarImbalanceIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  imbalanceIndex: number;
+  mostImbalancedPair: ['diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'];
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  let imbalanceIndex = 0;
+  let mostImbalancedPair: [AxisKey, AxisKey] = [axes[0]!, axes[1]!];
+  for (let i = 0; i < axes.length; i++) {
+    for (let j = i + 1; j < axes.length; j++) {
+      const diff = Math.abs(meanProfile[axes[i]!]! - meanProfile[axes[j]!]!);
+      if (
+        diff > imbalanceIndex ||
+        (diff === imbalanceIndex &&
+          [axes[i]!, axes[j]!].join(',') < mostImbalancedPair.join(','))
+      ) {
+        imbalanceIndex = diff;
+        mostImbalancedPair = [axes[i]!, axes[j]!];
+      }
+    }
+  }
+  return { imbalanceIndex, mostImbalancedPair };
+}
+
+// ---------------------------------------------------------------------------
+// Q1068 — tuningFamilySocraticRadarGradientVector
+// ---------------------------------------------------------------------------
+
+/**
+ * Rate of change from axis i to axis i+1 in fixed order
+ * (diversity→versatility→maturity→benchmark→convergence).
+ * gradientVector[i] = profile[axes[i+1]] - profile[axes[i]]
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { gradientVector } of length 4
+ */
+export function tuningFamilySocraticRadarGradientVector(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { gradientVector: number[] } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const gradientVector: number[] = [];
+  for (let i = 0; i < axes.length - 1; i++) {
+    gradientVector.push(meanProfile[axes[i + 1]!]! - meanProfile[axes[i]!]!);
+  }
+  return { gradientVector };
+}
+
+// ---------------------------------------------------------------------------
+// Q1070 — tuningFamilySocraticRadarCrossAxisCorrelation
+// ---------------------------------------------------------------------------
+
+/**
+ * Average Pearson correlation between all pairs of axis scores across family members.
+ * For each of the 10 axis pairs: compute Pearson r between member scores.
+ * avgCorrelation = mean of all 10 r values.
+ * Single tuning: avgCorrelation = 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { avgCorrelation }
+ */
+export function tuningFamilySocraticRadarCrossAxisCorrelation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { avgCorrelation: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return { avgCorrelation: 0 };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+
+  function pearsonR(axA: AxisKey, axB: AxisKey): number {
+    const xs = profiles.map((p) => p[axA]);
+    const ys = profiles.map((p) => p[axB]);
+    const meanX = xs.reduce((s, v) => s + v, 0) / n;
+    const meanY = ys.reduce((s, v) => s + v, 0) / n;
+    let num = 0;
+    let denomX = 0;
+    let denomY = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = xs[i]! - meanX;
+      const dy = ys[i]! - meanY;
+      num += dx * dy;
+      denomX += dx * dx;
+      denomY += dy * dy;
+    }
+    const denom = Math.sqrt(denomX * denomY);
+    return denom === 0 ? 0 : num / denom;
+  }
+
+  let total = 0;
+  let count = 0;
+  for (let i = 0; i < axes.length; i++) {
+    for (let j = i + 1; j < axes.length; j++) {
+      total += pearsonR(axes[i]!, axes[j]!);
+      count++;
+    }
+  }
+  return { avgCorrelation: count === 0 ? 0 : total / count };
+}
+
+// ---------------------------------------------------------------------------
+// Q1072 — tuningFamilySocraticRadarCompositeRank
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank the family on a composite score that combines mean, balance, and health.
+ * compositeScore = (meanScore + balanceScore + healthIndex) / 3
+ *   meanScore = mean of all 5 axis scores
+ *   balanceScore = 1 - sqrt(variance of 5 scores) / 0.5, clamped to [0,1]
+ *   healthIndex = (balanceScore + saturationIndex + meanScore) / 3
+ *     saturationIndex = fraction of axes >= 0.9
+ * Labels: < 0.2 → 'D', < 0.4 → 'C', < 0.6 → 'B', < 0.8 → 'A', ≥ 0.8 → 'S'
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { compositeScore, compositeLabel }
+ */
+export function tuningFamilySocraticRadarCompositeRank(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { compositeScore: number; compositeLabel: 'D' | 'C' | 'B' | 'A' | 'S' } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const scores = axes.map((ax) => meanProfile[ax]);
+  const meanScore = scores.reduce((s, v) => s + v, 0) / 5;
+  const variance = scores.reduce((s, v) => s + (v - meanScore) * (v - meanScore), 0) / 5;
+  const balanceScore = Math.max(0, Math.min(1, 1 - Math.sqrt(variance) / 0.5));
+  const saturationIndex = scores.filter((v) => v >= 0.9).length / 5;
+  const healthIndex = (balanceScore + saturationIndex + meanScore) / 3;
+  const compositeScore = (meanScore + balanceScore + healthIndex) / 3;
+  let compositeLabel: 'D' | 'C' | 'B' | 'A' | 'S';
+  if (compositeScore < 0.2) compositeLabel = 'D';
+  else if (compositeScore < 0.4) compositeLabel = 'C';
+  else if (compositeScore < 0.6) compositeLabel = 'B';
+  else if (compositeScore < 0.8) compositeLabel = 'A';
+  else compositeLabel = 'S';
+  return { compositeScore, compositeLabel };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 

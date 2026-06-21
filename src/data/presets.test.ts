@@ -334,6 +334,12 @@ import {
   presetFamilySocraticRadarAboveThresholdCount,
   presetFamilySocraticRadarL1Norm,
   presetFamilySocraticRadarL2Norm,
+  presetFamilySocraticRadarZScore,
+  presetFamilySocraticRadarRelativeStrength,
+  presetFamilySocraticRadarImbalanceIndex,
+  presetFamilySocraticRadarGradientVector,
+  presetFamilySocraticRadarCrossAxisCorrelation,
+  presetFamilySocraticRadarCompositeRank,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -11510,6 +11516,157 @@ describe('presetFamilySocraticRadarL2Norm (Q1061)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarL2Norm(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1063 — presetFamilySocraticRadarZScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarZScore (Q1063)', () => {
+  it('zScoreProfile has all 5 axes', () => {
+    const spec = harmonicSpectrum(6);
+    const { zScoreProfile } = presetFamilySocraticRadarZScore(
+      ['12-tet'],
+      spec,
+      0.5,
+      0.2,
+      undefined,
+      [TWELVE_TET],
+    );
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(typeof zScoreProfile[ax]).toBe('number');
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarZScore(['not-a-preset'], spec, 0.5, 0.2, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1065 — presetFamilySocraticRadarRelativeStrength
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRelativeStrength (Q1065)', () => {
+  it('strongerAxes and weakerAxes are arrays', () => {
+    const spec = harmonicSpectrum(6);
+    const { strongerAxes, weakerAxes } = presetFamilySocraticRadarRelativeStrength(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(Array.isArray(strongerAxes)).toBe(true);
+    expect(Array.isArray(weakerAxes)).toBe(true);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarRelativeStrength(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1067 — presetFamilySocraticRadarImbalanceIndex
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarImbalanceIndex (Q1067)', () => {
+  it('imbalanceIndex is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { imbalanceIndex } = presetFamilySocraticRadarImbalanceIndex(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(imbalanceIndex).toBeGreaterThanOrEqual(0);
+    expect(imbalanceIndex).toBeLessThanOrEqual(1 + 1e-9);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarImbalanceIndex(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1069 — presetFamilySocraticRadarGradientVector
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarGradientVector (Q1069)', () => {
+  it('gradientVector has length 4', () => {
+    const spec = harmonicSpectrum(6);
+    const { gradientVector } = presetFamilySocraticRadarGradientVector(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(gradientVector).toHaveLength(4);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarGradientVector(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1071 — presetFamilySocraticRadarCrossAxisCorrelation
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCrossAxisCorrelation (Q1071)', () => {
+  it('avgCorrelation is 0 for single preset', () => {
+    const spec = harmonicSpectrum(6);
+    const { avgCorrelation } = presetFamilySocraticRadarCrossAxisCorrelation(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(avgCorrelation).toBe(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarCrossAxisCorrelation(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1073 — presetFamilySocraticRadarCompositeRank
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCompositeRank (Q1073)', () => {
+  it('compositeLabel is one of D/C/B/A/S', () => {
+    const spec = harmonicSpectrum(6);
+    const { compositeLabel } = presetFamilySocraticRadarCompositeRank(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(['D', 'C', 'B', 'A', 'S']).toContain(compositeLabel);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarCompositeRank(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
