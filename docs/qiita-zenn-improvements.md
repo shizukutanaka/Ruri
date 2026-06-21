@@ -226,3 +226,10 @@
 - M4: chordProgressionTension — コード進行の各和音の不協和スコアを返す
 
 **将来の検討**: 音楽的緊張の頂点検出 / カデンツ認識 / ヴォイスリーディング評価 / 対位法チェッカー / レゲエスカラベース解析
+
+## Round 6 — 音楽集合論・MIDI変換・部分集合・バス音最適化 (N1–N4)
+
+- N1: intervalVector — 音程クラスベクトル(forte理論)
+- N2: midiNoteToName — MIDIノート番号→音名変換 (C4/A#4/Bb4形式)
+- N3: scaleSubsets — スケール音の部分集合列挙 (コード抽出)
+- N4: fundamentalBassNote — 最低不協和バスノートの最適化

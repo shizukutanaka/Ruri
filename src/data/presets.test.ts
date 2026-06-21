@@ -274,6 +274,12 @@ import {
   presetFamilySocraticRadarSignatureDistance,
   presetFamilySocraticRadarClusterability,
   presetFamilySocraticRadarDominanceMap,
+  presetFamilySocraticRadarRegimeProbability,
+  presetFamilySocraticRadarContribution,
+  presetFamilySocraticRadarOutlierDetection,
+  presetFamilySocraticRadarTrend,
+  presetFamilySocraticRadarRobustnessScore,
+  presetFamilySocraticRadarCentroidProfile,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -9918,6 +9924,143 @@ describe('presetFamilySocraticRadarDominanceMap (Q941)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarDominanceMap(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q943 — presetFamilySocraticRadarRegimeProbability
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRegimeProbability (Q943)', () => {
+  it('empty regime gives probability 1', () => {
+    const spec = harmonicSpectrum(6);
+    const { probability } = presetFamilySocraticRadarRegimeProbability(
+      ['12-tet'],
+      {},
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(probability).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarRegimeProbability(['not-a-preset'], {}, spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q945 — presetFamilySocraticRadarContribution
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarContribution (Q945)', () => {
+  it('single preset contribution is zero', () => {
+    const spec = harmonicSpectrum(6);
+    const { contributions } = presetFamilySocraticRadarContribution(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(contributions).toHaveLength(1);
+    expect(contributions[0]).toBeCloseTo(0, 10);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarContribution(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q947 — presetFamilySocraticRadarOutlierDetection
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarOutlierDetection (Q947)', () => {
+  it('single preset has no outliers', () => {
+    const spec = harmonicSpectrum(6);
+    const { outlierIndices } = presetFamilySocraticRadarOutlierDetection(
+      ['12-tet'],
+      spec,
+      undefined,
+      1.5,
+      [TWELVE_TET],
+    );
+    expect(outlierIndices).toEqual([]);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarOutlierDetection(['not-a-preset'], spec, undefined, 1.5, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q949 — presetFamilySocraticRadarTrend
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTrend (Q949)', () => {
+  it('single preset has stable trend', () => {
+    const spec = harmonicSpectrum(6);
+    const { overallTrend } = presetFamilySocraticRadarTrend(['12-tet'], spec, undefined, [TWELVE_TET]);
+    expect(overallTrend).toBe('stable');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarTrend(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q951 — presetFamilySocraticRadarRobustnessScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRobustnessScore (Q951)', () => {
+  it('single preset robustnessScore is 1', () => {
+    const spec = harmonicSpectrum(6);
+    const { robustnessScore } = presetFamilySocraticRadarRobustnessScore(['12-tet'], spec, undefined, [
+      TWELVE_TET,
+    ]);
+    expect(robustnessScore).toBe(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarRobustnessScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q953 — presetFamilySocraticRadarCentroidProfile
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCentroidProfile (Q953)', () => {
+  it('single preset closestIndex is 0 and closestDistance is 0', () => {
+    const spec = harmonicSpectrum(6);
+    const { closestIndex, closestDistance } = presetFamilySocraticRadarCentroidProfile(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(closestIndex).toBe(0);
+    expect(closestDistance).toBeCloseTo(0, 10);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarCentroidProfile(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

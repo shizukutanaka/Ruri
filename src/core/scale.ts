@@ -16930,6 +16930,256 @@ export function tuningFamilySocraticRadarDominanceMap(
 }
 
 // ---------------------------------------------------------------------------
+// Q942 — tuningFamilySocraticRadarRegimeProbability
+// ---------------------------------------------------------------------------
+
+type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+type RegimeSpec = Partial<Record<AxisKey, { min?: number; max?: number }>>;
+
+/**
+ * Compute the fraction of family members satisfying ALL axis thresholds in a regime spec.
+ * A tuning satisfies an axis spec if score >= min (if set) AND <= max (if set).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param regime - Partial record of axis thresholds.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { probability, passingIndices }
+ */
+export function tuningFamilySocraticRadarRegimeProbability(
+  tunings: readonly TuningSystem[],
+  regime: RegimeSpec,
+  spectrum: Spectrum,
+  rootHz?: number,
+): { probability: number; passingIndices: number[] } {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const regimeAxes = Object.keys(regime) as AxisKey[];
+  const passingIndices: number[] = [];
+  for (let i = 0; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    let passes = true;
+    for (const ax of regimeAxes) {
+      const spec = regime[ax];
+      if (!spec) continue;
+      const score = p[ax];
+      if (spec.min !== undefined && score < spec.min) { passes = false; break; }
+      if (spec.max !== undefined && score > spec.max) { passes = false; break; }
+    }
+    if (passes) passingIndices.push(i);
+  }
+  const probability = tunings.length === 0 ? 0 : passingIndices.length / tunings.length;
+  return { probability, passingIndices };
+}
+
+// ---------------------------------------------------------------------------
+// Q944 — tuningFamilySocraticRadarContribution
+// ---------------------------------------------------------------------------
+
+/**
+ * For each tuning in the family, compute its "contribution" to the family mean profile
+ * (L2 distance from mean / sum of all distances). Returns all-zeros if all tunings are identical.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { contributions } — length = tunings.length, sums to 1.0 (or all-zeros if all identical).
+ */
+export function tuningFamilySocraticRadarContribution(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { contributions: number[] } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length === 0) return { contributions: [] };
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const distances = profiles.map((p) =>
+    Math.sqrt(axes.reduce((s, ax) => s + (p[ax] - meanProfile[ax]) ** 2, 0)),
+  );
+  const totalDistance = distances.reduce((s, d) => s + d, 0);
+  const contributions =
+    totalDistance === 0 ? distances.map(() => 0) : distances.map((d) => d / totalDistance);
+  return { contributions };
+}
+
+// ---------------------------------------------------------------------------
+// Q946 — tuningFamilySocraticRadarOutlierDetection
+// ---------------------------------------------------------------------------
+
+/**
+ * Identify tunings that are statistical outliers on any axis (z-score > threshold).
+ * If only 1 tuning, returns empty (can't compute z-score). If std=0 on an axis, no outlier on that axis.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @param threshold - Z-score threshold (default 1.5).
+ * @returns { outlierIndices, outlierAxes }
+ */
+export function tuningFamilySocraticRadarOutlierDetection(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  threshold = 1.5,
+): { outlierIndices: number[]; outlierAxes: Record<number, AxisKey[]> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return { outlierIndices: [], outlierAxes: {} };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanPerAxis = {} as Record<AxisKey, number>;
+  const stdPerAxis = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+    const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length;
+    meanPerAxis[ax] = mean;
+    stdPerAxis[ax] = Math.sqrt(variance);
+  }
+  const outlierAxes: Record<number, AxisKey[]> = {};
+  for (let i = 0; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    const outlierAxList: AxisKey[] = [];
+    for (const ax of axes) {
+      const std = stdPerAxis[ax];
+      if (std === 0) continue;
+      const z = Math.abs((p[ax] - meanPerAxis[ax]) / std);
+      if (z > threshold) outlierAxList.push(ax);
+    }
+    if (outlierAxList.length > 0) {
+      outlierAxes[i] = outlierAxList;
+    }
+  }
+  const outlierIndices = Object.keys(outlierAxes).map(Number).sort((a, b) => a - b);
+  return { outlierIndices, outlierAxes };
+}
+
+// ---------------------------------------------------------------------------
+// Q948 — tuningFamilySocraticRadarTrend
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute per-axis linear regression slope over the ordered tuning sequence.
+ * If only 1 tuning, all slopes = 0 and overallTrend = 'stable'.
+ *
+ * @param tunings - Ordered array of tunings (conceptually temporal/evolutionary).
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { slopes, overallTrend }
+ */
+export function tuningFamilySocraticRadarTrend(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { slopes: Record<AxisKey, number>; overallTrend: 'improving' | 'declining' | 'stable' } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) {
+    const slopes = {} as Record<AxisKey, number>;
+    for (const ax of axes) slopes[ax] = 0;
+    return { slopes, overallTrend: 'stable' };
+  }
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const sumX = (n * (n - 1)) / 2;
+  const sumX2 = (n * (n - 1) * (2 * n - 1)) / 6;
+  const slopes = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const sumY = vals.reduce((s, v) => s + v, 0);
+    const sumXY = vals.reduce((s, v, i) => s + i * v, 0);
+    const denom = n * sumX2 - sumX * sumX;
+    slopes[ax] = denom === 0 ? 0 : (n * sumXY - sumX * sumY) / denom;
+  }
+  const avgSlope = Object.values(slopes).reduce((s, v) => s + v, 0) / 5;
+  const overallTrend: 'improving' | 'declining' | 'stable' =
+    avgSlope > 0.02 ? 'improving' : avgSlope < -0.02 ? 'declining' : 'stable';
+  return { slopes, overallTrend };
+}
+
+// ---------------------------------------------------------------------------
+// Q950 — tuningFamilySocraticRadarRobustnessScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures how robust a family profile is via leave-one-out analysis.
+ * robustnessScore = 1 - (max LOO distance / sqrt(5)).
+ * Single tuning: robustnessScore=1, mostInfluentialIndex=0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { robustnessScore, mostInfluentialIndex }
+ */
+export function tuningFamilySocraticRadarRobustnessScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { robustnessScore: number; mostInfluentialIndex: number } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return { robustnessScore: 1, mostInfluentialIndex: 0 };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const fullMean = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    fullMean[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  let maxDist = 0;
+  let mostInfluentialIndex = 0;
+  for (let i = 0; i < profiles.length; i++) {
+    const looProfiles = profiles.filter((_, j) => j !== i);
+    const looMean = {} as Record<AxisKey, number>;
+    for (const ax of axes) {
+      looMean[ax] = looProfiles.reduce((s, p) => s + p[ax], 0) / looProfiles.length;
+    }
+    const dist = Math.sqrt(axes.reduce((s, ax) => s + (looMean[ax] - fullMean[ax]) ** 2, 0));
+    if (dist > maxDist) {
+      maxDist = dist;
+      mostInfluentialIndex = i;
+    }
+  }
+  const robustnessScore = 1 - maxDist / Math.sqrt(5);
+  return { robustnessScore, mostInfluentialIndex };
+}
+
+// ---------------------------------------------------------------------------
+// Q952 — tuningFamilySocraticRadarCentroidProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the centroid (arithmetic mean profile) of the family and find the tuning closest to it.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { centroid, closestIndex, closestDistance }
+ */
+export function tuningFamilySocraticRadarCentroidProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { centroid: Record<AxisKey, number>; closestIndex: number; closestDistance: number } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const centroid = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    centroid[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  let closestIndex = 0;
+  let closestDistance = Infinity;
+  for (let i = 0; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    const dist = Math.sqrt(axes.reduce((s, ax) => s + (p[ax] - centroid[ax]) ** 2, 0));
+    if (dist < closestDistance) {
+      closestDistance = dist;
+      closestIndex = i;
+    }
+  }
+  if (profiles.length === 0) closestDistance = 0;
+  return { centroid, closestIndex, closestDistance };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -17094,4 +17344,139 @@ export function chordProgressionTension(
     const freqs = chord.map((pc) => rootHz * Math.pow(2, pc / 12));
     return chordDissonance(freqs, spectrum);
   });
+}
+
+// ---------------------------------------------------------------------------
+// N2 — midiNoteToName
+// ---------------------------------------------------------------------------
+
+const SHARP_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
+const FLAT_NAMES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'] as const;
+
+/**
+ * Convert a MIDI note number to a human-readable note name with octave.
+ *
+ * MIDI 60 = C4, MIDI 69 = A4, MIDI 0 = C-1, MIDI 127 = G9.
+ * Enharmonic accidentals use sharps (default) or flats.
+ *
+ * @param midi - Integer MIDI note number (0–127).
+ * @param preferSharps - If `true` (default), use sharps (C#, D#, …); otherwise use flats (Db, Eb, …).
+ * @returns Note name with octave, e.g. `"C4"`, `"A#4"`, `"Bb4"`.
+ *
+ * @example
+ * midiNoteToName(60);          // "C4"
+ * midiNoteToName(69);          // "A4"
+ * midiNoteToName(61, true);    // "C#4"
+ * midiNoteToName(61, false);   // "Db4"
+ */
+export function midiNoteToName(midi: number, preferSharps = true): string {
+  const octave = Math.floor(midi / 12) - 1;
+  const pc = ((midi % 12) + 12) % 12;
+  const names = preferSharps ? SHARP_NAMES : FLAT_NAMES;
+  const name = names[pc]!;
+  return `${name}${octave}`;
+}
+
+// ---------------------------------------------------------------------------
+// N3 — scaleSubsets
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate all unique subsets of a given size from scale degrees, each normalized to start at 0.
+ *
+ * Every C(n, size) combination of `degrees` is taken, then normalized by subtracting
+ * the minimum value of the subset (mod 12) from all elements. Duplicates that arise
+ * from normalization are removed. Results are sorted within each subset and subsets
+ * are sorted lexicographically.
+ *
+ * @param degrees - Array of scale degree integers (typically pitch classes 0–11).
+ * @param size - Number of elements in each subset.
+ * @returns Array of normalized subsets, sorted lexicographically. Empty if `size <= 0` or `size > degrees.length`.
+ *
+ * @example
+ * scaleSubsets([0, 2, 4, 5, 7, 9, 11], 3);
+ * // All 3-note subsets of the major scale, normalized to start at 0
+ */
+export function scaleSubsets(degrees: readonly number[], size: number): number[][] {
+  if (size <= 0 || size > degrees.length) return [];
+
+  const results: number[][] = [];
+  const seen = new Set<string>();
+
+  function combine(start: number, current: number[]): void {
+    if (current.length === size) {
+      const minVal = current[0]!;
+      const normalized = current.map((d) => ((d - minVal) % 12 + 12) % 12).sort((a, b) => a - b);
+      const key = normalized.join(',');
+      if (!seen.has(key)) {
+        seen.add(key);
+        results.push(normalized);
+      }
+      return;
+    }
+    const remaining = degrees.length - start;
+    const needed = size - current.length;
+    if (remaining < needed) return;
+    for (let i = start; i < degrees.length; i++) {
+      combine(i + 1, [...current, degrees[i]!]);
+    }
+  }
+
+  combine(0, []);
+  results.sort((a, b) => {
+    for (let i = 0; i < Math.min(a.length, b.length); i++) {
+      if (a[i]! !== b[i]!) return a[i]! - b[i]!;
+    }
+    return a.length - b.length;
+  });
+  return results;
+}
+
+// ---------------------------------------------------------------------------
+// N4 — fundamentalBassNote
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the pitch class that, when used as a bass note, produces the lowest
+ * sensory dissonance for the given chord.
+ *
+ * For each unique pitch class in `chord`, compute the dissonance of the full
+ * texture [bassFreq, ...chordFreqs] where bassFreq = rootHz * 2^(bass_pc / 12).
+ * Returns the pitch class that minimises `chordDissonance(freqs, spectrum)`.
+ *
+ * @param chord - Array of pitch class integers (0–11).
+ * @param spectrum - Timbre spectrum (array of `{ ratio, amplitude }` partials).
+ * @param rootHz - Frequency for pitch class 0 (default: 220 Hz).
+ * @returns The pitch class (0–11) that minimises dissonance when used as the bass note.
+ *          For single-note chords, returns that note's pitch class mod 12.
+ *
+ * @example
+ * const spec = harmonicSpectrum(6);
+ * fundamentalBassNote([0, 4, 7], spec); // likely returns 0 (C as bass for C major)
+ */
+export function fundamentalBassNote(
+  chord: readonly number[],
+  spectrum: Spectrum,
+  rootHz = 220,
+): number {
+  if (chord.length === 0) return 0;
+  if (chord.length === 1) return ((chord[0]! % 12) + 12) % 12;
+
+  const uniquePcs = [...new Set(chord.map((pc) => ((pc % 12) + 12) % 12))];
+  const chordFreqs = chord.map((pc) => rootHz * Math.pow(2, ((pc % 12 + 12) % 12) / 12));
+
+  let bestPc = uniquePcs[0]!;
+  let bestDissonance = Infinity;
+
+  for (const bassPC of uniquePcs) {
+    const bassFreq = rootHz * Math.pow(2, bassPC / 12);
+    const allFreqs = [bassFreq, ...chordFreqs];
+    const dissonance = chordDissonance(allFreqs, spectrum);
+    if (dissonance < bestDissonance) {
+      bestDissonance = dissonance;
+      bestPc = bassPC;
+    }
+  }
+
+  return bestPc;
 }
