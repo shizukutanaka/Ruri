@@ -26,3 +26,5 @@ export * from './maqam.js';
 export * from './key-detect.js';
 export * from './progression.js';
 export * from './japanese-scale.js';
+export * from './tonnetz.js';
+export * from './gamelan.js';

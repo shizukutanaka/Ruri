@@ -67,6 +67,49 @@ export function quantizeTicks(
   });
 }
 
+// ---------------------------------------------------------------------------
+// L1 — polyrhythmPattern
+// ---------------------------------------------------------------------------
+
+function gcd(a: number, b: number): number {
+  while (b !== 0) {
+    const t = b;
+    b = a % b;
+    a = t;
+  }
+  return a;
+}
+
+function lcm(a: number, b: number): number {
+  return (a / gcd(a, b)) * b;
+}
+
+/**
+ * Generate polyrhythm patterns for N voices, each with a different pulse count.
+ * Each voice is a boolean[] of length = LCM(divisors).
+ * Returns one boolean[] per divisor, all the same length.
+ */
+export function polyrhythmPattern(divisors: number[]): boolean[][] {
+  if (divisors.length === 0) throw new RangeError(`polyrhythmPattern: divisors must not be empty`);
+  for (let i = 0; i < divisors.length; i++) {
+    const d = divisors[i]!;
+    if (!Number.isInteger(d) || d < 1) {
+      throw new RangeError(
+        `polyrhythmPattern: divisors[${i}] must be a positive integer, got ${d}`,
+      );
+    }
+  }
+  const total = divisors.reduce(lcm, 1);
+  return divisors.map((d) => {
+    const spacing = total / d;
+    const row = new Array<boolean>(total).fill(false);
+    for (let i = 0; i < total; i++) {
+      if (i % spacing === 0) row[i] = true;
+    }
+    return row;
+  });
+}
+
 /**
  * Apply swing to a list of tick positions.
  * `swingRatio` ∈ (0.5, 1): fraction of beat for the on-beat;

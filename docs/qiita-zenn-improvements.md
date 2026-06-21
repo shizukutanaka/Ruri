@@ -175,3 +175,43 @@
 | polyrhythm スケジューラ (LCM)         | `rhythm.ts` への追加、K4 と同時 PR にしない方がレビュー軽い |
 | neo-Riemannian P/L/R 操作             | `voice-leading.ts` との統合判断、別PR                   |
 | JI subgroup 近似探索                  | `ratio.ts` 拡張、コストモデル選定後別PR                 |
+
+## Round 4 調査(2026-06-21)
+
+第4回調査では多声リズム/コンマ/トネッツ/ガムランに焦点を当てた。Round 3 の「将来検討」項目のうち 4 件を実装スコープに昇格。
+
+### Round 4 改善点(実装スコープ)
+
+#### L1. `polyrhythmPattern(divisors) → boolean[][]`
+
+- **場所**: 既存 `src/core/rhythm.ts` に追加
+- **アルゴリズム**: LCM(divisors) 長さの boolean[][] を生成; 各ボイスは divisors[i] パルスを LCM グリッドに均等配置
+- **用途**: 3 対 4、4 対 5 等のポリリズム可視化・スケジューリング
+
+#### L2. `nearestComma(cents) → CommaInfo | null`
+
+- **場所**: `src/core/tuning.ts` の先頭に追加（`CommaInfo` インターフェースも同所）
+- **コンマ辞書**: schisma(1.95c)、diaschisma(19.55c)、syntonic comma(21.51c)、Pythagorean comma(23.46c)、septimal comma(27.26c)、diesis(41.06c)、undecimal comma(53.27c)
+- **返却**: 5 cents 以内に最寄りコンマがある場合のみ非 null
+
+#### L3. Tonnetz 座標と Neo-Riemannian 変換 (`tonnetzCoords`, `neoRiemannianP/L/R`)
+
+- **場所**: 新規 `src/core/tonnetz.ts`
+- **アルゴリズム**: Cohn (1998) の五度格子座標 `x = (pc*7)%12`, `y = (pc*3)%12`; P/L/R の正確な定義(involution 性をテストで保証)
+- **修正点**: R 変換の実装バグ(誤った note を drop していた)を修正済み
+
+#### L4. `gamelanTuning(name) → readonly number[]`
+
+- **場所**: 新規 `src/core/gamelan.ts`
+- **スケール**: slendro(5音/約240c等分)、pelog(7音/不等)、pelog-pathet-nem/sanga/manyura の 5 種
+- **注記**: 実機ガムランはアンサンブル毎に異なるため、これは民族音楽文献ベースの近似値
+
+### Round 4 実装外(将来検討)
+
+| 提案                                        | 理由                                            |
+| ------------------------------------------- | ----------------------------------------------- |
+| 加算合成スペクトラム (PeriodicWave用)       | `spectrum.ts` 拡張、Web Audio API 設計が必要    |
+| JI subgroup 近似探索                        | `ratio.ts` 拡張、コストモデル選定後別PR         |
+| tonnetz ビジュアライザ (SVG/Canvas)         | UI 層、別 adapter として設計が必要              |
+| Raga (arohana/avarohana/pakad)              | 22-shruti 体系の選定と J4 より大規模、別PR      |
+| `generateJustLattice` (Dijkstra JI 探索)    | グラフ探索で実装複雑、計算量大、別PR            |

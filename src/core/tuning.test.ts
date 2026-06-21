@@ -10,6 +10,7 @@ import {
   tuningDistance,
   tuningDeviationReport,
   approximateEdoForIntervals,
+  nearestComma,
   type TuningSystem,
 } from './tuning.js';
 import { cents, fromRatio } from './cents.js';
@@ -447,5 +448,89 @@ describe('approximateEdoForIntervals (I4)', () => {
     for (const entry of results) {
       expect(entry.rmsCents).toBeCloseTo(0, 9);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// L2 — nearestComma
+// ---------------------------------------------------------------------------
+
+describe('nearestComma (L2)', () => {
+  it('test_syntonic_comma_exact', () => {
+    const c = nearestComma(21.5063);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('syntonic comma');
+    expect(c!.ratio).toEqual([81, 80]);
+  });
+
+  it('test_pythagorean_comma_exact', () => {
+    const c = nearestComma(23.46);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('Pythagorean comma');
+  });
+
+  it('test_schisma_exact', () => {
+    const c = nearestComma(1.9537);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('schisma');
+    expect(c!.ratio).toEqual([32805, 32768]);
+  });
+
+  it('test_diaschisma_exact', () => {
+    const c = nearestComma(19.5529);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('diaschisma');
+  });
+
+  it('test_septimal_comma_exact', () => {
+    const c = nearestComma(27.2641);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('septimal comma');
+  });
+
+  it('test_diesis_exact', () => {
+    const c = nearestComma(41.059);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('diesis');
+    expect(c!.ratio).toEqual([128, 125]);
+  });
+
+  it('test_undecimal_comma_exact', () => {
+    const c = nearestComma(53.2729);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('undecimal comma');
+  });
+
+  it('test_returns_null_when_no_comma_within_5_cents', () => {
+    expect(nearestComma(100)).toBeNull();
+    expect(nearestComma(600)).toBeNull();
+    // 0c is 1.95c from schisma, so it IS within 5c — not null
+    expect(nearestComma(200)).toBeNull();
+  });
+
+  it('test_within_tolerance_boundary', () => {
+    // 21.5063 + 4.9 = 26.4063 — still within 5c of syntonic (21.5063)
+    // but closer to septimal comma (27.2641)? dist = 0.858, syntonic dist = 4.9
+    // nearest is septimal? No: 26.4063 - 21.5063 = 4.9 (syntonic); 27.2641 - 26.4063 = 0.858 (septimal)
+    // So nearestComma(26.4063) → septimal comma
+    const c = nearestComma(26.4063);
+    expect(c).not.toBeNull();
+    expect(c!.name).toBe('septimal comma');
+  });
+
+  it('test_outside_5_cents_threshold_returns_null', () => {
+    // 60c is 6.7c away from undecimal comma (53.27) — beyond 5c
+    expect(nearestComma(60)).toBeNull();
+  });
+
+  it('property_result_within_5_cents_of_input_when_non_null', () => {
+    fc.assert(
+      fc.property(fc.float({ min: 0, max: 60, noNaN: true }), (c) => {
+        const result = nearestComma(c);
+        if (result !== null) {
+          expect(Math.abs(c - result.cents)).toBeLessThanOrEqual(5);
+        }
+      }),
+    );
   });
 });

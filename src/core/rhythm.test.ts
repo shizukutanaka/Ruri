@@ -1,11 +1,97 @@
 import { describe, it, expect } from 'vitest';
+import fc from 'fast-check';
 import {
   euclideanRhythm,
   rotateEuclidean,
   rhythmOnsets,
   quantizeTicks,
   applySwing,
+  polyrhythmPattern,
 } from './rhythm.js';
+
+// ---------------------------------------------------------------------------
+// L1 — polyrhythmPattern
+// ---------------------------------------------------------------------------
+
+describe('polyrhythmPattern', () => {
+  it('test_single_divisor_all_true', () => {
+    const result = polyrhythmPattern([1]);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual([true]);
+  });
+
+  it('test_two_voices_3_and_4_lcm_is_12', () => {
+    const result = polyrhythmPattern([3, 4]);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveLength(12);
+    expect(result[1]).toHaveLength(12);
+  });
+
+  it('test_3_voice_hits_count', () => {
+    const [v3, v4] = polyrhythmPattern([3, 4]);
+    expect(v3!.filter(Boolean)).toHaveLength(3);
+    expect(v4!.filter(Boolean)).toHaveLength(4);
+  });
+
+  it('test_all_voices_same_length_lcm', () => {
+    const result = polyrhythmPattern([2, 3, 5]);
+    const len = result[0]!.length;
+    expect(len).toBe(30);
+    for (const row of result) {
+      expect(row).toHaveLength(30);
+    }
+  });
+
+  it('test_first_element_always_true', () => {
+    const result = polyrhythmPattern([3, 4, 5]);
+    for (const row of result) {
+      expect(row[0]).toBe(true);
+    }
+  });
+
+  it('test_divisor_2_and_3_correct_pattern', () => {
+    const [v2, v3] = polyrhythmPattern([2, 3]);
+    // LCM(2,3)=6; v2 hits at 0,3; v3 hits at 0,2,4
+    expect(v2).toEqual([true, false, false, true, false, false]);
+    expect(v3).toEqual([true, false, true, false, true, false]);
+  });
+
+  it('test_throws_on_zero_divisor', () => {
+    expect(() => polyrhythmPattern([2, 0])).toThrow(RangeError);
+  });
+
+  it('test_throws_on_negative_divisor', () => {
+    expect(() => polyrhythmPattern([-1])).toThrow(RangeError);
+  });
+
+  it('test_throws_on_empty_divisors', () => {
+    expect(() => polyrhythmPattern([])).toThrow(RangeError);
+  });
+
+  it('test_throws_on_non_integer_divisor', () => {
+    expect(() => polyrhythmPattern([2.5])).toThrow(RangeError);
+  });
+
+  it('property_all_rows_have_lcm_length', () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: 1, max: 8 }), { minLength: 1, maxLength: 4 }),
+        (divs) => {
+          const result = polyrhythmPattern(divs);
+          const expectedLen = result[0]!.length;
+          // every row must share the same length
+          for (const row of result) {
+            expect(row).toHaveLength(expectedLen);
+          }
+          // each divisor d must produce exactly d hits
+          for (let i = 0; i < divs.length; i++) {
+            expect(result[i]!.filter(Boolean)).toHaveLength(divs[i]!);
+          }
+        },
+      ),
+    );
+  });
+});
 
 describe('euclideanRhythm', () => {
   it('test_zero_pulses_all_false', () => {

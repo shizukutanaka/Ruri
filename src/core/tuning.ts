@@ -1,6 +1,43 @@
 import { CENTS_PER_OCTAVE } from './ratio.js';
 import { type Pitch, centsToFreq, pitchToCents } from './cents.js';
 
+// ---------------------------------------------------------------------------
+// L2 — commaInfo / nearestComma
+// ---------------------------------------------------------------------------
+
+export interface CommaInfo {
+  name: string;
+  ratio: readonly [number, number];
+  cents: number;
+}
+
+const NAMED_COMMAS: readonly CommaInfo[] = [
+  { name: 'schisma', ratio: [32805, 32768], cents: 1.9537 },
+  { name: 'diaschisma', ratio: [2048, 2025], cents: 19.5529 },
+  { name: 'syntonic comma', ratio: [81, 80], cents: 21.5063 },
+  { name: 'Pythagorean comma', ratio: [531441, 524288], cents: 23.46 },
+  { name: 'septimal comma', ratio: [64, 63], cents: 27.2641 },
+  { name: 'diesis', ratio: [128, 125], cents: 41.059 },
+  { name: 'undecimal comma', ratio: [33, 32], cents: 53.2729 },
+] as const;
+
+/**
+ * Return info about the nearest named musical comma for the given cents value.
+ * Returns null if no comma within 5 cents of the input.
+ */
+export function nearestComma(cents: number): CommaInfo | null {
+  let best: CommaInfo | null = null;
+  let bestDist = Infinity;
+  for (const comma of NAMED_COMMAS) {
+    const dist = Math.abs(cents - comma.cents);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = comma;
+    }
+  }
+  return bestDist <= 5 ? best : null;
+}
+
 /**
  * A tuning system. No single normal form exists across cultures (improvement #2):
  * gamelan varies per ensemble with stretched octaves; maqam varies by region.
