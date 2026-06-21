@@ -478,6 +478,15 @@ import {
   tuningFamilySocraticRadarMomentumComparison,
   tuningFamilySocraticRadarResilienceScore,
   tuningFamilySocraticRadarResilienceScoreNarrative,
+  tuningFamilySocraticRadarOpportunityScore,
+  tuningFamilySocraticRadarStrengthsWeaknesses,
+  tuningFamilySocraticRadarBalanceScore,
+  tuningFamilySocraticRadarOpportunityNarrative,
+  tuningFamilySocraticRadarFullDiagnostic,
+  tuningFamilySocraticRadarCrossProfile,
+  tuningFamilySocraticRadarDimensionalRanking,
+  tuningFamilySocraticRadarGrowthVector,
+  tuningFamilySocraticRadarConsistencyScore,
   snapHzToScaleDegree,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -16930,20 +16939,20 @@ describe('tuningFamilySocraticRadarMomentumNarrative (Q904)', () => {
 // ---------------------------------------------------------------------------
 
 describe('snapHzToScaleDegree (I1)', () => {
-  // 12-TET tuning: degree 0 = 0¢, degree 9 = 900¢ (A), referenceHz = 440
-  // Degree 9 = A4 = 440 Hz when reference is 440 Hz.
+  // equalTemperament12(440): referenceHz = 440, degree 0 = 0¢ = 440 Hz.
+  // 440 Hz maps to degree 0 (the reference pitch itself).
   const t12 = equalTemperament12(440);
 
-  it('test_snap_A4_440hz_to_degree9_octave0', () => {
+  it('test_snap_A4_440hz_to_degree0_octave0', () => {
     const result = snapHzToScaleDegree(440, t12);
-    expect(result.degreeIndex).toBe(9);
+    expect(result.degreeIndex).toBe(0);
     expect(result.octave).toBe(0);
     expect(result.centsError).toBeCloseTo(0, 6);
   });
 
   it('test_snap_A5_880hz_is_octave1', () => {
     const result = snapHzToScaleDegree(880, t12);
-    expect(result.degreeIndex).toBe(9);
+    expect(result.degreeIndex).toBe(0);
     expect(result.octave).toBe(1);
     expect(result.centsError).toBeCloseTo(0, 6);
   });
@@ -16951,7 +16960,7 @@ describe('snapHzToScaleDegree (I1)', () => {
   it('test_snap_slightly_sharp_442hz_gives_positive_centsError', () => {
     // 442 Hz vs 440 Hz: cents diff ≈ 1200 * log2(442/440) ≈ +7.85¢
     const result = snapHzToScaleDegree(442, t12);
-    expect(result.degreeIndex).toBe(9);
+    expect(result.degreeIndex).toBe(0);
     expect(result.centsError).toBeGreaterThan(0);
     expect(result.centsError).toBeCloseTo(1200 * Math.log2(442 / 440), 2);
   });
@@ -17002,5 +17011,284 @@ describe('snapHzToScaleDegree (I1)', () => {
         },
       ),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q912 — tuningFamilySocraticRadarOpportunityScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarOpportunityScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_opportunityScore_and_axes', () => {
+    const result = tuningFamilySocraticRadarOpportunityScore([t12], spec, 440);
+    expect(typeof result.opportunityScore).toBe('number');
+    expect(Array.isArray(result.opportunityAxes)).toBe(true);
+  });
+
+  it('test_opportunityScore_is_fraction_of_5', () => {
+    const result = tuningFamilySocraticRadarOpportunityScore([t12], spec, 440);
+    expect(result.opportunityScore).toBeGreaterThanOrEqual(0);
+    expect(result.opportunityScore).toBeLessThanOrEqual(1);
+    expect(result.opportunityScore * 5).toBeCloseTo(result.opportunityAxes.length, 5);
+  });
+
+  it('test_opportunity_axes_are_valid_keys', () => {
+    const result = tuningFamilySocraticRadarOpportunityScore([t12], spec, 440);
+    const valid = new Set(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']);
+    for (const ax of result.opportunityAxes) {
+      expect(valid.has(ax)).toBe(true);
+    }
+  });
+
+  it('test_single_tuning_returns_valid_score', () => {
+    const result = tuningFamilySocraticRadarOpportunityScore([t12, t12], spec, 440);
+    expect(result.opportunityScore).toBeGreaterThanOrEqual(0);
+    expect(result.opportunityScore).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q914 — tuningFamilySocraticRadarStrengthsWeaknesses
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarStrengthsWeaknesses', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_exactly_2_strengths_and_2_weaknesses', () => {
+    const result = tuningFamilySocraticRadarStrengthsWeaknesses([t12], spec, 440);
+    expect(result.strengths).toHaveLength(2);
+    expect(result.weaknesses).toHaveLength(2);
+  });
+
+  it('test_all_returned_axes_are_valid_keys', () => {
+    const valid = new Set(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']);
+    const result = tuningFamilySocraticRadarStrengthsWeaknesses([t12], spec, 440);
+    for (const ax of [...result.strengths, ...result.weaknesses]) {
+      expect(valid.has(ax)).toBe(true);
+    }
+  });
+
+  it('test_strengths_and_weaknesses_disjoint', () => {
+    const result = tuningFamilySocraticRadarStrengthsWeaknesses([t12], spec, 440);
+    const strengthSet = new Set(result.strengths);
+    for (const w of result.weaknesses) {
+      expect(strengthSet.has(w)).toBe(false);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q916 — tuningFamilySocraticRadarBalanceScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarBalanceScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_balanceScore_in_0_1', () => {
+    const result = tuningFamilySocraticRadarBalanceScore([t12], spec, 440);
+    expect(result.balanceScore).toBeGreaterThanOrEqual(0);
+    expect(result.balanceScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_balanceLabel_is_valid', () => {
+    const result = tuningFamilySocraticRadarBalanceScore([t12], spec, 440);
+    expect(['unbalanced', 'moderate', 'balanced']).toContain(result.balanceLabel);
+  });
+
+  it('test_label_consistent_with_score', () => {
+    const result = tuningFamilySocraticRadarBalanceScore([t12], spec, 440);
+    if (result.balanceScore < 0.4) {
+      expect(result.balanceLabel).toBe('unbalanced');
+    } else if (result.balanceScore < 0.7) {
+      expect(result.balanceLabel).toBe('moderate');
+    } else {
+      expect(result.balanceLabel).toBe('balanced');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q918 — tuningFamilySocraticRadarOpportunityNarrative
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarOpportunityNarrative', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_all_fields', () => {
+    const result = tuningFamilySocraticRadarOpportunityNarrative([t12], spec, 440);
+    expect(typeof result.opportunityScore).toBe('number');
+    expect(Array.isArray(result.opportunityAxes)).toBe(true);
+    expect(typeof result.opportunityNarrative).toBe('string');
+    expect(result.opportunityNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('test_narrative_mentions_none_when_all_axes_strong', () => {
+    // With enough tunings, axes may all exceed 0.5; just check narrative is non-empty
+    const result = tuningFamilySocraticRadarOpportunityNarrative([t12, t12], spec, 440);
+    expect(result.opportunityNarrative.length).toBeGreaterThan(0);
+  });
+
+  it('test_narrative_mentions_axes_when_present', () => {
+    const result = tuningFamilySocraticRadarOpportunityNarrative([t12], spec, 440);
+    if (result.opportunityAxes.length > 0) {
+      expect(result.opportunityNarrative).toContain(result.opportunityAxes[0]!);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q920 — tuningFamilySocraticRadarFullDiagnostic
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarFullDiagnostic', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_all_diagnostic_fields', () => {
+    const result = tuningFamilySocraticRadarFullDiagnostic([t12], spec, 440);
+    expect(typeof result.resilienceScore).toBe('number');
+    expect(typeof result.balanceScore).toBe('number');
+    expect(typeof result.opportunityScore).toBe('number');
+    expect(typeof result.diagnosticSummary).toBe('string');
+    expect(result.diagnosticSummary.length).toBeGreaterThan(0);
+  });
+
+  it('test_labels_are_valid', () => {
+    const result = tuningFamilySocraticRadarFullDiagnostic([t12], spec, 440);
+    expect(['fragile', 'moderate', 'resilient']).toContain(result.resilienceLabel);
+    expect(['unbalanced', 'moderate', 'balanced']).toContain(result.balanceLabel);
+  });
+
+  it('test_diagnostic_contains_resilience_and_balance', () => {
+    const result = tuningFamilySocraticRadarFullDiagnostic([t12], spec, 440);
+    expect(result.diagnosticSummary.toLowerCase()).toContain('resilience');
+    expect(result.diagnosticSummary.toLowerCase()).toContain('balance');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q922 — tuningFamilySocraticRadarCrossProfile
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCrossProfile', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_profileA_profileB_deltas_dominantFamily', () => {
+    const result = tuningFamilySocraticRadarCrossProfile([t12], [t12], spec, 440);
+    expect(result.profileA).toBeDefined();
+    expect(result.profileB).toBeDefined();
+    expect(result.deltas).toBeDefined();
+    expect(['A', 'B', 'tie']).toContain(result.dominantFamily);
+  });
+
+  it('test_identical_families_give_tie_and_zero_deltas', () => {
+    const result = tuningFamilySocraticRadarCrossProfile([t12], [t12], spec, 440);
+    expect(result.dominantFamily).toBe('tie');
+    for (const val of Object.values(result.deltas)) {
+      expect(val).toBeCloseTo(0, 10);
+    }
+  });
+
+  it('test_deltas_are_profileA_minus_profileB', () => {
+    const result = tuningFamilySocraticRadarCrossProfile([t12], [t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(result.deltas[ax]).toBeCloseTo(result.profileA[ax] - result.profileB[ax], 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q924 — tuningFamilySocraticRadarDimensionalRanking
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDimensionalRanking', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_ranking_has_5_entries', () => {
+    const { ranking } = tuningFamilySocraticRadarDimensionalRanking([t12], spec, 440);
+    expect(ranking).toHaveLength(5);
+  });
+
+  it('test_ranking_is_descending', () => {
+    const { ranking } = tuningFamilySocraticRadarDimensionalRanking([t12], spec, 440);
+    for (let i = 1; i < ranking.length; i++) {
+      expect(ranking[i - 1]!.score).toBeGreaterThanOrEqual(ranking[i]!.score);
+    }
+  });
+
+  it('test_all_axes_present', () => {
+    const { ranking } = tuningFamilySocraticRadarDimensionalRanking([t12], spec, 440);
+    const axisNames = ranking.map((r) => r.axis);
+    const valid = new Set(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']);
+    for (const ax of axisNames) {
+      expect(valid.has(ax)).toBe(true);
+    }
+    expect(new Set(axisNames).size).toBe(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q926 — tuningFamilySocraticRadarGrowthVector
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarGrowthVector', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_growth_vector_sum_is_zero', () => {
+    const { growthVector } = tuningFamilySocraticRadarGrowthVector([t12], spec, 440);
+    const sum = Object.values(growthVector).reduce((s, v) => s + v, 0);
+    expect(sum).toBeCloseTo(0, 10);
+  });
+
+  it('test_mean_equals_average_of_all_axis_scores', () => {
+    const { mean, growthVector } = tuningFamilySocraticRadarGrowthVector([t12], spec, 440);
+    const profile = Object.fromEntries(Object.entries(growthVector).map(([k, v]) => [k, v + mean]));
+    const computedMean = Object.values(profile).reduce((s, v) => s + v, 0) / 5;
+    expect(computedMean).toBeCloseTo(mean, 10);
+  });
+
+  it('test_mean_in_0_1', () => {
+    const { mean } = tuningFamilySocraticRadarGrowthVector([t12], spec, 440);
+    expect(mean).toBeGreaterThanOrEqual(0);
+    expect(mean).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q928 — tuningFamilySocraticRadarConsistencyScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarConsistencyScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_returns_uniform_zero', () => {
+    const { consistencyScore, consistencyLabel } = tuningFamilySocraticRadarConsistencyScore(
+      [t12],
+      spec,
+      440,
+    );
+    expect(consistencyScore).toBe(0);
+    expect(consistencyLabel).toBe('uniform');
+  });
+
+  it('test_identical_tunings_return_zero', () => {
+    const { consistencyScore } = tuningFamilySocraticRadarConsistencyScore(
+      [t12, t12, t12],
+      spec,
+      440,
+    );
+    expect(consistencyScore).toBeCloseTo(0, 10);
+  });
+
+  it('test_label_is_valid', () => {
+    const { consistencyLabel } = tuningFamilySocraticRadarConsistencyScore([t12], spec, 440);
+    expect(['uniform', 'moderate', 'diverse']).toContain(consistencyLabel);
+  });
+
+  it('test_consistency_score_non_negative', () => {
+    const { consistencyScore } = tuningFamilySocraticRadarConsistencyScore([t12, t12], spec, 440);
+    expect(consistencyScore).toBeGreaterThanOrEqual(0);
   });
 });

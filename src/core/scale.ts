@@ -16443,3 +16443,287 @@ export function snapHzToScaleDegree(
     centsError: bestDelta,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Q912 — tuningFamilySocraticRadarOpportunityScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Counts axes below 0.5 as opportunity areas.
+ * opportunityScore = count / 5 (0 = all axes strong, 1 = all weak).
+ */
+export function tuningFamilySocraticRadarOpportunityScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  opportunityScore: number;
+  opportunityAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+  const opportunityAxes = [...axes].filter((k) => profile[k] < 0.5);
+  return { opportunityScore: opportunityAxes.length / 5, opportunityAxes };
+}
+
+// ---------------------------------------------------------------------------
+// Q914 — tuningFamilySocraticRadarStrengthsWeaknesses
+// ---------------------------------------------------------------------------
+
+/**
+ * Identifies the top-2 strongest and bottom-2 weakest radar axes by score.
+ */
+export function tuningFamilySocraticRadarStrengthsWeaknesses(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  strengths: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+  weaknesses: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const sorted = [...axes].sort((a, b) => profile[b] - profile[a]);
+  return {
+    strengths: sorted.slice(0, 2),
+    weaknesses: sorted.slice(-2),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q916 — tuningFamilySocraticRadarBalanceScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures how evenly balanced the radar profile is across all 5 axes.
+ * Uses 1 - (stdDev / 0.5) so a perfectly uniform profile scores 1.
+ */
+export function tuningFamilySocraticRadarBalanceScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  balanceScore: number;
+  balanceLabel: 'unbalanced' | 'moderate' | 'balanced';
+} {
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const vals = [
+    profile.diversity,
+    profile.versatility,
+    profile.maturity,
+    profile.benchmark,
+    profile.convergence,
+  ];
+  const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+  const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length;
+  const balanceScore = Math.max(0, Math.min(1, 1 - Math.sqrt(variance) / 0.5));
+  const balanceLabel: 'unbalanced' | 'moderate' | 'balanced' =
+    balanceScore < 0.4 ? 'unbalanced' : balanceScore < 0.7 ? 'moderate' : 'balanced';
+  return { balanceScore, balanceLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q918 — tuningFamilySocraticRadarOpportunityNarrative
+// ---------------------------------------------------------------------------
+
+/**
+ * Narrative description of which axes fall below 0.5, framed as growth areas.
+ */
+export function tuningFamilySocraticRadarOpportunityNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  opportunityScore: number;
+  opportunityAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+  opportunityNarrative: string;
+} {
+  const { opportunityScore, opportunityAxes } = tuningFamilySocraticRadarOpportunityScore(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const opportunityNarrative =
+    opportunityAxes.length === 0
+      ? `No axes fall below 0.5 — this tuning family is strong across all dimensions.`
+      : `Growth areas (score < 0.5): ${opportunityAxes.join(', ')}. Opportunity score: ${opportunityScore.toFixed(2)} (${opportunityAxes.length}/5 axes).`;
+  return { opportunityScore, opportunityAxes, opportunityNarrative };
+}
+
+// ---------------------------------------------------------------------------
+// Q920 — tuningFamilySocraticRadarFullDiagnostic
+// ---------------------------------------------------------------------------
+
+/**
+ * One-call combined diagnostic: resilience, balance, and opportunities merged.
+ */
+export function tuningFamilySocraticRadarFullDiagnostic(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  resilienceScore: number;
+  resilienceLabel: 'fragile' | 'moderate' | 'resilient';
+  balanceScore: number;
+  balanceLabel: 'unbalanced' | 'moderate' | 'balanced';
+  opportunityScore: number;
+  opportunityAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+  diagnosticSummary: string;
+} {
+  const { resilienceScore, resilienceLabel } = tuningFamilySocraticRadarResilienceScore(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const { balanceScore, balanceLabel } = tuningFamilySocraticRadarBalanceScore(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const { opportunityScore, opportunityAxes } = tuningFamilySocraticRadarOpportunityScore(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const diagnosticSummary = `Resilience: ${resilienceLabel} (${resilienceScore.toFixed(2)}). Balance: ${balanceLabel} (${balanceScore.toFixed(2)}). Opportunities: ${opportunityAxes.length > 0 ? opportunityAxes.join(', ') : 'none'}.`;
+  return {
+    resilienceScore,
+    resilienceLabel,
+    balanceScore,
+    balanceLabel,
+    opportunityScore,
+    opportunityAxes,
+    diagnosticSummary,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q922 — tuningFamilySocraticRadarCrossProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Side-by-side radar profiles for two tuning families, with per-axis delta.
+ */
+export function tuningFamilySocraticRadarCrossProfile(
+  tuningsA: TuningSystem[],
+  tuningsB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  profileA: ReturnType<typeof tuningFamilySocraticRadarProfile>;
+  profileB: ReturnType<typeof tuningFamilySocraticRadarProfile>;
+  deltas: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>;
+  dominantFamily: 'A' | 'B' | 'tie';
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const profileA = tuningFamilySocraticRadarProfile(tuningsA, spectrum, rootHz);
+  const profileB = tuningFamilySocraticRadarProfile(tuningsB, spectrum, rootHz);
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const deltas = {} as Record<AxisKey, number>;
+  let totalDelta = 0;
+  for (const ax of axes) {
+    deltas[ax] = profileA[ax] - profileB[ax];
+    totalDelta += deltas[ax];
+  }
+  const dominantFamily: 'A' | 'B' | 'tie' =
+    Math.abs(totalDelta) < 1e-9 ? 'tie' : totalDelta > 0 ? 'A' : 'B';
+  return { profileA, profileB, deltas, dominantFamily };
+}
+
+// ---------------------------------------------------------------------------
+// Q924 — tuningFamilySocraticRadarDimensionalRanking
+// ---------------------------------------------------------------------------
+
+/**
+ * Rank all 5 radar axes from highest to lowest score.
+ * Returns axes in descending order of value.
+ */
+export function tuningFamilySocraticRadarDimensionalRanking(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  ranking: {
+    axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+    score: number;
+  }[];
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const ranking = axes
+    .map((axis) => ({ axis, score: profile[axis] }))
+    .sort((a, b) => b.score - a.score);
+  return { ranking };
+}
+
+// ---------------------------------------------------------------------------
+// Q926 — tuningFamilySocraticRadarGrowthVector
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes the "growth vector" — each axis score minus the mean, indicating
+ * which axes outperform or underperform the overall average.
+ */
+export function tuningFamilySocraticRadarGrowthVector(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  mean: number;
+  growthVector: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const profile = tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const mean = axes.reduce((s, ax) => s + profile[ax], 0) / axes.length;
+  const growthVector = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    growthVector[ax] = profile[ax] - mean;
+  }
+  return { mean, growthVector };
+}
+
+// ---------------------------------------------------------------------------
+// Q928 — tuningFamilySocraticRadarConsistencyScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures consistency of the family: average pairwise distance between member
+ * radar profiles. Low = consistent family, High = diverse/inconsistent family.
+ * With a single tuning the score is 0 (trivially consistent).
+ */
+export function tuningFamilySocraticRadarConsistencyScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  consistencyScore: number;
+  consistencyLabel: 'uniform' | 'moderate' | 'diverse';
+} {
+  if (tunings.length <= 1) {
+    return { consistencyScore: 0, consistencyLabel: 'uniform' };
+  }
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let totalDist = 0;
+  let count = 0;
+  for (let i = 0; i < profiles.length; i++) {
+    for (let j = i + 1; j < profiles.length; j++) {
+      const a = profiles[i]!;
+      const b = profiles[j]!;
+      const dist = Math.sqrt(axes.reduce((s, ax) => s + (a[ax] - b[ax]) ** 2, 0));
+      totalDist += dist;
+      count++;
+    }
+  }
+  const consistencyScore = count > 0 ? totalDist / count : 0;
+  const consistencyLabel: 'uniform' | 'moderate' | 'diverse' =
+    consistencyScore < 0.15 ? 'uniform' : consistencyScore < 0.3 ? 'moderate' : 'diverse';
+  return { consistencyScore, consistencyLabel };
+}
