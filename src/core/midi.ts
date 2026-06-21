@@ -41,3 +41,57 @@ export function mpeToFreq(m: MpeNote, bendRangeSemitones = 2, a4Hz = A4_HZ_DEFAU
   const bendSemis = ((m.bend14 - BEND_CENTER) / BEND_CENTER) * bendRangeSemitones;
   return midiToFreq(m.note + bendSemis, a4Hz);
 }
+
+// ---------------------------------------------------------------------------
+// I3 — pitchHzClassify
+// ---------------------------------------------------------------------------
+
+type NoteName = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B';
+
+const NOTE_NAMES: readonly NoteName[] = [
+  'C',
+  'C#',
+  'D',
+  'D#',
+  'E',
+  'F',
+  'F#',
+  'G',
+  'G#',
+  'A',
+  'A#',
+  'B',
+];
+
+/**
+ * Classify a frequency in Hz against 12-TET MIDI pitch space.
+ *
+ * Returns the fractional MIDI note, nearest integer MIDI note, note name,
+ * octave number (MIDI 60 = C4 → octave 4), and the signed cents deviation
+ * from equal temperament (positive = sharp of ET).
+ *
+ * @throws {RangeError} if `hz <= 0` or `hz` is not finite.
+ */
+export function pitchHzClassify(
+  hz: number,
+  a4Hz?: number,
+): {
+  midiFloat: number;
+  midiNearest: number;
+  noteName: NoteName;
+  octave: number;
+  centsOff: number;
+} {
+  if (!Number.isFinite(hz) || hz <= 0) {
+    throw new RangeError(`pitchHzClassify: hz must be a finite positive number, got ${hz}`);
+  }
+
+  const midiFloat = freqToMidiFloat(hz, a4Hz);
+  const midiNearest = Math.round(midiFloat);
+  const centsOff = (midiFloat - midiNearest) * 100;
+  const noteIndex = ((midiNearest % 12) + 12) % 12;
+  const noteName = NOTE_NAMES[noteIndex]!;
+  const octave = Math.floor(midiNearest / 12) - 1;
+
+  return { midiFloat, midiNearest, noteName, octave, centsOff };
+}

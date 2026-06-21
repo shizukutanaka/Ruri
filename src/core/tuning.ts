@@ -234,3 +234,129 @@ export function tuningIntervalMatrix(tuning: TuningSystem): number[][] {
     Array.from({ length: n }, (__, j) => (centsArr[j] as number) - (centsArr[i] as number)),
   );
 }
+
+// ---------------------------------------------------------------------------
+// I2 — tuningDeviationReport
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare two tuning systems degree-by-degree and report the signed cents
+ * deviation of each candidate degree from the reference degree.
+ *
+ * Only the first `Math.min(reference.degrees.length, candidate.degrees.length)`
+ * degrees are compared (shorter tuning wins).  Results are returned in ascending
+ * `degreeIndex` order (i.e. natural iteration order — NOT sorted by delta magnitude).
+ *
+ * `deltaCents > 0` means the candidate degree is sharper (higher in pitch) than
+ * the reference degree.
+ *
+ * @throws {RangeError} if either tuning has zero degrees.
+ */
+export function tuningDeviationReport(
+  reference: TuningSystem,
+  candidate: TuningSystem,
+): Array<{ degreeIndex: number; refCents: number; candCents: number; deltaCents: number }> {
+  if (reference.degrees.length === 0) {
+    throw new RangeError(
+      `tuningDeviationReport: reference tuning '${reference.id}' has no degrees`,
+    );
+  }
+  if (candidate.degrees.length === 0) {
+    throw new RangeError(
+      `tuningDeviationReport: candidate tuning '${candidate.id}' has no degrees`,
+    );
+  }
+
+  const n = Math.min(reference.degrees.length, candidate.degrees.length);
+  const result: Array<{
+    degreeIndex: number;
+    refCents: number;
+    candCents: number;
+    deltaCents: number;
+  }> = [];
+
+  for (let i = 0; i < n; i++) {
+    const refPitch = reference.degrees[i]!;
+    const candPitch = candidate.degrees[i]!;
+    const refCents = pitchToCents(refPitch);
+    const candCents = pitchToCents(candPitch);
+    result.push({
+      degreeIndex: i,
+      refCents,
+      candCents,
+      deltaCents: candCents - refCents,
+    });
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// I4 — approximateEdoForIntervals
+// ---------------------------------------------------------------------------
+
+/**
+ * For each EDO n in [minN, maxN], compute how well n-EDO approximates the
+ * given target intervals (in cents).  Returns all results sorted ascending by
+ * `rmsCents` (best-fit first).
+ *
+ * `perInterval[i].deltaCents` is signed: positive = EDO's nearest step is
+ * sharper than the target.
+ *
+ * Defaults: `minN = 5`, `maxN = 53`.
+ *
+ * @throws {RangeError} if `targetCents` is empty, any element is non-finite,
+ *   `minN < 2`, or `maxN < minN`.
+ */
+export function approximateEdoForIntervals(
+  targetCents: number[],
+  minN = 5,
+  maxN = 53,
+): Array<{
+  n: number;
+  rmsCents: number;
+  perInterval: Array<{ targetCents: number; nearestCents: number; deltaCents: number }>;
+}> {
+  if (targetCents.length === 0) {
+    throw new RangeError(`approximateEdoForIntervals: targetCents must not be empty`);
+  }
+  if (minN < 2) {
+    throw new RangeError(`approximateEdoForIntervals: minN must be >= 2, got ${minN}`);
+  }
+  if (maxN < minN) {
+    throw new RangeError(`approximateEdoForIntervals: maxN (${maxN}) must be >= minN (${minN})`);
+  }
+  for (let k = 0; k < targetCents.length; k++) {
+    const v = targetCents[k] as number;
+    if (!Number.isFinite(v)) {
+      throw new RangeError(`approximateEdoForIntervals: targetCents[${k}] is not finite (${v})`);
+    }
+  }
+
+  const results: Array<{
+    n: number;
+    rmsCents: number;
+    perInterval: Array<{ targetCents: number; nearestCents: number; deltaCents: number }>;
+  }> = [];
+
+  for (let n = minN; n <= maxN; n++) {
+    const stepCents = CENTS_PER_OCTAVE / n;
+    let sumSq = 0;
+    const perInterval: Array<{ targetCents: number; nearestCents: number; deltaCents: number }> =
+      [];
+
+    for (const target of targetCents) {
+      const nearestStep = Math.round(target / stepCents);
+      const nearestCents = nearestStep * stepCents;
+      const deltaCents = nearestCents - target;
+      sumSq += deltaCents * deltaCents;
+      perInterval.push({ targetCents: target, nearestCents, deltaCents });
+    }
+
+    const rmsCents = Math.sqrt(sumSq / targetCents.length);
+    results.push({ n, rmsCents, perInterval });
+  }
+
+  results.sort((a, b) => a.rmsCents - b.rmsCents);
+  return results;
+}

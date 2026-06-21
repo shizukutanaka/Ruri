@@ -16371,3 +16371,75 @@ export function tuningFamilySocraticRadarResilienceScoreNarrative(
   }`;
   return { resilienceScore, resilienceLabel, resilienceNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// I1 — snapHzToScaleDegree
+// ---------------------------------------------------------------------------
+
+/**
+ * Snap a frequency in Hz to the nearest degree within a tuning system (or a
+ * subset defined by a `Scale`). Returns the matched degree index, the octave
+ * (period count relative to `tuning.referenceHz`), and the signed cents error
+ * (positive = hz is sharper than the matched degree).
+ *
+ * @throws {RangeError} if `hz <= 0`, or `tuning.degrees` is empty, or (when
+ *   `scale` is provided) `scale.degreeIndices` is empty.
+ */
+export function snapHzToScaleDegree(
+  hz: number,
+  tuning: TuningSystem,
+  scale?: Scale,
+): { degreeIndex: number; octave: number; centsError: number } {
+  if (hz <= 0) throw new RangeError(`snapHzToScaleDegree: hz must be > 0, got ${hz}`);
+  if (tuning.degrees.length === 0)
+    throw new RangeError(`snapHzToScaleDegree: tuning has no degrees`);
+
+  const candidateIndices: readonly number[] =
+    scale !== undefined
+      ? scale.degreeIndices
+      : Array.from({ length: tuning.degrees.length }, (_, i) => i);
+
+  if (candidateIndices.length === 0) {
+    throw new RangeError(`snapHzToScaleDegree: scale has no degree indices`);
+  }
+
+  // Step 1: cents of hz relative to tuning reference
+  const centsFromRef = 1200 * Math.log2(hz / tuning.referenceHz);
+
+  // Step 2: period (octave) and position within period
+  const octave = Math.floor(centsFromRef / tuning.periodCents);
+  const centsInPeriod = centsFromRef - octave * tuning.periodCents;
+
+  // Step 3-5: find the closest degree, considering period-boundary wraps
+  let bestIndex = candidateIndices[0] as number;
+  let bestDelta = Infinity;
+  let bestOctaveAdjust = 0;
+
+  for (const degIdx of candidateIndices) {
+    const pitch = tuning.degrees[degIdx];
+    if (pitch === undefined) continue;
+    const degreeCents = pitchToCents(pitch);
+    const rawDelta = centsInPeriod - degreeCents;
+
+    // Three candidates: no wrap, wrap up (degree is near period end, hz is near start), wrap down
+    const candidates: Array<{ delta: number; octaveAdjust: number }> = [
+      { delta: rawDelta, octaveAdjust: 0 },
+      { delta: rawDelta + tuning.periodCents, octaveAdjust: -1 },
+      { delta: rawDelta - tuning.periodCents, octaveAdjust: 1 },
+    ];
+
+    for (const { delta, octaveAdjust } of candidates) {
+      if (Math.abs(delta) < Math.abs(bestDelta)) {
+        bestDelta = delta;
+        bestIndex = degIdx;
+        bestOctaveAdjust = octaveAdjust;
+      }
+    }
+  }
+
+  return {
+    degreeIndex: bestIndex,
+    octave: octave + bestOctaveAdjust,
+    centsError: bestDelta,
+  };
+}
