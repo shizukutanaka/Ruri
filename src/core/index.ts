@@ -23,3 +23,6 @@ export * from './rhythm.js';
 export * from './pitch-detect.js';
 export * from './pcset.js';
 export * from './maqam.js';
+export * from './key-detect.js';
+export * from './progression.js';
+export * from './japanese-scale.js';
