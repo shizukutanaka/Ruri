@@ -90,3 +90,46 @@
 | `packSysEx7bit` 公開                                  | `mts.ts` の内部実装を抽出するリファクタ、低リスクだが別 PR |
 | `compareTunings` テーブル                             | `tuningDeviationReport` を N 音律に拡張、I2 検証後に着手   |
 | `harmonicAlignmentScore`                              | spectrum と scale の cross-correlation、別 PR              |
+
+## Round 2 調査(2026-06-21)
+
+追加で Qiita/Zenn/note を調査し、現行リポジトリに存在しない領域(リズム、ピッチ検出、ピッチクラス集合論、非西洋音律)を抽出した。
+
+### Round 2 改善点(実装スコープ)
+
+#### J1. `euclideanRhythm(pulses, steps, rotation?) → boolean[]`
+
+- **場所**: 新規 `src/core/rhythm.ts`
+- **アルゴリズム**: Bjorklund アルゴリズム — k 個のヒットを n ステップ上にできるだけ均等に分布
+- **出典**: [Strudel IDM 記事](https://zenn.dev/yasuna_ide/articles/4cfbd8b8f1ad50)
+- **付随**: `rotateEuclidean(pattern, k)`, `rhythmOnsets(pattern, stepMs) → number[]`
+
+#### J2. `autocorrelationPitch(samples, sampleRate, opts?) → { hz, clarity } | null`
+
+- **場所**: 新規 `src/core/pitch-detect.ts`
+- **アルゴリズム**: 時間領域自己相関 + パラボリック内挿(低音での1サンプル誤差を約3 centsに改善)
+- **出典**: [sen-ltd / 自己相関チューナー](https://qiita.com/sen-ltd/items/61b13b49d0df19b68d4d)
+
+#### J3. ピッチクラス集合論ツールキット(`normalForm`/`primeForm`/`intervalVector`/`forteNumber`)
+
+- **場所**: 新規 `src/core/pcset.ts`
+- **API**: 12-EDO だけでなく 19/22/24/31 EDO 対応(modulus 引数で一般化)
+- **出典**: [西澤健一 / ピッチクラス・セット入門](https://note.com/nishizawakenichi/n/n86a3ccd6957f)
+
+#### J4. アラブ音楽マカーム/ジンス構築(`jins`/`maqam`)
+
+- **場所**: 新規 `src/core/maqam.ts`
+- **API**: rast/bayati/hijaz/kurd/nahawand/saba 等の jins(三/四/五度音列)、maqam 構築
+- **データ**: 24-EDO ベース、quarter-tone は `+150c` 等で表現
+- **出典**: [iota studio マカーム解説](https://note.com/nagareruiota/n/n562b7b148f38), [ryoseiarabic ジンス](https://note.com/ryoseiarabic/n/n2ad050aed9f4)
+
+### Round 2 実装外(将来検討)
+
+| 提案                                          | 理由                                           |
+| --------------------------------------------- | ---------------------------------------------- |
+| `tonnetzCoords` + 新リーマン変換 P/L/R        | 既存 `voice-leading.ts` と統合判断が必要、別PR |
+| `markovMelody` 学習+生成                      | API設計とseed/RNGの方針が必要、別PR            |
+| `raga` (arohana/avarohana/pakad)              | 22-shruti 体系の選定とJ4より大規模、別PR       |
+| `intervalRecognitionStages` (耳トレ4段階分類) | 教育用UI寄り、別PR                             |
+| `historicalTuningPreset` (Werckmeister 他)    | `temperament.ts` の preset 拡張、別PR          |
+| `abcNotation` adapter                         | 微分音記号(sagittal)の選定が必要、別PR         |
