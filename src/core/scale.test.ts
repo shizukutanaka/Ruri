@@ -547,6 +547,12 @@ import {
   tuningFamilySocraticRadarTrimmedMean,
   tuningFamilySocraticRadarRobustMedian,
   tuningFamilySocraticRadarPercentileRank,
+  tuningFamilySocraticRadarCumulativeScore,
+  tuningFamilySocraticRadarRankingVector,
+  tuningFamilySocraticRadarMinMaxNormalized,
+  tuningFamilySocraticRadarAboveThresholdCount,
+  tuningFamilySocraticRadarL1Norm,
+  tuningFamilySocraticRadarL2Norm,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -579,6 +585,10 @@ import {
   pcSetIntersection,
   pcSetUnion,
   scaleDistance,
+  zetaFunction,
+  roughnessProfile,
+  normalizeSpectrum,
+  spectrumSimilarity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -19935,6 +19945,164 @@ describe('tuningFamilySocraticRadarPercentileRank', () => {
   });
 });
 
+// Q1050 — tuningFamilySocraticRadarCumulativeScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCumulativeScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_cumulativeScores_has_length_5', () => {
+    const { cumulativeScores } = tuningFamilySocraticRadarCumulativeScore([t12], spec, 440);
+    expect(cumulativeScores).toHaveLength(5);
+  });
+
+  it('test_totalScore_equals_last_cumulativeScore', () => {
+    const { cumulativeScores, totalScore } = tuningFamilySocraticRadarCumulativeScore([t12], spec, 440);
+    expect(totalScore).toBeCloseTo(cumulativeScores[4]!, 10);
+  });
+
+  it('test_cumulativeScores_are_monotonically_non_decreasing', () => {
+    const { cumulativeScores } = tuningFamilySocraticRadarCumulativeScore([t12], spec, 440);
+    for (let i = 1; i < cumulativeScores.length; i++) {
+      expect(cumulativeScores[i]!).toBeGreaterThanOrEqual(cumulativeScores[i - 1]!);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1052 — tuningFamilySocraticRadarRankingVector
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarRankingVector', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_rankingVector_has_all_5_axes', () => {
+    const { rankingVector } = tuningFamilySocraticRadarRankingVector([t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(typeof rankingVector[ax]).toBe('number');
+    }
+  });
+
+  it('test_ranks_sum_to_15', () => {
+    const { rankingVector } = tuningFamilySocraticRadarRankingVector([t12], spec, 440);
+    const total = Object.values(rankingVector).reduce((s, v) => s + v, 0);
+    expect(total).toBeCloseTo(15, 10);
+  });
+
+  it('test_all_ranks_in_range_1_to_5', () => {
+    const { rankingVector } = tuningFamilySocraticRadarRankingVector([t12], spec, 440);
+    for (const v of Object.values(rankingVector)) {
+      expect(v).toBeGreaterThanOrEqual(1);
+      expect(v).toBeLessThanOrEqual(5);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1054 — tuningFamilySocraticRadarMinMaxNormalized
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMinMaxNormalized', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_normalizedProfile_values_in_0_1', () => {
+    const { normalizedProfile } = tuningFamilySocraticRadarMinMaxNormalized([t12], spec, 440);
+    for (const v of Object.values(normalizedProfile)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('test_min_value_is_0_and_max_is_1_when_not_flat', () => {
+    const { normalizedProfile } = tuningFamilySocraticRadarMinMaxNormalized([t12], spec, 440);
+    const values = Object.values(normalizedProfile);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    if (max !== min) {
+      expect(min).toBeCloseTo(0, 10);
+      expect(max).toBeCloseTo(1, 10);
+    }
+  });
+
+  it('test_empty_tunings_returns_all_0_5', () => {
+    const { normalizedProfile } = tuningFamilySocraticRadarMinMaxNormalized([], spec, 440);
+    for (const v of Object.values(normalizedProfile)) {
+      expect(v).toBeCloseTo(0.5, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1056 — tuningFamilySocraticRadarAboveThresholdCount
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAboveThresholdCount', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_count_equals_aboveAxes_length', () => {
+    const { count, aboveAxes } = tuningFamilySocraticRadarAboveThresholdCount([t12], spec, 0.5, 440);
+    expect(count).toBe(aboveAxes.length);
+  });
+
+  it('test_threshold_negative_returns_count_5', () => {
+    const { count } = tuningFamilySocraticRadarAboveThresholdCount([t12], spec, -0.1, 440);
+    expect(count).toBe(5);
+  });
+
+  it('test_threshold_1_returns_count_at_most_5', () => {
+    const { count } = tuningFamilySocraticRadarAboveThresholdCount([t12], spec, 1, 440);
+    expect(count).toBeGreaterThanOrEqual(0);
+    expect(count).toBeLessThanOrEqual(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1058 — tuningFamilySocraticRadarL1Norm
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarL1Norm', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_l1Norm_is_non_negative', () => {
+    const { l1Norm } = tuningFamilySocraticRadarL1Norm([t12], spec, 440);
+    expect(l1Norm).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_l1Norm_at_most_5', () => {
+    const { l1Norm } = tuningFamilySocraticRadarL1Norm([t12], spec, 440);
+    expect(l1Norm).toBeLessThanOrEqual(5);
+  });
+
+  it('test_empty_tunings_returns_l1Norm_0', () => {
+    const { l1Norm } = tuningFamilySocraticRadarL1Norm([], spec, 440);
+    expect(l1Norm).toBeCloseTo(0, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1060 — tuningFamilySocraticRadarL2Norm
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarL2Norm', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_l2Norm_is_non_negative', () => {
+    const { l2Norm } = tuningFamilySocraticRadarL2Norm([t12], spec, 440);
+    expect(l2Norm).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_l2Norm_at_most_sqrt_5', () => {
+    const { l2Norm } = tuningFamilySocraticRadarL2Norm([t12], spec, 440);
+    expect(l2Norm).toBeLessThanOrEqual(Math.sqrt(5) + 1e-9);
+  });
+
+  it('test_empty_tunings_returns_l2Norm_0', () => {
+    const { l2Norm } = tuningFamilySocraticRadarL2Norm([], spec, 440);
+    expect(l2Norm).toBeCloseTo(0, 10);
+  });
+});
+
 describe('isSubsetOf (U1)', () => {
   it('test_C_triad_in_major_scale', () => {
     expect(isSubsetOf([0, 4, 7], [0, 2, 4, 5, 7, 9, 11])).toBe(true);
@@ -19993,5 +20161,88 @@ describe('scaleDistance (U4)', () => {
   });
   it('test_empty_vs_empty_is_zero', () => {
     expect(scaleDistance([], [])).toBe(0);
+  });
+});
+
+describe('zetaFunction (V1)', () => {
+  it('test_empty_returns_0', () => {
+    expect(zetaFunction([])).toBe(0);
+  });
+  it('test_single_note_returns_0', () => {
+    expect(zetaFunction([5])).toBe(0);
+  });
+  it('test_major_triad_returns_positive', () => {
+    expect(zetaFunction([0, 4, 7])).toBeGreaterThan(0);
+  });
+  it('test_chromatic_cluster_higher_than_triad', () => {
+    // A semitone cluster is more harmonically dense than a spread triad
+    expect(zetaFunction([0, 1, 2])).toBeGreaterThan(zetaFunction([0, 4, 7]));
+  });
+});
+
+describe('roughnessProfile (V2)', () => {
+  const spec = harmonicSpectrum();
+  it('test_empty_returns_empty', () => {
+    expect(roughnessProfile([], spec)).toEqual([]);
+  });
+  it('test_single_freq_returns_empty', () => {
+    expect(roughnessProfile([440], spec)).toEqual([]);
+  });
+  it('test_two_freqs_returns_one_value', () => {
+    const result = roughnessProfile([261.63, 392.00], spec);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('test_three_freqs_returns_three_values', () => {
+    const result = roughnessProfile([261.63, 329.63, 392.00], spec);
+    expect(result).toHaveLength(3);
+    result.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
+  });
+});
+
+describe('normalizeSpectrum (V3)', () => {
+  it('test_empty_spectrum_returns_same', () => {
+    const s: ReturnType<typeof harmonicSpectrum> = [];
+    expect(normalizeSpectrum(s)).toEqual([]);
+  });
+  it('test_amplitudes_sum_to_1', () => {
+    const spec = harmonicSpectrum();
+    const norm = normalizeSpectrum(spec);
+    const total = norm.reduce((acc, p) => acc + p.amplitude, 0);
+    expect(total).toBeCloseTo(1.0, 10);
+  });
+  it('test_zero_amplitude_returns_original', () => {
+    const s = [{ ratio: 1, amplitude: 0 }, { ratio: 2, amplitude: 0 }];
+    const result = normalizeSpectrum(s);
+    expect(result).toBe(s); // same reference
+  });
+  it('test_ratios_preserved', () => {
+    const spec = harmonicSpectrum();
+    const norm = normalizeSpectrum(spec);
+    spec.forEach((p, i) => {
+      expect(norm[i]?.ratio).toBe(p.ratio);
+    });
+  });
+});
+
+describe('spectrumSimilarity (V4)', () => {
+  it('test_same_spectrum_returns_1', () => {
+    const spec = harmonicSpectrum();
+    expect(spectrumSimilarity(spec, spec)).toBeCloseTo(1.0, 10);
+  });
+  it('test_disjoint_spectra_returns_0', () => {
+    const a = [{ ratio: 1, amplitude: 1 }];
+    const b = [{ ratio: 2, amplitude: 1 }];
+    expect(spectrumSimilarity(a, b)).toBe(0);
+  });
+  it('test_empty_spectra_returns_0', () => {
+    expect(spectrumSimilarity([], [])).toBe(0);
+  });
+  it('test_range_0_to_1', () => {
+    const a = harmonicSpectrum(4);
+    const b = harmonicSpectrum(6);
+    const sim = spectrumSimilarity(a, b);
+    expect(sim).toBeGreaterThanOrEqual(0);
+    expect(sim).toBeLessThanOrEqual(1);
   });
 });

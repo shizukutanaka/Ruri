@@ -275,3 +275,10 @@
 - U2: pcSetIntersection — PC集合の積集合
 - U3: pcSetUnion — PC集合の和集合
 - U4: scaleDistance — ジャカード距離（音階類似度）
+
+## Round 13 — ゼータ関数・粗さプロファイル・スペクトル正規化・スペクトル類似度 (V1–V4)
+
+- V1: zetaFunction — 音程クラスベクトルのゼータ関数メトリクス
+- V2: roughnessProfile — 周波数ペアの粗さプロファイル配列
+- V3: normalizeSpectrum — スペクトル振幅の正規化
+- V4: spectrumSimilarity — スペクトル間のコサイン類似度

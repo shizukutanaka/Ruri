@@ -328,6 +328,12 @@ import {
   presetFamilySocraticRadarTrimmedMean,
   presetFamilySocraticRadarRobustMedian,
   presetFamilySocraticRadarPercentileRank,
+  presetFamilySocraticRadarCumulativeScore,
+  presetFamilySocraticRadarRankingVector,
+  presetFamilySocraticRadarMinMaxNormalized,
+  presetFamilySocraticRadarAboveThresholdCount,
+  presetFamilySocraticRadarL1Norm,
+  presetFamilySocraticRadarL2Norm,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -11352,6 +11358,158 @@ describe('presetFamilySocraticRadarPercentileRank (Q1049)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarPercentileRank(['not-a-preset'], spec, queryProfile, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1051 — presetFamilySocraticRadarCumulativeScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCumulativeScore (Q1051)', () => {
+  it('cumulativeScores has length 5 and totalScore equals last element', () => {
+    const spec = harmonicSpectrum(6);
+    const { cumulativeScores, totalScore } = presetFamilySocraticRadarCumulativeScore(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(cumulativeScores).toHaveLength(5);
+    expect(totalScore).toBeCloseTo(cumulativeScores[4]!, 10);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarCumulativeScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1053 — presetFamilySocraticRadarRankingVector
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRankingVector (Q1053)', () => {
+  it('ranks sum to 15', () => {
+    const spec = harmonicSpectrum(6);
+    const { rankingVector } = presetFamilySocraticRadarRankingVector(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    const total = Object.values(rankingVector).reduce((s, v) => s + v, 0);
+    expect(total).toBeCloseTo(15, 10);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarRankingVector(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1055 — presetFamilySocraticRadarMinMaxNormalized
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMinMaxNormalized (Q1055)', () => {
+  it('normalized values are in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { normalizedProfile } = presetFamilySocraticRadarMinMaxNormalized(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    for (const v of Object.values(normalizedProfile)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarMinMaxNormalized(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1057 — presetFamilySocraticRadarAboveThresholdCount
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAboveThresholdCount (Q1057)', () => {
+  it('count equals aboveAxes length with threshold 0.5', () => {
+    const spec = harmonicSpectrum(6);
+    const { count, aboveAxes } = presetFamilySocraticRadarAboveThresholdCount(
+      ['12-tet'],
+      spec,
+      0.5,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(count).toBe(aboveAxes.length);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAboveThresholdCount(['not-a-preset'], spec, 0.5, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1059 — presetFamilySocraticRadarL1Norm
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarL1Norm (Q1059)', () => {
+  it('l1Norm is in [0, 5]', () => {
+    const spec = harmonicSpectrum(6);
+    const { l1Norm } = presetFamilySocraticRadarL1Norm(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(l1Norm).toBeGreaterThanOrEqual(0);
+    expect(l1Norm).toBeLessThanOrEqual(5);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarL1Norm(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1061 — presetFamilySocraticRadarL2Norm
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarL2Norm (Q1061)', () => {
+  it('l2Norm is in [0, sqrt(5)]', () => {
+    const spec = harmonicSpectrum(6);
+    const { l2Norm } = presetFamilySocraticRadarL2Norm(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(l2Norm).toBeGreaterThanOrEqual(0);
+    expect(l2Norm).toBeLessThanOrEqual(Math.sqrt(5) + 1e-9);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarL2Norm(['not-a-preset'], spec, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });
