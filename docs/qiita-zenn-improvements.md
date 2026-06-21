@@ -133,3 +133,45 @@
 | `intervalRecognitionStages` (耳トレ4段階分類) | 教育用UI寄り、別PR                             |
 | `historicalTuningPreset` (Werckmeister 他)    | `temperament.ts` の preset 拡張、別PR          |
 | `abcNotation` adapter                         | 微分音記号(sagittal)の選定が必要、別PR         |
+
+## Round 3 調査(2026-06-21)
+
+第3回調査ではジャズ和声/伝統音律/グルーヴ/鍵検出に焦点を当てた。
+
+### Round 3 改善点(実装スコープ)
+
+#### K1. `detectKey(pcWeights[12]) → { tonic, mode, score, ranked }`
+
+- **場所**: 新規 `src/core/key-detect.ts`
+- **アルゴリズム**: Krumhansl–Schmuckler — 入力 chroma ベクトルと長/短調 12 回転プロファイルの相関を計算、上位を返す
+- **出典**: [y_abe_bc コード推定](https://qiita.com/y_abe_bc/items/73778c9202ab4f8a7474), [platoronical 鍵検出](https://qiita.com/platoronical/items/9981670a903dd252a9be)
+
+#### K2. ジャズ ii-V-I + リハーモ補助 (`iiVI`, `tritoneSub`, `secondaryDominantOf`)
+
+- **場所**: 新規 `src/core/progression.ts`
+- **API**: `iiVI(key, 'major'|'minor') → ChordSpec[]`, `tritoneSub(chord)`, `secondaryDominantOf(chord)`
+- **出典**: [daisukekuroda 2-5-1](https://note.com/daisukekuroda/n/nabbe0e28be09), [mtdtkm_88 トライトーン置換](https://note.com/mtdtkm_88/n/n0c2f72d077e0)
+
+#### K3. 日本箏調律プリセット (`kotoTuning`, `japaneseScale`)
+
+- **場所**: 新規 `src/core/japanese-scale.ts`
+- **API**: `japaneseScale('in'|'ritsu'|'miyakoBushi'|'yo'|'minyo') → number[]` (cents 配列)
+- **箏調律**: `kotoTuning('hira'|'kumoi'|'nakazora'|'akebono'|'iwato', tonicHz) → number[]` (13弦の周波数)
+- **出典**: [惣楽舎 箏調律](https://note.com/sohgakusha25/n/nc4fed8208a2e), [keijiikeya 都節](https://note.com/keijiikeya/n/nbbe7ab4ab196)
+
+#### K4. スイング・クォンタイズ (`applySwing`, `quantizeTicks`)
+
+- **場所**: 既存 `src/core/rhythm.ts` に追加
+- **API**: `applySwing(events, ratio, subdivision) → events`, `quantizeTicks(ticks, grid, strength?) → ticks`
+- **出典**: [satie スイング変換](https://qiita.com/satie/items/15619988cfb7a2046086), [tatmos REAPER クォンタイズ](https://qiita.com/tatmos/items/ebb0241c34c1c83de7b7)
+
+### Round 3 実装外(将来検討)
+
+| 提案                                  | 理由                                                    |
+| ------------------------------------- | ------------------------------------------------------- |
+| ガムラン slendro/pelog 生成器         | 各セット bespoke、テスト基準を選定後別PR                |
+| comma toolbox (syntonic/Pythagorean)  | `cents.ts` の純粋拡張、低リスクだが別PR                 |
+| 加算合成スペクトラム (PeriodicWave用) | `spectrum.ts` 拡張、Web Audio 連携の API 設計が必要     |
+| polyrhythm スケジューラ (LCM)         | `rhythm.ts` への追加、K4 と同時 PR にしない方がレビュー軽い |
+| neo-Riemannian P/L/R 操作             | `voice-leading.ts` との統合判断、別PR                   |
+| JI subgroup 近似探索                  | `ratio.ts` 拡張、コストモデル選定後別PR                 |
