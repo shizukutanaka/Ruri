@@ -18657,6 +18657,213 @@ export function tuningFamilySocraticRadarSignificanceTest(
 }
 
 // ---------------------------------------------------------------------------
+// Q1026 — tuningFamilySocraticRadarMaturityGap
+// ---------------------------------------------------------------------------
+
+/**
+ * Difference between the maturity axis score and the mean of the other 4 axes.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { maturityGap, maturityLabel }
+ */
+export function tuningFamilySocraticRadarMaturityGap(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { maturityGap: number; maturityLabel: 'lagging' | 'aligned' | 'leading' } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const otherAxes: AxisKey[] = ['diversity', 'versatility', 'benchmark', 'convergence'];
+  const otherMean = otherAxes.reduce((s, ax) => s + meanProfile[ax], 0) / otherAxes.length;
+  const maturityGap = meanProfile['maturity'] - otherMean;
+  const maturityLabel: 'lagging' | 'aligned' | 'leading' =
+    maturityGap < -0.1 ? 'lagging' : maturityGap > 0.1 ? 'leading' : 'aligned';
+  return { maturityGap, maturityLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q1028 — tuningFamilySocraticRadarConvergenceScore
+// ---------------------------------------------------------------------------
+
+/**
+ * How strongly do all family members agree on the convergence axis?
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { convergenceAgreement, convergenceLabel }
+ */
+export function tuningFamilySocraticRadarConvergenceScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { convergenceAgreement: number; convergenceLabel: 'divergent' | 'mixed' | 'convergent' } {
+  if (tunings.length <= 1) {
+    return { convergenceAgreement: 1, convergenceLabel: 'convergent' };
+  }
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vals = profiles.map((p) => p['convergence']);
+  const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+  const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length;
+  const std = Math.sqrt(variance);
+  const convergenceAgreement = Math.max(0, Math.min(1, 1 - std));
+  const convergenceLabel: 'divergent' | 'mixed' | 'convergent' =
+    convergenceAgreement < 0.5 ? 'divergent' : convergenceAgreement < 0.8 ? 'mixed' : 'convergent';
+  return { convergenceAgreement, convergenceLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q1030 — tuningFamilySocraticRadarBenchmarkGap
+// ---------------------------------------------------------------------------
+
+/**
+ * Gap between the benchmark axis and the mean of the other 4 axes.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { benchmarkGap, benchmarkLabel }
+ */
+export function tuningFamilySocraticRadarBenchmarkGap(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { benchmarkGap: number; benchmarkLabel: 'underperforming' | 'aligned' | 'outperforming' } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const otherAxes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'convergence'];
+  const otherMean = otherAxes.reduce((s, ax) => s + meanProfile[ax], 0) / otherAxes.length;
+  const benchmarkGap = meanProfile['benchmark'] - otherMean;
+  const benchmarkLabel: 'underperforming' | 'aligned' | 'outperforming' =
+    benchmarkGap < -0.1 ? 'underperforming' : benchmarkGap > 0.1 ? 'outperforming' : 'aligned';
+  return { benchmarkGap, benchmarkLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q1032 — tuningFamilySocraticRadarDiversityLeadership
+// ---------------------------------------------------------------------------
+
+/**
+ * How much does the diversity axis lead or lag the family's overall mean score?
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { diversityLeadership, leadershipLabel }
+ */
+export function tuningFamilySocraticRadarDiversityLeadership(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { diversityLeadership: number; leadershipLabel: 'follower' | 'peer' | 'leader' } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const overallMean = axes.reduce((s, ax) => s + meanProfile[ax], 0) / axes.length;
+  const diversityLeadership = meanProfile['diversity'] - overallMean;
+  const leadershipLabel: 'follower' | 'peer' | 'leader' =
+    diversityLeadership < -0.1 ? 'follower' : diversityLeadership > 0.1 ? 'leader' : 'peer';
+  return { diversityLeadership, leadershipLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q1034 — tuningFamilySocraticRadarVersatilityQuotient
+// ---------------------------------------------------------------------------
+
+/**
+ * The ratio of versatility to maturity axis scores.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { versatilityQuotient, quotientLabel }
+ */
+export function tuningFamilySocraticRadarVersatilityQuotient(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  versatilityQuotient: number;
+  quotientLabel: 'maturity-heavy' | 'balanced' | 'versatility-heavy';
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const maturity = meanProfile['maturity'];
+  const versatility = meanProfile['versatility'];
+  const versatilityQuotient = maturity === 0 ? 1.0 : versatility / maturity;
+  const quotientLabel: 'maturity-heavy' | 'balanced' | 'versatility-heavy' =
+    versatilityQuotient < 0.8
+      ? 'maturity-heavy'
+      : versatilityQuotient > 1.25
+        ? 'versatility-heavy'
+        : 'balanced';
+  return { versatilityQuotient, quotientLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q1036 — tuningFamilySocraticRadarWeightedScore
+// ---------------------------------------------------------------------------
+
+/**
+ * A weighted composite score given a weight vector for each axis.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param weights - Per-axis weights; missing axes default to 1.0.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { weightedScore }
+ */
+export function tuningFamilySocraticRadarWeightedScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  weights: Partial<Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>>,
+  rootHz?: number,
+): { weightedScore: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  let weightedSum = 0;
+  let totalWeight = 0;
+  for (const ax of axes) {
+    const w = weights[ax] ?? 1.0;
+    weightedSum += meanProfile[ax] * w;
+    totalWeight += w;
+  }
+  const weightedScore = totalWeight === 0 ? 0 : weightedSum / totalWeight;
+  return { weightedScore };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 

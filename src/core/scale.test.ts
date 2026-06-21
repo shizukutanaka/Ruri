@@ -535,6 +535,12 @@ import {
   tuningFamilySocraticRadarResonanceScore,
   tuningFamilySocraticRadarFlexibilityScore,
   tuningFamilySocraticRadarSignificanceTest,
+  tuningFamilySocraticRadarMaturityGap,
+  tuningFamilySocraticRadarConvergenceScore,
+  tuningFamilySocraticRadarBenchmarkGap,
+  tuningFamilySocraticRadarDiversityLeadership,
+  tuningFamilySocraticRadarVersatilityQuotient,
+  tuningFamilySocraticRadarWeightedScore,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -18781,6 +18787,157 @@ describe('tuningFamilySocraticRadarSignificanceTest', () => {
     for (const ax of significantAxes) {
       expect(validAxes.has(ax)).toBe(true);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1026 — tuningFamilySocraticRadarMaturityGap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMaturityGap', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_maturityGap_is_number', () => {
+    const { maturityGap } = tuningFamilySocraticRadarMaturityGap([t12], spec, 440);
+    expect(typeof maturityGap).toBe('number');
+  });
+
+  it('test_maturityLabel_is_valid', () => {
+    const validLabels = new Set(['lagging', 'aligned', 'leading']);
+    const { maturityLabel } = tuningFamilySocraticRadarMaturityGap([t12], spec, 440);
+    expect(validLabels.has(maturityLabel)).toBe(true);
+  });
+
+  it('test_empty_tunings_maturityGap_is_zero', () => {
+    const { maturityGap } = tuningFamilySocraticRadarMaturityGap([], spec, 440);
+    expect(maturityGap).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1028 — tuningFamilySocraticRadarConvergenceScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarConvergenceScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_convergenceAgreement_is_one', () => {
+    const { convergenceAgreement } = tuningFamilySocraticRadarConvergenceScore([t12], spec, 440);
+    expect(convergenceAgreement).toBe(1);
+  });
+
+  it('test_convergenceLabel_is_valid', () => {
+    const validLabels = new Set(['divergent', 'mixed', 'convergent']);
+    const { convergenceLabel } = tuningFamilySocraticRadarConvergenceScore([t12], spec, 440);
+    expect(validLabels.has(convergenceLabel)).toBe(true);
+  });
+
+  it('test_convergenceAgreement_in_range', () => {
+    const { convergenceAgreement } = tuningFamilySocraticRadarConvergenceScore([t12, edo(19, 440)], spec, 440);
+    expect(convergenceAgreement).toBeGreaterThanOrEqual(0);
+    expect(convergenceAgreement).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1030 — tuningFamilySocraticRadarBenchmarkGap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarBenchmarkGap', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_benchmarkGap_is_number', () => {
+    const { benchmarkGap } = tuningFamilySocraticRadarBenchmarkGap([t12], spec, 440);
+    expect(typeof benchmarkGap).toBe('number');
+  });
+
+  it('test_benchmarkLabel_is_valid', () => {
+    const validLabels = new Set(['underperforming', 'aligned', 'outperforming']);
+    const { benchmarkLabel } = tuningFamilySocraticRadarBenchmarkGap([t12], spec, 440);
+    expect(validLabels.has(benchmarkLabel)).toBe(true);
+  });
+
+  it('test_empty_tunings_benchmarkGap_is_zero', () => {
+    const { benchmarkGap } = tuningFamilySocraticRadarBenchmarkGap([], spec, 440);
+    expect(benchmarkGap).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1032 — tuningFamilySocraticRadarDiversityLeadership
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDiversityLeadership', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_diversityLeadership_is_number', () => {
+    const { diversityLeadership } = tuningFamilySocraticRadarDiversityLeadership([t12], spec, 440);
+    expect(typeof diversityLeadership).toBe('number');
+  });
+
+  it('test_leadershipLabel_is_valid', () => {
+    const validLabels = new Set(['follower', 'peer', 'leader']);
+    const { leadershipLabel } = tuningFamilySocraticRadarDiversityLeadership([t12], spec, 440);
+    expect(validLabels.has(leadershipLabel)).toBe(true);
+  });
+
+  it('test_empty_tunings_diversityLeadership_is_zero', () => {
+    const { diversityLeadership } = tuningFamilySocraticRadarDiversityLeadership([], spec, 440);
+    expect(diversityLeadership).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1034 — tuningFamilySocraticRadarVersatilityQuotient
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarVersatilityQuotient', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_versatilityQuotient_is_number', () => {
+    const { versatilityQuotient } = tuningFamilySocraticRadarVersatilityQuotient([t12], spec, 440);
+    expect(typeof versatilityQuotient).toBe('number');
+  });
+
+  it('test_quotientLabel_is_valid', () => {
+    const validLabels = new Set(['maturity-heavy', 'balanced', 'versatility-heavy']);
+    const { quotientLabel } = tuningFamilySocraticRadarVersatilityQuotient([t12], spec, 440);
+    expect(validLabels.has(quotientLabel)).toBe(true);
+  });
+
+  it('test_empty_tunings_versatilityQuotient_is_one', () => {
+    // maturity=0 → quotient defaults to 1.0
+    const { versatilityQuotient } = tuningFamilySocraticRadarVersatilityQuotient([], spec, 440);
+    expect(versatilityQuotient).toBe(1.0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1036 — tuningFamilySocraticRadarWeightedScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarWeightedScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_weightedScore_is_number', () => {
+    const { weightedScore } = tuningFamilySocraticRadarWeightedScore([t12], spec, {}, 440);
+    expect(typeof weightedScore).toBe('number');
+  });
+
+  it('test_weightedScore_in_range_0_1', () => {
+    const { weightedScore } = tuningFamilySocraticRadarWeightedScore(
+      [t12],
+      spec,
+      { diversity: 2, versatility: 1 },
+      440,
+    );
+    expect(weightedScore).toBeGreaterThanOrEqual(0);
+    expect(weightedScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_empty_tunings_weightedScore_is_zero', () => {
+    const { weightedScore } = tuningFamilySocraticRadarWeightedScore([], spec, {}, 440);
+    expect(weightedScore).toBe(0);
   });
 });
 

@@ -316,6 +316,12 @@ import {
   presetFamilySocraticRadarResonanceScore,
   presetFamilySocraticRadarFlexibilityScore,
   presetFamilySocraticRadarSignificanceTest,
+  presetFamilySocraticRadarMaturityGap,
+  presetFamilySocraticRadarConvergenceScore,
+  presetFamilySocraticRadarBenchmarkGap,
+  presetFamilySocraticRadarDiversityLeadership,
+  presetFamilySocraticRadarVersatilityQuotient,
+  presetFamilySocraticRadarWeightedScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -11023,6 +11029,160 @@ describe('presetFamilySocraticRadarSignificanceTest (Q1025)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarSignificanceTest(['not-a-preset'], ['12-tet'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1027 — presetFamilySocraticRadarMaturityGap
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMaturityGap (Q1027)', () => {
+  it('maturityGap is a number', () => {
+    const spec = harmonicSpectrum(6);
+    const { maturityGap } = presetFamilySocraticRadarMaturityGap(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof maturityGap).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarMaturityGap(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1029 — presetFamilySocraticRadarConvergenceScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarConvergenceScore (Q1029)', () => {
+  it('convergenceAgreement is in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { convergenceAgreement } = presetFamilySocraticRadarConvergenceScore(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(convergenceAgreement).toBeGreaterThanOrEqual(0);
+    expect(convergenceAgreement).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarConvergenceScore(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1031 — presetFamilySocraticRadarBenchmarkGap
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarBenchmarkGap (Q1031)', () => {
+  it('benchmarkGap is a number', () => {
+    const spec = harmonicSpectrum(6);
+    const { benchmarkGap } = presetFamilySocraticRadarBenchmarkGap(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof benchmarkGap).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarBenchmarkGap(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1033 — presetFamilySocraticRadarDiversityLeadership
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarDiversityLeadership (Q1033)', () => {
+  it('diversityLeadership is a number', () => {
+    const spec = harmonicSpectrum(6);
+    const { diversityLeadership } = presetFamilySocraticRadarDiversityLeadership(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof diversityLeadership).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarDiversityLeadership(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1035 — presetFamilySocraticRadarVersatilityQuotient
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarVersatilityQuotient (Q1035)', () => {
+  it('versatilityQuotient is a number', () => {
+    const spec = harmonicSpectrum(6);
+    const { versatilityQuotient } = presetFamilySocraticRadarVersatilityQuotient(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof versatilityQuotient).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarVersatilityQuotient(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1037 — presetFamilySocraticRadarWeightedScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarWeightedScore (Q1037)', () => {
+  it('weightedScore is a number in [0, 1]', () => {
+    const spec = harmonicSpectrum(6);
+    const { weightedScore } = presetFamilySocraticRadarWeightedScore(
+      ['12-tet'],
+      spec,
+      { diversity: 2, versatility: 1 },
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof weightedScore).toBe('number');
+    expect(weightedScore).toBeGreaterThanOrEqual(0);
+    expect(weightedScore).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarWeightedScore(
+        ['not-a-preset'],
+        spec,
+        { diversity: 2, versatility: 1 },
+        undefined,
+        [TWELVE_TET],
+      ),
     ).toThrow(RangeError);
   });
 });
