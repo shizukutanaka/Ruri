@@ -517,6 +517,12 @@ import {
   tuningFamilySocraticRadarIntersectionProfile,
   tuningFamilySocraticRadarUnionProfile,
   tuningFamilySocraticRadarSpreadProfile,
+  tuningFamilySocraticRadarOptimalityGap,
+  tuningFamilySocraticRadarNeutralityScore,
+  tuningFamilySocraticRadarTopPerformers,
+  tuningFamilySocraticRadarWeakMembers,
+  tuningFamilySocraticRadarStrengthMap,
+  tuningFamilySocraticRadarSummaryReport,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -533,6 +539,10 @@ import {
   diatonicTransposition,
   enharmonicEquivalents,
   chordComplexity,
+  noteNameToMidi,
+  scaleDegreeToSolfege,
+  pitchClassSet,
+  chordName,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -18268,6 +18278,170 @@ describe('tuningFamilySocraticRadarSpreadProfile', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Q990 — tuningFamilySocraticRadarOptimalityGap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarOptimalityGap', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_optimalityGap_is_non_negative', () => {
+    const { optimalityGap } = tuningFamilySocraticRadarOptimalityGap([t12], spec, 440);
+    expect(optimalityGap).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_optimalityLabel_is_valid', () => {
+    const { optimalityLabel } = tuningFamilySocraticRadarOptimalityGap([t12], spec, 440);
+    expect(['excellent', 'good', 'fair', 'poor']).toContain(optimalityLabel);
+  });
+
+  it('test_optimalityGap_bounded_by_sqrt5', () => {
+    const { optimalityGap } = tuningFamilySocraticRadarOptimalityGap([t12], spec, 440);
+    expect(optimalityGap).toBeLessThanOrEqual(Math.sqrt(5) + 1e-9);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q992 — tuningFamilySocraticRadarNeutralityScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarNeutralityScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_neutralityScore_in_0_to_1', () => {
+    const { neutralityScore } = tuningFamilySocraticRadarNeutralityScore([t12], spec, 440);
+    expect(neutralityScore).toBeGreaterThanOrEqual(0);
+    expect(neutralityScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_mostNeutralAxis_is_valid_axis', () => {
+    const { mostNeutralAxis } = tuningFamilySocraticRadarNeutralityScore([t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(axes).toContain(mostNeutralAxis);
+  });
+
+  it('test_leastNeutralAxis_is_valid_axis', () => {
+    const { leastNeutralAxis } = tuningFamilySocraticRadarNeutralityScore([t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    expect(axes).toContain(leastNeutralAxis);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q994 — tuningFamilySocraticRadarTopPerformers
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarTopPerformers', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_topPerformers_has_all_5_axes', () => {
+    const { topPerformers } = tuningFamilySocraticRadarTopPerformers([t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    for (const ax of axes) {
+      expect(topPerformers).toHaveProperty(ax);
+    }
+  });
+
+  it('test_single_tuning_all_axes_empty', () => {
+    const { topPerformers } = tuningFamilySocraticRadarTopPerformers([t12], spec, 440);
+    for (const arr of Object.values(topPerformers)) {
+      expect(arr).toHaveLength(0);
+    }
+  });
+
+  it('test_topPerformers_indices_within_range', () => {
+    const t2 = equalTemperament12(440);
+    const { topPerformers } = tuningFamilySocraticRadarTopPerformers([t12, t2], spec, 440);
+    for (const arr of Object.values(topPerformers)) {
+      for (const idx of arr) {
+        expect(idx).toBeGreaterThanOrEqual(0);
+        expect(idx).toBeLessThan(2);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q996 — tuningFamilySocraticRadarWeakMembers
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarWeakMembers', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_returns_empty_array', () => {
+    const { weakMemberIndices } = tuningFamilySocraticRadarWeakMembers([t12], spec, 440);
+    expect(weakMemberIndices).toEqual([]);
+  });
+
+  it('test_weakMemberIndices_is_array', () => {
+    const { weakMemberIndices } = tuningFamilySocraticRadarWeakMembers([t12], spec, 440);
+    expect(Array.isArray(weakMemberIndices)).toBe(true);
+  });
+
+  it('test_weakMemberIndices_within_valid_range', () => {
+    const t2 = equalTemperament12(440);
+    const { weakMemberIndices } = tuningFamilySocraticRadarWeakMembers([t12, t2], spec, 440);
+    for (const idx of weakMemberIndices) {
+      expect(idx).toBeGreaterThanOrEqual(0);
+      expect(idx).toBeLessThan(2);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q998 — tuningFamilySocraticRadarStrengthMap
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarStrengthMap', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_strengthMap_has_all_5_axes', () => {
+    const { strengthMap } = tuningFamilySocraticRadarStrengthMap([t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    for (const ax of axes) {
+      expect(strengthMap).toHaveProperty(ax);
+    }
+  });
+
+  it('test_strengthMap_values_in_0_to_1', () => {
+    const { strengthMap } = tuningFamilySocraticRadarStrengthMap([t12], spec, 440);
+    for (const v of Object.values(strengthMap)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('test_empty_tunings_strengthMap_all_zero', () => {
+    const { strengthMap } = tuningFamilySocraticRadarStrengthMap([], spec, 440);
+    for (const v of Object.values(strengthMap)) {
+      expect(v).toBe(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1000 — tuningFamilySocraticRadarSummaryReport
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSummaryReport', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_summaryReport_is_string', () => {
+    const { summaryReport } = tuningFamilySocraticRadarSummaryReport([t12], spec, 440);
+    expect(typeof summaryReport).toBe('string');
+  });
+
+  it('test_summaryReport_contains_family_size', () => {
+    const { summaryReport } = tuningFamilySocraticRadarSummaryReport([t12], spec, 440);
+    expect(summaryReport).toContain('Family: 1 tunings');
+  });
+
+  it('test_summaryReport_contains_trend_label', () => {
+    const { summaryReport } = tuningFamilySocraticRadarSummaryReport([t12], spec, 440);
+    expect(summaryReport).toMatch(/Trend: (improving|declining|stable)/);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -18770,5 +18944,141 @@ describe('chordComplexity (P4)', () => {
   it('test_all_12_pcs_has_high_complexity', () => {
     const score = chordComplexity([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], spectrum, 220);
     expect(score).toBeGreaterThan(0.5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// R1 — noteNameToMidi
+// ---------------------------------------------------------------------------
+
+describe('noteNameToMidi (R1)', () => {
+  it('test_C4_is_60', () => {
+    expect(noteNameToMidi('C4')).toBe(60);
+  });
+
+  it('test_A4_is_69', () => {
+    expect(noteNameToMidi('A4')).toBe(69);
+  });
+
+  it('test_sharp_note_C_sharp_4_is_61', () => {
+    expect(noteNameToMidi('C#4')).toBe(61);
+  });
+
+  it('test_flat_note_Db4_is_61', () => {
+    expect(noteNameToMidi('Db4')).toBe(61);
+  });
+
+  it('test_C_minus1_is_0', () => {
+    expect(noteNameToMidi('C-1')).toBe(0);
+  });
+
+  it('test_G9_is_127', () => {
+    expect(noteNameToMidi('G9')).toBe(127);
+  });
+
+  it('test_invalid_name_throws_range_error', () => {
+    expect(() => noteNameToMidi('X4')).toThrow(RangeError);
+  });
+
+  it('test_case_insensitive_c4_is_60', () => {
+    expect(noteNameToMidi('c4')).toBe(60);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// R2 — scaleDegreeToSolfege
+// ---------------------------------------------------------------------------
+
+describe('scaleDegreeToSolfege (R2)', () => {
+  it('test_7_degree_tonic_is_Do', () => {
+    expect(scaleDegreeToSolfege(0, 7)).toBe('Do');
+  });
+
+  it('test_7_degree_fifth_is_Sol', () => {
+    expect(scaleDegreeToSolfege(4, 7)).toBe('Sol');
+  });
+
+  it('test_5_degree_third_is_Mi', () => {
+    expect(scaleDegreeToSolfege(2, 5)).toBe('Mi');
+  });
+
+  it('test_12_degree_movable_do_index_6_is_Fi', () => {
+    expect(scaleDegreeToSolfege(6, 12)).toBe('Fi');
+  });
+
+  it('test_fixed_do_uses_chromatic_syllables', () => {
+    expect(scaleDegreeToSolfege(1, 7, 'fixed-do')).toBe('Di');
+  });
+
+  it('test_out_of_range_degree_throws_range_error', () => {
+    expect(() => scaleDegreeToSolfege(7, 7)).toThrow(RangeError);
+  });
+
+  it('test_negative_degree_throws_range_error', () => {
+    expect(() => scaleDegreeToSolfege(-1, 7)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// R3 — pitchClassSet
+// ---------------------------------------------------------------------------
+
+describe('pitchClassSet (R3)', () => {
+  it('test_removes_duplicates', () => {
+    expect(pitchClassSet([0, 12, 24])).toEqual([0]);
+  });
+
+  it('test_sorts_ascending', () => {
+    expect(pitchClassSet([7, 4, 0])).toEqual([0, 4, 7]);
+  });
+
+  it('test_maps_mod12', () => {
+    expect(pitchClassSet([13, 14])).toEqual([1, 2]);
+  });
+
+  it('test_negative_values_normalized', () => {
+    expect(pitchClassSet([-1])).toEqual([11]);
+  });
+
+  it('test_empty_array_returns_empty', () => {
+    expect(pitchClassSet([])).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// R4 — chordName
+// ---------------------------------------------------------------------------
+
+describe('chordName (R4)', () => {
+  it('test_C_major', () => {
+    expect(chordName([0, 4, 7])).toBe('maj');
+  });
+
+  it('test_A_minor_rotated', () => {
+    expect(chordName([9, 0, 4])).toBe('min');
+  });
+
+  it('test_dominant7', () => {
+    expect(chordName([0, 4, 7, 10])).toBe('dom7');
+  });
+
+  it('test_diminished', () => {
+    expect(chordName([0, 3, 6])).toBe('dim');
+  });
+
+  it('test_augmented', () => {
+    expect(chordName([0, 4, 8])).toBe('aug');
+  });
+
+  it('test_major7', () => {
+    expect(chordName([0, 4, 7, 11])).toBe('maj7');
+  });
+
+  it('test_half_diminished', () => {
+    expect(chordName([0, 3, 6, 10])).toBe('m7b5');
+  });
+
+  it('test_unknown_chord', () => {
+    expect(chordName([0, 1, 6])).toBe('unknown');
   });
 });

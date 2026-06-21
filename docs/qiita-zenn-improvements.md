@@ -247,3 +247,10 @@
 - P2: diatonicTransposition — 音階内度数移調
 - P3: enharmonicEquivalents — 異名同音表記の列挙
 - P4: chordComplexity — 和音複雑度（構造+スペクトル）
+
+## Round 9 — 音符名変換・ソルフェージュ・音高集合・和音名判定 (R1–R4)
+
+- R1: noteNameToMidi — 音符名→MIDIノート番号変換（midiNoteToNameの逆）
+- R2: scaleDegreeToSolfege — 音階度数→ソルフェージュ変換
+- R3: pitchClassSet — ピッチクラス集合の正規化
+- R4: chordName — インターバル構造から和音名判定

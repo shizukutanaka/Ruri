@@ -17934,6 +17934,243 @@ export function tuningFamilySocraticRadarSpreadProfile(
 }
 
 // ---------------------------------------------------------------------------
+// Q990 — tuningFamilySocraticRadarOptimalityGap
+// ---------------------------------------------------------------------------
+
+/**
+ * How far is the family's mean profile from the "ideal" [1,1,1,1,1]?
+ *
+ * optimalityGap = L2 distance from mean profile to [1,1,1,1,1]
+ * normalizedGap = optimalityGap / sqrt(5)
+ * Labels: normalizedGap < 0.2 → 'excellent', < 0.4 → 'good', < 0.7 → 'fair', ≥ 0.7 → 'poor'
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { optimalityGap, optimalityLabel }
+ */
+export function tuningFamilySocraticRadarOptimalityGap(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { optimalityGap: number; optimalityLabel: 'excellent' | 'good' | 'fair' | 'poor' } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const sumSq = axes.reduce((s, ax) => s + (1 - meanProfile[ax]) ** 2, 0);
+  const optimalityGap = Math.sqrt(sumSq);
+  const normalizedGap = optimalityGap / Math.sqrt(5);
+  const optimalityLabel: 'excellent' | 'good' | 'fair' | 'poor' =
+    normalizedGap < 0.2
+      ? 'excellent'
+      : normalizedGap < 0.4
+        ? 'good'
+        : normalizedGap < 0.7
+          ? 'fair'
+          : 'poor';
+  return { optimalityGap, optimalityLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q992 — tuningFamilySocraticRadarNeutralityScore
+// ---------------------------------------------------------------------------
+
+/**
+ * How close is each axis to the neutral value of 0.5?
+ *
+ * Per axis neutrality = 1 - 2*|score - 0.5|   (1 = perfectly neutral, 0 = fully extreme)
+ * neutralityScore = mean of all 5 per-axis neutralities
+ * mostNeutralAxis: axis closest to 0.5
+ * leastNeutralAxis: axis furthest from 0.5
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { neutralityScore, mostNeutralAxis, leastNeutralAxis }
+ */
+export function tuningFamilySocraticRadarNeutralityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { neutralityScore: number; mostNeutralAxis: AxisKey; leastNeutralAxis: AxisKey } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const axisNeutrality = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    axisNeutrality[ax] = 1 - 2 * Math.abs(meanProfile[ax] - 0.5);
+  }
+  const neutralityScore = axes.reduce((s, ax) => s + axisNeutrality[ax], 0) / 5;
+  let mostNeutralAxis: AxisKey = axes[0]!;
+  let leastNeutralAxis: AxisKey = axes[0]!;
+  for (let i = 1; i < axes.length; i++) {
+    if (axisNeutrality[axes[i]!]! > axisNeutrality[mostNeutralAxis]) mostNeutralAxis = axes[i]!;
+    if (axisNeutrality[axes[i]!]! < axisNeutrality[leastNeutralAxis]) leastNeutralAxis = axes[i]!;
+  }
+  return { neutralityScore, mostNeutralAxis, leastNeutralAxis };
+}
+
+// ---------------------------------------------------------------------------
+// Q994 — tuningFamilySocraticRadarTopPerformers
+// ---------------------------------------------------------------------------
+
+/**
+ * List which tunings score above the family mean on each axis (the "top performers").
+ *
+ * topPerformers[ax] = array of tuning indices whose score on ax > familyMean[ax]
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { topPerformers }
+ */
+export function tuningFamilySocraticRadarTopPerformers(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { topPerformers: Record<AxisKey, number[]> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const topPerformers = {} as Record<AxisKey, number[]>;
+  for (const ax of axes) {
+    topPerformers[ax] = profiles
+      .map((p, i) => ({ score: p[ax], idx: i }))
+      .filter(({ score }) => score > meanProfile[ax])
+      .map(({ idx }) => idx);
+  }
+  return { topPerformers };
+}
+
+// ---------------------------------------------------------------------------
+// Q996 — tuningFamilySocraticRadarWeakMembers
+// ---------------------------------------------------------------------------
+
+/**
+ * List which tunings score BELOW the family mean on ALL axes simultaneously.
+ *
+ * weakMemberIndices: indices of tunings where ALL 5 axis scores < family mean on that axis
+ * Single tuning: []
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { weakMemberIndices }
+ */
+export function tuningFamilySocraticRadarWeakMembers(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { weakMemberIndices: number[] } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return { weakMemberIndices: [] };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const weakMemberIndices = profiles
+    .map((p, i) => ({ profile: p, idx: i }))
+    .filter(({ profile }) => axes.every((ax) => profile[ax] < meanProfile[ax]))
+    .map(({ idx }) => idx);
+  return { weakMemberIndices };
+}
+
+// ---------------------------------------------------------------------------
+// Q998 — tuningFamilySocraticRadarStrengthMap
+// ---------------------------------------------------------------------------
+
+/**
+ * For each axis, identify the "strength zone": the fraction of family members scoring ≥ 0.6 on that axis.
+ *
+ * strengthMap[ax] = count of tunings with score ≥ 0.6 on ax / total tunings
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { strengthMap }
+ */
+export function tuningFamilySocraticRadarStrengthMap(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { strengthMap: Record<AxisKey, number> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const strengthMap = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+  for (const ax of axes) {
+    strengthMap[ax] =
+      n === 0 ? 0 : profiles.filter((p) => p[ax] >= 0.6).length / n;
+  }
+  return { strengthMap };
+}
+
+// ---------------------------------------------------------------------------
+// Q1000 — tuningFamilySocraticRadarSummaryReport
+// ---------------------------------------------------------------------------
+
+/**
+ * A comprehensive text summary combining multiple metrics.
+ *
+ * Includes:
+ *   - family size (number of tunings)
+ *   - mean scores per axis (round to 2 decimal places)
+ *   - top-2 strongest axes (highest mean score)
+ *   - healthIndex (from Q976 formula: (balance + saturation + mean) / 3)
+ *   - overallTrend label (from Q948 formula)
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { summaryReport }
+ */
+export function tuningFamilySocraticRadarSummaryReport(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { summaryReport: string } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  // Axes section (rounded to 2 dp)
+  const axesStr = axes.map((ax) => `${ax}=${meanProfile[ax].toFixed(2)}`).join(', ');
+  // Top-2 strongest axes
+  const sortedAxes = [...axes].sort((a, b) => meanProfile[b] - meanProfile[a]);
+  const strongest = `${sortedAxes[0]!}, ${sortedAxes[1]!}`;
+  // Health index
+  const { healthIndex } = tuningFamilySocraticRadarHealthIndex(tunings, spectrum, rootHz);
+  const healthLabel =
+    healthIndex >= 0.8 ? 'excellent' : healthIndex >= 0.6 ? 'good' : healthIndex >= 0.4 ? 'fair' : 'poor';
+  // Overall trend
+  const { overallTrend } = tuningFamilySocraticRadarTrend(tunings, spectrum, rootHz);
+  const summaryReport = [
+    `Family: ${tunings.length} tunings`,
+    `Axes: ${axesStr}`,
+    `Strongest: ${strongest}`,
+    `Health: ${healthIndex.toFixed(2)} (${healthLabel})`,
+    `Trend: ${overallTrend}`,
+  ].join('\n');
+  return { summaryReport };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -18572,4 +18809,216 @@ export function chordComplexity(
   const spectral = refDiss > 0 ? Math.min(chordDiss / refDiss, 1) : 0;
 
   return (structural + spectral) / 2;
+}
+
+// ---------------------------------------------------------------------------
+// R1 — noteNameToMidi
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a note name string to a MIDI note number.
+ *
+ * This is the inverse of `midiNoteToName`. MIDI 60 = C4, MIDI 69 = A4.
+ * Accidentals: `#` for sharp, `b` (lowercase b immediately after the letter) for flat.
+ * Octave range: -1 to 9 (MIDI 0–127).
+ *
+ * @param name - Note name string, e.g. `"C4"`, `"A#4"`, `"Bb4"`, `"Db3"`, `"F#5"`.
+ * @returns MIDI note number (0–127).
+ * @throws {RangeError} If the string is not a valid note name or the result is out of 0–127.
+ *
+ * @example
+ * noteNameToMidi('C4');   // 60
+ * noteNameToMidi('A4');   // 69
+ * noteNameToMidi('C#4');  // 61
+ * noteNameToMidi('Db4');  // 61
+ */
+export function noteNameToMidi(name: string): number {
+  // Regex: letter A-G (case-insensitive), optional accidental (# or b), then octave (possibly negative)
+  const match = /^([A-Ga-g])([#b]?)(-?\d+)$/.exec(name.trim());
+  if (!match) {
+    throw new RangeError(`Invalid note name: "${name}"`);
+  }
+  const letter = match[1]!.toUpperCase();
+  const accidental = match[2]!;
+  const octave = parseInt(match[3]!, 10);
+
+  // Base pitch class for each letter (C=0)
+  const letterPc: Record<string, number> = {
+    C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11,
+  };
+  const basePc = letterPc[letter];
+  if (basePc === undefined) {
+    throw new RangeError(`Invalid note letter: "${letter}"`);
+  }
+
+  let pc = basePc;
+  if (accidental === '#') pc += 1;
+  else if (accidental === 'b') pc -= 1;
+  // Normalize pc to [0, 11]
+  pc = ((pc % 12) + 12) % 12;
+
+  const midi = (octave + 1) * 12 + pc;
+  if (midi < 0 || midi > 127) {
+    throw new RangeError(`MIDI number ${midi} out of range [0, 127] for note "${name}"`);
+  }
+  return midi;
+}
+
+// ---------------------------------------------------------------------------
+// R2 — scaleDegreeToSolfege
+// ---------------------------------------------------------------------------
+
+const SOLFEGE_7 = ['Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Si'] as const;
+const SOLFEGE_5 = ['Do', 'Re', 'Mi', 'Sol', 'La'] as const;
+const SOLFEGE_12 = ['Do', 'Di', 'Re', 'Ri', 'Mi', 'Fa', 'Fi', 'Sol', 'Si', 'La', 'Li', 'Ti'] as const;
+
+/**
+ * Convert a scale degree index to its solfege syllable.
+ *
+ * @param degree - Zero-based scale degree index (0 = tonic).
+ * @param totalDegrees - Number of degrees in the scale (5, 7, or 12).
+ * @param system - Solfege system: `'movable-do'` (default) or `'fixed-do'`.
+ * @returns Solfege syllable string, e.g. `"Do"`, `"Re"`, `"Sol"`.
+ * @throws {RangeError} If `degree < 0` or `degree >= totalDegrees`.
+ *
+ * @example
+ * scaleDegreeToSolfege(0, 7);   // "Do"
+ * scaleDegreeToSolfege(4, 7);   // "Sol"
+ * scaleDegreeToSolfege(2, 5);   // "Mi"
+ * scaleDegreeToSolfege(6, 12);  // "Fi"
+ */
+export function scaleDegreeToSolfege(
+  degree: number,
+  totalDegrees: number,
+  system: 'movable-do' | 'fixed-do' = 'movable-do',
+): string {
+  if (degree < 0 || degree >= totalDegrees) {
+    throw new RangeError(
+      `Degree ${degree} is out of range [0, ${totalDegrees - 1}] for a ${totalDegrees}-degree scale`,
+    );
+  }
+
+  // fixed-do always uses the 12-degree chromatic solfege
+  if (system === 'fixed-do') {
+    const syllable = SOLFEGE_12[degree % 12];
+    if (syllable === undefined) {
+      throw new RangeError(`Degree ${degree} has no fixed-do solfege mapping`);
+    }
+    return syllable;
+  }
+
+  // movable-do: pick the table based on totalDegrees
+  if (totalDegrees === 7) {
+    const syllable = SOLFEGE_7[degree];
+    if (syllable === undefined) throw new RangeError(`No solfege for degree ${degree} of 7`);
+    return syllable;
+  }
+  if (totalDegrees === 5) {
+    const syllable = SOLFEGE_5[degree];
+    if (syllable === undefined) throw new RangeError(`No solfege for degree ${degree} of 5`);
+    return syllable;
+  }
+  if (totalDegrees === 12) {
+    const syllable = SOLFEGE_12[degree];
+    if (syllable === undefined) throw new RangeError(`No solfege for degree ${degree} of 12`);
+    return syllable;
+  }
+
+  // For other scale sizes: map by proportional index into 7-degree table
+  const mapped = Math.round((degree / totalDegrees) * 7) % 7;
+  const syllable = SOLFEGE_7[mapped];
+  if (syllable === undefined) throw new RangeError(`No solfege mapping for degree ${degree} of ${totalDegrees}`);
+  return syllable;
+}
+
+// ---------------------------------------------------------------------------
+// R3 — pitchClassSet
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a list of pitch classes into a canonical pitch class set.
+ *
+ * - Maps all values modulo 12 to the range [0, 11].
+ * - Removes duplicates.
+ * - Returns the result sorted in ascending order.
+ *
+ * @param pitchClasses - Array of pitch class numbers (any integers).
+ * @returns Sorted array of unique pitch classes in [0, 11].
+ *
+ * @example
+ * pitchClassSet([0, 4, 7]);           // [0, 4, 7]
+ * pitchClassSet([0, 12, 24]);         // [0]
+ * pitchClassSet([11, 0, 1, -1, 13]);  // [0, 1, 11]
+ */
+export function pitchClassSet(pitchClasses: readonly number[]): number[] {
+  const seen = new Set<number>();
+  for (const pc of pitchClasses) {
+    seen.add(((pc % 12) + 12) % 12);
+  }
+  return [...seen].sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// R4 — chordName
+// ---------------------------------------------------------------------------
+
+/** Known chord interval signatures (intervals from root, sorted ascending, excluding root 0) */
+const CHORD_SIGNATURES: ReadonlyArray<readonly [readonly number[], string]> = [
+  // Triads
+  [[4, 7], 'maj'],
+  [[3, 7], 'min'],
+  [[3, 6], 'dim'],
+  [[4, 8], 'aug'],
+  [[2, 7], 'sus2'],
+  [[5, 7], 'sus4'],
+  // Seventh chords
+  [[4, 7, 11], 'maj7'],
+  [[3, 7, 10], 'min7'],
+  [[4, 7, 10], 'dom7'],
+  [[3, 6, 10], 'm7b5'],
+  [[3, 6, 9], 'dim7'],
+];
+
+/**
+ * Identify a chord type by name based on its interval structure.
+ *
+ * The input chord is treated as a set of pitch classes. All rotations are checked
+ * to find a match against known chord types. Returns `"unknown"` for unrecognised chords.
+ *
+ * Recognised types: `"maj"`, `"min"`, `"dim"`, `"aug"`, `"sus2"`, `"sus4"`,
+ * `"maj7"`, `"min7"`, `"dom7"`, `"m7b5"`, `"dim7"`.
+ *
+ * @param chord - Array of pitch class numbers (mod 12 applied automatically).
+ * @returns Chord type name string, or `"unknown"` if not recognised.
+ *
+ * @example
+ * chordName([0, 4, 7]);       // "maj"
+ * chordName([9, 0, 4]);       // "min"   (A minor, rotated)
+ * chordName([0, 4, 7, 10]);   // "dom7"
+ */
+export function chordName(chord: readonly number[]): string {
+  // Normalize to unique pitch classes in [0, 11]
+  const pcs = pitchClassSet(chord);
+  if (pcs.length === 0) return 'unknown';
+
+  // Try each rotation (i.e., each pitch class as the root)
+  for (let i = 0; i < pcs.length; i++) {
+    const root = pcs[i]!;
+    // Compute intervals from this root, sorted
+    const intervals = pcs
+      .map((pc) => (pc - root + 12) % 12)
+      .filter((iv) => iv !== 0)
+      .sort((a, b) => a - b);
+
+    for (const [sig, name] of CHORD_SIGNATURES) {
+      if (
+        sig.length === intervals.length &&
+        sig.every((iv, idx) => iv === intervals[idx])
+      ) {
+        return name;
+      }
+    }
+  }
+
+  return 'unknown';
 }
