@@ -215,3 +215,14 @@
 | tonnetz ビジュアライザ (SVG/Canvas)         | UI 層、別 adapter として設計が必要              |
 | Raga (arohana/avarohana/pakad)              | 22-shruti 体系の選定と J4 より大規模、別PR      |
 | `generateJustLattice` (Dijkstra JI 探索)    | グラフ探索で実装複雑、計算量大、別PR            |
+
+## Round 5 — Melody, Harmony & Progression (M1–M4)
+
+**研究メモ**: Qiita/Zenn の音楽理論記事では、メロディーの輪郭分析（アダムス輪郭理論）、コード進行のリズム分析、スケールモード展開、コード進行の緊張感分析が注目されている。
+
+- M1: melodicContour — 音列の輪郭（U/D/R）を文字列で返す
+- M2: harmonicRhythm — 和声リズム（変化位置・密度・平均持続）分析
+- M3: scaleRotations — スケールの全ローテーション（モード展開）を返す
+- M4: chordProgressionTension — コード進行の各和音の不協和スコアを返す
+
+**将来の検討**: 音楽的緊張の頂点検出 / カデンツ認識 / ヴォイスリーディング評価 / 対位法チェッカー / レゲエスカラベース解析
