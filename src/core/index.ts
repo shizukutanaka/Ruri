@@ -19,3 +19,7 @@ export * from './envelope.js';
 export * from './voice-leading.js';
 export * from './fretless.js';
 export * from './temperament.js';
+export * from './rhythm.js';
+export * from './pitch-detect.js';
+export * from './pcset.js';
+export * from './maqam.js';
