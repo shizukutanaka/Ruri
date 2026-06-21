@@ -499,6 +499,12 @@ import {
   tuningFamilySocraticRadarTrend,
   tuningFamilySocraticRadarRobustnessScore,
   tuningFamilySocraticRadarCentroidProfile,
+  tuningFamilySocraticRadarEvolutionScore,
+  tuningFamilySocraticRadarSymmetryScore,
+  tuningFamilySocraticRadarSaturationIndex,
+  tuningFamilySocraticRadarVolatilityIndex,
+  tuningFamilySocraticRadarCoherenceScore,
+  tuningFamilySocraticRadarMomentumScore,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -17655,6 +17661,190 @@ describe('tuningFamilySocraticRadarCentroidProfile', () => {
     const { closestIndex } = tuningFamilySocraticRadarCentroidProfile(tunings, spec, 440);
     expect(closestIndex).toBeGreaterThanOrEqual(0);
     expect(closestIndex).toBeLessThan(tunings.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q954 — tuningFamilySocraticRadarEvolutionScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarEvolutionScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_evolutionScore_is_0_and_all_stable', () => {
+    const { evolutionScore, evolutionDirection } = tuningFamilySocraticRadarEvolutionScore(
+      [t12],
+      spec,
+      440,
+    );
+    expect(evolutionScore).toBe(0);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(evolutionDirection[ax]).toBe('stable');
+    }
+  });
+
+  it('test_identical_tunings_evolutionScore_is_0', () => {
+    const { evolutionScore } = tuningFamilySocraticRadarEvolutionScore([t12, t12], spec, 440);
+    expect(evolutionScore).toBeCloseTo(0, 10);
+  });
+
+  it('test_evolutionDirection_has_five_axes', () => {
+    const { evolutionDirection } = tuningFamilySocraticRadarEvolutionScore([t12, t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(['rising', 'falling', 'stable']).toContain(evolutionDirection[ax]);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q956 — tuningFamilySocraticRadarSymmetryScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSymmetryScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_symmetryScore_is_in_expected_range', () => {
+    const { symmetryScore } = tuningFamilySocraticRadarSymmetryScore([t12], spec, 440);
+    expect(symmetryScore).toBeGreaterThanOrEqual(-1);
+    expect(symmetryScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_axisPairs_has_two_entries', () => {
+    const { axisPairs } = tuningFamilySocraticRadarSymmetryScore([t12], spec, 440);
+    expect(axisPairs).toHaveLength(2);
+    expect(axisPairs[0]).toHaveProperty('pairA');
+    expect(axisPairs[0]).toHaveProperty('pairB');
+    expect(axisPairs[0]).toHaveProperty('diff');
+  });
+
+  it('test_axisPairs_sorted_desc_by_diff', () => {
+    const { axisPairs } = tuningFamilySocraticRadarSymmetryScore([t12, t12], spec, 440);
+    expect(axisPairs.length).toBe(2);
+    expect(axisPairs[0]!.diff).toBeGreaterThanOrEqual(axisPairs[1]!.diff);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q958 — tuningFamilySocraticRadarSaturationIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSaturationIndex', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_saturationIndex_is_between_0_and_1', () => {
+    const { saturationIndex } = tuningFamilySocraticRadarSaturationIndex([t12], spec, 440);
+    expect(saturationIndex).toBeGreaterThanOrEqual(0);
+    expect(saturationIndex).toBeLessThanOrEqual(1);
+  });
+
+  it('test_saturatedAxes_is_subset_of_five_axes', () => {
+    const { saturatedAxes } = tuningFamilySocraticRadarSaturationIndex([t12], spec, 440);
+    const validAxes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    for (const ax of saturatedAxes) {
+      expect(validAxes).toContain(ax);
+    }
+  });
+
+  it('test_saturationIndex_equals_saturatedAxes_length_over_5', () => {
+    const { saturationIndex, saturatedAxes } = tuningFamilySocraticRadarSaturationIndex(
+      [t12],
+      spec,
+      440,
+    );
+    expect(saturationIndex).toBeCloseTo(saturatedAxes.length / 5, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q960 — tuningFamilySocraticRadarVolatilityIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarVolatilityIndex', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_volatilityIndex_is_0', () => {
+    const { volatilityIndex, axisRanges } = tuningFamilySocraticRadarVolatilityIndex(
+      [t12],
+      spec,
+      440,
+    );
+    expect(volatilityIndex).toBe(0);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(axisRanges[ax]).toBe(0);
+    }
+  });
+
+  it('test_identical_tunings_volatilityIndex_is_0', () => {
+    const { volatilityIndex } = tuningFamilySocraticRadarVolatilityIndex([t12, t12], spec, 440);
+    expect(volatilityIndex).toBeCloseTo(0, 10);
+  });
+
+  it('test_axisRanges_all_non_negative', () => {
+    const { axisRanges } = tuningFamilySocraticRadarVolatilityIndex([t12, t12], spec, 440);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(axisRanges[ax]).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q962 — tuningFamilySocraticRadarCoherenceScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCoherenceScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_coherenceScore_is_0_and_incoherent', () => {
+    const { coherenceScore, coherenceLabel } = tuningFamilySocraticRadarCoherenceScore(
+      [t12],
+      spec,
+      440,
+    );
+    expect(coherenceScore).toBe(0);
+    expect(coherenceLabel).toBe('incoherent');
+  });
+
+  it('test_coherenceScore_is_between_minus1_and_1', () => {
+    const { coherenceScore } = tuningFamilySocraticRadarCoherenceScore([t12, t12], spec, 440);
+    expect(coherenceScore).toBeGreaterThanOrEqual(-1);
+    expect(coherenceScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_coherenceLabel_is_valid_string', () => {
+    const { coherenceLabel } = tuningFamilySocraticRadarCoherenceScore([t12, t12], spec, 440);
+    expect(['incoherent', 'moderate', 'coherent']).toContain(coherenceLabel);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q964 — tuningFamilySocraticRadarMomentumScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMomentumScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_single_tuning_momentumScore_is_0_and_neutral', () => {
+    const { momentumScore, momentumLabel } = tuningFamilySocraticRadarMomentumScore(
+      [t12],
+      spec,
+      440,
+    );
+    expect(momentumScore).toBe(0);
+    expect(momentumLabel).toBe('neutral');
+  });
+
+  it('test_identical_tunings_momentumScore_is_0', () => {
+    const { momentumScore } = tuningFamilySocraticRadarMomentumScore([t12, t12], spec, 440);
+    expect(momentumScore).toBeCloseTo(0, 10);
+  });
+
+  it('test_momentumLabel_is_valid_string', () => {
+    const { momentumLabel } = tuningFamilySocraticRadarMomentumScore([t12, t12], spec, 440);
+    expect(['positive', 'negative', 'neutral']).toContain(momentumLabel);
   });
 });
 

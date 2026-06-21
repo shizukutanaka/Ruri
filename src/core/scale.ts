@@ -17180,6 +17180,244 @@ export function tuningFamilySocraticRadarCentroidProfile(
 }
 
 // ---------------------------------------------------------------------------
+// Q954 — tuningFamilySocraticRadarEvolutionScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures how much the mean radar profile has "evolved" from the first half of
+ * the family to the second half.
+ *
+ * evolutionScore = L2 distance between first-half mean and second-half mean.
+ * evolutionDirection per axis: diff > 0.02 → 'rising', < -0.02 → 'falling', else 'stable'.
+ * Single tuning: evolutionScore=0, all axes 'stable'.
+ *
+ * @param tunings - Array of tunings in order.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { evolutionScore, evolutionDirection }
+ */
+export function tuningFamilySocraticRadarEvolutionScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  evolutionScore: number;
+  evolutionDirection: Record<AxisKey, 'rising' | 'falling' | 'stable'>;
+} {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const stableDir = Object.fromEntries(axes.map((ax) => [ax, 'stable'])) as Record<
+    AxisKey,
+    'rising' | 'falling' | 'stable'
+  >;
+  if (tunings.length <= 1) return { evolutionScore: 0, evolutionDirection: stableDir };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const mid = Math.floor(profiles.length / 2);
+  const firstHalf = profiles.slice(0, mid === 0 ? 1 : mid);
+  const secondHalf = profiles.slice(mid === 0 ? 1 : mid);
+  const firstMean = {} as Record<AxisKey, number>;
+  const secondMean = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    firstMean[ax] = firstHalf.reduce((s, p) => s + p[ax], 0) / firstHalf.length;
+    secondMean[ax] = secondHalf.reduce((s, p) => s + p[ax], 0) / secondHalf.length;
+  }
+  const evolutionScore = Math.sqrt(
+    axes.reduce((s, ax) => s + (secondMean[ax] - firstMean[ax]) ** 2, 0),
+  );
+  const evolutionDirection = {} as Record<AxisKey, 'rising' | 'falling' | 'stable'>;
+  for (const ax of axes) {
+    const diff = secondMean[ax] - firstMean[ax];
+    evolutionDirection[ax] = diff > 0.02 ? 'rising' : diff < -0.02 ? 'falling' : 'stable';
+  }
+  return { evolutionScore, evolutionDirection };
+}
+
+// ---------------------------------------------------------------------------
+// Q956 — tuningFamilySocraticRadarSymmetryScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures axis symmetry in the mean profile: how close are paired axes to equal values?
+ * Pairs: (diversity, convergence) and (versatility, maturity); benchmark is unpaired.
+ *
+ * symmetryScore = 1 - (|div-conv| + |vers-mat|) / 2  (perfect symmetry = 1.0).
+ * axisPairs: the 2 pairs with their abs differences, sorted by diff descending.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { symmetryScore, axisPairs }
+ */
+export function tuningFamilySocraticRadarSymmetryScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  symmetryScore: number;
+  axisPairs: { pairA: AxisKey; pairB: AxisKey; diff: number }[];
+} {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const mean = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    mean[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const diffDivConv = Math.abs(mean.diversity - mean.convergence);
+  const diffVersMat = Math.abs(mean.versatility - mean.maturity);
+  const symmetryScore = 1 - (diffDivConv + diffVersMat) / 2;
+  const axisPairs: { pairA: AxisKey; pairB: AxisKey; diff: number }[] = [
+    { pairA: 'diversity', pairB: 'convergence', diff: diffDivConv },
+    { pairA: 'versatility', pairB: 'maturity', diff: diffVersMat },
+  ];
+  axisPairs.sort((a, b) => b.diff - a.diff);
+  return { symmetryScore, axisPairs };
+}
+
+// ---------------------------------------------------------------------------
+// Q958 — tuningFamilySocraticRadarSaturationIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * How many axes are "saturated" (score ≥ 0.9) in the mean profile?
+ *
+ * saturationIndex = saturatedAxes.length / 5 ∈ [0,1].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { saturationIndex, saturatedAxes }
+ */
+export function tuningFamilySocraticRadarSaturationIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { saturationIndex: number; saturatedAxes: AxisKey[] } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const mean = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    mean[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const saturatedAxes = axes.filter((ax) => mean[ax] >= 0.9);
+  const saturationIndex = saturatedAxes.length / 5;
+  return { saturationIndex, saturatedAxes };
+}
+
+// ---------------------------------------------------------------------------
+// Q960 — tuningFamilySocraticRadarVolatilityIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * Range of each axis score across family members (max - min per axis).
+ * volatilityIndex = average of all 5 axis ranges.
+ * Single tuning: all ranges 0, volatilityIndex 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { volatilityIndex, axisRanges }
+ */
+export function tuningFamilySocraticRadarVolatilityIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { volatilityIndex: number; axisRanges: Record<AxisKey, number> } {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) {
+    return {
+      volatilityIndex: 0,
+      axisRanges: Object.fromEntries(axes.map((ax) => [ax, 0])) as Record<AxisKey, number>,
+    };
+  }
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const axisRanges = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    axisRanges[ax] = Math.max(...vals) - Math.min(...vals);
+  }
+  const volatilityIndex = axes.reduce((s, ax) => s + axisRanges[ax], 0) / 5;
+  return { volatilityIndex, axisRanges };
+}
+
+// ---------------------------------------------------------------------------
+// Q962 — tuningFamilySocraticRadarCoherenceScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Pearson correlation coefficient between diversity and versatility axes across family members.
+ *
+ * coherenceScore = Pearson r between diversity scores and versatility scores.
+ * Labels: |r| ≥ 0.7 → 'coherent'; |r| ≥ 0.3 → 'moderate'; else 'incoherent'.
+ * Single tuning or zero variance: coherenceScore=0, 'incoherent'.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { coherenceScore, coherenceLabel }
+ */
+export function tuningFamilySocraticRadarCoherenceScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { coherenceScore: number; coherenceLabel: 'incoherent' | 'moderate' | 'coherent' } {
+  if (tunings.length <= 1) return { coherenceScore: 0, coherenceLabel: 'incoherent' };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const divVals = profiles.map((p) => p.diversity);
+  const versVals = profiles.map((p) => p.versatility);
+  const meanDiv = divVals.reduce((s, v) => s + v, 0) / n;
+  const meanVers = versVals.reduce((s, v) => s + v, 0) / n;
+  let cov = 0;
+  let varDiv = 0;
+  let varVers = 0;
+  for (let i = 0; i < n; i++) {
+    const dDiv = divVals[i]! - meanDiv;
+    const dVers = versVals[i]! - meanVers;
+    cov += dDiv * dVers;
+    varDiv += dDiv * dDiv;
+    varVers += dVers * dVers;
+  }
+  if (varDiv === 0 || varVers === 0) return { coherenceScore: 0, coherenceLabel: 'incoherent' };
+  const coherenceScore = cov / Math.sqrt(varDiv * varVers);
+  const absR = Math.abs(coherenceScore);
+  const coherenceLabel: 'incoherent' | 'moderate' | 'coherent' =
+    absR >= 0.7 ? 'coherent' : absR >= 0.3 ? 'moderate' : 'incoherent';
+  return { coherenceScore, coherenceLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q964 — tuningFamilySocraticRadarMomentumScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare the last tuning's profile to the first tuning's profile.
+ *
+ * momentumScore = (sum of (last[ax] - first[ax])) / 5 → average per-axis change.
+ * Labels: > 0.02 → 'positive', < -0.02 → 'negative', else 'neutral'.
+ * Single tuning: momentumScore=0, 'neutral'.
+ *
+ * @param tunings - Array of tunings in order.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { momentumScore, momentumLabel }
+ */
+export function tuningFamilySocraticRadarMomentumScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { momentumScore: number; momentumLabel: 'positive' | 'negative' | 'neutral' } {
+  if (tunings.length <= 1) return { momentumScore: 0, momentumLabel: 'neutral' };
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const firstProfile = tuningFamilySocraticRadarProfile([tunings[0]!], spectrum, rootHz);
+  const lastProfile = tuningFamilySocraticRadarProfile([tunings[tunings.length - 1]!], spectrum, rootHz);
+  const momentumScore = axes.reduce((s, ax) => s + (lastProfile[ax] - firstProfile[ax]), 0) / 5;
+  const momentumLabel: 'positive' | 'negative' | 'neutral' =
+    momentumScore > 0.02 ? 'positive' : momentumScore < -0.02 ? 'negative' : 'neutral';
+  return { momentumScore, momentumLabel };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
