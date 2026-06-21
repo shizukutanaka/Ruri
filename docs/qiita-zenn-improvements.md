@@ -261,3 +261,10 @@
 - S2: melodicLeaps — 跳躍（3半音以上）の分析
 - S3: generateChordProgression — ルートから和音進行を生成
 - S4: transposePitchClasses — ピッチクラス群の半音移調
+
+## Round 11 — スケール対称性・補音階・移調群・不協和曲線 (T1–T4)
+
+- T1: scaleSymmetry — 音階の対称性（区間列回文）検定
+- T2: complementScale — 補音階（使用外のPC集合）
+- T3: scaleTranspositions — 全12移調の列挙
+- T4: computeDissonanceCurve — ルートから各度数への不協和カーブ

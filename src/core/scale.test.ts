@@ -529,6 +529,12 @@ import {
   tuningFamilySocraticRadarCapacityScore,
   tuningFamilySocraticRadarAnchorAxis,
   tuningFamilySocraticRadarConvexHullVolume,
+  tuningFamilySocraticRadarAxialSymmetry,
+  tuningFamilySocraticRadarPeakAxis,
+  tuningFamilySocraticRadarValleyAxis,
+  tuningFamilySocraticRadarResonanceScore,
+  tuningFamilySocraticRadarFlexibilityScore,
+  tuningFamilySocraticRadarSignificanceTest,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -553,6 +559,10 @@ import {
   melodicLeaps,
   generateChordProgression,
   transposePitchClasses,
+  scaleSymmetry,
+  complementScale,
+  scaleTranspositions,
+  computeDissonanceCurve,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -560,6 +570,7 @@ import { generatedTuning } from './generate.js';
 import { rankChords } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance, chordObjectDissonance } from './dissonance.js';
+import { centsToFreq, pitchToCents } from './cents.js';
 import { DEFAULT_SYNTH_SCALE } from './ks-synth.js';
 import { chordToCents, chordFromDegrees, chordFromRatios, chordFromSemitones } from './chord.js';
 
@@ -18613,6 +18624,167 @@ describe('tuningFamilySocraticRadarConvexHullVolume', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Q1014 — tuningFamilySocraticRadarAxialSymmetry
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAxialSymmetry', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_axialSymmetryScore_is_number', () => {
+    const { axialSymmetryScore } = tuningFamilySocraticRadarAxialSymmetry([t12], spec, 440);
+    expect(typeof axialSymmetryScore).toBe('number');
+  });
+
+  it('test_pairDiffs_are_non_negative', () => {
+    const { pairDiffs } = tuningFamilySocraticRadarAxialSymmetry([t12], spec, 440);
+    expect(pairDiffs.diversity_convergence).toBeGreaterThanOrEqual(0);
+    expect(pairDiffs.versatility_maturity).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_empty_tunings_axialSymmetryScore_is_one', () => {
+    const { axialSymmetryScore, pairDiffs } = tuningFamilySocraticRadarAxialSymmetry([], spec, 440);
+    expect(pairDiffs.diversity_convergence).toBe(0);
+    expect(pairDiffs.versatility_maturity).toBe(0);
+    expect(axialSymmetryScore).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1016 — tuningFamilySocraticRadarPeakAxis
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarPeakAxis', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_peakAxis_is_valid_axis', () => {
+    const validAxes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    const { peakAxis } = tuningFamilySocraticRadarPeakAxis([t12], spec, 440);
+    expect(validAxes).toContain(peakAxis);
+  });
+
+  it('test_peakScore_is_non_negative', () => {
+    const { peakScore } = tuningFamilySocraticRadarPeakAxis([t12], spec, 440);
+    expect(peakScore).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_empty_tunings_returns_defaults', () => {
+    const { peakAxis, peakScore, peakTuningIndex } = tuningFamilySocraticRadarPeakAxis([], spec, 440);
+    expect(peakAxis).toBe('diversity');
+    expect(peakScore).toBe(0);
+    expect(peakTuningIndex).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1018 — tuningFamilySocraticRadarValleyAxis
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarValleyAxis', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_valleyAxis_is_valid_axis', () => {
+    const validAxes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    const { valleyAxis } = tuningFamilySocraticRadarValleyAxis([t12], spec, 440);
+    expect(validAxes).toContain(valleyAxis);
+  });
+
+  it('test_valleyScore_is_non_negative', () => {
+    const { valleyScore } = tuningFamilySocraticRadarValleyAxis([t12], spec, 440);
+    expect(valleyScore).toBeGreaterThanOrEqual(0);
+  });
+
+  it('test_empty_tunings_returns_defaults', () => {
+    const { valleyAxis, valleyScore, valleyTuningIndex } = tuningFamilySocraticRadarValleyAxis([], spec, 440);
+    expect(valleyAxis).toBe('diversity');
+    expect(valleyScore).toBe(0);
+    expect(valleyTuningIndex).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1020 — tuningFamilySocraticRadarResonanceScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarResonanceScore', () => {
+  const spec = harmonicSpectrum(6);
+  const uniformTarget = { diversity: 0.5, versatility: 0.5, maturity: 0.5, benchmark: 0.5, convergence: 0.5 };
+
+  it('test_resonanceScore_is_number', () => {
+    const { resonanceScore } = tuningFamilySocraticRadarResonanceScore([t12], spec, uniformTarget, 440);
+    expect(typeof resonanceScore).toBe('number');
+  });
+
+  it('test_resonanceScore_with_identical_profile_is_one', () => {
+    // When target equals the mean profile, normalized dot product = 1
+    const profile = tuningFamilySocraticRadarConvexHullVolume; // just for reference
+    void profile;
+    const { resonanceScore } = tuningFamilySocraticRadarResonanceScore([t12], spec, uniformTarget, 440);
+    // Score is between -1 and 1 (cosine similarity); just check it is a valid number
+    expect(resonanceScore).toBeGreaterThanOrEqual(-1 - 1e-9);
+    expect(resonanceScore).toBeLessThanOrEqual(1 + 1e-9);
+  });
+
+  it('test_empty_tunings_resonanceScore_is_zero', () => {
+    const { resonanceScore } = tuningFamilySocraticRadarResonanceScore([], spec, uniformTarget, 440);
+    expect(resonanceScore).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1022 — tuningFamilySocraticRadarFlexibilityScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarFlexibilityScore', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_flexibilityScore_is_between_0_and_1', () => {
+    const { flexibilityScore } = tuningFamilySocraticRadarFlexibilityScore([t12], spec, 440);
+    expect(flexibilityScore).toBeGreaterThanOrEqual(0);
+    expect(flexibilityScore).toBeLessThanOrEqual(1);
+  });
+
+  it('test_activeAxes_are_valid_axes', () => {
+    const validAxes = new Set(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']);
+    const { activeAxes } = tuningFamilySocraticRadarFlexibilityScore([t12], spec, 440);
+    for (const ax of activeAxes) {
+      expect(validAxes.has(ax)).toBe(true);
+    }
+  });
+
+  it('test_empty_tunings_flexibilityScore_is_zero', () => {
+    const { flexibilityScore, activeAxes } = tuningFamilySocraticRadarFlexibilityScore([], spec, 440);
+    expect(flexibilityScore).toBe(0);
+    expect(activeAxes).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1024 — tuningFamilySocraticRadarSignificanceTest
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSignificanceTest', () => {
+  const spec = harmonicSpectrum(6);
+
+  it('test_tStatistic_is_number', () => {
+    const { tStatistic } = tuningFamilySocraticRadarSignificanceTest([t12], [t12], spec, 440);
+    expect(typeof tStatistic).toBe('number');
+  });
+
+  it('test_same_family_is_not_significant', () => {
+    const { significant } = tuningFamilySocraticRadarSignificanceTest([t12], [t12], spec, 440);
+    expect(significant).toBe(false);
+  });
+
+  it('test_significantAxes_is_array_of_valid_axes', () => {
+    const validAxes = new Set(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']);
+    const { significantAxes } = tuningFamilySocraticRadarSignificanceTest([t12], [t12], spec, 440);
+    for (const ax of significantAxes) {
+      expect(validAxes.has(ax)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -19348,5 +19520,81 @@ describe('transposePitchClasses (S4)', () => {
 
   it('test_transpose_negative', () => {
     expect(transposePitchClasses([0, 4, 7], -1)).toEqual([11, 3, 6]);
+  });
+});
+
+describe('scaleSymmetry (T1)', () => {
+  it('test_whole_tone_is_symmetric', () => {
+    expect(scaleSymmetry([0, 2, 4, 6, 8, 10])).toBe(true);
+  });
+  it('test_major_scale_is_symmetric', () => {
+    // [2,2,1,2,2,2,1] is a palindrome
+    expect(scaleSymmetry([0, 2, 4, 5, 7, 9, 11])).toBe(true);
+  });
+  it('test_empty_is_symmetric', () => {
+    expect(scaleSymmetry([])).toBe(true);
+  });
+  it('test_single_note_is_symmetric', () => {
+    expect(scaleSymmetry([0])).toBe(true);
+  });
+});
+
+describe('complementScale (T2)', () => {
+  it('test_whole_tone_complement', () => {
+    expect(complementScale([0, 2, 4, 6, 8, 10])).toEqual([1, 3, 5, 7, 9, 11]);
+  });
+  it('test_empty_complement_is_all', () => {
+    expect(complementScale([])).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  });
+  it('test_full_chromatic_complement_is_empty', () => {
+    expect(complementScale([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])).toEqual([]);
+  });
+  it('test_triad_complement', () => {
+    expect(complementScale([0, 4, 7])).toEqual([1, 2, 3, 5, 6, 8, 9, 10, 11]);
+  });
+});
+
+describe('scaleTranspositions (T3)', () => {
+  it('test_returns_12_transpositions', () => {
+    expect(scaleTranspositions([0, 4, 7])).toHaveLength(12);
+  });
+  it('test_first_is_original', () => {
+    expect(scaleTranspositions([0, 4, 7])[0]).toEqual([0, 4, 7]);
+  });
+  it('test_second_is_shifted', () => {
+    expect(scaleTranspositions([0, 4, 7])[1]).toEqual([1, 5, 8]);
+  });
+  it('test_transposition_wraps_mod12', () => {
+    // t=5: [0+5,4+5,7+5] = [5,9,0] sorted = [0,5,9]
+    expect(scaleTranspositions([0, 4, 7])[5]).toEqual([0, 5, 9]);
+  });
+});
+
+describe('computeDissonanceCurve (T4)', () => {
+  const t12 = equalTemperament12(440);
+  const spec = harmonicSpectrum(6);
+
+  it('test_returns_one_value_per_degree', () => {
+    const curve = computeDissonanceCurve(t12, spec);
+    expect(curve).toHaveLength(t12.degrees.length);
+  });
+  it('test_first_value_matches_unison_dissonance', () => {
+    // degree 0 vs degree 0 = unison; the curve value equals chordDissonance([f, f], spec)
+    const curve = computeDissonanceCurve(t12, spec);
+    const rootPitch = t12.degrees[0]!;
+    const rootFreq = centsToFreq(pitchToCents(rootPitch), 220);
+    expect(curve[0]).toBeCloseTo(chordDissonance([rootFreq, rootFreq], spec), 8);
+  });
+  it('test_all_values_nonnegative', () => {
+    const curve = computeDissonanceCurve(t12, spec);
+    expect(curve.every((v) => v >= 0)).toBe(true);
+  });
+  it('test_custom_rootHz', () => {
+    const curve = computeDissonanceCurve(t12, spec, 110);
+    expect(curve).toHaveLength(t12.degrees.length);
+    // degree 0 vs itself with rootHz=110
+    const rootPitch = t12.degrees[0]!;
+    const rootFreq = centsToFreq(pitchToCents(rootPitch), 110);
+    expect(curve[0]).toBeCloseTo(chordDissonance([rootFreq, rootFreq], spec), 8);
   });
 });

@@ -7,7 +7,7 @@ import {
 } from './tuning.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { midiToFreq } from './midi.js';
-import { pitchToCents } from './cents.js';
+import { pitchToCents, centsToFreq } from './cents.js';
 import { chordDissonance, chordObjectDissonance } from './dissonance.js';
 import {
   rankChords,
@@ -18418,6 +18418,245 @@ export function tuningFamilySocraticRadarConvexHullVolume(
 }
 
 // ---------------------------------------------------------------------------
+// Q1014 — tuningFamilySocraticRadarAxialSymmetry
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures axial symmetry between paired opposite axes on the radar:
+ * diversity↔convergence and versatility↔maturity (benchmark is the center axis).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { axialSymmetryScore, pairDiffs }
+ */
+export function tuningFamilySocraticRadarAxialSymmetry(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  axialSymmetryScore: number;
+  pairDiffs: { diversity_convergence: number; versatility_maturity: number };
+} {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const diversity_convergence = Math.abs(meanProfile.diversity - meanProfile.convergence);
+  const versatility_maturity = Math.abs(meanProfile.versatility - meanProfile.maturity);
+  const axialSymmetryScore = 1 - (diversity_convergence + versatility_maturity) / 2;
+  return { axialSymmetryScore, pairDiffs: { diversity_convergence, versatility_maturity } };
+}
+
+// ---------------------------------------------------------------------------
+// Q1016 — tuningFamilySocraticRadarPeakAxis
+// ---------------------------------------------------------------------------
+
+/**
+ * Finds which axis achieves the absolute highest score across all individual tuning profiles.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { peakAxis, peakScore, peakTuningIndex }
+ */
+export function tuningFamilySocraticRadarPeakAxis(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { peakAxis: AxisKey; peakScore: number; peakTuningIndex: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length === 0) {
+    return { peakAxis: axes[0]!, peakScore: 0, peakTuningIndex: 0 };
+  }
+  let peakAxis: AxisKey = axes[0]!;
+  let peakScore = -Infinity;
+  let peakTuningIndex = 0;
+  for (let i = 0; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    for (const ax of axes) {
+      if (p[ax] > peakScore) {
+        peakScore = p[ax];
+        peakAxis = ax;
+        peakTuningIndex = i;
+      }
+    }
+  }
+  return { peakAxis, peakScore, peakTuningIndex };
+}
+
+// ---------------------------------------------------------------------------
+// Q1018 — tuningFamilySocraticRadarValleyAxis
+// ---------------------------------------------------------------------------
+
+/**
+ * Finds which axis achieves the absolute lowest score across all individual tuning profiles.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { valleyAxis, valleyScore, valleyTuningIndex }
+ */
+export function tuningFamilySocraticRadarValleyAxis(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { valleyAxis: AxisKey; valleyScore: number; valleyTuningIndex: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length === 0) {
+    return { valleyAxis: axes[0]!, valleyScore: 0, valleyTuningIndex: 0 };
+  }
+  let valleyAxis: AxisKey = axes[0]!;
+  let valleyScore = Infinity;
+  let valleyTuningIndex = 0;
+  for (let i = 0; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    for (const ax of axes) {
+      if (p[ax] < valleyScore) {
+        valleyScore = p[ax];
+        valleyAxis = ax;
+        valleyTuningIndex = i;
+      }
+    }
+  }
+  return { valleyAxis, valleyScore, valleyTuningIndex };
+}
+
+// ---------------------------------------------------------------------------
+// Q1020 — tuningFamilySocraticRadarResonanceScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Dot-product similarity between the normalized mean radar profile and a normalized target profile.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param target - Target profile for each axis.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { resonanceScore }
+ */
+export function tuningFamilySocraticRadarResonanceScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  target: Record<AxisKey, number>,
+  rootHz?: number,
+): { resonanceScore: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const meanVals = axes.map((ax) => meanProfile[ax]);
+  const targetVals = axes.map((ax) => target[ax]);
+  const meanNorm = Math.sqrt(meanVals.reduce((s, v) => s + v * v, 0));
+  const targetNorm = Math.sqrt(targetVals.reduce((s, v) => s + v * v, 0));
+  const mNorm = meanNorm === 0 ? 1 : meanNorm;
+  const tNorm = targetNorm === 0 ? 1 : targetNorm;
+  const normalizedMean = meanVals.map((v) => v / mNorm);
+  const normalizedTarget = targetVals.map((v) => v / tNorm);
+  let dot = 0;
+  for (let i = 0; i < axes.length; i++) {
+    dot += (normalizedMean[i] ?? 0) * (normalizedTarget[i] ?? 0);
+  }
+  return { resonanceScore: dot };
+}
+
+// ---------------------------------------------------------------------------
+// Q1022 — tuningFamilySocraticRadarFlexibilityScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Ratio of axes with non-zero (>0.01) mean scores to total axes (5).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { flexibilityScore, activeAxes }
+ */
+export function tuningFamilySocraticRadarFlexibilityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { flexibilityScore: number; activeAxes: AxisKey[] } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const meanProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    meanProfile[ax] =
+      profiles.length === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
+  }
+  const activeAxes = axes.filter((ax) => meanProfile[ax] > 0.01);
+  const flexibilityScore = activeAxes.length / 5;
+  return { flexibilityScore, activeAxes };
+}
+
+// ---------------------------------------------------------------------------
+// Q1024 — tuningFamilySocraticRadarSignificanceTest
+// ---------------------------------------------------------------------------
+
+/**
+ * T-test-like comparison between two tuning families across each radar axis.
+ *
+ * @param tuningsA - First family of tunings.
+ * @param tuningsB - Second family of tunings.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { tStatistic, significant, significantAxes }
+ */
+export function tuningFamilySocraticRadarSignificanceTest(
+  tuningsA: readonly TuningSystem[],
+  tuningsB: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { tStatistic: number; significant: boolean; significantAxes: AxisKey[] } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profilesA = tuningsA.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const profilesB = tuningsB.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const nA = profilesA.length;
+  const nB = profilesB.length;
+  const tStats: number[] = [];
+  const significantAxes: AxisKey[] = [];
+  for (const ax of axes) {
+    const valsA = profilesA.map((p) => p[ax]);
+    const valsB = profilesB.map((p) => p[ax]);
+    const meanA = nA === 0 ? 0 : valsA.reduce((s, v) => s + v, 0) / nA;
+    const meanB = nB === 0 ? 0 : valsB.reduce((s, v) => s + v, 0) / nB;
+    let t: number;
+    if (nA <= 1 && nB <= 1) {
+      t = meanA - meanB;
+    } else {
+      const varA =
+        nA <= 1 ? 0 : valsA.reduce((s, v) => s + (v - meanA) ** 2, 0) / (nA - 1);
+      const varB =
+        nB <= 1 ? 0 : valsB.reduce((s, v) => s + (v - meanB) ** 2, 0) / (nB - 1);
+      const se = Math.sqrt((nA > 0 ? varA / nA : 0) + (nB > 0 ? varB / nB : 0));
+      t = se === 0 ? meanA - meanB : (meanA - meanB) / se;
+    }
+    tStats.push(t);
+    const threshold = nA <= 1 && nB <= 1 ? 0.02 : 2.0;
+    if (Math.abs(t) > threshold) {
+      significantAxes.push(ax);
+    }
+  }
+  const maxT = tStats.reduce((m, v) => (Math.abs(v) > Math.abs(m) ? v : m), 0);
+  const significant = significantAxes.length > 0;
+  return { tStatistic: maxT, significant, significantAxes };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -19405,4 +19644,104 @@ export function transposePitchClasses(
   semitones: number,
 ): number[] {
   return pitchClasses.map((pc) => ((pc + semitones) % 12 + 12) % 12);
+}
+
+/**
+ * Test whether a scale is symmetric (palindrome under inversion mod 12).
+ *
+ * A scale is symmetric if its interval sequence reads the same forwards and
+ * backwards. The interval sequence is computed as the differences between
+ * consecutive degrees (including wrap-around back to 12).
+ *
+ * @param degrees - Pitch classes of the scale (e.g. [0, 2, 4, 5, 7, 9, 11]).
+ * @returns true if the interval sequence is a palindrome, true for empty/single.
+ *
+ * @example
+ * scaleSymmetry([0, 2, 4, 6, 8, 10]); // true (whole-tone: all intervals 2)
+ * scaleSymmetry([0, 2, 4, 5, 7, 9, 11]); // true (major: [2,2,1,2,2,2,1])
+ */
+export function scaleSymmetry(degrees: readonly number[]): boolean {
+  if (degrees.length <= 1) return true;
+  const sorted = degrees.slice().sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const curr = sorted[i]!;
+    const next = sorted[(i + 1) % sorted.length]!;
+    const interval = i < sorted.length - 1 ? next - curr : 12 - curr + sorted[0]!;
+    intervals.push(interval);
+  }
+  const rev = intervals.slice().reverse();
+  const n = intervals.length;
+  // Check if rev is a cyclic rotation of intervals (cyclic palindrome / inversional symmetry)
+  for (let shift = 0; shift < n; shift++) {
+    if (intervals.every((v, i) => v === rev[(i + shift) % n])) return true;
+  }
+  return false;
+}
+
+/**
+ * Return the complement pitch classes — those NOT in the scale (within 0-11).
+ *
+ * @param degrees - Pitch classes of the scale, normalized mod 12.
+ * @returns Sorted array of pitch classes not present in the scale.
+ *
+ * @example
+ * complementScale([0, 2, 4, 6, 8, 10]); // [1, 3, 5, 7, 9, 11]
+ * complementScale([]);                   // [0,1,2,3,4,5,6,7,8,9,10,11]
+ */
+export function complementScale(degrees: readonly number[]): number[] {
+  const present = new Set(degrees.map((d) => ((d % 12) + 12) % 12));
+  const result: number[] = [];
+  for (let i = 0; i < 12; i++) {
+    if (!present.has(i)) result.push(i);
+  }
+  return result;
+}
+
+/**
+ * Generate all 12 transpositions of the scale.
+ *
+ * For each shift t in 0..11, computes a new set of pitch classes:
+ * [(d + t) % 12 for d in degrees], sorted ascending.
+ *
+ * @param degrees - Pitch classes of the scale.
+ * @returns Array of 12 transpositions (index 0 = original, sorted).
+ *
+ * @example
+ * scaleTranspositions([0, 4, 7]); // [[0,4,7], [1,5,8], [2,6,9], ...]
+ */
+export function scaleTranspositions(degrees: readonly number[]): number[][] {
+  const result: number[][] = [];
+  for (let t = 0; t < 12; t++) {
+    const transposed = degrees.map((d) => (d + t) % 12).sort((a, b) => a - b);
+    result.push(transposed);
+  }
+  return result;
+}
+
+/**
+ * Compute a dissonance "curve" for successive intervals of the tuning.
+ *
+ * For each degree index i from 0 to tuning.degrees.length-1, computes the
+ * dissonance between degree 0 (root) and degree i using chordDissonance.
+ *
+ * @param tuning - The tuning system whose degrees define the intervals.
+ * @param spectrum - The spectral model used for dissonance calculation.
+ * @param rootHz - Reference frequency for the root (default 220 Hz).
+ * @returns Array of dissonance values, one per degree (degree 0 = 0).
+ *
+ * @example
+ * computeDissonanceCurve(equalTemperament12(440), harmonicSpectrum(8));
+ */
+export function computeDissonanceCurve(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz = 220,
+): number[] {
+  const rootPitch = tuning.degrees[0]!;
+  const rootFreq = centsToFreq(pitchToCents(rootPitch), rootHz);
+  return tuning.degrees.map((pitch) => {
+    const degFreq = centsToFreq(pitchToCents(pitch), rootHz);
+    return chordDissonance([rootFreq, degFreq], spectrum);
+  });
 }
