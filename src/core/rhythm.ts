@@ -47,3 +47,53 @@ export function rhythmOnsets(pattern: boolean[], stepMs: number): number[] {
   }
   return onsets;
 }
+
+/**
+ * Quantize tick positions to a grid. `strength` ∈ [0, 1]: 0 = no change, 1 = full snap.
+ * Throws RangeError if grid <= 0 or strength outside [0, 1].
+ */
+export function quantizeTicks(
+  ticks: readonly number[],
+  grid: number,
+  strength: number = 1.0,
+): number[] {
+  if (grid <= 0) throw new RangeError(`quantizeTicks: grid must be > 0, got ${grid}`);
+  if (strength < 0 || strength > 1) {
+    throw new RangeError(`quantizeTicks: strength must be in [0, 1], got ${strength}`);
+  }
+  return ticks.map((t) => {
+    const nearest = Math.round(t / grid) * grid;
+    return Math.round(t + (nearest - t) * strength);
+  });
+}
+
+/**
+ * Apply swing to a list of tick positions.
+ * `swingRatio` ∈ (0.5, 1): fraction of beat for the on-beat;
+ *   0.5 = straight, 0.667 = triplet swing, 0.75 = hard swing.
+ * `subdivisionTicks` = the duration of one swung subdivision pair (e.g., quarter note in ticks).
+ * Throws RangeError if swingRatio outside (0.5, 1) or subdivisionTicks <= 0.
+ */
+export function applySwing(
+  ticks: readonly number[],
+  swingRatio: number,
+  subdivisionTicks: number,
+): number[] {
+  if (swingRatio <= 0.5 || swingRatio >= 1) {
+    throw new RangeError(`applySwing: swingRatio must be in (0.5, 1), got ${swingRatio}`);
+  }
+  if (subdivisionTicks <= 0) {
+    throw new RangeError(`applySwing: subdivisionTicks must be > 0, got ${subdivisionTicks}`);
+  }
+  return ticks.map((t) => {
+    const pair = Math.floor(t / subdivisionTicks);
+    const phase = (t - pair * subdivisionTicks) / subdivisionTicks;
+    let newPhase: number;
+    if (phase < 0.5) {
+      newPhase = phase * 2 * swingRatio;
+    } else {
+      newPhase = swingRatio + (phase - 0.5) * 2 * (1 - swingRatio);
+    }
+    return Math.round(pair * subdivisionTicks + newPhase * subdivisionTicks);
+  });
+}
