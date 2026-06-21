@@ -16288,3 +16288,86 @@ export function tuningFamilySocraticRadarMomentumNarrative(
   }`;
   return { momentum, momentumLabel, momentumNarrative };
 }
+
+// ---------------------------------------------------------------------------
+// Q906 — tuningFamilySocraticRadarMomentumComparison
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarMomentumComparison(
+  tuningsA: TuningSystem[],
+  tuningsB: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  momentumA: number;
+  momentumB: number;
+  momentumLabelA: 'stagnant' | 'neutral' | 'growing' | 'thriving';
+  momentumLabelB: 'stagnant' | 'neutral' | 'growing' | 'thriving';
+  momentumDiff: number;
+  higherMomentum: 'A' | 'B' | 'tie';
+} {
+  const { momentum: momentumA, momentumLabel: momentumLabelA } = tuningFamilySocraticRadarMomentum(
+    tuningsA,
+    spectrum,
+    rootHz,
+  );
+  const { momentum: momentumB, momentumLabel: momentumLabelB } = tuningFamilySocraticRadarMomentum(
+    tuningsB,
+    spectrum,
+    rootHz,
+  );
+  const momentumDiff = Math.abs(momentumA - momentumB);
+  const higherMomentum: 'A' | 'B' | 'tie' =
+    momentumDiff < 0.02 ? 'tie' : momentumA > momentumB ? 'A' : 'B';
+  return { momentumA, momentumB, momentumLabelA, momentumLabelB, momentumDiff, higherMomentum };
+}
+
+// ---------------------------------------------------------------------------
+// Q908 — tuningFamilySocraticRadarResilienceScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarResilienceScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  resilienceScore: number;
+  resilienceLabel: 'fragile' | 'moderate' | 'resilient';
+} {
+  const { diversity, versatility, maturity, benchmark, convergence } =
+    tuningFamilySocraticRadarProfile(tunings, spectrum, rootHz);
+  const scores = [diversity, versatility, maturity, benchmark, convergence];
+  const count = scores.filter((s) => s > 0.5).length;
+  const resilienceScore = count / 5;
+  const resilienceLabel: 'fragile' | 'moderate' | 'resilient' =
+    resilienceScore < 0.4 ? 'fragile' : resilienceScore < 0.7 ? 'moderate' : 'resilient';
+  return { resilienceScore, resilienceLabel };
+}
+
+// ---------------------------------------------------------------------------
+// Q910 — tuningFamilySocraticRadarResilienceScoreNarrative
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarResilienceScoreNarrative(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): {
+  resilienceScore: number;
+  resilienceLabel: 'fragile' | 'moderate' | 'resilient';
+  resilienceNarrative: string;
+} {
+  const { resilienceScore, resilienceLabel } = tuningFamilySocraticRadarResilienceScore(
+    tunings,
+    spectrum,
+    rootHz,
+  );
+  const resilienceNarrative = `Resilience: ${resilienceLabel} — ${Math.round(resilienceScore * 5)} of 5 axes exceed 0.5 (score: ${resilienceScore.toFixed(2)}). ${
+    resilienceLabel === 'resilient'
+      ? 'The profile is robust across most dimensions.'
+      : resilienceLabel === 'moderate'
+        ? 'The profile shows partial resilience with room to improve.'
+        : 'Most dimensions fall below the midpoint, indicating fragility.'
+  }`;
+  return { resilienceScore, resilienceLabel, resilienceNarrative };
+}

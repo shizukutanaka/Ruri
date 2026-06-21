@@ -474,6 +474,9 @@ import {
   tuningFamilySocraticRadarTierComparison,
   tuningFamilySocraticRadarMomentum,
   tuningFamilySocraticRadarMomentumNarrative,
+  tuningFamilySocraticRadarMomentumComparison,
+  tuningFamilySocraticRadarResilienceScore,
+  tuningFamilySocraticRadarResilienceScoreNarrative,
 } from './scale.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
 import { generatedTuning } from './generate.js';
