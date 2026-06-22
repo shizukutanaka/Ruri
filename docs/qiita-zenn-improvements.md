@@ -755,3 +755,14 @@
 | III4 | `scalePalindromicScore` | 音程列の回文度スコア |
 
 **参考**: Retrograde and inversion in serial music theory (Schoenberg); Scale palindromes in music set theory。
+
+## Round 53: スケール学習可能性・認知指標 (JJJ1–JJJ4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| JJJ1 | `scaleLearnabilityScore` | 音程規則性・音数・種類数に基づく学習容易性スコア |
+| JJJ2 | `scaleRecognizabilityIndex` | 著名スケールとの類似度に基づく認識可能性指数 |
+| JJJ3 | `scaleMemorizabilityScore` | パターン反復・順次進行による記憶容易性スコア |
+| JJJ4 | `scaleTeachingDifficulty` | マイクロトーナル音程・高音数などによる教授難易度 |
+
+**参考**: Cognitive psychology of music learning (Dowling & Harwood 1986); Scale difficulty in ear training pedagogy。

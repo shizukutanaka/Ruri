@@ -555,6 +555,12 @@ import {
   tuningFamilySocraticRadarParetoDominanceCount,
   tuningFamilySocraticRadarStrategicDiversityIndex,
   tuningFamilySocraticRadarBargainingPower,
+  tuningFamilySocraticRadarTOPSISRanking,
+  tuningFamilySocraticRadarSAWScores,
+  tuningFamilySocraticRadarVIKORCompromise,
+  tuningFamilySocraticRadarELECTREOutranking,
+  tuningFamilySocraticRadarPROMETHEEFlowMean,
+  tuningFamilySocraticRadarCOPRASRatio,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -13244,4 +13250,94 @@ export function presetFamilySocraticRadarBargainingPower(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarBargainingPower(tunings, spectrum, rootHz);
+}
+
+// Q1531 — presetFamilySocraticRadarTOPSISRanking
+export function presetFamilySocraticRadarTOPSISRanking(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTOPSISRanking> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTOPSISRanking(tunings, spectrum, rootHz);
+}
+
+// Q1533 — presetFamilySocraticRadarSAWScores
+export function presetFamilySocraticRadarSAWScores(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSAWScores> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSAWScores(tunings, spectrum, rootHz);
+}
+
+// Q1535 — presetFamilySocraticRadarVIKORCompromise
+export function presetFamilySocraticRadarVIKORCompromise(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarVIKORCompromise> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarVIKORCompromise(tunings, spectrum, rootHz);
+}
+
+// Q1537 — presetFamilySocraticRadarELECTREOutranking
+export function presetFamilySocraticRadarELECTREOutranking(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarELECTREOutranking> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarELECTREOutranking(tunings, spectrum, rootHz);
+}
+
+// Q1539 — presetFamilySocraticRadarPROMETHEEFlowMean
+export function presetFamilySocraticRadarPROMETHEEFlowMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPROMETHEEFlowMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPROMETHEEFlowMean(tunings, spectrum, rootHz);
+}
+
+// Q1541 — presetFamilySocraticRadarCOPRASRatio
+export function presetFamilySocraticRadarCOPRASRatio(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCOPRASRatio> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCOPRASRatio(tunings, spectrum, rootHz);
 }

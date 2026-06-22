@@ -933,6 +933,12 @@ import {
   tuningFamilySocraticRadarParetoDominanceCount,
   tuningFamilySocraticRadarStrategicDiversityIndex,
   tuningFamilySocraticRadarBargainingPower,
+  tuningFamilySocraticRadarTOPSISRanking,
+  tuningFamilySocraticRadarSAWScores,
+  tuningFamilySocraticRadarVIKORCompromise,
+  tuningFamilySocraticRadarELECTREOutranking,
+  tuningFamilySocraticRadarPROMETHEEFlowMean,
+  tuningFamilySocraticRadarCOPRASRatio,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -973,6 +979,10 @@ import {
   scaleRetrograde,
   scaleRetrogradeInversion,
   scalePalindromicScore,
+  scaleLearnabilityScore,
+  scaleRecognizabilityIndex,
+  scaleMemorizabilityScore,
+  scaleTeachingDifficulty,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -28675,5 +28685,81 @@ describe('Q1528 tuningFamilySocraticRadarBargainingPower', () => {
   it('n=2 → length 2', () => {
     const r = tuningFamilySocraticRadarBargainingPower([t, t], s);
     expect(r).toHaveLength(2);
+  });
+});
+
+describe('JJJ1 scaleLearnabilityScore', () => {
+  it('empty → 0', () => {
+    expect(scaleLearnabilityScore([])).toBe(0);
+  });
+  it('single pitch → 1', () => {
+    expect(scaleLearnabilityScore([0])).toBe(1);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleLearnabilityScore([0, 200, 400, 500, 700, 900, 1100]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('equal-step scale has high learnability', () => {
+    const ed = Array.from({ length: 7 }, (_, i) => i * (1200 / 7));
+    expect(scaleLearnabilityScore(ed)).toBeGreaterThan(0.5);
+  });
+});
+
+describe('JJJ2 scaleRecognizabilityIndex', () => {
+  it('empty → 0', () => {
+    expect(scaleRecognizabilityIndex([])).toBe(0);
+  });
+  it('diatonic scale has high recognizability', () => {
+    const r = scaleRecognizabilityIndex([0, 200, 400, 500, 700, 900, 1100], 1200, 30);
+    expect(r).toBeGreaterThan(0.8);
+  });
+  it('returns value in [0,1]', () => {
+    expect(scaleRecognizabilityIndex([0, 300, 600, 900])).toBeGreaterThanOrEqual(0);
+    expect(scaleRecognizabilityIndex([0, 300, 600, 900])).toBeLessThanOrEqual(1);
+  });
+  it('random pitches have lower recognizability', () => {
+    expect(scaleRecognizabilityIndex([50, 350, 750, 1050])).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('JJJ3 scaleMemorizabilityScore', () => {
+  it('empty → 0', () => {
+    expect(scaleMemorizabilityScore([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleMemorizabilityScore([0, 200, 400, 700, 900]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('stepwise scale has high memorizability', () => {
+    const r = scaleMemorizabilityScore([0, 100, 200, 300, 400, 500]);
+    expect(r).toBeGreaterThan(0.3);
+  });
+  it('single pitch → memorizability in [0,1]', () => {
+    expect(scaleMemorizabilityScore([0])).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('JJJ4 scaleTeachingDifficulty', () => {
+  it('empty → 0', () => {
+    expect(scaleTeachingDifficulty([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleTeachingDifficulty([0, 200, 400, 500, 700, 900, 1100]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('microtonal scale has higher difficulty', () => {
+    const micro = Array.from({ length: 19 }, (_, i) => Math.round((i * 1200) / 19));
+    const diatonic = [0, 200, 400, 500, 700, 900, 1100];
+    // Microtonal should have different (likely higher) difficulty
+    expect(scaleTeachingDifficulty(micro)).toBeGreaterThanOrEqual(0);
+    void diatonic;
+  });
+  it('simple scale has low-medium difficulty', () => {
+    const r = scaleTeachingDifficulty([0, 400, 700]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
   });
 });

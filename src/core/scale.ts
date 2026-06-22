@@ -35148,3 +35148,426 @@ export function tuningFamilySocraticRadarBargainingPower(
   if (maxMean === 0) return means.map(() => 1);
   return means.map((m) => Math.max(0, m / maxMean));
 }
+
+// ---------------------------------------------------------------------------
+// Q1530 — tuningFamilySocraticRadarTOPSISRanking
+
+/**
+ * TOPSIS ranking: rank tunings by closeness to the ideal solution.
+ * Ideal = max on each axis; anti-ideal = min on each axis.
+ * D+ = sqrt(Σ(v_i - ideal_i)²). Closeness = D- / (D+ + D-).
+ * Returns a number[] of closeness scores (length n). Returns [] for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Array of closeness scores in [0,1] ([] for empty).
+ */
+export function tuningFamilySocraticRadarTOPSISRanking(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const ideal = axes.map((ax) => profiles.reduce((best, p) => Math.max(best, p[ax]), -Infinity));
+  const antiIdeal = axes.map((ax) => profiles.reduce((worst, p) => Math.min(worst, p[ax]), Infinity));
+  return profiles.map((p) => {
+    let dPlus = 0;
+    let dMinus = 0;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const ax = axes[ai]!;
+      const diffPlus = p[ax] - ideal[ai]!;
+      const diffMinus = p[ax] - antiIdeal[ai]!;
+      dPlus += diffPlus * diffPlus;
+      dMinus += diffMinus * diffMinus;
+    }
+    dPlus = Math.sqrt(dPlus);
+    dMinus = Math.sqrt(dMinus);
+    const total = dPlus + dMinus;
+    return total === 0 ? 0.5 : Math.max(0, Math.min(1, dMinus / total));
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1532 — tuningFamilySocraticRadarSAWScores
+
+/**
+ * Simple Additive Weighting: weighted sum of normalized radar scores.
+ * Equal weights (1/5 each). Returns number[] of SAW scores. Returns [] for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Array of SAW scores in [0,1] ([] for empty).
+ */
+export function tuningFamilySocraticRadarSAWScores(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const weight = 1 / axes.length;
+  const axisMax = axes.map((ax) => profiles.reduce((m, p) => Math.max(m, p[ax]), 0));
+  return profiles.map((p) => {
+    let score = 0;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const ax = axes[ai]!;
+      const maxVal = axisMax[ai]!;
+      const normalized = maxVal === 0 ? 0 : p[ax] / maxVal;
+      score += weight * normalized;
+    }
+    return Math.max(0, Math.min(1, score));
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1534 — tuningFamilySocraticRadarVIKORCompromise
+
+/**
+ * VIKOR compromise ranking. For each tuning:
+ * S = Σ w_i*(f*_i - f_ij)/(f*_i - f^_i)
+ * R = max_i[w_i*(f*_i - f_ij)/(f*_i - f^_i)]
+ * Q = v*S/S* + (1-v)*R/R* where v=0.5.
+ * Returns number[] of Q-values (lower = better). Returns [] for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Array of Q-values ([] for empty).
+ */
+export function tuningFamilySocraticRadarVIKORCompromise(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const w = 1 / axes.length;
+  const v = 0.5;
+  const fBest = axes.map((ax) => profiles.reduce((best, p) => Math.max(best, p[ax]), -Infinity));
+  const fWorst = axes.map((ax) => profiles.reduce((worst, p) => Math.min(worst, p[ax]), Infinity));
+  const S = profiles.map((p) => {
+    let s = 0;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const ax = axes[ai]!;
+      const best = fBest[ai]!;
+      const worst = fWorst[ai]!;
+      const range = best - worst;
+      if (range === 0) continue;
+      s += w * (best - p[ax]) / range;
+    }
+    return s;
+  });
+  const R = profiles.map((p) => {
+    let r = -Infinity;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const ax = axes[ai]!;
+      const best = fBest[ai]!;
+      const worst = fWorst[ai]!;
+      const range = best - worst;
+      if (range === 0) continue;
+      const val = w * (best - p[ax]) / range;
+      if (val > r) r = val;
+    }
+    return r === -Infinity ? 0 : r;
+  });
+  const sStar = S.reduce((m, s) => Math.max(m, s), -Infinity);
+  const rStar = R.reduce((m, r) => Math.max(m, r), -Infinity);
+  return profiles.map((_p, i) => {
+    const sNorm = sStar === 0 ? 0 : S[i]! / sStar;
+    const rNorm = rStar === 0 ? 0 : R[i]! / rStar;
+    return Math.max(0, v * sNorm + (1 - v) * rNorm);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1536 — tuningFamilySocraticRadarELECTREOutranking
+
+/**
+ * Simplified ELECTRE outranking: for each pair (A,B), A outranks B if
+ * the weighted sum of axes where A>=B exceeds 0.6 and the max axis where
+ * B>A is < 0.3. Returns number[] of outranking scores = count dominated by
+ * each tuning / (n-1). Returns zeros for n<=1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Array of outranking scores in [0,1] (zeros for n<=1).
+ */
+export function tuningFamilySocraticRadarELECTREOutranking(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [0];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const w = 1 / axes.length;
+  const dominatedCounts = new Array<number>(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const pi = profiles[i]!;
+      const pj = profiles[j]!;
+      let concordance = 0;
+      let discordanceMax = 0;
+      for (const ax of axes) {
+        if (pi[ax] >= pj[ax]) {
+          concordance += w;
+        } else {
+          const diff = pj[ax] - pi[ax];
+          if (diff > discordanceMax) discordanceMax = diff;
+        }
+      }
+      if (concordance > 0.6 && discordanceMax < 0.3) {
+        dominatedCounts[i]!++;
+      }
+    }
+  }
+  return dominatedCounts.map((c) => Math.max(0, Math.min(1, c / (n - 1))));
+}
+
+// ---------------------------------------------------------------------------
+// Q1538 — tuningFamilySocraticRadarPROMETHEEFlowMean
+
+/**
+ * PROMETHEE net flow: for each tuning i,
+ * φ(i) = Σ_{j≠i} [P(i,j) - P(j,i)] / (n-1)
+ * where P(i,j) = max(0, meanProfile[i] - meanProfile[j]).
+ * Returns mean |φ| across tunings. Returns 0 for n<=1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean absolute net flow (0 for n<=1).
+ */
+export function tuningFamilySocraticRadarPROMETHEEFlowMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const means = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+  const flows = means.map((mi, i) => {
+    let flow = 0;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const pij = Math.max(0, mi - means[j]!);
+      const pji = Math.max(0, means[j]! - mi);
+      flow += pij - pji;
+    }
+    return flow / (n - 1);
+  });
+  const meanAbsFlow = flows.reduce((s, f) => s + Math.abs(f), 0) / n;
+  return Math.max(0, meanAbsFlow);
+}
+
+// ---------------------------------------------------------------------------
+// Q1540 — tuningFamilySocraticRadarCOPRASRatio
+
+/**
+ * COPRAS method: for each tuning, utility ratio
+ * U = S+ / max(S+) + min(S-) / S-
+ * where S+ = sum of beneficial attributes (diversity, versatility)
+ * and S- = sum of non-beneficial (1-maturity, 1-benchmark, 1-convergence).
+ * Returns number[] of utility ratios. Returns [] for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Array of utility ratios ([] for empty).
+ */
+export function tuningFamilySocraticRadarCOPRASRatio(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const sPlus = profiles.map((p) => p.diversity + p.versatility);
+  const sMinus = profiles.map((p) => (1 - p.maturity) + (1 - p.benchmark) + (1 - p.convergence));
+  const maxSPlus = sPlus.reduce((m, v) => Math.max(m, v), 0);
+  const minSMinus = sMinus.reduce((m, v) => Math.min(m, v), Infinity);
+  return profiles.map((_p, i) => {
+    const sPlusNorm = maxSPlus === 0 ? 0 : sPlus[i]! / maxSPlus;
+    const sMinusVal = sMinus[i]!;
+    const sMinusNorm = sMinusVal === 0 ? 1 : minSMinus / sMinusVal;
+    return Math.max(0, sPlusNorm + sMinusNorm);
+  });
+}
+
+/**
+ * JJJ1: scaleLearnabilityScore
+ *
+ * Measures how "learnable" a scale is, based on cognitive simplicity.
+ * Factors:
+ *  1. Regularity: 1 - CV(intervals) [coefficient of variation of gap sizes]
+ *  2. Small cardinality bonus: 1 / (1 + max(0, n - 7))
+ *  3. Few distinct interval sizes: 1 / distinctIntervals
+ * Combined = (regularity + 0.5*smallBonus + 0.5*(1/distinctIntervals)) / 2
+ * Clamped to [0,1]. Returns 0 for empty, 1 for single pitch.
+ *
+ * @param scaleCents - Scale pitches in cents (unsorted OK).
+ * @param periodCents - Period in cents (default 1200).
+ * @returns Learnability score in [0,1].
+ */
+export function scaleLearnabilityScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  if (scaleCents.length === 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const n = sorted.length;
+  const gaps: number[] = [];
+  for (let i = 1; i < n; i++) {
+    gaps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  gaps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const mean = gaps.reduce((s, g) => s + g, 0) / gaps.length;
+  const variance = gaps.reduce((s, g) => s + (g - mean) ** 2, 0) / gaps.length;
+  const stdDev = Math.sqrt(variance);
+  const cv = mean === 0 ? 0 : stdDev / mean;
+  const regularity = Math.min(1, Math.max(0, 1 - cv));
+  const smallBonus = 1 / (1 + Math.max(0, n - 7));
+  const tolerance = 1;
+  const distinctIntervals = new Set(gaps.map((g) => Math.round(g / tolerance))).size;
+  const fewDistinct = 1 / distinctIntervals;
+  const score = (regularity + 0.5 * smallBonus + 0.5 * fewDistinct) / 2;
+  return Math.min(1, Math.max(0, score));
+}
+
+/**
+ * JJJ2: scaleRecognizabilityIndex
+ *
+ * How recognizable is the scale? Based on similarity to well-known reference scales.
+ * Checks against 5 reference scales and returns the best match fraction.
+ * Returns 0 for empty.
+ *
+ * @param scaleCents - Scale pitches in cents.
+ * @param periodCents - Period in cents (default 1200).
+ * @param tolerance - Tolerance in cents for matching (default 30).
+ * @returns Recognizability index in [0,1].
+ */
+export function scaleRecognizabilityIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+  tolerance: number = 30,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const references: number[][] = [
+    [0, 200, 400, 700, 900],
+    [0, 200, 400, 500, 700, 900, 1100],
+    [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100],
+    [0, 204, 386, 498, 702, 884, 1088],
+    [0, 200, 300, 500, 700, 800, 1100],
+  ];
+  let bestMatch = 0;
+  for (const ref of references) {
+    let matched = 0;
+    for (const pitch of scaleCents) {
+      const normalized = ((pitch % periodCents) + periodCents) % periodCents;
+      for (const refPitch of ref) {
+        if (Math.abs(normalized - refPitch) <= tolerance) {
+          matched++;
+          break;
+        }
+      }
+    }
+    const fraction = matched / scaleCents.length;
+    if (fraction > bestMatch) bestMatch = fraction;
+  }
+  return Math.min(1, Math.max(0, bestMatch));
+}
+
+/**
+ * JJJ3: scaleMemorizabilityScore
+ *
+ * Memorizability combines:
+ *  1. Pattern repetition: does the scale contain repeated sub-patterns?
+ *  2. Stepwise motion: fraction of consecutive intervals ≤ 200c
+ * Combined = 0.5 * patternScore + 0.5 * stepwiseScore.
+ * Returns 0 for empty.
+ *
+ * @param scaleCents - Scale pitches in cents.
+ * @param periodCents - Period in cents (default 1200).
+ * @returns Memorizability score in [0,1].
+ */
+export function scaleMemorizabilityScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const n = sorted.length;
+  const gaps: number[] = [];
+  for (let i = 1; i < n; i++) {
+    gaps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  gaps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  // Pattern repetition: check if any half-length prefix appears later within 10c
+  let patternScore = 0;
+  const halfLen = Math.floor(gaps.length / 2);
+  if (halfLen > 0) {
+    const prefix = gaps.slice(0, halfLen);
+    outer: for (let start = 1; start <= gaps.length - halfLen; start++) {
+      for (let j = 0; j < halfLen; j++) {
+        if (Math.abs(gaps[start + j]! - prefix[j]!) > 10) continue outer;
+      }
+      patternScore = 1;
+      break;
+    }
+  }
+  // Stepwise motion: fraction of gaps ≤ 200c
+  const stepwise = gaps.filter((g) => g <= 200).length / gaps.length;
+  return Math.min(1, Math.max(0, 0.5 * patternScore + 0.5 * stepwise));
+}
+
+/**
+ * JJJ4: scaleTeachingDifficulty
+ *
+ * Difficulty to teach = complement of learnability + extra penalties:
+ *  - Microtonal intervals (< 50c): count * 0.2 per such interval
+ *  - Large cardinality (> 12): 0.1 per extra degree
+ *  - High interval variance: CV(intervals) component
+ * Base difficulty = 1 - scaleLearnabilityScore(scaleCents, periodCents).
+ * Penalties added, clamped to [0,1]. Returns 0 for empty.
+ *
+ * @param scaleCents - Scale pitches in cents.
+ * @param periodCents - Period in cents (default 1200).
+ * @returns Teaching difficulty in [0,1].
+ */
+export function scaleTeachingDifficulty(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const base = 1 - scaleLearnabilityScore(scaleCents, periodCents);
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const n = sorted.length;
+  const gaps: number[] = [];
+  for (let i = 1; i < n; i++) {
+    gaps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  gaps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const microtonalCount = gaps.filter((g) => g < 50).length;
+  const microtonalPenalty = microtonalCount * 0.2;
+  const cardinalityPenalty = Math.max(0, n - 12) * 0.1;
+  const total = base + microtonalPenalty + cardinalityPenalty;
+  return Math.min(1, Math.max(0, total));
+}
