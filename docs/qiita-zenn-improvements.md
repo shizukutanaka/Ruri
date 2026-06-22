@@ -1173,3 +1173,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | VVV2 | `scaleBrightest` | 最も明るいモードの明度（上半部の音数比） |
 | VVV3 | `scaleDarkest` | 最も暗いモードの暗度（下半部の音数比） |
 | VVV4 | `scaleModeBalanceSpread` | 最明モードと最暗モードの明度差 |
+
+## Round 91: 音階対称性分析 (WWW1–WWW4)
+
+音階の反射・並進・回文・反転対称性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| WWW1 | `scaleReflectionSymmetryV2` | 周期中点での反射対称性（ミラー音の比率） |
+| WWW2 | `scaleTranslationSymmetry` | 自己音程によるシフトで不変な割合 |
+| WWW3 | `scalePalindromeRatio` | ステップ列の回文度 |
+| WWW4 | `scaleInversionEquivalence` | 反転スケールとの類似度（平均絶対差） |
