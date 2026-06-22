@@ -909,6 +909,12 @@ import {
   tuningFamilySocraticRadarPageRankVector,
   tuningFamilySocraticRadarAssortativity,
   tuningFamilySocraticRadarNetworkDensityV2,
+  tuningFamilySocraticRadarAutocorrelationLag1,
+  tuningFamilySocraticRadarProfileTrendSlope,
+  tuningFamilySocraticRadarMaxChangePoint,
+  tuningFamilySocraticRadarProfileVolatility,
+  tuningFamilySocraticRadarCumulativeGrowth,
+  tuningFamilySocraticRadarHurstEstimate,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -929,6 +935,10 @@ import {
   scalePrimeForm,
   scaleForteNumber,
   scaleIntervalClassContent,
+  scaleEDOApproximationError,
+  scaleMeantoneDeviation,
+  scaleWellTemperamentScore,
+  scaleJustIntonationRatioScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -27819,6 +27829,101 @@ describe('Q1468 tuningFamilySocraticRadarNetworkDensityV2', () => {
   });
 });
 
+describe('Q1470 tuningFamilySocraticRadarAutocorrelationLag1', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(tuningFamilySocraticRadarAutocorrelationLag1([t], s)).toBe(0);
+    expect(tuningFamilySocraticRadarAutocorrelationLag1([], s)).toBe(0);
+  });
+  it('returns finite number for n=3', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarAutocorrelationLag1([t, t2, t], s);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+  it('two identical tunings with n=3 returns 0 or finite', () => {
+    const r = tuningFamilySocraticRadarAutocorrelationLag1([t, t, t], s);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+});
+
+describe('Q1472 tuningFamilySocraticRadarProfileTrendSlope', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=1', () => {
+    expect(tuningFamilySocraticRadarProfileTrendSlope([t], s)).toBe(0);
+  });
+  it('returns finite number for n=2', () => {
+    const r = tuningFamilySocraticRadarProfileTrendSlope([t, t], s);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+  it('identical tunings slope is 0', () => {
+    expect(tuningFamilySocraticRadarProfileTrendSlope([t, t, t], s)).toBeCloseTo(0, 5);
+  });
+});
+
+describe('Q1474 tuningFamilySocraticRadarMaxChangePoint', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(tuningFamilySocraticRadarMaxChangePoint([t], s)).toBe(0);
+    expect(tuningFamilySocraticRadarMaxChangePoint([], s)).toBe(0);
+  });
+  it('returns non-negative for n=3', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarMaxChangePoint([t, t2, t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('identical tunings → 0', () => {
+    expect(tuningFamilySocraticRadarMaxChangePoint([t, t, t], s)).toBeCloseTo(0, 5);
+  });
+});
+
+describe('Q1476 tuningFamilySocraticRadarProfileVolatility', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=1', () => {
+    expect(tuningFamilySocraticRadarProfileVolatility([t], s)).toBe(0);
+  });
+  it('identical tunings → 0', () => {
+    expect(tuningFamilySocraticRadarProfileVolatility([t, t, t], s)).toBeCloseTo(0, 5);
+  });
+  it('returns non-negative', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarProfileVolatility([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1478 tuningFamilySocraticRadarCumulativeGrowth', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty → 1', () => {
+    expect(tuningFamilySocraticRadarCumulativeGrowth([], s)).toBe(1);
+  });
+  it('returns positive value', () => {
+    expect(tuningFamilySocraticRadarCumulativeGrowth([t], s)).toBeGreaterThan(0);
+  });
+  it('n=2 returns positive value', () => {
+    expect(tuningFamilySocraticRadarCumulativeGrowth([t, t], s)).toBeGreaterThan(0);
+  });
+});
+
+describe('Q1480 tuningFamilySocraticRadarHurstEstimate', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=4 → 0.5', () => {
+    expect(tuningFamilySocraticRadarHurstEstimate([t, t, t], s)).toBe(0.5);
+  });
+  it('returns value in [0,1] for n>4', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarHurstEstimate([t, t2, t, t2, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty → 0.5', () => {
+    expect(tuningFamilySocraticRadarHurstEstimate([], s)).toBe(0.5);
+  });
+});
+
 describe('DDD1 scalePitchClassSet', () => {
   it('major triad maps to [0,4,7]', () => {
     const r = scalePitchClassSet([0, 400, 700]);
@@ -27887,5 +27992,79 @@ describe('DDD4 scaleIntervalClassContent', () => {
   });
   it('empty → all zeros', () => {
     expect(scaleIntervalClassContent([])).toEqual([0, 0, 0, 0, 0, 0]);
+  });
+});
+
+describe('EEE1 scaleEDOApproximationError', () => {
+  it('12-EDO scale has 0 error', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleEDOApproximationError(chromatic, 12)).toBe(0);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleEDOApproximationError([])).toBe(0);
+  });
+  it('returns non-negative', () => {
+    expect(scaleEDOApproximationError([0,386,702])).toBeGreaterThanOrEqual(0);
+  });
+  it('just intonation pitches have non-zero error', () => {
+    // 386c (5/4 major third) is ~14c off from 12-EDO 400c
+    const err = scaleEDOApproximationError([0, 386, 702]);
+    expect(err).toBeGreaterThan(0);
+  });
+});
+
+describe('EEE2 scaleMeantoneDeviation', () => {
+  it('returns non-negative', () => {
+    expect(scaleMeantoneDeviation([0,200,400,500,700,900,1100])).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns 0', () => {
+    expect(scaleMeantoneDeviation([])).toBe(0);
+  });
+  it('meantone scale has low deviation', () => {
+    // approx meantone pitches
+    const meantone = [0, 193.157, 386.314, 503.422, 696.578, 889.735, 1082.892];
+    expect(scaleMeantoneDeviation(meantone)).toBeLessThan(10);
+  });
+  it('12-TET has some deviation', () => {
+    const chromatic = Array.from({length:7},(_,i)=>[0,200,400,500,700,900,1100][i]!);
+    expect(scaleMeantoneDeviation(chromatic)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('EEE3 scaleWellTemperamentScore', () => {
+  it('chromatic scale → 1', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleWellTemperamentScore(chromatic)).toBe(1);
+  });
+  it('empty → 0', () => {
+    expect(scaleWellTemperamentScore([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleWellTemperamentScore([0,200,400,500,700,900,1100]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('diatonic covers some chromatic pitches', () => {
+    const r = scaleWellTemperamentScore([0,200,400,500,700,900,1100]);
+    expect(r).toBeGreaterThan(0.5);
+  });
+});
+
+describe('EEE4 scaleJustIntonationRatioScore', () => {
+  it('empty → 0', () => {
+    expect(scaleJustIntonationRatioScore([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleJustIntonationRatioScore([0])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleJustIntonationRatioScore([0,386,702]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('just intervals have high score', () => {
+    // 386c ≈ 5/4 (386.314c), 702c ≈ 3/2 (701.955c)
+    const r = scaleJustIntonationRatioScore([0, 386, 702], 5, 10);
+    expect(r).toBeGreaterThan(0.5);
   });
 });

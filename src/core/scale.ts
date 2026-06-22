@@ -33486,3 +33486,290 @@ export function scaleIntervalClassContent(
   }
   return icVector;
 }
+
+// EEE1
+export function scaleEDOApproximationError(
+  scaleCents: readonly number[],
+  edoDivisions: number = 12,
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const step = periodCents / edoDivisions;
+  let totalError = 0;
+  for (let i = 0; i < scaleCents.length; i++) {
+    const pitch = scaleCents[i]!;
+    const nearest = Math.round(pitch / step) * step;
+    totalError += Math.abs(pitch - nearest);
+  }
+  return totalError / scaleCents.length;
+}
+
+// EEE2
+export function scaleMeantoneDeviation(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const meaFifth = 696.578;
+  const meaonePitches: number[] = [];
+  for (let k = -6; k <= 6; k++) {
+    let p = ((k * meaFifth) % periodCents + periodCents) % periodCents;
+    meaonePitches.push(p);
+  }
+  let totalDev = 0;
+  for (let i = 0; i < scaleCents.length; i++) {
+    const pitch = scaleCents[i]!;
+    let minDiff = Infinity;
+    for (let j = 0; j < meaonePitches.length; j++) {
+      const diff = Math.abs(pitch - meaonePitches[j]!);
+      if (diff < minDiff) minDiff = diff;
+    }
+    totalDev += minDiff;
+  }
+  return totalDev / scaleCents.length;
+}
+
+// EEE3
+export function scaleWellTemperamentScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const tolerance = 20;
+  const chromatic12: number[] = [];
+  for (let k = 0; k < 12; k++) {
+    chromatic12.push(k * 100);
+  }
+  let covered = 0;
+  for (let c = 0; c < chromatic12.length; c++) {
+    const target = chromatic12[c]!;
+    for (let i = 0; i < scaleCents.length; i++) {
+      const p = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+      if (Math.abs(p - target) <= tolerance) {
+        covered++;
+        break;
+      }
+    }
+  }
+  return covered / chromatic12.length;
+}
+
+// EEE4
+export function scaleJustIntonationRatioScore(
+  scaleCents: readonly number[],
+  primeLimit: number = 5,
+  tolerance: number = 10,
+): number {
+  if (scaleCents.length <= 1) return 0;
+
+  // Generate 5-limit integers (numbers whose prime factors are all <= primeLimit)
+  function isSmoothNumber(n: number, limit: number): boolean {
+    if (n <= 0) return false;
+    let x = n;
+    const primes = [2, 3, 5, 7, 11, 13].filter(p => p <= limit);
+    for (const p of primes) {
+      while (x % p === 0) x = Math.floor(x / p);
+    }
+    return x === 1;
+  }
+
+  // Generate smooth numbers up to a reasonable bound
+  const maxVal = primeLimit * primeLimit * 4;
+  const smoothNums: number[] = [];
+  for (let n = 1; n <= maxVal; n++) {
+    if (isSmoothNumber(n, primeLimit)) smoothNums.push(n);
+  }
+
+  // Generate all just ratios p/q in (1, 2]
+  const justCents: number[] = [];
+  for (const p of smoothNums) {
+    for (const q of smoothNums) {
+      if (p === q) continue;
+      const ratio = p / q;
+      if (ratio > 1 && ratio <= 2) {
+        justCents.push(1200 * Math.log2(ratio));
+      }
+    }
+  }
+
+  // Count intervals (all ordered pairs i<j) that are within tolerance of a just ratio
+  let totalIntervals = 0;
+  let matchedIntervals = 0;
+  for (let i = 0; i < scaleCents.length; i++) {
+    for (let j = i + 1; j < scaleCents.length; j++) {
+      const interval = Math.abs(scaleCents[j]! - scaleCents[i]!);
+      totalIntervals++;
+      // Check if interval is within tolerance of any just ratio cents value
+      let matched = false;
+      for (const jc of justCents) {
+        if (Math.abs(interval - jc) <= tolerance) {
+          matched = true;
+          break;
+        }
+      }
+      if (matched) matchedIntervals++;
+    }
+  }
+  if (totalIntervals === 0) return 0;
+  return matchedIntervals / totalIntervals;
+}
+
+// ---------------------------------------------------------------------------
+// Q1470 — tuningFamilySocraticRadarAutocorrelationLag1
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAutocorrelationLag1(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n <= 2) return 0;
+  let sumAC = 0;
+  for (const axis of axes) {
+    const vals = profiles.map((p) => p[axis]);
+    const mean = vals.reduce((a, b) => a + b, 0) / n;
+    let num = 0;
+    let den = 0;
+    for (let t = 0; t < n - 1; t++) {
+      num += (vals[t]! - mean) * (vals[t + 1]! - mean);
+    }
+    for (let t = 0; t < n; t++) {
+      den += (vals[t]! - mean) ** 2;
+    }
+    sumAC += den === 0 ? 0 : num / den;
+  }
+  return sumAC / axes.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1472 — tuningFamilySocraticRadarProfileTrendSlope
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileTrendSlope(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n <= 1) return 0;
+  let sumSlope = 0;
+  const tMean = (n - 1) / 2;
+  const tVar = profiles.reduce((_, __, idx) => 0, 0);
+  let tSS = 0;
+  for (let i = 0; i < n; i++) {
+    tSS += (i - tMean) ** 2;
+  }
+  for (const axis of axes) {
+    const vals = profiles.map((p) => p[axis]);
+    const yMean = vals.reduce((a, b) => a + b, 0) / n;
+    let cov = 0;
+    for (let i = 0; i < n; i++) {
+      cov += (i - tMean) * (vals[i]! - yMean);
+    }
+    sumSlope += tSS === 0 ? 0 : cov / tSS;
+  }
+  return sumSlope / axes.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1474 — tuningFamilySocraticRadarMaxChangePoint
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarMaxChangePoint(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n <= 2) return 0;
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const meanVals = profiles.map((p) => axes.reduce((s, a) => s + p[a], 0) / axes.length);
+  let maxDiff = 0;
+  for (let i = 1; i <= n - 2; i++) {
+    const leftMean = meanVals.slice(0, i).reduce((a, b) => a + b, 0) / i;
+    const rightMean = meanVals.slice(i).reduce((a, b) => a + b, 0) / (n - i);
+    const diff = Math.abs(leftMean - rightMean);
+    if (diff > maxDiff) maxDiff = diff;
+  }
+  return maxDiff;
+}
+
+// ---------------------------------------------------------------------------
+// Q1476 — tuningFamilySocraticRadarProfileVolatility
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarProfileVolatility(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n <= 1) return 0;
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity' , 'benchmark', 'convergence'];
+  const meanVals = profiles.map((p) => axes.reduce((s, a) => s + p[a], 0) / axes.length);
+  const mean = meanVals.reduce((a, b) => a + b, 0) / n;
+  const variance = meanVals.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+  return Math.sqrt(variance);
+}
+
+// ---------------------------------------------------------------------------
+// Q1478 — tuningFamilySocraticRadarCumulativeGrowth
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarCumulativeGrowth(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length === 0) return 1;
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  let product = 1;
+  for (const p of profiles) {
+    const meanVal = axes.reduce((s, a) => s + p[a], 0) / axes.length;
+    product *= 1 + meanVal;
+  }
+  return product;
+}
+
+// ---------------------------------------------------------------------------
+// Q1480 — tuningFamilySocraticRadarHurstEstimate
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarHurstEstimate(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n <= 4) return 0.5;
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const y = profiles.map((p) => axes.reduce((s, a) => s + p[a], 0) / axes.length);
+  const yMean = y.reduce((a, b) => a + b, 0) / n;
+  const Z: number[] = [];
+  let cumSum = 0;
+  for (let t = 0; t < n; t++) {
+    cumSum += y[t]! - yMean;
+    Z.push(cumSum);
+  }
+  const R = Math.max(...Z) - Math.min(...Z);
+  const variance = y.reduce((s, v) => s + (v - yMean) ** 2, 0) / n;
+  const S = Math.sqrt(variance);
+  if (S === 0) return 0.5;
+  const H = Math.log(R / S) / Math.log(n);
+  return Math.max(0, Math.min(1, H));
+}

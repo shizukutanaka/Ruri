@@ -538,6 +538,12 @@ import {
   presetFamilySocraticRadarPageRankVector,
   presetFamilySocraticRadarAssortativity,
   presetFamilySocraticRadarNetworkDensityV2,
+  presetFamilySocraticRadarAutocorrelationLag1,
+  presetFamilySocraticRadarProfileTrendSlope,
+  presetFamilySocraticRadarMaxChangePoint,
+  presetFamilySocraticRadarProfileVolatility,
+  presetFamilySocraticRadarCumulativeGrowth,
+  presetFamilySocraticRadarHurstEstimate,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -15611,5 +15617,96 @@ describe('Q1469 presetFamilySocraticRadarNetworkDensityV2', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarNetworkDensityV2(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1471 — presetFamilySocraticRadarAutocorrelationLag1
+describe('Q1471 presetFamilySocraticRadarAutocorrelationLag1', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite number', () => {
+    const r = presetFamilySocraticRadarAutocorrelationLag1(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+  it('single preset returns 0 (n<=2)', () => {
+    expect(presetFamilySocraticRadarAutocorrelationLag1(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAutocorrelationLag1(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1473 — presetFamilySocraticRadarProfileTrendSlope
+describe('Q1473 presetFamilySocraticRadarProfileTrendSlope', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite number for two presets', () => {
+    const r = presetFamilySocraticRadarProfileTrendSlope(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+  it('single preset returns 0 (n<=1)', () => {
+    expect(presetFamilySocraticRadarProfileTrendSlope(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfileTrendSlope(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1475 — presetFamilySocraticRadarMaxChangePoint
+describe('Q1475 presetFamilySocraticRadarMaxChangePoint', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for three presets', () => {
+    const r = presetFamilySocraticRadarMaxChangePoint(['12-tet', 'just-5-limit', '12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for n<=2', () => {
+    expect(presetFamilySocraticRadarMaxChangePoint(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMaxChangePoint(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1477 — presetFamilySocraticRadarProfileVolatility
+describe('Q1477 presetFamilySocraticRadarProfileVolatility', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarProfileVolatility(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('single preset returns 0 (n<=1)', () => {
+    expect(presetFamilySocraticRadarProfileVolatility(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfileVolatility(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1479 — presetFamilySocraticRadarCumulativeGrowth
+describe('Q1479 presetFamilySocraticRadarCumulativeGrowth', () => {
+  const s = harmonicSpectrum(6);
+  it('returns positive value for single preset', () => {
+    const r = presetFamilySocraticRadarCumulativeGrowth(['12-tet'], s);
+    expect(r).toBeGreaterThan(0);
+  });
+  it('empty returns 1', () => {
+    expect(presetFamilySocraticRadarCumulativeGrowth([], s)).toBe(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCumulativeGrowth(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1481 — presetFamilySocraticRadarHurstEstimate
+describe('Q1481 presetFamilySocraticRadarHurstEstimate', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0.5 for n<=4', () => {
+    expect(presetFamilySocraticRadarHurstEstimate(['12-tet', 'just-5-limit', '12-tet'], s)).toBe(0.5);
+  });
+  it('returns value in [0,1] for n>4', () => {
+    const r = presetFamilySocraticRadarHurstEstimate(['12-tet', 'just-5-limit', '12-tet', 'just-5-limit', '12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHurstEstimate(['unknown'], s)).toThrow(RangeError);
   });
 });

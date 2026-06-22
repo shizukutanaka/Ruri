@@ -700,3 +700,14 @@
 **参考**: Allen Forte「The Structure of Atonal Music」(1973); Set-Theory in music analysis。
 
 **参考**: Scale complement theory (Forte 1973); Necklace enumeration in combinatorics on words。
+
+## Round 48: マイクロトーナル固有指標 (EEE1–EEE4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| EEE1 | `scaleEDOApproximationError` | EDO近似誤差の平均(純正律スケールの12-TET偏差など) |
+| EEE2 | `scaleMeantoneDeviation` | 1/4コンマミーントーン音律からの平均偏差 |
+| EEE3 | `scaleWellTemperamentScore` | 全半音階をカバーする「良律」スコア |
+| EEE4 | `scaleJustIntonationRatioScore` | 純正律比への近接度スコア(素数制限付き) |
+
+**参考**: Meantone temperament (Barbour 1951); Well temperament criteria (Lindley 1984)。
