@@ -317,3 +317,17 @@
 - Y2: scaleMirror — 音階の反転（鏡映）
 - Y3: modalTranspose — 旋法転置（モード回転 + 正規化）
 - Y4: scaleSymmetryAxes — 反射対称軸の検出
+
+## Round 17: 純正律誤差・連分数・倍音距離 (Z1–Z4)
+
+**テーマ**: 音律の数論的・倍音的分析
+
+### 研究トピック
+- Qiita: 純正律比率の近似と誤差分析（TypeScriptで実装）
+- Zenn: 連分数展開による音程の最良近似とEDO理論
+
+### 実装
+- Z1: justIntonationError — 各音度の最近傍純正律比率と誤差
+- Z2: edoToContinuedFraction — セント値の連分数展開
+- Z3: harmonicDistanceMatrix — ピッチクラス間倍音距離行列
+- Z4: scaleRoughnessProfile — 音度ごとの根音に対するラフネス

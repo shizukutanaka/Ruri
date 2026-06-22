@@ -358,6 +358,12 @@ import {
   presetFamilySocraticRadarAxisQuartiles,
   presetFamilySocraticRadarAnomalyScore,
   presetFamilySocraticRadarRadialBalance,
+  presetFamilySocraticRadarWeightedAverage,
+  presetFamilySocraticRadarAxisRegression,
+  presetFamilySocraticRadarCovarianceMatrix,
+  presetFamilySocraticRadarKMeansCluster,
+  presetFamilySocraticRadarPrincipalAxis,
+  presetFamilySocraticRadarBootstrapCI,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12075,5 +12081,115 @@ describe('presetFamilySocraticRadarRadialBalance (Q1109)', () => {
       expect(entry.balance).toBeGreaterThanOrEqual(0);
       expect(entry.balance).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1111 — presetFamilySocraticRadarWeightedAverage
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarWeightedAverage (Q1111)', () => {
+  it('returns expected shape for two presets with equal weights', () => {
+    const result = presetFamilySocraticRadarWeightedAverage(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      [1, 1],
+    );
+    expect(result).toBeDefined();
+    for (const k of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[k]).toBeGreaterThanOrEqual(0);
+      expect(result[k]).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1113 — presetFamilySocraticRadarAxisRegression
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAxisRegression (Q1113)', () => {
+  it('returns slope, intercept, r2 for two presets', () => {
+    const result = presetFamilySocraticRadarAxisRegression(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      'diversity',
+      'maturity',
+    );
+    expect(result).toHaveProperty('slope');
+    expect(result).toHaveProperty('intercept');
+    expect(result).toHaveProperty('r2');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1115 — presetFamilySocraticRadarCovarianceMatrix
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCovarianceMatrix (Q1115)', () => {
+  it('returns 5x5 matrix for two presets', () => {
+    const result = presetFamilySocraticRadarCovarianceMatrix(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(Object.keys(result)).toHaveLength(5);
+    for (const k of Object.keys(result)) {
+      expect(Object.keys((result as any)[k])).toHaveLength(5);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1117 — presetFamilySocraticRadarKMeansCluster
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarKMeansCluster (Q1117)', () => {
+  it('returns one entry per preset with k=2', () => {
+    const result = presetFamilySocraticRadarKMeansCluster(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      2,
+    );
+    expect(result).toHaveLength(2);
+    for (const e of result) {
+      expect(e.cluster).toBeGreaterThanOrEqual(0);
+      expect(e.cluster).toBeLessThan(2);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1119 — presetFamilySocraticRadarPrincipalAxis
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarPrincipalAxis (Q1119)', () => {
+  it('returns 5 axes sorted by variance descending', () => {
+    const result = presetFamilySocraticRadarPrincipalAxis(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toHaveLength(5);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i - 1]!.variance).toBeGreaterThanOrEqual(result[i]!.variance);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1121 — presetFamilySocraticRadarBootstrapCI
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarBootstrapCI (Q1121)', () => {
+  it('returns lower, upper, mean with axis=diversity and samples=50', () => {
+    const result = presetFamilySocraticRadarBootstrapCI(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      'diversity',
+      50,
+    );
+    expect(result).toHaveProperty('lower');
+    expect(result).toHaveProperty('upper');
+    expect(result).toHaveProperty('mean');
+    expect(result.lower).toBeLessThanOrEqual(result.mean);
+    expect(result.mean).toBeLessThanOrEqual(result.upper);
   });
 });

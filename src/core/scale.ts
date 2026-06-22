@@ -22013,3 +22013,463 @@ export function scaleSymmetryAxes(
 
   return axes.sort((a, b) => a - b);
 }
+
+// ---------------------------------------------------------------------------
+// Q1110 — tuningFamilySocraticRadarWeightedAverage
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarWeightedAverage(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  weights: number[],
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  if (weights.length !== tunings.length) {
+    throw new RangeError(
+      `weights.length (${weights.length}) must equal tunings.length (${tunings.length})`,
+    );
+  }
+  const totalWeight = weights.reduce((s, w) => s + w, 0);
+  if (totalWeight === 0) {
+    throw new RangeError('Sum of weights must be non-zero');
+  }
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    let sum = 0;
+    for (let i = 0; i < profiles.length; i++) {
+      sum += (weights[i] ?? 0) * profiles[i]![ax];
+    }
+    result[ax] = sum / totalWeight;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1112 — tuningFamilySocraticRadarAxisRegression
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAxisRegression(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  xAxisKey: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  yAxisKey: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): { slope: number; intercept: number; r2: number } {
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
+  const n = profiles.length;
+  if (n === 0) return { slope: 0, intercept: 0, r2: 0 };
+
+  const xs = profiles.map((p) => p[xAxisKey]);
+  const ys = profiles.map((p) => p[yAxisKey]);
+
+  const meanX = xs.reduce((s, v) => s + v, 0) / n;
+  const meanY = ys.reduce((s, v) => s + v, 0) / n;
+
+  const varX = xs.reduce((s, v) => s + (v - meanX) ** 2, 0) / n;
+  const covXY = xs.reduce((s, v, i) => s + (v - meanX) * (ys[i]! - meanY), 0) / n;
+
+  if (varX === 0) {
+    // No variance in x — check if y is also constant (perfect degenerate fit)
+    const varY = ys.reduce((s, v) => s + (v - meanY) ** 2, 0) / n;
+    return { slope: 0, intercept: meanY, r2: varY === 0 ? 1 : 0 };
+  }
+
+  const slope = covXY / varX;
+  const intercept = meanY - slope * meanX;
+
+  const ssTot = ys.reduce((s, v) => s + (v - meanY) ** 2, 0);
+  const ssRes = ys.reduce((s, v, i) => s + (v - (slope * xs[i]! + intercept)) ** 2, 0);
+  const r2 = ssTot === 0 ? 1 : 1 - ssRes / ssTot;
+
+  return { slope, intercept, r2: Math.max(0, Math.min(1, r2)) };
+}
+
+// ---------------------------------------------------------------------------
+// Q1114 — tuningFamilySocraticRadarCovarianceMatrix
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarCovarianceMatrix(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<
+  'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>
+> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
+  const n = profiles.length;
+
+  const means: Record<AxisKey, number> = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    means[ax] = n === 0 ? 0 : vals.reduce((s, v) => s + v, 0) / n;
+  }
+
+  const matrix = {} as Record<AxisKey, Record<AxisKey, number>>;
+  for (const a of axes) {
+    matrix[a] = {} as Record<AxisKey, number>;
+    for (const b of axes) {
+      if (n === 0) {
+        matrix[a][b] = 0;
+      } else {
+        let cov = 0;
+        for (const p of profiles) {
+          cov += (p[a] - means[a]) * (p[b] - means[b]);
+        }
+        matrix[a][b] = cov / n;
+      }
+    }
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1116 — tuningFamilySocraticRadarKMeansCluster
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarKMeansCluster(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  k = 2,
+  maxIter = 20,
+  rootHz?: number,
+): Array<{ id: string; cluster: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (k < 1 || k > tunings.length) {
+    throw new RangeError(
+      `k must be between 1 and tunings.length (${tunings.length}), got ${k}`,
+    );
+  }
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
+    axes.map((ax) => p[ax]);
+
+  const l2 = (a: number[], b: number[]) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - (b[i] ?? 0)) ** 2, 0));
+
+  // Initialize centroids: first k tunings
+  let centroids: number[][] = profiles.slice(0, k).map(toVec);
+  let assignments: number[] = new Array(tunings.length).fill(0);
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    // Assign
+    const newAssignments = profiles.map((p) => {
+      const vec = toVec(p);
+      let bestCluster = 0;
+      let bestDist = Infinity;
+      for (let c = 0; c < k; c++) {
+        const d = l2(vec, centroids[c]!);
+        if (d < bestDist) {
+          bestDist = d;
+          bestCluster = c;
+        }
+      }
+      return bestCluster;
+    });
+
+    // Check convergence
+    const changed = newAssignments.some((a, i) => a !== assignments[i]);
+    assignments = newAssignments;
+    if (!changed) break;
+
+    // Recompute centroids
+    centroids = Array.from({ length: k }, (_, c) => {
+      const members = profiles.filter((_, i) => assignments[i] === c);
+      if (members.length === 0) return centroids[c]!;
+      return axes.map(
+        (ax, j) => members.reduce((s, p) => s + (toVec(p)[j] ?? 0), 0) / members.length,
+      );
+    });
+  }
+
+  return tunings.map((t, i) => ({ id: t.id, cluster: assignments[i] ?? 0 }));
+}
+
+// ---------------------------------------------------------------------------
+// Q1118 — tuningFamilySocraticRadarPrincipalAxis
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarPrincipalAxis(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Array<{ axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; variance: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
+  const n = profiles.length;
+
+  const result = axes.map((ax) => {
+    if (n === 0) return { axis: ax, variance: 0 };
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / n;
+    const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    return { axis: ax, variance };
+  });
+
+  return result.sort((a, b) => b.variance - a.variance);
+}
+
+// ---------------------------------------------------------------------------
+// Q1120 — tuningFamilySocraticRadarBootstrapCI
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarBootstrapCI(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  samples = 200,
+  confidenceLevel = 0.95,
+  rootHz?: number,
+): { lower: number; upper: number; mean: number } {
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
+  const scores = profiles.map((p) => p[axis]);
+  const n = scores.length;
+  const mean = n === 0 ? 0 : scores.reduce((s, v) => s + v, 0) / n;
+
+  if (n === 0) return { lower: 0, upper: 0, mean: 0 };
+
+  // Simple LCG with seed=42
+  let lcgState = 42;
+  const lcgNext = () => {
+    lcgState = (lcgState * 1664525 + 1013904223) & 0xffffffff;
+    return (lcgState >>> 0) / 0x100000000;
+  };
+
+  const sampleMeans: number[] = [];
+  for (let s = 0; s < samples; s++) {
+    let sum = 0;
+    for (let j = 0; j < n; j++) {
+      const idx = Math.floor(lcgNext() * n);
+      sum += scores[idx] ?? 0;
+    }
+    sampleMeans.push(sum / n);
+  }
+
+  sampleMeans.sort((a, b) => a - b);
+
+  const alpha = 1 - confidenceLevel;
+  const lowerIdx = Math.floor((alpha / 2) * samples);
+  const upperIdx = Math.min(Math.floor((1 - alpha / 2) * samples), samples - 1);
+  const lower = sampleMeans[lowerIdx] ?? 0;
+  const upper = sampleMeans[upperIdx] ?? 0;
+
+  return { lower, upper, mean };
+}
+
+// ---------------------------------------------------------------------------
+// Round 17: Z1-Z4 — 純正律誤差・連分数・倍音距離・ラフネスプロファイル
+// ---------------------------------------------------------------------------
+
+/** Euclidean GCD for positive integers. */
+const _gcd = (a: number, b: number): number => (b === 0 ? a : _gcd(b, a % b));
+
+// ---------------------------------------------------------------------------
+// Z1: justIntonationError
+// ---------------------------------------------------------------------------
+
+/**
+ * For each scale degree (in cents), find the nearest just interval ratio n/d
+ * where n,d ≤ 32, gcd(n,d)=1, ratio in (0.5, 2], and return the signed error.
+ *
+ * @param scaleCents     Scale degrees in cents (e.g. [0, 200, 400, 500, 700, 900, 1100]).
+ * @param primeLimit     Must be ≥ 2 (default 5). Only used for the RangeError guard.
+ * @param toleranceCents Threshold for including ratios (default 15). Error is always returned.
+ * @returns Array of { degree, nearestRatio, errorCents } for each scale degree.
+ * @throws {RangeError} if primeLimit < 2.
+ *
+ * @example
+ * justIntonationError([0, 700])[1]; // → { degree: 1, nearestRatio: '3/2', errorCents: ~-1.96 }
+ */
+export function justIntonationError(
+  scaleCents: readonly number[],
+  primeLimit: number = 5,
+  toleranceCents: number = 15,
+): Array<{ degree: number; nearestRatio: string; errorCents: number }> {
+  if (primeLimit < 2) throw new RangeError('primeLimit must be >= 2');
+
+  // Build candidate ratios: n/d with n,d in [1..32], gcd=1, ratio in (0.5, 2]
+  const candidates: Array<{ n: number; d: number; cents: number }> = [];
+  for (let n = 1; n <= 32; n++) {
+    for (let d = 1; d <= 32; d++) {
+      const ratio = n / d;
+      if (ratio <= 0.5 || ratio > 2) continue;
+      if (_gcd(n, d) !== 1) continue;
+      candidates.push({ n, d, cents: 1200 * Math.log2(ratio) });
+    }
+  }
+
+  return scaleCents.map((degreeCents, idx) => {
+    const pc = ((degreeCents % 1200) + 1200) % 1200;
+    let bestN = 1, bestD = 1, bestErr = Infinity;
+    for (const { n, d, cents } of candidates) {
+      const err = cents - pc;
+      if (Math.abs(err) < Math.abs(bestErr)) {
+        bestErr = err;
+        bestN = n;
+        bestD = d;
+      }
+    }
+    return {
+      degree: idx,
+      nearestRatio: `${bestN}/${bestD}`,
+      errorCents: bestErr,
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Z2: edoToContinuedFraction
+// ---------------------------------------------------------------------------
+
+/**
+ * Express cents/1200 as a continued fraction [a0; a1, a2, ...].
+ *
+ * @param cents     The interval in cents.
+ * @param maxTerms  Maximum number of continued-fraction terms (default 8).
+ * @returns Array of integer coefficients.
+ * @throws {RangeError} if maxTerms < 1.
+ *
+ * @example
+ * edoToContinuedFraction(700, 5); // → [0, 1, 1, 2, 2] (approx. 7/12)
+ */
+export function edoToContinuedFraction(
+  cents: number,
+  maxTerms: number = 8,
+): number[] {
+  if (maxTerms < 1) throw new RangeError('maxTerms must be >= 1');
+
+  const result: number[] = [];
+  let x = cents / 1200;
+
+  for (let i = 0; i < maxTerms; i++) {
+    const a = Math.floor(x);
+    result.push(a);
+    const remainder = x - a;
+    if (remainder < 1e-10) break;
+    x = 1 / remainder;
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Z3: harmonicDistanceMatrix
+// ---------------------------------------------------------------------------
+
+/**
+ * Harmonic distance lookup table for 0–11 semitone intervals.
+ * Entry i = log2(num_i * den_i) for the just ratio approximation of i semitones.
+ * Ratios: [1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8]
+ */
+const _SEMITONE_HD: readonly number[] = [
+  Math.log2(1 * 1),        // 0: 1/1
+  Math.log2(16 * 15),      // 1: 16/15
+  Math.log2(9 * 8),        // 2: 9/8
+  Math.log2(6 * 5),        // 3: 6/5
+  Math.log2(5 * 4),        // 4: 5/4
+  Math.log2(4 * 3),        // 5: 4/3
+  Math.log2(45 * 32),      // 6: 45/32
+  Math.log2(3 * 2),        // 7: 3/2
+  Math.log2(8 * 5),        // 8: 8/5
+  Math.log2(5 * 3),        // 9: 5/3
+  Math.log2(16 * 9),       // 10: 16/9
+  Math.log2(15 * 8),       // 11: 15/8
+];
+
+/**
+ * Compute pairwise harmonic distance between pitch classes (integers, interpreted mod 12).
+ * Uses the standard 12-TET just approximation table: distance = log2(n * d) for ratio n/d.
+ *
+ * @param pitchClasses  Non-empty array of pitch class integers.
+ * @returns n×n symmetric matrix with 0 on diagonal.
+ * @throws {RangeError} if pitchClasses is empty.
+ *
+ * @example
+ * harmonicDistanceMatrix([0, 4, 7]); // C-E-G triad harmonic distances
+ */
+export function harmonicDistanceMatrix(
+  pitchClasses: readonly number[],
+): number[][] {
+  if (pitchClasses.length === 0) throw new RangeError('pitchClasses must not be empty');
+
+  const n = pitchClasses.length;
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0) as number[]);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) {
+        matrix[i]![j] = 0;
+        continue;
+      }
+      const interval = ((pitchClasses[j]! - pitchClasses[i]!) % 12 + 12) % 12;
+      const hdUp = _SEMITONE_HD[interval]!;
+      const hdDown = _SEMITONE_HD[(12 - interval) % 12]!;
+      matrix[i]![j] = Math.min(hdUp, hdDown);
+    }
+  }
+
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Z4: scaleRoughnessProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * For each degree in the tuning, compute roughness against the root (degree 0)
+ * using the Sethares roughness model over the given spectrum.
+ *
+ * @param tuning    TuningSystem whose degrees are analyzed.
+ * @param spectrum  Partial structure (ratio + amplitude pairs).
+ * @param rootHz    Root frequency in Hz (default 220).
+ * @returns Array of { degree, roughness } for each degree.
+ *
+ * @example
+ * scaleRoughnessProfile(equalTemperament12(440), harmonicSpectrum(4));
+ */
+export function scaleRoughnessProfile(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  rootHz: number = 220,
+): Array<{ degree: number; roughness: number }> {
+  const degrees = tuning.degrees;
+  const specLen = spectrum.length;
+  const norm = specLen === 0 ? 1 : specLen * specLen;
+
+  return degrees.map((deg, idx) => {
+    const degCents = pitchToCents(deg);
+    const degHz = centsToFreq(degCents, rootHz);
+
+    let roughness = 0;
+    for (const pi of spectrum) {
+      const fi = rootHz * pi.ratio;
+      for (const pj of spectrum) {
+        const fj = degHz * pj.ratio;
+        const avg = (fi + fj) / 2;
+        if (avg === 0) continue;
+        roughness += pi.amplitude * pj.amplitude * Math.exp(-3.5 * Math.abs(fi - fj) / avg);
+      }
+    }
+
+    return { degree: idx, roughness: roughness / norm };
+  });
+}

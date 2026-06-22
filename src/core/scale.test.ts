@@ -577,6 +577,12 @@ import {
   tuningFamilySocraticRadarAxisQuartiles,
   tuningFamilySocraticRadarAnomalyScore,
   tuningFamilySocraticRadarRadialBalance,
+  tuningFamilySocraticRadarWeightedAverage,
+  tuningFamilySocraticRadarAxisRegression,
+  tuningFamilySocraticRadarCovarianceMatrix,
+  tuningFamilySocraticRadarKMeansCluster,
+  tuningFamilySocraticRadarPrincipalAxis,
+  tuningFamilySocraticRadarBootstrapCI,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -625,6 +631,10 @@ import {
   scaleMirror,
   modalTranspose,
   scaleSymmetryAxes,
+  justIntonationError,
+  edoToContinuedFraction,
+  harmonicDistanceMatrix,
+  scaleRoughnessProfile,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -21171,6 +21181,230 @@ describe('tuningFamilySocraticRadarRadialBalance (Q1108)', () => {
     const result = tuningFamilySocraticRadarRadialBalance([equalTemperament12(440), equalTemperament12(432)], spectrum);
     for (let i = 1; i < result.length; i++) {
       expect(result[i-1]!.balance).toBeGreaterThanOrEqual(result[i]!.balance);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1110 — tuningFamilySocraticRadarWeightedAverage
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarWeightedAverage (Q1110)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('equal weights equals arithmetic mean', () => {
+    const r = tuningFamilySocraticRadarWeightedAverage(tunings, spectrum, [1, 1]);
+    for (const k of ['diversity','versatility','maturity','benchmark','convergence'] as const) {
+      expect(r[k]).toBeGreaterThanOrEqual(0);
+      expect(r[k]).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws if weights.length !== tunings.length', () => {
+    expect(() => tuningFamilySocraticRadarWeightedAverage(tunings, spectrum, [1])).toThrow(RangeError);
+  });
+  it('all 5 axis keys present', () => {
+    const r = tuningFamilySocraticRadarWeightedAverage(tunings, spectrum, [2, 1]);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1112 — tuningFamilySocraticRadarAxisRegression
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAxisRegression (Q1112)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns slope, intercept, r2', () => {
+    const r = tuningFamilySocraticRadarAxisRegression(tunings, spectrum, 'diversity', 'maturity');
+    expect(r).toHaveProperty('slope');
+    expect(r).toHaveProperty('intercept');
+    expect(r).toHaveProperty('r2');
+  });
+  it('r2 is in [0,1]', () => {
+    const r = tuningFamilySocraticRadarAxisRegression(tunings, spectrum, 'diversity', 'maturity');
+    expect(r.r2).toBeGreaterThanOrEqual(0);
+    expect(r.r2).toBeLessThanOrEqual(1);
+  });
+  it('same axis: r2 in [0,1] (may be 0 when variance=0)', () => {
+    const r = tuningFamilySocraticRadarAxisRegression(tunings, spectrum, 'diversity', 'diversity');
+    expect(r.r2).toBeGreaterThanOrEqual(0);
+    expect(r.r2).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1114 — tuningFamilySocraticRadarCovarianceMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCovarianceMatrix (Q1114)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('diagonal entries are non-negative (variance)', () => {
+    const m = tuningFamilySocraticRadarCovarianceMatrix(tunings, spectrum);
+    for (const k of ['diversity','versatility','maturity','benchmark','convergence'] as const) {
+      expect(m[k][k]).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('matrix is symmetric: cov(a,b)=cov(b,a)', () => {
+    const m = tuningFamilySocraticRadarCovarianceMatrix(tunings, spectrum);
+    expect(m['diversity']['maturity']).toBeCloseTo(m['maturity']['diversity'], 10);
+  });
+  it('has all 5x5 entries', () => {
+    const m = tuningFamilySocraticRadarCovarianceMatrix(tunings, spectrum);
+    expect(Object.keys(m)).toHaveLength(5);
+    for (const k of Object.keys(m)) { expect(Object.keys((m as any)[k])).toHaveLength(5); }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1116 — tuningFamilySocraticRadarKMeansCluster
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarKMeansCluster (Q1116)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarKMeansCluster(tunings, spectrum, 2)).toHaveLength(2);
+  });
+  it('cluster labels in [0, k-1]', () => {
+    const r = tuningFamilySocraticRadarKMeansCluster(tunings, spectrum, 2);
+    for (const e of r) { expect(e.cluster).toBeGreaterThanOrEqual(0); expect(e.cluster).toBeLessThan(2); }
+  });
+  it('throws for k > tunings.length', () => {
+    expect(() => tuningFamilySocraticRadarKMeansCluster(tunings, spectrum, 5)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1118 — tuningFamilySocraticRadarPrincipalAxis
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarPrincipalAxis (Q1118)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 5 axes', () => {
+    expect(tuningFamilySocraticRadarPrincipalAxis(tunings, spectrum)).toHaveLength(5);
+  });
+  it('sorted by variance descending', () => {
+    const r = tuningFamilySocraticRadarPrincipalAxis(tunings, spectrum);
+    for (let i = 1; i < r.length; i++) { expect(r[i-1]!.variance).toBeGreaterThanOrEqual(r[i]!.variance); }
+  });
+  it('variances are non-negative', () => {
+    for (const e of tuningFamilySocraticRadarPrincipalAxis(tunings, spectrum)) {
+      expect(e.variance).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1120 — tuningFamilySocraticRadarBootstrapCI
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarBootstrapCI (Q1120)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('lower <= mean <= upper', () => {
+    const r = tuningFamilySocraticRadarBootstrapCI(tunings, spectrum, 'diversity');
+    expect(r.lower).toBeLessThanOrEqual(r.mean);
+    expect(r.mean).toBeLessThanOrEqual(r.upper);
+  });
+  it('returns lower, upper, mean', () => {
+    const r = tuningFamilySocraticRadarBootstrapCI(tunings, spectrum, 'convergence');
+    expect(r).toHaveProperty('lower');
+    expect(r).toHaveProperty('upper');
+    expect(r).toHaveProperty('mean');
+  });
+  it('CI is within [0,1]', () => {
+    const r = tuningFamilySocraticRadarBootstrapCI(tunings, spectrum, 'maturity');
+    expect(r.lower).toBeGreaterThanOrEqual(0);
+    expect(r.upper).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 17: Z1-Z4 tests
+// ---------------------------------------------------------------------------
+
+describe('justIntonationError (Z1)', () => {
+  it('returns one entry per degree', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(justIntonationError(scale)).toHaveLength(7);
+  });
+  it('degree 0 (unison) has errorCents near 0', () => {
+    const result = justIntonationError([0, 700]);
+    expect(Math.abs(result[0]!.errorCents)).toBeCloseTo(0, 3);
+  });
+  it('degree 700c (fifth) has ratio "3/2"', () => {
+    const result = justIntonationError([0, 700]);
+    expect(result[1]!.nearestRatio).toBe('3/2');
+  });
+  it('throws for primeLimit < 2', () => {
+    expect(() => justIntonationError([0], 1)).toThrow(RangeError);
+  });
+});
+
+describe('edoToContinuedFraction (Z2)', () => {
+  it('700 cents starts with [0,...]', () => {
+    const cf = edoToContinuedFraction(700, 6);
+    expect(cf[0]).toBe(0);
+  });
+  it('returns array of integers', () => {
+    const cf = edoToContinuedFraction(700, 5);
+    expect(cf.every(n => Number.isInteger(n))).toBe(true);
+  });
+  it('throws for maxTerms < 1', () => {
+    expect(() => edoToContinuedFraction(700, 0)).toThrow(RangeError);
+  });
+  it('1200 cents (octave) is [1] (x=1.0, exact)', () => {
+    const cf = edoToContinuedFraction(1200, 5);
+    expect(cf[0]).toBe(1);
+  });
+});
+
+describe('harmonicDistanceMatrix (Z3)', () => {
+  it('throws for empty input', () => {
+    expect(() => harmonicDistanceMatrix([])).toThrow(RangeError);
+  });
+  it('diagonal is 0', () => {
+    const m = harmonicDistanceMatrix([0, 4, 7]);
+    expect(m[0]![0]).toBe(0);
+    expect(m[1]![1]).toBe(0);
+  });
+  it('n×n matrix for n pitch classes', () => {
+    const m = harmonicDistanceMatrix([0, 4, 7]);
+    expect(m).toHaveLength(3);
+    expect(m[0]).toHaveLength(3);
+  });
+  it('symmetric: m[i][j]=m[j][i]', () => {
+    const m = harmonicDistanceMatrix([0, 4, 7]);
+    expect(m[0]![1]).toBeCloseTo(m[1]![0]!, 10);
+  });
+});
+
+describe('scaleRoughnessProfile (Z4)', () => {
+  it('returns one entry per degree', () => {
+    const t = equalTemperament12(440);
+    const s = harmonicSpectrum(4);
+    expect(scaleRoughnessProfile(t, s)).toHaveLength(t.degrees.length);
+  });
+  it('roughness values are non-negative', () => {
+    const t = equalTemperament12(440);
+    const s = harmonicSpectrum(4);
+    for (const e of scaleRoughnessProfile(t, s)) {
+      expect(e.roughness).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('degree index matches entry index', () => {
+    const t = equalTemperament12(440);
+    const s = harmonicSpectrum(4);
+    const r = scaleRoughnessProfile(t, s);
+    r.forEach((e, i) => expect(e.degree).toBe(i));
+  });
+  it('empty spectrum returns all-zero roughness', () => {
+    const t = equalTemperament12(440);
+    for (const e of scaleRoughnessProfile(t, [])) {
+      expect(e.roughness).toBe(0);
     }
   });
 });
