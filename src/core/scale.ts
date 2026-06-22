@@ -41075,3 +41075,116 @@ export function scaleSpectralKurtosis(scaleCents: readonly number[], periodCents
   const kurtosis = m4 / (std * std * std * std) - 3;
   return Math.max(0, Math.min(1, (kurtosis + 3) / 6));
 }
+
+/**
+ * DDD1 — scaleHarmonicSeriesAlignment
+ * How well the scale degrees align with the harmonic series.
+ * For each pitch p (in cents), compute ratio r = 2^(p/1200).
+ * A pitch aligns if min(|r - n/m|) < 0.01 for some n,m with n,m ≤ 8.
+ * Returns count_aligned / n; 0 for n=0.
+ */
+export function scaleHarmonicSeriesAlignment(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let countAligned = 0;
+  for (let i = 0; i < n; i++) {
+    const r = Math.pow(2, scaleCents[i]! / 1200);
+    let aligned = false;
+    for (let num = 1; num <= 8 && !aligned; num++) {
+      for (let den = 1; den <= 8 && !aligned; den++) {
+        if (Math.abs(r - num / den) < 0.01) {
+          aligned = true;
+        }
+      }
+    }
+    if (aligned) countAligned++;
+  }
+  return countAligned / n;
+}
+
+/**
+ * DDD2 — scaleSubharmonicDensity
+ * Density of subharmonic relationships.
+ * For each pair (i,j), compute interval wrapped to period, convert to ratio r = 2^(interval/1200).
+ * Check if 1/r is close to a simple ratio (n/m ≤ 6).
+ * Returns count / total_pairs; 0 for n<2.
+ */
+export function scaleSubharmonicDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let count = 0;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const wrapped = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+      const r = Math.pow(2, wrapped / 1200);
+      const inv = 1 / r;
+      let isSubharmonic = false;
+      for (let num = 1; num <= 6 && !isSubharmonic; num++) {
+        for (let den = 1; den <= 6 && !isSubharmonic; den++) {
+          if (Math.abs(inv - num / den) < 0.01) {
+            isSubharmonic = true;
+          }
+        }
+      }
+      if (isSubharmonic) count++;
+      total++;
+    }
+  }
+  return total === 0 ? 0 : count / total;
+}
+
+/**
+ * DDD3 — scaleResonanceScore
+ * Composite resonance: weighted sum of harmonic alignment + (1 - subharmonic density) + (1 - tritone tension).
+ * Weights: [0.5, 0.3, 0.2].
+ * Returns weighted sum clamped to [0,1].
+ */
+export function scaleResonanceScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const harmonicAlignment = scaleHarmonicSeriesAlignment(scaleCents);
+  const subharmonicDensity = scaleSubharmonicDensity(scaleCents, periodCents);
+  // Inline tritone tension calculation
+  const n = scaleCents.length;
+  let tritoneTension = 0;
+  if (n >= 2) {
+    let ttCount = 0;
+    let ttTotal = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+        const wrapped = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+        ttTotal++;
+        if (Math.abs(wrapped - periodCents / 2) <= 50) ttCount++;
+      }
+    }
+    tritoneTension = ttTotal === 0 ? 0 : ttCount / ttTotal;
+  }
+  const score = 0.5 * harmonicAlignment + 0.3 * (1 - subharmonicDensity) + 0.2 * (1 - tritoneTension);
+  return Math.max(0, Math.min(1, score));
+}
+
+/**
+ * DDD4 — scaleNodeDensity
+ * Density of "nodal" pitches — pitches that form integer ratios with the root (pitch 0).
+ * For each non-zero pitch p, compute r = 2^(p/1200).
+ * Check if r ≈ n/1 or 1/n for n = 1..16 (within 0.02).
+ * Returns count_nodal / (n-1); 0 for n<2.
+ */
+export function scaleNodeDensity(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let countNodal = 0;
+  for (let i = 0; i < n; i++) {
+    if (scaleCents[i]! === 0) continue;
+    const r = Math.pow(2, scaleCents[i]! / 1200);
+    let nodal = false;
+    for (let k = 1; k <= 16 && !nodal; k++) {
+      if (Math.abs(r - k) < 0.02 || Math.abs(r - 1 / k) < 0.02) {
+        nodal = true;
+      }
+    }
+    if (nodal) countNodal++;
+  }
+  return countNodal / (n - 1);
+}
