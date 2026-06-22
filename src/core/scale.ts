@@ -26909,3 +26909,335 @@ export function harmonicComplexityProfile(
   }
   return result;
 }
+
+/**
+ * KK1: Measures how strongly the scale pitches are "pulled" toward the root.
+ * For each pitch p, weight = 1 / (1 + |p - rootCents| / 100).
+ * Returns the mean weight across all pitches (0 for empty, 1 if only root).
+ */
+export function scaleHarmonicGravity(
+  scaleCents: readonly number[],
+  rootCents: number = 0,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    const p = scaleCents[i]!;
+    sum += 1 / (1 + Math.abs(p - rootCents) / 100);
+  }
+  return sum / n;
+}
+
+/**
+ * KK2: Measures how well the tuning's degrees align with the harmonic series.
+ * For each degree, finds the nearest harmonic k (1..harmonics) by cents distance,
+ * then alignment = 1 - minDist/100 clamped to [0,1].
+ * Returns the mean alignment across all degrees (0 for no degrees).
+ */
+export function tuningOvertoneAlignment(
+  tuning: TuningSystem,
+  harmonics: number = 8,
+): number {
+  const n = tuning.degrees.length;
+  if (n === 0) return 0;
+  const harmonicCents: number[] = [];
+  for (let k = 1; k <= harmonics; k++) {
+    harmonicCents.push(1200 * Math.log2(k));
+  }
+  let totalAlignment = 0;
+  for (let i = 0; i < n; i++) {
+    const degree = tuning.degrees[i]!;
+    const degreeCents = pitchToCents(degree);
+    let minDist = Infinity;
+    for (let j = 0; j < harmonicCents.length; j++) {
+      const dist = Math.abs(degreeCents - harmonicCents[j]!);
+      if (dist < minDist) minDist = dist;
+    }
+    const alignment = Math.max(0, Math.min(1, 1 - minDist / 100));
+    totalAlignment += alignment;
+  }
+  return totalAlignment / n;
+}
+
+/**
+ * KK3: Counts how many distinct rotations (modes) of the scale have a unique interval vector.
+ * A rotation starting at degree i uses scaleCents[i] as root and computes sorted step sizes.
+ * Returns count / n (fraction of unique modes), 0 for n <= 1.
+ */
+export function scaleModalDiversity(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const uniqueVectors = new Set<string>();
+  for (let i = 0; i < n; i++) {
+    const steps: number[] = [];
+    for (let j = 1; j <= n; j++) {
+      const curr = scaleCents[(i + j - 1) % n]!;
+      const prev = scaleCents[(i + j - 2) % n]!;
+      let step = curr - prev;
+      if (step <= 0) step += 1200;
+      steps.push(step);
+    }
+    const sorted = steps.slice().sort((a, b) => a - b);
+    uniqueVectors.add(JSON.stringify(sorted));
+  }
+  return uniqueVectors.size / n;
+}
+
+/**
+ * KK4: Measures the "spread" of the tuning in the harmonic lattice.
+ * Computes frequencyRatioComplexity for each degree's ratio (2^(cents/1200)),
+ * then returns the standard deviation of those complexity values.
+ * Returns 0 for tuning with <= 1 degree.
+ */
+export function tuningLatticeSpread(tuning: TuningSystem): number {
+  const n = tuning.degrees.length;
+  if (n <= 1) return 0;
+  const complexities: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const degree = tuning.degrees[i]!;
+    const cents = pitchToCents(degree);
+    const ratio = Math.pow(2, cents / 1200);
+    complexities.push(frequencyRatioComplexity(ratio));
+  }
+  const mean = complexities.reduce((s, v) => s + v, 0) / n;
+  const variance =
+    complexities.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+  return Math.sqrt(variance);
+}
+
+// ---------------------------------------------------------------------------
+// Q1242 — tuningFamilySocraticRadarEWMA
+// ---------------------------------------------------------------------------
+
+/**
+ * Exponentially Weighted Moving Average of radar profiles across tunings.
+ *
+ * Treats the tunings array as a time series.
+ * EWMA_0 = profile[0], EWMA_i = alpha * profile[i] + (1 - alpha) * EWMA_{i-1}.
+ * Returns the final EWMA as a Record of axis → score.
+ *
+ * @param tunings - Array of tunings (treated as ordered time series).
+ * @param spectrum - Timbre spectrum.
+ * @param alpha - Smoothing factor in (0, 1) exclusive. Defaults to 0.3.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, number> of the final EWMA.
+ * @throws {RangeError} If alpha is not in (0, 1) exclusive or tunings is empty.
+ */
+export function tuningFamilySocraticRadarEWMA(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  alpha: number = 0.3,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  if (alpha <= 0 || alpha >= 1) throw new RangeError('alpha must be in (0, 1) exclusive');
+  if (tunings.length === 0) throw new RangeError('tunings must not be empty');
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const ewma = { ...profiles[0]! } as Record<AxisKey, number>;
+  for (let i = 1; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    for (const ax of axes) {
+      ewma[ax] = alpha * p[ax] + (1 - alpha) * ewma[ax];
+    }
+  }
+  return ewma;
+}
+
+// ---------------------------------------------------------------------------
+// Q1244 — tuningFamilySocraticRadarGiniCoefficientV2
+// ---------------------------------------------------------------------------
+
+/**
+ * Gini coefficient of score distribution per axis.
+ *
+ * Gini = sum_i sum_j |x_i - x_j| / (2 * n^2 * mean)
+ * Returns 0 for n <= 1 or mean = 0. Result is in [0, 1].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, number> with Gini coefficients in [0, 1].
+ */
+export function tuningFamilySocraticRadarGiniCoefficientV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    if (n <= 1) { result[ax] = 0; continue; }
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / n;
+    if (mean === 0) { result[ax] = 0; continue; }
+    let sumDiff = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        sumDiff += Math.abs(vals[i]! - vals[j]!);
+      }
+    }
+    result[ax] = Math.max(0, Math.min(1, sumDiff / (2 * n * n * mean)));
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1246 — tuningFamilySocraticRadarTheilIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * Theil T index of score distribution per axis.
+ *
+ * T = (1/n) * sum(x_i / mean * log(x_i / mean)) for positive x_i.
+ * For x_i = 0: contributes 0. Returns 0 for n = 0 or mean = 0.
+ * Result is >= 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, number> with Theil indices >= 0.
+ */
+export function tuningFamilySocraticRadarTheilIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    if (n === 0) { result[ax] = 0; continue; }
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / n;
+    if (mean === 0) { result[ax] = 0; continue; }
+    let theil = 0;
+    for (const x of vals) {
+      if (x > 0) {
+        const ratio = x / mean;
+        theil += ratio * Math.log(ratio);
+      }
+    }
+    result[ax] = theil / n;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1248 — tuningFamilySocraticRadarAtkinsonIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * Atkinson inequality index (epsilon = 0.5) per axis.
+ *
+ * A = 1 - geometric_mean / arithmetic_mean.
+ * geometric_mean uses epsilon offset: exp(mean(log(x + 1e-10))) to avoid log(0).
+ * Returns 0 if arithmetic_mean = 0. Result is in [0, 1).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, number> with Atkinson indices in [0, 1).
+ */
+export function tuningFamilySocraticRadarAtkinsonIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    if (n === 0) { result[ax] = 0; continue; }
+    const vals = profiles.map((p) => p[ax]);
+    const arithmeticMean = vals.reduce((s, v) => s + v, 0) / n;
+    if (arithmeticMean === 0) { result[ax] = 0; continue; }
+    const logSum = vals.reduce((s, v) => s + Math.log(v + 1e-10), 0);
+    const geometricMean = Math.exp(logSum / n);
+    result[ax] = Math.max(0, Math.min(1, 1 - geometricMean / arithmeticMean));
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1250 — tuningFamilySocraticRadarHooverIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * Hoover (Robin Hood) index per axis.
+ *
+ * Hoover = sum(|x_i - mean|) / (2 * sum(x_i)).
+ * Returns 0 if sum = 0. Result is in [0, 0.5].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, number> with Hoover indices in [0, 0.5].
+ */
+export function tuningFamilySocraticRadarHooverIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    if (n === 0) { result[ax] = 0; continue; }
+    const vals = profiles.map((p) => p[ax]);
+    const sumX = vals.reduce((s, v) => s + v, 0);
+    if (sumX === 0) { result[ax] = 0; continue; }
+    const mean = sumX / n;
+    const sumAbsDiff = vals.reduce((s, v) => s + Math.abs(v - mean), 0);
+    result[ax] = sumAbsDiff / (2 * sumX);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1252 — tuningFamilySocraticRadarParetoScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Pareto optimality score per tuning.
+ *
+ * For each tuning, counts what fraction of other tunings it is NOT dominated by.
+ * Tuning A dominates tuning B if A[axis] >= B[axis] for all axes (at least one strictly greater).
+ * Score = fraction of tunings that do NOT strictly dominate it.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns number[] with one score per tuning.
+ */
+export function tuningFamilySocraticRadarParetoScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility' , 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n === 0) return [];
+  return profiles.map((pA) => {
+    let dominatedCount = 0;
+    for (const pB of profiles) {
+      // Check if pB dominates pA: pB[ax] >= pA[ax] for all axes, at least one strictly greater
+      const allGe = axes.every((ax) => pB[ax] >= pA[ax]);
+      const someGt = axes.some((ax) => pB[ax] > pA[ax]);
+      if (allGe && someGt) dominatedCount++;
+    }
+    return 1 - dominatedCount / n;
+  });
+}

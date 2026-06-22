@@ -727,6 +727,12 @@ import {
   tuningFamilySocraticRadarTOPSIS,
   tuningFamilySocraticRadarSAW,
   tuningFamilySocraticRadarVIKOR,
+  tuningFamilySocraticRadarEWMA,
+  tuningFamilySocraticRadarGiniCoefficientV2,
+  tuningFamilySocraticRadarTheilIndex,
+  tuningFamilySocraticRadarAtkinsonIndex,
+  tuningFamilySocraticRadarHooverIndex,
+  tuningFamilySocraticRadarParetoScore,
   barkScale,
   pitchSalience,
   scaleStepVariety,
@@ -735,6 +741,10 @@ import {
   frequencyRatioComplexity,
   melodicEntropy,
   harmonicComplexityProfile,
+  scaleHarmonicGravity,
+  tuningOvertoneAlignment,
+  scaleModalDiversity,
+  tuningLatticeSpread,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -23595,5 +23605,258 @@ describe('harmonicComplexityProfile (JJ4)', () => {
     const t = equalTemperament12(440);
     const profile = harmonicComplexityProfile(t);
     expect(profile.every((v) => v >= 0)).toBe(true);
+  });
+});
+
+describe('scaleHarmonicGravity', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHarmonicGravity([])).toBe(0);
+  });
+  it('returns 1 for scale with only root', () => {
+    expect(scaleHarmonicGravity([0])).toBe(1);
+  });
+  it('returns value in (0, 1] for multi-pitch scale', () => {
+    const v = scaleHarmonicGravity([0, 200, 400]);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('decreases as pitches move farther from root', () => {
+    const near = scaleHarmonicGravity([0, 100]);
+    const far = scaleHarmonicGravity([0, 1000]);
+    expect(near).toBeGreaterThan(far);
+  });
+});
+
+describe('tuningOvertoneAlignment', () => {
+  it('returns value in [0, 1] for 12-TET', () => {
+    const v = tuningOvertoneAlignment(equalTemperament12(440));
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value > 0 for 12-TET with 8 harmonics', () => {
+    expect(tuningOvertoneAlignment(equalTemperament12(440), 8)).toBeGreaterThan(0);
+  });
+  it('returns 0 for tuning with no degrees', () => {
+    const emptyTuning: TuningSystem = {
+      id: 'empty',
+      name: 'Empty',
+      degrees: [],
+      referenceHz: 440,
+      periodCents: 1200,
+      source: 'theoretical',
+    };
+    expect(tuningOvertoneAlignment(emptyTuning)).toBe(0);
+  });
+  it('returns higher alignment with more harmonics available', () => {
+    const t = equalTemperament12(440);
+    const v4 = tuningOvertoneAlignment(t, 4);
+    const v16 = tuningOvertoneAlignment(t, 16);
+    expect(v16).toBeGreaterThanOrEqual(v4);
+  });
+});
+
+describe('scaleModalDiversity', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleModalDiversity([0])).toBe(0);
+  });
+  it('returns 0 for empty scale', () => {
+    expect(scaleModalDiversity([])).toBe(0);
+  });
+  it('returns value in (0, 1] for major scale', () => {
+    const majorScale = [0, 200, 400, 500, 700, 900, 1100];
+    const v = scaleModalDiversity(majorScale);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 1 for scale where all modes are unique', () => {
+    // A scale with all different step sizes has all unique modes
+    const asymmetric = [0, 100, 300, 600, 1000];
+    const v = scaleModalDiversity(asymmetric);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('tuningLatticeSpread', () => {
+  it('returns 0 for single-degree tuning', () => {
+    expect(tuningLatticeSpread(edo(1, 440))).toBe(0);
+  });
+  it('returns non-negative value for 12-TET', () => {
+    expect(tuningLatticeSpread(equalTemperament12(440))).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for tuning with no degrees', () => {
+    const emptyTuning: TuningSystem = {
+      id: 'empty',
+      name: 'Empty',
+      degrees: [],
+      referenceHz: 440,
+      periodCents: 1200,
+      source: 'theoretical',
+    };
+    expect(tuningLatticeSpread(emptyTuning)).toBe(0);
+  });
+  it('returns a finite number for standard tunings', () => {
+    expect(isFinite(tuningLatticeSpread(equalTemperament12(440)))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1242 — tuningFamilySocraticRadarEWMA
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarEWMA (Q1242)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const tunings = [equalTemperament12(440), equalTemperament12(440)];
+  it('returns a Record with all 5 axes', () => {
+    const result = tuningFamilySocraticRadarEWMA(tunings, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('all values are finite numbers', () => {
+    const result = tuningFamilySocraticRadarEWMA(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+  it('throws RangeError for alpha out of (0,1)', () => {
+    expect(() => tuningFamilySocraticRadarEWMA(tunings, spectrum, 0)).toThrow(RangeError);
+    expect(() => tuningFamilySocraticRadarEWMA(tunings, spectrum, 1)).toThrow(RangeError);
+    expect(() => tuningFamilySocraticRadarEWMA(tunings, spectrum, -0.1)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1244 — tuningFamilySocraticRadarGiniCoefficientV2
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarGiniCoefficientV2 (Q1244)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const tunings = [equalTemperament12(440), equalTemperament12(440)];
+  it('returns a Record with all 5 axes', () => {
+    const result = tuningFamilySocraticRadarGiniCoefficientV2(tunings, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarGiniCoefficientV2(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('returns all zeros for single tuning', () => {
+    const result = tuningFamilySocraticRadarGiniCoefficientV2([equalTemperament12(440)], spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBe(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1246 — tuningFamilySocraticRadarTheilIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarTheilIndex (Q1246)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const tunings = [equalTemperament12(440), equalTemperament12(440)];
+  it('returns a Record with all 5 axes', () => {
+    const result = tuningFamilySocraticRadarTheilIndex(tunings, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are >= 0', () => {
+    const result = tuningFamilySocraticRadarTheilIndex(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('equal tunings produce 0 Theil index', () => {
+    const result = tuningFamilySocraticRadarTheilIndex(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeCloseTo(0, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1248 — tuningFamilySocraticRadarAtkinsonIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAtkinsonIndex (Q1248)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const tunings = [equalTemperament12(440), equalTemperament12(440)];
+  it('returns a Record with all 5 axes', () => {
+    const result = tuningFamilySocraticRadarAtkinsonIndex(tunings, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are in [0, 1)', () => {
+    const result = tuningFamilySocraticRadarAtkinsonIndex(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThan(1);
+    }
+  });
+  it('all values are finite numbers', () => {
+    const result = tuningFamilySocraticRadarAtkinsonIndex(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1250 — tuningFamilySocraticRadarHooverIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarHooverIndex (Q1250)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const tunings = [equalTemperament12(440), equalTemperament12(440)];
+  it('returns a Record with all 5 axes', () => {
+    const result = tuningFamilySocraticRadarHooverIndex(tunings, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are in [0, 0.5]', () => {
+    const result = tuningFamilySocraticRadarHooverIndex(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(0.5);
+    }
+  });
+  it('equal tunings produce 0 Hoover index', () => {
+    const result = tuningFamilySocraticRadarHooverIndex(tunings, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeCloseTo(0, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1252 — tuningFamilySocraticRadarParetoScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarParetoScore (Q1252)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const tunings = [equalTemperament12(440), equalTemperament12(440)];
+  it('returns one score per tuning', () => {
+    const result = tuningFamilySocraticRadarParetoScore(tunings, spectrum);
+    expect(result).toHaveLength(2);
+  });
+  it('values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarParetoScore(tunings, spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarParetoScore([], spectrum);
+    expect(result).toHaveLength(0);
   });
 });

@@ -467,3 +467,15 @@
 | `frequencyRatioComplexity` | 周波数比の調和複雑度（log2(p)+log2(q)） |
 | `melodicEntropy` | 旋律ステップ分布のシャノンエントロピー |
 | `harmonicComplexityProfile` | 調律の各音度の複雑度プロファイル |
+
+## Round 28: 調律格子・モード多様性分析 (KK1–KK4)
+
+**テーマ**: 音律の倍音整合性・格子構造・モード多様性指標  
+**実装**: KK1–KK4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleHarmonicGravity` | ルートへの重力的引力（距離重み平均） |
+| `tuningOvertoneAlignment` | 調律と倍音列の整合度 |
+| `scaleModalDiversity` | ユニークな旋法の割合 |
+| `tuningLatticeSpread` | 調律複雑度の標準偏差（格子拡散度） |

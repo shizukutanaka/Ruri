@@ -424,6 +424,12 @@ import {
   presetFamilySocraticRadarTOPSIS,
   presetFamilySocraticRadarSAW,
   presetFamilySocraticRadarVIKOR,
+  presetFamilySocraticRadarEWMA,
+  presetFamilySocraticRadarGiniCoefficientV2,
+  presetFamilySocraticRadarTheilIndex,
+  presetFamilySocraticRadarAtkinsonIndex,
+  presetFamilySocraticRadarHooverIndex,
+  presetFamilySocraticRadarParetoScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -13318,5 +13324,151 @@ describe('presetFamilySocraticRadarVIKOR (Q1241)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarVIKOR(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1243 — presetFamilySocraticRadarEWMA
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarEWMA (Q1243)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a Record with all 5 axes', () => {
+    const result = presetFamilySocraticRadarEWMA(presetIds, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('all values are finite numbers', () => {
+    const result = presetFamilySocraticRadarEWMA(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEWMA(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1245 — presetFamilySocraticRadarGiniCoefficientV2
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarGiniCoefficientV2 (Q1245)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a Record with all 5 axes', () => {
+    const result = presetFamilySocraticRadarGiniCoefficientV2(presetIds, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarGiniCoefficientV2(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGiniCoefficientV2(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1247 — presetFamilySocraticRadarTheilIndex
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTheilIndex (Q1247)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a Record with all 5 axes', () => {
+    const result = presetFamilySocraticRadarTheilIndex(presetIds, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are >= 0', () => {
+    const result = presetFamilySocraticRadarTheilIndex(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTheilIndex(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1249 — presetFamilySocraticRadarAtkinsonIndex
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAtkinsonIndex (Q1249)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a Record with all 5 axes', () => {
+    const result = presetFamilySocraticRadarAtkinsonIndex(presetIds, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are in [0, 1)', () => {
+    const result = presetFamilySocraticRadarAtkinsonIndex(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThan(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAtkinsonIndex(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1251 — presetFamilySocraticRadarHooverIndex
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarHooverIndex (Q1251)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a Record with all 5 axes', () => {
+    const result = presetFamilySocraticRadarHooverIndex(presetIds, spectrum);
+    expect(Object.keys(result).sort()).toEqual(
+      ['benchmark', 'convergence', 'diversity', 'maturity', 'versatility'],
+    );
+  });
+  it('values are in [0, 0.5]', () => {
+    const result = presetFamilySocraticRadarHooverIndex(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(0.5);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHooverIndex(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1253 — presetFamilySocraticRadarParetoScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarParetoScore (Q1253)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one score per preset', () => {
+    const result = presetFamilySocraticRadarParetoScore(presetIds, spectrum);
+    expect(result).toHaveLength(2);
+  });
+  it('values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarParetoScore(presetIds, spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarParetoScore(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });
