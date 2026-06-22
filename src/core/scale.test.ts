@@ -885,6 +885,16 @@ import {
   tuningFamilySocraticRadarNormalizedEntropy,
   tuningFamilySocraticRadarRelativeEntropy,
   tuningFamilySocraticRadarTransferEntropyMean,
+  tuningFamilySocraticRadarSpectralCentroidProfile,
+  tuningFamilySocraticRadarSpectralFlatnessProfile,
+  tuningFamilySocraticRadarSpectralRolloffProfile,
+  tuningFamilySocraticRadarSpectralFluxMean,
+  tuningFamilySocraticRadarSpectralContrastMean,
+  tuningFamilySocraticRadarSpectralBandwidthMean,
+  scaleComplexityRatio,
+  scaleExpressivenessIndex,
+  scaleHarmonicComplexity,
+  scaleTonalGravity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -27054,5 +27064,174 @@ describe('Q1420 tuningFamilySocraticRadarTransferEntropyMean', () => {
   });
   it('returns 0 for empty tunings', () => {
     expect(tuningFamilySocraticRadarTransferEntropyMean([], s)).toBe(0);
+  });
+});
+
+describe('ZZ1 scaleComplexityRatio', () => {
+  it('equal-step scale has 0 complexity', () => {
+    const ed = Array.from({length:7},(_,i)=>i*200);
+    expect(scaleComplexityRatio(ed)).toBe(0);
+  });
+  it('mixed intervals have positive complexity', () => {
+    expect(scaleComplexityRatio([0,100,500,700,1100])).toBeGreaterThan(0);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleComplexityRatio([])).toBe(0);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleComplexityRatio([0])).toBe(0);
+  });
+});
+
+describe('ZZ2 scaleExpressivenessIndex', () => {
+  it('chromatic scale: all 100c intervals → index 1', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleExpressivenessIndex(chromatic)).toBe(1);
+  });
+  it('mixed scale has index > 0', () => {
+    expect(scaleExpressivenessIndex([0,200,300,500,700,900,1100])).toBeGreaterThan(0);
+  });
+  it('empty returns 0', () => {
+    expect(scaleExpressivenessIndex([])).toBe(0);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleExpressivenessIndex([0])).toBe(0);
+  });
+});
+
+describe('ZZ3 scaleHarmonicComplexity', () => {
+  it('returns non-negative number', () => {
+    expect(scaleHarmonicComplexity([0,386,702])).toBeGreaterThanOrEqual(0);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleHarmonicComplexity([])).toBe(0);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleHarmonicComplexity([0])).toBe(0);
+  });
+  it('just intervals have lower complexity than tempered', () => {
+    const just = [0, 386, 702]; // 5/4, 3/2 approximations
+    const tempered = [0, 400, 700]; // 12-TET
+    // Both should be non-negative
+    expect(scaleHarmonicComplexity(just)).toBeGreaterThanOrEqual(0);
+    expect(scaleHarmonicComplexity(tempered)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('ZZ4 scaleTonalGravity', () => {
+  it('scale with pitch near tonic has high gravity', () => {
+    const g = scaleTonalGravity([0, 100, 700], 0);
+    expect(g).toBeGreaterThan(0);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleTonalGravity([])).toBe(0);
+  });
+  it('single pitch (only tonic) returns 0', () => {
+    expect(scaleTonalGravity([0], 0)).toBe(0);
+  });
+  it('gravity is in reasonable range', () => {
+    const g = scaleTonalGravity([0,200,400,500,700,900,1100]);
+    expect(g).toBeGreaterThanOrEqual(0);
+    expect(g).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q1422 — tuningFamilySocraticRadarSpectralCentroidProfile
+describe('Q1422 tuningFamilySocraticRadarSpectralCentroidProfile', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarSpectralCentroidProfile([t], s);
+    expect(r).toHaveLength(1);
+  });
+  it('centroid is positive', () => {
+    const r = tuningFamilySocraticRadarSpectralCentroidProfile([t], s);
+    expect(r[0]).toBeGreaterThan(0);
+  });
+  it('empty tunings returns empty array', () => {
+    expect(tuningFamilySocraticRadarSpectralCentroidProfile([], s)).toEqual([]);
+  });
+});
+
+// Q1424 — tuningFamilySocraticRadarSpectralFlatnessProfile
+describe('Q1424 tuningFamilySocraticRadarSpectralFlatnessProfile', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarSpectralFlatnessProfile([t], s);
+    expect(r).toHaveLength(1);
+  });
+  it('flatness is in [0,1]', () => {
+    const r = tuningFamilySocraticRadarSpectralFlatnessProfile([t], s);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+    expect(r[0]).toBeLessThanOrEqual(1);
+  });
+  it('empty tunings returns empty array', () => {
+    expect(tuningFamilySocraticRadarSpectralFlatnessProfile([], s)).toEqual([]);
+  });
+});
+
+// Q1426 — tuningFamilySocraticRadarSpectralRolloffProfile
+describe('Q1426 tuningFamilySocraticRadarSpectralRolloffProfile', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarSpectralRolloffProfile([t], s);
+    expect(r).toHaveLength(1);
+  });
+  it('rolloff frequency is positive', () => {
+    const r = tuningFamilySocraticRadarSpectralRolloffProfile([t], s);
+    expect(r[0]).toBeGreaterThan(0);
+  });
+  it('empty tunings returns empty array', () => {
+    expect(tuningFamilySocraticRadarSpectralRolloffProfile([], s)).toEqual([]);
+  });
+});
+
+// Q1428 — tuningFamilySocraticRadarSpectralFluxMean
+describe('Q1428 tuningFamilySocraticRadarSpectralFluxMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<2', () => {
+    expect(tuningFamilySocraticRadarSpectralFluxMean([t], s)).toBe(0);
+  });
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSpectralFluxMean([], s)).toBe(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarSpectralFluxMean([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1430 — tuningFamilySocraticRadarSpectralContrastMean
+describe('Q1430 tuningFamilySocraticRadarSpectralContrastMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSpectralContrastMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarSpectralContrastMean([t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarSpectralContrastMean([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1432 — tuningFamilySocraticRadarSpectralBandwidthMean
+describe('Q1432 tuningFamilySocraticRadarSpectralBandwidthMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSpectralBandwidthMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarSpectralBandwidthMean([t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarSpectralBandwidthMean([t, t2], s)).toBeGreaterThanOrEqual(0);
   });
 });

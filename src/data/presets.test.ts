@@ -514,6 +514,12 @@ import {
   presetFamilySocraticRadarNormalizedEntropy,
   presetFamilySocraticRadarRelativeEntropy,
   presetFamilySocraticRadarTransferEntropyMean,
+  presetFamilySocraticRadarSpectralCentroidProfile,
+  presetFamilySocraticRadarSpectralFlatnessProfile,
+  presetFamilySocraticRadarSpectralRolloffProfile,
+  presetFamilySocraticRadarSpectralFluxMean,
+  presetFamilySocraticRadarSpectralContrastMean,
+  presetFamilySocraticRadarSpectralBandwidthMean,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -15198,5 +15204,99 @@ describe('Q1421 presetFamilySocraticRadarTransferEntropyMean', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarTransferEntropyMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1423 — presetFamilySocraticRadarSpectralCentroidProfile
+describe('Q1423 presetFamilySocraticRadarSpectralCentroidProfile', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = presetFamilySocraticRadarSpectralCentroidProfile(['12-tet', 'just-5-limit'], s);
+    expect(r).toHaveLength(2);
+  });
+  it('centroid values are positive', () => {
+    const r = presetFamilySocraticRadarSpectralCentroidProfile(['12-tet'], s);
+    expect(r[0]).toBeGreaterThan(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralCentroidProfile(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1425 — presetFamilySocraticRadarSpectralFlatnessProfile
+describe('Q1425 presetFamilySocraticRadarSpectralFlatnessProfile', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = presetFamilySocraticRadarSpectralFlatnessProfile(['12-tet', 'just-5-limit'], s);
+    expect(r).toHaveLength(2);
+  });
+  it('flatness values are in [0,1]', () => {
+    const r = presetFamilySocraticRadarSpectralFlatnessProfile(['12-tet'], s);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+    expect(r[0]).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralFlatnessProfile(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1427 — presetFamilySocraticRadarSpectralRolloffProfile
+describe('Q1427 presetFamilySocraticRadarSpectralRolloffProfile', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = presetFamilySocraticRadarSpectralRolloffProfile(['12-tet', 'just-5-limit'], s);
+    expect(r).toHaveLength(2);
+  });
+  it('rolloff frequency is positive', () => {
+    const r = presetFamilySocraticRadarSpectralRolloffProfile(['12-tet'], s);
+    expect(r[0]).toBeGreaterThan(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralRolloffProfile(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1429 — presetFamilySocraticRadarSpectralFluxMean
+describe('Q1429 presetFamilySocraticRadarSpectralFluxMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarSpectralFluxMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for single preset', () => {
+    expect(presetFamilySocraticRadarSpectralFluxMean(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralFluxMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1431 — presetFamilySocraticRadarSpectralContrastMean
+describe('Q1431 presetFamilySocraticRadarSpectralContrastMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarSpectralContrastMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for single preset', () => {
+    expect(presetFamilySocraticRadarSpectralContrastMean(['12-tet'], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralContrastMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1433 — presetFamilySocraticRadarSpectralBandwidthMean
+describe('Q1433 presetFamilySocraticRadarSpectralBandwidthMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarSpectralBandwidthMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for single preset', () => {
+    expect(presetFamilySocraticRadarSpectralBandwidthMean(['12-tet'], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralBandwidthMean(['unknown'], s)).toThrow(RangeError);
   });
 });

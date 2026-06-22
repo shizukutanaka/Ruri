@@ -645,3 +645,14 @@
 | YY4 | `scaleSelfSimilarityScore` | ズームレベル間の音程列相関による自己相似スコア |
 
 **参考**: Fractal dimension of musical scales; Messiaen の限定移調音階は高い回転対称性を持つ。
+
+## Round 43: スケール複雑度・表現力・調性引力指標 (ZZ1–ZZ4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| ZZ1 | `scaleComplexityRatio` | 音程サイズの変動係数(CV)によるスケール複雑度 |
+| ZZ2 | `scaleExpressivenessIndex` | 異なる音程サイズ数 / (n-1) による表現力指数 |
+| ZZ3 | `scaleHarmonicComplexity` | 最近傍整数比(p+q)の平均による和声複雑度 |
+| ZZ4 | `scaleTonalGravity` | トニックへの距離に基づく調性引力スコア |
+
+**参考**: 調性引力はLerdahl「Tonal Pitch Space」; 和声複雑度はHarmonicity metrics (Gill & Purves 2009)。
