@@ -37288,6 +37288,165 @@ export function tuningFamilySocraticRadarCorrelationDimensionProxy(
   return Math.max(0, Math.log(cr) / Math.log(r));
 }
 
+// Q1638 — tuningFamilySocraticRadarComplexityIndexMean
+export function tuningFamilySocraticRadarComplexityIndexMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const total = vec.reduce((a, b) => a + b, 0);
+    const norm = total > 0 ? vec.map((v) => v / total) : vec.map(() => 1 / 5);
+    let H = 0;
+    for (const p of norm) {
+      H -= p * Math.log2(p + 1e-10);
+    }
+    let D = 0;
+    for (const p of norm) {
+      const d = p - 1 / 5;
+      D += d * d;
+    }
+    sum += H * D;
+  }
+  return sum / tunings.length;
+}
+
+// Q1640 — tuningFamilySocraticRadarEmergenceMean
+export function tuningFamilySocraticRadarEmergenceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const mean = vec.reduce((a, b) => a + b, 0) / n;
+    let variance = 0;
+    for (const v of vec) {
+      variance += (v - mean) * (v - mean);
+    }
+    variance /= n;
+    const std = Math.sqrt(variance);
+    const maxVal = Math.max(...vec);
+    const emergence = Math.max(0, std / (maxVal + 1e-10));
+    sum += emergence;
+  }
+  return sum / tunings.length;
+}
+
+// Q1642 — tuningFamilySocraticRadarSelfOrganizationMean
+export function tuningFamilySocraticRadarSelfOrganizationMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const total = vec.reduce((a, b) => a + b, 0);
+    const norm = total > 0 ? vec.map((v) => v / total) : vec.map(() => 1 / 5);
+    let H = 0;
+    for (const p of norm) {
+      H -= p * Math.log2(p + 1e-10);
+    }
+    const Hmax = Math.log2(5);
+    const order = 1 - H / Hmax;
+    sum += Math.max(0, Math.min(1, order));
+  }
+  return sum / tunings.length;
+}
+
+// Q1644 — tuningFamilySocraticRadarCriticalityProxyMean
+export function tuningFamilySocraticRadarCriticalityProxyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const total = vec.reduce((a, b) => a + b, 0);
+    const norm = total > 0 ? vec.map((v) => v / total) : vec.map(() => 1 / 5);
+    let H = 0;
+    for (const p of norm) {
+      H -= p * Math.log2(p + 1e-10);
+    }
+    const Hmax = Math.log2(5);
+    const proxy = 1 - Math.abs(H / Hmax - 0.5);
+    sum += Math.max(0, Math.min(1, proxy));
+  }
+  return sum / tunings.length;
+}
+
+// Q1646 — tuningFamilySocraticRadarResilienceMean
+export function tuningFamilySocraticRadarResilienceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const mean = vec.reduce((a, b) => a + b, 0) / n;
+    let variance = 0;
+    for (const v of vec) {
+      variance += (v - mean) * (v - mean);
+    }
+    variance /= n;
+    sum += Math.exp(-variance / 0.1);
+  }
+  return sum / tunings.length;
+}
+
+// Q1648 — tuningFamilySocraticRadarAdaptabilityMean
+export function tuningFamilySocraticRadarAdaptabilityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const mean = vec.reduce((a, b) => a + b, 0) / n;
+    let variance = 0;
+    for (const v of vec) {
+      variance += (v - mean) * (v - mean);
+    }
+    variance /= n;
+    sum += 1 - Math.exp(-variance / 0.1);
+  }
+  return sum / tunings.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -38059,4 +38218,83 @@ export function scaleDispersionIndex(scaleCents: readonly number[], periodCents:
   if (mean === 0) return 0;
   const variance = steps.reduce((s, x) => s + (x - mean) ** 2, 0) / steps.length;
   return variance / mean;
+}
+
+// SSS1
+export function scaleHarmonicAlignmentScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  // First 16 harmonics in cents (harmonic k: 1200 * log2(k))
+  const rawHarmonics = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(
+    (k) => (1200 * Math.log2(k)) % periodCents
+  );
+  // Deduplicate by rounding to nearest cent
+  const harmonicSet = [...new Set(rawHarmonics.map((c) => Math.round(c)))];
+  let count = 0;
+  for (const p of scaleCents) {
+    const pc = ((p % periodCents) + periodCents) % periodCents;
+    for (const h of harmonicSet) {
+      const dist = Math.abs(pc - h);
+      const minDist = Math.min(dist, periodCents - dist);
+      if (minDist < 20) {
+        count++;
+        break;
+      }
+    }
+  }
+  return count / n;
+}
+
+// SSS2
+export function scaleSubharmonicAlignmentScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  // Subharmonic series: compute 1200 * log2(k) mod 1200, then (1200 - value) % 1200
+  const rawSub = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((k) => {
+    const harmonic = (1200 * Math.log2(k)) % periodCents;
+    return (periodCents - harmonic) % periodCents;
+  });
+  // Deduplicate by rounding to nearest cent
+  const subSet = [...new Set(rawSub.map((c) => Math.round(c)))];
+  let count = 0;
+  for (const p of scaleCents) {
+    const pc = ((p % periodCents) + periodCents) % periodCents;
+    for (const s of subSet) {
+      const dist = Math.abs(pc - s);
+      const minDist = Math.min(dist, periodCents - dist);
+      if (minDist < 20) {
+        count++;
+        break;
+      }
+    }
+  }
+  return count / n;
+}
+
+// SSS3
+export function scaleResonanceIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+  if (scaleCents.length === 0) return 0;
+  return (scaleHarmonicAlignmentScore(scaleCents, periodCents) + scaleSubharmonicAlignmentScore(scaleCents, periodCents)) / 2;
+}
+
+// SSS4
+export function scaleOvertoneRichness(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let matchCount = 0;
+  for (const p of scaleCents) {
+    for (let k = 2; k <= 8; k++) {
+      const harmonicCents = ((p + 1200 * Math.log2(k)) % periodCents + periodCents) % periodCents;
+      for (const q of scaleCents) {
+        const qc = ((q % periodCents) + periodCents) % periodCents;
+        const dist = Math.abs(harmonicCents - qc);
+        const minDist = Math.min(dist, periodCents - dist);
+        if (minDist < 15) {
+          matchCount++;
+          break;
+        }
+      }
+    }
+  }
+  return Math.min(1, matchCount / (n * 7));
 }

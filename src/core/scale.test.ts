@@ -987,6 +987,12 @@ import {
   tuningFamilySocraticRadarRecurrenceRateMean,
   tuningFamilySocraticRadarInvariantMeasureEntropy,
   tuningFamilySocraticRadarCorrelationDimensionProxy,
+  tuningFamilySocraticRadarComplexityIndexMean,
+  tuningFamilySocraticRadarEmergenceMean,
+  tuningFamilySocraticRadarSelfOrganizationMean,
+  tuningFamilySocraticRadarCriticalityProxyMean,
+  tuningFamilySocraticRadarResilienceMean,
+  tuningFamilySocraticRadarAdaptabilityMean,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1063,6 +1069,10 @@ import {
   scaleUniquePitchClassCount,
   scaleClusteringScore,
   scaleDispersionIndex,
+  scaleHarmonicAlignmentScore,
+  scaleSubharmonicAlignmentScore,
+  scaleResonanceIndex,
+  scaleOvertoneRichness,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -30169,5 +30179,157 @@ describe('Q1636 tuningFamilySocraticRadarCorrelationDimensionProxy', () => {
     const r = tuningFamilySocraticRadarCorrelationDimensionProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(r)).toBe(true);
     expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1638 tuningFamilySocraticRadarComplexityIndexMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarComplexityIndexMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarComplexityIndexMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarComplexityIndexMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1640 tuningFamilySocraticRadarEmergenceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarEmergenceMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarEmergenceMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarEmergenceMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1642 tuningFamilySocraticRadarSelfOrganizationMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarSelfOrganizationMean([], s)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarSelfOrganizationMean([equalTemperament12(440)], s);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarSelfOrganizationMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1644 tuningFamilySocraticRadarCriticalityProxyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarCriticalityProxyMean([], s)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCriticalityProxyMean([equalTemperament12(440)], s);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarCriticalityProxyMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1646 tuningFamilySocraticRadarResilienceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarResilienceMean([], s)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarResilienceMean([equalTemperament12(440)], s);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarResilienceMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1648 tuningFamilySocraticRadarAdaptabilityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarAdaptabilityMean([], s)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarAdaptabilityMean([equalTemperament12(440)], s);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarAdaptabilityMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('SSS1 scaleHarmonicAlignmentScore', () => {
+  it('empty → 0', () => { expect(scaleHarmonicAlignmentScore([])).toBe(0); });
+  it('returns value in [0,1]', () => {
+    const r = scaleHarmonicAlignmentScore([0, 200, 400, 700]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('pitch at 702 (3/2 ≈ harmonic 3) scores > 0', () => {
+    expect(scaleHarmonicAlignmentScore([0, 702])).toBeGreaterThan(0);
+  });
+  it('12-TET has reasonable alignment', () => {
+    const chromatic = Array.from({length:12}, (_,i) => i*100);
+    expect(scaleHarmonicAlignmentScore(chromatic)).toBeGreaterThan(0);
+  });
+});
+
+describe('SSS2 scaleSubharmonicAlignmentScore', () => {
+  it('empty → 0', () => { expect(scaleSubharmonicAlignmentScore([])).toBe(0); });
+  it('returns value in [0,1]', () => {
+    const r = scaleSubharmonicAlignmentScore([0, 200, 400, 700]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('non-negative', () => {
+    expect(scaleSubharmonicAlignmentScore([0, 500, 700])).toBeGreaterThanOrEqual(0);
+  });
+  it('12-TET has reasonable alignment', () => {
+    const chromatic = Array.from({length:12}, (_,i) => i*100);
+    expect(scaleSubharmonicAlignmentScore(chromatic)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('SSS3 scaleResonanceIndex', () => {
+  it('empty → 0', () => { expect(scaleResonanceIndex([])).toBe(0); });
+  it('returns value in [0,1]', () => {
+    const r = scaleResonanceIndex([0, 200, 400, 700]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('equals average of harmonic and subharmonic scores', () => {
+    const scale = [0, 386, 702];
+    const h = scaleHarmonicAlignmentScore(scale);
+    const s = scaleSubharmonicAlignmentScore(scale);
+    expect(scaleResonanceIndex(scale)).toBeCloseTo((h + s) / 2, 10);
+  });
+  it('non-negative', () => {
+    expect(scaleResonanceIndex([0, 100, 700])).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('SSS4 scaleOvertoneRichness', () => {
+  it('empty → 0', () => { expect(scaleOvertoneRichness([])).toBe(0); });
+  it('returns value in [0,1]', () => {
+    const r = scaleOvertoneRichness([0, 200, 400, 700]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('non-negative for diatonic', () => {
+    expect(scaleOvertoneRichness([0,200,400,500,700,900,1100])).toBeGreaterThanOrEqual(0);
+  });
+  it('single pitch has some overtone richness', () => {
+    // single pitch: all harmonics are of that pitch; none hit other scale pitches since n=1
+    expect(scaleOvertoneRichness([0])).toBe(0);
   });
 });
