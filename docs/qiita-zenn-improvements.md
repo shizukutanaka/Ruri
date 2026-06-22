@@ -799,3 +799,14 @@
 | MMM4 | `scaleInversionSymmetryScore` | 反転対称性スコア（音楽的逆行との一致度） |
 
 **参考**: Myhill's property (Clough & Myerson 1985); Modal brightness theory (Rothenberg 1978); Maximal evenness (Clough & Douthett 1991).
+
+## Round 57: ステップサイズ分布統計 (NNN1–NNN4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| NNN1 | `scaleStepSizeEntropy` | ステップサイズ分布のシャノンエントロピー |
+| NNN2 | `scaleStepSizeSkewness` | ステップサイズ分布の歪度 |
+| NNN3 | `scaleHemitoneCount` | 半音ステップ（50-150セント）の個数 |
+| NNN4 | `scaleCoherenceIndex` | 最多2種のステップサイズが占める割合（整合性指標） |
+
+**参考**: Step-size distribution analysis in scale theory (Carey & Clampitt 1989); Coherence in musical scale design.
