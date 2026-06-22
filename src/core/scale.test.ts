@@ -32441,7 +32441,7 @@ describe('Q1772 tuningFamilySocraticRadarCooperationIndexMean', () => {
     expect(v).toBeGreaterThanOrEqual(0);
   });
   it('two different tunings → finite and ≥0', () => {
-    const v = tuningFamilySocraticRadarCooperationIndexMean([equalTemperament12(440), harmonicSpectrum(6) as unknown as never, edo(19, 440)].filter((_, i) => i !== 1) as Parameters<typeof tuningFamilySocraticRadarCooperationIndexMean>[0], s);
+    const v = tuningFamilySocraticRadarCooperationIndexMean([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
   });
