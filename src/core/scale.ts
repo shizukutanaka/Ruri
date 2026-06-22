@@ -31337,7 +31337,7 @@ export function scaleIntervalClassVector(
 }
 
 /**
- * XX2 — Voice leading distance between two chords.
+ * XX2 — Euclidean voice leading distance between two chords.
  *
  * Computes the "voice leading distance" between two chords given as lists of
  * pitch offsets in cents. Pairs voices by sorting both arrays and matching
@@ -31350,9 +31350,9 @@ export function scaleIntervalClassVector(
  * @returns Euclidean voice-leading distance in cents
  *
  * @example
- * scaleVoiceLeadingDistance([0, 400, 700], [0, 400, 700]); // → 0
+ * scaleChordVLDistance([0, 400, 700], [0, 400, 700]); // → 0
  */
-export function scaleVoiceLeadingDistance(
+export function scaleChordVLDistance(
   fromCents: readonly number[],
   toCents: readonly number[],
 ): number {
@@ -31612,7 +31612,7 @@ export function scaleFractalDimension(
 }
 
 /**
- * YY4: scaleSelfSimilarityScore
+ * YY4: scaleZoomSelfSimilarity
  *
  * Measures self-similarity: for each pair of scales at different zoom levels
  * (subsample at every 2nd, 3rd pitch), computes the correlation of interval
@@ -31624,7 +31624,7 @@ export function scaleFractalDimension(
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Mean self-similarity score (Pearson correlation, in [-1,1])
  */
-export function scaleSelfSimilarityScore(
+export function scaleZoomSelfSimilarity(
   scaleCents: readonly number[],
   periodCents: number = 1200,
 ): number {
@@ -36877,6 +36877,240 @@ export function tuningFamilySocraticRadarMinkowskiP3Mean(
   return count === 0 ? 0 : total / count;
 }
 
+// Q1614 — tuningFamilySocraticRadarDegreeCentralityMean
+export function tuningFamilySocraticRadarDegreeCentralityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
+    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  );
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    const degree = adj[i]!.filter(Boolean).length;
+    total += degree / (n - 1);
+  }
+  return total / n;
+}
+
+// Q1616 — tuningFamilySocraticRadarClosenessCentralityMean
+export function tuningFamilySocraticRadarClosenessCentralityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
+    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  );
+  let totalCloseness = 0;
+  for (let src = 0; src < n; src++) {
+    const dist = new Array<number>(n).fill(Infinity);
+    dist[src] = 0;
+    const queue = [src];
+    let qi = 0;
+    while (qi < queue.length) {
+      const cur = queue[qi++]!;
+      for (let nb = 0; nb < n; nb++) {
+        if (adj[cur]![nb] && dist[nb] === Infinity) {
+          dist[nb] = dist[cur]! + 1;
+          queue.push(nb);
+        }
+      }
+    }
+    let sumDist = 0;
+    let reachable = 0;
+    for (let i = 0; i < n; i++) {
+      if (i !== src && dist[i] !== Infinity) {
+        sumDist += dist[i]!;
+        reachable++;
+      }
+    }
+    totalCloseness += reachable === 0 ? 0 : (n - 1) / sumDist;
+  }
+  return totalCloseness / n;
+}
+
+// Q1618 — tuningFamilySocraticRadarBetweennessCentralityMean
+export function tuningFamilySocraticRadarBetweennessCentralityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
+    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  );
+  const betweenness = new Array<number>(n).fill(0);
+  for (let s = 0; s < n; s++) {
+    const dist = new Array<number>(n).fill(-1);
+    const sigma = new Array<number>(n).fill(0);
+    const pred: number[][] = Array.from({length: n}, () => []);
+    dist[s] = 0;
+    sigma[s] = 1;
+    const queue = [s];
+    const stack: number[] = [];
+    let qi = 0;
+    while (qi < queue.length) {
+      const v = queue[qi++]!;
+      stack.push(v);
+      for (let w = 0; w < n; w++) {
+        if (!adj[v]![w]) continue;
+        if (dist[w] === -1) {
+          dist[w] = dist[v]! + 1;
+          queue.push(w);
+        }
+        if (dist[w] === dist[v]! + 1) {
+          sigma[w] = (sigma[w] ?? 0) + sigma[v]!;
+          pred[w]!.push(v);
+        }
+      }
+    }
+    const delta = new Array<number>(n).fill(0);
+    while (stack.length > 0) {
+      const w = stack.pop()!;
+      for (const v of pred[w]!) {
+        delta[v] = (delta[v] ?? 0) + (sigma[v]! / sigma[w]!) * (1 + delta[w]!);
+      }
+      if (w !== s) betweenness[w] = (betweenness[w] ?? 0) + delta[w]!;
+    }
+  }
+  const norm = (n - 1) * (n - 2) / 2;
+  let total = 0;
+  for (let i = 0; i < n; i++) total += betweenness[i]! / norm;
+  return total / n;
+}
+
+// Q1620 — tuningFamilySocraticRadarClusteringCoefficientMeanV2
+export function tuningFamilySocraticRadarClusteringCoefficientMeanV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
+    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  );
+  let totalCC = 0;
+  for (let i = 0; i < n; i++) {
+    const neighbors: number[] = [];
+    for (let j = 0; j < n; j++) {
+      if (adj[i]![j]) neighbors.push(j);
+    }
+    const k = neighbors.length;
+    if (k < 2) { totalCC += 0; continue; }
+    let triangles = 0;
+    for (let a = 0; a < neighbors.length; a++) {
+      for (let b = a + 1; b < neighbors.length; b++) {
+        if (adj[neighbors[a]!]![neighbors[b]!]) triangles++;
+      }
+    }
+    totalCC += (triangles * 2) / (k * (k - 1));
+  }
+  return totalCC / n;
+}
+
+// Q1622 — tuningFamilySocraticRadarGraphDensityMean
+export function tuningFamilySocraticRadarGraphDensityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
+    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  );
+  const groupSize = 3;
+  let totalDensity = 0;
+  let groupCount = 0;
+  for (let start = 0; start < n; start += groupSize) {
+    const group: number[] = [];
+    for (let gi = start; gi < Math.min(start + groupSize, n); gi++) group.push(gi);
+    const m = group.length;
+    const possible = m * (m - 1) / 2;
+    if (possible === 0) { groupCount++; totalDensity += 0; continue; }
+    let edges = 0;
+    for (let a = 0; a < group.length; a++) {
+      for (let b = a + 1; b < group.length; b++) {
+        if (adj[group[a]!]![group[b]!]) edges++;
+      }
+    }
+    totalDensity += edges / possible;
+    groupCount++;
+  }
+  return groupCount === 0 ? 0 : totalDensity / groupCount;
+}
+
+// Q1624 — tuningFamilySocraticRadarSpectralRadiusMean
+export function tuningFamilySocraticRadarSpectralRadiusMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  const A: number[][] = Array.from({length: n}, (_, i) =>
+    Array.from({length: n}, (__, j) => (i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3) ? 1 : 0)
+  );
+  let vec = new Array<number>(n).fill(1 / Math.sqrt(n));
+  let eigenvalue = 0;
+  for (let iter = 0; iter < 10; iter++) {
+    const next = new Array<number>(n).fill(0);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        next[i] = (next[i] ?? 0) + A[i]![j]! * vec[j]!;
+      }
+    }
+    eigenvalue = Math.sqrt(next.reduce((s, v) => s + v * v, 0));
+    if (eigenvalue === 0) break;
+    vec = next.map((v) => v / eigenvalue);
+  }
+  return eigenvalue / n;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -37506,4 +37740,82 @@ export function scaleMaxStepCents(scaleCents: readonly number[], periodCents: nu
     steps.push(step);
   }
   return Math.max(...steps);
+}
+
+// QQQ1
+export function scaleVoiceLeadingDistance(
+  a: readonly number[],
+  b: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (a.length !== b.length) return periodCents;
+  const n = a.length;
+  if (n === 0) return 0;
+
+  const modDist = (x: number, y: number): number => {
+    const d = Math.abs(x - y) % periodCents;
+    return Math.min(d, periodCents - d);
+  };
+
+  const computeSum = (bPerm: number[]): number => {
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+      sum += modDist(a[i]!, bPerm[i]!);
+    }
+    return sum;
+  };
+
+  const bArr = [...b];
+  let best = Infinity;
+
+  // Try all n cyclic shifts
+  for (let shift = 0; shift < n; shift++) {
+    const shifted = bArr.slice(shift).concat(bArr.slice(0, shift));
+    best = Math.min(best, computeSum(shifted));
+  }
+
+  // For small n, also try n reflections (reverse + cyclic shifts)
+  if (n <= 8) {
+    const bRev = [...bArr].reverse();
+    for (let shift = 0; shift < n; shift++) {
+      const shifted = bRev.slice(shift).concat(bRev.slice(0, shift));
+      best = Math.min(best, computeSum(shifted));
+    }
+  }
+
+  return best;
+}
+
+// QQQ2
+export function scaleVoiceLeadingRadius(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const evenScale: number[] = [];
+  for (let i = 0; i < n; i++) {
+    evenScale.push((i * periodCents) / n);
+  }
+  return scaleVoiceLeadingDistance(scaleCents, evenScale, periodCents);
+}
+
+// QQQ3
+export function scaleParsimonyCost(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  let best = Infinity;
+  for (let step = 100; step < periodCents; step += 100) {
+    const transposed = scaleCents.map((p) => (p + step) % periodCents);
+    const dist = scaleVoiceLeadingDistance(scaleCents, transposed, periodCents);
+    if (dist < best) best = dist;
+  }
+  return best === Infinity ? 0 : best;
+}
+
+// QQQ4
+export function scaleSelfSimilarityScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const reversed = scaleCents.slice().reverse();
+  const dist = scaleVoiceLeadingDistance(scaleCents, reversed, periodCents);
+  const normalizedDist = dist / (periodCents * n);
+  return 1 - normalizedDist;
 }

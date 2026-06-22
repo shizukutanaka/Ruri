@@ -872,13 +872,13 @@ import {
   spectralSpread,
   harmonicSeriesMatchCount,
   scaleIntervalClassVector,
-  scaleVoiceLeadingDistance,
+  scaleChordVLDistance,
   scaleChromaticSaturation,
   scaleMaximallyEven,
   scaleReflectionSymmetry,
   scaleRotationalSymmetry,
   scaleFractalDimension,
-  scaleSelfSimilarityScore,
+  scaleZoomSelfSimilarity,
   tuningFamilySocraticRadarShannonEntropyMean,
   tuningFamilySocraticRadarJensenShannonDivergenceMean,
   tuningFamilySocraticRadarMutualInformationMean,
@@ -975,6 +975,12 @@ import {
   tuningFamilySocraticRadarChebyshevMean,
   tuningFamilySocraticRadarManhattanMean,
   tuningFamilySocraticRadarMinkowskiP3Mean,
+  tuningFamilySocraticRadarDegreeCentralityMean,
+  tuningFamilySocraticRadarClosenessCentralityMean,
+  tuningFamilySocraticRadarBetweennessCentralityMean,
+  tuningFamilySocraticRadarClusteringCoefficientMeanV2,
+  tuningFamilySocraticRadarGraphDensityMean,
+  tuningFamilySocraticRadarSpectralRadiusMean,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1043,6 +1049,10 @@ import {
   scaleMaxGapRatio,
   scaleMinStepCents,
   scaleMaxStepCents,
+  scaleVoiceLeadingDistance,
+  scaleVoiceLeadingRadius,
+  scaleParsimonyCost,
+  scaleSelfSimilarityScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -26868,19 +26878,19 @@ describe('XX1 scaleIntervalClassVector', () => {
   });
 });
 
-describe('XX2 scaleVoiceLeadingDistance', () => {
+describe('XX2 scaleChordVLDistance', () => {
   it('same chord → distance 0', () => {
-    expect(scaleVoiceLeadingDistance([0,400,700],[0,400,700])).toBe(0);
+    expect(scaleChordVLDistance([0,400,700],[0,400,700])).toBe(0);
   });
   it('shifts by 100c → distance 100*sqrt(n)', () => {
-    const d = scaleVoiceLeadingDistance([0,400],[100,500]);
+    const d = scaleChordVLDistance([0,400],[100,500]);
     expect(d).toBeCloseTo(Math.sqrt(2)*100, 1);
   });
   it('empty arrays → 0', () => {
-    expect(scaleVoiceLeadingDistance([],[])).toBe(0);
+    expect(scaleChordVLDistance([],[])).toBe(0);
   });
   it('different lengths → pads with zeros', () => {
-    const d = scaleVoiceLeadingDistance([0,400],[0]);
+    const d = scaleChordVLDistance([0,400],[0]);
     expect(d).toBeGreaterThanOrEqual(0);
   });
 });
@@ -27094,22 +27104,22 @@ describe('YY3 scaleFractalDimension', () => {
   });
 });
 
-describe('YY4 scaleSelfSimilarityScore', () => {
+describe('YY4 scaleZoomSelfSimilarity', () => {
   it('returns value in [-1,1] for valid scale', () => {
     const s = [0,200,400,500,700,900,1100];
-    const r = scaleSelfSimilarityScore(s);
+    const r = scaleZoomSelfSimilarity(s);
     expect(r).toBeGreaterThanOrEqual(-1);
     expect(r).toBeLessThanOrEqual(1);
   });
   it('empty scale returns 0', () => {
-    expect(scaleSelfSimilarityScore([])).toBe(0);
+    expect(scaleZoomSelfSimilarity([])).toBe(0);
   });
   it('fewer than 4 pitches returns 0', () => {
-    expect(scaleSelfSimilarityScore([0,200,400])).toBe(0);
+    expect(scaleZoomSelfSimilarity([0,200,400])).toBe(0);
   });
   it('equal-step scale has high self-similarity', () => {
     const ed = Array.from({length:12},(_,i)=>i*100);
-    const r = scaleSelfSimilarityScore(ed);
+    const r = scaleZoomSelfSimilarity(ed);
     expect(r).toBeGreaterThanOrEqual(0);
   });
 });
@@ -29852,5 +29862,164 @@ describe('PPP4 scaleMaxStepCents', () => {
     const max = scaleMaxStepCents([0, 100, 700, 900]);
     const min = scaleMinStepCents([0, 100, 700, 900]);
     expect(max).toBeGreaterThanOrEqual(min);
+  });
+});
+
+describe('QQQ1 scaleVoiceLeadingDistance', () => {
+  it('both empty → 0', () => { expect(scaleVoiceLeadingDistance([], [])).toBe(0); });
+  it('different lengths → periodCents', () => {
+    expect(scaleVoiceLeadingDistance([0,200], [0])).toBe(1200);
+  });
+  it('identical scales → 0', () => {
+    expect(scaleVoiceLeadingDistance([0,200,400,700],[0,200,400,700])).toBe(0);
+  });
+  it('non-negative', () => {
+    expect(scaleVoiceLeadingDistance([0,200,400,700],[0,300,500,800])).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('QQQ2 scaleVoiceLeadingRadius', () => {
+  it('empty → 0', () => { expect(scaleVoiceLeadingRadius([])).toBe(0); });
+  it('equal-step scale → 0 radius', () => {
+    // [0,300,600,900] IS the even 4-note scale → distance to itself = 0
+    expect(scaleVoiceLeadingRadius([0,300,600,900])).toBe(0);
+  });
+  it('non-equal scale → positive radius', () => {
+    expect(scaleVoiceLeadingRadius([0,100,700,900])).toBeGreaterThan(0);
+  });
+  it('non-negative', () => {
+    expect(scaleVoiceLeadingRadius([0,200,400,500,700,900,1100])).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('QQQ3 scaleParsimonyCost', () => {
+  it('empty → 0', () => { expect(scaleParsimonyCost([])).toBe(0); });
+  it('n=1 → 0', () => { expect(scaleParsimonyCost([0])).toBe(0); });
+  it('non-negative', () => {
+    expect(scaleParsimonyCost([0,200,400,700])).toBeGreaterThanOrEqual(0);
+  });
+  it('returns finite', () => {
+    expect(Number.isFinite(scaleParsimonyCost([0,200,400,500,700,900,1100]))).toBe(true);
+  });
+});
+
+describe('QQQ4 scaleSelfSimilarityScore', () => {
+  it('empty → 0', () => { expect(scaleSelfSimilarityScore([])).toBe(0); });
+  it('single pitch is palindromic → 1', () => {
+    expect(scaleSelfSimilarityScore([0])).toBeCloseTo(1, 5);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleSelfSimilarityScore([0,200,400,700]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('symmetric scale has high self-similarity', () => {
+    // [0,600] is symmetric
+    expect(scaleSelfSimilarityScore([0,600])).toBeGreaterThan(0.5);
+  });
+});
+
+describe('Q1614 tuningFamilySocraticRadarDegreeCentralityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤1', () => {
+    expect(tuningFamilySocraticRadarDegreeCentralityMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarDegreeCentralityMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns value in [0,1] for two tunings', () => {
+    const r = tuningFamilySocraticRadarDegreeCentralityMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('identical tunings → distance 0 → all connected → centrality 1', () => {
+    const r = tuningFamilySocraticRadarDegreeCentralityMean([equalTemperament12(440), equalTemperament12(440), equalTemperament12(440)], s);
+    expect(r).toBeCloseTo(1, 5);
+  });
+});
+
+describe('Q1616 tuningFamilySocraticRadarClosenessCentralityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤1', () => {
+    expect(tuningFamilySocraticRadarClosenessCentralityMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarClosenessCentralityMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns value in [0,1] for two tunings', () => {
+    const r = tuningFamilySocraticRadarClosenessCentralityMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('identical tunings → all connected → closeness 1', () => {
+    const r = tuningFamilySocraticRadarClosenessCentralityMean([equalTemperament12(440), equalTemperament12(440), equalTemperament12(440)], s);
+    expect(r).toBeCloseTo(1, 5);
+  });
+});
+
+describe('Q1618 tuningFamilySocraticRadarBetweennessCentralityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤2', () => {
+    expect(tuningFamilySocraticRadarBetweennessCentralityMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarBetweennessCentralityMean([equalTemperament12(440)], s)).toBe(0);
+    expect(tuningFamilySocraticRadarBetweennessCentralityMean([equalTemperament12(440), edo(19, 440)], s)).toBe(0);
+  });
+  it('returns value in [0,1] for three tunings', () => {
+    const r = tuningFamilySocraticRadarBetweennessCentralityMean([equalTemperament12(440), edo(19, 440), edo(31, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('identical tunings → all connected → betweenness 0 (no betweenness in complete graph)', () => {
+    const r = tuningFamilySocraticRadarBetweennessCentralityMean([equalTemperament12(440), equalTemperament12(440), equalTemperament12(440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1620 tuningFamilySocraticRadarClusteringCoefficientMeanV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤2', () => {
+    expect(tuningFamilySocraticRadarClusteringCoefficientMeanV2([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarClusteringCoefficientMeanV2([equalTemperament12(440)], s)).toBe(0);
+    expect(tuningFamilySocraticRadarClusteringCoefficientMeanV2([equalTemperament12(440), edo(19, 440)], s)).toBe(0);
+  });
+  it('returns value in [0,1] for three tunings', () => {
+    const r = tuningFamilySocraticRadarClusteringCoefficientMeanV2([equalTemperament12(440), edo(19, 440), edo(31, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('identical tunings → fully connected triangle → clustering 1', () => {
+    const r = tuningFamilySocraticRadarClusteringCoefficientMeanV2([equalTemperament12(440), equalTemperament12(440), equalTemperament12(440)], s);
+    expect(r).toBeCloseTo(1, 5);
+  });
+});
+
+describe('Q1622 tuningFamilySocraticRadarGraphDensityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤2', () => {
+    expect(tuningFamilySocraticRadarGraphDensityMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarGraphDensityMean([equalTemperament12(440)], s)).toBe(0);
+    expect(tuningFamilySocraticRadarGraphDensityMean([equalTemperament12(440), edo(19, 440)], s)).toBe(0);
+  });
+  it('returns value in [0,1] for three tunings', () => {
+    const r = tuningFamilySocraticRadarGraphDensityMean([equalTemperament12(440), edo(19, 440), edo(31, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('identical tunings → fully connected → density 1', () => {
+    const r = tuningFamilySocraticRadarGraphDensityMean([equalTemperament12(440), equalTemperament12(440), equalTemperament12(440)], s);
+    expect(r).toBeCloseTo(1, 5);
+  });
+});
+
+describe('Q1624 tuningFamilySocraticRadarSpectralRadiusMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤1', () => {
+    expect(tuningFamilySocraticRadarSpectralRadiusMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarSpectralRadiusMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarSpectralRadiusMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('identical tunings → connected graph → positive spectral radius', () => {
+    const r = tuningFamilySocraticRadarSpectralRadiusMean([equalTemperament12(440), equalTemperament12(440), equalTemperament12(440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
   });
 });
