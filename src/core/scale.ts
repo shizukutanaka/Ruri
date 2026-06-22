@@ -25865,3 +25865,421 @@ export function scaleModalNetwork(
   results.sort((a, b) => b.commonTones - a.commonTones);
   return results;
 }
+
+// ---------------------------------------------------------------------------
+// HH1 — virtualPitchStrength
+// ---------------------------------------------------------------------------
+
+/**
+ * Estimate the strength of a virtual pitch candidate at `candidateHz`.
+ *
+ * A virtual pitch is supported by partials in `frequencies` that coincide
+ * with integer multiples of the candidate. For each harmonic k = 1..harmonics,
+ * any frequency within 3% of k*candidateHz scores 1/k (higher harmonics
+ * contribute progressively less). Returns the sum of match scores.
+ *
+ * @param frequencies - Observed partial frequencies in Hz (any order).
+ * @param candidateHz - Candidate virtual-pitch frequency in Hz.
+ * @param harmonics - Number of harmonics to test (default 8).
+ * @returns Sum of match scores ≥ 0; 0 for empty input.
+ *
+ * @example
+ * // Harmonic series on 220 Hz → strong virtual pitch at 220 Hz
+ * virtualPitchStrength([220, 440, 660, 880], 220); // > 1
+ */
+export function virtualPitchStrength(
+  frequencies: readonly number[],
+  candidateHz: number,
+  harmonics: number = 8,
+): number {
+  if (frequencies.length === 0) return 0;
+  let score = 0;
+  for (let k = 1; k <= harmonics; k++) {
+    const target = k * candidateHz;
+    for (const f of frequencies) {
+      if (Math.abs(f - target) / target <= 0.03) {
+        score += 1 / k;
+        break; // count each harmonic at most once
+      }
+    }
+  }
+  return score;
+}
+
+// ---------------------------------------------------------------------------
+// HH2 — roughnessCurvePoints
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute pairwise Sethares roughness between a root note and a second note
+ * at each integer multiple of `intervalStepCents` from 0 to 1200 cents.
+ *
+ * Roughness formula (per pair of partials):
+ *   `amp_i * amp_j * exp(-3.5 * |f_i - f_j| / avg(f_i, f_j))`
+ * summed over all (i, j) partial pairs and divided by n² where n = spectrum.length.
+ *
+ * @param spectrum - Timbre spectrum (ratio/amplitude pairs).
+ * @param referenceHz - Fundamental frequency of the root note in Hz (default 220).
+ * @param intervalStepCents - Step size in cents (default 10); must be > 0.
+ * @returns Array of `{ intervalCents, roughness }` from 0 to 1200 cents inclusive.
+ * @throws {RangeError} if `intervalStepCents` ≤ 0.
+ *
+ * @example
+ * roughnessCurvePoints(harmonicSpectrum(4), 220, 100); // 13 points
+ */
+export function roughnessCurvePoints(
+  spectrum: Spectrum,
+  referenceHz: number = 220,
+  intervalStepCents: number = 10,
+): Array<{ intervalCents: number; roughness: number }> {
+  if (intervalStepCents <= 0) {
+    throw new RangeError('intervalStepCents must be > 0');
+  }
+  const n = spectrum.length;
+  const norm = n * n;
+  const result: Array<{ intervalCents: number; roughness: number }> = [];
+  for (
+    let intervalCents = 0;
+    intervalCents <= 1200 + 1e-9;
+    intervalCents += intervalStepCents
+  ) {
+    const ic = Math.round(intervalCents * 1e6) / 1e6; // avoid float drift
+    let roughness = 0;
+    if (n > 0) {
+      const secondHz = centsToFreq(ic, referenceHz);
+      for (const pi of spectrum) {
+        const fi = referenceHz * pi.ratio;
+        for (const pj of spectrum) {
+          const fj = secondHz * pj.ratio;
+          const avg = (fi + fj) / 2;
+          if (avg === 0) continue;
+          roughness +=
+            pi.amplitude *
+            pj.amplitude *
+            Math.exp((-3.5 * Math.abs(fi - fj)) / avg);
+        }
+      }
+      roughness /= norm;
+    }
+    result.push({ intervalCents: ic, roughness });
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// HH3 — scaleExpressiveness
+// ---------------------------------------------------------------------------
+
+/**
+ * A measure of scale expressiveness based on interval variety and range.
+ *
+ * Formula: `(uniqueIntervalClasses / C(n,2)) * (maxDegree / 1200)`
+ *
+ * Interval classes are rounded to the nearest 50 cents before counting
+ * unique values. `C(n,2) = n*(n-1)/2` counts all pairwise intervals.
+ * `maxDegree = max(scaleCents)` (0 for empty input).
+ *
+ * @param scaleCents - Scale pitches in cents (need not be sorted).
+ * @returns Expressiveness score in [0, 1]; 0 for empty or single-note scale.
+ *
+ * @example
+ * // Diatonic scale
+ * scaleExpressiveness([0, 200, 400, 500, 700, 900, 1100]); // > 0
+ */
+export function scaleExpressiveness(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const pairs = (n * (n - 1)) / 2;
+  const uniqueClasses = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs((scaleCents[j] ?? 0) - (scaleCents[i] ?? 0));
+      const rounded = Math.round(diff / 50) * 50;
+      uniqueClasses.add(rounded);
+    }
+  }
+  const maxDegree = Math.max(...scaleCents);
+  return (uniqueClasses.size / pairs) * (maxDegree / 1200);
+}
+
+// ---------------------------------------------------------------------------
+// HH4 — tuningHistoricalDistance
+// ---------------------------------------------------------------------------
+
+/**
+ * Distance between two tunings measured as the RMS of per-degree cent
+ * differences, computed in absolute pitch (Hz-based) space.
+ *
+ * Each degree's absolute pitch is derived as:
+ *   `hz[i] = centsToFreq(pitchToCents(degree[i]), tuning.referenceHz)`
+ * and the per-degree difference in cents is:
+ *   `|1200 * log2(hz1[i] / hz2[i])|`
+ *
+ * This ensures that two tunings with the same interval structure but different
+ * reference frequencies are non-zero distance apart.
+ *
+ * @param tuning - First tuning system.
+ * @param referenceTuning - Second tuning system.
+ * @returns RMS distance in cents; 0 if either tuning has 0 degrees.
+ *
+ * @example
+ * tuningHistoricalDistance(equalTemperament12(440), equalTemperament12(432)); // > 0
+ */
+export function tuningHistoricalDistance(
+  tuning: TuningSystem,
+  referenceTuning: TuningSystem,
+): number {
+  const n = Math.min(tuning.degrees.length, referenceTuning.degrees.length);
+  if (n === 0) return 0;
+  let sumSq = 0;
+  for (let i = 0; i < n; i++) {
+    const d1 = tuning.degrees[i];
+    const d2 = referenceTuning.degrees[i];
+    if (d1 === undefined || d2 === undefined) continue;
+    const hz1 = centsToFreq(pitchToCents(d1), tuning.referenceHz);
+    const hz2 = centsToFreq(pitchToCents(d2), referenceTuning.referenceHz);
+    if (hz1 <= 0 || hz2 <= 0) continue;
+    const diffCents = 1200 * Math.log2(hz1 / hz2);
+    sumSq += diffCents * diffCents;
+  }
+  return Math.sqrt(sumSq / n);
+}
+
+// ---------------------------------------------------------------------------
+// Q1206 — tuningFamilySocraticRadarPairwiseDifference
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns an n×n matrix of axis-score differences between family members.
+ * matrix[i][j] = profile[i][axis] - profile[j][axis]
+ * Diagonal = 0; matrix[i][j] = -matrix[j][i].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Axis to compare.
+ * @param rootHz - Reference frequency (optional).
+ * @returns n×n matrix of score differences.
+ */
+export function tuningFamilySocraticRadarPairwiseDifference(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): number[][] {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const matrix: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    const row: number[] = [];
+    for (let j = 0; j < n; j++) {
+      row.push(i === j ? 0 : (profiles[i]![axis] - profiles[j]![axis]));
+    }
+    matrix.push(row);
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1208 — tuningFamilySocraticRadarDecileProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns deciles D1..D9 of axis scores across the family.
+ * D_k = value at k/10 quantile (linear interpolation between sorted values).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Axis to profile.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of 9 decile values.
+ */
+export function tuningFamilySocraticRadarDecileProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): number[] {
+  const scores = tunings
+    .map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz)[axis])
+    .sort((a, b) => a - b);
+  const n = scores.length;
+  const deciles: number[] = [];
+  for (let k = 1; k <= 9; k++) {
+    const p = k / 10;
+    if (n === 0) {
+      deciles.push(0);
+    } else if (n === 1) {
+      deciles.push(scores[0]!);
+    } else {
+      const pos = p * (n - 1);
+      const lo = Math.floor(pos);
+      const hi = Math.min(lo + 1, n - 1);
+      const frac = pos - lo;
+      deciles.push(scores[lo]! * (1 - frac) + scores[hi]! * frac);
+    }
+  }
+  return deciles;
+}
+
+// ---------------------------------------------------------------------------
+// Q1210 — tuningFamilySocraticRadarIQR
+// ---------------------------------------------------------------------------
+
+/**
+ * Interquartile range (Q3 - Q1) for each axis across the family.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, iqr> in [0, 1].
+ */
+export function tuningFamilySocraticRadarIQR(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+
+  function quantile(sorted: number[], p: number): number {
+    if (sorted.length === 0) return 0;
+    if (sorted.length === 1) return sorted[0]!;
+    const pos = p * (sorted.length - 1);
+    const lo = Math.floor(pos);
+    const hi = Math.min(lo + 1, sorted.length - 1);
+    const frac = pos - lo;
+    return sorted[lo]! * (1 - frac) + sorted[hi]! * frac;
+  }
+
+  for (const ax of axes) {
+    const sorted = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    const q1 = quantile(sorted, 0.25);
+    const q3 = quantile(sorted, 0.75);
+    result[ax] = Math.max(0, Math.min(1, q3 - q1));
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1212 — tuningFamilySocraticRadarModeProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Mode of binned axis scores (most common bin center) for each axis.
+ * Bins score into floor(score * bins) (0..bins-1), finds most frequent bin.
+ * Returns bin center = (bin + 0.5) / bins.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param bins - Number of bins, default 5.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, modeValue>.
+ */
+export function tuningFamilySocraticRadarModeProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  bins: number = 5,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+
+  for (const ax of axes) {
+    const counts = new Array<number>(bins).fill(0);
+    for (const p of profiles) {
+      const b = Math.min(Math.floor(p[ax] * bins), bins - 1);
+      counts[b] = (counts[b] ?? 0) + 1;
+    }
+    let maxCount = -1;
+    let modeBin = 0;
+    for (let i = 0; i < bins; i++) {
+      if ((counts[i] ?? 0) > maxCount) {
+        maxCount = counts[i] ?? 0;
+        modeBin = i;
+      }
+    }
+    result[ax] = (modeBin + 0.5) / bins;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1214 — tuningFamilySocraticRadarGeometricMeanV2
+// ---------------------------------------------------------------------------
+
+/**
+ * Geometric mean of axis scores using log-sum-exp: exp(mean(ln(score + epsilon))).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param epsilon - Small positive value to avoid log(0), default 1e-10.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, geometricMean>.
+ */
+export function tuningFamilySocraticRadarGeometricMeanV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  epsilon: number = 1e-10,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+
+  for (const ax of axes) {
+    if (n === 0) {
+      result[ax] = 0;
+    } else {
+      const logSum = profiles.reduce((s, p) => s + Math.log(p[ax] + epsilon), 0);
+      result[ax] = Math.exp(logSum / n);
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1216 — tuningFamilySocraticRadarTrimmedMeanV2
+// ---------------------------------------------------------------------------
+
+/**
+ * Trimmed mean: remove bottom and top trimFraction of scores per axis.
+ * If fewer than 2 values remain after trimming, uses all values.
+ * Throws RangeError if trimFraction < 0 or trimFraction >= 0.5.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param trimFraction - Fraction to trim from each end, default 0.1.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, trimmedMean>.
+ */
+export function tuningFamilySocraticRadarTrimmedMeanV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  trimFraction: number = 0.1,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  if (trimFraction < 0 || trimFraction >= 0.5) {
+    throw new RangeError('trimFraction must be in [0, 0.5)');
+  }
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+
+  for (const ax of axes) {
+    const sorted = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    const trimCount = Math.floor(n * trimFraction);
+    const lo = trimCount;
+    const hi = n - trimCount;
+    const slice = hi - lo >= 2 ? sorted.slice(lo, hi) : sorted;
+    result[ax] = slice.length === 0 ? 0 : slice.reduce((s, v) => s + v, 0) / slice.length;
+  }
+  return result;
+}

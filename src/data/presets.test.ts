@@ -406,6 +406,12 @@ import {
   presetFamilySocraticRadarDetrendedFluctuation,
   presetFamilySocraticRadarKolmogorovComplexity,
   presetFamilySocraticRadarMultiScaleEntropy,
+  presetFamilySocraticRadarPairwiseDifference,
+  presetFamilySocraticRadarDecileProfile,
+  presetFamilySocraticRadarIQR,
+  presetFamilySocraticRadarModeProfile,
+  presetFamilySocraticRadarGeometricMeanV2,
+  presetFamilySocraticRadarTrimmedMeanV2,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12934,6 +12940,110 @@ describe('presetFamilySocraticRadarMultiScaleEntropy (Q1205)', () => {
     expect(r).toHaveLength(2);
     for (const v of r) {
       expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1207 — presetFamilySocraticRadarPairwiseDifference
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarPairwiseDifference (Q1207)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns n×n matrix with diagonal 0 and antisymmetry', () => {
+    const m = presetFamilySocraticRadarPairwiseDifference(presetIds, spectrum, 'diversity');
+    expect(m).toHaveLength(2);
+    expect(m[0]!).toHaveLength(2);
+    expect(m[0]![0]).toBe(0);
+    expect(m[1]![1]).toBe(0);
+    expect(m[0]![1]).toBeCloseTo(-(m[1]![0]!), 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1209 — presetFamilySocraticRadarDecileProfile
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarDecileProfile (Q1209)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 9 non-decreasing deciles in [0,1]', () => {
+    const d = presetFamilySocraticRadarDecileProfile(presetIds, spectrum, 'diversity');
+    expect(d).toHaveLength(9);
+    for (const v of d) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+    for (let i = 1; i < d.length; i++) {
+      expect(d[i]!).toBeGreaterThanOrEqual(d[i - 1]!);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1211 — presetFamilySocraticRadarIQR
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarIQR (Q1211)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys with values in [0,1]', () => {
+    const r = presetFamilySocraticRadarIQR(presetIds, spectrum);
+    expect(Object.keys(r)).toHaveLength(5);
+    for (const v of Object.values(r)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1213 — presetFamilySocraticRadarModeProfile
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarModeProfile (Q1213)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys with bin center values', () => {
+    const r = presetFamilySocraticRadarModeProfile(presetIds, spectrum, 5);
+    expect(Object.keys(r)).toHaveLength(5);
+    for (const v of Object.values(r)) {
+      expect(v).toBeGreaterThan(0);
+      expect(v).toBeLessThan(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1215 — presetFamilySocraticRadarGeometricMeanV2
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarGeometricMeanV2 (Q1215)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys with positive values', () => {
+    const r = presetFamilySocraticRadarGeometricMeanV2(presetIds, spectrum, 1e-10);
+    expect(Object.keys(r)).toHaveLength(5);
+    for (const v of Object.values(r)) {
+      expect(v).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1217 — presetFamilySocraticRadarTrimmedMeanV2
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTrimmedMeanV2 (Q1217)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys with values in [0,1]', () => {
+    const r = presetFamilySocraticRadarTrimmedMeanV2(presetIds, spectrum, 0.1);
+    expect(Object.keys(r)).toHaveLength(5);
+    for (const v of Object.values(r)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
     }
   });
 });

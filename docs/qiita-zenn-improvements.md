@@ -429,3 +429,17 @@
 - GG2: intervalAmbiguity — 近接音程ペアの曖昧性スコア
 - GG3: tuningNetworkCentrality — 完全五度近傍ネットワーク中心性
 - GG4: scaleModalNetwork — 旋法間共通音ネットワーク（降順ソート）
+
+## Round 25: 仮想音高・粗さ曲線・表現性・歴史的距離 (HH1–HH4)
+
+**テーマ**: 心理音響・音律の表現的・歴史的分析
+
+### 研究トピック
+- Qiita: 仮想音高（バーチャルピッチ）理論のTypeScript実装
+- Zenn: 音律の表現性と歴史的距離分析
+
+### 実装
+- HH1: virtualPitchStrength — 候補仮想音高の倍音一致強度
+- HH2: roughnessCurvePoints — 音程別ラフネス曲線（Sethares）
+- HH3: scaleExpressiveness — 音程多様性×音域による表現性スコア
+- HH4: tuningHistoricalDistance — 絶対Hz基準の音律RMS距離
