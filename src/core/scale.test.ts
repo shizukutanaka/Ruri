@@ -1155,6 +1155,12 @@ import {
   tuningFamilySocraticRadarPressureGradientProxy,
   tuningFamilySocraticRadarVorticityProxy,
   tuningFamilySocraticRadarReynoldsNumberProxy,
+  tuningFamilySocraticRadarSeismicAmplitudeProxy,
+  tuningFamilySocraticRadarErosionProxy,
+  tuningFamilySocraticRadarTectonicStressProxy,
+  tuningFamilySocraticRadarStratificationProxy,
+  tuningFamilySocraticRadarVolcanicActivityProxy,
+  tuningFamilySocraticRadarRichterScaleProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1341,6 +1347,10 @@ import {
   scaleRunLengthProxy,
   scaleAutocorrelationProxy,
   scaleDescriptionLength,
+  scaleModeCountV2,
+  scaleBrightest,
+  scaleDarkest,
+  scaleModeBalanceSpread,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -35649,5 +35659,184 @@ describe('Q1972 tuningFamilySocraticRadarReynoldsNumberProxy', () => {
     const v = tuningFamilySocraticRadarReynoldsNumberProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1974 — tuningFamilySocraticRadarSeismicAmplitudeProxy
+describe('Q1974 tuningFamilySocraticRadarSeismicAmplitudeProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarSeismicAmplitudeProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSeismicAmplitudeProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSeismicAmplitudeProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1976 — tuningFamilySocraticRadarErosionProxy
+describe('Q1976 tuningFamilySocraticRadarErosionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarErosionProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarErosionProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarErosionProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1978 — tuningFamilySocraticRadarTectonicStressProxy
+describe('Q1978 tuningFamilySocraticRadarTectonicStressProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarTectonicStressProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarTectonicStressProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarTectonicStressProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1980 — tuningFamilySocraticRadarStratificationProxy
+describe('Q1980 tuningFamilySocraticRadarStratificationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarStratificationProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarStratificationProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarStratificationProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1982 — tuningFamilySocraticRadarVolcanicActivityProxy
+describe('Q1982 tuningFamilySocraticRadarVolcanicActivityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarVolcanicActivityProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarVolcanicActivityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarVolcanicActivityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1984 — tuningFamilySocraticRadarRichterScaleProxy
+describe('Q1984 tuningFamilySocraticRadarRichterScaleProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarRichterScaleProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarRichterScaleProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarRichterScaleProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// VVV1 — scaleModeCountV2
+describe('VVV1 scaleModeCountV2', () => {
+  it('empty returns 0', () => {
+    expect(scaleModeCountV2([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleModeCountV2([0])).toBe(0);
+  });
+  it('12-TET → value in (0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleModeCountV2(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// VVV2 — scaleBrightest
+describe('VVV2 scaleBrightest', () => {
+  it('empty returns 0', () => {
+    expect(scaleBrightest([])).toBe(0);
+  });
+  it('all notes in upper half → high brightness', () => {
+    // Three notes above midpoint
+    const v = scaleBrightest([700, 900, 1100]);
+    expect(v).toBeGreaterThan(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleBrightest(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// VVV3 — scaleDarkest
+describe('VVV3 scaleDarkest', () => {
+  it('empty returns 0', () => {
+    expect(scaleDarkest([])).toBe(0);
+  });
+  it('all notes in lower half → high darkness', () => {
+    const v = scaleDarkest([0, 100, 300]);
+    expect(v).toBeGreaterThan(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleDarkest(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// VVV4 — scaleModeBalanceSpread
+describe('VVV4 scaleModeBalanceSpread', () => {
+  it('empty returns 0', () => {
+    expect(scaleModeBalanceSpread([])).toBe(0);
+  });
+  it('single note returns 0 (n<2)', () => {
+    expect(scaleModeBalanceSpread([0])).toBe(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleModeBalanceSpread(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

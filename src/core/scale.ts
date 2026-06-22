@@ -41808,6 +41808,146 @@ export function tuningFamilySocraticRadarReynoldsNumberProxy(
   return total / vecs.length;
 }
 
+// Q1974 — tuningFamilySocraticRadarSeismicAmplitudeProxy
+export function tuningFamilySocraticRadarSeismicAmplitudeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let maxVal = 0;
+    for (const x of vec) {
+      if (x > maxVal) maxVal = x;
+    }
+    total += maxVal;
+  }
+  return total / vecs.length;
+}
+
+// Q1976 — tuningFamilySocraticRadarErosionProxy
+export function tuningFamilySocraticRadarErosionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    const mean = sum / vec.length;
+    const erosion = 1 - Math.abs(mean - 0.5) * 2;
+    total += erosion;
+  }
+  return total / vecs.length;
+}
+
+// Q1978 — tuningFamilySocraticRadarTectonicStressProxy
+export function tuningFamilySocraticRadarTectonicStressProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let maxVal = 0;
+    let minVal = 1;
+    for (const x of vec) {
+      if (x > maxVal) maxVal = x;
+      if (x < minVal) minVal = x;
+    }
+    total += maxVal - minVal;
+  }
+  return total / vecs.length;
+}
+
+// Q1980 — tuningFamilySocraticRadarStratificationProxy
+export function tuningFamilySocraticRadarStratificationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    let strataCount = 1;
+    for (let i = 1; i < sorted.length; i++) {
+      if ((sorted[i]! - sorted[i - 1]!) > 0.2) strataCount++;
+    }
+    total += strataCount / 5;
+  }
+  return total / vecs.length;
+}
+
+// Q1982 — tuningFamilySocraticRadarVolcanicActivityProxy
+export function tuningFamilySocraticRadarVolcanicActivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    let maxSpike = 0;
+    for (let i = 0; i < vec.length; i++) {
+      const meanOthers = (sum - vec[i]!) / 4;
+      const spike = Math.abs(vec[i]! - meanOthers);
+      if (spike > maxSpike) maxSpike = spike;
+    }
+    total += Math.min(1, maxSpike);
+  }
+  return total / vecs.length;
+}
+
+// Q1984 — tuningFamilySocraticRadarRichterScaleProxy
+export function tuningFamilySocraticRadarRichterScaleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let maxVal = 0;
+    for (const x of vec) {
+      if (x > maxVal) maxVal = x;
+    }
+    const richter = Math.log10(maxVal * 9 + 1);
+    total += richter;
+  }
+  return total / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -45453,4 +45593,156 @@ export function scaleDescriptionLength(
   const uniqueSteps = roundedIntervals.size;
   const mdl = (Math.log2(n + 1) + uniqueSteps * Math.log2(periodCents)) / (n * Math.log2(periodCents) + 1);
   return Math.min(1, mdl);
+}
+
+// ---------------------------------------------------------------------------
+// Round 90: 音階モード分析 (VVV1–VVV4)
+// ---------------------------------------------------------------------------
+
+/**
+ * VVV1 — Count of rotationally distinct modes (normalized).
+ * For each of the n rotations, compute a step-pattern fingerprint.
+ * Returns distinctPatternCount / n, so 1.0 = all modes are unique, < 1 = symmetry.
+ * Returns 0 for n < 2.
+ */
+export function scaleModeCountV2(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  tolerance = 5,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Build step intervals (consecutive differences + wrap-around)
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) {
+      steps.push((sorted[i + 1]! - sorted[i]!));
+    } else {
+      steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+    }
+  }
+  // For each rotation, build a fingerprint rounded by tolerance
+  const seen = new Set<string>();
+  for (let r = 0; r < n; r++) {
+    const rotated = steps.slice(r).concat(steps.slice(0, r));
+    const fingerprint = rotated
+      .map(s => Math.round(s / tolerance))
+      .join(',');
+    seen.add(fingerprint);
+  }
+  return seen.size / n;
+}
+
+/**
+ * VVV2 — Brightness of the "brightest" mode.
+ * For each rotation, brightness = count of notes in upper half (> periodCents/2) / n.
+ * Returns the maximum brightness over all rotations.
+ * Returns 0 for n = 0.
+ */
+export function scaleBrightest(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const mid = periodCents / 2;
+  // Build step intervals for rotation computation
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) {
+      steps.push(sorted[i + 1]! - sorted[i]!);
+    } else {
+      steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+    }
+  }
+  let maxBrightness = 0;
+  for (let r = 0; r < n; r++) {
+    // Reconstruct note positions for rotation r (start from 0)
+    let pos = 0;
+    let countAbove = 0;
+    const rotated = steps.slice(r).concat(steps.slice(0, r));
+    for (let i = 0; i < n; i++) {
+      if (pos > mid) countAbove++;
+      if (i < n - 1) pos += rotated[i]!;
+    }
+    const brightness = countAbove / n;
+    if (brightness > maxBrightness) maxBrightness = brightness;
+  }
+  return maxBrightness;
+}
+
+/**
+ * VVV3 — Darkness of the "darkest" mode.
+ * darkness = 1 - minBrightness (over all rotations).
+ * Returns 0 for n = 0.
+ */
+export function scaleDarkest(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const mid = periodCents / 2;
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) {
+      steps.push(sorted[i + 1]! - sorted[i]!);
+    } else {
+      steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+    }
+  }
+  let minBrightness = 1;
+  for (let r = 0; r < n; r++) {
+    let pos = 0;
+    let countAbove = 0;
+    const rotated = steps.slice(r).concat(steps.slice(0, r));
+    for (let i = 0; i < n; i++) {
+      if (pos > mid) countAbove++;
+      if (i < n - 1) pos += rotated[i]!;
+    }
+    const brightness = countAbove / n;
+    if (brightness < minBrightness) minBrightness = brightness;
+  }
+  return 1 - minBrightness;
+}
+
+/**
+ * VVV4 — Spread between brightest and darkest mode.
+ * spread = maxBrightness - minBrightness over all rotations.
+ * Returns 0 for n < 2.
+ */
+export function scaleModeBalanceSpread(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const mid = periodCents / 2;
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) {
+      steps.push(sorted[i + 1]! - sorted[i]!);
+    } else {
+      steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+    }
+  }
+  let maxBrightness = 0;
+  let minBrightness = 1;
+  for (let r = 0; r < n; r++) {
+    let pos = 0;
+    let countAbove = 0;
+    const rotated = steps.slice(r).concat(steps.slice(0, r));
+    for (let i = 0; i < n; i++) {
+      if (pos > mid) countAbove++;
+      if (i < n - 1) pos += rotated[i]!;
+    }
+    const brightness = countAbove / n;
+    if (brightness > maxBrightness) maxBrightness = brightness;
+    if (brightness < minBrightness) minBrightness = brightness;
+  }
+  return Math.max(0, maxBrightness - minBrightness);
 }
