@@ -42614,6 +42614,143 @@ export function tuningFamilySocraticRadarNeutronStarDensityProxy(
   return Math.min(1, Math.max(0, totalScore / vecs.length));
 }
 
+// Q2046 — tuningFamilySocraticRadarMarketValueProxy
+export function tuningFamilySocraticRadarMarketValueProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const max = Math.max(...vec);
+    const min = Math.min(...vec);
+    const score = mean * (1 + max - min) / 2;
+    totalScore += score;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2048 — tuningFamilySocraticRadarVolatilityProxy
+export function tuningFamilySocraticRadarVolatilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const variance = vec.reduce((a, b) => a + (b - mean) ** 2, 0) / vec.length;
+    const stdDev = Math.sqrt(variance);
+    totalScore += stdDev / 0.5;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2050 — tuningFamilySocraticRadarLiquidityProxy
+export function tuningFamilySocraticRadarLiquidityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const liquidCount = vec.filter((x) => x > 0.5).length;
+    totalScore += liquidCount / vec.length;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2052 — tuningFamilySocraticRadarInflationProxy
+export function tuningFamilySocraticRadarInflationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const max = Math.max(...vec);
+    const min = Math.min(...vec);
+    const rate = (max - min) / (mean + 1e-10);
+    totalScore += rate;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2054 — tuningFamilySocraticRadarGDPProxy
+export function tuningFamilySocraticRadarGDPProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const weightSum = axes.reduce((acc, _, i) => acc + (i + 1), 0); // 1+2+3+4+5 = 15
+  let totalScore = 0;
+  for (const vec of vecs) {
+    let weightedSum = 0;
+    for (let i = 0; i < vec.length; i++) {
+      weightedSum += vec[i]! * (i + 1);
+    }
+    totalScore += weightedSum / weightSum;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2056 — tuningFamilySocraticRadarGiniCoefficientProxyV2
+export function tuningFamilySocraticRadarGiniCoefficientProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = 5;
+  let totalGini = 0;
+  let counted = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const sumV = sorted.reduce((acc, x) => acc + x, 0);
+    if (sumV < 1e-10) continue;
+    let weightedSum = 0;
+    for (let i = 0; i < n; i++) {
+      weightedSum += (i + 1) * sorted[i]!;
+    }
+    const gini = (2 * weightedSum) / (n * sumV) - (n + 1) / n;
+    totalGini += Math.max(0, Math.min(1, gini));
+    counted++;
+  }
+  if (counted === 0) return 0;
+  return totalGini / counted;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -46794,40 +46931,42 @@ export function scaleIntervalClassBalance(scaleCents: readonly number[], periodC
 /**
  * AAAA1 — scaleHarmonicRhythmDensity
  * Measure how frequently the interval size changes (step-to-step variation).
- * Sort cents, compute n step sizes (including wrap-around).
+ * Sort cents, compute n+1 step sizes: step from 0 to sorted[0], between consecutive degrees,
+ * and wrap from sorted[n-1] to periodCents.
  * Count transitions where step[i] ≠ step[i-1] (within 10 cents tolerance), wrapping around.
- * Return: transitions / n
+ * Return: transitions / stepCount
  * Empty/single → 0.
  */
 export function scaleHarmonicRhythmDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
+  // n+1 steps: 0→sorted[0], sorted[0]→sorted[1], ..., sorted[n-1]→periodCents
   const steps: number[] = [];
-  for (let i = 0; i < n; i++) {
-    if (i < n - 1) {
-      steps.push(sorted[i + 1]! - sorted[i]!);
-    } else {
-      steps.push(periodCents - sorted[i]! + sorted[0]!);
-    }
+  steps.push(sorted[0]!);
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
   }
+  steps.push(periodCents - sorted[n - 1]!);
+  const stepCount = steps.length;
   let transitions = 0;
-  for (let i = 0; i < n; i++) {
-    const prev = steps[(i - 1 + n) % n]!;
+  for (let i = 0; i < stepCount; i++) {
+    const prev = steps[(i - 1 + stepCount) % stepCount]!;
     const curr = steps[i]!;
     if (Math.abs(curr - prev) > 10) {
       transitions++;
     }
   }
-  return transitions / n;
+  return transitions / stepCount;
 }
 
 /**
  * AAAA2 — scaleHarmonicAccelerationProxy
  * Average rate of change of step sizes.
- * Compute second differences of step sequence (circular): |step[i+1] - step[i]| for all i.
- * Normalize by periodCents/n.
- * Return: mean(diffs) / (periodCents/n), clamped to [0,1].
+ * Compute n+1 steps (0→sorted[0], between consecutive degrees, sorted[n-1]→periodCents).
+ * Second differences (circular): |step[i+1] - step[i]| for all i.
+ * Normalize by periodCents/stepCount.
+ * Return: mean(diffs) / (periodCents/stepCount), clamped to [0,1].
  * Empty/single → 0.
  */
 export function scaleHarmonicAccelerationProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
@@ -46835,21 +46974,20 @@ export function scaleHarmonicAccelerationProxy(scaleCents: readonly number[], pe
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   const steps: number[] = [];
-  for (let i = 0; i < n; i++) {
-    if (i < n - 1) {
-      steps.push(sorted[i + 1]! - sorted[i]!);
-    } else {
-      steps.push(periodCents - sorted[i]! + sorted[0]!);
-    }
+  steps.push(sorted[0]!);
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
   }
+  steps.push(periodCents - sorted[n - 1]!);
+  const stepCount = steps.length;
   let sumDiffs = 0;
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < stepCount; i++) {
     const curr = steps[i]!;
-    const next = steps[(i + 1) % n]!;
+    const next = steps[(i + 1) % stepCount]!;
     sumDiffs += Math.abs(next - curr);
   }
-  const meanDiff = sumDiffs / n;
-  const normalizer = periodCents / n;
+  const meanDiff = sumDiffs / stepCount;
+  const normalizer = periodCents / stepCount;
   if (normalizer === 0) return 0;
   return Math.min(1, Math.max(0, meanDiff / normalizer));
 }
@@ -46878,4 +47016,97 @@ export function scaleHarmonicComplexityProxy(scaleCents: readonly number[], peri
   const density = scaleHarmonicRhythmDensity(scaleCents, periodCents);
   const acceleration = scaleHarmonicAccelerationProxy(scaleCents, periodCents);
   return Math.min(1, Math.max(0, (density + acceleration) / 2));
+}
+
+/**
+ * BBBB1 — scaleChecksumProxy
+ * A simple numeric checksum of pitch positions.
+ * Normalize each pitch: p_i = cents[i] / periodCents
+ * Return: (sum of p_i) mod 1 — wraps to [0,1)
+ * Empty → 0.
+ */
+export function scaleChecksumProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (periodCents === 0) return 0;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += scaleCents[i]! / periodCents;
+  }
+  const result = sum - Math.floor(sum);
+  return Math.min(1, Math.max(0, result));
+}
+
+/**
+ * BBBB2 — scaleHashVariance
+ * Variance-based fingerprint.
+ * Normalize pitches: p_i = cents[i] / periodCents
+ * mean_p = sum(p_i) / n
+ * Return: mean((p_i - mean_p)^2) / 0.25 clamped to [0,1]
+ * Empty → 0, single note → 0.
+ */
+export function scaleHashVariance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (periodCents === 0) return 0;
+  const normalized: number[] = [];
+  for (let i = 0; i < n; i++) {
+    normalized.push(scaleCents[i]! / periodCents);
+  }
+  let mean = 0;
+  for (let i = 0; i < n; i++) {
+    mean += normalized[i]!;
+  }
+  mean /= n;
+  let variance = 0;
+  for (let i = 0; i < n; i++) {
+    const diff = normalized[i]! - mean;
+    variance += diff * diff;
+  }
+  variance /= n;
+  return Math.min(1, Math.max(0, variance / 0.25));
+}
+
+/**
+ * BBBB3 — scalePeriodicityFingerprint
+ * How well the scale fits into equal divisions.
+ * For each d in [2..12], compute fraction of notes within 20 cents of k*(periodCents/d) for any integer k.
+ * Return: max fraction over all d ∈ [0,1].
+ * Empty → 0.
+ */
+export function scalePeriodicityFingerprint(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (periodCents === 0) return 0;
+  let bestFraction = 0;
+  for (let d = 2; d <= 12; d++) {
+    const stepSize = periodCents / d;
+    let count = 0;
+    for (let i = 0; i < n; i++) {
+      const c = scaleCents[i]!;
+      // Find nearest k*stepSize
+      const k = Math.round(c / stepSize);
+      const nearest = k * stepSize;
+      if (Math.abs(c - nearest) <= 20) {
+        count++;
+      }
+    }
+    const fraction = count / n;
+    if (fraction > bestFraction) {
+      bestFraction = fraction;
+    }
+  }
+  return Math.min(1, Math.max(0, bestFraction));
+}
+
+/**
+ * BBBB4 — scaleUniquenessProxy
+ * How unique/irregular the scale is (opposite of periodicity).
+ * Return: 1 - scalePeriodicityFingerprint(scaleCents, periodCents)
+ * Empty → 1.
+ */
+export function scaleUniquenessProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  return Math.min(1, Math.max(0, 1 - scalePeriodicityFingerprint(scaleCents, periodCents)));
 }
