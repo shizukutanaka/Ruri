@@ -562,6 +562,12 @@ import {
   presetFamilySocraticRadarParetoDominanceCount,
   presetFamilySocraticRadarStrategicDiversityIndex,
   presetFamilySocraticRadarBargainingPower,
+  presetFamilySocraticRadarTOPSISRanking,
+  presetFamilySocraticRadarSAWScores,
+  presetFamilySocraticRadarVIKORCompromise,
+  presetFamilySocraticRadarELECTREOutranking,
+  presetFamilySocraticRadarPROMETHEEFlowMean,
+  presetFamilySocraticRadarCOPRASRatio,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -16008,5 +16014,100 @@ describe('Q1529 presetFamilySocraticRadarBargainingPower', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarBargainingPower(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1531 — presetFamilySocraticRadarTOPSISRanking
+describe('Q1531 presetFamilySocraticRadarTOPSISRanking', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length 1 for single preset', () => {
+    const r = presetFamilySocraticRadarTOPSISRanking(['12-tet'], s);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns []', () => {
+    expect(presetFamilySocraticRadarTOPSISRanking([], s)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTOPSISRanking(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1533 — presetFamilySocraticRadarSAWScores
+describe('Q1533 presetFamilySocraticRadarSAWScores', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length 1 for single preset', () => {
+    const r = presetFamilySocraticRadarSAWScores(['12-tet'], s);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns []', () => {
+    expect(presetFamilySocraticRadarSAWScores([], s)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSAWScores(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1535 — presetFamilySocraticRadarVIKORCompromise
+describe('Q1535 presetFamilySocraticRadarVIKORCompromise', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length 1 for single preset', () => {
+    const r = presetFamilySocraticRadarVIKORCompromise(['12-tet'], s);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns []', () => {
+    expect(presetFamilySocraticRadarVIKORCompromise([], s)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarVIKORCompromise(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1537 — presetFamilySocraticRadarELECTREOutranking
+describe('Q1537 presetFamilySocraticRadarELECTREOutranking', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length 1 for single preset', () => {
+    const r = presetFamilySocraticRadarELECTREOutranking(['12-tet'], s);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns []', () => {
+    expect(presetFamilySocraticRadarELECTREOutranking([], s)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarELECTREOutranking(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1539 — presetFamilySocraticRadarPROMETHEEFlowMean
+describe('Q1539 presetFamilySocraticRadarPROMETHEEFlowMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for single preset', () => {
+    const r = presetFamilySocraticRadarPROMETHEEFlowMean(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarPROMETHEEFlowMean([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPROMETHEEFlowMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1541 — presetFamilySocraticRadarCOPRASRatio
+describe('Q1541 presetFamilySocraticRadarCOPRASRatio', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length 1 for single preset', () => {
+    const r = presetFamilySocraticRadarCOPRASRatio(['12-tet'], s);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns []', () => {
+    expect(presetFamilySocraticRadarCOPRASRatio([], s)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCOPRASRatio(['unknown'], s)).toThrow(RangeError);
   });
 });

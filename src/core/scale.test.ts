@@ -983,6 +983,10 @@ import {
   scaleRecognizabilityIndex,
   scaleMemorizabilityScore,
   scaleTeachingDifficulty,
+  scaleMorphDistance,
+  scaleInterpol,
+  scaleGradientDescent,
+  scaleConvergenceRate,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -28761,5 +28765,116 @@ describe('JJJ4 scaleTeachingDifficulty', () => {
     const r = scaleTeachingDifficulty([0, 400, 700]);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1530 tuningFamilySocraticRadarTOPSISRanking', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarTOPSISRanking([t, t], s);
+    expect(r).toHaveLength(2);
+  });
+  it('empty → []', () => {
+    expect(tuningFamilySocraticRadarTOPSISRanking([], s)).toEqual([]);
+  });
+  it('values in [0,1]', () => {
+    const r = tuningFamilySocraticRadarTOPSISRanking([t, t], s);
+    r.forEach((v) => {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+});
+
+describe('Q1532 tuningFamilySocraticRadarSAWScores', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarSAWScores([t, t], s);
+    expect(r).toHaveLength(2);
+  });
+  it('empty → []', () => {
+    expect(tuningFamilySocraticRadarSAWScores([], s)).toEqual([]);
+  });
+  it('values in [0,1]', () => {
+    const r = tuningFamilySocraticRadarSAWScores([t, t], s);
+    r.forEach((v) => {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+});
+
+describe('Q1534 tuningFamilySocraticRadarVIKORCompromise', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarVIKORCompromise([t, t], s);
+    expect(r).toHaveLength(2);
+  });
+  it('empty → []', () => {
+    expect(tuningFamilySocraticRadarVIKORCompromise([], s)).toEqual([]);
+  });
+  it('non-negative values', () => {
+    const r = tuningFamilySocraticRadarVIKORCompromise([t, t], s);
+    r.forEach((v) => {
+      expect(v).toBeGreaterThanOrEqual(0);
+    });
+  });
+});
+
+describe('Q1536 tuningFamilySocraticRadarELECTREOutranking', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n≤1 → zeros', () => {
+    expect(tuningFamilySocraticRadarELECTREOutranking([], s)).toEqual([]);
+    expect(tuningFamilySocraticRadarELECTREOutranking([t], s)).toEqual([0]);
+  });
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarELECTREOutranking([t, t], s);
+    expect(r).toHaveLength(2);
+  });
+  it('values in [0,1]', () => {
+    const r = tuningFamilySocraticRadarELECTREOutranking([t, t], s);
+    r.forEach((v) => {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+});
+
+describe('Q1538 tuningFamilySocraticRadarPROMETHEEFlowMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n≤1 → 0', () => {
+    expect(tuningFamilySocraticRadarPROMETHEEFlowMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarPROMETHEEFlowMean([t], s)).toBe(0);
+  });
+  it('n=2 → non-negative number', () => {
+    const r = tuningFamilySocraticRadarPROMETHEEFlowMean([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns a finite number', () => {
+    const r = tuningFamilySocraticRadarPROMETHEEFlowMean([t, t], s);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+});
+
+describe('Q1540 tuningFamilySocraticRadarCOPRASRatio', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarCOPRASRatio([t, t], s);
+    expect(r).toHaveLength(2);
+  });
+  it('empty → []', () => {
+    expect(tuningFamilySocraticRadarCOPRASRatio([], s)).toEqual([]);
+  });
+  it('non-negative values', () => {
+    const r = tuningFamilySocraticRadarCOPRASRatio([t, t], s);
+    r.forEach((v) => {
+      expect(v).toBeGreaterThanOrEqual(0);
+    });
   });
 });
