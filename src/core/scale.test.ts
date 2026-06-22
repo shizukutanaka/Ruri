@@ -1017,6 +1017,12 @@ import {
   tuningFamilySocraticRadarBifurcationProxyMean,
   tuningFamilySocraticRadarPoincareReturnMean,
   tuningFamilySocraticRadarChaosIndexMean,
+  tuningFamilySocraticRadarScalingExponentMean,
+  tuningFamilySocraticRadarUniversalityClassProxy,
+  tuningFamilySocraticRadarFixedPointProximityMean,
+  tuningFamilySocraticRadarFlowDirectionMean,
+  tuningFamilySocraticRadarAnomalousDimensionMean,
+  tuningFamilySocraticRadarCriticalSlowingMean,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1111,6 +1117,10 @@ import {
   scaleMelodicDescent,
   scaleMelodicPeakRatio,
   scaleMelodicContourEntropy,
+  scaleTritoneTension,
+  scaleLeadingToneTension,
+  scaleSuspensionDensity,
+  scaleHarmonicTensionIndex,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -31086,6 +31096,94 @@ describe('WWW4 scaleMelodicContourEntropy', () => {
   });
   it('ascending steps [0, 100, 300, 600, 1000] → finite, in [0,1]', () => {
     const v = scaleMelodicContourEntropy([0, 100, 300, 600, 1000]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Round 67: 調和的テンション (Harmonic Tension)
+
+const chromatic67 = Array.from({ length: 12 }, (_, i) => i * 100);
+
+describe('scaleTritoneTension', () => {
+  it('empty array → 0', () => {
+    expect(scaleTritoneTension([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleTritoneTension([0])).toBe(0);
+  });
+  it('tritone scale [0, 600] → value in [0,1], finite', () => {
+    const v = scaleTritoneTension([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleTritoneTension(chromatic67);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleLeadingToneTension', () => {
+  it('empty array → 0', () => {
+    expect(scaleLeadingToneTension([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleLeadingToneTension([0])).toBe(0);
+  });
+  it('tritone scale [0, 600] → value in [0,1], finite', () => {
+    const v = scaleLeadingToneTension([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleLeadingToneTension(chromatic67);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSuspensionDensity', () => {
+  it('empty array → 0', () => {
+    expect(scaleSuspensionDensity([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleSuspensionDensity([0])).toBe(0);
+  });
+  it('tritone scale [0, 600] → value in [0,1], finite', () => {
+    const v = scaleSuspensionDensity([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleSuspensionDensity(chromatic67);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleHarmonicTensionIndex', () => {
+  it('empty array → 0', () => {
+    expect(scaleHarmonicTensionIndex([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleHarmonicTensionIndex([0])).toBe(0);
+  });
+  it('tritone scale [0, 600] → value in [0,1], finite', () => {
+    const v = scaleHarmonicTensionIndex([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleHarmonicTensionIndex(chromatic67);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);

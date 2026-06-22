@@ -38162,6 +38162,143 @@ export function tuningFamilySocraticRadarChaosIndexMean(
   return count > 0 ? Math.max(0, Math.min(1, sum / count)) : 0;
 }
 
+// Q1698 — tuningFamilySocraticRadarScalingExponentMean
+export function tuningFamilySocraticRadarScalingExponentMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-9;
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const minVal = sorted[0]! + eps;
+    const maxVal = sorted[sorted.length - 1]!;
+    const exponent = maxVal > minVal ? (Math.log(maxVal) - Math.log(minVal)) / Math.log(5) : 0;
+    sum += Math.max(0, Math.min(1, exponent));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1700 — tuningFamilySocraticRadarUniversalityClassProxy
+export function tuningFamilySocraticRadarUniversalityClassProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const bin = (v: number): number => v < 1 / 3 ? 0 : v < 2 / 3 ? 1 : 2;
+  const binVecs = vecs.map((vec) => vec.map(bin));
+  const vecToKey = (vec: number[]): string => vec.join(',');
+  const distinct = new Set(binVecs.map(vecToKey)).size;
+  const total = tunings.length;
+  return Math.max(0, Math.min(1, distinct / total));
+}
+
+// Q1702 — tuningFamilySocraticRadarFixedPointProximityMean
+export function tuningFamilySocraticRadarFixedPointProximityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const maxDist = Math.sqrt(5) * 0.5;
+  let sum = 0;
+  for (const vec of vecs) {
+    let distSq = 0;
+    for (let k = 0; k < vec.length; k++) {
+      const diff = vec[k]! - 0.5;
+      distSq += diff * diff;
+    }
+    const dist = Math.sqrt(distSq);
+    sum += Math.max(0, Math.min(1, 1 - dist / maxDist));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1704 — tuningFamilySocraticRadarFlowDirectionMean
+export function tuningFamilySocraticRadarFlowDirectionMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) return 0;
+  let positiveFlows = 0;
+  let count = 0;
+  for (let i = 1; i < vecs.length; i++) {
+    const p = vecs[i - 1]!;
+    const q = vecs[i]!;
+    const normP = p.reduce((a, b) => a + b, 0);
+    const normQ = q.reduce((a, b) => a + b, 0);
+    if (normQ > normP) positiveFlows++;
+    count++;
+  }
+  return count > 0 ? Math.max(0, Math.min(1, positiveFlows / count)) : 0;
+}
+
+// Q1706 — tuningFamilySocraticRadarAnomalousDimensionMean
+export function tuningFamilySocraticRadarAnomalousDimensionMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-9;
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const minVal = sorted[0]! + eps;
+    const maxVal = sorted[sorted.length - 1]!;
+    const scalingExponent = maxVal > minVal ? (Math.log(maxVal) - Math.log(minVal)) / Math.log(5) : 0;
+    const anomalous = Math.abs(scalingExponent - 0.5) * 2;
+    sum += Math.max(0, Math.min(1, anomalous));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1708 — tuningFamilySocraticRadarCriticalSlowingMean
+export function tuningFamilySocraticRadarCriticalSlowingMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-9;
+  let sum = 0;
+  for (const vec of vecs) {
+    const minAxis = vec.reduce((a, b) => Math.min(a, b), Infinity);
+    const slowing = 1 / (1 + minAxis + eps);
+    sum += Math.max(0, Math.min(1, slowing));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -39441,4 +39578,82 @@ export function scaleMelodicContourEntropy(scaleCents: readonly number[], period
     return -p * Math.log2(p);
   };
   return (entropy(up) + entropy(flat) + entropy(down)) / Math.log2(3);
+}
+
+// Round 67: 調和的テンション (Harmonic Tension)
+
+/**
+ * XXX1 — scaleTritoneTension
+ * Proportion of intervals close to a tritone (600 ± 50 cents, wrapped).
+ */
+export function scaleTritoneTension(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let count = 0;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const wrapped = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+      total++;
+      if (Math.abs(wrapped - periodCents / 2) <= 50) count++;
+    }
+  }
+  return total === 0 ? 0 : count / total;
+}
+
+/**
+ * XXX2 — scaleLeadingToneTension
+ * Proportion of intervals that are "leading tones" (within 50–150 cents of a period multiple,
+ * i.e., minor 2nd at top or bottom).
+ */
+export function scaleLeadingToneTension(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let count = 0;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const wrapped = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+      total++;
+      if (wrapped >= 50 && wrapped <= 150) count++;
+    }
+  }
+  return total === 0 ? 0 : count / total;
+}
+
+/**
+ * XXX3 — scaleSuspensionDensity
+ * Density of "suspended" intervals: intervals within 30 cents of a perfect 4th (500 cents)
+ * or perfect 5th (700 cents), wrapped to period.
+ */
+export function scaleSuspensionDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let count = 0;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const wrapped = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+      total++;
+      if (Math.abs(wrapped - 500) <= 30 || Math.abs(wrapped - 700) <= 30) count++;
+    }
+  }
+  return total === 0 ? 0 : count / total;
+}
+
+/**
+ * XXX4 — scaleHarmonicTensionIndex
+ * Composite tension: weighted sum of tritone tension + leading-tone tension + suspension density.
+ * Weights: [0.5, 0.3, 0.2].
+ */
+export function scaleHarmonicTensionIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const tritone = scaleTritoneTension(scaleCents, periodCents);
+  const leading = scaleLeadingToneTension(scaleCents, periodCents);
+  const suspension = scaleSuspensionDensity(scaleCents, periodCents);
+  return 0.5 * tritone + 0.3 * leading + 0.2 * suspension;
 }

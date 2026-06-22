@@ -909,3 +909,14 @@
 | WWW2 | `scaleMelodicDescent` | 下降ステップペアの割合 |
 | WWW3 | `scaleMelodicPeakRatio` | 旋律的ピーク音の割合（円環上） |
 | WWW4 | `scaleMelodicContourEntropy` | 輪郭3記号列のShannon entropy |
+
+## Round 67: 調和的テンション分析 (XXX1–XXX4)
+
+音階内の調和的テンション特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| XXX1 | `scaleTritoneTension` | 増四度（±50セント）音程ペアの割合 |
+| XXX2 | `scaleLeadingToneTension` | 導音的音程（50–150セント）の割合 |
+| XXX3 | `scaleSuspensionDensity` | 完全4度・5度（±30セント）音程の密度 |
+| XXX4 | `scaleHarmonicTensionIndex` | テンション複合指数（加重平均） |
