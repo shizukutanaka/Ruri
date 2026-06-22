@@ -40885,6 +40885,134 @@ export function tuningFamilySocraticRadarDimensionalityCurseProxy(
   return Math.max(0, Math.min(1, sum / vecs.length));
 }
 
+// Q1890 — tuningFamilySocraticRadarSuperpositionProxy
+export function tuningFamilySocraticRadarSuperpositionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const meanAbsDev = vec.reduce((acc, vi) => acc + Math.abs(vi - 0.5), 0) / vec.length;
+    const superposition = Math.max(0, Math.min(1, 1 - meanAbsDev * 2));
+    sum += superposition;
+  }
+  return sum / vecs.length;
+}
+
+// Q1892 — tuningFamilySocraticRadarEntanglementProxy
+export function tuningFamilySocraticRadarEntanglementProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    let pairSum = 0;
+    let pairCount = 0;
+    for (let i = 0; i < vec.length; i++) {
+      for (let j = i + 1; j < vec.length; j++) {
+        pairSum += 1 - Math.abs(vec[i]! - vec[j]!);
+        pairCount++;
+      }
+    }
+    sum += pairCount > 0 ? pairSum / pairCount : 0;
+  }
+  return sum / vecs.length;
+}
+
+// Q1894 — tuningFamilySocraticRadarWaveFunctionCollapseProxy
+export function tuningFamilySocraticRadarWaveFunctionCollapseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const maxV = Math.max(...vec);
+    sum += maxV;
+  }
+  return sum / vecs.length;
+}
+
+// Q1896 — tuningFamilySocraticRadarUncertaintyPrincipleProxy
+export function tuningFamilySocraticRadarUncertaintyPrincipleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const median = sorted[2]!;
+    const spread = sorted[sorted.length - 1]! - sorted[0]!;
+    const uncertainty = Math.min(1, 2 * median * spread);
+    sum += uncertainty;
+  }
+  return sum / vecs.length;
+}
+
+// Q1898 — tuningFamilySocraticRadarTunnelingProxy
+export function tuningFamilySocraticRadarTunnelingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const meanV = vec.reduce((acc, vi) => acc + vi, 0) / vec.length;
+    const barrierHeight = 1 - meanV;
+    const tunneling = Math.exp(-2 * barrierHeight);
+    sum += tunneling;
+  }
+  return sum / vecs.length;
+}
+
+// Q1900 — tuningFamilySocraticRadarDecoherenceProxy
+export function tuningFamilySocraticRadarDecoherenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const coherence = vec.reduce((acc, vi) => acc + vi, 0) / vec.length;
+    const decoherence = 1 - coherence;
+    sum += decoherence;
+  }
+  return sum / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -43831,4 +43959,103 @@ export function scaleResolutionTendency(
     if (resolves) resolving++;
   }
   return resolving / unstableDegrees.length;
+}
+
+// ---------------------------------------------------------------------------
+// Round 83: 音響心理学 (Psychoacoustics) — OOO1–OOO4
+// ---------------------------------------------------------------------------
+
+/**
+ * OOO1 scaleJNDStepCount
+ * Count of step intervals above the Just Noticeable Difference (JND) threshold,
+ * normalized by the number of scale degrees.
+ * JND is the smallest perceivable pitch difference (~5 cents for trained listeners).
+ */
+export function scaleJNDStepCount(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  jndCents = 5,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 1; i < n; i++) {
+    steps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const count = steps.filter((s) => s > jndCents).length;
+  return count / n;
+}
+
+/**
+ * OOO2 scaleCriticalBandDensity
+ * Density of intervals within a critical band (~100 cents).
+ * High density implies more potential for auditory masking and roughness.
+ */
+export function scaleCriticalBandDensity(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  criticalBandCents = 100,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const totalPairs = (n * (n - 1)) / 2;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const interval = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const modularInterval = Math.min(interval, periodCents - interval);
+      if (modularInterval <= criticalBandCents) {
+        count++;
+      }
+    }
+  }
+  return count / totalPairs;
+}
+
+/**
+ * OOO3 scaleMaskingIndex
+ * Spectral masking index — proportion of scale degrees likely masked by adjacent degrees.
+ * Assumes equal amplitudes; a lower-pitched degree masks a nearby higher one.
+ */
+export function scaleMaskingIndex(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  maskingRangeCents = 80,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let maskedCount = 0;
+  for (let i = 1; i < n; i++) {
+    if (sorted[i]! - sorted[i - 1]! < maskingRangeCents) {
+      maskedCount++;
+    }
+  }
+  return maskedCount / n;
+}
+
+/**
+ * OOO4 scalePitchHeightSpread
+ * Perceptual pitch height spread in Bark scale units, normalized to [0, 1].
+ * Bark scale approximates the frequency resolution of the human auditory system.
+ */
+export function scalePitchHeightSpread(
+  scaleCents: readonly number[],
+  referenceHz = 440,
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const hzToBark = (f: number): number =>
+    13 * Math.atan(0.76 * f / 1000) + 3.5 * Math.atan(Math.pow(f / 7500, 2));
+  const barkValues = scaleCents.map((c) => {
+    const hz = referenceHz * Math.pow(2, c / 1200);
+    return hzToBark(hz);
+  });
+  const minBark = Math.min(...barkValues);
+  const maxBark = Math.max(...barkValues);
+  const spread = (maxBark - minBark) / 24;
+  return Math.min(1, Math.max(0, spread));
 }
