@@ -41137,6 +41137,136 @@ export function tuningFamilySocraticRadarExtinctionProxy(
   return sum / vecs.length;
 }
 
+// Q1914 — tuningFamilySocraticRadarGiniCoefficientProxy
+export function tuningFamilySocraticRadarGiniCoefficientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = 5;
+  let totalGini = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const sumV = sorted.reduce((acc, x) => acc + x, 0);
+    if (sumV < 1e-10) { continue; }
+    let weightedSum = 0;
+    for (let i = 0; i < n; i++) {
+      weightedSum += (i + 1) * sorted[i]!;
+    }
+    const gini = (2 * weightedSum - (n + 1) * sumV) / (n * sumV + 1e-10);
+    totalGini += Math.max(0, Math.min(1, gini));
+  }
+  return totalGini / vecs.length;
+}
+
+// Q1916 — tuningFamilySocraticRadarParetoPrincipleProxy
+export function tuningFamilySocraticRadarParetoPrincipleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalProxy = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => b - a);
+    const top20 = sorted[0]!;
+    const total = sorted.reduce((acc, x) => acc + x, 0) + 1e-10;
+    const pareto = top20 / total;
+    const proxy = Math.max(0, 1 - Math.abs(pareto - 0.8) / 0.8);
+    totalProxy += proxy;
+  }
+  return totalProxy / vecs.length;
+}
+
+// Q1918 — tuningFamilySocraticRadarElasticityProxy
+export function tuningFamilySocraticRadarElasticityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalElasticity = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const meanV = sorted.reduce((acc, x) => acc + x, 0) / sorted.length;
+    const elasticity = (sorted[4]! - sorted[0]!) / (meanV + 1e-10);
+    totalElasticity += Math.min(1, elasticity / 4);
+  }
+  return totalElasticity / vecs.length;
+}
+
+// Q1920 — tuningFamilySocraticRadarUtilityFunctionProxy
+export function tuningFamilySocraticRadarUtilityFunctionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalUtility = 0;
+  for (const vec of vecs) {
+    const utility = vec.reduce((acc, vi) => acc + Math.log(1 + vi) / Math.log(2), 0) / vec.length;
+    totalUtility += utility;
+  }
+  return totalUtility / vecs.length;
+}
+
+// Q1922 — tuningFamilySocraticRadarNashEquilibriumProxyV3
+export function tuningFamilySocraticRadarNashEquilibriumProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalEquilibrium = 0;
+  for (const vec of vecs) {
+    const bestResponse = Math.max(...vec);
+    const deviation = vec.reduce((acc, vi) => acc + Math.abs(vi - bestResponse), 0) / vec.length;
+    const equilibrium = Math.max(0, 1 - deviation);
+    totalEquilibrium += equilibrium;
+  }
+  return totalEquilibrium / vecs.length;
+}
+
+// Q1924 — tuningFamilySocraticRadarMarketEfficiencyProxy
+export function tuningFamilySocraticRadarMarketEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalEfficiency = 0;
+  for (const vec of vecs) {
+    const efficiency = Math.max(0, 1 - (vec.reduce((acc, vi) => acc + Math.abs(vi - 0.5), 0) / vec.length) * 2);
+    totalEfficiency += efficiency;
+  }
+  return totalEfficiency / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -44267,4 +44397,136 @@ export function scaleTonalFusion(
     fusionSum += Math.max(0, 1 - minDist / 0.5);
   }
   return fusionSum / n;
+}
+
+/**
+ * QQQ1 scaleIntervalGraphEdgeCount
+ *
+ * Count edges in the interval graph (pairs of degrees within a threshold).
+ * Returns edge density = edgeCount / C(n,2); 0 for n < 2.
+ *
+ * @example
+ * scaleIntervalGraphEdgeCount([0, 100, 200]); // → 1 (all 3 pairs within 200c)
+ */
+export function scaleIntervalGraphEdgeCount(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  edgeThreshold = 200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let edgeCount = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const ci = scaleCents[i]!;
+      const cj = scaleCents[j]!;
+      const diff = Math.abs(ci - cj);
+      const interval = Math.min(diff, periodCents - diff);
+      if (interval <= edgeThreshold) edgeCount++;
+    }
+  }
+  const totalPossible = (n * (n - 1)) / 2;
+  return edgeCount / totalPossible;
+}
+
+/**
+ * QQQ2 scaleChordal
+ *
+ * How close the scale is to being chordal (every cycle has a chord).
+ * Simplification: every 3 consecutive sorted degrees (circular) span ≤ a tritone.
+ * Returns chordal_triples / n; 0 for n < 3.
+ *
+ * @example
+ * scaleChordal([0, 200, 400]); // → finite value in [0,1]
+ */
+export function scaleChordal(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  tritoneCents = 600,
+): number {
+  const n = scaleCents.length;
+  if (n < 3) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let chordalCount = 0;
+  for (let i = 0; i < n; i++) {
+    const a = sorted[i]!;
+    const b = sorted[(i + 1) % n]!;
+    const c = sorted[(i + 2) % n]!;
+    const pairwise = [
+      [a, b],
+      [a, c],
+      [b, c],
+    ] as const;
+    let allWithin = true;
+    for (const [x, y] of pairwise) {
+      const diff = Math.abs(x - y);
+      const interval = Math.min(diff, periodCents - diff);
+      if (interval > tritoneCents) {
+        allWithin = false;
+        break;
+      }
+    }
+    if (allWithin) chordalCount++;
+  }
+  return chordalCount / n;
+}
+
+/**
+ * QQQ3 scaleChromatic
+ *
+ * Chromaticity — how many scale degrees are chromatic (within tolerance cents of
+ * a 12-TET semitone, i.e. multiples of 100 cents within the period).
+ * Returns chromaticCount / n; 0 for n = 0.
+ *
+ * @example
+ * scaleChromatic(Array.from({length:12},(_,i)=>i*100)); // → 1
+ */
+export function scaleChromatic(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  tolerance = 50,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const semitoneCents = periodCents / 12;
+  let chromaticCount = 0;
+  for (let i = 0; i < n; i++) {
+    const c = scaleCents[i]!;
+    const nearest = Math.round(c / semitoneCents) * semitoneCents;
+    if (Math.abs(c - nearest) <= tolerance) chromaticCount++;
+  }
+  return chromaticCount / n;
+}
+
+/**
+ * QQQ4 scaleSpectralRadius
+ *
+ * Spectral radius proxy — largest "eigenvalue" proxy of interval adjacency.
+ * Builds an adjacency matrix where A[i][j] = 1 if modular distance ≤ adjacencyThreshold.
+ * Returns maxDegree / (n - 1); 0 for n < 2.
+ *
+ * @example
+ * scaleSpectralRadius(Array.from({length:12},(_,i)=>i*100)); // → finite value in [0,1]
+ */
+export function scaleSpectralRadius(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  adjacencyThreshold = 200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let maxDegree = 0;
+  for (let i = 0; i < n; i++) {
+    let degree = 0;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const ci = scaleCents[i]!;
+      const cj = scaleCents[j]!;
+      const diff = Math.abs(ci - cj);
+      const interval = Math.min(diff, periodCents - diff);
+      if (interval <= adjacencyThreshold) degree++;
+    }
+    if (degree > maxDegree) maxDegree = degree;
+  }
+  return maxDegree / (n - 1);
 }
