@@ -35571,3 +35571,302 @@ export function scaleTeachingDifficulty(
   const total = base + microtonalPenalty + cardinalityPenalty;
   return Math.min(1, Math.max(0, total));
 }
+
+// ---------------------------------------------------------------------------
+// Q1542 — tuningFamilySocraticRadarFitnessVariance
+
+/**
+ * Variance in "fitness" (mean radar profile value) across the tuning family.
+ * Fitness of each tuning = mean of its 5 radar axis values.
+ * Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Variance of per-tuning fitness values. 0 for n≤1.
+ */
+export function tuningFamilySocraticRadarFitnessVariance(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const means = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+  const popMean = means.reduce((s, v) => s + v, 0) / means.length;
+  const variance = means.reduce((s, v) => s + (v - popMean) ** 2, 0) / means.length;
+  return variance;
+}
+
+// ---------------------------------------------------------------------------
+// Q1544 — tuningFamilySocraticRadarMutationDistance
+
+/**
+ * Mean Euclidean distance between consecutive tuning radar profiles
+ * (treating tunings as a population sequence).
+ * Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean consecutive Euclidean distance. 0 for n≤1.
+ */
+export function tuningFamilySocraticRadarMutationDistance(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let totalDist = 0;
+  for (let i = 0; i < profiles.length - 1; i++) {
+    const a = profiles[i]!;
+    const b = profiles[i + 1]!;
+    let sq = 0;
+    for (const ax of axes) {
+      sq += (a[ax] - b[ax]) ** 2;
+    }
+    totalDist += Math.sqrt(sq);
+  }
+  return totalDist / (profiles.length - 1);
+}
+
+// ---------------------------------------------------------------------------
+// Q1546 — tuningFamilySocraticRadarSelectionPressure
+
+/**
+ * Ratio of the best tuning's mean radar profile to the population mean.
+ * Best = max mean radar profile value. Returns 1 for empty (no pressure).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Selection pressure ratio. 1 for empty.
+ */
+export function tuningFamilySocraticRadarSelectionPressure(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 1;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const means = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+  const popMean = means.reduce((s, v) => s + v, 0) / means.length;
+  const bestMean = means.reduce((m, v) => Math.max(m, v), -Infinity);
+  if (popMean === 0) return 1;
+  return Math.max(1, bestMean / popMean);
+}
+
+// ---------------------------------------------------------------------------
+// Q1548 — tuningFamilySocraticRadarCrossoverDiversity
+
+/**
+ * Crossover diversity: mean pairwise Euclidean distance between all tuning radar profiles.
+ * Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean pairwise Euclidean distance. 0 for n≤1.
+ */
+export function tuningFamilySocraticRadarCrossoverDiversity(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let totalDist = 0;
+  let count = 0;
+  for (let i = 0; i < profiles.length; i++) {
+    for (let j = i + 1; j < profiles.length; j++) {
+      const a = profiles[i]!;
+      const b = profiles[j]!;
+      let sq = 0;
+      for (const ax of axes) {
+        sq += (a[ax] - b[ax]) ** 2;
+      }
+      totalDist += Math.sqrt(sq);
+      count++;
+    }
+  }
+  return count === 0 ? 0 : totalDist / count;
+}
+
+// ---------------------------------------------------------------------------
+// Q1550 — tuningFamilySocraticRadarFitnessLandscapeRuggedness
+
+/**
+ * Ruggedness of fitness landscape: variance of differences between consecutive
+ * mean radar profile values. Returns 0 for n≤2.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Variance of consecutive fitness differences. 0 for n≤2.
+ */
+export function tuningFamilySocraticRadarFitnessLandscapeRuggedness(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const means = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+  const diffs: number[] = [];
+  for (let i = 0; i < means.length - 1; i++) {
+    diffs.push(means[i + 1]! - means[i]!);
+  }
+  const diffMean = diffs.reduce((s, v) => s + v, 0) / diffs.length;
+  const variance = diffs.reduce((s, v) => s + (v - diffMean) ** 2, 0) / diffs.length;
+  return variance;
+}
+
+// ---------------------------------------------------------------------------
+// Q1552 — tuningFamilySocraticRadarGenotypePhenotypeMean
+
+/**
+ * Genotype-phenotype alignment: correlation between the tuning's interval diversity
+ * (number of distinct intervals) and its mean radar profile value.
+ * Returns mean absolute correlation per tuning pair. Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean absolute genotype-phenotype correlation. 0 for n≤1.
+ */
+export function tuningFamilySocraticRadarGenotypePhenotypeMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const phenotypes = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+  const genotypes = tunings.map((t) => tuningToIntervalVector(t).size);
+  // Pearson correlation between genotypes and phenotypes
+  const n = tunings.length;
+  const gMean = genotypes.reduce((s, v) => s + v, 0) / n;
+  const pMean = phenotypes.reduce((s, v) => s + v, 0) / n;
+  let cov = 0;
+  let gVar = 0;
+  let pVar = 0;
+  for (let i = 0; i < n; i++) {
+    const gd = genotypes[i]! - gMean;
+    const pd = phenotypes[i]! - pMean;
+    cov += gd * pd;
+    gVar += gd * gd;
+    pVar += pd * pd;
+  }
+  const denom = Math.sqrt(gVar * pVar);
+  if (denom === 0) return 0;
+  return Math.abs(cov / denom);
+}
+
+// KKK1
+export function scaleMorphDistance(
+  fromCents: readonly number[],
+  toCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  void periodCents;
+  if (fromCents.length === 0 && toCents.length === 0) return 0;
+  const n = Math.max(fromCents.length, toCents.length);
+  const a = [...fromCents].sort((x, y) => x - y);
+  const b = [...toCents].sort((x, y) => x - y);
+  while (a.length < n) a.push(0);
+  while (b.length < n) b.push(0);
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += Math.abs(a[i]! - b[i]!);
+  }
+  return sum / n;
+}
+
+// KKK2
+export function scaleInterpol(
+  fromCents: readonly number[],
+  toCents: readonly number[],
+  t: number,
+  periodCents: number = 1200,
+): number[] {
+  if (fromCents.length === 0 && toCents.length === 0) return [];
+  const n = Math.max(fromCents.length, toCents.length);
+  const a = [...fromCents];
+  const b = [...toCents];
+  while (a.length < n) a.push(0);
+  while (b.length < n) b.push(0);
+  const result: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const v = a[i]! * (1 - t) + b[i]! * t;
+    result.push(Math.min(periodCents - Number.EPSILON, Math.max(0, v)));
+  }
+  return result;
+}
+
+// KKK3
+export function scaleGradientDescent(
+  scaleCents: readonly number[],
+  targetCents: readonly number[],
+  steps: number = 10,
+  learningRate: number = 0.1,
+  periodCents: number = 1200,
+): number[][] {
+  void periodCents;
+  if (scaleCents.length === 0) return [];
+  const n = Math.max(scaleCents.length, targetCents.length);
+  const target = [...targetCents];
+  while (target.length < n) target.push(0);
+  let current = [...scaleCents];
+  while (current.length < n) current.push(0);
+  const result: number[][] = [];
+  for (let s = 0; s < steps; s++) {
+    const next: number[] = [];
+    for (let i = 0; i < n; i++) {
+      next.push(current[i]! + learningRate * (target[i]! - current[i]!));
+    }
+    result.push(next);
+    current = next;
+  }
+  return result;
+}
+
+// KKK4
+export function scaleConvergenceRate(
+  scaleCents: readonly number[],
+  targetCents: readonly number[],
+  learningRate: number = 0.1,
+  periodCents: number = 1200,
+): number {
+  void periodCents;
+  if (scaleCents.length === 0 && targetCents.length === 0) return 0;
+  const n = Math.max(scaleCents.length, targetCents.length);
+  const target = [...targetCents];
+  while (target.length < n) target.push(0);
+  let current = [...scaleCents];
+  while (current.length < n) current.push(0);
+  const initialDist = current.reduce((acc, v, i) => acc + Math.abs(v - target[i]!), 0) / n;
+  if (initialDist < 1) return 0;
+  for (let step = 1; step <= 1000; step++) {
+    const next: number[] = [];
+    for (let i = 0; i < n; i++) {
+      next.push(current[i]! + learningRate * (target[i]! - current[i]!));
+    }
+    current = next;
+    const dist = current.reduce((acc, v, i) => acc + Math.abs(v - target[i]!), 0) / n;
+    if (dist < 1) return step;
+  }
+  return -1;
+}

@@ -28878,3 +28878,76 @@ describe('Q1540 tuningFamilySocraticRadarCOPRASRatio', () => {
     });
   });
 });
+
+describe('KKK1 scaleMorphDistance', () => {
+  it('same scale → 0', () => {
+    expect(scaleMorphDistance([0,400,700],[0,400,700])).toBe(0);
+  });
+  it('empty both → 0', () => {
+    expect(scaleMorphDistance([],[])).toBe(0);
+  });
+  it('returns non-negative', () => {
+    expect(scaleMorphDistance([0,400,700],[0,300,600])).toBeGreaterThanOrEqual(0);
+  });
+  it('larger difference → larger distance', () => {
+    const d1 = scaleMorphDistance([0,400],[0,500]);
+    const d2 = scaleMorphDistance([0,400],[0,800]);
+    expect(d2).toBeGreaterThan(d1);
+  });
+});
+
+describe('KKK2 scaleInterpol', () => {
+  it('t=0 → fromCents', () => {
+    expect(scaleInterpol([0,400,700],[0,300,600],0)).toEqual([0,400,700]);
+  });
+  it('t=1 → toCents', () => {
+    const r = scaleInterpol([0,400,700],[0,300,600],1);
+    expect(r[1]).toBeCloseTo(300,5);
+  });
+  it('both empty → []', () => {
+    expect(scaleInterpol([],[],0.5)).toEqual([]);
+  });
+  it('t=0.5 → midpoint', () => {
+    const r = scaleInterpol([0,400],[0,600],0.5);
+    expect(r[1]).toBeCloseTo(500,5);
+  });
+});
+
+describe('KKK3 scaleGradientDescent', () => {
+  it('empty → []', () => {
+    expect(scaleGradientDescent([],[],10)).toEqual([]);
+  });
+  it('returns steps arrays', () => {
+    const r = scaleGradientDescent([0,400,700],[0,300,600],5);
+    expect(r).toHaveLength(5);
+    expect(r[0]).toHaveLength(3);
+  });
+  it('approaches target over steps', () => {
+    const r = scaleGradientDescent([0,400],[0,300],10,0.5);
+    const lastDist = Math.abs(r[9]![1]! - 300);
+    const firstDist = Math.abs(r[0]![1]! - 300);
+    expect(lastDist).toBeLessThan(firstDist);
+  });
+  it('same scale → stays same', () => {
+    const r = scaleGradientDescent([0,400],[0,400],3);
+    r.forEach(step => step.forEach((v,i) => expect(v).toBeCloseTo([0,400][i]!,5)));
+  });
+});
+
+describe('KKK4 scaleConvergenceRate', () => {
+  it('already converged → 0', () => {
+    expect(scaleConvergenceRate([0,400],[0,400])).toBe(0);
+  });
+  it('returns non-negative integer or -1', () => {
+    const r = scaleConvergenceRate([0,400],[0,500]);
+    expect(Number.isInteger(r) || r === -1).toBe(true);
+  });
+  it('empty scales → 0', () => {
+    expect(scaleConvergenceRate([],[])).toBe(0);
+  });
+  it('converges in finite steps', () => {
+    const r = scaleConvergenceRate([0,400],[0,450], 0.5);
+    expect(r).toBeGreaterThan(0);
+    expect(r).toBeLessThan(1000);
+  });
+});
