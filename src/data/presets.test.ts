@@ -478,6 +478,12 @@ import {
   presetFamilySocraticRadarARAS,
   presetFamilySocraticRadarWASPAS,
   presetFamilySocraticRadarEDAS,
+  presetFamilySocraticRadarBoundingBoxVolume,
+  presetFamilySocraticRadarBoundingBoxDiagonal,
+  presetFamilySocraticRadarRadiusOfGyration,
+  presetFamilySocraticRadarAspectRatio,
+  presetFamilySocraticRadarProfilePolygonArea,
+  presetFamilySocraticRadarLeaveOneCentroid,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -14515,5 +14521,119 @@ describe('presetFamilySocraticRadarEDAS (Q1349)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarEDAS(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 37: Q1351–Q1361 — Geometric / spatial preset bridges
+// ---------------------------------------------------------------------------
+
+// Q1351 — presetFamilySocraticRadarBoundingBoxVolume
+describe('presetFamilySocraticRadarBoundingBoxVolume (Q1351)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for empty presetIds', () => {
+    const result = presetFamilySocraticRadarBoundingBoxVolume([], spectrum);
+    expect(result).toBe(0);
+  });
+  it('returns a non-negative number for two presets', () => {
+    const result = presetFamilySocraticRadarBoundingBoxVolume(presetIds, spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBoundingBoxVolume(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1353 — presetFamilySocraticRadarBoundingBoxDiagonal
+describe('presetFamilySocraticRadarBoundingBoxDiagonal (Q1353)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for empty presetIds', () => {
+    const result = presetFamilySocraticRadarBoundingBoxDiagonal([], spectrum);
+    expect(result).toBe(0);
+  });
+  it('returns a non-negative number for two presets', () => {
+    const result = presetFamilySocraticRadarBoundingBoxDiagonal(presetIds, spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBoundingBoxDiagonal(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1355 — presetFamilySocraticRadarRadiusOfGyration
+describe('presetFamilySocraticRadarRadiusOfGyration (Q1355)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for empty presetIds', () => {
+    const result = presetFamilySocraticRadarRadiusOfGyration([], spectrum);
+    expect(result).toBe(0);
+  });
+  it('returns a non-negative number for two presets', () => {
+    const result = presetFamilySocraticRadarRadiusOfGyration(presetIds, spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarRadiusOfGyration(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1357 — presetFamilySocraticRadarAspectRatio
+describe('presetFamilySocraticRadarAspectRatio (Q1357)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for empty presetIds', () => {
+    const result = presetFamilySocraticRadarAspectRatio([], spectrum);
+    expect(result).toBe(0);
+  });
+  it('returns a non-negative number for two presets', () => {
+    const result = presetFamilySocraticRadarAspectRatio(presetIds, spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAspectRatio(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1359 — presetFamilySocraticRadarProfilePolygonArea
+describe('presetFamilySocraticRadarProfilePolygonArea (Q1359)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for empty presetIds', () => {
+    const result = presetFamilySocraticRadarProfilePolygonArea([], spectrum);
+    expect(result).toBe(0);
+  });
+  it('returns a non-negative number for two presets', () => {
+    const result = presetFamilySocraticRadarProfilePolygonArea(presetIds, spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfilePolygonArea(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1361 — presetFamilySocraticRadarLeaveOneCentroid
+describe('presetFamilySocraticRadarLeaveOneCentroid (Q1361)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns empty array for empty presetIds', () => {
+    const result = presetFamilySocraticRadarLeaveOneCentroid([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns n rows each with 5 values for n presets', () => {
+    const result = presetFamilySocraticRadarLeaveOneCentroid(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLeaveOneCentroid(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

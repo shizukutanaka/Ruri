@@ -825,6 +825,16 @@ import {
   tuningOctaveConsistency,
   primeFactorComplexity,
   scaleIntervalicRichness,
+  scaleOctaveStretchFactor,
+  chordJustIntonationScore,
+  spectrumHarmonicDeviation,
+  scaleVoiceLeadingEfficiency,
+  tuningFamilySocraticRadarBoundingBoxVolume,
+  tuningFamilySocraticRadarBoundingBoxDiagonal,
+  tuningFamilySocraticRadarRadiusOfGyration,
+  tuningFamilySocraticRadarAspectRatio,
+  tuningFamilySocraticRadarProfilePolygonArea,
+  tuningFamilySocraticRadarLeaveOneCentroid,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -25774,5 +25784,212 @@ describe('scaleIntervalicRichness', () => {
     const result = scaleIntervalicRichness(chromatic);
     expect(result).toBeGreaterThan(0);
     expect(result).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleOctaveStretchFactor', () => {
+  it('returns ~0 for 12-TET (perfect octave)', () => {
+    const result = scaleOctaveStretchFactor(equalTemperament12(440));
+    expect(Math.abs(result)).toBeLessThan(0.01);
+  });
+
+  it('returns 0 for edo(1) — no degree within 200c of 1200', () => {
+    expect(scaleOctaveStretchFactor(edo(1, 440))).toBe(0);
+  });
+
+  it('returns positive for a stretched tuning', () => {
+    const stretched = edo(12, 440, 1210);
+    const result = scaleOctaveStretchFactor(stretched);
+    expect(result).toBeGreaterThan(0);
+  });
+
+  it('returns negative for a compressed tuning', () => {
+    const compressed = edo(12, 440, 1190);
+    const result = scaleOctaveStretchFactor(compressed);
+    expect(result).toBeLessThan(0);
+  });
+});
+
+describe('chordJustIntonationScore', () => {
+  it('returns 1 for empty chord', () => {
+    expect(chordJustIntonationScore([])).toBe(1);
+  });
+
+  it('returns 1 for single-note chord', () => {
+    expect(chordJustIntonationScore([0])).toBe(1);
+  });
+
+  it('returns close to 1 for 5-limit major triad [0, 386, 702]', () => {
+    const score = chordJustIntonationScore([0, 386, 702]);
+    expect(score).toBeGreaterThan(0.9);
+  });
+
+  it('returns lower score for non-just chord', () => {
+    const justScore = chordJustIntonationScore([0, 386, 702]);
+    const nonJust = chordJustIntonationScore([0, 350, 650]);
+    expect(justScore).toBeGreaterThan(nonJust);
+  });
+});
+
+describe('spectrumHarmonicDeviation', () => {
+  it('returns 0 for empty spectrum', () => {
+    expect(spectrumHarmonicDeviation([])).toBe(0);
+  });
+
+  it('returns ~0 for harmonicSpectrum (pure integer ratios)', () => {
+    const result = spectrumHarmonicDeviation(harmonicSpectrum(4));
+    expect(result).toBeCloseTo(0, 10);
+  });
+
+  it('returns 0 for zero-amplitude spectrum', () => {
+    const spec = [{ ratio: 1.5, amplitude: 0 }];
+    expect(spectrumHarmonicDeviation(spec)).toBe(0);
+  });
+
+  it('returns positive value for inharmonic spectrum', () => {
+    const inharmonic = [
+      { ratio: 1.3, amplitude: 1 },
+      { ratio: 2.7, amplitude: 1 },
+    ];
+    const result = spectrumHarmonicDeviation(inharmonic);
+    expect(result).toBeGreaterThan(0);
+  });
+});
+
+describe('scaleVoiceLeadingEfficiency', () => {
+  it('returns 0 for empty target', () => {
+    expect(scaleVoiceLeadingEfficiency([0, 200, 400], [])).toBe(0);
+  });
+
+  it('returns 0 for empty scale', () => {
+    expect(scaleVoiceLeadingEfficiency([], [0, 200])).toBe(0);
+  });
+
+  it('returns 0 for identical scales', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleVoiceLeadingEfficiency(scale, scale)).toBe(0);
+  });
+
+  it('returns 100 for target [100] against scale [0, 200]', () => {
+    expect(scaleVoiceLeadingEfficiency([0, 200], [100])).toBe(100);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 37: Q1350–Q1360 — Geometric / spatial analysis
+// ---------------------------------------------------------------------------
+
+// Q1350 — tuningFamilySocraticRadarBoundingBoxVolume
+describe('tuningFamilySocraticRadarBoundingBoxVolume (Q1350)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBoundingBoxVolume([], spectrum)).toBe(0);
+  });
+  it('returns 0 for identical tunings (zero range on all axes)', () => {
+    expect(tuningFamilySocraticRadarBoundingBoxVolume([t1, t2], spectrum)).toBe(0);
+  });
+  it('returns a non-negative number for distinct tunings', () => {
+    const t3 = edo(19, 440);
+    const result = tuningFamilySocraticRadarBoundingBoxVolume([t1, t3], spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1352 — tuningFamilySocraticRadarBoundingBoxDiagonal
+describe('tuningFamilySocraticRadarBoundingBoxDiagonal (Q1352)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBoundingBoxDiagonal([], spectrum)).toBe(0);
+  });
+  it('returns 0 for identical tunings', () => {
+    expect(tuningFamilySocraticRadarBoundingBoxDiagonal([t1, t2], spectrum)).toBe(0);
+  });
+  it('returns a non-negative number for distinct tunings', () => {
+    const t3 = edo(19, 440);
+    const result = tuningFamilySocraticRadarBoundingBoxDiagonal([t1, t3], spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1354 — tuningFamilySocraticRadarRadiusOfGyration
+describe('tuningFamilySocraticRadarRadiusOfGyration (Q1354)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarRadiusOfGyration([], spectrum)).toBe(0);
+  });
+  it('returns 0 for a single tuning', () => {
+    expect(tuningFamilySocraticRadarRadiusOfGyration([t1], spectrum)).toBe(0);
+  });
+  it('returns a non-negative number for two tunings', () => {
+    const result = tuningFamilySocraticRadarRadiusOfGyration([t1, t2], spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1356 — tuningFamilySocraticRadarAspectRatio
+describe('tuningFamilySocraticRadarAspectRatio (Q1356)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAspectRatio([], spectrum)).toBe(0);
+  });
+  it('returns a non-negative number for two identical tunings', () => {
+    const t2 = equalTemperament12(440);
+    const result = tuningFamilySocraticRadarAspectRatio([t1, t2], spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('returns a non-negative number for distinct tunings', () => {
+    const t3 = edo(19, 440);
+    const result = tuningFamilySocraticRadarAspectRatio([t1, t3], spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1358 — tuningFamilySocraticRadarProfilePolygonArea
+describe('tuningFamilySocraticRadarProfilePolygonArea (Q1358)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarProfilePolygonArea([], spectrum)).toBe(0);
+  });
+  it('returns a non-negative number for one tuning', () => {
+    const result = tuningFamilySocraticRadarProfilePolygonArea([t1], spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('returns a non-negative number for two tunings', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarProfilePolygonArea([t1, t2], spectrum);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1360 — tuningFamilySocraticRadarLeaveOneCentroid
+describe('tuningFamilySocraticRadarLeaveOneCentroid (Q1360)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    expect(tuningFamilySocraticRadarLeaveOneCentroid([], spectrum)).toEqual([]);
+  });
+  it('returns [[0,0,0,0,0]] for a single tuning', () => {
+    expect(tuningFamilySocraticRadarLeaveOneCentroid([t1], spectrum)).toEqual([[0, 0, 0, 0, 0]]);
+  });
+  it('returns n rows each with 5 values for n tunings', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarLeaveOneCentroid([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
   });
 });

@@ -29693,3 +29693,308 @@ export function scaleIntervalicRichness(scaleCents: readonly number[]): number {
   }
   return bins.size / 13;
 }
+
+// ---------------------------------------------------------------------------
+// Round 37: TT1–TT4
+// ---------------------------------------------------------------------------
+
+/**
+ * TT1 — Measures how much the tuning's "octave" deviates from 1200 cents.
+ * Returns stretch factor in percent; 0 for perfect octave or no near-octave degree.
+ */
+export function scaleOctaveStretchFactor(tuning: TuningSystem): number {
+  const { degrees, periodCents } = tuning;
+  if (degrees.length === 0) return 0;
+  // Include the period itself as it represents the octave boundary
+  const candidates: number[] = [periodCents];
+  for (let i = 0; i < degrees.length; i++) {
+    candidates.push(pitchToCents(degrees[i]!));
+  }
+  let closestCents = NaN;
+  let minDist = Infinity;
+  for (let i = 0; i < candidates.length; i++) {
+    const c = candidates[i]!;
+    const dist = Math.abs(c - 1200);
+    if (dist < minDist) {
+      minDist = dist;
+      closestCents = c;
+    }
+  }
+  if (minDist > 200) return 0;
+  return (closestCents - 1200) / 1200 * 100;
+}
+
+/**
+ * TT2 — Measures how well the chord approximates just intonation.
+ * Returns mean score across all pairs; 1 for empty or single-note chord.
+ */
+export function chordJustIntonationScore(chordCents: readonly number[]): number {
+  const n = chordCents.length;
+  if (n < 2) return 1;
+  const justIntervals = [0, 204, 316, 386, 498, 590, 702, 814, 884, 969, 1088];
+  let totalScore = 0;
+  let pairs = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const interval = Math.abs(chordCents[j]! - chordCents[i]!);
+      const wrapped = ((interval % 1200) + 1200) % 1200;
+      let minDist = Infinity;
+      for (let k = 0; k < justIntervals.length; k++) {
+        const d = Math.abs(wrapped - justIntervals[k]!);
+        if (d < minDist) minDist = d;
+      }
+      totalScore += Math.max(0, 1 - minDist / 50);
+      pairs++;
+    }
+  }
+  return pairs === 0 ? 1 : totalScore / pairs;
+}
+
+/**
+ * TT3 — Measures how far the spectrum's partial ratios deviate from integer multiples.
+ * Returns amplitude-weighted mean deviation; 0 for empty or zero-amplitude spectrum.
+ */
+export function spectrumHarmonicDeviation(spectrum: Spectrum): number {
+  if (spectrum.length === 0) return 0;
+  let weightedSum = 0;
+  let totalAmplitude = 0;
+  for (let i = 0; i < spectrum.length; i++) {
+    const { ratio, amplitude } = spectrum[i]!;
+    const kNearest = Math.round(ratio);
+    const deviation = Math.abs(ratio - kNearest);
+    weightedSum += amplitude * deviation;
+    totalAmplitude += amplitude;
+  }
+  if (totalAmplitude === 0) return 0;
+  return weightedSum / totalAmplitude;
+}
+
+/**
+ * TT4 — Measures how efficiently the scale can voice-lead to another scale/chord.
+ * Returns mean nearest-note distance in cents; 0 if either array is empty.
+ */
+export function scaleVoiceLeadingEfficiency(
+  scaleCents: readonly number[],
+  targetCents: readonly number[],
+): number {
+  if (scaleCents.length === 0 || targetCents.length === 0) return 0;
+  let totalDist = 0;
+  for (let i = 0; i < targetCents.length; i++) {
+    const t = targetCents[i]!;
+    let minDist = Infinity;
+    for (let j = 0; j < scaleCents.length; j++) {
+      const d = Math.abs(t - scaleCents[j]!);
+      if (d < minDist) minDist = d;
+    }
+    totalDist += minDist;
+  }
+  return totalDist / targetCents.length;
+}
+
+// ---------------------------------------------------------------------------
+// Round 37: Q1350–Q1360 — Geometric / spatial analysis
+// ---------------------------------------------------------------------------
+
+/**
+ * Q1350 — tuningFamilySocraticRadarBoundingBoxVolume
+ *
+ * Computes the "volume" (product of axis ranges) of the bounding box in 5D
+ * radar-profile space across all tunings.
+ *
+ * For each axis: range = max(score) − min(score) across all tunings.
+ * Volume = product of the 5 axis ranges.
+ *
+ * Returns 0 if tunings is empty or any axis has zero range.
+ */
+export function tuningFamilySocraticRadarBoundingBoxVolume(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  let volume = 1;
+  for (let k = 0; k < 5; k++) {
+    let mn = Infinity;
+    let mx = -Infinity;
+    for (const row of scores) {
+      const v = row[k]!;
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+    const range = mx - mn;
+    if (range === 0) return 0;
+    volume *= range;
+  }
+  return volume;
+}
+
+/**
+ * Q1352 — tuningFamilySocraticRadarBoundingBoxDiagonal
+ *
+ * Diagonal of the 5D bounding box: sqrt(sum of range_axis^2 for all 5 axes).
+ *
+ * Returns 0 for empty tunings.
+ */
+export function tuningFamilySocraticRadarBoundingBoxDiagonal(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  let sumSq = 0;
+  for (let k = 0; k < 5; k++) {
+    let mn = Infinity;
+    let mx = -Infinity;
+    for (const row of scores) {
+      const v = row[k]!;
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+    const range = mx - mn;
+    sumSq += range * range;
+  }
+  return Math.sqrt(sumSq);
+}
+
+/**
+ * Q1354 — tuningFamilySocraticRadarRadiusOfGyration
+ *
+ * Radius of gyration: sqrt(mean(L2_distance_to_centroid^2)) across all tunings.
+ * Centroid = per-axis mean; L2_distance[i] = sqrt(sum((profile[i][axis] − centroid[axis])^2)).
+ *
+ * Returns 0 for 0 or 1 tuning.
+ */
+export function tuningFamilySocraticRadarRadiusOfGyration(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  // Centroid per axis
+  const centroid = axes.map((_, k) => scores.reduce((s, row) => s + row[k]!, 0) / n);
+  // Mean of squared L2 distances
+  const meanSqDist = scores.reduce((acc, row) => {
+    const sq = row.reduce((s, v, k) => s + (v - centroid[k]!) ** 2, 0);
+    return acc + sq;
+  }, 0) / n;
+  return Math.sqrt(meanSqDist);
+}
+
+/**
+ * Q1356 — tuningFamilySocraticRadarAspectRatio
+ *
+ * Aspect ratio = max_axis_range / min_axis_range.
+ * If min_range = 0, returns max_range / 1e-10 (large number indicating extreme elongation).
+ * Returns 1 for perfectly isotropic (all ranges equal).
+ * Returns 0 for empty tunings.
+ */
+export function tuningFamilySocraticRadarAspectRatio(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  let maxRange = 0;
+  let minRange = Infinity;
+  for (let k = 0; k < 5; k++) {
+    let mn = Infinity;
+    let mx = -Infinity;
+    for (const row of scores) {
+      const v = row[k]!;
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+    const range = mx - mn;
+    if (range > maxRange) maxRange = range;
+    if (range < minRange) minRange = range;
+  }
+  if (minRange === 0) return maxRange / 1e-10;
+  return maxRange / minRange;
+}
+
+/**
+ * Q1358 — tuningFamilySocraticRadarProfilePolygonArea
+ *
+ * Approximate "polygon area" formed by the radar profile of each tuning's
+ * average profile, using the shoelace formula on 5 equally spaced angles.
+ *
+ * x_k = score[axis_k] * cos(2πk/5), y_k = score[axis_k] * sin(2πk/5)
+ * Area = 0.5 * |sum_k(x_k * y_{k+1} − x_{k+1} * y_k)|, k cycles 0..4
+ * Returns the mean area across all tunings.
+ */
+export function tuningFamilySocraticRadarProfilePolygonArea(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const angles = axes.map((_, k) => (2 * Math.PI * k) / 5);
+  let totalArea = 0;
+  for (const row of scores) {
+    const xs = row.map((v, k) => v * Math.cos(angles[k]!));
+    const ys = row.map((v, k) => v * Math.sin(angles[k]!));
+    let shoelace = 0;
+    for (let k = 0; k < 5; k++) {
+      const next = (k + 1) % 5;
+      shoelace += xs[k]! * ys[next]! - xs[next]! * ys[k]!;
+    }
+    totalArea += 0.5 * Math.abs(shoelace);
+  }
+  return totalArea / n;
+}
+
+/**
+ * Q1360 — tuningFamilySocraticRadarLeaveOneCentroid
+ *
+ * For each tuning i, computes the centroid of all OTHER tunings (leave-one-out).
+ * Returns number[][] (n × 5), each row is the 5-axis leave-one-out centroid.
+ * For n <= 1: returns array of zero vectors.
+ */
+export function tuningFamilySocraticRadarLeaveOneCentroid(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n <= 1) return tunings.map(() => [0, 0, 0, 0, 0]);
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  // Precompute full sum per axis
+  const fullSum = axes.map((_, k) => scores.reduce((s, row) => s + row[k]!, 0));
+  return scores.map((row) =>
+    axes.map((_, k) => (fullSum[k]! - row[k]!) / (n - 1)),
+  );
+}

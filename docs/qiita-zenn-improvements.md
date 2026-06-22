@@ -575,3 +575,15 @@
 | `tuningOctaveConsistency` | オクターブ対の一貫性スコア |
 | `primeFactorComplexity` | 周波数比の素因数総数 |
 | `scaleIntervalicRichness` | 50cビン単位の音程多様性 |
+
+## Round 37: オクターブストレッチ・純正律スコア・声部進行 (TT1–TT4)
+
+**テーマ**: オクターブ伸縮・和音純正律近似・スペクトル調波偏差・声部進行効率  
+**実装**: TT1–TT4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleOctaveStretchFactor` | オクターブの1200c偏差率（%） |
+| `chordJustIntonationScore` | 和音の純正律近似スコア |
+| `spectrumHarmonicDeviation` | スペクトル比の整数倍音偏差 |
+| `scaleVoiceLeadingEfficiency` | スケール間の声部進行距離 |
