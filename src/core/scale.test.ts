@@ -1197,6 +1197,12 @@ import {
   tuningFamilySocraticRadarInflationProxy,
   tuningFamilySocraticRadarGDPProxy,
   tuningFamilySocraticRadarGiniCoefficientProxyV2,
+  tuningFamilySocraticRadarSocialCohesionProxy,
+  tuningFamilySocraticRadarNetworkDensityProxyV3,
+  tuningFamilySocraticRadarConformityProxy,
+  tuningFamilySocraticRadarInnovationProxy,
+  tuningFamilySocraticRadarSocialMobilityProxy,
+  tuningFamilySocraticRadarCulturalDiversityProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1411,6 +1417,10 @@ import {
   scaleHashVariance,
   scalePeriodicityFingerprint,
   scaleUniquenessProxy,
+  scaleTonalCenterOfGravity,
+  scaleTonalGravityBalance,
+  scaleTonalPolarization,
+  scaleTonalCentripetal,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -37006,6 +37016,120 @@ describe('Q2056 tuningFamilySocraticRadarGiniCoefficientProxyV2', () => {
   });
 });
 
+// Q2058 — tuningFamilySocraticRadarSocialCohesionProxy
+describe('Q2058 tuningFamilySocraticRadarSocialCohesionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSocialCohesionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarSocialCohesionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarSocialCohesionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2060 — tuningFamilySocraticRadarNetworkDensityProxyV3
+describe('Q2060 tuningFamilySocraticRadarNetworkDensityProxyV3', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNetworkDensityProxyV3([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarNetworkDensityProxyV3([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarNetworkDensityProxyV3([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2062 — tuningFamilySocraticRadarConformityProxy
+describe('Q2062 tuningFamilySocraticRadarConformityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarConformityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarConformityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarConformityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2064 — tuningFamilySocraticRadarInnovationProxy
+describe('Q2064 tuningFamilySocraticRadarInnovationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarInnovationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarInnovationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarInnovationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2066 — tuningFamilySocraticRadarSocialMobilityProxy
+describe('Q2066 tuningFamilySocraticRadarSocialMobilityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSocialMobilityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarSocialMobilityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarSocialMobilityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2068 — tuningFamilySocraticRadarCulturalDiversityProxy
+describe('Q2068 tuningFamilySocraticRadarCulturalDiversityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCulturalDiversityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCulturalDiversityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarCulturalDiversityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
 // BBBB4 — scaleUniquenessProxy
 describe('BBBB4 scaleUniquenessProxy', () => {
   it('returns 1 for empty', () => {
@@ -37019,6 +37143,78 @@ describe('BBBB4 scaleUniquenessProxy', () => {
   it('returns finite [0,1] for diatonic scale', () => {
     const diatonic = [200, 400, 500, 700, 900, 1100];
     const v = scaleUniquenessProxy(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// CCCC1 — scaleTonalCenterOfGravity
+describe('CCCC1 scaleTonalCenterOfGravity', () => {
+  it('returns 0.5 for empty (neutral)', () => {
+    expect(scaleTonalCenterOfGravity([])).toBe(0.5);
+  });
+  it('returns 0.5 for tritone (centered)', () => {
+    const v = scaleTonalCenterOfGravity([600]);
+    expect(v).toBeCloseTo(0.5, 5);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleTonalCenterOfGravity(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// CCCC2 — scaleTonalGravityBalance
+describe('CCCC2 scaleTonalGravityBalance', () => {
+  it('returns 1 for empty', () => {
+    expect(scaleTonalGravityBalance([])).toBe(1);
+  });
+  it('returns 1 for tritone (centroid = 0.5)', () => {
+    const v = scaleTonalGravityBalance([600]);
+    expect(v).toBeCloseTo(1, 5);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleTonalGravityBalance(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// CCCC3 — scaleTonalPolarization
+describe('CCCC3 scaleTonalPolarization', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleTonalPolarization([])).toBe(0);
+  });
+  it('returns 0 for tritone (at center)', () => {
+    const v = scaleTonalPolarization([600]);
+    expect(v).toBeCloseTo(0, 5);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleTonalPolarization(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// CCCC4 — scaleTonalCentripetal
+describe('CCCC4 scaleTonalCentripetal', () => {
+  it('returns 1 for empty', () => {
+    expect(scaleTonalCentripetal([])).toBe(1);
+  });
+  it('returns 1 for tritone (maximally centripetal)', () => {
+    const v = scaleTonalCentripetal([600]);
+    expect(v).toBeCloseTo(1, 5);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleTonalCentripetal(diatonic);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);

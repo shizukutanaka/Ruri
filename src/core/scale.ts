@@ -42751,6 +42751,132 @@ export function tuningFamilySocraticRadarGiniCoefficientProxyV2(
   return totalGini / counted;
 }
 
+// Q2058 — tuningFamilySocraticRadarSocialCohesionProxy
+export function tuningFamilySocraticRadarSocialCohesionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalCohesion = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    const variance = vec.reduce((acc, x) => acc + (x - mean) ** 2, 0) / vec.length;
+    const std = Math.sqrt(variance);
+    // std in [0, 0.5] range theoretically; normalize by 0.5
+    totalCohesion += Math.max(0, Math.min(1, 1 - std / 0.5));
+  }
+  return Math.min(1, Math.max(0, totalCohesion / vecs.length));
+}
+
+// Q2060 — tuningFamilySocraticRadarNetworkDensityProxyV3
+export function tuningFamilySocraticRadarNetworkDensityProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalDensity = 0;
+  for (const vec of vecs) {
+    const activeCount = vec.filter((x) => x > 0.5).length;
+    totalDensity += activeCount / axes.length;
+  }
+  return Math.min(1, Math.max(0, totalDensity / vecs.length));
+}
+
+// Q2062 — tuningFamilySocraticRadarConformityProxy
+export function tuningFamilySocraticRadarConformityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalConformity = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    const meanAbsDev = vec.reduce((acc, x) => acc + Math.abs(x - mean), 0) / vec.length;
+    totalConformity += Math.max(0, Math.min(1, 1 - meanAbsDev * 2));
+  }
+  return Math.min(1, Math.max(0, totalConformity / vecs.length));
+}
+
+// Q2064 — tuningFamilySocraticRadarInnovationProxy
+export function tuningFamilySocraticRadarInnovationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalInnovation = 0;
+  for (const vec of vecs) {
+    const highCount = vec.filter((x) => x > 0.7).length;
+    totalInnovation += highCount / axes.length;
+  }
+  return Math.min(1, Math.max(0, totalInnovation / vecs.length));
+}
+
+// Q2066 — tuningFamilySocraticRadarSocialMobilityProxy
+export function tuningFamilySocraticRadarSocialMobilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalMobility = 0;
+  for (const vec of vecs) {
+    const max = Math.max(...vec);
+    const min = Math.min(...vec);
+    totalMobility += Math.max(0, Math.min(1, max - min));
+  }
+  return Math.min(1, Math.max(0, totalMobility / vecs.length));
+}
+
+// Q2068 — tuningFamilySocraticRadarCulturalDiversityProxy
+export function tuningFamilySocraticRadarCulturalDiversityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const log2_5 = Math.log2(5);
+  let totalEntropy = 0;
+  for (const vec of vecs) {
+    const sum = vec.reduce((acc, x) => acc + x, 0);
+    if (sum < 1e-10) continue;
+    let entropy = 0;
+    for (let i = 0; i < vec.length; i++) {
+      const p = vec[i]! / sum;
+      if (p > 1e-10) entropy -= p * Math.log2(p);
+    }
+    totalEntropy += entropy / log2_5;
+  }
+  return Math.min(1, Math.max(0, totalEntropy / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -47109,4 +47235,73 @@ export function scaleUniquenessProxy(scaleCents: readonly number[], periodCents:
   const n = scaleCents.length;
   if (n === 0) return 1;
   return Math.min(1, Math.max(0, 1 - scalePeriodicityFingerprint(scaleCents, periodCents)));
+}
+
+/**
+ * CCCC1 — scaleTonalCenterOfGravity
+ * Weighted centroid of pitch positions.
+ * Normalize: p_i = cents[i] / periodCents
+ * centroid = mean(p_i)
+ * Return: centroid (already in [0,1] since all p_i ∈ [0,1))
+ * Empty → 0.5 (neutral center)
+ */
+export function scaleTonalCenterOfGravity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0.5;
+  if (periodCents === 0) return 0.5;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += scaleCents[i]! / periodCents;
+  }
+  const centroid = sum / n;
+  return Math.min(1, Math.max(0, centroid));
+}
+
+/**
+ * CCCC2 — scaleTonalGravityBalance
+ * How balanced the scale is around the midpoint (0.5 of period).
+ * mid = 0.5
+ * centroid = scaleTonalCenterOfGravity(scaleCents, periodCents)
+ * Return: 1 - 2 * |centroid - mid| — perfect balance if centroid = 0.5
+ * Empty → 1
+ */
+export function scaleTonalGravityBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  const centroid = scaleTonalCenterOfGravity(scaleCents, periodCents);
+  const mid = 0.5;
+  return Math.min(1, Math.max(0, 1 - 2 * Math.abs(centroid - mid)));
+}
+
+/**
+ * CCCC3 — scaleTonalPolarization
+ * How polarized pitches are toward extremes (0 and 1 of period).
+ * Normalize: p_i = cents[i] / periodCents
+ * polarization: mean of (2 * |p_i - 0.5|) — distance from center
+ * Return: polarization, clamped to [0,1]
+ * Empty → 0
+ */
+export function scaleTonalPolarization(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (periodCents === 0) return 0;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    const p = scaleCents[i]! / periodCents;
+    sum += 2 * Math.abs(p - 0.5);
+  }
+  const polarization = sum / n;
+  return Math.min(1, Math.max(0, polarization));
+}
+
+/**
+ * CCCC4 — scaleTonalCentripetal
+ * Opposite of polarization — how centripetal (center-attracted) the scale is.
+ * Return: 1 - scaleTonalPolarization(scaleCents, periodCents)
+ * Empty → 1
+ */
+export function scaleTonalCentripetal(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  return Math.min(1, Math.max(0, 1 - scaleTonalPolarization(scaleCents, periodCents)));
 }

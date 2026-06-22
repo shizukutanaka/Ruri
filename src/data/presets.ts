@@ -819,6 +819,12 @@ import {
   tuningFamilySocraticRadarInflationProxy,
   tuningFamilySocraticRadarGDPProxy,
   tuningFamilySocraticRadarGiniCoefficientProxyV2,
+  tuningFamilySocraticRadarSocialCohesionProxy,
+  tuningFamilySocraticRadarNetworkDensityProxyV3,
+  tuningFamilySocraticRadarConformityProxy,
+  tuningFamilySocraticRadarInnovationProxy,
+  tuningFamilySocraticRadarSocialMobilityProxy,
+  tuningFamilySocraticRadarCulturalDiversityProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -17468,4 +17474,94 @@ export function presetFamilySocraticRadarGiniCoefficientProxyV2(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarGiniCoefficientProxyV2(tunings, spectrum, rootHz);
+}
+
+// Q2059 — presetFamilySocraticRadarSocialCohesionProxy
+export function presetFamilySocraticRadarSocialCohesionProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSocialCohesionProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSocialCohesionProxy(tunings, spectrum, rootHz);
+}
+
+// Q2061 — presetFamilySocraticRadarNetworkDensityProxyV3
+export function presetFamilySocraticRadarNetworkDensityProxyV3(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarNetworkDensityProxyV3> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarNetworkDensityProxyV3(tunings, spectrum, rootHz);
+}
+
+// Q2063 — presetFamilySocraticRadarConformityProxy
+export function presetFamilySocraticRadarConformityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarConformityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarConformityProxy(tunings, spectrum, rootHz);
+}
+
+// Q2065 — presetFamilySocraticRadarInnovationProxy
+export function presetFamilySocraticRadarInnovationProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarInnovationProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarInnovationProxy(tunings, spectrum, rootHz);
+}
+
+// Q2067 — presetFamilySocraticRadarSocialMobilityProxy
+export function presetFamilySocraticRadarSocialMobilityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSocialMobilityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSocialMobilityProxy(tunings, spectrum, rootHz);
+}
+
+// Q2069 — presetFamilySocraticRadarCulturalDiversityProxy
+export function presetFamilySocraticRadarCulturalDiversityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCulturalDiversityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCulturalDiversityProxy(tunings, spectrum, rootHz);
 }
