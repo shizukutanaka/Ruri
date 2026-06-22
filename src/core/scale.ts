@@ -26550,3 +26550,362 @@ export function spectrumFlux(
   const n = Math.max(spectrum1.length, spectrum2.length, 1);
   return Math.sqrt(sumSq / n);
 }
+
+// ---------------------------------------------------------------------------
+// Q1230 — tuningFamilySocraticRadarRobustScale
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarRobustScale(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function quantile(sorted: number[], p: number): number {
+    if (sorted.length === 0) return 0;
+    if (sorted.length === 1) return sorted[0]!;
+    const pos = p * (sorted.length - 1);
+    const lo = Math.floor(pos);
+    const hi = Math.min(lo + 1, sorted.length - 1);
+    const frac = pos - lo;
+    return sorted[lo]! * (1 - frac) + sorted[hi]! * frac;
+  }
+
+  const axisStats = axes.map((ax) => {
+    const sorted = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    const median = quantile(sorted, 0.5);
+    const q1 = quantile(sorted, 0.25);
+    const q3 = quantile(sorted, 0.75);
+    const iqr = q3 - q1;
+    return { median, iqr };
+  });
+
+  return profiles.map((p) =>
+    axes.map((ax, ai) => {
+      const stat = axisStats[ai]!;
+      return stat.iqr === 0 ? 0 : (p[ax] - stat.median) / stat.iqr;
+    }),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Q1232 — tuningFamilySocraticRadarMinMaxNormalize
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarMinMaxNormalize(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  const axisStats = axes.map((ax) => {
+    const scores = profiles.map((p) => p[ax]);
+    const min = scores.length === 0 ? 0 : Math.min(...scores);
+    const max = scores.length === 0 ? 0 : Math.max(...scores);
+    return { min, max };
+  });
+
+  return profiles.map((p) =>
+    axes.map((ax, ai) => {
+      const stat = axisStats[ai]!;
+      return stat.max === stat.min ? 0.5 : (p[ax] - stat.min) / (stat.max - stat.min);
+    }),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Q1234 — tuningFamilySocraticRadarEntropyWeightedComposite
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarEntropyWeightedComposite(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const bins = 5;
+
+  const axisEntropies = axes.map((ax) => {
+    const scores = profiles.map((p) => p[ax]);
+    const counts = new Array<number>(bins).fill(0);
+    for (const s of scores) {
+      const b = Math.min(Math.floor(s * bins), bins - 1);
+      counts[b] = (counts[b] ?? 0) + 1;
+    }
+    const total = scores.length;
+    let entropy = 0;
+    if (total > 0) {
+      for (const c of counts) {
+        if (c > 0) {
+          const prob = c / total;
+          entropy -= prob * Math.log2(prob);
+        }
+      }
+    }
+    return entropy;
+  });
+
+  const totalEntropy = axisEntropies.reduce((s, e) => s + e, 0);
+  const weights = totalEntropy === 0
+    ? axes.map(() => 1 / axes.length)
+    : axisEntropies.map((e) => e / totalEntropy);
+
+  return profiles.map((p) =>
+    axes.reduce((sum, ax, ai) => sum + (weights[ai]! * p[ax]), 0),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Q1236 — tuningFamilySocraticRadarTOPSIS
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarTOPSIS(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  // Normalize: divide each score by column norm
+  const axisNorms = axes.map((ax) => {
+    const scores = profiles.map((p) => p[ax]);
+    const sumSq = scores.reduce((s, v) => s + v * v, 0);
+    return Math.sqrt(sumSq);
+  });
+
+  const normalized = profiles.map((p) =>
+    axes.map((ax, ai) => {
+      const norm = axisNorms[ai]!;
+      return norm === 0 ? 0 : p[ax] / norm;
+    }),
+  );
+
+  // Find ideal best (max) and worst (min) per axis
+  const idealBest = axes.map((_ax, ai) =>
+    normalized.reduce((best, row) => Math.max(best, row[ai]!), -Infinity),
+  );
+  const idealWorst = axes.map((_ax, ai) =>
+    normalized.reduce((worst, row) => Math.min(worst, row[ai]!), Infinity),
+  );
+
+  return normalized.map((row) => {
+    let dBest = 0;
+    let dWorst = 0;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const diffBest = row[ai]! - idealBest[ai]!;
+      const diffWorst = row[ai]! - idealWorst[ai]!;
+      dBest += diffBest * diffBest;
+      dWorst += diffWorst * diffWorst;
+    }
+    dBest = Math.sqrt(dBest);
+    dWorst = Math.sqrt(dWorst);
+    const total = dBest + dWorst;
+    return total === 0 ? 0.5 : dWorst / total;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1238 — tuningFamilySocraticRadarSAW
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarSAW(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const weight = 1 / axes.length;
+  return profiles.map((p) => axes.reduce((sum, ax) => sum + weight * p[ax], 0));
+}
+
+// ---------------------------------------------------------------------------
+// Q1240 — tuningFamilySocraticRadarVIKOR
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarVIKOR(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const w = 1 / axes.length;
+  const v = 0.5;
+
+  const fBest = axes.map((ax) => profiles.reduce((best, p) => Math.max(best, p[ax]), -Infinity));
+  const fWorst = axes.map((ax) => profiles.reduce((worst, p) => Math.min(worst, p[ax]), Infinity));
+
+  const S = profiles.map((p) => {
+    let s = 0;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const ax = axes[ai]!;
+      const best = fBest[ai]!;
+      const worst = fWorst[ai]!;
+      const range = best - worst;
+      if (range === 0) continue;
+      s += w * (best - p[ax]) / range;
+    }
+    return s;
+  });
+
+  const R = profiles.map((p) => {
+    let r = -Infinity;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const ax = axes[ai]!;
+      const best = fBest[ai]!;
+      const worst = fWorst[ai]!;
+      const range = best - worst;
+      if (range === 0) continue;
+      const val = w * (best - p[ax]) / range;
+      if (val > r) r = val;
+    }
+    return r === -Infinity ? 0 : r;
+  });
+
+  const sMax = S.reduce((m, s) => Math.max(m, s), -Infinity);
+  const rMax = R.reduce((m, r) => Math.max(m, r), -Infinity);
+
+  return profiles.map((_p, i) => {
+    const sNorm = sMax === 0 ? 0 : S[i]! / sMax;
+    const rNorm = rMax === 0 ? 0 : R[i]! / rMax;
+    const Q = v * sNorm + (1 - v) * rNorm;
+    return Math.max(0, Math.min(1, 1 - Q));
+  });
+}
+
+// ── Round 27: JJ1–JJ4 ────────────────────────────────────────────────────────
+
+/**
+ * JJ1 — Interval class vector.
+ *
+ * For each pair of distinct scale degrees, compute the absolute difference
+ * mod 1200 cents (folded to [0, 600]), round to the nearest `binSize`,
+ * and count. Returns an array of length `Math.round(1200 / binSize)` where
+ * `result[i]` is the count of intervals in bin `i * binSize`.
+ *
+ * Throws `RangeError` if `binSize <= 0`.
+ */
+export function intervalClassVector(
+  scaleCents: readonly number[],
+  binSize: number = 100,
+): number[] {
+  if (binSize <= 0) throw new RangeError('binSize must be > 0');
+  const numBins = Math.round(1200 / binSize);
+  const result = new Array<number>(numBins).fill(0);
+  for (let i = 0; i < scaleCents.length; i++) {
+    for (let j = i + 1; j < scaleCents.length; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!) % 1200;
+      const binIndex = Math.min(Math.round(diff / binSize), numBins - 1);
+      result[binIndex]!++;
+    }
+  }
+  return result;
+}
+
+/**
+ * JJ2 — Frequency ratio harmonic complexity.
+ *
+ * Decomposes `ratio` as p/q (lowest-terms rational approximation via
+ * continued fractions, max denominator 1000) and returns `log2(p) + log2(q)`.
+ *
+ * Returns 0 for ratio = 1 (unison). Throws `RangeError` if ratio <= 0.
+ */
+export function frequencyRatioComplexity(ratio: number): number {
+  if (ratio <= 0) throw new RangeError('ratio must be > 0');
+  if (ratio === 1) return 0;
+
+  // Continued-fraction rational approximation with max denominator 1000.
+  // We want p/q ≈ ratio in lowest terms.
+  let h0 = 1, k0 = 0;
+  let h1 = 0, k1 = 1;
+  let x = ratio;
+  for (let iter = 0; iter < 50; iter++) {
+    const a = Math.floor(x);
+    const h2 = a * h1 + h0;
+    const k2 = a * k1 + k0;
+    if (k2 > 1000) break;
+    h0 = h1; k0 = k1;
+    h1 = h2; k1 = k2;
+    const frac = x - a;
+    if (frac < 1e-8) break;
+    x = 1 / frac;
+  }
+  // h1/k1 is the best approximation with denominator <= 1000.
+  const p = h1;
+  const q = k1;
+  if (p <= 0 || q <= 0) return 0;
+  return Math.log2(p) + Math.log2(q);
+}
+
+/**
+ * JJ3 — Melodic entropy.
+ *
+ * Shannon entropy (bits) of the melodic step distribution of a sorted scale.
+ * Steps are binned into `bins` equal bins over [0, 1200). Returns 0 for
+ * scales with fewer than 2 notes. Throws `RangeError` if `bins <= 0`.
+ */
+export function melodicEntropy(
+  scaleCents: readonly number[],
+  bins: number = 12,
+): number {
+  if (bins <= 0) throw new RangeError('bins must be > 0');
+  if (scaleCents.length < 2) return 0;
+
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const binWidth = 1200 / bins;
+  const counts = new Array<number>(bins).fill(0);
+
+  for (let i = 1; i < sorted.length; i++) {
+    const step = sorted[i]! - sorted[i - 1]!;
+    const b = Math.min(Math.floor(step / binWidth), bins - 1);
+    counts[b]!++;
+  }
+
+  const total = sorted.length - 1;
+  let entropy = 0;
+  for (const count of counts) {
+    if (count > 0) {
+      const p = count / total;
+      entropy -= p * Math.log2(p);
+    }
+  }
+  return entropy;
+}
+
+/**
+ * JJ4 — Harmonic complexity profile.
+ *
+ * For each degree of `tuning` (up to `maxDegree` if specified), computes
+ * the ratio of that degree's frequency to `tuning.referenceHz` and applies
+ * `frequencyRatioComplexity`. Returns one complexity value per degree.
+ */
+export function harmonicComplexityProfile(
+  tuning: TuningSystem,
+  maxDegree?: number,
+): number[] {
+  const limit =
+    maxDegree !== undefined
+      ? Math.min(maxDegree, tuning.degrees.length)
+      : tuning.degrees.length;
+  const result: number[] = [];
+  for (let i = 0; i < limit; i++) {
+    const degree = tuning.degrees[i]!;
+    const ratio =
+      centsToFreq(pitchToCents(degree), tuning.referenceHz) / tuning.referenceHz;
+    result.push(frequencyRatioComplexity(ratio));
+  }
+  return result;
+}

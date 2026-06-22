@@ -721,10 +721,20 @@ import {
   tuningFamilySocraticRadarSkewness,
   tuningFamilySocraticRadarKurtosis,
   tuningFamilySocraticRadarZScoreMatrix,
+  tuningFamilySocraticRadarRobustScale,
+  tuningFamilySocraticRadarMinMaxNormalize,
+  tuningFamilySocraticRadarEntropyWeightedComposite,
+  tuningFamilySocraticRadarTOPSIS,
+  tuningFamilySocraticRadarSAW,
+  tuningFamilySocraticRadarVIKOR,
   barkScale,
   pitchSalience,
   scaleStepVariety,
   spectrumFlux,
+  intervalClassVector,
+  frequencyRatioComplexity,
+  melodicEntropy,
+  harmonicComplexityProfile,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -23356,5 +23366,234 @@ describe('tuningFamilySocraticRadarZScoreMatrix (Q1228)', () => {
     for (let ai = 0; ai < 5; ai++) {
       expect(m[0]![ai]!).toBeCloseTo(-(m[1]![ai]!), 10);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1230 — tuningFamilySocraticRadarRobustScale
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarRobustScale (Q1230)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a matrix with tunings rows and 5 columns', () => {
+    const m = tuningFamilySocraticRadarRobustScale(tunings, spectrum);
+    expect(m).toHaveLength(2);
+    expect(m[0]!).toHaveLength(5);
+  });
+  it('single tuning returns all zeros (IQR=0)', () => {
+    const m = tuningFamilySocraticRadarRobustScale([equalTemperament12(440)], spectrum);
+    expect(m[0]!.every((v) => v === 0)).toBe(true);
+  });
+  it('two tunings yield negated robust scores for each axis', () => {
+    const m = tuningFamilySocraticRadarRobustScale(tunings, spectrum);
+    for (let ai = 0; ai < 5; ai++) {
+      expect(m[0]![ai]!).toBeCloseTo(-(m[1]![ai]!), 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1232 — tuningFamilySocraticRadarMinMaxNormalize
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMinMaxNormalize (Q1232)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a matrix with tunings rows and 5 columns', () => {
+    const m = tuningFamilySocraticRadarMinMaxNormalize(tunings, spectrum);
+    expect(m).toHaveLength(2);
+    expect(m[0]!).toHaveLength(5);
+  });
+  it('single tuning returns all 0.5 (max=min edge case)', () => {
+    const m = tuningFamilySocraticRadarMinMaxNormalize([equalTemperament12(440)], spectrum);
+    expect(m[0]!.every((v) => v === 0.5)).toBe(true);
+  });
+  it('normalized values are in [0,1] for two tunings', () => {
+    const m = tuningFamilySocraticRadarMinMaxNormalize(tunings, spectrum);
+    for (const row of m) {
+      for (const v of row) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1234 — tuningFamilySocraticRadarEntropyWeightedComposite
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarEntropyWeightedComposite (Q1234)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one score per tuning', () => {
+    const scores = tuningFamilySocraticRadarEntropyWeightedComposite(tunings, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('all scores are finite', () => {
+    const scores = tuningFamilySocraticRadarEntropyWeightedComposite(tunings, spectrum);
+    for (const v of scores) expect(isFinite(v)).toBe(true);
+  });
+  it('single tuning still returns a finite score', () => {
+    const scores = tuningFamilySocraticRadarEntropyWeightedComposite([equalTemperament12(440)], spectrum);
+    expect(scores).toHaveLength(1);
+    expect(isFinite(scores[0]!)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1236 — tuningFamilySocraticRadarTOPSIS
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarTOPSIS (Q1236)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one closeness score per tuning', () => {
+    const scores = tuningFamilySocraticRadarTOPSIS(tunings, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('closeness scores sum to 1 for two tunings', () => {
+    const scores = tuningFamilySocraticRadarTOPSIS(tunings, spectrum);
+    expect(scores[0]! + scores[1]!).toBeCloseTo(1, 10);
+  });
+  it('single tuning returns 0.5', () => {
+    const scores = tuningFamilySocraticRadarTOPSIS([equalTemperament12(440)], spectrum);
+    expect(scores[0]!).toBeCloseTo(0.5, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1238 — tuningFamilySocraticRadarSAW
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSAW (Q1238)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one SAW score per tuning', () => {
+    const scores = tuningFamilySocraticRadarSAW(tunings, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('scores are in [0,1]', () => {
+    const scores = tuningFamilySocraticRadarSAW(tunings, spectrum);
+    for (const v of scores) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('equal-weight sum equals mean of axis scores', () => {
+    const scores = tuningFamilySocraticRadarSAW([equalTemperament12(440)], spectrum);
+    expect(isFinite(scores[0]!)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1240 — tuningFamilySocraticRadarVIKOR
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarVIKOR (Q1240)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one VIKOR score per tuning', () => {
+    const scores = tuningFamilySocraticRadarVIKOR(tunings, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('scores are in [0,1]', () => {
+    const scores = tuningFamilySocraticRadarVIKOR(tunings, spectrum);
+    for (const v of scores) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('single tuning returns 1 (Q=0, best possible)', () => {
+    const scores = tuningFamilySocraticRadarVIKOR([equalTemperament12(440)], spectrum);
+    expect(scores[0]!).toBeCloseTo(1, 10);
+  });
+});
+
+// ── Round 27: JJ1–JJ4 ────────────────────────────────────────────────────────
+
+describe('intervalClassVector (JJ1)', () => {
+  it('returns 12-element vector for binSize=100', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    const v = intervalClassVector(scale);
+    expect(v).toHaveLength(12);
+  });
+  it('sum equals C(n,2) pairs', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    const v = intervalClassVector(scale);
+    const total = v.reduce((a, b) => a + b, 0);
+    expect(total).toBe(21); // C(7,2) = 21
+  });
+  it('3-note scale: correct bin counts', () => {
+    const v = intervalClassVector([0, 200, 400]);
+    // pairs: |200-0|=200 → bin2, |400-0|=400 → bin4, |400-200|=200 → bin2
+    expect(v[2]).toBe(2);
+    expect(v[4]).toBe(1);
+    expect(v.reduce((a, b) => a + b, 0)).toBe(3);
+  });
+  it('throws RangeError for binSize <= 0', () => {
+    expect(() => intervalClassVector([0, 200], 0)).toThrow(RangeError);
+    expect(() => intervalClassVector([0, 200], -50)).toThrow(RangeError);
+  });
+});
+
+describe('frequencyRatioComplexity (JJ2)', () => {
+  it('returns 0 for ratio = 1 (unison)', () => {
+    expect(frequencyRatioComplexity(1)).toBe(0);
+  });
+  it('returns log2(2)+log2(1)=1 for ratio = 2 (octave, p=2 q=1)', () => {
+    // 2 = 2/1, so complexity = log2(2) + log2(1) = 1 + 0 = 1
+    expect(frequencyRatioComplexity(2)).toBeCloseTo(1, 8);
+  });
+  it('returns positive value for 3/2 (perfect fifth)', () => {
+    expect(frequencyRatioComplexity(3 / 2)).toBeGreaterThan(0);
+  });
+  it('throws RangeError for ratio <= 0', () => {
+    expect(() => frequencyRatioComplexity(0)).toThrow(RangeError);
+    expect(() => frequencyRatioComplexity(-1)).toThrow(RangeError);
+  });
+});
+
+describe('melodicEntropy (JJ3)', () => {
+  it('returns 0 for scale with fewer than 2 notes', () => {
+    expect(melodicEntropy([])).toBe(0);
+    expect(melodicEntropy([0])).toBe(0);
+  });
+  it('returns 0 for uniform step distribution (all same size)', () => {
+    // All steps equal → single bin → p=1 → -1*log2(1)=0
+    expect(melodicEntropy([0, 200, 400])).toBe(0);
+  });
+  it('returns > 0 for diverse step distribution', () => {
+    // Diatonic scale has mixed 100c and 200c steps
+    const entropy = melodicEntropy([0, 200, 400, 500, 700, 900, 1100]);
+    expect(entropy).toBeGreaterThan(0);
+  });
+  it('throws RangeError for bins <= 0', () => {
+    expect(() => melodicEntropy([0, 200], 0)).toThrow(RangeError);
+  });
+});
+
+describe('harmonicComplexityProfile (JJ4)', () => {
+  it('returns one value per degree for equalTemperament12', () => {
+    const t = equalTemperament12(440);
+    const profile = harmonicComplexityProfile(t);
+    expect(profile).toHaveLength(12);
+  });
+  it('first element (unison) has complexity ~0', () => {
+    const t = equalTemperament12(440);
+    const profile = harmonicComplexityProfile(t);
+    // degree 0 = 0 cents → ratio = 1 → complexity = 0
+    expect(profile[0]).toBeCloseTo(0, 5);
+  });
+  it('respects maxDegree parameter', () => {
+    const t = equalTemperament12(440);
+    const profile = harmonicComplexityProfile(t, 5);
+    expect(profile).toHaveLength(5);
+  });
+  it('all values are non-negative', () => {
+    const t = equalTemperament12(440);
+    const profile = harmonicComplexityProfile(t);
+    expect(profile.every((v) => v >= 0)).toBe(true);
   });
 });

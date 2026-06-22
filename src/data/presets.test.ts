@@ -418,6 +418,12 @@ import {
   presetFamilySocraticRadarSkewness,
   presetFamilySocraticRadarKurtosis,
   presetFamilySocraticRadarZScoreMatrix,
+  presetFamilySocraticRadarRobustScale,
+  presetFamilySocraticRadarMinMaxNormalize,
+  presetFamilySocraticRadarEntropyWeightedComposite,
+  presetFamilySocraticRadarTOPSIS,
+  presetFamilySocraticRadarSAW,
+  presetFamilySocraticRadarVIKOR,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -13177,5 +13183,140 @@ describe('presetFamilySocraticRadarZScoreMatrix (Q1229)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarZScoreMatrix(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1231 — presetFamilySocraticRadarRobustScale
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRobustScale (Q1231)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns matrix with 2 rows and 5 columns', () => {
+    const m = presetFamilySocraticRadarRobustScale(presetIds, spectrum);
+    expect(m).toHaveLength(2);
+    expect(m[0]!).toHaveLength(5);
+  });
+  it('two presets yield negated robust scores for each axis', () => {
+    const m = presetFamilySocraticRadarRobustScale(presetIds, spectrum);
+    for (let ai = 0; ai < 5; ai++) {
+      expect(m[0]![ai]!).toBeCloseTo(-(m[1]![ai]!), 10);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarRobustScale(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1233 — presetFamilySocraticRadarMinMaxNormalize
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMinMaxNormalize (Q1233)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns matrix with 2 rows and 5 columns', () => {
+    const m = presetFamilySocraticRadarMinMaxNormalize(presetIds, spectrum);
+    expect(m).toHaveLength(2);
+    expect(m[0]!).toHaveLength(5);
+  });
+  it('normalized values are in [0,1]', () => {
+    const m = presetFamilySocraticRadarMinMaxNormalize(presetIds, spectrum);
+    for (const row of m) {
+      for (const v of row) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMinMaxNormalize(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1235 — presetFamilySocraticRadarEntropyWeightedComposite
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarEntropyWeightedComposite (Q1235)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one score per preset', () => {
+    const scores = presetFamilySocraticRadarEntropyWeightedComposite(presetIds, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('all scores are finite', () => {
+    const scores = presetFamilySocraticRadarEntropyWeightedComposite(presetIds, spectrum);
+    for (const v of scores) expect(isFinite(v)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEntropyWeightedComposite(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1237 — presetFamilySocraticRadarTOPSIS
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTOPSIS (Q1237)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one closeness score per preset', () => {
+    const scores = presetFamilySocraticRadarTOPSIS(presetIds, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('closeness scores sum to 1 for two presets', () => {
+    const scores = presetFamilySocraticRadarTOPSIS(presetIds, spectrum);
+    expect(scores[0]! + scores[1]!).toBeCloseTo(1, 10);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTOPSIS(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1239 — presetFamilySocraticRadarSAW
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarSAW (Q1239)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one SAW score per preset', () => {
+    const scores = presetFamilySocraticRadarSAW(presetIds, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('SAW scores are in [0,1]', () => {
+    const scores = presetFamilySocraticRadarSAW(presetIds, spectrum);
+    for (const v of scores) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSAW(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1241 — presetFamilySocraticRadarVIKOR
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarVIKOR (Q1241)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one VIKOR score per preset', () => {
+    const scores = presetFamilySocraticRadarVIKOR(presetIds, spectrum);
+    expect(scores).toHaveLength(2);
+  });
+  it('VIKOR scores are in [0,1]', () => {
+    const scores = presetFamilySocraticRadarVIKOR(presetIds, spectrum);
+    for (const v of scores) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarVIKOR(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

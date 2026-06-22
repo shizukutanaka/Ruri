@@ -455,3 +455,15 @@
 | `pitchSalience` | スペクトル重心（振幅重み付き比の平均） |
 | `scaleStepVariety` | スケールのステップ種類数（ビン丸め） |
 | `spectrumFlux` | 2スペクトル間の差分量（正規化RMS） |
+
+## Round 27: 音程複雑度・エントロピー分析 (JJ1–JJ4)
+
+**テーマ**: 音程クラスベクトルと調律複雑度指標  
+**実装**: JJ1–JJ4
+
+| 関数 | 説明 |
+|------|------|
+| `intervalClassVector` | 音程クラス頻度ベクトル（ビン丸め） |
+| `frequencyRatioComplexity` | 周波数比の調和複雑度（log2(p)+log2(q)） |
+| `melodicEntropy` | 旋律ステップ分布のシャノンエントロピー |
+| `harmonicComplexityProfile` | 調律の各音度の複雑度プロファイル |
