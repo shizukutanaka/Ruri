@@ -766,3 +766,14 @@
 | JJJ4 | `scaleTeachingDifficulty` | マイクロトーナル音程・高音数などによる教授難易度 |
 
 **参考**: Cognitive psychology of music learning (Dowling & Harwood 1986); Scale difficulty in ear training pedagogy。
+
+## Round 54: スケール変換・モーフィング (KKK1–KKK4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| KKK1 | `scaleMorphDistance` | 2スケール間の最適輸送モーフ距離 |
+| KKK2 | `scaleInterpol` | 2スケール間の線形補間 |
+| KKK3 | `scaleGradientDescent` | 目標スケールへの勾配降下経路 |
+| KKK4 | `scaleConvergenceRate` | 収束に必要なステップ数 |
+
+**参考**: Scale morphing and continuous transformations; Optimal transport in music analysis。
