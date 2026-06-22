@@ -1140,3 +1140,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | SSS2 | `scaleDFTBalanceIndex` | DFT均衡指数（k=1..6の平均振幅の逆数） |
 | SSS3 | `scaleDFTPeakFrequency` | 支配的DFT周波数（最大振幅のk値、正規化） |
 | SSS4 | `scaleDFTSpectralFlatness` | DFTスペクトル平坦性（Wienerエントロピー） |
+
+## Round 88: 音程ベクトル分析 (TTT1–TTT4)
+
+音程クラスベクトル（集合論的音楽理論）を解析する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| TTT1 | `scaleIntervalVectorV2` | 音程ベクトル（IC1–IC6のカウント配列） |
+| TTT2 | `scaleIntervalVectorEntropyV2` | 音程ベクトルのShannonエントロピー（正規化） |
+| TTT3 | `scaleIntervalVectorBalanceV2` | 音程ベクトルの均衡性スコア（変動係数の逆数） |
+| TTT4 | `scaleIntervalVectorMaxICV2` | 支配的音程クラス（最大カウントIC、正規化） |
