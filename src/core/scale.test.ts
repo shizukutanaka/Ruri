@@ -879,6 +879,12 @@ import {
   scaleRotationalSymmetry,
   scaleFractalDimension,
   scaleSelfSimilarityScore,
+  tuningFamilySocraticRadarShannonEntropyMean,
+  tuningFamilySocraticRadarJensenShannonDivergenceMean,
+  tuningFamilySocraticRadarMutualInformationMean,
+  tuningFamilySocraticRadarNormalizedEntropy,
+  tuningFamilySocraticRadarRelativeEntropy,
+  tuningFamilySocraticRadarTransferEntropyMean,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -26947,5 +26953,106 @@ describe('YY4 scaleSelfSimilarityScore', () => {
     const ed = Array.from({length:12},(_,i)=>i*100);
     const r = scaleSelfSimilarityScore(ed);
     expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1410 — tuningFamilySocraticRadarShannonEntropyMean
+describe('Q1410 tuningFamilySocraticRadarShannonEntropyMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns non-negative number', () => {
+    expect(tuningFamilySocraticRadarShannonEntropyMean([t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarShannonEntropyMean([], s)).toBe(0);
+  });
+  it('two tunings returns non-negative', () => {
+    expect(tuningFamilySocraticRadarShannonEntropyMean([t, t], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1412 — tuningFamilySocraticRadarJensenShannonDivergenceMean
+describe('Q1412 tuningFamilySocraticRadarJensenShannonDivergenceMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<2', () => {
+    expect(tuningFamilySocraticRadarJensenShannonDivergenceMean([t], s)).toBe(0);
+  });
+  it('returns value in [0,1] for two tunings', () => {
+    const r = tuningFamilySocraticRadarJensenShannonDivergenceMean([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('two distinct tunings returns non-negative', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarJensenShannonDivergenceMean([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1414 — tuningFamilySocraticRadarMutualInformationMean
+describe('Q1414 tuningFamilySocraticRadarMutualInformationMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<2', () => {
+    expect(tuningFamilySocraticRadarMutualInformationMean([t], s)).toBe(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    expect(tuningFamilySocraticRadarMutualInformationMean([t, t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for three tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    expect(tuningFamilySocraticRadarMutualInformationMean([t, t2, t3], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1416 — tuningFamilySocraticRadarNormalizedEntropy
+describe('Q1416 tuningFamilySocraticRadarNormalizedEntropy', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=1', () => {
+    expect(tuningFamilySocraticRadarNormalizedEntropy([t], s)).toBe(0);
+  });
+  it('returns value in [0,1] for n=2', () => {
+    const r = tuningFamilySocraticRadarNormalizedEntropy([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns non-negative for three tunings', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarNormalizedEntropy([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1418 — tuningFamilySocraticRadarRelativeEntropy
+describe('Q1418 tuningFamilySocraticRadarRelativeEntropy', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns non-negative number for single tuning', () => {
+    expect(tuningFamilySocraticRadarRelativeEntropy([t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for empty tunings', () => {
+    expect(tuningFamilySocraticRadarRelativeEntropy([], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarRelativeEntropy([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1420 — tuningFamilySocraticRadarTransferEntropyMean
+describe('Q1420 tuningFamilySocraticRadarTransferEntropyMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<3', () => {
+    expect(tuningFamilySocraticRadarTransferEntropyMean([t, t], s)).toBe(0);
+  });
+  it('returns non-negative for three tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    expect(tuningFamilySocraticRadarTransferEntropyMean([t, t2, t3], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTransferEntropyMean([], s)).toBe(0);
   });
 });

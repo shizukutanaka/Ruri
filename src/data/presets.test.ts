@@ -508,6 +508,12 @@ import {
   presetFamilySocraticRadarClusterPurity,
   presetFamilySocraticRadarDunnIndex,
   presetFamilySocraticRadarDaviesBouldinIndex,
+  presetFamilySocraticRadarShannonEntropyMean,
+  presetFamilySocraticRadarJensenShannonDivergenceMean,
+  presetFamilySocraticRadarMutualInformationMean,
+  presetFamilySocraticRadarNormalizedEntropy,
+  presetFamilySocraticRadarRelativeEntropy,
+  presetFamilySocraticRadarTransferEntropyMean,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -15100,5 +15106,97 @@ describe('Q1409 presetFamilySocraticRadarDaviesBouldinIndex', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarDaviesBouldinIndex(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1411 — presetFamilySocraticRadarShannonEntropyMean
+describe('Q1411 presetFamilySocraticRadarShannonEntropyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative number', () => {
+    const r = presetFamilySocraticRadarShannonEntropyMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('single preset returns non-negative', () => {
+    expect(presetFamilySocraticRadarShannonEntropyMean(['12-tet'], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarShannonEntropyMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1413 — presetFamilySocraticRadarJensenShannonDivergenceMean
+describe('Q1413 presetFamilySocraticRadarJensenShannonDivergenceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for two presets', () => {
+    const r = presetFamilySocraticRadarJensenShannonDivergenceMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('single preset returns 0', () => {
+    expect(presetFamilySocraticRadarJensenShannonDivergenceMean(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarJensenShannonDivergenceMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1415 — presetFamilySocraticRadarMutualInformationMean
+describe('Q1415 presetFamilySocraticRadarMutualInformationMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarMutualInformationMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('single preset returns 0', () => {
+    expect(presetFamilySocraticRadarMutualInformationMean(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMutualInformationMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1417 — presetFamilySocraticRadarNormalizedEntropy
+describe('Q1417 presetFamilySocraticRadarNormalizedEntropy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for two presets', () => {
+    const r = presetFamilySocraticRadarNormalizedEntropy(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('single preset returns 0', () => {
+    expect(presetFamilySocraticRadarNormalizedEntropy(['12-tet'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNormalizedEntropy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1419 — presetFamilySocraticRadarRelativeEntropy
+describe('Q1419 presetFamilySocraticRadarRelativeEntropy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative number', () => {
+    const r = presetFamilySocraticRadarRelativeEntropy(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('single preset returns non-negative', () => {
+    expect(presetFamilySocraticRadarRelativeEntropy(['12-tet'], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarRelativeEntropy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1421 — presetFamilySocraticRadarTransferEntropyMean
+describe('Q1421 presetFamilySocraticRadarTransferEntropyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for three presets', () => {
+    const r = presetFamilySocraticRadarTransferEntropyMean(['12-tet', 'just-5-limit', 'makam-ussak-example'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('two presets returns 0', () => {
+    expect(presetFamilySocraticRadarTransferEntropyMean(['12-tet', 'just-5-limit'], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTransferEntropyMean(['unknown'], s)).toThrow(RangeError);
   });
 });

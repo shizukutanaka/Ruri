@@ -31693,3 +31693,316 @@ export function scaleSelfSimilarityScore(
   if (count === 0) return 0;
   return totalCorr / count;
 }
+
+// ---------------------------------------------------------------------------
+// Q1410 — tuningFamilySocraticRadarShannonEntropyMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Shannon entropy of the distribution of radar axis values across tunings.
+ * For each axis, treat normalized profile values as a probability distribution;
+ * compute H = -Σ p*log2(p). Average across 5 axes. Returns a non-negative number.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Mean Shannon entropy across all 5 axes (non-negative).
+ */
+export function tuningFamilySocraticRadarShannonEntropyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n === 0) return 0;
+  let totalEntropy = 0;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    let axisEntropy = 0;
+    if (sum > 0) {
+      for (const v of vals) {
+        const p = v / sum;
+        if (p > 0) axisEntropy -= p * Math.log2(p);
+      }
+    }
+    totalEntropy += axisEntropy;
+  }
+  return Math.max(0, totalEntropy / axes.length);
+}
+
+// ---------------------------------------------------------------------------
+// Q1412 — tuningFamilySocraticRadarJensenShannonDivergenceMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Jensen-Shannon divergence between the radar profiles of the first two tunings.
+ * Returns 0 for n<2. JSD(P||Q) = (KL(P||M) + KL(Q||M))/2 where M=(P+Q)/2.
+ * Uses base-2 log. Return value in [0,1].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns JSD between first two tuning profiles, in [0,1].
+ */
+export function tuningFamilySocraticRadarJensenShannonDivergenceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n < 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const p0 = profiles[0]!;
+  const p1 = profiles[1]!;
+  const vals0 = axes.map((ax) => p0[ax]);
+  const vals1 = axes.map((ax) => p1[ax]);
+  const sum0 = vals0.reduce((a, b) => a + b, 0);
+  const sum1 = vals1.reduce((a, b) => a + b, 0);
+  const pmf0 = vals0.map((v) => (sum0 > 0 ? v / sum0 : 1 / axes.length));
+  const pmf1 = vals1.map((v) => (sum1 > 0 ? v / sum1 : 1 / axes.length));
+  const mixture = pmf0.map((p, i) => (p + pmf1[i]!) / 2);
+  let klPM = 0;
+  let klQM = 0;
+  for (let i = 0; i < axes.length; i++) {
+    const p = pmf0[i]!;
+    const q = pmf1[i]!;
+    const m = mixture[i]!;
+    if (p > 0 && m > 0) klPM += p * Math.log2(p / m);
+    if (q > 0 && m > 0) klQM += q * Math.log2(q / m);
+  }
+  return Math.max(0, Math.min(1, (klPM + klQM) / 2));
+}
+
+// ---------------------------------------------------------------------------
+// Q1414 — tuningFamilySocraticRadarMutualInformationMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Mutual information between axis pairs averaged over all axis pairs (C(5,2)=10 pairs).
+ * For each pair of axes, treat the n tuning values as joint samples; discretize into
+ * 3 bins, compute I(X;Y) = ΣΣ p(x,y)*log2(p(x,y)/(p(x)*p(y))).
+ * Returns non-negative number. Returns 0 for n<2.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Mean mutual information across all axis pairs (non-negative).
+ */
+export function tuningFamilySocraticRadarMutualInformationMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n < 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const bins = 3;
+
+  function computeMI(ax1: AxisKey, ax2: AxisKey): number {
+    const b1 = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[ax1] * bins))));
+    const b2 = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[ax2] * bins))));
+    const joint: number[][] = Array.from({ length: bins }, () => new Array<number>(bins).fill(0));
+    for (let i = 0; i < n; i++) {
+      joint[b1[i]!]![b2[i]!]! += 1 / n;
+    }
+    const m1 = new Array<number>(bins).fill(0);
+    const m2 = new Array<number>(bins).fill(0);
+    for (let i = 0; i < bins; i++) {
+      for (let j = 0; j < bins; j++) {
+        m1[i]! += joint[i]![j]!;
+        m2[j]! += joint[i]![j]!;
+      }
+    }
+    let mi = 0;
+    for (let i = 0; i < bins; i++) {
+      for (let j = 0; j < bins; j++) {
+        const pij = joint[i]![j]!;
+        const pi = m1[i]!;
+        const pj = m2[j]!;
+        if (pij > 0 && pi > 0 && pj > 0) {
+          mi += pij * Math.log2(pij / (pi * pj));
+        }
+      }
+    }
+    return Math.max(0, mi);
+  }
+
+  let total = 0;
+  let count = 0;
+  for (let i = 0; i < axes.length; i++) {
+    for (let j = i + 1; j < axes.length; j++) {
+      total += computeMI(axes[i]!, axes[j]!);
+      count++;
+    }
+  }
+  return count > 0 ? Math.max(0, total / count) : 0;
+}
+
+// ---------------------------------------------------------------------------
+// Q1416 — tuningFamilySocraticRadarNormalizedEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Shannon entropy normalized to [0,1] by dividing by log2(n) where n = number of tunings.
+ * Computes entropy across each axis and averages. Returns 0 for n<=1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Normalized entropy in [0,1].
+ */
+export function tuningFamilySocraticRadarNormalizedEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const maxEntropy = Math.log2(n);
+  let totalNormEntropy = 0;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    let axisEntropy = 0;
+    if (sum > 0) {
+      for (const v of vals) {
+        const p = v / sum;
+        if (p > 0) axisEntropy -= p * Math.log2(p);
+      }
+    }
+    totalNormEntropy += axisEntropy / maxEntropy;
+  }
+  return Math.max(0, Math.min(1, totalNormEntropy / axes.length));
+}
+
+// ---------------------------------------------------------------------------
+// Q1418 — tuningFamilySocraticRadarRelativeEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * KL divergence of the mean profile from a uniform distribution U=[0.5,0.5,0.5,0.5,0.5].
+ * KL(P||U) = Σ p_i * log2(p_i / u_i). Clamp values to avoid log(0).
+ * Returns non-negative number.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns KL divergence from uniform distribution (non-negative).
+ */
+export function tuningFamilySocraticRadarRelativeEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const uniform = 0.5;
+  const meanProfile = axes.map((ax) => {
+    if (n === 0) return uniform;
+    return profiles.reduce((s, p) => s + p[ax], 0) / n;
+  });
+  let kl = 0;
+  for (const p of meanProfile) {
+    const clamped = Math.max(1e-10, p);
+    kl += clamped * Math.log2(clamped / uniform);
+  }
+  return Math.max(0, kl);
+}
+
+// ---------------------------------------------------------------------------
+// Q1420 — tuningFamilySocraticRadarTransferEntropyMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Simplified transfer entropy: for pairs of axes, compute
+ * TE(X->Y) = H(Y_t | Y_{t-1}) - H(Y_t | Y_{t-1}, X_{t-1}),
+ * treating each tuning index as a time step.
+ * Returns the mean TE across all ordered axis pairs.
+ * Returns 0 for n<3 (need at least 3 time steps).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Mean transfer entropy across all ordered axis pairs (non-negative).
+ */
+export function tuningFamilySocraticRadarTransferEntropyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n < 3) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const bins = 3;
+
+  function binVal(v: number): number {
+    return Math.min(bins - 1, Math.max(0, Math.floor(v * bins)));
+  }
+
+  function computeTE(fromAx: AxisKey, toAx: AxisKey): number {
+    const xt = profiles.map((p) => binVal(p[fromAx]));
+    const yt = profiles.map((p) => binVal(p[toAx]));
+    const total = n - 1;
+    const jointYY: Record<string, number> = {};
+    const margY: Record<string, number> = {};
+    const jointXYY: Record<string, number> = {};
+    const jointXY: Record<string, number> = {};
+    for (let t = 1; t < n; t++) {
+      const yCurr = yt[t]!;
+      const yPrev = yt[t - 1]!;
+      const xPrev = xt[t - 1]!;
+      const keyYY = `${yPrev},${yCurr}`;
+      const keyY = `${yPrev}`;
+      const keyXYY = `${xPrev},${yPrev},${yCurr}`;
+      const keyXY = `${xPrev},${yPrev}`;
+      jointYY[keyYY] = (jointYY[keyYY] ?? 0) + 1;
+      margY[keyY] = (margY[keyY] ?? 0) + 1;
+      jointXYY[keyXYY] = (jointXYY[keyXYY] ?? 0) + 1;
+      jointXY[keyXY] = (jointXY[keyXY] ?? 0) + 1;
+    }
+    let hYgY = 0;
+    for (const [keyYY, cntYY] of Object.entries(jointYY)) {
+      const parts = keyYY.split(',');
+      const yPrevStr = parts[0]!;
+      const pYY = cntYY / total;
+      const pY = (margY[yPrevStr] ?? 0) / total;
+      if (pYY > 0 && pY > 0) hYgY -= pYY * Math.log2(pYY / pY);
+    }
+    let hYgXY = 0;
+    for (const [keyXYY, cntXYY] of Object.entries(jointXYY)) {
+      const parts = keyXYY.split(',');
+      const keyXY = `${parts[0]!},${parts[1]!}`;
+      const pXYY = cntXYY / total;
+      const pXY = (jointXY[keyXY] ?? 0) / total;
+      if (pXYY > 0 && pXY > 0) hYgXY -= pXYY * Math.log2(pXYY / pXY);
+    }
+    return Math.max(0, hYgY - hYgXY);
+  }
+
+  let totalTE = 0;
+  let count = 0;
+  for (let i = 0; i < axes.length; i++) {
+    for (let j = 0; j < axes.length; j++) {
+      if (i !== j) {
+        totalTE += computeTE(axes[i]!, axes[j]!);
+        count++;
+      }
+    }
+  }
+  return count > 0 ? Math.max(0, totalTE / count) : 0;
+}
