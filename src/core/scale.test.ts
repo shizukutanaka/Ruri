@@ -1059,6 +1059,12 @@ import {
   tuningFamilySocraticRadarParetoDominanceMean,
   tuningFamilySocraticRadarShapleyValueProxy,
   tuningFamilySocraticRadarMinimaxProxy,
+  tuningFamilySocraticRadarMorphismCountProxy,
+  tuningFamilySocraticRadarFunctorFaithfulnessProxy,
+  tuningFamilySocraticRadarNaturalTransformationMean,
+  tuningFamilySocraticRadarAdjunctionProxy,
+  tuningFamilySocraticRadarLimitProxy,
+  tuningFamilySocraticRadarColimitProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1181,6 +1187,10 @@ import {
   scaleSubharmonicDensity,
   scaleResonanceScore,
   scaleNodeDensity,
+  scaleKMeansClusters,
+  scaleClusterSeparation,
+  scaleSilhouetteScore,
+  scaleClusterBalance,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -32516,5 +32526,100 @@ describe('Q1780 tuningFamilySocraticRadarMinimaxProxy', () => {
     const v = tuningFamilySocraticRadarMinimaxProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 74: ピッチクラスタ分析 (EEE1–EEE4)
+// ---------------------------------------------------------------------------
+
+// EEE1 — scaleKMeansClusters
+describe('EEE1 scaleKMeansClusters', () => {
+  it('empty → 0', () => {
+    expect(scaleKMeansClusters([])).toBe(0);
+  });
+  it('n=1 → 0 or finite [0,1]', () => {
+    const v = scaleKMeansClusters([600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('spread scale [0,400,800] → finite, in [0,1]', () => {
+    const v = scaleKMeansClusters([0, 400, 800]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,600,650,700] → finite, in [0,1]', () => {
+    const v = scaleKMeansClusters([0, 50, 100, 600, 650, 700]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// EEE2 — scaleClusterSeparation
+describe('EEE2 scaleClusterSeparation', () => {
+  it('empty → 0', () => {
+    expect(scaleClusterSeparation([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleClusterSeparation([600])).toBe(0);
+  });
+  it('spread scale [0,400,800] → finite, in [0,1]', () => {
+    const v = scaleClusterSeparation([0, 400, 800]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,600,650,700] → finite, in [0,1]', () => {
+    const v = scaleClusterSeparation([0, 50, 100, 600, 650, 700]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// EEE3 — scaleSilhouetteScore
+describe('EEE3 scaleSilhouetteScore', () => {
+  it('empty → 0', () => {
+    expect(scaleSilhouetteScore([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleSilhouetteScore([600])).toBe(0);
+  });
+  it('spread scale [0,400,800] → finite, in [0,1]', () => {
+    const v = scaleSilhouetteScore([0, 400, 800]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,600,650,700] → finite, in [0,1]', () => {
+    const v = scaleSilhouetteScore([0, 50, 100, 600, 650, 700]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// EEE4 — scaleClusterBalance
+describe('EEE4 scaleClusterBalance', () => {
+  it('empty → 0', () => {
+    expect(scaleClusterBalance([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleClusterBalance([600])).toBe(0);
+  });
+  it('spread scale [0,400,800] → finite, in [0,1]', () => {
+    const v = scaleClusterBalance([0, 400, 800]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,600,650,700] → finite, in [0,1]', () => {
+    const v = scaleClusterBalance([0, 50, 100, 600, 650, 700]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

@@ -39344,6 +39344,180 @@ export function tuningFamilySocraticRadarMinimaxProxy(
   return Math.max(0, Math.min(1, minimaxVal));
 }
 
+// Q1782 — tuningFamilySocraticRadarMorphismCountProxy
+export function tuningFamilySocraticRadarMorphismCountProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    // single profile: normalize rank count by 5! = 120
+    return Math.max(0, Math.min(1, 1 / 120));
+  }
+  // factorial of 5
+  const fact5 = 120;
+  let total = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const a = vecs[i]!;
+    const b = vecs[i + 1]!;
+    // count monotone maps: pairs (j,k) where a[j] <= a[k] implies b[j] <= b[k]
+    let monotone = 0;
+    for (let j = 0; j < axes.length; j++) {
+      for (let k = j + 1; k < axes.length; k++) {
+        if (a[j]! <= a[k]! && b[j]! <= b[k]!) monotone++;
+        if (a[j]! >= a[k]! && b[j]! >= b[k]!) monotone++;
+      }
+    }
+    total += monotone / fact5;
+    pairs++;
+  }
+  return Math.max(0, Math.min(1, total / pairs));
+}
+
+// Q1784 — tuningFamilySocraticRadarFunctorFaithfulnessProxy
+export function tuningFamilySocraticRadarFunctorFaithfulnessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    // single profile: rank correlation with itself is 1
+    return Math.max(0, Math.min(1, 1));
+  }
+  const rank = (arr: number[]): number[] => {
+    const sorted = [...arr].sort((a, b) => a - b);
+    return arr.map((v) => sorted.indexOf(v));
+  };
+  let total = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const ra = rank(vecs[i]!);
+    const rb = rank(vecs[i + 1]!);
+    const n = ra.length;
+    const meanA = ra.reduce((s, v) => s + v, 0) / n;
+    const meanB = rb.reduce((s, v) => s + v, 0) / n;
+    let num = 0, da = 0, db = 0;
+    for (let j = 0; j < n; j++) {
+      const a = ra[j]! - meanA;
+      const b = rb[j]! - meanB;
+      num += a * b;
+      da += a * a;
+      db += b * b;
+    }
+    const corr = da === 0 || db === 0 ? 0 : num / Math.sqrt(da * db);
+    total += (corr + 1) / 2; // map [-1,1] -> [0,1]
+    pairs++;
+  }
+  return Math.max(0, Math.min(1, total / pairs));
+}
+
+// Q1786 — tuningFamilySocraticRadarNaturalTransformationMean
+export function tuningFamilySocraticRadarNaturalTransformationMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    return 0;
+  }
+  const norm = Math.sqrt(axes.length); // sqrt(5)
+  let total = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const a = vecs[i]!;
+    const b = vecs[i + 1]!;
+    let dist = 0;
+    for (let j = 0; j < axes.length; j++) {
+      dist += Math.abs(a[j]! - b[j]!);
+    }
+    total += dist / norm;
+    pairs++;
+  }
+  // invert: closer profiles → higher faithfulness
+  const meanDist = total / pairs;
+  return Math.max(0, Math.min(1, 1 - meanDist));
+}
+
+// Q1788 — tuningFamilySocraticRadarAdjunctionProxy
+export function tuningFamilySocraticRadarAdjunctionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    return 0;
+  }
+  let total = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const q = vecs[i + 1]!;
+    // count axes where p[ai] <= q[j] for all j (left adjoint indicator)
+    let count = 0;
+    for (let ai = 0; ai < axes.length; ai++) {
+      const allLeq = q.every((qj) => vecs[i]![ai]! <= qj);
+      if (allLeq) count++;
+    }
+    total += count / axes.length;
+    pairs++;
+  }
+  return Math.max(0, Math.min(1, total / pairs));
+}
+
+// Q1790 — tuningFamilySocraticRadarLimitProxy
+export function tuningFamilySocraticRadarLimitProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // axis-wise minimum across all profiles
+  const minimums = axes.map((_, ai) => Math.min(...vecs.map((v) => v[ai]!)));
+  const meanMin = minimums.reduce((s, v) => s + v, 0) / axes.length;
+  return Math.max(0, Math.min(1, meanMin / 0.5));
+}
+
+// Q1792 — tuningFamilySocraticRadarColimitProxy
+export function tuningFamilySocraticRadarColimitProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // axis-wise maximum across all profiles
+  const maximums = axes.map((_, ai) => Math.max(...vecs.map((v) => v[ai]!)));
+  const meanMax = maximums.reduce((s, v) => s + v, 0) / axes.length;
+  return Math.max(0, Math.min(1, meanMax / 1.0));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -41337,4 +41511,160 @@ export function scaleNodeDensity(scaleCents: readonly number[]): number {
     if (nodal) countNodal++;
   }
   return countNodal / (n - 1);
+}
+
+// ---------------------------------------------------------------------------
+// Round 74: ピッチクラスタ分析 (EEE1–EEE4)
+// ---------------------------------------------------------------------------
+
+/** Run k=3 k-means on scaleCents values, returning [assignments, centroids]. */
+function _kMeans3(scaleCents: readonly number[], periodCents: number): { assignments: number[]; centroids: [number, number, number] } {
+  const n = scaleCents.length;
+  let c0 = periodCents / 6;
+  let c1 = periodCents / 2;
+  let c2 = (5 * periodCents) / 6;
+  const assignments: number[] = new Array(n).fill(0) as number[];
+  for (let iter = 0; iter < 5; iter++) {
+    // Assign
+    for (let i = 0; i < n; i++) {
+      const p = scaleCents[i]!;
+      const d0 = Math.abs(p - c0);
+      const d1 = Math.abs(p - c1);
+      const d2 = Math.abs(p - c2);
+      if (d0 <= d1 && d0 <= d2) assignments[i] = 0;
+      else if (d1 <= d2) assignments[i] = 1;
+      else assignments[i] = 2;
+    }
+    // Recompute centroids
+    let sum0 = 0, cnt0 = 0, sum1 = 0, cnt1 = 0, sum2 = 0, cnt2 = 0;
+    for (let i = 0; i < n; i++) {
+      const p = scaleCents[i]!;
+      if (assignments[i] === 0) { sum0 += p; cnt0++; }
+      else if (assignments[i] === 1) { sum1 += p; cnt1++; }
+      else { sum2 += p; cnt2++; }
+    }
+    if (cnt0 > 0) c0 = sum0 / cnt0;
+    if (cnt1 > 0) c1 = sum1 / cnt1;
+    if (cnt2 > 0) c2 = sum2 / cnt2;
+  }
+  return { assignments, centroids: [c0, c1, c2] };
+}
+
+/**
+ * EEE1 — scaleKMeansClusters
+ * K-means clustering of pitch positions (k=3), returns intra-cluster variance
+ * normalized to [0,1].
+ * - Initialize 3 centroids at period/6, period/2, 5*period/6
+ * - Iterate 5 times: assign each pitch to nearest centroid, recompute centroids
+ * - Return mean intra-cluster variance / (periodCents/6)^2; clamp [0,1]; 0 for n=0
+ */
+export function scaleKMeansClusters(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const { assignments, centroids } = _kMeans3(scaleCents, periodCents);
+  // Compute intra-cluster variances
+  const sums: [number, number, number] = [0, 0, 0];
+  const cnts: [number, number, number] = [0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    const a = assignments[i] as 0 | 1 | 2;
+    const diff = scaleCents[i]! - centroids[a];
+    sums[a] += diff * diff;
+    cnts[a]++;
+  }
+  let totalVar = 0;
+  let clusterCount = 0;
+  for (let k = 0; k < 3; k++) {
+    if (cnts[k as 0 | 1 | 2] > 0) {
+      totalVar += sums[k as 0 | 1 | 2] / cnts[k as 0 | 1 | 2];
+      clusterCount++;
+    }
+  }
+  const meanVar = clusterCount === 0 ? 0 : totalVar / clusterCount;
+  const norm = (periodCents / 6) * (periodCents / 6);
+  return Math.max(0, Math.min(1, norm === 0 ? 0 : meanVar / norm));
+}
+
+/**
+ * EEE2 — scaleClusterSeparation
+ * Mean inter-cluster distance (between k=3 cluster centroids).
+ * - Use same k-means as EEE1
+ * - Return mean of 3 pairwise centroid distances / periodCents; clamp [0,1]; 0 for n<3
+ */
+export function scaleClusterSeparation(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 3) return 0;
+  const { centroids } = _kMeans3(scaleCents, periodCents);
+  const [c0, c1, c2] = centroids;
+  const d01 = Math.abs(c0 - c1);
+  const d02 = Math.abs(c0 - c2);
+  const d12 = Math.abs(c1 - c2);
+  const meanDist = (d01 + d02 + d12) / 3;
+  return Math.max(0, Math.min(1, periodCents === 0 ? 0 : meanDist / periodCents));
+}
+
+/**
+ * EEE3 — scaleSilhouetteScore
+ * Silhouette score of pitch clustering (k=3).
+ * - For each pitch: a = mean distance to same-cluster pitches, b = min mean distance to other-cluster pitches
+ * - silhouette_i = (b - a) / max(a, b); mean over all pitches
+ * - Return (score + 1) / 2 to map [-1,1] to [0,1]; 0 for n<2
+ */
+export function scaleSilhouetteScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const { assignments } = _kMeans3(scaleCents, periodCents);
+  let totalSil = 0;
+  for (let i = 0; i < n; i++) {
+    const myCluster = assignments[i]!;
+    // Compute mean distance to each cluster
+    const clusterSums: [number, number, number] = [0, 0, 0];
+    const clusterCnts: [number, number, number] = [0, 0, 0];
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      const c = assignments[j] as 0 | 1 | 2;
+      clusterSums[c] += Math.abs(scaleCents[i]! - scaleCents[j]!);
+      clusterCnts[c]++;
+    }
+    // a = mean dist to same cluster
+    const aCnt = clusterCnts[myCluster as 0 | 1 | 2];
+    const a = aCnt === 0 ? 0 : clusterSums[myCluster as 0 | 1 | 2] / aCnt;
+    // b = min mean dist to other clusters
+    let b = Infinity;
+    for (let k = 0; k < 3; k++) {
+      if (k === myCluster) continue;
+      const kCnt = clusterCnts[k as 0 | 1 | 2];
+      if (kCnt > 0) {
+        const meanDist = clusterSums[k as 0 | 1 | 2] / kCnt;
+        if (meanDist < b) b = meanDist;
+      }
+    }
+    if (!isFinite(b)) b = 0;
+    const maxAB = Math.max(a, b);
+    const sil = maxAB === 0 ? 0 : (b - a) / maxAB;
+    totalSil += sil;
+  }
+  const score = totalSil / n;
+  return Math.max(0, Math.min(1, (score + 1) / 2));
+}
+
+/**
+ * EEE4 — scaleClusterBalance
+ * How balanced the cluster sizes are (k=3 clusters from k-means).
+ * - Compute sizes of 3 clusters
+ * - Return 1 - std_dev(sizes) / mean(sizes); clamp [0,1]; 0 for n<3
+ */
+export function scaleClusterBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 3) return 0;
+  const { assignments } = _kMeans3(scaleCents, periodCents);
+  const sizes: [number, number, number] = [0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    sizes[assignments[i] as 0 | 1 | 2]++;
+  }
+  const mean = (sizes[0] + sizes[1] + sizes[2]) / 3;
+  if (mean === 0) return 0;
+  const variance =
+    ((sizes[0] - mean) ** 2 + (sizes[1] - mean) ** 2 + (sizes[2] - mean) ** 2) / 3;
+  const stdDev = Math.sqrt(variance);
+  return Math.max(0, Math.min(1, 1 - stdDev / mean));
 }

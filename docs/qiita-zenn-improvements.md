@@ -986,3 +986,14 @@
 | DDD2 | `scaleSubharmonicDensity` | 下倍音関係の密度 |
 | DDD3 | `scaleResonanceScore` | 複合共鳴スコア（加重平均） |
 | DDD4 | `scaleNodeDensity` | 根音との整数比「節音」の密度 |
+
+## Round 74: ピッチクラスタ分析 (EEE1–EEE4)
+
+k-meansクラスタリングによるピッチ空間の構造分析を行う4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| EEE1 | `scaleKMeansClusters` | k=3クラスタ内分散（正規化） |
+| EEE2 | `scaleClusterSeparation` | クラスタ重心間距離（正規化） |
+| EEE3 | `scaleSilhouetteScore` | シルエットスコア（[0,1]正規化） |
+| EEE4 | `scaleClusterBalance` | クラスタサイズ均衡度 |
