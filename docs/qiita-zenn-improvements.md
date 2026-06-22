@@ -810,3 +810,14 @@
 | NNN4 | `scaleCoherenceIndex` | 最多2種のステップサイズが占める割合（整合性指標） |
 
 **参考**: Step-size distribution analysis in scale theory (Carey & Clampitt 1989); Coherence in musical scale design.
+
+## Round 58: スケール回転対称性・音程スペクトル (OOO1–OOO4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| OOO1 | `scaleRotationSymmetryOrder` | 循環回転で同一パターンを生む回転の個数 |
+| OOO2 | `scaleTranspositionInvarianceCount` | 音程移調で不変となる移調の個数 |
+| OOO3 | `scaleIntervalSpectrumWidth` | 全音程の最大値と最小値の差（音程スペクトル幅） |
+| OOO4 | `scaleStepRatioVariance` | 連続ステップサイズ比の分散 |
+
+**参考**: Transpositional symmetry in pitch-class set theory (Forte 1977); Rothenberg's scale coherence model.

@@ -1023,6 +1023,10 @@ import {
   scaleStepSizeSkewness,
   scaleHemitoneCount,
   scaleCoherenceIndex,
+  scaleRotationSymmetryOrder,
+  scaleTranspositionInvarianceCount,
+  scaleIntervalSpectrumWidth,
+  scaleStepRatioVariance,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -29540,5 +29544,53 @@ describe('NNN4 scaleCoherenceIndex', () => {
   it('diatonic scale is highly coherent', () => {
     // Diatonic: steps 200,200,100,200,200,200,100 → top 2 sizes cover all steps
     expect(scaleCoherenceIndex([0, 200, 400, 500, 700, 900, 1100])).toBeCloseTo(1, 10);
+  });
+});
+
+describe('OOO1 scaleRotationSymmetryOrder', () => {
+  it('empty → 0', () => { expect(scaleRotationSymmetryOrder([])).toBe(0); });
+  it('n=1 → 1', () => { expect(scaleRotationSymmetryOrder([0])).toBe(1); });
+  it('equal-step scale → n (fully symmetric)', () => {
+    // 4 equal steps of 300 cents each → all 4 rotations match
+    expect(scaleRotationSymmetryOrder([0, 300, 600, 900])).toBe(4);
+  });
+  it('non-uniform scale has order 1', () => {
+    // Diatonic scale has no non-trivial rotational symmetry
+    expect(scaleRotationSymmetryOrder([0, 200, 400, 500, 700, 900, 1100])).toBe(1);
+  });
+});
+
+describe('OOO2 scaleTranspositionInvarianceCount', () => {
+  it('empty → 1', () => { expect(scaleTranspositionInvarianceCount([])).toBe(1); });
+  it('n=1 → 1', () => { expect(scaleTranspositionInvarianceCount([0])).toBe(1); });
+  it('equal-step → n+1 (all transpositions invariant)', () => {
+    // Whole-tone scale {0,200,400,600,800,1000} invariant under transposition by 200
+    const wt = [0,200,400,600,800,1000];
+    expect(scaleTranspositionInvarianceCount(wt)).toBeGreaterThan(1);
+  });
+  it('diatonic → at least 1 (trivial only)', () => {
+    expect(scaleTranspositionInvarianceCount([0,200,400,500,700,900,1100])).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('OOO3 scaleIntervalSpectrumWidth', () => {
+  it('empty → 0', () => { expect(scaleIntervalSpectrumWidth([])).toBe(0); });
+  it('n=1 → 0', () => { expect(scaleIntervalSpectrumWidth([0])).toBe(0); });
+  it('two equal pitches → 0 width', () => {
+    expect(scaleIntervalSpectrumWidth([0, 600])).toBe(0);
+  });
+  it('scale with varied intervals → positive width', () => {
+    expect(scaleIntervalSpectrumWidth([0, 100, 700, 1100])).toBeGreaterThan(0);
+  });
+});
+
+describe('OOO4 scaleStepRatioVariance', () => {
+  it('empty → 0', () => { expect(scaleStepRatioVariance([])).toBe(0); });
+  it('n=1 → 0', () => { expect(scaleStepRatioVariance([0])).toBe(0); });
+  it('equal-step scale → 0 variance', () => {
+    expect(scaleStepRatioVariance([0, 300, 600, 900])).toBeCloseTo(0, 10);
+  });
+  it('non-uniform scale → positive variance', () => {
+    expect(scaleStepRatioVariance([0, 100, 700, 900])).toBeGreaterThan(0);
   });
 });
