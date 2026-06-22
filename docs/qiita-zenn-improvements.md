@@ -503,3 +503,15 @@
 | `tuningStepsVariance` | 調律ステップ幅の分散 |
 | `scaleChordCoverage` | スケールによる和音音程カバレッジ率 |
 | `harmonicSeriesDeviation` | 倍音列への近似偏差（平均セント） |
+
+## Round 31: 調性・音色・方向性分析 (NN1–NN4)
+
+**テーマ**: 調性支持度・音程方向性・根音曖昧性・スケール色彩度  
+**実装**: NN1–NN4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleTonicStrength` | 主音支持スコア（ダイアトニック引力） |
+| `intervalDirectionalityBias` | 音程の上下半分への偏在度 |
+| `chordRootAmbiguity` | 和音根音の曖昧性指標 |
+| `scaleColorfulness` | 基準EDO比の色彩度（偏差正規化） |

@@ -442,6 +442,12 @@ import {
   presetFamilySocraticRadarHellingerDistance,
   presetFamilySocraticRadarBhattacharyyaCoefficient,
   presetFamilySocraticRadarKLDivergenceAsymmetric,
+  presetFamilySocraticRadarSpectralRolloff,
+  presetFamilySocraticRadarDissonanceGradient,
+  presetFamilySocraticRadarCrossAxisCorrelationMatrix,
+  presetFamilySocraticRadarVarianceExplained,
+  presetFamilySocraticRadarSpectralBandwidth,
+  presetFamilySocraticRadarAutoCorrelationLag1,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -13723,5 +13729,125 @@ describe('presetFamilySocraticRadarKLDivergenceAsymmetric (Q1277)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarKLDivergenceAsymmetric(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarSpectralRolloff (Q1279)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns index in [0,4] per preset', () => {
+    const result = presetFamilySocraticRadarSpectralRolloff(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    for (const idx of result) {
+      expect(idx).toBeGreaterThanOrEqual(0);
+      expect(idx).toBeLessThanOrEqual(4);
+    }
+  });
+  it('returns empty array for empty input', () => {
+    expect(presetFamilySocraticRadarSpectralRolloff([], spectrum)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralRolloff(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarDissonanceGradient (Q1281)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns length n-1', () => {
+    const result = presetFamilySocraticRadarDissonanceGradient(presetIds, spectrum);
+    expect(result.length).toBe(1);
+  });
+  it('returns empty array for empty input', () => {
+    expect(presetFamilySocraticRadarDissonanceGradient([], spectrum)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDissonanceGradient(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarCrossAxisCorrelationMatrix (Q1283)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 5×5 matrix', () => {
+    const result = presetFamilySocraticRadarCrossAxisCorrelationMatrix(presetIds, spectrum);
+    expect(result.length).toBe(5);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
+  });
+  it('diagonal entries are 1', () => {
+    const result = presetFamilySocraticRadarCrossAxisCorrelationMatrix(presetIds, spectrum);
+    for (let i = 0; i < 5; i++) {
+      expect(result[i]![i]).toBeCloseTo(1, 5);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCrossAxisCorrelationMatrix(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarVarianceExplained (Q1285)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('values are non-negative', () => {
+    const result = presetFamilySocraticRadarVarianceExplained(presetIds, spectrum);
+    expect(result.diversity).toBeGreaterThanOrEqual(0);
+    expect(result.versatility).toBeGreaterThanOrEqual(0);
+    expect(result.maturity).toBeGreaterThanOrEqual(0);
+    expect(result.benchmark).toBeGreaterThanOrEqual(0);
+    expect(result.convergence).toBeGreaterThanOrEqual(0);
+  });
+  it('returns all zeros for empty input', () => {
+    const result = presetFamilySocraticRadarVarianceExplained([], spectrum);
+    const total =
+      result.diversity + result.versatility + result.maturity + result.benchmark + result.convergence;
+    expect(total).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarVarianceExplained(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarSpectralBandwidth (Q1287)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const result = presetFamilySocraticRadarSpectralBandwidth(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('bandwidth values are non-negative', () => {
+    const result = presetFamilySocraticRadarSpectralBandwidth(presetIds, spectrum);
+    for (const bw of result) {
+      expect(bw).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpectralBandwidth(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarAutoCorrelationLag1 (Q1289)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns array of length n', () => {
+    const result = presetFamilySocraticRadarAutoCorrelationLag1(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('autocorrelation in [-1, 1]', () => {
+    const result = presetFamilySocraticRadarAutoCorrelationLag1(presetIds, spectrum);
+    for (const r of result) {
+      expect(r).toBeGreaterThanOrEqual(-1);
+      expect(r).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAutoCorrelationLag1(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });
