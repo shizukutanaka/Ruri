@@ -598,6 +598,12 @@ import {
   presetFamilySocraticRadarFootruleDistanceMean,
   presetFamilySocraticRadarRankEntropyMean,
   presetFamilySocraticRadarProfileMadMean,
+  presetFamilySocraticRadarCosineSimMean,
+  presetFamilySocraticRadarPearsonMean,
+  presetFamilySocraticRadarBrayCurtisMean,
+  presetFamilySocraticRadarChebyshevMean,
+  presetFamilySocraticRadarManhattanMean,
+  presetFamilySocraticRadarMinkowskiP3Mean,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -16589,5 +16595,89 @@ describe('Q1601 presetFamilySocraticRadarProfileMadMean', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarProfileMadMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1603 — presetFamilySocraticRadarCosineSimMean
+describe('Q1603 presetFamilySocraticRadarCosineSimMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCosineSimMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCosineSimMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCosineSimMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1605 — presetFamilySocraticRadarPearsonMean
+describe('Q1605 presetFamilySocraticRadarPearsonMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPearsonMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPearsonMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPearsonMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1607 — presetFamilySocraticRadarBrayCurtisMean
+describe('Q1607 presetFamilySocraticRadarBrayCurtisMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarBrayCurtisMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarBrayCurtisMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBrayCurtisMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1609 — presetFamilySocraticRadarChebyshevMean
+describe('Q1609 presetFamilySocraticRadarChebyshevMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarChebyshevMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarChebyshevMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarChebyshevMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1611 — presetFamilySocraticRadarManhattanMean
+describe('Q1611 presetFamilySocraticRadarManhattanMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarManhattanMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarManhattanMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarManhattanMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1613 — presetFamilySocraticRadarMinkowskiP3Mean
+describe('Q1613 presetFamilySocraticRadarMinkowskiP3Mean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarMinkowskiP3Mean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarMinkowskiP3Mean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMinkowskiP3Mean(['unknown'], s)).toThrow(RangeError);
   });
 });

@@ -591,6 +591,12 @@ import {
   tuningFamilySocraticRadarFootruleDistanceMean,
   tuningFamilySocraticRadarRankEntropyMean,
   tuningFamilySocraticRadarProfileMadMean,
+  tuningFamilySocraticRadarCosineSimMean,
+  tuningFamilySocraticRadarPearsonMean,
+  tuningFamilySocraticRadarBrayCurtisMean,
+  tuningFamilySocraticRadarChebyshevMean,
+  tuningFamilySocraticRadarManhattanMean,
+  tuningFamilySocraticRadarMinkowskiP3Mean,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -13820,4 +13826,94 @@ export function presetFamilySocraticRadarProfileMadMean(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarProfileMadMean(tunings, spectrum, rootHz);
+}
+
+// Q1603 — presetFamilySocraticRadarCosineSimMean
+export function presetFamilySocraticRadarCosineSimMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCosineSimMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCosineSimMean(tunings, spectrum, rootHz);
+}
+
+// Q1605 — presetFamilySocraticRadarPearsonMean
+export function presetFamilySocraticRadarPearsonMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPearsonMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPearsonMean(tunings, spectrum, rootHz);
+}
+
+// Q1607 — presetFamilySocraticRadarBrayCurtisMean
+export function presetFamilySocraticRadarBrayCurtisMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarBrayCurtisMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarBrayCurtisMean(tunings, spectrum, rootHz);
+}
+
+// Q1609 — presetFamilySocraticRadarChebyshevMean
+export function presetFamilySocraticRadarChebyshevMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarChebyshevMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarChebyshevMean(tunings, spectrum, rootHz);
+}
+
+// Q1611 — presetFamilySocraticRadarManhattanMean
+export function presetFamilySocraticRadarManhattanMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarManhattanMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarManhattanMean(tunings, spectrum, rootHz);
+}
+
+// Q1613 — presetFamilySocraticRadarMinkowskiP3Mean
+export function presetFamilySocraticRadarMinkowskiP3Mean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMinkowskiP3Mean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMinkowskiP3Mean(tunings, spectrum, rootHz);
 }
