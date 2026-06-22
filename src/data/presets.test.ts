@@ -688,6 +688,12 @@ import {
   presetFamilySocraticRadarParetoDominanceMean,
   presetFamilySocraticRadarShapleyValueProxy,
   presetFamilySocraticRadarMinimaxProxy,
+  presetFamilySocraticRadarMorphismCountProxy,
+  presetFamilySocraticRadarFunctorFaithfulnessProxy,
+  presetFamilySocraticRadarNaturalTransformationMean,
+  presetFamilySocraticRadarAdjunctionProxy,
+  presetFamilySocraticRadarLimitProxy,
+  presetFamilySocraticRadarColimitProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
