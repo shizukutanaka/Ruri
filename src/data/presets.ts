@@ -525,6 +525,12 @@ import {
   tuningFamilySocraticRadarGeneticDiversityScore,
   tuningFamilySocraticRadarParetoFrontSize,
   tuningFamilySocraticRadarObjectiveSpaceVolume,
+  tuningFamilySocraticRadarDegreeSequence,
+  tuningFamilySocraticRadarClusteringCoefficientV2,
+  tuningFamilySocraticRadarBetweennessCentrality,
+  tuningFamilySocraticRadarPageRankVector,
+  tuningFamilySocraticRadarAssortativity,
+  tuningFamilySocraticRadarNetworkDensityV2,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -12758,4 +12764,94 @@ export function presetFamilySocraticRadarObjectiveSpaceVolume(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarObjectiveSpaceVolume(tunings, spectrum, rootHz);
+}
+
+// Q1459 — presetFamilySocraticRadarDegreeSequence
+export function presetFamilySocraticRadarDegreeSequence(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarDegreeSequence> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarDegreeSequence(tunings, spectrum, rootHz);
+}
+
+// Q1461 — presetFamilySocraticRadarClusteringCoefficientV2
+export function presetFamilySocraticRadarClusteringCoefficientV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarClusteringCoefficientV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarClusteringCoefficientV2(tunings, spectrum, rootHz);
+}
+
+// Q1463 — presetFamilySocraticRadarBetweennessCentrality
+export function presetFamilySocraticRadarBetweennessCentrality(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarBetweennessCentrality> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarBetweennessCentrality(tunings, spectrum, rootHz);
+}
+
+// Q1465 — presetFamilySocraticRadarPageRankVector
+export function presetFamilySocraticRadarPageRankVector(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPageRankVector> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPageRankVector(tunings, spectrum, rootHz);
+}
+
+// Q1467 — presetFamilySocraticRadarAssortativity
+export function presetFamilySocraticRadarAssortativity(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarAssortativity> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarAssortativity(tunings, spectrum, rootHz);
+}
+
+// Q1469 — presetFamilySocraticRadarNetworkDensityV2
+export function presetFamilySocraticRadarNetworkDensityV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarNetworkDensityV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarNetworkDensityV2(tunings, spectrum, rootHz);
 }

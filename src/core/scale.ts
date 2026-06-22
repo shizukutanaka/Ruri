@@ -33100,3 +33100,277 @@ export function scaleNeighborhoodDensity(
   }
   return totalEdges / n / (n - 1);
 }
+
+// ---------------------------------------------------------------------------
+// Q1458 — tuningFamilySocraticRadarDegreeSequence
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarDegreeSequence(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [0];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  function cosineSim(p: Record<AxisKey, number>, q: Record<AxisKey, number>): number {
+    const dot = axes.reduce((s, a) => s + p[a] * q[a], 0);
+    const magP = Math.sqrt(axes.reduce((s, a) => s + p[a] ** 2, 0));
+    const magQ = Math.sqrt(axes.reduce((s, a) => s + q[a] ** 2, 0));
+    if (magP === 0 || magQ === 0) return 0;
+    return dot / (magP * magQ);
+  }
+  const degrees: number[] = new Array(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const w = cosineSim(profiles[i]!, profiles[j]!);
+      degrees[i]! += w;
+      degrees[j]! += w;
+    }
+  }
+  return degrees.slice().sort((a, b) => b - a);
+}
+
+// ---------------------------------------------------------------------------
+// Q1460 — tuningFamilySocraticRadarClusteringCoefficientV2
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarClusteringCoefficientV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  function cosineSim(p: Record<AxisKey, number>, q: Record<AxisKey, number>): number {
+    const dot = axes.reduce((s, a) => s + p[a] * q[a], 0);
+    const magP = Math.sqrt(axes.reduce((s, a) => s + p[a] ** 2, 0));
+    const magQ = Math.sqrt(axes.reduce((s, a) => s + q[a] ** 2, 0));
+    if (magP === 0 || magQ === 0) return 0;
+    return dot / (magP * magQ);
+  }
+  const THRESHOLD = 0.5;
+  const adj: boolean[][] = [];
+  for (let i = 0; i < n; i++) {
+    const row: boolean[] = [];
+    for (let j = 0; j < n; j++) {
+      row.push(i !== j && cosineSim(profiles[i]!, profiles[j]!) >= THRESHOLD);
+    }
+    adj.push(row);
+  }
+  let totalCC = 0;
+  for (let i = 0; i < n; i++) {
+    const neighbors: number[] = [];
+    for (let j = 0; j < n; j++) {
+      if (adj[i]![j]) neighbors.push(j);
+    }
+    const k = neighbors.length;
+    if (k < 2) continue;
+    let edgesAmongNeighbors = 0;
+    for (let a = 0; a < neighbors.length; a++) {
+      for (let b = a + 1; b < neighbors.length; b++) {
+        if (adj[neighbors[a]!]![neighbors[b]!]) edgesAmongNeighbors++;
+      }
+    }
+    totalCC += edgesAmongNeighbors / (k * (k - 1) / 2);
+  }
+  return totalCC / n;
+}
+
+// ---------------------------------------------------------------------------
+// Q1462 — tuningFamilySocraticRadarBetweennessCentrality
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarBetweennessCentrality(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  function cosineSim(p: Record<AxisKey, number>, q: Record<AxisKey, number>): number {
+    const dot = axes.reduce((s, a) => s + p[a] * q[a], 0);
+    const magP = Math.sqrt(axes.reduce((s, a) => s + p[a] ** 2, 0));
+    const magQ = Math.sqrt(axes.reduce((s, a) => s + q[a] ** 2, 0));
+    if (magP === 0 || magQ === 0) return 0;
+    return dot / (magP * magQ);
+  }
+  const THRESHOLD = 0.5;
+  const adj: boolean[][] = [];
+  for (let i = 0; i < n; i++) {
+    const row: boolean[] = [];
+    for (let j = 0; j < n; j++) {
+      row.push(i !== j && cosineSim(profiles[i]!, profiles[j]!) >= THRESHOLD);
+    }
+    adj.push(row);
+  }
+  // Floyd-Warshall to count shortest paths
+  const INF = 1e9;
+  const dist: number[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => (i === j ? 0 : adj[i]![j] ? 1 : INF)),
+  );
+  const count: number[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => (i === j ? 1 : adj[i]![j] ? 1 : 0)),
+  );
+  for (let k = 0; k < n; k++) {
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        const through = dist[i]![k]! + dist[k]![j]!;
+        if (through < dist[i]![j]!) {
+          dist[i]![j] = through;
+          count[i]![j] = count[i]![k]! * count[k]![j]!;
+        } else if (through === dist[i]![j]! && dist[i]![j]! < INF) {
+          count[i]![j]! += count[i]![k]! * count[k]![j]!;
+        }
+      }
+    }
+  }
+  const betweenness: number[] = new Array(n).fill(0);
+  for (let s = 0; s < n; s++) {
+    for (let t = 0; t < n; t++) {
+      if (s === t) continue;
+      const totalPaths = count[s]![t]!;
+      if (totalPaths === 0) continue;
+      for (let i = 0; i < n; i++) {
+        if (i === s || i === t) continue;
+        if (dist[s]![i]! + dist[i]![t]! === dist[s]![t]!) {
+          betweenness[i]! += (count[s]![i]! * count[i]![t]!) / totalPaths;
+        }
+      }
+    }
+  }
+  return betweenness;
+}
+
+// ---------------------------------------------------------------------------
+// Q1464 — tuningFamilySocraticRadarPageRankVector
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarPageRankVector(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [1];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  function cosineSim(p: Record<AxisKey, number>, q: Record<AxisKey, number>): number {
+    const dot = axes.reduce((s, a) => s + p[a] * q[a], 0);
+    const magP = Math.sqrt(axes.reduce((s, a) => s + p[a] ** 2, 0));
+    const magQ = Math.sqrt(axes.reduce((s, a) => s + q[a] ** 2, 0));
+    if (magP === 0 || magQ === 0) return 0;
+    return dot / (magP * magQ);
+  }
+  const D = 0.85;
+  const ITER = 50;
+  const w: number[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => (i === j ? 0 : cosineSim(profiles[i]!, profiles[j]!))),
+  );
+  const outDeg: number[] = w.map((row) => row.reduce((s, v) => s + v, 0));
+  let pr: number[] = new Array(n).fill(1 / n);
+  for (let iter = 0; iter < ITER; iter++) {
+    const next: number[] = new Array(n).fill((1 - D) / n);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (outDeg[j]! > 0) {
+          next[i]! += D * (w[j]![i]! / outDeg[j]!) * pr[j]!;
+        }
+      }
+    }
+    pr = next;
+  }
+  return pr;
+}
+
+// ---------------------------------------------------------------------------
+// Q1466 — tuningFamilySocraticRadarAssortativity
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAssortativity(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  function cosineSim(p: Record<AxisKey, number>, q: Record<AxisKey, number>): number {
+    const dot = axes.reduce((s, a) => s + p[a] * q[a], 0);
+    const magP = Math.sqrt(axes.reduce((s, a) => s + p[a] ** 2, 0));
+    const magQ = Math.sqrt(axes.reduce((s, a) => s + q[a] ** 2, 0));
+    if (magP === 0 || magQ === 0) return 0;
+    return dot / (magP * magQ);
+  }
+  const degree: number[] = new Array(n).fill(0);
+  const edges: [number, number][] = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const wVal = cosineSim(profiles[i]!, profiles[j]!);
+      degree[i]! += wVal;
+      degree[j]! += wVal;
+      edges.push([i, j]);
+    }
+  }
+  if (edges.length === 0) return 0;
+  let sumJK = 0;
+  let sumHalf = 0;
+  let sumSqHalf = 0;
+  for (const [ei, ej] of edges) {
+    const j = degree[ei]!;
+    const k = degree[ej]!;
+    sumJK += j * k;
+    sumHalf += (j + k) / 2;
+    sumSqHalf += (j * j + k * k) / 2;
+  }
+  const m = edges.length;
+  const meanHalf = sumHalf / m;
+  const numerator = sumJK / m - meanHalf * meanHalf;
+  const denominator = sumSqHalf / m - meanHalf * meanHalf;
+  if (denominator === 0) return 0;
+  return numerator / denominator;
+}
+
+// ---------------------------------------------------------------------------
+// Q1468 — tuningFamilySocraticRadarNetworkDensityV2
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarNetworkDensityV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  function cosineSim(p: Record<AxisKey, number>, q: Record<AxisKey, number>): number {
+    const dot = axes.reduce((s, a) => s + p[a] * q[a], 0);
+    const magP = Math.sqrt(axes.reduce((s, a) => s + p[a] ** 2, 0));
+    const magQ = Math.sqrt(axes.reduce((s, a) => s + q[a] ** 2, 0));
+    if (magP === 0 || magQ === 0) return 0;
+    return dot / (magP * magQ);
+  }
+  const THRESHOLD = 0.5;
+  let edgeCount = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (cosineSim(profiles[i]!, profiles[j]!) >= THRESHOLD) edgeCount++;
+    }
+  }
+  return (2 * edgeCount) / (n * (n - 1));
+}

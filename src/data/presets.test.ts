@@ -532,6 +532,12 @@ import {
   presetFamilySocraticRadarGeneticDiversityScore,
   presetFamilySocraticRadarParetoFrontSize,
   presetFamilySocraticRadarObjectiveSpaceVolume,
+  presetFamilySocraticRadarDegreeSequence,
+  presetFamilySocraticRadarClusteringCoefficientV2,
+  presetFamilySocraticRadarBetweennessCentrality,
+  presetFamilySocraticRadarPageRankVector,
+  presetFamilySocraticRadarAssortativity,
+  presetFamilySocraticRadarNetworkDensityV2,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -15507,5 +15513,103 @@ describe('Q1457 presetFamilySocraticRadarObjectiveSpaceVolume', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarObjectiveSpaceVolume(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1459 — presetFamilySocraticRadarDegreeSequence
+describe('Q1459 presetFamilySocraticRadarDegreeSequence', () => {
+  const s = harmonicSpectrum(6);
+  it('returns empty for no presets', () => {
+    expect(presetFamilySocraticRadarDegreeSequence([], s)).toEqual([]);
+  });
+  it('returns array of length n', () => {
+    const r = presetFamilySocraticRadarDegreeSequence(['12-tet', 'just-5-limit'], s);
+    expect(r).toHaveLength(2);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDegreeSequence(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1461 — presetFamilySocraticRadarClusteringCoefficientV2
+describe('Q1461 presetFamilySocraticRadarClusteringCoefficientV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(presetFamilySocraticRadarClusteringCoefficientV2(['12-tet', 'just-5-limit'], s)).toBe(0);
+  });
+  it('returns value in [0,1] for n>2', () => {
+    const r = presetFamilySocraticRadarClusteringCoefficientV2(
+      ['12-tet', 'just-5-limit', '12-tet'],
+      s,
+    );
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() =>
+      presetFamilySocraticRadarClusteringCoefficientV2(['unknown'], s),
+    ).toThrow(RangeError);
+  });
+});
+
+// Q1463 — presetFamilySocraticRadarBetweennessCentrality
+describe('Q1463 presetFamilySocraticRadarBetweennessCentrality', () => {
+  const s = harmonicSpectrum(6);
+  it('returns empty for no presets', () => {
+    expect(presetFamilySocraticRadarBetweennessCentrality([], s)).toEqual([]);
+  });
+  it('returns array of length n', () => {
+    const r = presetFamilySocraticRadarBetweennessCentrality(['12-tet', 'just-5-limit'], s);
+    expect(r).toHaveLength(2);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBetweennessCentrality(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1465 — presetFamilySocraticRadarPageRankVector
+describe('Q1465 presetFamilySocraticRadarPageRankVector', () => {
+  const s = harmonicSpectrum(6);
+  it('returns [1] for single preset', () => {
+    expect(presetFamilySocraticRadarPageRankVector(['12-tet'], s)).toEqual([1]);
+  });
+  it('sum is approximately 1 for two presets', () => {
+    const r = presetFamilySocraticRadarPageRankVector(['12-tet', 'just-5-limit'], s);
+    const sum = r.reduce((a, b) => a + b, 0);
+    expect(sum).toBeCloseTo(1, 5);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPageRankVector(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1467 — presetFamilySocraticRadarAssortativity
+describe('Q1467 presetFamilySocraticRadarAssortativity', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(presetFamilySocraticRadarAssortativity(['12-tet', 'just-5-limit'], s)).toBe(0);
+  });
+  it('returns finite number for n>2', () => {
+    const r = presetFamilySocraticRadarAssortativity(['12-tet', 'just-5-limit', '12-tet'], s);
+    expect(isFinite(r)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAssortativity(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1469 — presetFamilySocraticRadarNetworkDensityV2
+describe('Q1469 presetFamilySocraticRadarNetworkDensityV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(presetFamilySocraticRadarNetworkDensityV2([], s)).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = presetFamilySocraticRadarNetworkDensityV2(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNetworkDensityV2(['unknown'], s)).toThrow(RangeError);
   });
 });

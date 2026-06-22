@@ -903,6 +903,12 @@ import {
   tuningFamilySocraticRadarGeneticDiversityScore,
   tuningFamilySocraticRadarParetoFrontSize,
   tuningFamilySocraticRadarObjectiveSpaceVolume,
+  tuningFamilySocraticRadarDegreeSequence,
+  tuningFamilySocraticRadarClusteringCoefficientV2,
+  tuningFamilySocraticRadarBetweennessCentrality,
+  tuningFamilySocraticRadarPageRankVector,
+  tuningFamilySocraticRadarAssortativity,
+  tuningFamilySocraticRadarNetworkDensityV2,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -27697,5 +27703,114 @@ describe('CCC4 scaleNeighborhoodDensity', () => {
   it('tightly clustered pitches → high density', () => {
     const r = scaleNeighborhoodDensity([0, 50, 100, 150], 1200, 1200);
     expect(r).toBeGreaterThan(0);
+  });
+});
+
+// Q1458 — tuningFamilySocraticRadarDegreeSequence
+describe('Q1458 tuningFamilySocraticRadarDegreeSequence', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns empty for n=0', () => {
+    expect(tuningFamilySocraticRadarDegreeSequence([], s)).toEqual([]);
+  });
+  it('returns array of length n', () => {
+    const r = tuningFamilySocraticRadarDegreeSequence([t, t], s);
+    expect(r).toHaveLength(2);
+  });
+  it('values are non-negative', () => {
+    const r = tuningFamilySocraticRadarDegreeSequence([t, t], s);
+    r.forEach((d) => expect(d).toBeGreaterThanOrEqual(0));
+  });
+});
+
+// Q1460 — tuningFamilySocraticRadarClusteringCoefficientV2
+describe('Q1460 tuningFamilySocraticRadarClusteringCoefficientV2', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(tuningFamilySocraticRadarClusteringCoefficientV2([t, t], s)).toBe(0);
+  });
+  it('returns value in [0,1] for n>2', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarClusteringCoefficientV2([t, t2, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarClusteringCoefficientV2([], s)).toBe(0);
+  });
+});
+
+// Q1462 — tuningFamilySocraticRadarBetweennessCentrality
+describe('Q1462 tuningFamilySocraticRadarBetweennessCentrality', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns empty for n=0', () => {
+    expect(tuningFamilySocraticRadarBetweennessCentrality([], s)).toEqual([]);
+  });
+  it('returns array of length n', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarBetweennessCentrality([t, t2, t], s);
+    expect(r).toHaveLength(3);
+  });
+  it('values are non-negative', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarBetweennessCentrality([t, t2, t], s);
+    r.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
+  });
+});
+
+// Q1464 — tuningFamilySocraticRadarPageRankVector
+describe('Q1464 tuningFamilySocraticRadarPageRankVector', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns empty for n=0', () => {
+    expect(tuningFamilySocraticRadarPageRankVector([], s)).toEqual([]);
+  });
+  it('returns [1] for n=1', () => {
+    expect(tuningFamilySocraticRadarPageRankVector([t], s)).toEqual([1]);
+  });
+  it('sum is approximately 1 for n>=2', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarPageRankVector([t, t2], s);
+    const sum = r.reduce((a, b) => a + b, 0);
+    expect(sum).toBeCloseTo(1, 5);
+  });
+});
+
+// Q1466 — tuningFamilySocraticRadarAssortativity
+describe('Q1466 tuningFamilySocraticRadarAssortativity', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(tuningFamilySocraticRadarAssortativity([t, t], s)).toBe(0);
+  });
+  it('returns 0 for n=0', () => {
+    expect(tuningFamilySocraticRadarAssortativity([], s)).toBe(0);
+  });
+  it('returns finite number for n>2', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarAssortativity([t, t2, t], s);
+    expect(isFinite(r)).toBe(true);
+  });
+});
+
+// Q1468 — tuningFamilySocraticRadarNetworkDensityV2
+describe('Q1468 tuningFamilySocraticRadarNetworkDensityV2', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=1', () => {
+    expect(tuningFamilySocraticRadarNetworkDensityV2([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarNetworkDensityV2([t], s)).toBe(0);
+  });
+  it('returns 1 for two identical tunings (fully connected)', () => {
+    const r = tuningFamilySocraticRadarNetworkDensityV2([t, t], s);
+    expect(r).toBe(1);
+  });
+  it('returns value in [0,1]', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarNetworkDensityV2([t, t2, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
   });
 });
