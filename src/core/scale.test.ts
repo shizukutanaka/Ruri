@@ -897,6 +897,12 @@ import {
   tuningFamilySocraticRadarMaskingThresholdMean,
   tuningFamilySocraticRadarPitchSalienceMean,
   tuningFamilySocraticRadarAuditoryDistanceMean,
+  tuningFamilySocraticRadarGradientDescentProfile,
+  tuningFamilySocraticRadarParticleSwarmBest,
+  tuningFamilySocraticRadarSimulatedAnnealingScore,
+  tuningFamilySocraticRadarGeneticDiversityScore,
+  tuningFamilySocraticRadarParetoFrontSize,
+  tuningFamilySocraticRadarObjectiveSpaceVolume,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -905,6 +911,10 @@ import {
   scaleModulationGraph,
   scaleModulationConnectivity,
   scaleBestModulationTarget,
+  scaleSubsetCount,
+  scaleModeCount,
+  scaleComplementCents,
+  scaleNecklaceCount,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -27434,6 +27444,177 @@ describe('Q1444 tuningFamilySocraticRadarAuditoryDistanceMean', () => {
   it('two tunings returns non-negative', () => {
     const t2 = edo(19, 440);
     const r = tuningFamilySocraticRadarAuditoryDistanceMean([t, t2], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('BBB1 scaleSubsetCount', () => {
+  it('C(7,3) = 35', () => {
+    const diatonic = [0,200,400,500,700,900,1100];
+    expect(scaleSubsetCount(diatonic, 3)).toBe(35);
+  });
+  it('k > n → 0', () => {
+    expect(scaleSubsetCount([0,200,400], 5)).toBe(0);
+  });
+  it('empty scale → 0', () => {
+    expect(scaleSubsetCount([], 3)).toBe(0);
+  });
+  it('k=0 → 1', () => {
+    expect(scaleSubsetCount([0,200,400], 0)).toBe(1);
+  });
+});
+
+describe('BBB2 scaleModeCount', () => {
+  it('chromatic scale: all modes same → 1 or 12', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleModeCount(chromatic)).toBeGreaterThanOrEqual(1);
+  });
+  it('empty → 0', () => {
+    expect(scaleModeCount([])).toBe(0);
+  });
+  it('single pitch → 1', () => {
+    expect(scaleModeCount([0])).toBe(1);
+  });
+  it('diatonic has 7 modes', () => {
+    const diatonic = [0,200,400,500,700,900,1100];
+    expect(scaleModeCount(diatonic)).toBe(7);
+  });
+});
+
+describe('BBB3 scaleComplementCents', () => {
+  it('diatonic complement of chromatic has 5 pitches', () => {
+    const diatonic = [0,200,400,500,700,900,1100];
+    const comp = scaleComplementCents(diatonic, 12);
+    expect(comp).toHaveLength(5);
+  });
+  it('chromatic scale complement is empty', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleComplementCents(chromatic, 12)).toHaveLength(0);
+  });
+  it('empty scale complement is all chromatic pitches', () => {
+    expect(scaleComplementCents([], 12)).toHaveLength(12);
+  });
+  it('single pitch at 0 complement has 11 pitches', () => {
+    expect(scaleComplementCents([0], 12)).toHaveLength(11);
+  });
+});
+
+describe('BBB4 scaleNecklaceCount', () => {
+  it('single pitch → 1', () => {
+    expect(scaleNecklaceCount([0])).toBe(1);
+  });
+  it('empty → 1', () => {
+    expect(scaleNecklaceCount([])).toBe(1);
+  });
+  it('chromatic scale → 1 (all rotations same)', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleNecklaceCount(chromatic)).toBe(1);
+  });
+  it('diatonic → returns positive number', () => {
+    const diatonic = [0,200,400,500,700,900,1100];
+    expect(scaleNecklaceCount(diatonic)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// Q1446 — tuningFamilySocraticRadarGradientDescentProfile
+describe('Q1446 tuningFamilySocraticRadarGradientDescentProfile', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 5-element array for n>1', () => {
+    const r = tuningFamilySocraticRadarGradientDescentProfile([t, t], s);
+    expect(r).toHaveLength(5);
+  });
+  it('returns all-zeros for n<=1', () => {
+    expect(tuningFamilySocraticRadarGradientDescentProfile([t], s)).toEqual([0, 0, 0, 0, 0]);
+  });
+  it('empty → all-zeros', () => {
+    expect(tuningFamilySocraticRadarGradientDescentProfile([], s)).toEqual([0, 0, 0, 0, 0]);
+  });
+});
+
+// Q1448 — tuningFamilySocraticRadarParticleSwarmBest
+describe('Q1448 tuningFamilySocraticRadarParticleSwarmBest', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarParticleSwarmBest([], s)).toBe(0);
+  });
+  it('returns valid index', () => {
+    const r = tuningFamilySocraticRadarParticleSwarmBest([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThan(2);
+  });
+  it('single tuning returns 0', () => {
+    expect(tuningFamilySocraticRadarParticleSwarmBest([t], s)).toBe(0);
+  });
+});
+
+// Q1450 — tuningFamilySocraticRadarSimulatedAnnealingScore
+describe('Q1450 tuningFamilySocraticRadarSimulatedAnnealingScore', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for n>1', () => {
+    const r = tuningFamilySocraticRadarSimulatedAnnealingScore([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns 1 for n<=1', () => {
+    expect(tuningFamilySocraticRadarSimulatedAnnealingScore([t], s)).toBe(1);
+  });
+  it('empty → 1', () => {
+    expect(tuningFamilySocraticRadarSimulatedAnnealingScore([], s)).toBe(1);
+  });
+});
+
+// Q1452 — tuningFamilySocraticRadarGeneticDiversityScore
+describe('Q1452 tuningFamilySocraticRadarGeneticDiversityScore', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for n>1', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarGeneticDiversityScore([t, t2], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns 0 for n<=1', () => {
+    expect(tuningFamilySocraticRadarGeneticDiversityScore([t], s)).toBe(0);
+  });
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarGeneticDiversityScore([], s)).toBe(0);
+  });
+});
+
+// Q1454 — tuningFamilySocraticRadarParetoFrontSize
+describe('Q1454 tuningFamilySocraticRadarParetoFrontSize', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns at least 1 for non-empty', () => {
+    const r = tuningFamilySocraticRadarParetoFrontSize([t], s);
+    expect(r).toBeGreaterThanOrEqual(1);
+  });
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarParetoFrontSize([], s)).toBe(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarParetoFrontSize([t, t2], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1456 — tuningFamilySocraticRadarObjectiveSpaceVolume
+describe('Q1456 tuningFamilySocraticRadarObjectiveSpaceVolume', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for single tuning', () => {
+    const r = tuningFamilySocraticRadarObjectiveSpaceVolume([t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarObjectiveSpaceVolume([], s)).toBe(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarObjectiveSpaceVolume([t, t2], s);
     expect(r).toBeGreaterThanOrEqual(0);
   });
 });

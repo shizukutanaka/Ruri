@@ -667,3 +667,14 @@
 | AAA4 | `scaleBestModulationTarget` | 最小転調距離を与える最適転調先 |
 
 **参考**: Modulation distance in Neo-Riemannian theory; Transposition networks in Lewin (1987)。
+
+## Round 45: スケール組合せ論・列挙 (BBB1–BBB4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| BBB1 | `scaleSubsetCount` | k要素部分集合数 C(n,k) |
+| BBB2 | `scaleModeCount` | 回転により異なる音程列となるモード数 |
+| BBB3 | `scaleComplementCents` | クロマチック音階内の補集合(非スケール音) |
+| BBB4 | `scaleNecklaceCount` | 回転同値類によるネックレス数 |
+
+**参考**: Scale complement theory (Forte 1973); Necklace enumeration in combinatorics on words。

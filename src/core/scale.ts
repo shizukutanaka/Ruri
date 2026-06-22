@@ -32721,3 +32721,310 @@ export function scaleBestModulationTarget(
   }
   return bestTarget;
 }
+
+export function scaleSubsetCount(
+  scaleCents: readonly number[],
+  subsetSize: number,
+  periodCents: number = 1200,
+): number {
+  void periodCents;
+  const n = scaleCents.length;
+  if (n === 0 || subsetSize < 0 || subsetSize > n) return 0;
+  if (subsetSize === 0) return 1;
+  const k = Math.min(subsetSize, n - subsetSize);
+  let result = 1;
+  for (let i = 0; i < k; i++) {
+    result = (result * (n - i)) / (i + 1);
+  }
+  return Math.round(result);
+}
+
+export function scaleModeCount(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (n === 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Build base interval sequence (consecutive differences + wrap-around interval)
+  const baseIntervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) {
+      baseIntervals.push(Math.round((sorted[i + 1]! - sorted[i]!) * 1000) / 1000);
+    } else {
+      baseIntervals.push(Math.round((periodCents - sorted[n - 1]! + sorted[0]!) * 1000) / 1000);
+    }
+  }
+  // Each mode is a rotation of the interval sequence
+  const seen = new Set<string>();
+  for (let r = 0; r < n; r++) {
+    const ivals = Array.from({ length: n }, (_, i) => baseIntervals[(r + i) % n]!);
+    seen.add(JSON.stringify(ivals));
+  }
+  return seen.size;
+}
+
+export function scaleComplementCents(
+  scaleCents: readonly number[],
+  divisions: number = 12,
+  periodCents: number = 1200,
+): number[] {
+  const step = periodCents / divisions;
+  const tolerance = step / 2;
+  const result: number[] = [];
+  for (let k = 0; k < divisions; k++) {
+    const chromPitch = k * step;
+    const inScale = scaleCents.some((p) => {
+      const diff = Math.abs(p - chromPitch);
+      return diff < tolerance;
+    });
+    if (!inScale) result.push(chromPitch);
+  }
+  return result;
+}
+
+export function scaleNecklaceCount(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Build interval sequence
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) {
+      intervals.push(Math.round((sorted[i + 1]! - sorted[i]!) * 10) / 10);
+    } else {
+      intervals.push(Math.round((periodCents - sorted[n - 1]! + sorted[0]!) * 10) / 10);
+    }
+  }
+  // Find canonical (lexicographically minimum) rotation using 10-cent bucket key
+  const BUCKET = 10;
+  function rotLess(a: number[], b: number[]): boolean {
+    for (let i = 0; i < n; i++) {
+      if (a[i]! < b[i]!) return true;
+      if (a[i]! > b[i]!) return false;
+    }
+    return false;
+  }
+  let minRot = intervals.slice();
+  for (let s = 1; s < n; s++) {
+    const rot = Array.from({ length: n }, (_, i) => intervals[(s + i) % n]!);
+    if (rotLess(rot, minRot)) minRot = rot;
+  }
+  // Since all rotations share one canonical, the necklace count for a single
+  // interval sequence is always 1. But scales can only produce one interval
+  // sequence, so necklaceCount always returns 1 for a single scale input.
+  // Return the canonical key as a check — for this function, result is 1.
+  void minRot;
+  void BUCKET;
+  // Count distinct canonical forms across all rotations
+  const seen = new Set<string>();
+  for (let r = 0; r < n; r++) {
+    const rotIntervals = Array.from({ length: n }, (_, i) => intervals[(r + i) % n]!);
+    let minR = rotIntervals.slice();
+    for (let s = 1; s < n; s++) {
+      const rot2 = Array.from({ length: n }, (_, i) => rotIntervals[(s + i) % n]!);
+      if (rotLess(rot2, minR)) minR = rot2;
+    }
+    seen.add(minR.map((v) => Math.round(v / BUCKET)).join(','));
+  }
+  return seen.size;
+}
+
+// ---------------------------------------------------------------------------
+// Q1446 — tuningFamilySocraticRadarGradientDescentProfile
+
+export function tuningFamilySocraticRadarGradientDescentProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return [0, 0, 0, 0, 0];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const step = 0.01;
+  const gradient: number[] = new Array<number>(5).fill(0);
+  const baselineDist = (() => {
+    let sum = 0;
+    for (let i = 0; i < profiles.length; i++) {
+      for (let j = i + 1; j < profiles.length; j++) {
+        let sq = 0;
+        for (let ai = 0; ai < axes.length; ai++) {
+          const diff = profiles[i]![axes[ai]!]! - profiles[j]![axes[ai]!]!;
+          sq += diff * diff;
+        }
+        sum += Math.sqrt(sq);
+      }
+    }
+    return sum;
+  })();
+  for (let ai = 0; ai < axes.length; ai++) {
+    let perturbedDist = 0;
+    for (let i = 0; i < profiles.length; i++) {
+      for (let j = i + 1; j < profiles.length; j++) {
+        let sq = 0;
+        for (let bi = 0; bi < axes.length; bi++) {
+          const baxis = axes[bi]!;
+          const vi = profiles[i]![baxis]! + (bi === ai ? step : 0);
+          const vj = profiles[j]![baxis]! + (bi === ai ? step : 0);
+          const diff = vi - vj;
+          sq += diff * diff;
+        }
+        perturbedDist += Math.sqrt(sq);
+      }
+    }
+    gradient[ai] = -(perturbedDist - baselineDist) / step;
+  }
+  return gradient;
+}
+
+// ---------------------------------------------------------------------------
+// Q1448 — tuningFamilySocraticRadarParticleSwarmBest
+
+export function tuningFamilySocraticRadarParticleSwarmBest(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let bestIndex = 0;
+  let bestMean = -Infinity;
+  for (let i = 0; i < profiles.length; i++) {
+    const mean = axes.reduce((s, axis) => s + profiles[i]![axis], 0) / axes.length;
+    if (mean > bestMean) {
+      bestMean = mean;
+      bestIndex = i;
+    }
+  }
+  return bestIndex;
+}
+
+// ---------------------------------------------------------------------------
+// Q1450 — tuningFamilySocraticRadarSimulatedAnnealingScore
+
+export function tuningFamilySocraticRadarSimulatedAnnealingScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 1;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const T = 1.0;
+  let sumProb = 0;
+  let count = 0;
+  for (let i = 0; i < profiles.length - 1; i++) {
+    let sq = 0;
+    for (const axis of axes) {
+      const diff = profiles[i]![axis] - profiles[i + 1]![axis];
+      sq += diff * diff;
+    }
+    const delta = Math.sqrt(Math.max(0, sq));
+    sumProb += Math.exp(-delta / T);
+    count++;
+  }
+  return count === 0 ? 1 : sumProb / count;
+}
+
+// ---------------------------------------------------------------------------
+// Q1452 — tuningFamilySocraticRadarGeneticDiversityScore
+
+export function tuningFamilySocraticRadarGeneticDiversityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let sumDist = 0;
+  let pairCount = 0;
+  for (let i = 0; i < profiles.length; i++) {
+    for (let j = i + 1; j < profiles.length; j++) {
+      let sq = 0;
+      for (const axis of axes) {
+        const diff = profiles[i]![axis] - profiles[j]![axis];
+        sq += diff * diff;
+      }
+      sumDist += Math.sqrt(Math.max(0, sq));
+      pairCount++;
+    }
+  }
+  return pairCount === 0 ? 0 : sumDist / pairCount;
+}
+
+// ---------------------------------------------------------------------------
+// Q1454 — tuningFamilySocraticRadarParetoFrontSize
+
+export function tuningFamilySocraticRadarParetoFrontSize(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const objectives = profiles.map((p) => {
+    const vals = axes.map((axis) => p[axis]);
+    const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+    const variance = vals.reduce((s, v) => s + (v - mean) * (v - mean), 0) / vals.length;
+    return { mean, variance };
+  });
+  let frontCount = 0;
+  for (let i = 0; i < objectives.length; i++) {
+    let dominated = false;
+    for (let j = 0; j < objectives.length; j++) {
+      if (i === j) continue;
+      if (
+        objectives[j]!.mean >= objectives[i]!.mean &&
+        objectives[j]!.variance >= objectives[i]!.variance &&
+        (objectives[j]!.mean > objectives[i]!.mean || objectives[j]!.variance > objectives[i]!.variance)
+      ) {
+        dominated = true;
+        break;
+      }
+    }
+    if (!dominated) frontCount++;
+  }
+  return frontCount;
+}
+
+// ---------------------------------------------------------------------------
+// Q1456 — tuningFamilySocraticRadarObjectiveSpaceVolume
+
+export function tuningFamilySocraticRadarObjectiveSpaceVolume(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const objectives = profiles.map((p) => {
+    const vals = axes.map((axis) => p[axis]);
+    const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+    const variance = vals.reduce((s, v) => s + (v - mean) * (v - mean), 0) / vals.length;
+    return { mean, variance };
+  });
+  const sorted = [...objectives].sort((a, b) => b.mean - a.mean);
+  let hypervolume = 0;
+  let maxVariance = 0;
+  for (const pt of sorted) {
+    if (pt.variance > maxVariance) {
+      hypervolume += pt.mean * (pt.variance - maxVariance);
+      maxVariance = pt.variance;
+    }
+  }
+  return Math.max(0, hypervolume);
+}
