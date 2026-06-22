@@ -1077,6 +1077,12 @@ import {
   tuningFamilySocraticRadarConnectionFormProxy,
   tuningFamilySocraticRadarExponentialMapProxy,
   tuningFamilySocraticRadarRicciCurvatureProxy,
+  tuningFamilySocraticRadarPrimeFactorComplexityMean,
+  tuningFamilySocraticRadarGoldenRatioProximityMean,
+  tuningFamilySocraticRadarFibonacciAlignmentMean,
+  tuningFamilySocraticRadarModularArithmeticProxy,
+  tuningFamilySocraticRadarContinuedFractionProxy,
+  tuningFamilySocraticRadarEulerTotientProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -32967,6 +32973,114 @@ describe('Q1816 tuningFamilySocraticRadarRicciCurvatureProxy', () => {
   });
   it('two different tunings → finite and ≥0', () => {
     const v = tuningFamilySocraticRadarRicciCurvatureProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1818 — tuningFamilySocraticRadarPrimeFactorComplexityMean
+describe('Q1818 tuningFamilySocraticRadarPrimeFactorComplexityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarPrimeFactorComplexityMean([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPrimeFactorComplexityMean([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPrimeFactorComplexityMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1820 — tuningFamilySocraticRadarGoldenRatioProximityMean
+describe('Q1820 tuningFamilySocraticRadarGoldenRatioProximityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarGoldenRatioProximityMean([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarGoldenRatioProximityMean([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarGoldenRatioProximityMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1822 — tuningFamilySocraticRadarFibonacciAlignmentMean
+describe('Q1822 tuningFamilySocraticRadarFibonacciAlignmentMean', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarFibonacciAlignmentMean([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarFibonacciAlignmentMean([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarFibonacciAlignmentMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1824 — tuningFamilySocraticRadarModularArithmeticProxy
+describe('Q1824 tuningFamilySocraticRadarModularArithmeticProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarModularArithmeticProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarModularArithmeticProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarModularArithmeticProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1826 — tuningFamilySocraticRadarContinuedFractionProxy
+describe('Q1826 tuningFamilySocraticRadarContinuedFractionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarContinuedFractionProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarContinuedFractionProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarContinuedFractionProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1828 — tuningFamilySocraticRadarEulerTotientProxy
+describe('Q1828 tuningFamilySocraticRadarEulerTotientProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarEulerTotientProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarEulerTotientProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarEulerTotientProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
   });
