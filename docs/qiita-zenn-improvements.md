@@ -733,3 +733,14 @@
 | GGG4 | `scaleWienerIndex` | 全ペア最短パス距離の総和(Wiener指数) |
 
 **参考**: Wiener index in chemical graph theory (Wiener 1947); Pitch-class graphs in music theory。
+
+## Round 51: 倍音・サブ倍音マッチング・ビート周波数・粗さ (HHH1–HHH4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| HHH1 | `scaleOvertoneMatchScore` | 倍音列への近接度スコア(周波数誤差ベース) |
+| HHH2 | `scaleSubharmonicMatchScore` | サブ倍音列への近接度スコア(cents誤差ベース) |
+| HHH3 | `scaleBeatFrequency` | 隣接音程間のビート周波数の平均 |
+| HHH4 | `scaleRoughnessSum` | 全ペアのVassilakis粗さモデル総和 |
+
+**参考**: Vassilakis (2001) roughness model; Overtone matching in just intonation theory。

@@ -34380,3 +34380,423 @@ export function scaleWienerIndex(
   }
   return total;
 }
+
+export function scaleOvertoneMatchScore(
+  scaleCents: readonly number[],
+  fundamentalHz: number = 220,
+  harmonics: number = 8,
+  tolerance: number = 15,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let matched = 0;
+  for (let i = 0; i < n; i++) {
+    const pitchHz = fundamentalHz * Math.pow(2, scaleCents[i]! / 1200);
+    let found = false;
+    for (let k = 1; k <= harmonics; k++) {
+      if (Math.abs(pitchHz - fundamentalHz * k) <= tolerance) {
+        found = true;
+        break;
+      }
+    }
+    if (found) matched++;
+  }
+  return matched / n;
+}
+
+export function scaleSubharmonicMatchScore(
+  scaleCents: readonly number[],
+  fundamentalHz: number = 440,
+  subharmonics: number = 8,
+  toleranceCents: number = 20,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let matched = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    let found = false;
+    for (let k = 1; k <= subharmonics; k++) {
+      const subCents = -1200 * Math.log2(k);
+      if (Math.abs(pitch - subCents) <= toleranceCents) {
+        found = true;
+        break;
+      }
+    }
+    if (found) matched++;
+  }
+  return matched / n;
+}
+
+export function scaleBeatFrequency(
+  scaleCents: readonly number[],
+  fundamentalHz: number = 440,
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let total = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const p1 = sorted[i]!;
+    const p2 = sorted[i + 1]!;
+    const f1 = fundamentalHz * Math.pow(2, p1 / 1200);
+    const f2 = fundamentalHz * Math.pow(2, p2 / 1200);
+    total += Math.abs(f2 - f1);
+  }
+  return total / (sorted.length - 1);
+}
+
+export function scaleRoughnessSum(
+  scaleCents: readonly number[],
+  fundamentalHz: number = 440,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const f1 = fundamentalHz * Math.pow(2, scaleCents[i]! / 1200);
+      const f2 = fundamentalHz * Math.pow(2, scaleCents[j]! / 1200);
+      const fabs = Math.abs(f2 - f1);
+      const s = 0.24 / (0.0207 * fabs + 18.96);
+      sum += Math.exp(-9.25 * s * fabs);
+    }
+  }
+  return sum;
+}
+
+// ---------------------------------------------------------------------------
+// Round 51: Q1506–Q1516 — Complexity Theory / Algorithmic Information of Tuning Systems
+// ---------------------------------------------------------------------------
+
+// Q1506 — tuningFamilySocraticRadarKolmogorovProxy
+/**
+ * Kolmogorov complexity proxy: for each tuning, encode the rounded degree cents
+ * values as a string and measure compressibility via run-length encoding length
+ * vs. original length. Returns mean (RLE_length / original_length) across tunings.
+ * Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum (unused).
+ * @param rootHz - Reference frequency (unused).
+ * @returns Mean RLE compression ratio in (0,1] (or 0 if empty).
+ */
+export function tuningFamilySocraticRadarKolmogorovProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let total = 0;
+  for (const t of tunings) {
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    const tokens = cents.map((c) => String(Math.round(((c % 1200) + 1200) % 1200 / 10) * 10));
+    const original = tokens.join(',');
+    const len = original.length;
+    if (len === 0) {
+      total += 1;
+      continue;
+    }
+    // Run-length encoding: count character runs
+    let rleLen = 0;
+    let i = 0;
+    while (i < len) {
+      const ch = original[i]!;
+      let count = 1;
+      while (i + count < len && original[i + count] === ch) count++;
+      rleLen += count > 1 ? String(count).length + 1 : 1;
+      i += count;
+    }
+    total += rleLen / len;
+  }
+  return total / tunings.length;
+}
+
+// Q1508 — tuningFamilySocraticRadarLempelZivProxy
+/**
+ * LZ complexity proxy: count the number of unique "patterns" in the degree sequence
+ * using LZ76-like approach. For each tuning, bin each degree into one of 12 bins
+ * (which 12th of the octave it falls in). Count the number of new substrings
+ * encountered during a left-to-right scan. Returns mean across tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum (unused).
+ * @param rootHz - Reference frequency (unused).
+ * @returns Mean LZ76-like complexity count (>0 for non-empty tunings, 0 for empty).
+ */
+export function tuningFamilySocraticRadarLempelZivProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) {
+      total += 0;
+      continue;
+    }
+    const period = t.periodCents > 0 ? t.periodCents : 1200;
+    const seq = t.degrees.map((d) => {
+      const c = ((pitchToCents(d) % period) + period) % period;
+      return Math.floor((c / period) * 12);
+    });
+    // LZ76-like: scan left-to-right, count new substrings
+    const seen = new Set<string>();
+    let complexity = 0;
+    let start = 0;
+    while (start < n) {
+      let len = 1;
+      while (start + len <= n) {
+        const sub = seq.slice(start, start + len).join(',');
+        if (!seen.has(sub)) {
+          seen.add(sub);
+          complexity++;
+          start += len;
+          break;
+        }
+        len++;
+        if (start + len > n) {
+          start++;
+          break;
+        }
+      }
+    }
+    total += complexity;
+  }
+  return total / tunings.length;
+}
+
+// Q1510 — tuningFamilySocraticRadarFractalDimension
+/**
+ * Fractal dimension estimate: for each tuning, estimate the box-counting dimension
+ * of the degree distribution. Uses D = log(N(r)) / log(1/r) where N(r) is the
+ * number of non-empty boxes when the period is divided into r=12 equal parts.
+ * Returns mean D across tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum (unused).
+ * @param rootHz - Reference frequency (unused).
+ * @returns Mean fractal dimension estimate (in [0,2], 0 for empty).
+ */
+export function tuningFamilySocraticRadarFractalDimensionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let total = 0;
+  const r = 12;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) {
+      total += 0;
+      continue;
+    }
+    const period = t.periodCents > 0 ? t.periodCents : 1200;
+    const occupied = new Set<number>();
+    for (const d of t.degrees) {
+      const c = ((pitchToCents(d) % period) + period) % period;
+      const box = Math.min(Math.floor((c / period) * r), r - 1);
+      occupied.add(box);
+    }
+    const nBoxes = occupied.size;
+    if (nBoxes <= 0) {
+      total += 0;
+      continue;
+    }
+    // D = log(N(r)) / log(r)
+    const D = Math.log(nBoxes) / Math.log(r);
+    total += Math.max(0, D);
+  }
+  return total / tunings.length;
+}
+
+// Q1512 — tuningFamilySocraticRadarSelfSimilarityScore
+/**
+ * Self-similarity: for each tuning, compare the interval structure at different
+ * scales (full set vs. any subset of size floor(n/2)). Returns the maximum
+ * Jaccard similarity between the full interval set and any such subset's interval
+ * set (intervals rounded to 50c). Returns 0 for n<=2.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum (unused).
+ * @param rootHz - Reference frequency (unused).
+ * @returns Mean max Jaccard similarity in [0,1] (0 for empty or n<=2).
+ */
+export function tuningFamilySocraticRadarSelfSimilarityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n <= 2) {
+      total += 0;
+      continue;
+    }
+    const period = t.periodCents > 0 ? t.periodCents : 1200;
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    // Full interval set (rounded to 50c)
+    const fullIntervals = new Set<number>();
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const iv = ((cents[j]! - cents[i]! + period * 10) % period);
+        fullIntervals.add(Math.round(iv / 50) * 50);
+      }
+    }
+    const subSize = Math.floor(n / 2);
+    // Try all combinations of subSize elements — cap at C(n, subSize) <= 210
+    let maxJaccard = 0;
+    const indices = Array.from({ length: n }, (_, i) => i);
+    function combine(start: number, chosen: number[]): void {
+      if (chosen.length === subSize) {
+        const subIntervals = new Set<number>();
+        for (let a = 0; a < subSize; a++) {
+          for (let b = 0; b < subSize; b++) {
+            if (a === b) continue;
+            const iv = ((cents[chosen[b]!]! - cents[chosen[a]!]! + period * 10) % period);
+            subIntervals.add(Math.round(iv / 50) * 50);
+          }
+        }
+        let inter = 0;
+        for (const v of subIntervals) {
+          if (fullIntervals.has(v)) inter++;
+        }
+        const union = fullIntervals.size + subIntervals.size - inter;
+        const j = union > 0 ? inter / union : 0;
+        if (j > maxJaccard) maxJaccard = j;
+        return;
+      }
+      for (let i = start; i < n; i++) {
+        chosen.push(indices[i]!);
+        combine(i + 1, chosen);
+        chosen.pop();
+        // Pruning: if remaining elements can't fill, stop
+        if (n - i - 1 < subSize - chosen.length) break;
+      }
+    }
+    combine(0, []);
+    total += maxJaccard;
+  }
+  return total / tunings.length;
+}
+
+// Q1514 — tuningFamilySocraticRadarRepetitiveness
+/**
+ * Repetitiveness: fraction of degrees that are "repetitions" in the sense of
+ * appearing at integer multiples of the smallest interval. Smallest interval =
+ * min gap between consecutive pitches (including wrap-around). Count degrees
+ * within 10c of k * smallest for integer k. Returns mean fraction across tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum (unused).
+ * @param rootHz - Reference frequency (unused).
+ * @returns Mean repetitiveness fraction in [0,1] (0 for empty).
+ */
+export function tuningFamilySocraticRadarRepetitiveness(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) {
+      total += 0;
+      continue;
+    }
+    if (n === 1) {
+      total += 1;
+      continue;
+    }
+    const period = t.periodCents > 0 ? t.periodCents : 1200;
+    const cents = t.degrees.map((d) => pitchToCents(d)).sort((a, b) => a - b);
+    // Compute gaps between consecutive sorted degrees including wrap-around
+    const gaps: number[] = [];
+    for (let i = 0; i < n; i++) {
+      const next = i + 1 < n ? cents[i + 1]! : cents[0]! + period;
+      gaps.push(next - cents[i]!);
+    }
+    const minGap = Math.min(...gaps);
+    if (minGap <= 0) {
+      total += 1;
+      continue;
+    }
+    // Count degrees within 10c of k * minGap for some positive integer k
+    const root = cents[0]!;
+    let count = 0;
+    for (let i = 0; i < n; i++) {
+      const offset = cents[i]! - root;
+      const k = Math.round(offset / minGap);
+      if (k >= 0 && Math.abs(k * minGap - offset) <= 10) count++;
+    }
+    total += count / n;
+  }
+  return total / tunings.length;
+}
+
+// Q1516 — tuningFamilySocraticRadarPredictabilityScore
+/**
+ * Predictability: for each tuning, compute how well each degree can be "predicted"
+ * from the previous ones using the mean interval. Prediction for degree i =
+ * mean_interval * i. Fraction of degrees within 20c of prediction. Returns mean
+ * across tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum (unused).
+ * @param rootHz - Reference frequency (unused).
+ * @returns Mean predictability fraction in [0,1] (0 for empty).
+ */
+export function tuningFamilySocraticRadarPredictabilityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) {
+      total += 0;
+      continue;
+    }
+    if (n === 1) {
+      total += 1;
+      continue;
+    }
+    const cents = t.degrees.map((d) => pitchToCents(d)).sort((a, b) => a - b);
+    const root = cents[0]!;
+    const top = cents[n - 1]!;
+    const meanInterval = (top - root) / (n - 1);
+    if (meanInterval <= 0) {
+      total += 1;
+      continue;
+    }
+    let count = 0;
+    for (let i = 0; i < n; i++) {
+      const predicted = root + meanInterval * i;
+      if (Math.abs(cents[i]! - predicted) <= 20) count++;
+    }
+    total += count / n;
+  }
+  return total / tunings.length;
+}
