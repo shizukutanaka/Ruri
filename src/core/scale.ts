@@ -40077,6 +40077,194 @@ export function tuningFamilySocraticRadarEulerTotientProxy(
   return Math.max(0, Math.min(1, total / profiles.length));
 }
 
+// Q1830 — tuningFamilySocraticRadarPermutationDistanceMean
+export function tuningFamilySocraticRadarPermutationDistanceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length < 2) {
+    const p = profiles[0]!;
+    const vals = axes.map((ax) => p[ax]);
+    const sorted = [...vals].sort((a, b) => a - b);
+    let dist = 0;
+    for (let i = 0; i < vals.length; i++) {
+      const rankA = i;
+      const rankB = sorted.indexOf(vals[i]!);
+      dist += Math.abs(rankA - rankB);
+    }
+    return Math.max(0, Math.min(1, dist / 10));
+  }
+  let total = 0;
+  for (let i = 0; i + 1 < profiles.length; i++) {
+    const p1 = profiles[i]!;
+    const p2 = profiles[i + 1]!;
+    const vals1 = axes.map((ax) => p1[ax]);
+    const vals2 = axes.map((ax) => p2[ax]);
+    const sorted1 = [...vals1].map((v, idx) => ({ v, idx })).sort((a, b) => b.v - a.v);
+    const sorted2 = [...vals2].map((v, idx) => ({ v, idx })).sort((a, b) => b.v - a.v);
+    const rank1 = new Array<number>(5);
+    const rank2 = new Array<number>(5);
+    for (let r = 0; r < 5; r++) {
+      rank1[sorted1[r]!.idx] = r;
+      rank2[sorted2[r]!.idx] = r;
+    }
+    let tau = 0;
+    for (let a = 0; a < 5; a++) {
+      for (let b = a + 1; b < 5; b++) {
+        const sign1 = Math.sign(rank1[a]! - rank1[b]!);
+        const sign2 = Math.sign(rank2[a]! - rank2[b]!);
+        if (sign1 !== sign2) tau++;
+      }
+    }
+    total += tau / 10;
+  }
+  return Math.max(0, Math.min(1, total / (profiles.length - 1)));
+}
+
+// Q1832 — tuningFamilySocraticRadarCombinationCountProxy
+export function tuningFamilySocraticRadarCombinationCountProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let total = 0;
+  for (const p of profiles) {
+    const nAbove = axes.filter((ax) => p[ax] > 0.5).length;
+    const c = nAbove * Math.max(0, nAbove - 1) / 2;
+    total += c / 10;
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+}
+
+// Q1834 — tuningFamilySocraticRadarPartitionFunctionCountProxy
+export function tuningFamilySocraticRadarPartitionFunctionCountProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let total = 0;
+  const factorial5 = 120;
+  for (const p of profiles) {
+    const sum = axes.reduce((acc, ax) => acc + p[ax], 0);
+    const k = Math.floor(sum * 5);
+    const approx = k > 0 ? Math.pow(2, k - 1) / factorial5 : 0;
+    total += Math.tanh(approx);
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+}
+
+// Q1836 — tuningFamilySocraticRadarSterlingNumberProxy
+export function tuningFamilySocraticRadarSterlingNumberProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const bell5 = 52;
+  let total = 0;
+  for (const p of profiles) {
+    const bins = axes.map((ax) => {
+      const v = p[ax];
+      if (v < 1 / 3) return 0;
+      if (v < 2 / 3) return 1;
+      return 2;
+    });
+    const groups = new Set<number>(bins);
+    const k = groups.size;
+    let stirlingSum = 0;
+    for (let j = 1; j <= k; j++) {
+      let s = 0;
+      for (let i = 0; i <= j; i++) {
+        const sign = i % 2 === 0 ? 1 : -1;
+        let binCoeff = 1;
+        for (let m = 0; m < i; m++) {
+          binCoeff = binCoeff * (j - m) / (m + 1);
+        }
+        s += sign * binCoeff * Math.pow(j - i, 5);
+      }
+      stirlingSum += Math.round(s) / sterlingFactorial(j);
+    }
+    total += Math.max(0, stirlingSum) / bell5;
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+
+  function sterlingFactorial(n: number): number {
+    let r = 1;
+    for (let i = 2; i <= n; i++) r *= i;
+    return r;
+  }
+}
+
+// Q1838 — tuningFamilySocraticRadarHammingDistanceMean
+export function tuningFamilySocraticRadarHammingDistanceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const binarized = profiles.map((p) => axes.map((ax) => (p[ax] >= 0.5 ? 1 : 0)));
+  if (profiles.length < 2) {
+    const b = binarized[0]!;
+    const ones = b.filter((v) => v === 1).length;
+    return Math.max(0, Math.min(1, ones / 5));
+  }
+  let total = 0;
+  for (let i = 0; i + 1 < binarized.length; i++) {
+    const b1 = binarized[i]!;
+    const b2 = binarized[i + 1]!;
+    let diff = 0;
+    for (let k = 0; k < 5; k++) {
+      if (b1[k] !== b2[k]) diff++;
+    }
+    total += diff / 5;
+  }
+  return Math.max(0, Math.min(1, total / (binarized.length - 1)));
+}
+
+// Q1840 — tuningFamilySocraticRadarCatalanNumberProxy
+export function tuningFamilySocraticRadarCatalanNumberProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const catalanNorm = 14;
+  let total = 0;
+  for (const p of profiles) {
+    const mean = axes.reduce((acc, ax) => acc + p[ax], 0) / axes.length;
+    const n = Math.floor(mean * 4);
+    let c2n = 1;
+    for (let i = 0; i < n; i++) {
+      c2n = c2n * (2 * n - i) / (i + 1);
+    }
+    const catalan = n >= 0 ? c2n / (n + 1) : 0;
+    total += catalan / catalanNorm;
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -42530,4 +42718,105 @@ export function scaleSubOctaveDensity(
     }
   }
   return count / n;
+}
+
+/**
+ * III1 — scaleConjunctMotion
+ * Proportion of step pairs classified as "conjunct" (step ≤ 200 cents).
+ * - Steps = consecutive diffs of sorted pitches + wrap step
+ * - Count steps ≤ 200 cents
+ * - Return count / n; 0 for n<2
+ */
+export function scaleConjunctMotion(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let conjunct = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (step <= 200) conjunct++;
+  }
+  const wrap = periodCents - sorted[n - 1]! + sorted[0]!;
+  if (wrap <= 200) conjunct++;
+  return conjunct / n;
+}
+
+/**
+ * III2 — scaleDisjunctMotion
+ * Proportion of steps classified as "disjunct" (step > 200 cents).
+ * - Steps = consecutive diffs of sorted pitches + wrap step
+ * - Count steps > 200 cents
+ * - Return count / n; 0 for n<2
+ */
+export function scaleDisjunctMotion(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let disjunct = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (step > 200) disjunct++;
+  }
+  const wrap = periodCents - sorted[n - 1]! + sorted[0]!;
+  if (wrap > 200) disjunct++;
+  return disjunct / n;
+}
+
+/**
+ * III3 — scaleStepSizeVariance
+ * Normalized variance of step sizes.
+ * - Steps = consecutive diffs (sorted + wrap)
+ * - Return variance(steps) / (periodCents/n)^2; clamp [0,1]; 0 for n<2
+ */
+export function scaleStepSizeVariance(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const mean = steps.reduce((s, v) => s + v, 0) / steps.length;
+  const variance =
+    steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
+  const norm = (periodCents / n) ** 2;
+  if (norm === 0) return 0;
+  return Math.min(1, Math.max(0, variance / norm));
+}
+
+/**
+ * III4 — scaleGapFill
+ * "Gap-fill" tendency: proportion of steps that follow a large leap (>300 cents)
+ * with a small step (<200 cents).
+ * - For consecutive step pairs (s[i], s[i+1]):
+ *   Count pairs where s[i] > 300 AND s[i+1] < 200
+ * - Return count / max(n-1, 1); 0 for n<3
+ */
+export function scaleGapFill(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 3) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  let count = 0;
+  for (let i = 0; i < steps.length - 1; i++) {
+    if (steps[i]! > 300 && steps[i + 1]! < 200) count++;
+  }
+  return count / Math.max(n - 1, 1);
 }

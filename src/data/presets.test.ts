@@ -712,6 +712,12 @@ import {
   presetFamilySocraticRadarModularArithmeticProxy,
   presetFamilySocraticRadarContinuedFractionProxy,
   presetFamilySocraticRadarEulerTotientProxy,
+  presetFamilySocraticRadarPermutationDistanceMean,
+  presetFamilySocraticRadarCombinationCountProxy,
+  presetFamilySocraticRadarPartitionFunctionCountProxy,
+  presetFamilySocraticRadarSterlingNumberProxy,
+  presetFamilySocraticRadarHammingDistanceMean,
+  presetFamilySocraticRadarCatalanNumberProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -18299,5 +18305,89 @@ describe('Q1829 presetFamilySocraticRadarEulerTotientProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarEulerTotientProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1831 — presetFamilySocraticRadarPermutationDistanceMean
+describe('Q1831 presetFamilySocraticRadarPermutationDistanceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPermutationDistanceMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPermutationDistanceMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPermutationDistanceMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1833 — presetFamilySocraticRadarCombinationCountProxy
+describe('Q1833 presetFamilySocraticRadarCombinationCountProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCombinationCountProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCombinationCountProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCombinationCountProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1835 — presetFamilySocraticRadarPartitionFunctionCountProxy
+describe('Q1835 presetFamilySocraticRadarPartitionFunctionCountProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPartitionFunctionCountProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPartitionFunctionCountProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPartitionFunctionCountProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1837 — presetFamilySocraticRadarSterlingNumberProxy
+describe('Q1837 presetFamilySocraticRadarSterlingNumberProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarSterlingNumberProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarSterlingNumberProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSterlingNumberProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1839 — presetFamilySocraticRadarHammingDistanceMean
+describe('Q1839 presetFamilySocraticRadarHammingDistanceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarHammingDistanceMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarHammingDistanceMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHammingDistanceMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1841 — presetFamilySocraticRadarCatalanNumberProxy
+describe('Q1841 presetFamilySocraticRadarCatalanNumberProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCatalanNumberProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCatalanNumberProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCatalanNumberProxy(['unknown'], s)).toThrow(RangeError);
   });
 });

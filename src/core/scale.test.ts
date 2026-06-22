@@ -1083,6 +1083,12 @@ import {
   tuningFamilySocraticRadarModularArithmeticProxy,
   tuningFamilySocraticRadarContinuedFractionProxy,
   tuningFamilySocraticRadarEulerTotientProxy,
+  tuningFamilySocraticRadarPermutationDistanceMean,
+  tuningFamilySocraticRadarCombinationCountProxy,
+  tuningFamilySocraticRadarPartitionFunctionCountProxy,
+  tuningFamilySocraticRadarSterlingNumberProxy,
+  tuningFamilySocraticRadarHammingDistanceMean,
+  tuningFamilySocraticRadarCatalanNumberProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1221,6 +1227,10 @@ import {
   scaleRegisterWidth,
   scaleOctaveCompleteness,
   scaleSubOctaveDensity,
+  scaleConjunctMotion,
+  scaleDisjunctMotion,
+  scaleStepSizeVariance,
+  scaleGapFill,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -33086,6 +33096,114 @@ describe('Q1828 tuningFamilySocraticRadarEulerTotientProxy', () => {
   });
 });
 
+// Q1830 — tuningFamilySocraticRadarPermutationDistanceMean
+describe('Q1830 tuningFamilySocraticRadarPermutationDistanceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarPermutationDistanceMean([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPermutationDistanceMean([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPermutationDistanceMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1832 — tuningFamilySocraticRadarCombinationCountProxy
+describe('Q1832 tuningFamilySocraticRadarCombinationCountProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarCombinationCountProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarCombinationCountProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarCombinationCountProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1834 — tuningFamilySocraticRadarPartitionFunctionCountProxy
+describe('Q1834 tuningFamilySocraticRadarPartitionFunctionCountProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarPartitionFunctionCountProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPartitionFunctionCountProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPartitionFunctionCountProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1836 — tuningFamilySocraticRadarSterlingNumberProxy
+describe('Q1836 tuningFamilySocraticRadarSterlingNumberProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarSterlingNumberProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSterlingNumberProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSterlingNumberProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1838 — tuningFamilySocraticRadarHammingDistanceMean
+describe('Q1838 tuningFamilySocraticRadarHammingDistanceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarHammingDistanceMean([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarHammingDistanceMean([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarHammingDistanceMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1840 — tuningFamilySocraticRadarCatalanNumberProxy
+describe('Q1840 tuningFamilySocraticRadarCatalanNumberProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarCatalanNumberProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarCatalanNumberProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarCatalanNumberProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
 // FFF1 — scaleMicrotonalDensity
 describe('FFF1 scaleMicrotonalDensity', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -33393,6 +33511,94 @@ describe('HHH4 scaleSubOctaveDensity', () => {
   });
   it('multi-octave [0,200,400,1400,1600] → finite, in [0,1]', () => {
     const v = scaleSubOctaveDensity([0, 200, 400, 1400, 1600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// III1 — scaleConjunctMotion
+describe('III1 scaleConjunctMotion', () => {
+  it('empty → 0', () => {
+    expect(scaleConjunctMotion([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleConjunctMotion([0])).toBe(0);
+  });
+  it('equal-step [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleConjunctMotion([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('mixed [0,100,700,1100] → finite, in [0,1]', () => {
+    const v = scaleConjunctMotion([0, 100, 700, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// III2 — scaleDisjunctMotion
+describe('III2 scaleDisjunctMotion', () => {
+  it('empty → 0', () => {
+    expect(scaleDisjunctMotion([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleDisjunctMotion([0])).toBe(0);
+  });
+  it('equal-step [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleDisjunctMotion([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('mixed [0,100,700,1100] → finite, in [0,1]', () => {
+    const v = scaleDisjunctMotion([0, 100, 700, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// III3 — scaleStepSizeVariance
+describe('III3 scaleStepSizeVariance', () => {
+  it('empty → 0', () => {
+    expect(scaleStepSizeVariance([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleStepSizeVariance([0])).toBe(0);
+  });
+  it('equal-step [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleStepSizeVariance([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('mixed [0,100,700,1100] → finite, in [0,1]', () => {
+    const v = scaleStepSizeVariance([0, 100, 700, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// III4 — scaleGapFill
+describe('III4 scaleGapFill', () => {
+  it('empty → 0', () => {
+    expect(scaleGapFill([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleGapFill([0])).toBe(0);
+  });
+  it('equal-step [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleGapFill([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('mixed [0,100,700,1100] → finite, in [0,1]', () => {
+    const v = scaleGapFill([0, 100, 700, 1100]);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
