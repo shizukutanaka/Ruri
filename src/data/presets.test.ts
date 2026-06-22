@@ -556,6 +556,12 @@ import {
   presetFamilySocraticRadarSelfSimilarityScore,
   presetFamilySocraticRadarRepetitiveness,
   presetFamilySocraticRadarPredictabilityScore,
+  presetFamilySocraticRadarNashEquilibriumProxy,
+  presetFamilySocraticRadarGameValueMean,
+  presetFamilySocraticRadarCooperationIndex,
+  presetFamilySocraticRadarParetoDominanceCount,
+  presetFamilySocraticRadarStrategicDiversityIndex,
+  presetFamilySocraticRadarBargainingPower,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -15909,5 +15915,98 @@ describe('Q1517 presetFamilySocraticRadarPredictabilityScore', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarPredictabilityScore(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1519 — presetFamilySocraticRadarNashEquilibriumProxy
+describe('Q1519 presetFamilySocraticRadarNashEquilibriumProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for single preset', () => {
+    const r = presetFamilySocraticRadarNashEquilibriumProxy(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarNashEquilibriumProxy([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNashEquilibriumProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1521 — presetFamilySocraticRadarGameValueMean
+describe('Q1521 presetFamilySocraticRadarGameValueMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns positive value for single preset', () => {
+    const r = presetFamilySocraticRadarGameValueMean(['12-tet'], s);
+    expect(r).toBeGreaterThan(0);
+  });
+  it('empty returns 1', () => {
+    expect(presetFamilySocraticRadarGameValueMean([], s)).toBe(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGameValueMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1523 — presetFamilySocraticRadarCooperationIndex
+describe('Q1523 presetFamilySocraticRadarCooperationIndex', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for two presets', () => {
+    const r = presetFamilySocraticRadarCooperationIndex(['12-tet', '12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarCooperationIndex([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCooperationIndex(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1525 — presetFamilySocraticRadarParetoDominanceCount
+describe('Q1525 presetFamilySocraticRadarParetoDominanceCount', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 1 for single preset (non-dominated)', () => {
+    const r = presetFamilySocraticRadarParetoDominanceCount(['12-tet'], s);
+    expect(r).toBe(1);
+  });
+  it('empty returns 1', () => {
+    expect(presetFamilySocraticRadarParetoDominanceCount([], s)).toBe(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarParetoDominanceCount(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1527 — presetFamilySocraticRadarStrategicDiversityIndex
+describe('Q1527 presetFamilySocraticRadarStrategicDiversityIndex', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for single preset', () => {
+    const r = presetFamilySocraticRadarStrategicDiversityIndex(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarStrategicDiversityIndex([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarStrategicDiversityIndex(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1529 — presetFamilySocraticRadarBargainingPower
+describe('Q1529 presetFamilySocraticRadarBargainingPower', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length 1 for single preset', () => {
+    const r = presetFamilySocraticRadarBargainingPower(['12-tet'], s);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns []', () => {
+    expect(presetFamilySocraticRadarBargainingPower([], s)).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBargainingPower(['unknown'], s)).toThrow(RangeError);
   });
 });
