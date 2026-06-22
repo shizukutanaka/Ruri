@@ -382,6 +382,12 @@ import {
   presetFamilySocraticRadarExponentialSmoothing,
   presetFamilySocraticRadarOutlierReport,
   presetFamilySocraticRadarDendrogramOrder,
+  presetFamilySocraticRadarStabilityScore,
+  presetFamilySocraticRadarTrendSlope,
+  presetFamilySocraticRadarVolatilityScore,
+  presetFamilySocraticRadarMomentumProfile,
+  presetFamilySocraticRadarFamilyConvergence,
+  presetFamilySocraticRadarRegimeDetection,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12564,5 +12570,92 @@ describe('presetFamilySocraticRadarDendrogramOrder (Q1157)', () => {
   it('returns string array', () => {
     const result = presetFamilySocraticRadarDendrogramOrder(presetIds, spectrum);
     expect(result.every((s) => typeof s === 'string')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1159 — presetFamilySocraticRadarStabilityScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarStabilityScore (Q1159)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with 5 keys', () => {
+    const result = presetFamilySocraticRadarStabilityScore(presetIds, spectrum);
+    expect(Object.keys(result)).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1161 — presetFamilySocraticRadarTrendSlope
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTrendSlope (Q1161)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with 5 finite values', () => {
+    const result = presetFamilySocraticRadarTrendSlope(presetIds, spectrum);
+    expect(Object.keys(result)).toHaveLength(5);
+    for (const v of Object.values(result)) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1163 — presetFamilySocraticRadarVolatilityScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarVolatilityScore (Q1163)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with 5 keys in [0,1]', () => {
+    const result = presetFamilySocraticRadarVolatilityScore(presetIds, spectrum);
+    expect(Object.keys(result)).toHaveLength(5);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1165 — presetFamilySocraticRadarMomentumProfile
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMomentumProfile (Q1165)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per preset with window=2', () => {
+    const result = presetFamilySocraticRadarMomentumProfile(presetIds, spectrum, 2);
+    expect(result).toHaveLength(presetIds.length);
+    expect(Object.keys(result[0]!.momentum)).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1167 — presetFamilySocraticRadarFamilyConvergence
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarFamilyConvergence (Q1167)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns converging boolean and finite rate', () => {
+    const result = presetFamilySocraticRadarFamilyConvergence(presetIds, spectrum);
+    expect(typeof result.converging).toBe('boolean');
+    expect(Number.isFinite(result.rate)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1169 — presetFamilySocraticRadarRegimeDetection
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRegimeDetection (Q1169)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns array with threshold=0.1', () => {
+    const result = presetFamilySocraticRadarRegimeDetection(presetIds, spectrum, 0.1);
+    expect(Array.isArray(result)).toBe(true);
   });
 });

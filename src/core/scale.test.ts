@@ -665,6 +665,16 @@ import {
   tuningFamilySocraticRadarExponentialSmoothing,
   tuningFamilySocraticRadarOutlierReport,
   tuningFamilySocraticRadarDendrogramOrder,
+  tuningFamilySocraticRadarStabilityScore,
+  tuningFamilySocraticRadarTrendSlope,
+  tuningFamilySocraticRadarVolatilityScore,
+  tuningFamilySocraticRadarMomentumProfile,
+  tuningFamilySocraticRadarFamilyConvergence,
+  tuningFamilySocraticRadarRegimeDetection,
+  microtonalDeviationProfile,
+  optimalScaleSubset,
+  beatFrequencyPairs,
+  timbreBasedConsonance,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -22058,5 +22068,225 @@ describe('tuningFamilySocraticRadarDendrogramOrder (Q1156)', () => {
   it('returns string array', () => {
     const order = tuningFamilySocraticRadarDendrogramOrder(tunings, spectrum);
     expect(order.every((s) => typeof s === 'string')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarStabilityScore (Q1158)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarStabilityScore (Q1158)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('all values in [0,1]', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarStabilityScore(tunings, spectrum))) {
+      expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('returns 5 keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarStabilityScore(tunings, spectrum))).toHaveLength(5);
+  });
+  it('identical tunings return stability=1 for all axes', () => {
+    const t = equalTemperament12(440);
+    for (const v of Object.values(tuningFamilySocraticRadarStabilityScore([t, t], spectrum))) {
+      expect(v).toBeCloseTo(1, 5);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarTrendSlope (Q1160)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarTrendSlope (Q1160)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 5 keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarTrendSlope(tunings, spectrum))).toHaveLength(5);
+  });
+  it('single tuning returns zeros', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarTrendSlope([equalTemperament12(440)], spectrum))) {
+      expect(v).toBe(0);
+    }
+  });
+  it('slopes are finite numbers', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarTrendSlope(tunings, spectrum))) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarVolatilityScore (Q1162)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarVolatilityScore (Q1162)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('all values in [0,1]', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarVolatilityScore(tunings, spectrum))) {
+      expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('returns 5 keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarVolatilityScore(tunings, spectrum))).toHaveLength(5);
+  });
+  it('identical tunings return volatility=0', () => {
+    const t = equalTemperament12(440);
+    for (const v of Object.values(tuningFamilySocraticRadarVolatilityScore([t, t], spectrum))) {
+      expect(v).toBeCloseTo(0, 5);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarMomentumProfile (Q1164)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMomentumProfile (Q1164)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarMomentumProfile(tunings, spectrum)).toHaveLength(2);
+  });
+  it('first entry momentum is all zeros', () => {
+    const r = tuningFamilySocraticRadarMomentumProfile(tunings, spectrum);
+    for (const v of Object.values(r[0]!.momentum)) { expect(v).toBe(0); }
+  });
+  it('each entry has momentum with 5 keys', () => {
+    const r = tuningFamilySocraticRadarMomentumProfile(tunings, spectrum);
+    expect(Object.keys(r[0]!.momentum)).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarFamilyConvergence (Q1166)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarFamilyConvergence (Q1166)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns converging boolean and rate number', () => {
+    const r = tuningFamilySocraticRadarFamilyConvergence(tunings, spectrum);
+    expect(typeof r.converging).toBe('boolean');
+    expect(typeof r.rate).toBe('number');
+  });
+  it('n<4 returns converging=false rate=0', () => {
+    const r = tuningFamilySocraticRadarFamilyConvergence(tunings, spectrum);
+    expect(r.converging).toBe(false);
+    expect(r.rate).toBe(0);
+  });
+  it('rate is finite', () => {
+    const r = tuningFamilySocraticRadarFamilyConvergence([equalTemperament12(440), equalTemperament12(432), equalTemperament12(442), equalTemperament12(436)], spectrum);
+    expect(Number.isFinite(r.rate)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarRegimeDetection (Q1168)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarRegimeDetection (Q1168)', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('single tuning returns empty array', () => {
+    expect(tuningFamilySocraticRadarRegimeDetection([equalTemperament12(440)], spectrum)).toEqual([]);
+  });
+  it('returns array of numbers', () => {
+    const r = tuningFamilySocraticRadarRegimeDetection([equalTemperament12(440), equalTemperament12(432)], spectrum);
+    expect(Array.isArray(r)).toBe(true);
+  });
+  it('all change indices are in [1, n-1]', () => {
+    const ts = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442)];
+    for (const i of tuningFamilySocraticRadarRegimeDetection(ts, spectrum, 0)) {
+      expect(i).toBeGreaterThanOrEqual(1);
+      expect(i).toBeLessThanOrEqual(ts.length - 1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 21 (DD series)
+// ---------------------------------------------------------------------------
+
+describe('microtonalDeviationProfile (DD1)', () => {
+  it('12-TET has all zero deviations', () => {
+    const result = microtonalDeviationProfile(equalTemperament12(440), 12);
+    for (const { deviationCents } of result) {
+      expect(deviationCents).toBeCloseTo(0, 5);
+    }
+  });
+  it('returns one entry per degree', () => {
+    expect(microtonalDeviationProfile(equalTemperament12(440), 12)).toHaveLength(12);
+  });
+  it('throws for edoReference < 1', () => {
+    expect(() => microtonalDeviationProfile(equalTemperament12(440), 0)).toThrow(RangeError);
+  });
+  it('degree index matches entry index', () => {
+    const result = microtonalDeviationProfile(equalTemperament12(440), 12);
+    result.forEach((e, i) => expect(e.degree).toBe(i));
+  });
+});
+
+describe('optimalScaleSubset (DD2)', () => {
+  it('returns targetSize elements', () => {
+    const scale = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    expect(optimalScaleSubset(scale, 5)).toHaveLength(5);
+  });
+  it('throws for targetSize > scale length', () => {
+    expect(() => optimalScaleSubset([0, 200, 400], 5)).toThrow(RangeError);
+  });
+  it('result is sorted ascending', () => {
+    const scale = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    const result = optimalScaleSubset(scale, 7);
+    const sorted = [...result].sort((a, b) => a - b);
+    expect(result).toEqual(sorted);
+  });
+  it('prefers pitches near reference', () => {
+    const scale = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    const result = optimalScaleSubset(scale, 7, [0, 200, 400, 500, 700, 900, 1100], 15);
+    // All 7 reference pitches should be in the result
+    for (const ref of [0, 200, 400, 500, 700, 900, 1100]) {
+      expect(result).toContain(ref);
+    }
+  });
+});
+
+describe('beatFrequencyPairs (DD3)', () => {
+  it('returns empty for single frequency', () => {
+    expect(beatFrequencyPairs([440])).toEqual([]);
+  });
+  it('finds beat for 440 and 441 Hz', () => {
+    const result = beatFrequencyPairs([440, 441], 5);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.beatHz).toBeCloseTo(1, 5);
+  });
+  it('throws for negative maxBeatHz', () => {
+    expect(() => beatFrequencyPairs([440, 441], -1)).toThrow(RangeError);
+  });
+  it('sorted by beatHz ascending', () => {
+    const result = beatFrequencyPairs([440, 441, 443], 10);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i - 1]!.beatHz).toBeLessThanOrEqual(result[i]!.beatHz);
+    }
+  });
+});
+
+describe('timbreBasedConsonance (DD4)', () => {
+  it('empty spectrum returns 1', () => {
+    expect(timbreBasedConsonance(700, [])).toBe(1);
+  });
+  it('result in (0,1]', () => {
+    const r = timbreBasedConsonance(700, harmonicSpectrum(4));
+    expect(r).toBeGreaterThan(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('unison has well-defined consonance', () => {
+    const r = timbreBasedConsonance(0, harmonicSpectrum(4), 220);
+    expect(r).toBeGreaterThan(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('consonance(fifth) > consonance(tritone) for harmonic timbre', () => {
+    const s = harmonicSpectrum(6);
+    expect(timbreBasedConsonance(702, s)).toBeGreaterThan(timbreBasedConsonance(600, s));
   });
 });

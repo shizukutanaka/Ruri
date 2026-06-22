@@ -373,3 +373,17 @@
 - CC2: pitchGravityCenter — 円周平均による音高重心
 - CC3: scaleCoherenceScore — 参照音階との整合スコア
 - CC4: rhythmicInterlockingScore — XORベースのリズム噛み合わせ指数
+
+## Round 21: 微分音偏差・部分集合最適化・ビート・音色協和 (DD1–DD4)
+
+**テーマ**: 微分音チューニング偏差・音階部分集合最適化・ビート周波数・音色依存協和度
+
+### 研究トピック
+- Qiita: Sethares音色協和モデルのTypeScript実装と純正律への応用
+- Zenn: 微分音音律の12EDOからの偏差プロファイル可視化
+
+### 実装
+- DD1: microtonalDeviationProfile — 各音度のEDO参照からの偏差（セント）
+- DD2: optimalScaleSubset — 参照音階最大整合の貪欲部分集合選択
+- DD3: beatFrequencyPairs — ビート周波数閾値内の音頻ペア列挙
+- DD4: timbreBasedConsonance — 音色スペクトルに基づく協和度（1/(1+roughness)）
