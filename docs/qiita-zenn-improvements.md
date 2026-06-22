@@ -1228,3 +1228,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | AAAA2 | `scaleHarmonicAccelerationProxy` | 音程変化の加速度（2階差分の平均） |
 | AAAA3 | `scaleHarmonicSteadinessProxy` | 和声リズムの安定性（加速度の補数） |
 | AAAA4 | `scaleHarmonicComplexityProxy` | 密度と加速度の重み付き複合指数 |
+
+## Round 96: 音階フィンガープリント分析 (BBBB1–BBBB4)
+
+音階の識別署名（フィンガープリント）を生成する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| BBBB1 | `scaleChecksumProxy` | ピッチ正規化値の合計mod1チェックサム |
+| BBBB2 | `scaleHashVariance` | 正規化ピッチの分散フィンガープリント |
+| BBBB3 | `scalePeriodicityFingerprint` | 等分割音律へのフィット度（2-12等分） |
+| BBBB4 | `scaleUniquenessProxy` | 周期性の補数（音階の独自性指数） |
