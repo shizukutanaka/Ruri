@@ -571,6 +571,12 @@ import {
   tuningFamilySocraticRadarHarmonicMeanPerAxis,
   tuningFamilySocraticRadarGiniCoefficient,
   tuningFamilySocraticRadarNormalizedL1Distance,
+  tuningFamilySocraticRadarTopK,
+  tuningFamilySocraticRadarBottomK,
+  tuningFamilySocraticRadarDominantAxisPerTuning,
+  tuningFamilySocraticRadarAxisQuartiles,
+  tuningFamilySocraticRadarAnomalyScore,
+  tuningFamilySocraticRadarRadialBalance,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -615,6 +621,10 @@ import {
   edoEnharmonicEquivalents,
   commonTonesUnderTransposition,
   scaleToIntervalHistogram,
+  pitchSetComplement,
+  scaleMirror,
+  modalTranspose,
+  scaleSymmetryAxes,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -20936,5 +20946,231 @@ describe('tuningFamilySocraticRadarNormalizedL1Distance (Q1096)', () => {
     const result = tuningFamilySocraticRadarNormalizedL1Distance(single, spectrum);
     expect(result).toHaveLength(1);
     expect(result[0]!.l1).toBeCloseTo(0, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Y1 — pitchSetComplement
+// ---------------------------------------------------------------------------
+
+describe('pitchSetComplement (Y1)', () => {
+  it('complement of full 12-EDO scale is empty', () => {
+    const full = Array.from({ length: 12 }, (_, i) => i * 100);
+    expect(pitchSetComplement(full, 12, 5)).toEqual([]);
+  });
+  it('complement of empty scale returns all EDO degrees', () => {
+    expect(pitchSetComplement([], 12, 5)).toHaveLength(12);
+  });
+  it('throws for edoDivisions < 1', () => {
+    expect(() => pitchSetComplement([0], 0)).toThrow(RangeError);
+  });
+  it('[0,400,700] in 12-EDO has 9 complement tones', () => {
+    expect(pitchSetComplement([0, 400, 700], 12, 10)).toHaveLength(9);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Y2 — scaleMirror
+// ---------------------------------------------------------------------------
+
+describe('scaleMirror (Y2)', () => {
+  it('empty input returns empty', () => {
+    expect(scaleMirror([])).toEqual([]);
+  });
+  it('mirror of [0,200,400] contains 0', () => {
+    const result = scaleMirror([0, 200, 400]);
+    expect(result).toContain(0);
+  });
+  it('mirror is same length as input', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleMirror(scale)).toHaveLength(scale.length);
+  });
+  it('double mirror returns original', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    const double = scaleMirror(scaleMirror(scale));
+    scale.forEach((c, i) => expect(double[i]).toBeCloseTo(c, 1));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Y3 — modalTranspose
+// ---------------------------------------------------------------------------
+
+describe('modalTranspose (Y3)', () => {
+  it('step 0 returns sorted copy', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(modalTranspose(scale, 0)).toEqual(scale);
+  });
+  it('step 1 of major scale starts from second degree', () => {
+    const major = [0, 200, 400, 500, 700, 900, 1100];
+    const result = modalTranspose(major, 1);
+    expect(result[0]).toBe(0);
+    expect(result).toHaveLength(7);
+  });
+  it('step n = step 0 for n-length scale', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(modalTranspose(scale, 7)).toEqual(scale);
+  });
+  it('throws for empty scale with nonzero step', () => {
+    expect(() => modalTranspose([], 1)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Y4 — scaleSymmetryAxes
+// ---------------------------------------------------------------------------
+
+describe('scaleSymmetryAxes (Y4)', () => {
+  it('empty scale returns empty', () => {
+    expect(scaleSymmetryAxes([])).toEqual([]);
+  });
+  it('[0,600] has axis at 300', () => {
+    const axes = scaleSymmetryAxes([0, 600], 5);
+    expect(axes).toContain(300);
+  });
+  it('augmented triad [0,400,800] has at least 3 axes', () => {
+    const axes = scaleSymmetryAxes([0, 400, 800], 5);
+    expect(axes.length).toBeGreaterThanOrEqual(3);
+  });
+  it('returns sorted ascending', () => {
+    const axes = scaleSymmetryAxes([0, 400, 800], 5);
+    const sorted = [...axes].sort((a, b) => a - b);
+    expect(axes).toEqual(sorted);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1098 — tuningFamilySocraticRadarTopK
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarTopK (Q1098)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axes', () => {
+    const r = tuningFamilySocraticRadarTopK(tunings, spectrum, 1);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+  it('each axis has k entries', () => {
+    const r = tuningFamilySocraticRadarTopK(tunings, spectrum, 1);
+    for (const key of Object.keys(r)) { expect((r as any)[key]).toHaveLength(1); }
+  });
+  it('k>n returns all tunings', () => {
+    const r = tuningFamilySocraticRadarTopK(tunings, spectrum, 10);
+    for (const key of Object.keys(r)) { expect((r as any)[key]).toHaveLength(2); }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1100 — tuningFamilySocraticRadarBottomK
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarBottomK (Q1100)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axes', () => {
+    const r = tuningFamilySocraticRadarBottomK(tunings, spectrum, 1);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+  it('each axis has k entries', () => {
+    const r = tuningFamilySocraticRadarBottomK(tunings, spectrum, 1);
+    for (const key of Object.keys(r)) { expect((r as any)[key]).toHaveLength(1); }
+  });
+  it('bottom scores <= top scores for each axis', () => {
+    const top = tuningFamilySocraticRadarTopK(tunings, spectrum, 1);
+    const bot = tuningFamilySocraticRadarBottomK(tunings, spectrum, 1);
+    for (const key of ['diversity','versatility','maturity','benchmark','convergence'] as const) {
+      expect(bot[key][0]!.score).toBeLessThanOrEqual(top[key][0]!.score);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1102 — tuningFamilySocraticRadarDominantAxisPerTuning
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDominantAxisPerTuning (Q1102)', () => {
+  const tunings = [equalTemperament12(440)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarDominantAxisPerTuning([equalTemperament12(440), equalTemperament12(432)], spectrum)).toHaveLength(2);
+  });
+  it('dominant axis score equals max profile value', () => {
+    const result = tuningFamilySocraticRadarDominantAxisPerTuning(tunings, spectrum);
+    expect(result[0]!.score).toBeGreaterThanOrEqual(0);
+    expect(result[0]!.score).toBeLessThanOrEqual(1);
+  });
+  it('id is the tuning id', () => {
+    const result = tuningFamilySocraticRadarDominantAxisPerTuning(tunings, spectrum);
+    expect(result[0]!.id).toBe(equalTemperament12(440).id);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1104 — tuningFamilySocraticRadarAxisQuartiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAxisQuartiles (Q1104)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 5 axis entries', () => {
+    expect(tuningFamilySocraticRadarAxisQuartiles(tunings, spectrum)).toHaveLength(5);
+  });
+  it('q1 <= q2 <= q3', () => {
+    for (const q of tuningFamilySocraticRadarAxisQuartiles(tunings, spectrum)) {
+      expect(q.q1).toBeLessThanOrEqual(q.q2);
+      expect(q.q2).toBeLessThanOrEqual(q.q3);
+    }
+  });
+  it('all quartiles in [0,1]', () => {
+    for (const q of tuningFamilySocraticRadarAxisQuartiles(tunings, spectrum)) {
+      expect(q.q1).toBeGreaterThanOrEqual(0);
+      expect(q.q3).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1106 — tuningFamilySocraticRadarAnomalyScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAnomalyScore (Q1106)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarAnomalyScore(tunings, spectrum)).toHaveLength(2);
+  });
+  it('anomalyScore is non-negative', () => {
+    for (const e of tuningFamilySocraticRadarAnomalyScore(tunings, spectrum)) {
+      expect(e.anomalyScore).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('sorted descending by anomalyScore', () => {
+    const result = tuningFamilySocraticRadarAnomalyScore(tunings, spectrum);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i-1]!.anomalyScore).toBeGreaterThanOrEqual(result[i]!.anomalyScore);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1108 — tuningFamilySocraticRadarRadialBalance
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarRadialBalance (Q1108)', () => {
+  const tunings = [equalTemperament12(440)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarRadialBalance(tunings, spectrum)).toHaveLength(1);
+  });
+  it('balance is in [0,1]', () => {
+    const [entry] = tuningFamilySocraticRadarRadialBalance(tunings, spectrum);
+    expect(entry!.balance).toBeGreaterThanOrEqual(0);
+    expect(entry!.balance).toBeLessThanOrEqual(1);
+  });
+  it('sorted descending by balance', () => {
+    const result = tuningFamilySocraticRadarRadialBalance([equalTemperament12(440), equalTemperament12(432)], spectrum);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i-1]!.balance).toBeGreaterThanOrEqual(result[i]!.balance);
+    }
   });
 });

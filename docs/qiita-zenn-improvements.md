@@ -303,3 +303,17 @@
 - X2: edoEnharmonicEquivalents — EDO度数の異名同音候補検索
 - X3: commonTonesUnderTransposition — 移調時の共通音検出
 - X4: scaleToIntervalHistogram — 音程ヒストグラム（ビン化）
+
+## Round 16: スケール変換・対称性分析 (Y1–Y4)
+
+**テーマ**: ピッチセットの補集合・反転・旋法転置・対称軸検出
+
+### 研究トピック
+- Qiita: 音律理論のPython/TypeScript実装 — 音階の対称性と旋法変換
+- Zenn: 微分音における音程補集合とEDO度数分析
+
+### 実装
+- Y1: pitchSetComplement — EDOの補集合音程集合
+- Y2: scaleMirror — 音階の反転（鏡映）
+- Y3: modalTranspose — 旋法転置（モード回転 + 正規化）
+- Y4: scaleSymmetryAxes — 反射対称軸の検出

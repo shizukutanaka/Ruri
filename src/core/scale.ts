@@ -21659,3 +21659,357 @@ export function scaleToIntervalHistogram(
   }
   return hist;
 }
+
+// ---------------------------------------------------------------------------
+// Q1098 — tuningFamilySocraticRadarTopK
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarTopK(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  k: number = 3,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', Array<{ id: string; score: number }>> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const result = {} as Record<AxisKey, Array<{ id: string; score: number }>>;
+  const limit = Math.min(k, tunings.length);
+  for (const ax of axes) {
+    const entries = tunings.map((t, i) => ({ id: t.id, score: profiles[i]![ax] }));
+    entries.sort((a, b) => b.score - a.score);
+    result[ax] = entries.slice(0, limit);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1100 — tuningFamilySocraticRadarBottomK
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarBottomK(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  k: number = 3,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', Array<{ id: string; score: number }>> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const result = {} as Record<AxisKey, Array<{ id: string; score: number }>>;
+  const limit = Math.min(k, tunings.length);
+  for (const ax of axes) {
+    const entries = tunings.map((t, i) => ({ id: t.id, score: profiles[i]![ax] }));
+    entries.sort((a, b) => a.score - b.score);
+    result[ax] = entries.slice(0, limit);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1102 — tuningFamilySocraticRadarDominantAxisPerTuning
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarDominantAxisPerTuning(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Array<{ id: string; axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; score: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const result = tunings.map((t) => {
+    const profile = tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz);
+    let bestAxis = axes[0]!;
+    for (const ax of axes) {
+      if (profile[ax] > profile[bestAxis]) bestAxis = ax;
+    }
+    return { id: t.id, axis: bestAxis, score: profile[bestAxis] };
+  });
+  return result.sort((a, b) => b.score - a.score);
+}
+
+// ---------------------------------------------------------------------------
+// Q1104 — tuningFamilySocraticRadarAxisQuartiles
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAxisQuartiles(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Array<{ axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; q1: number; q2: number; q3: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+
+  function interpolate(sorted: number[], p: number): number {
+    const n = sorted.length;
+    if (n === 0) return 0;
+    if (n === 1) return sorted[0]!;
+    const idx = p * (n - 1);
+    const lo = Math.floor(idx);
+    const hi = Math.ceil(idx);
+    const frac = idx - lo;
+    return sorted[lo]! + frac * (sorted[hi]! - sorted[lo]!);
+  }
+
+  return axes.map((ax) => {
+    const vals = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    return {
+      axis: ax,
+      q1: interpolate(vals, 0.25),
+      q2: interpolate(vals, 0.5),
+      q3: interpolate(vals, 0.75),
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1106 — tuningFamilySocraticRadarAnomalyScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAnomalyScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Array<{ id: string; anomalyScore: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility' , 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const n = profiles.length;
+  if (n === 0) return [];
+
+  // Compute mean and population std per axis
+  const stats: Record<AxisKey, { mean: number; std: number }> = {} as Record<AxisKey, { mean: number; std: number }>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / n;
+    const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    stats[ax] = { mean, std: Math.sqrt(variance) };
+  }
+
+  const result = tunings.map((t, i) => {
+    const profile = profiles[i]!;
+    const meanAbsZ =
+      axes.reduce((s, ax) => {
+        const { mean, std } = stats[ax];
+        if (std === 0) return s;
+        return s + Math.abs((profile[ax] - mean) / std);
+      }, 0) / axes.length;
+    return { id: t.id, anomalyScore: meanAbsZ };
+  });
+  return result.sort((a, b) => b.anomalyScore - a.anomalyScore);
+}
+
+// ---------------------------------------------------------------------------
+// Q1108 — tuningFamilySocraticRadarRadialBalance
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarRadialBalance(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Array<{ id: string; balance: number }> {
+  const result = tunings.map((t) => {
+    const profile = tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz);
+    const vals = Object.values(profile) as number[];
+    const minVal = Math.min(...vals);
+    const maxVal = Math.max(...vals);
+    const balance = maxVal === 0 ? 1.0 : minVal / maxVal;
+    return { id: t.id, balance };
+  });
+  return result.sort((a, b) => b.balance - a.balance);
+}
+
+// ---------------------------------------------------------------------------
+// Y1 — pitchSetComplement
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the chromatic complement of a pitch set within an EDO: all EDO degree
+ * positions (in cents: `i * 1200/n`) that are NOT covered by any pitch in
+ * `pitchClassesCents` (mod 1200, within tolerance).
+ *
+ * @param pitchClassesCents - Pitch classes in cents (will be reduced mod 1200).
+ * @param edoDivisions - Number of equal divisions of the octave (must be ≥ 1).
+ * @param toleranceCents - Matching tolerance in cents (default 5).
+ * @returns Sorted ascending list of complement degree cents.
+ * @throws {RangeError} If `edoDivisions < 1`.
+ *
+ * @example
+ * pitchSetComplement([0, 400, 700], 12, 10); // → 9 degrees (all but 0, 4, 7)
+ */
+export function pitchSetComplement(
+  pitchClassesCents: readonly number[],
+  edoDivisions: number,
+  toleranceCents: number = 5,
+): number[] {
+  if (edoDivisions < 1) {
+    throw new RangeError(`pitchSetComplement: edoDivisions must be ≥ 1, got ${edoDivisions}`);
+  }
+  const step = 1200 / edoDivisions;
+  const pcs = pitchClassesCents.map(c => ((c % 1200) + 1200) % 1200);
+  const complement: number[] = [];
+  for (let i = 0; i < edoDivisions; i++) {
+    const degree = i * step;
+    let covered = false;
+    for (const pc of pcs) {
+      let diff = Math.abs(degree - pc);
+      if (diff > 600) diff = 1200 - diff;
+      if (diff <= toleranceCents) {
+        covered = true;
+        break;
+      }
+    }
+    if (!covered) complement.push(degree);
+  }
+  return complement.sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// Y2 — scaleMirror
+// ---------------------------------------------------------------------------
+
+/**
+ * Mirrors/inverts a scale around a given axis: each cent value `c` is mapped to
+ * `(2 * axis - c) mod 1200`. The result is sorted ascending and deduplicated
+ * (within 0.001 cents).
+ *
+ * @param scaleCents - Scale degrees in cents.
+ * @param axis - Reflection axis in cents (default 0).
+ * @returns Sorted, deduplicated mirrored scale.
+ *
+ * @example
+ * scaleMirror([0, 200, 400, 500, 700, 900, 1100]); // major → phrygian-like mirror
+ */
+export function scaleMirror(
+  scaleCents: readonly number[],
+  axis: number = 0,
+): number[] {
+  if (scaleCents.length === 0) return [];
+  const mirrored = scaleCents.map(c => ((2 * axis - c) % 1200 + 1200) % 1200);
+  mirrored.sort((a, b) => a - b);
+  // Deduplicate within 0.001 cents
+  const result: number[] = [mirrored[0]!];
+  for (let i = 1; i < mirrored.length; i++) {
+    if (Math.abs(mirrored[i]! - result[result.length - 1]!) > 0.001) {
+      result.push(mirrored[i]!);
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Y3 — modalTranspose
+// ---------------------------------------------------------------------------
+
+/**
+ * Rotates a scale by `steps` diatonic positions (modal rotation) and normalizes
+ * so the first degree is 0. Positive steps rotate toward higher modes.
+ *
+ * Algorithm:
+ * 1. Sort `scaleCents` ascending.
+ * 2. Rotate the array by `steps mod n` positions.
+ * 3. Subtract the new first element from all pitches; wrap negatives by +1200.
+ * 4. Sort ascending.
+ *
+ * @param scaleCents - Scale degrees in cents (will be sorted internally).
+ * @param steps - Number of diatonic steps to rotate (0 = no change).
+ * @returns Rotated, normalized scale.
+ * @throws {RangeError} If `scaleCents` is empty and `steps !== 0`.
+ *
+ * @example
+ * modalTranspose([0, 200, 400, 500, 700, 900, 1100], 1);
+ * // → [0, 200, 300, 500, 700, 900, 1000]  (Dorian from major)
+ */
+export function modalTranspose(
+  scaleCents: readonly number[],
+  steps: number,
+): number[] {
+  if (scaleCents.length === 0) {
+    if (steps !== 0) {
+      throw new RangeError('modalTranspose: cannot rotate empty scale with nonzero steps');
+    }
+    return [];
+  }
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const n = sorted.length;
+  const rotation = ((steps % n) + n) % n;
+  if (rotation === 0) return sorted;
+  const rotated = [...sorted.slice(rotation), ...sorted.slice(0, rotation)];
+  const offset = rotated[0]!;
+  return rotated
+    .map(c => ((c - offset) % 1200 + 1200) % 1200)
+    .sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// Y4 — scaleSymmetryAxes
+// ---------------------------------------------------------------------------
+
+/**
+ * Finds all reflection axes (in cents, 0 to <1200) around which the pitch set
+ * is symmetric under mod-1200 reflection.
+ *
+ * An axis `a` is valid if for every pitch `p` in the scale,
+ * `(2*a - p) mod 1200` is also in the scale (within tolerance).
+ *
+ * Candidate axes are generated as `(p1 + p2) / 2 mod 1200` for all pairs
+ * (including each pitch paired with its octave-shifted self: axis = p + 600).
+ *
+ * @param scaleCents - Scale degrees in cents.
+ * @param toleranceCents - Matching tolerance in cents (default 5).
+ * @returns Sorted list of symmetry axes in [0, 1200).
+ *
+ * @example
+ * scaleSymmetryAxes([0, 600], 5); // → [300, 900]
+ * scaleSymmetryAxes([0, 400, 800], 5); // → at least 3 axes (augmented triad)
+ */
+export function scaleSymmetryAxes(
+  scaleCents: readonly number[],
+  toleranceCents: number = 5,
+): number[] {
+  if (scaleCents.length === 0) return [];
+  const pcs = scaleCents.map(c => ((c % 1200) + 1200) % 1200);
+
+  // Generate candidate axes from all pairs (p1+p2)/2 mod 1200,
+  // including each pitch paired with its octave-shifted self (gives axis = p + 600).
+  const candidateSet = new Set<number>();
+  for (let i = 0; i < pcs.length; i++) {
+    const pi = pcs[i]!;
+    // Pair pitch with its octave-shifted self → axis = p + 600
+    candidateSet.add(((pi + 600) % 1200 + 1200) % 1200);
+    for (let j = i; j < pcs.length; j++) {
+      const pj = pcs[j]!;
+      // (pi + pj) / 2 mod 1200 and the "other half" (shifted by 600)
+      const a1 = ((pi + pj) / 2 % 1200 + 1200) % 1200;
+      const a2 = ((pi + pj) / 2 + 600) % 1200;
+      candidateSet.add(Math.round(a1 * 1000) / 1000);
+      candidateSet.add(Math.round(a2 * 1000) / 1000);
+    }
+  }
+
+  // Test each candidate axis for symmetry
+  const axes: number[] = [];
+  for (const axis of candidateSet) {
+    let symmetric = true;
+    for (const p of pcs) {
+      const reflected = ((2 * axis - p) % 1200 + 1200) % 1200;
+      let found = false;
+      for (const q of pcs) {
+        let diff = Math.abs(reflected - q);
+        if (diff > 600) diff = 1200 - diff;
+        if (diff <= toleranceCents) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        symmetric = false;
+        break;
+      }
+    }
+    if (symmetric) axes.push(axis);
+  }
+
+  return axes.sort((a, b) => a - b);
+}

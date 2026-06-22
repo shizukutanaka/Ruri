@@ -352,6 +352,12 @@ import {
   presetFamilySocraticRadarHarmonicMeanPerAxis,
   presetFamilySocraticRadarGiniCoefficient,
   presetFamilySocraticRadarNormalizedL1Distance,
+  presetFamilySocraticRadarTopK,
+  presetFamilySocraticRadarBottomK,
+  presetFamilySocraticRadarDominantAxisPerTuning,
+  presetFamilySocraticRadarAxisQuartiles,
+  presetFamilySocraticRadarAnomalyScore,
+  presetFamilySocraticRadarRadialBalance,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -11952,6 +11958,122 @@ describe('presetFamilySocraticRadarNormalizedL1Distance (Q1097)', () => {
     for (const entry of result) {
       expect(typeof entry.id).toBe('string');
       expect(entry.l1).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1099 — presetFamilySocraticRadarTopK
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTopK (Q1099)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarTopK(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      2,
+    );
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(5);
+    for (const key of ['diversity','versatility','maturity','benchmark','convergence'] as const) {
+      expect(result[key]).toHaveLength(2);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1101 — presetFamilySocraticRadarBottomK
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarBottomK (Q1101)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarBottomK(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      2,
+    );
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(5);
+    for (const key of ['diversity','versatility','maturity','benchmark','convergence'] as const) {
+      expect(result[key]).toHaveLength(2);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1103 — presetFamilySocraticRadarDominantAxisPerTuning
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarDominantAxisPerTuning (Q1103)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarDominantAxisPerTuning(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(typeof entry.axis).toBe('string');
+      expect(entry.score).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1105 — presetFamilySocraticRadarAxisQuartiles
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAxisQuartiles (Q1105)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarAxisQuartiles(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(5);
+    for (const entry of result) {
+      expect(entry.q1).toBeLessThanOrEqual(entry.q2);
+      expect(entry.q2).toBeLessThanOrEqual(entry.q3);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1107 — presetFamilySocraticRadarAnomalyScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAnomalyScore (Q1107)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarAnomalyScore(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.anomalyScore).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1109 — presetFamilySocraticRadarRadialBalance
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRadialBalance (Q1109)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarRadialBalance(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.balance).toBeGreaterThanOrEqual(0);
+      expect(entry.balance).toBeLessThanOrEqual(1);
     }
   });
 });
