@@ -586,6 +586,12 @@ import {
   presetFamilySocraticRadarRenyiEntropyMean,
   presetFamilySocraticRadarProfileMutualInfoMean,
   presetFamilySocraticRadarTotalVariationMean,
+  presetFamilySocraticRadarProfileSkewnessMean,
+  presetFamilySocraticRadarProfileKurtosisMean,
+  presetFamilySocraticRadarProfileGiniMean,
+  presetFamilySocraticRadarProfileContrastMean,
+  presetFamilySocraticRadarProfilePeaknessMean,
+  presetFamilySocraticRadarProfileFlatnessMean,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -16409,5 +16415,89 @@ describe('Q1577 presetFamilySocraticRadarTotalVariationMean', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarTotalVariationMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1579 — presetFamilySocraticRadarProfileSkewnessMean
+describe('Q1579 presetFamilySocraticRadarProfileSkewnessMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileSkewnessMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileSkewnessMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfileSkewnessMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1581 — presetFamilySocraticRadarProfileKurtosisMean
+describe('Q1581 presetFamilySocraticRadarProfileKurtosisMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileKurtosisMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileKurtosisMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfileKurtosisMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1583 — presetFamilySocraticRadarProfileGiniMean
+describe('Q1583 presetFamilySocraticRadarProfileGiniMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileGiniMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileGiniMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfileGiniMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1585 — presetFamilySocraticRadarProfileContrastMean
+describe('Q1585 presetFamilySocraticRadarProfileContrastMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileContrastMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileContrastMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfileContrastMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1587 — presetFamilySocraticRadarProfilePeaknessMean
+describe('Q1587 presetFamilySocraticRadarProfilePeaknessMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfilePeaknessMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfilePeaknessMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfilePeaknessMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1589 — presetFamilySocraticRadarProfileFlatnessMean
+describe('Q1589 presetFamilySocraticRadarProfileFlatnessMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileFlatnessMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarProfileFlatnessMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProfileFlatnessMean(['unknown'], s)).toThrow(RangeError);
   });
 });

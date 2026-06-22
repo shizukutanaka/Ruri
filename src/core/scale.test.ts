@@ -957,6 +957,12 @@ import {
   tuningFamilySocraticRadarRenyiEntropyMean,
   tuningFamilySocraticRadarProfileMutualInfoMean,
   tuningFamilySocraticRadarTotalVariationMean,
+  tuningFamilySocraticRadarProfileSkewnessMean,
+  tuningFamilySocraticRadarProfileKurtosisMean,
+  tuningFamilySocraticRadarProfileGiniMean,
+  tuningFamilySocraticRadarProfileContrastMean,
+  tuningFamilySocraticRadarProfilePeaknessMean,
+  tuningFamilySocraticRadarProfileFlatnessMean,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1013,6 +1019,10 @@ import {
   scaleMaximalEvennessScore,
   scaleMyhillPropertyScore,
   scaleInversionSymmetryScore,
+  scaleStepSizeEntropy,
+  scaleStepSizeSkewness,
+  scaleHemitoneCount,
+  scaleCoherenceIndex,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -29396,5 +29406,139 @@ describe('MMM4 scaleInversionSymmetryScore', () => {
   it('diatonic and its inversion differ', () => {
     const diatonic = [0, 200, 400, 500, 700, 900, 1100];
     expect(scaleInversionSymmetryScore(diatonic)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1578 tuningFamilySocraticRadarProfileSkewnessMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfileSkewnessMean([], s)).toBe(0);
+  });
+  it('returns finite for single tuning', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileSkewnessMean([equalTemperament12(440)], s))).toBe(true);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileSkewnessMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1580 tuningFamilySocraticRadarProfileKurtosisMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfileKurtosisMean([], s)).toBe(0);
+  });
+  it('returns finite for single tuning', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileKurtosisMean([equalTemperament12(440)], s))).toBe(true);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileKurtosisMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1582 tuningFamilySocraticRadarProfileGiniMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfileGiniMean([], s)).toBe(0);
+  });
+  it('returns finite for single tuning', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileGiniMean([equalTemperament12(440)], s))).toBe(true);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileGiniMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1584 tuningFamilySocraticRadarProfileContrastMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfileContrastMean([], s)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const r = tuningFamilySocraticRadarProfileContrastMean([equalTemperament12(440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileContrastMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1586 tuningFamilySocraticRadarProfilePeaknessMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfilePeaknessMean([], s)).toBe(0);
+  });
+  it('returns >= 1 for single tuning', () => {
+    expect(tuningFamilySocraticRadarProfilePeaknessMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(1);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfilePeaknessMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1588 tuningFamilySocraticRadarProfileFlatnessMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfileFlatnessMean([], s)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const r = tuningFamilySocraticRadarProfileFlatnessMean([equalTemperament12(440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarProfileFlatnessMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('NNN1 scaleStepSizeEntropy', () => {
+  it('empty → 0', () => { expect(scaleStepSizeEntropy([])).toBe(0); });
+  it('n=1 → 0', () => { expect(scaleStepSizeEntropy([0])).toBe(0); });
+  it('all-same steps → 0', () => {
+    // 4 equal steps = all same size → entropy = 0
+    expect(scaleStepSizeEntropy([0, 300, 600, 900])).toBeCloseTo(0, 5);
+  });
+  it('mixed steps → positive entropy', () => {
+    expect(scaleStepSizeEntropy([0, 100, 700, 900])).toBeGreaterThan(0);
+  });
+});
+
+describe('NNN2 scaleStepSizeSkewness', () => {
+  it('empty → 0', () => { expect(scaleStepSizeSkewness([])).toBe(0); });
+  it('n≤2 → 0', () => { expect(scaleStepSizeSkewness([0])).toBe(0); });
+  it('symmetric steps → near 0 skewness', () => {
+    // [0,200,400,600,800,1000] has symmetric equal steps
+    expect(scaleStepSizeSkewness([0,200,400,600,800,1000])).toBeCloseTo(0, 5);
+  });
+  it('returns finite number', () => {
+    expect(Number.isFinite(scaleStepSizeSkewness([0, 100, 700, 900]))).toBe(true);
+  });
+});
+
+describe('NNN3 scaleHemitoneCount', () => {
+  it('empty → 0', () => { expect(scaleHemitoneCount([])).toBe(0); });
+  it('no hemitones → 0', () => {
+    // [0, 400, 700] steps: 400, 300, 500 — none in [50,150]
+    expect(scaleHemitoneCount([0, 400, 700])).toBe(0);
+  });
+  it('diatonic scale has 2 semitones', () => {
+    // Diatonic: steps 200,200,100,200,200,200,100 → 2 hemitones
+    expect(scaleHemitoneCount([0, 200, 400, 500, 700, 900, 1100])).toBe(2);
+  });
+  it('chromatic scale has 12 hemitones', () => {
+    const chromatic = Array.from({length:12}, (_,i) => i*100);
+    expect(scaleHemitoneCount(chromatic)).toBe(12);
+  });
+});
+
+describe('NNN4 scaleCoherenceIndex', () => {
+  it('empty → 0', () => { expect(scaleCoherenceIndex([])).toBe(0); });
+  it('n=1 → 0', () => { expect(scaleCoherenceIndex([0])).toBe(0); });
+  it('equal-step scale → 1 (all same size)', () => {
+    expect(scaleCoherenceIndex([0, 300, 600, 900])).toBeCloseTo(1, 10);
+  });
+  it('diatonic scale is highly coherent', () => {
+    // Diatonic: steps 200,200,100,200,200,200,100 → top 2 sizes cover all steps
+    expect(scaleCoherenceIndex([0, 200, 400, 500, 700, 900, 1100])).toBeCloseTo(1, 10);
   });
 });

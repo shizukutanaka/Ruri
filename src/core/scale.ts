@@ -36309,6 +36309,176 @@ export function tuningFamilySocraticRadarTotalVariationMean(
   return pairs > 0 ? totalTV / pairs : 0;
 }
 
+// ---------------------------------------------------------------------------
+// Q1578 — tuningFamilySocraticRadarProfileSkewnessMean
+
+/**
+ * Mean skewness of the 5-axis Socratic radar profile distribution across tunings.
+ * skewness = (Σ(p_i - μ)³ / 5) / std³. If std=0, skewness=0. Returns 0 for empty.
+ */
+export function tuningFamilySocraticRadarProfileSkewnessMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const skewnesses = vecs.map((vec) => {
+    const n = vec.length;
+    const mu = vec.reduce((s, v) => s + v, 0) / n;
+    const variance = vec.reduce((s, v) => s + (v - mu) ** 2, 0) / n;
+    const std = Math.sqrt(variance);
+    if (std === 0) return 0;
+    const m3 = vec.reduce((s, v) => s + (v - mu) ** 3, 0) / n;
+    return m3 / std ** 3;
+  });
+  return skewnesses.reduce((s, v) => s + v, 0) / skewnesses.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1580 — tuningFamilySocraticRadarProfileKurtosisMean
+
+/**
+ * Mean excess kurtosis of the 5-axis Socratic radar profile distribution across tunings.
+ * kurtosis = (Σ(p_i - μ)⁴ / (5 * std⁴)) - 3. If std=0, kurtosis=0. Returns 0 for empty.
+ */
+export function tuningFamilySocraticRadarProfileKurtosisMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const kurtoses = vecs.map((vec) => {
+    const n = vec.length;
+    const mu = vec.reduce((s, v) => s + v, 0) / n;
+    const variance = vec.reduce((s, v) => s + (v - mu) ** 2, 0) / n;
+    const std = Math.sqrt(variance);
+    if (std === 0) return 0;
+    const m4 = vec.reduce((s, v) => s + (v - mu) ** 4, 0) / n;
+    return m4 / std ** 4 - 3;
+  });
+  return kurtoses.reduce((s, v) => s + v, 0) / kurtoses.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1582 — tuningFamilySocraticRadarProfileGiniMean
+
+/**
+ * Mean Gini coefficient of the 5-axis Socratic radar profile values across tunings.
+ * For sorted values v[0]≤...≤v[n-1]: Gini = (2 * Σ(i+1)*v[i] / (n * Σv[i])) - (n+1)/n.
+ * If all values are 0, return 0. Returns 0 for empty.
+ */
+export function tuningFamilySocraticRadarProfileGiniMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const ginis = vecs.map((vec) => {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const n = sorted.length;
+    const sumV = sorted.reduce((s, v) => s + v, 0);
+    if (sumV === 0) return 0;
+    const weightedSum = sorted.reduce((s, v, i) => s + (i + 1) * v, 0);
+    return (2 * weightedSum) / (n * sumV) - (n + 1) / n;
+  });
+  return ginis.reduce((s, v) => s + v, 0) / ginis.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1584 — tuningFamilySocraticRadarProfileContrastMean
+
+/**
+ * Mean Michelson contrast of the 5-axis Socratic radar profile values across tunings.
+ * contrast = (max - min) / (max + min). If max+min=0, return 0. Returns 0 for empty.
+ */
+export function tuningFamilySocraticRadarProfileContrastMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const contrasts = vecs.map((vec) => {
+    const maxV = Math.max(...vec);
+    const minV = Math.min(...vec);
+    const denom = maxV + minV;
+    if (denom === 0) return 0;
+    return (maxV - minV) / denom;
+  });
+  return contrasts.reduce((s, v) => s + v, 0) / contrasts.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1586 — tuningFamilySocraticRadarProfilePeaknessMean
+
+/**
+ * Mean peakness of the 5-axis Socratic radar profile values across tunings.
+ * peakness = max(profile values) / mean(profile values). If mean=0, return 0.
+ * Returns 0 for empty.
+ */
+export function tuningFamilySocraticRadarProfilePeaknessMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const peaknesses = vecs.map((vec) => {
+    const n = vec.length;
+    const mu = vec.reduce((s, v) => s + v, 0) / n;
+    if (mu === 0) return 0;
+    return Math.max(...vec) / mu;
+  });
+  return peaknesses.reduce((s, v) => s + v, 0) / peaknesses.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1588 — tuningFamilySocraticRadarProfileFlatnessMean
+
+/**
+ * Mean spectral flatness of the 5-axis Socratic radar profile values across tunings.
+ * flatness = geometric_mean / arithmetic_mean. geometric_mean = exp(Σ log(p_i + 1e-10) / 5).
+ * If arithmetic_mean=0, return 0. Returns 0 for empty.
+ */
+export function tuningFamilySocraticRadarProfileFlatnessMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const flatnesses = vecs.map((vec) => {
+    const n = vec.length;
+    const mu = vec.reduce((s, v) => s + v, 0) / n;
+    if (mu === 0) return 0;
+    const logSum = vec.reduce((s, v) => s + Math.log(v + 1e-10), 0);
+    const geomMean = Math.exp(logSum / n);
+    return geomMean / mu;
+  });
+  return flatnesses.reduce((s, v) => s + v, 0) / flatnesses.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -36662,4 +36832,115 @@ export function scaleInversionSymmetryScore(
   }
   const meanDist = totalMinDist / n;
   return Math.max(0, 1 - meanDist / (periodCents / 2));
+}
+
+/**
+ * NNN1: Shannon entropy of the step-size distribution.
+ * Computes n step sizes (sorted pitches, including wrap from last to first + periodCents).
+ * Rounds each step to nearest integer cent, counts occurrences, normalizes to probabilities,
+ * computes -Σ p*log2(p). Returns 0 for n≤1 or empty.
+ */
+export function scaleStepSizeEntropy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const next = sorted[(i + 1) % sorted.length]!;
+    let step = next - sorted[i]!;
+    if (step < 0) step += periodCents;
+    steps.push(Math.round(step));
+  }
+  const counts = new Map<number, number>();
+  for (const s of steps) {
+    counts.set(s, (counts.get(s) ?? 0) + 1);
+  }
+  let entropy = 0;
+  for (const count of counts.values()) {
+    const p = count / n;
+    entropy -= p * Math.log2(p);
+  }
+  return entropy;
+}
+
+/**
+ * NNN2: Skewness of the step-size distribution.
+ * Computes n step sizes (same method as NNN1).
+ * skewness = Σ(s_i - mean)³ / (n * std³). Returns 0 if std=0, n≤2, or empty.
+ */
+export function scaleStepSizeSkewness(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const next = sorted[(i + 1) % sorted.length]!;
+    let step = next - sorted[i]!;
+    if (step < 0) step += periodCents;
+    steps.push(step);
+  }
+  const mean = steps.reduce((acc, s) => acc + s, 0) / n;
+  const variance = steps.reduce((acc, s) => acc + (s - mean) ** 2, 0) / n;
+  const std = Math.sqrt(variance);
+  if (std === 0) return 0;
+  const skewness = steps.reduce((acc, s) => acc + (s - mean) ** 3, 0) / (n * std ** 3);
+  return skewness;
+}
+
+/**
+ * NNN3: Count of "hemitone" steps (steps in [50, 150] cents).
+ * Returns 0 for empty or single pitch.
+ */
+export function scaleHemitoneCount(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let count = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    const next = sorted[(i + 1) % sorted.length]!;
+    let step = next - sorted[i]!;
+    if (step < 0) step += periodCents;
+    if (step >= 50 && step <= 150) count++;
+  }
+  return count;
+}
+
+/**
+ * NNN4: Fraction of steps that are one of the 2 most common step sizes
+ * (rounded to nearest integer cent). If fewer than 2 distinct sizes exist,
+ * all steps are "coherent" → returns 1. Returns 0 for empty or n≤1.
+ */
+export function scaleCoherenceIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    const next = sorted[(i + 1) % sorted.length]!;
+    let step = next - sorted[i]!;
+    if (step < 0) step += periodCents;
+    steps.push(Math.round(step));
+  }
+  const counts = new Map<number, number>();
+  for (const s of steps) {
+    counts.set(s, (counts.get(s) ?? 0) + 1);
+  }
+  if (counts.size <= 2) return 1;
+  // Get top 2 most common step sizes
+  const sortedCounts = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  const top2 = new Set([sortedCounts[0]![0], sortedCounts[1]![0]]);
+  const coherentCount = steps.filter(s => top2.has(s)).length;
+  return coherentCount / n;
 }
