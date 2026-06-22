@@ -1129,3 +1129,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | RRR2 | `scaleMarkovTransitionEntropy` | ステップ系列のMarkov遷移エントロピー |
 | RRR3 | `scaleExpectedIntervalSize` | 音程期待値（半周期で正規化） |
 | RRR4 | `scaleIntervalSkewness` | 音程分布の歪度（Pearson第2係数の絶対値） |
+
+## Round 87: 音階スペクトル分析 (SSS1–SSS4)
+
+離散フーリエ変換(DFT)による音階スペクトル特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| SSS1 | `scaleDFTMagnitude` | DFT第k係数の振幅（音程の周期性強度） |
+| SSS2 | `scaleDFTBalanceIndex` | DFT均衡指数（k=1..6の平均振幅の逆数） |
+| SSS3 | `scaleDFTPeakFrequency` | 支配的DFT周波数（最大振幅のk値、正規化） |
+| SSS4 | `scaleDFTSpectralFlatness` | DFTスペクトル平坦性（Wienerエントロピー） |

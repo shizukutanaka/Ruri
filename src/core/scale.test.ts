@@ -1311,6 +1311,10 @@ import {
   scaleMarkovTransitionEntropy,
   scaleExpectedIntervalSize,
   scaleIntervalSkewness,
+  scaleDFTMagnitude,
+  scaleDFTBalanceIndex,
+  scaleDFTPeakFrequency,
+  scaleDFTSpectralFlatness,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -35081,6 +35085,81 @@ describe('RRR4 scaleIntervalSkewness', () => {
   it('12-TET → finite in [0,1]', () => {
     const cents = Array.from({length: 12}, (_, i) => i * 100);
     const v = scaleIntervalSkewness(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// SSS1 — scaleDFTMagnitude
+describe('SSS1 scaleDFTMagnitude', () => {
+  it('empty returns 0', () => {
+    expect(scaleDFTMagnitude([])).toBe(0);
+  });
+  it('single note → magnitude 1 (k=1)', () => {
+    // One note: |e^(2πi·1·0/1200)| / 1 = 1/1 = 1
+    expect(scaleDFTMagnitude([0], 1200, 1)).toBeCloseTo(1, 5);
+  });
+  it('12-TET balanced → k=12 has magnitude 1, k=1 small', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleDFTMagnitude(cents, 1200, 1);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// SSS2 — scaleDFTBalanceIndex
+describe('SSS2 scaleDFTBalanceIndex', () => {
+  it('empty returns 0', () => {
+    expect(scaleDFTBalanceIndex([])).toBe(0);
+  });
+  it('single note returns value in [0,1]', () => {
+    const v = scaleDFTBalanceIndex([0]);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleDFTBalanceIndex(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// SSS3 — scaleDFTPeakFrequency
+describe('SSS3 scaleDFTPeakFrequency', () => {
+  it('empty returns 0', () => {
+    expect(scaleDFTPeakFrequency([])).toBe(0);
+  });
+  it('single note returns value in (0,1]', () => {
+    const v = scaleDFTPeakFrequency([0]);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET → finite in (0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleDFTPeakFrequency(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// SSS4 — scaleDFTSpectralFlatness
+describe('SSS4 scaleDFTSpectralFlatness', () => {
+  it('empty returns 0', () => {
+    expect(scaleDFTSpectralFlatness([])).toBe(0);
+  });
+  it('single note → value in [0,1]', () => {
+    const v = scaleDFTSpectralFlatness([0]);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleDFTSpectralFlatness(cents);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
