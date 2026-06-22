@@ -574,6 +574,12 @@ import {
   presetFamilySocraticRadarCrossoverDiversity,
   presetFamilySocraticRadarFitnessLandscapeRuggedness,
   presetFamilySocraticRadarGenotypePhenotypeMean,
+  presetFamilySocraticRadarPersistentHomologyProxy,
+  presetFamilySocraticRadarManifoldDimensionProxy,
+  presetFamilySocraticRadarTopologicalDataDepth,
+  presetFamilySocraticRadarGeodesicDistanceMean,
+  presetFamilySocraticRadarCurvatureMean,
+  presetFamilySocraticRadarTopologicalEntropy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -16206,5 +16212,100 @@ describe('Q1553 presetFamilySocraticRadarGenotypePhenotypeMean', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarGenotypePhenotypeMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1555 — presetFamilySocraticRadarPersistentHomologyProxy
+describe('Q1555 presetFamilySocraticRadarPersistentHomologyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for single preset', () => {
+    const r = presetFamilySocraticRadarPersistentHomologyProxy(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarPersistentHomologyProxy(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPersistentHomologyProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1557 — presetFamilySocraticRadarManifoldDimensionProxy
+describe('Q1557 presetFamilySocraticRadarManifoldDimensionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(presetFamilySocraticRadarManifoldDimensionProxy(['12-tet'], s)).toBe(0);
+    expect(presetFamilySocraticRadarManifoldDimensionProxy(['12-tet', 'just-5-limit'], s)).toBe(0);
+  });
+  it('returns non-negative for three presets', () => {
+    const r = presetFamilySocraticRadarManifoldDimensionProxy(['12-tet', 'just-5-limit', '12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarManifoldDimensionProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1559 — presetFamilySocraticRadarTopologicalDataDepth
+describe('Q1559 presetFamilySocraticRadarTopologicalDataDepth', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0.5 for single preset (n=1)', () => {
+    expect(presetFamilySocraticRadarTopologicalDataDepth(['12-tet'], s)).toBe(0.5);
+  });
+  it('returns value in [0,1] for two presets', () => {
+    const r = presetFamilySocraticRadarTopologicalDataDepth(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTopologicalDataDepth(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1561 — presetFamilySocraticRadarGeodesicDistanceMean
+describe('Q1561 presetFamilySocraticRadarGeodesicDistanceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for single preset (n<=1)', () => {
+    expect(presetFamilySocraticRadarGeodesicDistanceMean(['12-tet'], s)).toBe(0);
+  });
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarGeodesicDistanceMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGeodesicDistanceMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1563 — presetFamilySocraticRadarCurvatureMean
+describe('Q1563 presetFamilySocraticRadarCurvatureMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    expect(presetFamilySocraticRadarCurvatureMean(['12-tet'], s)).toBe(0);
+    expect(presetFamilySocraticRadarCurvatureMean(['12-tet', 'just-5-limit'], s)).toBe(0);
+  });
+  it('returns non-negative for three presets', () => {
+    const r = presetFamilySocraticRadarCurvatureMean(['12-tet', 'just-5-limit', '12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCurvatureMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1565 — presetFamilySocraticRadarTopologicalEntropy
+describe('Q1565 presetFamilySocraticRadarTopologicalEntropy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for single preset', () => {
+    const r = presetFamilySocraticRadarTopologicalEntropy(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarTopologicalEntropy(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTopologicalEntropy(['unknown'], s)).toThrow(RangeError);
   });
 });

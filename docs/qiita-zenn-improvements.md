@@ -777,3 +777,14 @@
 | KKK4 | `scaleConvergenceRate` | 収束に必要なステップ数 |
 
 **参考**: Scale morphing and continuous transformations; Optimal transport in music analysis。
+
+## Round 55: スケール共起・生態的ニッチ・競争指数 (LLL1–LLL4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| LLL1 | `scaleCoOccurrenceMatrix` | 音高ペアの共起行列(ウィンドウサイズ内) |
+| LLL2 | `scaleMutualInformationMatrix` | 共起ベースの相互情報量行列 |
+| LLL3 | `scaleEcologicalNiche` | Voronoi分割による各音の生態的ニッチ幅 |
+| LLL4 | `scaleCompetitionIndex` | ニッチ幅の変動係数による競争指数 |
+
+**参考**: Co-occurrence analysis in musicology; Voronoi diagrams applied to pitch space (Tymoczko 2011)。

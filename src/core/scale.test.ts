@@ -945,6 +945,12 @@ import {
   tuningFamilySocraticRadarCrossoverDiversity,
   tuningFamilySocraticRadarFitnessLandscapeRuggedness,
   tuningFamilySocraticRadarGenotypePhenotypeMean,
+  tuningFamilySocraticRadarPersistentHomologyProxy,
+  tuningFamilySocraticRadarManifoldDimensionProxy,
+  tuningFamilySocraticRadarTopologicalDataDepth,
+  tuningFamilySocraticRadarGeodesicDistanceMean,
+  tuningFamilySocraticRadarCurvatureMean,
+  tuningFamilySocraticRadarTopologicalEntropy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -993,6 +999,10 @@ import {
   scaleInterpol,
   scaleGradientDescent,
   scaleConvergenceRate,
+  scaleCoOccurrenceMatrix,
+  scaleMutualInformationMatrix,
+  scaleEcologicalNiche,
+  scaleCompetitionIndex,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -29053,5 +29063,181 @@ describe('KKK4 scaleConvergenceRate', () => {
     const r = scaleConvergenceRate([0,400],[0,450], 0.5);
     expect(r).toBeGreaterThan(0);
     expect(r).toBeLessThan(1000);
+  });
+});
+
+describe('LLL1 scaleCoOccurrenceMatrix', () => {
+  it('empty → []', () => {
+    expect(scaleCoOccurrenceMatrix([])).toEqual([]);
+  });
+  it('returns n×n matrix', () => {
+    const r = scaleCoOccurrenceMatrix([0,400,700]);
+    expect(r).toHaveLength(3);
+    expect(r[0]).toHaveLength(3);
+  });
+  it('diagonal is 0 or self-count', () => {
+    const r = scaleCoOccurrenceMatrix([0,400,700], 3);
+    // diagonal can be non-zero (self co-occurrence)
+    expect(r[0]![0]).toBeGreaterThanOrEqual(0);
+  });
+  it('symmetric matrix', () => {
+    const r = scaleCoOccurrenceMatrix([0,400,700,900]);
+    expect(r[0]![1]).toBe(r[1]![0]);
+  });
+});
+
+describe('LLL2 scaleMutualInformationMatrix', () => {
+  it('empty → []', () => {
+    expect(scaleMutualInformationMatrix([])).toEqual([]);
+  });
+  it('returns n×n matrix', () => {
+    const r = scaleMutualInformationMatrix([0,400,700]);
+    expect(r).toHaveLength(3);
+  });
+  it('values non-negative', () => {
+    const r = scaleMutualInformationMatrix([0,400,700]);
+    r.forEach(row => row.forEach(v => expect(v).toBeGreaterThanOrEqual(0)));
+  });
+  it('symmetric', () => {
+    const r = scaleMutualInformationMatrix([0,400,700,900]);
+    expect(r[0]![1]).toBeCloseTo(r[1]![0]!, 10);
+  });
+});
+
+describe('LLL3 scaleEcologicalNiche', () => {
+  it('empty → []', () => {
+    expect(scaleEcologicalNiche([])).toEqual([]);
+  });
+  it('niches sum to periodCents', () => {
+    const niches = scaleEcologicalNiche([0,300,600,900]);
+    const sum = niches.reduce((a,b)=>a+b,0);
+    expect(sum).toBeCloseTo(1200,5);
+  });
+  it('equal-step scale has equal niches', () => {
+    const niches = scaleEcologicalNiche([0,300,600,900]);
+    niches.forEach(n => expect(n).toBeCloseTo(300,5));
+  });
+  it('returns array of length n', () => {
+    expect(scaleEcologicalNiche([0,400,700])).toHaveLength(3);
+  });
+});
+
+describe('LLL4 scaleCompetitionIndex', () => {
+  it('empty → 0', () => {
+    expect(scaleCompetitionIndex([])).toBe(0);
+  });
+  it('equal-step scale → 0', () => {
+    expect(scaleCompetitionIndex([0,300,600,900])).toBeCloseTo(0,10);
+  });
+  it('returns non-negative', () => {
+    expect(scaleCompetitionIndex([0,100,700,900])).toBeGreaterThanOrEqual(0);
+  });
+  it('unequal niches have positive index', () => {
+    // [0,100,700] has very unequal niches
+    expect(scaleCompetitionIndex([0,100,700])).toBeGreaterThan(0);
+  });
+});
+
+describe('Q1554 tuningFamilySocraticRadarPersistentHomologyProxy', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns non-negative', () => {
+    expect(tuningFamilySocraticRadarPersistentHomologyProxy([t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarPersistentHomologyProxy([], s)).toBe(0);
+  });
+  it('two tunings returns non-negative', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarPersistentHomologyProxy([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1556 tuningFamilySocraticRadarManifoldDimensionProxy', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=2 → 0', () => {
+    expect(tuningFamilySocraticRadarManifoldDimensionProxy([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarManifoldDimensionProxy([t], s)).toBe(0);
+    expect(tuningFamilySocraticRadarManifoldDimensionProxy([t, t], s)).toBe(0);
+  });
+  it('n=3 → non-negative', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarManifoldDimensionProxy([t, t2, t], s);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for distinct tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    expect(tuningFamilySocraticRadarManifoldDimensionProxy([t, t2, t3], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1558 tuningFamilySocraticRadarTopologicalDataDepth', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n=1 → 0.5', () => {
+    expect(tuningFamilySocraticRadarTopologicalDataDepth([t], s)).toBe(0.5);
+  });
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarTopologicalDataDepth([], s)).toBe(0);
+  });
+  it('n>=2 → in [0,1]', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarTopologicalDataDepth([t, t2], s);
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(result).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1560 tuningFamilySocraticRadarGeodesicDistanceMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=1 → 0', () => {
+    expect(tuningFamilySocraticRadarGeodesicDistanceMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarGeodesicDistanceMean([t], s)).toBe(0);
+  });
+  it('n=2 → non-negative', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarGeodesicDistanceMean([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for three tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    expect(tuningFamilySocraticRadarGeodesicDistanceMean([t, t2, t3], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1562 tuningFamilySocraticRadarCurvatureMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=2 → 0', () => {
+    expect(tuningFamilySocraticRadarCurvatureMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarCurvatureMean([t], s)).toBe(0);
+    expect(tuningFamilySocraticRadarCurvatureMean([t, t], s)).toBe(0);
+  });
+  it('n=3 → non-negative', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarCurvatureMean([t, t2, t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for distinct tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    expect(tuningFamilySocraticRadarCurvatureMean([t, t2, t3], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1564 tuningFamilySocraticRadarTopologicalEntropy', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarTopologicalEntropy([], s)).toBe(0);
+  });
+  it('n=1 → non-negative', () => {
+    expect(tuningFamilySocraticRadarTopologicalEntropy([t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings → non-negative', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarTopologicalEntropy([t, t2], s)).toBeGreaterThanOrEqual(0);
   });
 });

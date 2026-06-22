@@ -567,6 +567,12 @@ import {
   tuningFamilySocraticRadarCrossoverDiversity,
   tuningFamilySocraticRadarFitnessLandscapeRuggedness,
   tuningFamilySocraticRadarGenotypePhenotypeMean,
+  tuningFamilySocraticRadarPersistentHomologyProxy,
+  tuningFamilySocraticRadarManifoldDimensionProxy,
+  tuningFamilySocraticRadarTopologicalDataDepth,
+  tuningFamilySocraticRadarGeodesicDistanceMean,
+  tuningFamilySocraticRadarCurvatureMean,
+  tuningFamilySocraticRadarTopologicalEntropy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -13436,4 +13442,94 @@ export function presetFamilySocraticRadarGenotypePhenotypeMean(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarGenotypePhenotypeMean(tunings, spectrum, rootHz);
+}
+
+// Q1555 — presetFamilySocraticRadarPersistentHomologyProxy
+export function presetFamilySocraticRadarPersistentHomologyProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPersistentHomologyProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPersistentHomologyProxy(tunings, spectrum, rootHz);
+}
+
+// Q1557 — presetFamilySocraticRadarManifoldDimensionProxy
+export function presetFamilySocraticRadarManifoldDimensionProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarManifoldDimensionProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarManifoldDimensionProxy(tunings, spectrum, rootHz);
+}
+
+// Q1559 — presetFamilySocraticRadarTopologicalDataDepth
+export function presetFamilySocraticRadarTopologicalDataDepth(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTopologicalDataDepth> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTopologicalDataDepth(tunings, spectrum, rootHz);
+}
+
+// Q1561 — presetFamilySocraticRadarGeodesicDistanceMean
+export function presetFamilySocraticRadarGeodesicDistanceMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarGeodesicDistanceMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarGeodesicDistanceMean(tunings, spectrum, rootHz);
+}
+
+// Q1563 — presetFamilySocraticRadarCurvatureMean
+export function presetFamilySocraticRadarCurvatureMean(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCurvatureMean> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCurvatureMean(tunings, spectrum, rootHz);
+}
+
+// Q1565 — presetFamilySocraticRadarTopologicalEntropy
+export function presetFamilySocraticRadarTopologicalEntropy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTopologicalEntropy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTopologicalEntropy(tunings, spectrum, rootHz);
 }

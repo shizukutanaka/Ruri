@@ -35775,6 +35775,295 @@ export function tuningFamilySocraticRadarGenotypePhenotypeMean(
   return Math.abs(cov / denom);
 }
 
+// ---------------------------------------------------------------------------
+// Q1554 — tuningFamilySocraticRadarPersistentHomologyProxy
+
+/**
+ * Persistent homology proxy: for each tuning, compute a "birth-death" score by
+ * treating radar profiles as a filtration. At each threshold t ∈ {0.1, 0.2, ..., 0.9},
+ * count connected components (profile values > t). Persistence = Σ |components(t) -
+ * components(t+0.1)| over all thresholds. Return mean persistence across tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean persistence across tunings. 0 for empty.
+ */
+export function tuningFamilySocraticRadarPersistentHomologyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+  let totalPersistence = 0;
+  for (const vec of vecs) {
+    const components = thresholds.map((t) => vec.filter((v) => v > t).length);
+    let persistence = 0;
+    for (let i = 0; i < components.length - 1; i++) {
+      persistence += Math.abs(components[i]! - components[i + 1]!);
+    }
+    totalPersistence += persistence;
+  }
+  return totalPersistence / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1556 — tuningFamilySocraticRadarManifoldDimensionProxy
+
+/**
+ * Intrinsic dimension estimate using the two-nearest-neighbor method on radar
+ * profile vectors. For each tuning i, compute its 2 nearest neighbors (by
+ * Euclidean distance in 5D profile space), compute ratio r = d_k2 / d_k1
+ * (k2=2nd, k1=1st nearest). Dimension ≈ -1/log(mean(r)). Returns 0 for n≤2.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Intrinsic dimension estimate. 0 for n≤2.
+ */
+export function tuningFamilySocraticRadarManifoldDimensionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  const ratios: number[] = [];
+  for (let i = 0; i < vecs.length; i++) {
+    const dists: number[] = [];
+    for (let j = 0; j < vecs.length; j++) {
+      if (i !== j) dists.push(euclidean(vecs[i]!, vecs[j]!));
+    }
+    dists.sort((a, b) => a - b);
+    const d1 = dists[0]!;
+    const d2 = dists[1]!;
+    if (d1 > 0) ratios.push(d2 / d1);
+  }
+  if (ratios.length === 0) return 0;
+  const meanR = ratios.reduce((s, v) => s + v, 0) / ratios.length;
+  const logMeanR = Math.log(meanR);
+  if (logMeanR === 0) return 0;
+  return Math.max(0, -1 / logMeanR);
+}
+
+// ---------------------------------------------------------------------------
+// Q1558 — tuningFamilySocraticRadarTopologicalDataDepth
+
+/**
+ * Tukey data depth: for each tuning's radar profile, depth = min over all
+ * hyperplanes through the point of the fraction of tunings on each side.
+ * Approximation: for each of the 5 axes, compute the fraction of tunings with
+ * lower value on that axis. Depth = min over 5 axes. Return mean depth across
+ * tunings. Returns 0.5 for n=1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean Tukey depth across tunings. 0.5 for n=1, 0 for empty.
+ */
+export function tuningFamilySocraticRadarTopologicalDataDepth(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  if (tunings.length === 1) return 0.5;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  let totalDepth = 0;
+  for (let i = 0; i < n; i++) {
+    let minFrac = Infinity;
+    for (let k = 0; k < axes.length; k++) {
+      const val = vecs[i]![k]!;
+      let below = 0;
+      for (let j = 0; j < n; j++) {
+        if (j !== i && vecs[j]![k]! < val) below++;
+      }
+      const frac = below / (n - 1);
+      if (frac < minFrac) minFrac = frac;
+    }
+    totalDepth += minFrac === Infinity ? 0 : minFrac;
+  }
+  return totalDepth / n;
+}
+
+// ---------------------------------------------------------------------------
+// Q1560 — tuningFamilySocraticRadarGeodesicDistanceMean
+
+/**
+ * Mean "geodesic distance" on the profile manifold. Approximate: use shortest-path
+ * distance in a graph where each tuning is connected to its 2 nearest neighbors.
+ * Use BFS/Dijkstra for shortest paths, return mean over all pairs. Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean geodesic distance over all pairs. 0 for n≤1.
+ */
+export function tuningFamilySocraticRadarGeodesicDistanceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  // Build adjacency: each node connected to its 2 nearest neighbors
+  const adj: { node: number; weight: number }[][] = Array.from({ length: n }, () => []);
+  for (let i = 0; i < n; i++) {
+    const dists = vecs
+      .map((v, j) => ({ j, d: j !== i ? euclidean(vecs[i]!, v) : Infinity }))
+      .sort((a, b) => a.d - b.d);
+    const neighbors = Math.min(2, n - 1);
+    for (let ni = 0; ni < neighbors; ni++) {
+      const entry = dists[ni]!;
+      adj[i]!.push({ node: entry.j, weight: entry.d });
+      adj[entry.j]!.push({ node: i, weight: entry.d });
+    }
+  }
+  // Dijkstra from each node
+  let totalDist = 0;
+  let pairs = 0;
+  for (let src = 0; src < n; src++) {
+    const distArr: number[] = Array(n).fill(Infinity);
+    distArr[src] = 0;
+    const visited = new Set<number>();
+    for (let iter = 0; iter < n; iter++) {
+      let u = -1;
+      let best = Infinity;
+      for (let v = 0; v < n; v++) {
+        if (!visited.has(v) && distArr[v]! < best) {
+          best = distArr[v]!;
+          u = v;
+        }
+      }
+      if (u === -1) break;
+      visited.add(u);
+      for (const { node: w, weight } of adj[u]!) {
+        const nd = distArr[u]! + weight;
+        if (nd < distArr[w]!) distArr[w] = nd;
+      }
+    }
+    for (let dst = src + 1; dst < n; dst++) {
+      if (distArr[dst]! < Infinity) {
+        totalDist += distArr[dst]!;
+        pairs++;
+      }
+    }
+  }
+  return pairs === 0 ? 0 : totalDist / pairs;
+}
+
+// ---------------------------------------------------------------------------
+// Q1562 — tuningFamilySocraticRadarCurvatureMean
+
+/**
+ * Gaussian curvature proxy: for each tuning i with neighbors j,k, curvature ≈
+ * 1 - cos(angle at i in triangle i,j,k). Return mean curvature over all tunings.
+ * Returns 0 for n≤2.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean Gaussian curvature proxy. 0 for n≤2.
+ */
+export function tuningFamilySocraticRadarCurvatureMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const euclidean = (a: number[], b: number[]): number =>
+    Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
+  let totalCurvature = 0;
+  for (let i = 0; i < n; i++) {
+    // Find 2 nearest neighbors
+    const dists = vecs
+      .map((v, j) => ({ j, d: j !== i ? euclidean(vecs[i]!, v) : Infinity }))
+      .sort((a, b) => a.d - b.d);
+    if (dists.length < 2) { totalCurvature += 0; continue; }
+    const j = dists[0]!.j;
+    const k = dists[1]!.j;
+    const vi = vecs[i]!;
+    const vj = vecs[j]!;
+    const vk = vecs[k]!;
+    const dij = euclidean(vi, vj);
+    const dik = euclidean(vi, vk);
+    if (dij === 0 || dik === 0) { totalCurvature += 0; continue; }
+    // Vector from i to j and i to k
+    const dot = vi.reduce((s, v, d) => s + (vj[d]! - v) * (vk[d]! - vi[d]!), 0);
+    const cosAngle = dot / (dij * dik);
+    const clampedCos = Math.max(-1, Math.min(1, cosAngle));
+    totalCurvature += Math.max(0, 1 - clampedCos);
+  }
+  return totalCurvature / n;
+}
+
+// ---------------------------------------------------------------------------
+// Q1564 — tuningFamilySocraticRadarTopologicalEntropy
+
+/**
+ * Topological entropy: entropy of the Betti number sequence. Compute number of
+ * connected components at 9 thresholds (0.1..0.9), normalize to a distribution,
+ * compute Shannon entropy. Return mean across tunings. Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean topological entropy across tunings. 0 for empty.
+ */
+export function tuningFamilySocraticRadarTopologicalEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+  let totalEntropy = 0;
+  for (const vec of vecs) {
+    const components = thresholds.map((t) => vec.filter((v) => v > t).length);
+    const total = components.reduce((s, v) => s + v, 0);
+    let entropy = 0;
+    if (total > 0) {
+      for (const c of components) {
+        if (c > 0) {
+          const p = c / total;
+          entropy -= p * Math.log2(p);
+        }
+      }
+    }
+    totalEntropy += entropy;
+  }
+  return totalEntropy / tunings.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -35869,4 +36158,150 @@ export function scaleConvergenceRate(
     if (dist < 1) return step;
   }
   return -1;
+}
+
+/**
+ * LLL1: Co-occurrence matrix for scale pitches.
+ * For each window of `windowSize` consecutive pitches (in circular order),
+ * increment C[i][j] for every pair (i,j) within that window.
+ * Returns an n×n symmetric matrix. Returns [] for empty input.
+ */
+export function scaleCoOccurrenceMatrix(
+  scaleCents: readonly number[],
+  windowSize: number = 3,
+  periodCents: number = 1200,
+): number[][] {
+  void periodCents;
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Build index mapping from sorted position back to original
+  const matrix: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+  // For each starting index in the circular arrangement, collect a window of windowSize pitches
+  const w = Math.min(windowSize, n);
+  for (let start = 0; start < n; start++) {
+    // Collect indices of pitches in this window
+    const windowIndices: number[] = [];
+    for (let k = 0; k < w; k++) {
+      windowIndices.push((start + k) % n);
+    }
+    // Increment all pairs within the window
+    for (let a = 0; a < windowIndices.length; a++) {
+      for (let b = a + 1; b < windowIndices.length; b++) {
+        const i = windowIndices[a]!;
+        const j = windowIndices[b]!;
+        matrix[i]![j]!++;
+        matrix[j]![i]!++;
+      }
+    }
+  }
+  // The matrix rows/cols correspond to sorted order; remap to original order
+  // Build original-order matrix
+  const origOrder = scaleCents.map((c) => sorted.indexOf(c));
+  const result: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const si = origOrder[i]!;
+      const sj = origOrder[j]!;
+      result[i]![j] = matrix[si]![sj]!;
+    }
+  }
+  return result;
+}
+
+/**
+ * LLL2: Mutual information matrix based on co-occurrence.
+ * MI(i,j) = C[i][j]/N * log2((C[i][j]*N) / (rowSum_i * colSum_j))
+ * where N = sum of all co-occurrence counts.
+ * Returns n×n MI matrix. Returns [] for empty input.
+ */
+export function scaleMutualInformationMatrix(
+  scaleCents: readonly number[],
+  windowSize: number = 3,
+  periodCents: number = 1200,
+): number[][] {
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  const C = scaleCoOccurrenceMatrix(scaleCents, windowSize, periodCents);
+  let N = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      N += C[i]![j]!;
+    }
+  }
+  const rowSums: number[] = new Array<number>(n).fill(0);
+  const colSums: number[] = new Array<number>(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      rowSums[i]! += C[i]![j]!;
+      colSums[j]! += C[i]![j]!;
+    }
+  }
+  const MI: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const cij = C[i]![j]!;
+      if (cij === 0) continue;
+      const denom = rowSums[i]! * colSums[j]!;
+      if (denom === 0 || N === 0) continue;
+      MI[i]![j] = (cij / N) * Math.log2((cij * N) / denom);
+    }
+  }
+  return MI;
+}
+
+/**
+ * LLL3: Ecological niche widths via Voronoi partitioning.
+ * Each pitch controls the region of pitch-space closer to it than any other pitch (mod period).
+ * Niche boundaries lie at the midpoints between adjacent pitches.
+ * Returns array of length n summing to periodCents. Returns [] for empty input.
+ */
+export function scaleEcologicalNiche(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number[] {
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Compute niche widths in sorted order
+  // niche[i] = midpoint to right - midpoint to left (mod period)
+  // mid_left(i) = (sorted[i] + sorted[i-1]) / 2
+  // mid_right(i) = (sorted[i] + sorted[i+1]) / 2
+  const sortedNiches: number[] = new Array<number>(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    const prev = sorted[(i - 1 + n) % n]!;
+    const curr = sorted[i]!;
+    const next = sorted[(i + 1) % n]!;
+    // Compute gaps with wrapping
+    let gapLeft = curr - prev;
+    if (gapLeft < 0) gapLeft += periodCents;
+    let gapRight = next - curr;
+    if (gapRight < 0) gapRight += periodCents;
+    sortedNiches[i] = (gapLeft + gapRight) / 2;
+  }
+  // Remap back to original order
+  const result: number[] = new Array<number>(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    const si = sorted.indexOf(scaleCents[i]!);
+    result[i] = sortedNiches[si]!;
+  }
+  return result;
+}
+
+/**
+ * LLL4: Competition index: coefficient of variation (std/mean) of niche widths.
+ * Returns 0 for empty, ≤1 pitch, or all-equal niches.
+ */
+export function scaleCompetitionIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const niches = scaleEcologicalNiche(scaleCents, periodCents);
+  const mean = niches.reduce((a, b) => a + b, 0) / n;
+  if (mean === 0) return 0;
+  const variance = niches.reduce((acc, v) => acc + (v - mean) ** 2, 0) / n;
+  const std = Math.sqrt(variance);
+  return std / mean;
 }
