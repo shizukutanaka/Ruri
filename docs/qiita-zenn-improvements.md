@@ -1162,3 +1162,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | UUU2 | `scaleRunLengthProxy` | ランレングス符号化近似（平均ラン長、正規化） |
 | UUU3 | `scaleAutocorrelationProxy` | 自己相関係数（ラグ1、[0,1]にマップ） |
 | UUU4 | `scaleDescriptionLength` | 最小記述長近似（MDL複雑性） |
+
+## Round 90: 音階モード分析 (VVV1–VVV4)
+
+音階の回転モード特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| VVV1 | `scaleModeCountV2` | 回転的に異なるモード数（正規化） |
+| VVV2 | `scaleBrightest` | 最も明るいモードの明度（上半部の音数比） |
+| VVV3 | `scaleDarkest` | 最も暗いモードの暗度（下半部の音数比） |
+| VVV4 | `scaleModeBalanceSpread` | 最明モードと最暗モードの明度差 |
