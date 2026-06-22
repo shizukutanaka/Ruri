@@ -1019,3 +1019,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | GGG2 | `scalePythagoreanDeviation` | ピタゴラス音律からの平均偏差/100セント |
 | GGG3 | `scaleMeanToneDeviation` | 1/4コンマ・ミーントーンからの平均偏差/50セント |
 | GGG4 | `scaleEqualTemperamentDeviation` | 12平均律からの平均偏差/50セント |
+
+## Round 77: オクターブ等価性・音域特性 (HHH1–HHH4)
+
+音階のオクターブ等価性と音域にまたがる特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| HHH1 | `scaleOctaveEquivalenceScore` | ピッチクラス重複なし率 |
+| HHH2 | `scaleRegisterWidth` | 音域幅（オクターブ単位、正規化） |
+| HHH3 | `scaleOctaveCompleteness` | 12半音クラスのカバレッジ |
+| HHH4 | `scaleSubOctaveDensity` | 1オクターブ以内の音の密度 |

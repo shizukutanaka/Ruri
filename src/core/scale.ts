@@ -39884,6 +39884,199 @@ export function tuningFamilySocraticRadarRicciCurvatureProxy(
   return Math.max(0, Math.min(1, total / vecs.length));
 }
 
+// Q1818 — tuningFamilySocraticRadarPrimeFactorComplexityMean
+export function tuningFamilySocraticRadarPrimeFactorComplexityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function largestPrimeFactor(n: number): number {
+    if (n <= 1) return 1;
+    let largest = 1;
+    let d = 2;
+    let m = n;
+    while (d * d <= m) {
+      while (m % d === 0) {
+        largest = d;
+        m = Math.floor(m / d);
+      }
+      d++;
+    }
+    if (m > 1) largest = m;
+    return largest;
+  }
+
+  let total = 0;
+  for (const p of profiles) {
+    let sum = 0;
+    for (let i = 0; i < axes.length; i++) {
+      const ax = axes[i]!;
+      const lpf = largestPrimeFactor(i + 2);
+      sum += p[ax] * Math.log2(lpf) / 5;
+    }
+    total += sum;
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+}
+
+// Q1820 — tuningFamilySocraticRadarGoldenRatioProximityMean
+export function tuningFamilySocraticRadarGoldenRatioProximityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const phi = 0.618;
+  let total = 0;
+  for (const p of profiles) {
+    let sum = 0;
+    for (const ax of axes) {
+      sum += Math.abs(p[ax] - phi) / phi;
+    }
+    const mean = sum / axes.length;
+    total += mean;
+  }
+  const raw = total / profiles.length;
+  return Math.max(0, Math.min(1, 1 - raw));
+}
+
+// Q1822 — tuningFamilySocraticRadarFibonacciAlignmentMean
+export function tuningFamilySocraticRadarFibonacciAlignmentMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const fibNorm = [1 / 8, 2 / 8, 3 / 8, 5 / 8, 8 / 8];
+  const tol = 0.05;
+  let total = 0;
+  for (const p of profiles) {
+    let aligned = 0;
+    for (const ax of axes) {
+      const val = p[ax];
+      if (fibNorm.some((f) => Math.abs(val - f) <= tol)) {
+        aligned++;
+      }
+    }
+    total += aligned / axes.length;
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+}
+
+// Q1824 — tuningFamilySocraticRadarModularArithmeticProxy
+export function tuningFamilySocraticRadarModularArithmeticProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const mod = 1 / 5;
+  let total = 0;
+  for (const p of profiles) {
+    const residuals = axes.map((ax) => {
+      const v = p[ax];
+      return v - Math.floor(v / mod) * mod;
+    });
+    const mean = residuals.reduce((a, b) => a + b, 0) / residuals.length;
+    const variance =
+      residuals.reduce((a, r) => a + (r - mean) ** 2, 0) / residuals.length;
+    total += variance / (variance + 0.01);
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+}
+
+// Q1826 — tuningFamilySocraticRadarContinuedFractionProxy
+export function tuningFamilySocraticRadarContinuedFractionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  if (profiles.length < 2) {
+    // single profile: compare each axis to its mean
+    const p = profiles[0]!;
+    const vals = axes.map((ax) => p[ax]);
+    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const eps = 1e-9;
+    let sum = 0;
+    for (const v of vals) {
+      sum += Math.abs(v - mean) / (Math.abs(v + mean) + eps);
+    }
+    return Math.max(0, Math.min(1, sum / vals.length));
+  }
+  let total = 0;
+  let count = 0;
+  const eps = 1e-9;
+  for (let i = 0; i + 1 < profiles.length; i++) {
+    const p1 = profiles[i]!;
+    const p2 = profiles[i + 1]!;
+    const m1 = axes.reduce((a, ax) => a + p1[ax], 0) / axes.length;
+    const m2 = axes.reduce((a, ax) => a + p2[ax], 0) / axes.length;
+    total += Math.abs(m1 - m2) / (Math.abs(m1 + m2) + eps);
+    count++;
+  }
+  return Math.max(0, Math.min(1, total / count));
+}
+
+// Q1828 — tuningFamilySocraticRadarEulerTotientProxy
+export function tuningFamilySocraticRadarEulerTotientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function eulerTotient(n: number): number {
+    let result = n;
+    let p = 2;
+    let m = n;
+    while (p * p <= m) {
+      if (m % p === 0) {
+        while (m % p === 0) m = Math.floor(m / p);
+        result -= Math.floor(result / p);
+      }
+      p++;
+    }
+    if (m > 1) result -= Math.floor(result / m);
+    return result;
+  }
+
+  // φ(k)/k weights for k=1..5
+  const weights = [1, 2, 3, 4, 5].map((k) => eulerTotient(k) / k);
+  const weightSum = weights.reduce((a, b) => a + b, 0);
+
+  let total = 0;
+  for (const p of profiles) {
+    let weighted = 0;
+    for (let i = 0; i < axes.length; i++) {
+      const ax = axes[i]!;
+      weighted += weights[i]! * p[ax];
+    }
+    total += weighted / weightSum;
+  }
+  return Math.max(0, Math.min(1, total / profiles.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -42247,4 +42440,94 @@ export function scaleEqualTemperamentDeviation(scaleCents: readonly number[]): n
   }
   const meanDeviation = totalDeviation / n;
   return Math.min(1, Math.max(0, meanDeviation / 50));
+}
+
+/**
+ * HHH1 — scaleOctaveEquivalenceScore
+ * How many scale pitches map to the same pitch class when reduced modulo the period.
+ * - Pitch class = round(pitch mod periodCents / (periodCents/12)) * (periodCents/12)
+ * - Count duplicate pitch classes / n
+ * - Return 1 - duplicates/n (uniqueness score); 0 for n=0
+ */
+export function scaleOctaveEquivalenceScore(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const step = periodCents / 12;
+  const seen = new Set<number>();
+  let duplicates = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    const mod = ((pitch % periodCents) + periodCents) % periodCents;
+    const pc = Math.round(mod / step) * step;
+    if (seen.has(pc)) {
+      duplicates++;
+    } else {
+      seen.add(pc);
+    }
+  }
+  return 1 - duplicates / n;
+}
+
+/**
+ * HHH2 — scaleRegisterWidth
+ * Width of the scale in number of octaves.
+ * - Return 0 for n<2, otherwise (max-min) / 1200 clamped [0,1]
+ */
+export function scaleRegisterWidth(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let min = scaleCents[0]!;
+  let max = scaleCents[0]!;
+  for (let i = 1; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    if (pitch < min) min = pitch;
+    if (pitch > max) max = pitch;
+  }
+  const span = max - min;
+  return Math.min(1, Math.max(0, span / 1200));
+}
+
+/**
+ * HHH3 — scaleOctaveCompleteness
+ * How many of the 12 chromatic pitch classes (within the lowest octave) are represented.
+ * - For each pitch, compute pitch_class = round(pitch mod 1200 / 100) % 12
+ * - Return unique_pitch_classes / 12; 0 for n=0
+ */
+export function scaleOctaveCompleteness(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const seen = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    const mod = ((pitch % 1200) + 1200) % 1200;
+    const pc = Math.round(mod / 100) % 12;
+    seen.add(pc);
+  }
+  return seen.size / 12;
+}
+
+/**
+ * HHH4 — scaleSubOctaveDensity
+ * Density of pitches within the first octave (0 to periodCents).
+ * - Count pitches where 0 ≤ pitch mod periodCents < periodCents (after mod)
+ * - Return count / n; 0 for n=0
+ */
+export function scaleSubOctaveDensity(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    const mod = ((pitch % periodCents) + periodCents) % periodCents;
+    if (mod >= 0 && mod < periodCents) {
+      count++;
+    }
+  }
+  return count / n;
 }

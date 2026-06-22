@@ -1211,6 +1211,10 @@ import {
   scalePythagoreanDeviation,
   scaleMeanToneDeviation,
   scaleEqualTemperamentDeviation,
+  scaleOctaveEquivalenceScore,
+  scaleRegisterWidth,
+  scaleOctaveCompleteness,
+  scaleSubOctaveDensity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -33171,6 +33175,110 @@ describe('GGG4 scaleEqualTemperamentDeviation', () => {
   });
   it('quarter-tone scale → finite, in [0,1]', () => {
     const v = scaleEqualTemperamentDeviation(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// HHH1 — scaleOctaveEquivalenceScore
+describe('HHH1 scaleOctaveEquivalenceScore', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleOctaveEquivalenceScore([])).toBe(0);
+  });
+  it('single [0] → finite, in [0,1]', () => {
+    const v = scaleOctaveEquivalenceScore([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleOctaveEquivalenceScore(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('multi-octave [0,200,400,1400,1600] → finite, in [0,1]', () => {
+    const v = scaleOctaveEquivalenceScore([0, 200, 400, 1400, 1600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// HHH2 — scaleRegisterWidth
+describe('HHH2 scaleRegisterWidth', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleRegisterWidth([])).toBe(0);
+  });
+  it('single [0] → finite, in [0,1]', () => {
+    const v = scaleRegisterWidth([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleRegisterWidth(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('multi-octave [0,200,400,1400,1600] → finite, in [0,1]', () => {
+    const v = scaleRegisterWidth([0, 200, 400, 1400, 1600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// HHH3 — scaleOctaveCompleteness
+describe('HHH3 scaleOctaveCompleteness', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleOctaveCompleteness([])).toBe(0);
+  });
+  it('single [0] → finite, in [0,1]', () => {
+    const v = scaleOctaveCompleteness([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleOctaveCompleteness(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('multi-octave [0,200,400,1400,1600] → finite, in [0,1]', () => {
+    const v = scaleOctaveCompleteness([0, 200, 400, 1400, 1600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// HHH4 — scaleSubOctaveDensity
+describe('HHH4 scaleSubOctaveDensity', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleSubOctaveDensity([])).toBe(0);
+  });
+  it('single [0] → finite, in [0,1]', () => {
+    const v = scaleSubOctaveDensity([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleSubOctaveDensity(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('multi-octave [0,200,400,1400,1600] → finite, in [0,1]', () => {
+    const v = scaleSubOctaveDensity([0, 200, 400, 1400, 1600]);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
