@@ -36064,6 +36064,251 @@ export function tuningFamilySocraticRadarTopologicalEntropy(
   return totalEntropy / tunings.length;
 }
 
+// ---------------------------------------------------------------------------
+// Q1566 — tuningFamilySocraticRadarFisherInformationMean
+
+/**
+ * Fisher information proxy: treat each tuning's radar profile as a probability
+ * distribution (normalize 5 axis values to sum to 1), compute Fisher information
+ * approximation as sum of (p_i - mean_p)^2 / mean_p over axes.
+ * Return mean across tunings. Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean Fisher information proxy across tunings. 0 for empty.
+ */
+export function tuningFamilySocraticRadarFisherInformationMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalFisher = 0;
+  for (const vec of vecs) {
+    const sum = vec.reduce((s, v) => s + v, 0);
+    const ps = sum > 0 ? vec.map((v) => v / sum) : vec.map(() => 1 / axes.length);
+    const meanP = ps.reduce((s, v) => s + v, 0) / ps.length;
+    const fisher = ps.reduce((s, p) => s + (meanP > 0 ? (p - meanP) * (p - meanP) / meanP : 0), 0);
+    totalFisher += fisher;
+  }
+  return totalFisher / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1568 — tuningFamilySocraticRadarKullbackLeiblerMean
+
+/**
+ * KL divergence of each tuning's normalized profile from uniform (1/5 each).
+ * KL(P||U) = Σ p_i * log2(p_i / (1/5)). Normalize profile values by sum first;
+ * add 1e-10 to avoid log(0). Return mean across tunings. Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean KL divergence across tunings. 0 for empty.
+ */
+export function tuningFamilySocraticRadarKullbackLeiblerMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const uniform = 1 / axes.length;
+  let totalKL = 0;
+  for (const vec of vecs) {
+    const sum = vec.reduce((s, v) => s + v, 0);
+    const ps = sum > 0 ? vec.map((v) => v / sum) : vec.map(() => uniform);
+    const kl = ps.reduce((s, p) => s + (p + 1e-10) * Math.log2((p + 1e-10) / uniform), 0);
+    totalKL += kl;
+  }
+  return totalKL / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1570 — tuningFamilySocraticRadarJensenShannonMean
+
+/**
+ * Jensen-Shannon divergence between all pairs of tunings' normalized profiles.
+ * JS(P,Q) = 0.5*KL(P||M) + 0.5*KL(Q||M) where M = (P+Q)/2.
+ * Return mean over all pairs. Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean JS divergence over all pairs. 0 for n≤1.
+ */
+export function tuningFamilySocraticRadarJensenShannonMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => {
+    const vec = axes.map((ax) => p[ax]);
+    const sum = vec.reduce((s, v) => s + v, 0);
+    return sum > 0 ? vec.map((v) => v / sum) : vec.map(() => 1 / axes.length);
+  });
+  const klDiv = (p: number[], q: number[]): number =>
+    p.reduce((s, pi, i) => s + (pi + 1e-10) * Math.log2((pi + 1e-10) / (q[i]! + 1e-10)), 0);
+  let totalJS = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length; i++) {
+    for (let j = i + 1; j < vecs.length; j++) {
+      const pi = vecs[i]!;
+      const qi = vecs[j]!;
+      const m = pi.map((v, k) => (v + qi[k]!) / 2);
+      const js = 0.5 * klDiv(pi, m) + 0.5 * klDiv(qi, m);
+      totalJS += js;
+      pairs++;
+    }
+  }
+  return pairs > 0 ? totalJS / pairs : 0;
+}
+
+// ---------------------------------------------------------------------------
+// Q1572 — tuningFamilySocraticRadarRenyiEntropyMean
+
+/**
+ * Rényi entropy (α=2) of each tuning's normalized profile: H_2 = -log2(Σ p_i^2).
+ * Return mean across tunings. Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean Rényi entropy (α=2) across tunings. 0 for empty.
+ */
+export function tuningFamilySocraticRadarRenyiEntropyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalRenyi = 0;
+  for (const vec of vecs) {
+    const sum = vec.reduce((s, v) => s + v, 0);
+    const ps = sum > 0 ? vec.map((v) => v / sum) : vec.map(() => 1 / axes.length);
+    const sumSq = ps.reduce((s, p) => s + p * p, 0);
+    const renyi = sumSq > 0 ? -Math.log2(sumSq) : 0;
+    totalRenyi += renyi;
+  }
+  return totalRenyi / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1574 — tuningFamilySocraticRadarProfileMutualInfoMean
+
+/**
+ * Mutual information between axis distributions across tunings. For each pair of
+ * axes (k1, k2), compute MI using the joint distribution of profile values binned
+ * into 3 bins (low: <0.33, mid: [0.33,0.67), high: ≥0.67).
+ * Return mean MI over all C(5,2)=10 axis pairs. Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean mutual information over all axis pairs. 0 for empty.
+ */
+export function tuningFamilySocraticRadarProfileMutualInfoMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const bin = (v: number): number => v < 0.33 ? 0 : v < 0.67 ? 1 : 2;
+  const n = vecs.length;
+  let totalMI = 0;
+  let pairCount = 0;
+  for (let a = 0; a < axes.length; a++) {
+    for (let b = a + 1; b < axes.length; b++) {
+      // Build joint and marginal counts
+      const joint: number[][] = [[0,0,0],[0,0,0],[0,0,0]];
+      const margA = [0, 0, 0];
+      const margB = [0, 0, 0];
+      for (let t = 0; t < n; t++) {
+        const va = bin(vecs[t]![a]!);
+        const vb = bin(vecs[t]![b]!);
+        joint[va]![vb]!++;
+        margA[va]!++;
+        margB[vb]!++;
+      }
+      let mi = 0;
+      for (let x = 0; x < 3; x++) {
+        for (let y = 0; y < 3; y++) {
+          const pxy = joint[x]![y]! / n;
+          const px = margA[x]! / n;
+          const py = margB[y]! / n;
+          if (pxy > 0 && px > 0 && py > 0) {
+            mi += pxy * Math.log2(pxy / (px * py));
+          }
+        }
+      }
+      totalMI += mi;
+      pairCount++;
+    }
+  }
+  return pairCount > 0 ? totalMI / pairCount : 0;
+}
+
+// ---------------------------------------------------------------------------
+// Q1576 — tuningFamilySocraticRadarTotalVariationMean
+
+/**
+ * Total variation distance between all pairs of tunings' normalized profiles.
+ * TV(P,Q) = 0.5 * Σ|p_i - q_i|. Return mean over all pairs. Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Mean total variation distance over all pairs. 0 for n≤1.
+ */
+export function tuningFamilySocraticRadarTotalVariationMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => {
+    const vec = axes.map((ax) => p[ax]);
+    const sum = vec.reduce((s, v) => s + v, 0);
+    return sum > 0 ? vec.map((v) => v / sum) : vec.map(() => 1 / axes.length);
+  });
+  let totalTV = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length; i++) {
+    for (let j = i + 1; j < vecs.length; j++) {
+      const pi = vecs[i]!;
+      const qi = vecs[j]!;
+      const tv = 0.5 * pi.reduce((s, p, k) => s + Math.abs(p - qi[k]!), 0);
+      totalTV += tv;
+      pairs++;
+    }
+  }
+  return pairs > 0 ? totalTV / pairs : 0;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -36304,4 +36549,117 @@ export function scaleCompetitionIndex(
   const variance = niches.reduce((acc, v) => acc + (v - mean) ** 2, 0) / n;
   const std = Math.sqrt(variance);
   return std / mean;
+}
+
+/**
+ * MMM1: Modal brightness score (Rothenberg-inspired).
+ * For each pitch class p_i, brightness contribution = (count of pitches above p_i) / (n-1).
+ * Returns mean brightness across all pitches. Values in [0,1].
+ * Returns 0 for empty or single-pitch scales.
+ */
+export function scaleModalBrightness(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  void periodCents;
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let totalBrightness = 0;
+  for (let i = 0; i < n; i++) {
+    const pi = sorted[i]!;
+    let above = 0;
+    for (let j = 0; j < n; j++) {
+      if (sorted[j]! > pi) above++;
+    }
+    totalBrightness += above / (n - 1);
+  }
+  return totalBrightness / n;
+}
+
+/**
+ * MMM2: Maximal evenness score.
+ * How close is the scale to being maximally even?
+ * Score = max(0, 1 - std(step sizes) / ideal_step), where ideal_step = periodCents / n.
+ * Returns 0 for empty, 1 for single-pitch or perfectly even scales.
+ */
+export function scaleMaximalEvennessScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (n <= 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const idealStep = periodCents / n;
+  const mean = steps.reduce((a, b) => a + b, 0) / n;
+  const variance = steps.reduce((acc, v) => acc + (v - mean) ** 2, 0) / n;
+  const std = Math.sqrt(variance);
+  return Math.max(0, 1 - std / idealStep);
+}
+
+/**
+ * MMM3: Myhill's property score.
+ * A scale has Myhill's property if every generic interval comes in exactly 2 specific sizes.
+ * Score = fraction of generic intervals (1..floor(n/2)) that have exactly 2 specific sizes.
+ * Returns 0 for n≤2.
+ */
+export function scaleMyhillPropertyScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const maxK = Math.floor(n / 2);
+  let satisfying = 0;
+  for (let k = 1; k <= maxK; k++) {
+    const sizes = new Set<number>();
+    for (let i = 0; i < n; i++) {
+      const raw = (sorted[(i + k) % n]! - sorted[i]! + periodCents) % periodCents;
+      sizes.add(Math.round(raw));
+    }
+    if (sizes.size === 2) satisfying++;
+  }
+  return satisfying / maxK;
+}
+
+/**
+ * MMM4: Inversion symmetry score.
+ * How symmetric is the scale under inversion (reflecting around the midpoint)?
+ * Score = 1 - mean(min distances from inverted pitches to nearest scale pitch) / (periodCents/2).
+ * Returns 0 for empty, clamped to [0,1].
+ */
+export function scaleInversionSymmetryScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Invert each pitch: inverted_i = periodCents - sorted[n-1-i]
+  const inverted: number[] = [];
+  for (let i = 0; i < n; i++) {
+    inverted.push(periodCents - sorted[n - 1 - i]!);
+  }
+  inverted.sort((a, b) => a - b);
+  // For each inverted pitch, find minimum distance to any scale pitch (mod period)
+  let totalMinDist = 0;
+  for (let i = 0; i < n; i++) {
+    const ip = inverted[i]!;
+    let minDist = Infinity;
+    for (let j = 0; j < n; j++) {
+      const diff = Math.abs(ip - sorted[j]!);
+      const dist = Math.min(diff, periodCents - diff);
+      if (dist < minDist) minDist = dist;
+    }
+    totalMinDist += minDist;
+  }
+  const meanDist = totalMinDist / n;
+  return Math.max(0, 1 - meanDist / (periodCents / 2));
 }

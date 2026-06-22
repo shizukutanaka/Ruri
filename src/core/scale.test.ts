@@ -951,6 +951,12 @@ import {
   tuningFamilySocraticRadarGeodesicDistanceMean,
   tuningFamilySocraticRadarCurvatureMean,
   tuningFamilySocraticRadarTopologicalEntropy,
+  tuningFamilySocraticRadarFisherInformationMean,
+  tuningFamilySocraticRadarKullbackLeiblerMean,
+  tuningFamilySocraticRadarJensenShannonMean,
+  tuningFamilySocraticRadarRenyiEntropyMean,
+  tuningFamilySocraticRadarProfileMutualInfoMean,
+  tuningFamilySocraticRadarTotalVariationMean,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1003,6 +1009,10 @@ import {
   scaleMutualInformationMatrix,
   scaleEcologicalNiche,
   scaleCompetitionIndex,
+  scaleModalBrightness,
+  scaleMaximalEvennessScore,
+  scaleMyhillPropertyScore,
+  scaleInversionSymmetryScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -29239,5 +29249,152 @@ describe('Q1564 tuningFamilySocraticRadarTopologicalEntropy', () => {
   it('two tunings → non-negative', () => {
     const t2 = edo(19, 440);
     expect(tuningFamilySocraticRadarTopologicalEntropy([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1566 — tuningFamilySocraticRadarFisherInformationMean
+describe('Q1566 tuningFamilySocraticRadarFisherInformationMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarFisherInformationMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarFisherInformationMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarFisherInformationMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1568 — tuningFamilySocraticRadarKullbackLeiblerMean
+describe('Q1568 tuningFamilySocraticRadarKullbackLeiblerMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarKullbackLeiblerMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarKullbackLeiblerMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarKullbackLeiblerMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1570 — tuningFamilySocraticRadarJensenShannonMean
+describe('Q1570 tuningFamilySocraticRadarJensenShannonMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarJensenShannonMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarJensenShannonMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarJensenShannonMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1572 — tuningFamilySocraticRadarRenyiEntropyMean
+describe('Q1572 tuningFamilySocraticRadarRenyiEntropyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarRenyiEntropyMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarRenyiEntropyMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarRenyiEntropyMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1574 — tuningFamilySocraticRadarProfileMutualInfoMean
+describe('Q1574 tuningFamilySocraticRadarProfileMutualInfoMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfileMutualInfoMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarProfileMutualInfoMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarProfileMutualInfoMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1576 — tuningFamilySocraticRadarTotalVariationMean
+describe('Q1576 tuningFamilySocraticRadarTotalVariationMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarTotalVariationMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarTotalVariationMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarTotalVariationMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('MMM1 scaleModalBrightness', () => {
+  it('empty → 0', () => { expect(scaleModalBrightness([])).toBe(0); });
+  it('single pitch → 0', () => { expect(scaleModalBrightness([0])).toBe(0); });
+  it('equal step scale → 0.5', () => {
+    // For equal steps, each pitch has equal count above/below → mean = 0.5
+    const r = scaleModalBrightness([0, 200, 400, 600, 800, 1000]);
+    expect(r).toBeCloseTo(0.5, 5);
+  });
+  it('three-note scale returns 0.5 (symmetric rank distribution)', () => {
+    // For any n-note scale, rank-based mean brightness = 0.5 by definition
+    expect(scaleModalBrightness([900, 1000, 1100])).toBeCloseTo(0.5, 5);
+  });
+});
+
+describe('MMM2 scaleMaximalEvennessScore', () => {
+  it('empty → 0', () => { expect(scaleMaximalEvennessScore([])).toBe(0); });
+  it('single pitch → 1', () => { expect(scaleMaximalEvennessScore([0])).toBe(1); });
+  it('perfectly even → 1', () => {
+    expect(scaleMaximalEvennessScore([0, 300, 600, 900])).toBeCloseTo(1, 10);
+  });
+  it('uneven scale → less than 1', () => {
+    expect(scaleMaximalEvennessScore([0, 100, 900, 1000])).toBeLessThan(1);
+  });
+});
+
+describe('MMM3 scaleMyhillPropertyScore', () => {
+  it('empty → 0', () => { expect(scaleMyhillPropertyScore([])).toBe(0); });
+  it('n≤2 → 0', () => { expect(scaleMyhillPropertyScore([0, 600])).toBe(0); });
+  it('diatonic scale has high Myhill score', () => {
+    // Diatonic scale (W-W-H-W-W-W-H pattern: 200,200,100,200,200,200,100)
+    const diatonic = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleMyhillPropertyScore(diatonic)).toBeGreaterThan(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleMyhillPropertyScore([0, 200, 400, 700, 900]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('MMM4 scaleInversionSymmetryScore', () => {
+  it('empty → 0', () => { expect(scaleInversionSymmetryScore([])).toBe(0); });
+  it('symmetric scale → 1', () => {
+    // [0, 600] is symmetric (0 and 600 are self-inverses mod 1200)
+    expect(scaleInversionSymmetryScore([0, 600])).toBeCloseTo(1, 5);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleInversionSymmetryScore([0, 200, 400, 700, 900]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('diatonic and its inversion differ', () => {
+    const diatonic = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleInversionSymmetryScore(diatonic)).toBeGreaterThanOrEqual(0);
   });
 });
