@@ -1151,3 +1151,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | TTT2 | `scaleIntervalVectorEntropyV2` | 音程ベクトルのShannonエントロピー（正規化） |
 | TTT3 | `scaleIntervalVectorBalanceV2` | 音程ベクトルの均衡性スコア（変動係数の逆数） |
 | TTT4 | `scaleIntervalVectorMaxICV2` | 支配的音程クラス（最大カウントIC、正規化） |
+
+## Round 89: 音階情報密度 (UUU1–UUU4)
+
+音階パターンの情報理論的複雑性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| UUU1 | `scaleKolmogorovComplexityProxy` | Kolmogorov複雑性近似（固有ステップ数/n） |
+| UUU2 | `scaleRunLengthProxy` | ランレングス符号化近似（平均ラン長、正規化） |
+| UUU3 | `scaleAutocorrelationProxy` | 自己相関係数（ラグ1、[0,1]にマップ） |
+| UUU4 | `scaleDescriptionLength` | 最小記述長近似（MDL複雑性） |

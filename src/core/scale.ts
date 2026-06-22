@@ -41663,6 +41663,151 @@ export function tuningFamilySocraticRadarMaxwellBoltzmannProxy(
   return total / vecs.length;
 }
 
+// Q1962 — tuningFamilySocraticRadarViscosityProxy
+export function tuningFamilySocraticRadarViscosityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const minVal = sorted[0]!;
+    const maxVal = sorted[sorted.length - 1]!;
+    const viscosity = 1 - (maxVal - minVal);
+    total += Math.max(0, Math.min(1, viscosity));
+  }
+  return total / vecs.length;
+}
+
+// Q1964 — tuningFamilySocraticRadarTurbulenceProxy
+export function tuningFamilySocraticRadarTurbulenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let secondDiffSum = 0;
+    for (let i = 0; i <= 2; i++) {
+      const d = Math.abs(vec[i + 2]! - 2 * vec[i + 1]! + vec[i]!);
+      secondDiffSum += d;
+    }
+    const turbulence = Math.max(0, Math.min(1, (secondDiffSum / 3) / 2));
+    total += turbulence;
+  }
+  return total / vecs.length;
+}
+
+// Q1966 — tuningFamilySocraticRadarLaminarFlowProxy
+export function tuningFamilySocraticRadarLaminarFlowProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    let secondDiffSum = 0;
+    for (let i = 0; i <= 2; i++) {
+      const d = Math.abs(sorted[i + 2]! - 2 * sorted[i + 1]! + sorted[i]!);
+      secondDiffSum += d;
+    }
+    const turbulence = (secondDiffSum / 3) / 2;
+    const laminar = Math.max(0, Math.min(1, 1 - turbulence));
+    total += laminar;
+  }
+  return total / vecs.length;
+}
+
+// Q1968 — tuningFamilySocraticRadarPressureGradientProxy
+export function tuningFamilySocraticRadarPressureGradientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => b - a);
+    const gradient = sorted[0]! - sorted[sorted.length - 1]!;
+    total += Math.max(0, Math.min(1, gradient));
+  }
+  return total / vecs.length;
+}
+
+// Q1970 — tuningFamilySocraticRadarVorticityProxy
+export function tuningFamilySocraticRadarVorticityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let vorticity = 0;
+    for (let i = 0; i < 5; i++) {
+      vorticity += vec[i]! * vec[(i + 2) % 5]! - vec[(i + 1) % 5]! * vec[(i + 3) % 5]!;
+    }
+    const vorticityNorm = Math.min(1, Math.abs(vorticity) / 5);
+    total += vorticityNorm;
+  }
+  return total / vecs.length;
+}
+
+// Q1972 — tuningFamilySocraticRadarReynoldsNumberProxy
+export function tuningFamilySocraticRadarReynoldsNumberProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    let maxVal = 0;
+    let minVal = 1;
+    for (const x of vec) {
+      sum += x;
+      if (x > maxVal) maxVal = x;
+      if (x < minVal) minVal = x;
+    }
+    const mean = sum / vec.length;
+    const inertial = mean * maxVal;
+    const viscous = 1 - (maxVal - minVal) + 1e-10;
+    const re = inertial / viscous;
+    total += Math.min(1, re / 2);
+  }
+  return total / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -45223,4 +45368,89 @@ export function scaleIntervalVectorMaxICV2(
     }
   }
   return (maxIdx + 1) / 6;
+}
+
+// Round 89: 音階情報密度 (UUU1–UUU4)
+
+export function scaleKolmogorovComplexityProxy(
+  scaleCents: readonly number[],
+  _periodCents = 1200,
+  tolerance = 5,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push((sorted[i + 1] as number) - (sorted[i] as number));
+  }
+  steps.push(_periodCents - (sorted[n - 1] as number) + (sorted[0] as number));
+  const buckets = new Set(steps.map(s => Math.round(s / tolerance) * tolerance));
+  return buckets.size / n;
+}
+
+export function scaleRunLengthProxy(
+  scaleCents: readonly number[],
+  _periodCents = 1200,
+  tolerance = 20,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push((sorted[i + 1] as number) - (sorted[i] as number));
+  }
+  steps.push(_periodCents - (sorted[n - 1] as number) + (sorted[0] as number));
+  const bucketed = steps.map(s => Math.round(s / tolerance));
+  let runCount = 1;
+  for (let i = 1; i < bucketed.length; i++) {
+    if ((bucketed[i] as number) !== (bucketed[i - 1] as number)) runCount++;
+  }
+  const avgRunLength = n / runCount;
+  return Math.min(1, Math.max(0, (avgRunLength - 1) / Math.max(1, n / 2 - 1)));
+}
+
+export function scaleAutocorrelationProxy(
+  scaleCents: readonly number[],
+  _periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 3) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push((sorted[i + 1] as number) - (sorted[i] as number));
+  }
+  const m = steps.length;
+  const mean_s = steps.reduce((acc, s) => acc + s, 0) / m;
+  let num = 0;
+  let denom = 0;
+  for (let i = 0; i < m - 1; i++) {
+    const di = (steps[i] as number) - mean_s;
+    const di1 = (steps[i + 1] as number) - mean_s;
+    num += di * di1;
+    denom += di * di;
+  }
+  denom += ((steps[m - 1] as number) - mean_s) ** 2;
+  const r1 = num / (denom + 1e-10);
+  return Math.min(1, Math.max(0, (r1 + 1) / 2));
+}
+
+export function scaleDescriptionLength(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const roundedIntervals = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const interval = Math.abs((scaleCents[j] as number) - (scaleCents[i] as number));
+      roundedIntervals.add(Math.round(interval / 50) * 50);
+    }
+  }
+  const uniqueSteps = roundedIntervals.size;
+  const mdl = (Math.log2(n + 1) + uniqueSteps * Math.log2(periodCents)) / (n * Math.log2(periodCents) + 1);
+  return Math.min(1, mdl);
 }
