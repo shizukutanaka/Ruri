@@ -1041,3 +1041,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | III2 | `scaleDisjunctMotion` | 跳躍進行（>200セント）ステップの割合 |
 | III3 | `scaleStepSizeVariance` | ステップサイズ分散（正規化） |
 | III4 | `scaleGapFill` | 間隙補充傾向（跳躍→順次の割合） |
+
+## Round 79: 倍音近接性 (JJJ1–JJJ4)
+
+スケール音程と自然倍音列・純正律・平均律との近接度を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| JJJ1 | `scaleHarmonicSeriesProximity` | スケール音程と自然倍音列(2–16倍音)との近接度の平均 |
+| JJJ2 | `scaleJustIntonationProximity` | 5リミット純正律音程との近接度の平均 |
+| JJJ3 | `scaleEqualTemperamentDeviationV2` | 12平均律半音からの逸脱度(0=完全平均律) |
+| JJJ4 | `scaleMelodyCentroid` | 音程空間における旋律重心（周期音程比） |
