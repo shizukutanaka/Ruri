@@ -22473,3 +22473,456 @@ export function scaleRoughnessProfile(
     return { degree: idx, roughness: roughness / norm };
   });
 }
+
+// ---------------------------------------------------------------------------
+// AA1: scaleComplexity
+// ---------------------------------------------------------------------------
+
+/**
+ * Harmonic complexity of a scale based on average interval complexity.
+ *
+ * For each consecutive interval (including wrap-around from last note to
+ * first+1200), compute the interval in cents, map to nearest semitone
+ * (mod 12), and look up the complexity value from a precomputed table
+ * (log2(num*den) for 12-TET intervals 0–11 semitones). Returns the
+ * average complexity across all intervals.
+ *
+ * @param scaleCents  Scale pitches in cents (ascending).
+ * @returns Average harmonic complexity; 0 for empty or single-note scale.
+ *
+ * @example
+ * scaleComplexity([0, 200, 400, 500, 700, 900, 1100]); // diatonic scale
+ */
+export function scaleComplexity(scaleCents: readonly number[]): number {
+  if (scaleCents.length <= 1) return 0;
+
+  const HARMONIC_COMPLEXITY = [0, 5.09, 3.17, 4.09, 3.46, 2, 5.49, 1, 3.91, 3.17, 3.91, 4.09];
+
+  const n = scaleCents.length;
+  let total = 0;
+
+  for (let i = 0; i < n; i++) {
+    const curr = scaleCents[i]!;
+    const next = i + 1 < n ? scaleCents[i + 1]! : scaleCents[0]! + 1200;
+    const intervalCents = next - curr;
+    const semitone = ((Math.round(intervalCents / 100) % 12) + 12) % 12;
+    total += HARMONIC_COMPLEXITY[semitone]!;
+  }
+
+  return total / n;
+}
+
+// ---------------------------------------------------------------------------
+// AA2: scaleConnectedness
+// ---------------------------------------------------------------------------
+
+/**
+ * Jaccard similarity between two scales: ratio of common tones to union of tones.
+ *
+ * A tone from scale1 is considered "in" scale2 if it is within toleranceCents
+ * (mod 1200) of any tone in scale2. Intersection counts tones of scale1 that
+ * match a tone in scale2; union = |scale1| + |scale2| - |intersection|.
+ *
+ * @param scale1Cents    First scale in cents.
+ * @param scale2Cents    Second scale in cents.
+ * @param toleranceCents Matching tolerance in cents (default 10).
+ * @returns Jaccard similarity in [0, 1]; 0 if both scales are empty.
+ *
+ * @example
+ * // major scale vs natural minor
+ * scaleConnectedness([0,200,400,500,700,900,1100], [0,200,300,500,700,800,1000], 10);
+ */
+export function scaleConnectedness(
+  scale1Cents: readonly number[],
+  scale2Cents: readonly number[],
+  toleranceCents: number = 10,
+): number {
+  if (scale1Cents.length === 0 && scale2Cents.length === 0) return 0;
+
+  const normalize = (c: number) => ((c % 1200) + 1200) % 1200;
+
+  const norm2 = scale2Cents.map(normalize);
+
+  let intersection = 0;
+  for (const c1 of scale1Cents) {
+    const n1 = normalize(c1);
+    const matches = norm2.some(n2 => {
+      const diff = Math.abs(n1 - n2);
+      return Math.min(diff, 1200 - diff) <= toleranceCents;
+    });
+    if (matches) intersection++;
+  }
+
+  const union = scale1Cents.length + scale2Cents.length - intersection;
+  return union === 0 ? 0 : intersection / union;
+}
+
+// ---------------------------------------------------------------------------
+// AA3: chordVoiceLeadingDistance
+// ---------------------------------------------------------------------------
+
+/** Generate all permutations of an array (used internally). */
+function _permutations<T>(arr: T[]): T[][] {
+  if (arr.length <= 1) return [arr.slice()];
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i++) {
+    const rest = arr.slice(0, i).concat(arr.slice(i + 1));
+    for (const perm of _permutations(rest)) {
+      result.push([arr[i]! as T, ...perm]);
+    }
+  }
+  return result;
+}
+
+/**
+ * Minimal voice leading distance between two chords (in cents).
+ *
+ * Finds the optimal bijection between chord1 and chord2 that minimises total
+ * motion (sum of |motion| per voice). If chords differ in size, the shorter
+ * chord is padded by repeating its nearest note. For chords of ≤ 4 notes,
+ * brute-force permutation search is used; for larger chords, a greedy
+ * nearest-neighbor heuristic is applied.
+ *
+ * @param chord1Cents  First chord pitches in cents.
+ * @param chord2Cents  Second chord pitches in cents.
+ * @returns Total voice leading distance in cents.
+ *
+ * @example
+ * chordVoiceLeadingDistance([0, 400, 700], [200, 500, 900]); // C major → D minor
+ */
+export function chordVoiceLeadingDistance(
+  chord1Cents: readonly number[],
+  chord2Cents: readonly number[],
+): number {
+  if (chord1Cents.length === 0 && chord2Cents.length === 0) return 0;
+
+  // Pad the shorter chord so both have the same length
+  const padChord = (src: readonly number[], target: readonly number[]): number[] => {
+    if (src.length >= target.length) return src.slice();
+    const result = src.slice();
+    while (result.length < target.length) {
+      // find nearest note in src for each target note not yet matched
+      const nearest = target[result.length]!;
+      let bestNote = result[0]!;
+      let bestDist = Math.abs(nearest - bestNote);
+      for (const n of result) {
+        const d = Math.abs(nearest - n);
+        if (d < bestDist) {
+          bestDist = d;
+          bestNote = n;
+        }
+      }
+      result.push(bestNote);
+    }
+    return result;
+  };
+
+  const c1 = padChord(chord1Cents, chord2Cents);
+  const c2 = padChord(chord2Cents, chord1Cents);
+
+  const totalMotion = (a: number[], b: number[]): number =>
+    a.reduce((sum, ai, i) => sum + Math.abs(ai - b[i]!), 0);
+
+  if (c1.length <= 4) {
+    // Brute-force: try all permutations of c2 against fixed c1
+    const perms = _permutations(c2);
+    let best = Infinity;
+    for (const perm of perms) {
+      const d = totalMotion(c1, perm);
+      if (d < best) best = d;
+    }
+    return best;
+  }
+
+  // Greedy nearest-neighbor for larger chords
+  const used = new Array(c2.length).fill(false);
+  let total = 0;
+  for (const note1 of c1) {
+    let bestDist = Infinity;
+    let bestIdx = -1;
+    for (let j = 0; j < c2.length; j++) {
+      if (!used[j]) {
+        const d = Math.abs(note1 - c2[j]!);
+        if (d < bestDist) {
+          bestDist = d;
+          bestIdx = j;
+        }
+      }
+    }
+    if (bestIdx >= 0) {
+      used[bestIdx] = true;
+      total += bestDist;
+    }
+  }
+  return total;
+}
+
+// ---------------------------------------------------------------------------
+// AA4: melodicContourSimilarity
+// ---------------------------------------------------------------------------
+
+/**
+ * Compare two melodies by their contour shape (up/down/same movements).
+ *
+ * The contour of a melody is the sequence of signs of consecutive differences:
+ * +1 (ascending), 0 (same), or -1 (descending). Similarity is the fraction of
+ * matching contour steps, compared up to min(len1-1, len2-1) steps.
+ *
+ * @param melody1  First melody as pitch values (any unit).
+ * @param melody2  Second melody as pitch values (any unit).
+ * @returns Similarity in [0, 1]; 1.0 if both melodies have ≤ 1 note.
+ *
+ * @example
+ * melodicContourSimilarity([60, 62, 64], [60, 62, 64]); // 1.0 (same melody)
+ * melodicContourSimilarity([0, 1, 2], [0, -1, -2]);     // 0.0 (inverted)
+ */
+export function melodicContourSimilarity(
+  melody1: readonly number[],
+  melody2: readonly number[],
+): number {
+  if (melody1.length <= 1 && melody2.length <= 1) return 1.0;
+
+  const steps = Math.min(melody1.length - 1, melody2.length - 1);
+  if (steps <= 0) return 1.0;
+
+  const sign = (x: number): number => (x > 0 ? 1 : x < 0 ? -1 : 0);
+
+  let matches = 0;
+  for (let i = 0; i < steps; i++) {
+    const s1 = sign(melody1[i + 1]! - melody1[i]!);
+    const s2 = sign(melody2[i + 1]! - melody2[i]!);
+    if (s1 === s2) matches++;
+  }
+
+  return matches / steps;
+}
+
+// ---------------------------------------------------------------------------
+// Q1122 — tuningFamilySocraticRadarNormalizeProfiles
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize all tunings' radar profiles across the family.
+ *
+ * 'minmax': for each axis, `(score - min) / (max - min)` — if min===max, use 0.5
+ * 'zscore': for each axis, `(score - mean) / std` — if std===0, use 0; then clamp to [0,1] via `(z + 3) / 6`
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param method - Normalization method: 'minmax' or 'zscore'.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of `{ id, profile }` with normalized scores, one per tuning.
+ */
+export function tuningFamilySocraticRadarNormalizeProfiles(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  method: 'minmax' | 'zscore' = 'minmax',
+  rootHz?: number,
+): Array<{ id: string; profile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const n = profiles.length;
+  if (n === 0) return [];
+
+  const normalized: Array<{ id: string; profile: Record<AxisKey, number> }> = tunings.map((t) => ({
+    id: t.id,
+    profile: { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 },
+  }));
+
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]);
+    if (method === 'minmax') {
+      const min = Math.min(...scores);
+      const max = Math.max(...scores);
+      const range = max - min;
+      for (let i = 0; i < n; i++) {
+        normalized[i]!.profile[ax] = range === 0 ? 0.5 : (scores[i]! - min) / range;
+      }
+    } else {
+      // zscore
+      const mean = scores.reduce((s, v) => s + v, 0) / n;
+      const variance = scores.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+      const std = Math.sqrt(variance);
+      for (let i = 0; i < n; i++) {
+        const z = std === 0 ? 0 : (scores[i]! - mean) / std;
+        const clamped = Math.min(1, Math.max(0, (z + 3) / 6));
+        normalized[i]!.profile[ax] = clamped;
+      }
+    }
+  }
+
+  return normalized;
+}
+
+// ---------------------------------------------------------------------------
+// Q1124 — tuningFamilySocraticRadarFuzzyMembership
+// ---------------------------------------------------------------------------
+
+/**
+ * Soft membership: for each axis, `membership = 1 / (1 + Math.exp(-10 * (score - threshold)))`.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param threshold - Threshold for sigmoid (default 0.5).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of `{ id, membership }` one per tuning.
+ */
+export function tuningFamilySocraticRadarFuzzyMembership(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  threshold: number = 0.5,
+  rootHz?: number,
+): Array<{ id: string; membership: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  return tunings.map((t) => {
+    const profile = tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz);
+    const membership = {} as Record<AxisKey, number>;
+    for (const ax of axes) {
+      membership[ax] = 1 / (1 + Math.exp(-10 * (profile[ax] - threshold)));
+    }
+    return { id: t.id, membership };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1126 — tuningFamilySocraticRadarMultiObjectiveRank
+// ---------------------------------------------------------------------------
+
+/**
+ * Score each tuning: `sum over objectives of (maximize ? score : 1-score)`, divided by number of objectives.
+ * Rank 1 = highest score. Returns sorted by rank ascending.
+ * If objectives is empty, all tunings get score=0, rank=1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param objectives - Map of axis to 'maximize' or 'minimize'.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of `{ id, rank, score }` sorted by rank ascending.
+ */
+export function tuningFamilySocraticRadarMultiObjectiveRank(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  objectives: Partial<Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', 'maximize' | 'minimize'>>,
+  rootHz?: number,
+): Array<{ id: string; rank: number; score: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const objEntries = Object.entries(objectives) as [AxisKey, 'maximize' | 'minimize'][];
+  const numObj = objEntries.length;
+
+  const scored = tunings.map((t) => {
+    const profile = tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz);
+    let score = 0;
+    if (numObj > 0) {
+      for (const [ax, dir] of objEntries) {
+        score += dir === 'maximize' ? profile[ax] : 1 - profile[ax];
+      }
+      score /= numObj;
+    }
+    return { id: t.id, score };
+  });
+
+  // Sort by score descending, assign rank
+  scored.sort((a, b) => b.score - a.score);
+  return scored.map((e, i) => ({ id: e.id, rank: i + 1, score: e.score }));
+}
+
+// ---------------------------------------------------------------------------
+// Q1128 — tuningFamilySocraticRadarAdaptiveThreshold
+// ---------------------------------------------------------------------------
+
+/**
+ * For each axis, threshold = `mean + multiplier * std`. Count how many tunings score above the threshold.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param multiplier - Multiplier for std (default 1.0).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array (one per axis) of `{ axis, threshold, aboveCount }`.
+ */
+export function tuningFamilySocraticRadarAdaptiveThreshold(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  multiplier: number = 1.0,
+  rootHz?: number,
+): Array<{ axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; threshold: number; aboveCount: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const n = profiles.length;
+
+  return axes.map((ax) => {
+    const scores = profiles.map((p) => p[ax]);
+    const mean = n === 0 ? 0 : scores.reduce((s, v) => s + v, 0) / n;
+    const variance = n === 0 ? 0 : scores.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    const std = Math.sqrt(variance);
+    const threshold = mean + multiplier * std;
+    const aboveCount = scores.filter((v) => v > threshold).length;
+    return { axis: ax, threshold, aboveCount };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1130 — tuningFamilySocraticRadarSensitivityAnalysis
+// ---------------------------------------------------------------------------
+
+/**
+ * For each tuning, perturb its referenceHz by ±perturbationHz and recompute its radar profile.
+ * sensitivity = mean across 5 axes of `|profile_plus[axis] - profile_minus[axis]| / (2 * perturbationHz)`
+ * Returns sorted by sensitivity descending.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param perturbationHz - Perturbation in Hz (default 1.0).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of `{ id, sensitivity }` sorted by sensitivity descending.
+ */
+export function tuningFamilySocraticRadarSensitivityAnalysis(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  perturbationHz: number = 1.0,
+  rootHz?: number,
+): Array<{ id: string; sensitivity: number }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+
+  const result = tunings.map((t) => {
+    const tPlus: TuningSystem = { ...t, referenceHz: t.referenceHz + perturbationHz };
+    const tMinus: TuningSystem = { ...t, referenceHz: t.referenceHz - perturbationHz };
+    const profilePlus = tuningFamilySocraticRadarProfile([tPlus], spectrum, rootHz);
+    const profileMinus = tuningFamilySocraticRadarProfile([tMinus], spectrum, rootHz);
+    const sensitivity =
+      axes.reduce((s, ax) => s + Math.abs(profilePlus[ax] - profileMinus[ax]), 0) /
+      (axes.length * 2 * perturbationHz);
+    return { id: t.id, sensitivity };
+  });
+
+  return result.sort((a, b) => b.sensitivity - a.sensitivity);
+}
+
+// ---------------------------------------------------------------------------
+// Q1132 — tuningFamilySocraticRadarParallelCoordinates
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns parallel coordinates representation: for each tuning, an array of 5 values
+ * (one per axis in canonical order: diversity, versatility, maturity, benchmark, convergence).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of `{ id, coordinates: [div, ver, mat, ben, con] }`.
+ */
+export function tuningFamilySocraticRadarParallelCoordinates(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Array<{ id: string; coordinates: number[] }> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  return tunings.map((t) => {
+    const profile = tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz);
+    return { id: t.id, coordinates: axes.map((ax) => profile[ax]) };
+  });
+}

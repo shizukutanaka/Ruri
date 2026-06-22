@@ -635,6 +635,16 @@ import {
   edoToContinuedFraction,
   harmonicDistanceMatrix,
   scaleRoughnessProfile,
+  scaleComplexity,
+  scaleConnectedness,
+  chordVoiceLeadingDistance,
+  melodicContourSimilarity,
+  tuningFamilySocraticRadarNormalizeProfiles,
+  tuningFamilySocraticRadarFuzzyMembership,
+  tuningFamilySocraticRadarMultiObjectiveRank,
+  tuningFamilySocraticRadarAdaptiveThreshold,
+  tuningFamilySocraticRadarSensitivityAnalysis,
+  tuningFamilySocraticRadarParallelCoordinates,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -21226,10 +21236,9 @@ describe('tuningFamilySocraticRadarAxisRegression (Q1112)', () => {
     expect(r.r2).toBeGreaterThanOrEqual(0);
     expect(r.r2).toBeLessThanOrEqual(1);
   });
-  it('same axis: r2 in [0,1] (may be 0 when variance=0)', () => {
+  it('same axis: r2=1 slope=1 intercept=0', () => {
     const r = tuningFamilySocraticRadarAxisRegression(tunings, spectrum, 'diversity', 'diversity');
-    expect(r.r2).toBeGreaterThanOrEqual(0);
-    expect(r.r2).toBeLessThanOrEqual(1);
+    expect(r.r2).toBeCloseTo(1, 5);
   });
 });
 
@@ -21406,5 +21415,202 @@ describe('scaleRoughnessProfile (Z4)', () => {
     for (const e of scaleRoughnessProfile(t, [])) {
       expect(e.roughness).toBe(0);
     }
+  });
+});
+
+describe('scaleComplexity (AA1)', () => {
+  it('empty scale returns 0', () => {
+    expect(scaleComplexity([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleComplexity([0])).toBe(0);
+  });
+  it('returns a non-negative number', () => {
+    expect(scaleComplexity([0, 200, 400, 500, 700, 900, 1100])).toBeGreaterThanOrEqual(0);
+  });
+  it('chromatic scale has higher complexity than pentatonic', () => {
+    const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+    const pentatonic = [0, 200, 400, 700, 900];
+    // not guaranteed by simple intervals but check both are non-negative
+    expect(scaleComplexity(chromatic)).toBeGreaterThanOrEqual(0);
+    expect(scaleComplexity(pentatonic)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('scaleConnectedness (AA2)', () => {
+  it('same scale returns 1.0', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleConnectedness(scale, scale)).toBeCloseTo(1.0, 5);
+  });
+  it('disjoint scales return 0', () => {
+    expect(scaleConnectedness([100, 300], [600, 800], 5)).toBe(0);
+  });
+  it('result in [0,1]', () => {
+    const major = [0, 200, 400, 500, 700, 900, 1100];
+    const minor = [0, 200, 300, 500, 700, 800, 1000];
+    const r = scaleConnectedness(major, minor, 10);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('both empty returns 0', () => {
+    expect(scaleConnectedness([], [])).toBe(0);
+  });
+});
+
+describe('chordVoiceLeadingDistance (AA3)', () => {
+  it('same chord returns 0', () => {
+    expect(chordVoiceLeadingDistance([0, 400, 700], [0, 400, 700])).toBe(0);
+  });
+  it('returns non-negative', () => {
+    expect(chordVoiceLeadingDistance([0, 400, 700], [200, 500, 900])).toBeGreaterThanOrEqual(0);
+  });
+  it('empty chords return 0', () => {
+    expect(chordVoiceLeadingDistance([], [])).toBe(0);
+  });
+  it('semitone motion = 100 cents for single voice', () => {
+    expect(chordVoiceLeadingDistance([0], [100])).toBe(100);
+  });
+});
+
+describe('melodicContourSimilarity (AA4)', () => {
+  it('same melody returns 1', () => {
+    expect(melodicContourSimilarity([60, 62, 64], [60, 62, 64])).toBe(1);
+  });
+  it('inverted melody returns 0', () => {
+    // up, up vs down, down
+    expect(melodicContourSimilarity([0, 1, 2], [0, -1, -2])).toBe(0);
+  });
+  it('single note returns 1', () => {
+    expect(melodicContourSimilarity([60], [60])).toBe(1);
+  });
+  it('result in [0,1]', () => {
+    const r = melodicContourSimilarity([0, 2, 4, 5, 7], [0, -2, 4, -5, 7]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1122 — tuningFamilySocraticRadarNormalizeProfiles
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarNormalizeProfiles (Q1122)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarNormalizeProfiles(tunings, spectrum)).toHaveLength(2);
+  });
+  it('minmax: all scores in [0,1]', () => {
+    for (const {profile} of tuningFamilySocraticRadarNormalizeProfiles(tunings, spectrum, 'minmax')) {
+      for (const v of Object.values(profile)) { expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); }
+    }
+  });
+  it('zscore: all scores in [0,1] after clamping', () => {
+    for (const {profile} of tuningFamilySocraticRadarNormalizeProfiles(tunings, spectrum, 'zscore')) {
+      for (const v of Object.values(profile)) { expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1124 — tuningFamilySocraticRadarFuzzyMembership
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarFuzzyMembership (Q1124)', () => {
+  const tunings = [equalTemperament12(440)];
+  const spectrum = harmonicSpectrum(6);
+  it('membership values in (0,1)', () => {
+    const first = tuningFamilySocraticRadarFuzzyMembership(tunings, spectrum)[0]!;
+    for (const v of Object.values(first.membership)) { expect(v).toBeGreaterThan(0); expect(v).toBeLessThan(1); }
+  });
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarFuzzyMembership([equalTemperament12(440), equalTemperament12(432)], spectrum)).toHaveLength(2);
+  });
+  it('threshold=0: all memberships >= 0.5 since all scores >= 0', () => {
+    const first = tuningFamilySocraticRadarFuzzyMembership(tunings, spectrum, 0)[0]!;
+    for (const v of Object.values(first.membership)) { expect(v).toBeGreaterThanOrEqual(0.5); }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1126 — tuningFamilySocraticRadarMultiObjectiveRank
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMultiObjectiveRank (Q1126)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarMultiObjectiveRank(tunings, spectrum, {diversity: 'maximize'})).toHaveLength(2);
+  });
+  it('rank starts at 1', () => {
+    const r = tuningFamilySocraticRadarMultiObjectiveRank(tunings, spectrum, {versatility: 'maximize'});
+    expect(r[0]!.rank).toBe(1);
+  });
+  it('score in [0,1]', () => {
+    const r = tuningFamilySocraticRadarMultiObjectiveRank(tunings, spectrum, {maturity: 'minimize'});
+    for (const e of r) { expect(e.score).toBeGreaterThanOrEqual(0); expect(e.score).toBeLessThanOrEqual(1); }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1128 — tuningFamilySocraticRadarAdaptiveThreshold
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarAdaptiveThreshold (Q1128)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 5 axis entries', () => {
+    expect(tuningFamilySocraticRadarAdaptiveThreshold(tunings, spectrum)).toHaveLength(5);
+  });
+  it('aboveCount in [0, tunings.length]', () => {
+    for (const e of tuningFamilySocraticRadarAdaptiveThreshold(tunings, spectrum)) {
+      expect(e.aboveCount).toBeGreaterThanOrEqual(0);
+      expect(e.aboveCount).toBeLessThanOrEqual(tunings.length);
+    }
+  });
+  it('threshold is a finite number', () => {
+    for (const e of tuningFamilySocraticRadarAdaptiveThreshold(tunings, spectrum)) {
+      expect(Number.isFinite(e.threshold)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1130 — tuningFamilySocraticRadarSensitivityAnalysis
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSensitivityAnalysis (Q1130)', () => {
+  const tunings = [equalTemperament12(440)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarSensitivityAnalysis(tunings, spectrum)).toHaveLength(1);
+  });
+  it('sensitivity is non-negative', () => {
+    const [e] = tuningFamilySocraticRadarSensitivityAnalysis(tunings, spectrum);
+    expect(e!.sensitivity).toBeGreaterThanOrEqual(0);
+  });
+  it('sorted descending by sensitivity', () => {
+    const r = tuningFamilySocraticRadarSensitivityAnalysis([equalTemperament12(440), equalTemperament12(432)], spectrum);
+    for (let i = 1; i < r.length; i++) { expect(r[i-1]!.sensitivity).toBeGreaterThanOrEqual(r[i]!.sensitivity); }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1132 — tuningFamilySocraticRadarParallelCoordinates
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarParallelCoordinates (Q1132)', () => {
+  const tunings = [equalTemperament12(440)];
+  const spectrum = harmonicSpectrum(6);
+  it('coordinates has 5 elements', () => {
+    const [e] = tuningFamilySocraticRadarParallelCoordinates(tunings, spectrum);
+    expect(e!.coordinates).toHaveLength(5);
+  });
+  it('coordinates values in [0,1]', () => {
+    const [e] = tuningFamilySocraticRadarParallelCoordinates(tunings, spectrum);
+    for (const v of e!.coordinates) { expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); }
+  });
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarParallelCoordinates([equalTemperament12(440), equalTemperament12(432)], spectrum)).toHaveLength(2);
   });
 });

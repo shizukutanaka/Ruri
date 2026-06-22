@@ -331,3 +331,17 @@
 - Z2: edoToContinuedFraction — セント値の連分数展開
 - Z3: harmonicDistanceMatrix — ピッチクラス間倍音距離行列
 - Z4: scaleRoughnessProfile — 音度ごとの根音に対するラフネス
+
+## Round 18: スケール複雑度・音声進行・旋律輪郭 (AA1–AA4)
+
+**テーマ**: 和声複雑度・スケール連結性・声部進行・旋律輪郭分析
+
+### 研究トピック
+- Qiita: 音楽理論のTypeScript実装 — 声部進行と旋律輪郭の定量化
+- Zenn: Jaccard類似度による音階間の類似性分析
+
+### 実装
+- AA1: scaleComplexity — 平均倍音複雑度（セミトーン別ルックアップ）
+- AA2: scaleConnectedness — Jaccard類似度による音階連結性
+- AA3: chordVoiceLeadingDistance — 最小声部進行距離（総変位量）
+- AA4: melodicContourSimilarity — 旋律輪郭類似度（符号列比較）

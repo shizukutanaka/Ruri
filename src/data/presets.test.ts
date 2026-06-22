@@ -364,6 +364,12 @@ import {
   presetFamilySocraticRadarKMeansCluster,
   presetFamilySocraticRadarPrincipalAxis,
   presetFamilySocraticRadarBootstrapCI,
+  presetFamilySocraticRadarNormalizeProfiles,
+  presetFamilySocraticRadarFuzzyMembership,
+  presetFamilySocraticRadarMultiObjectiveRank,
+  presetFamilySocraticRadarAdaptiveThreshold,
+  presetFamilySocraticRadarSensitivityAnalysis,
+  presetFamilySocraticRadarParallelCoordinates,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12191,5 +12197,115 @@ describe('presetFamilySocraticRadarBootstrapCI (Q1121)', () => {
     expect(result).toHaveProperty('mean');
     expect(result.lower).toBeLessThanOrEqual(result.mean);
     expect(result.mean).toBeLessThanOrEqual(result.upper);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1123 — presetFamilySocraticRadarNormalizeProfiles
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarNormalizeProfiles (Q1123)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarNormalizeProfiles(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      'minmax',
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('profile');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1125 — presetFamilySocraticRadarFuzzyMembership
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarFuzzyMembership (Q1125)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarFuzzyMembership(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      0.5,
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('membership');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1127 — presetFamilySocraticRadarMultiObjectiveRank
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMultiObjectiveRank (Q1127)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarMultiObjectiveRank(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      { diversity: 'maximize' },
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('rank');
+    expect(result[0]).toHaveProperty('score');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1129 — presetFamilySocraticRadarAdaptiveThreshold
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAdaptiveThreshold (Q1129)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarAdaptiveThreshold(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      1.0,
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(5);
+    expect(result[0]).toHaveProperty('axis');
+    expect(result[0]).toHaveProperty('threshold');
+    expect(result[0]).toHaveProperty('aboveCount');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1131 — presetFamilySocraticRadarSensitivityAnalysis
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarSensitivityAnalysis (Q1131)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarSensitivityAnalysis(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      1.0,
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('sensitivity');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1133 — presetFamilySocraticRadarParallelCoordinates
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarParallelCoordinates (Q1133)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarParallelCoordinates(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('coordinates');
+    expect(result[0]!.coordinates).toHaveLength(5);
   });
 });
