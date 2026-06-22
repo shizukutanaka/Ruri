@@ -483,6 +483,12 @@ import {
   tuningFamilySocraticRadarChangePointIndex,
   tuningFamilySocraticRadarLocalExtremaCount,
   tuningFamilySocraticRadarSignChanges,
+  tuningFamilySocraticRadarSimilarityWalkMatrix,
+  tuningFamilySocraticRadarPowerIteration,
+  tuningFamilySocraticRadarConvergenceSteps,
+  tuningFamilySocraticRadarEigenGap,
+  tuningFamilySocraticRadarSelfReturnStep,
+  tuningFamilySocraticRadarClusterCount,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -12096,4 +12102,90 @@ export function presetFamilySocraticRadarSignChanges(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarSignChanges(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarSimilarityWalkMatrix(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSimilarityWalkMatrix> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSimilarityWalkMatrix(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarPowerIteration(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPowerIteration> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPowerIteration(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarConvergenceSteps(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarConvergenceSteps> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarConvergenceSteps(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarEigenGap(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarEigenGap> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarEigenGap(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarSelfReturnStep(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSelfReturnStep> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSelfReturnStep(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarClusterCount(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarClusterCount> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarClusterCount(tunings, spectrum, rootHz);
 }

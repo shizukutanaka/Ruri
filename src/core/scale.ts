@@ -30211,6 +30211,206 @@ export function tuningFamilySocraticRadarSignChanges(
 }
 
 // ---------------------------------------------------------------------------
+// Q1374 — tuningFamilySocraticRadarSimilarityWalkMatrix
+/**
+ * Build a transition matrix based on Gaussian similarity between tuning radar profiles.
+ * P[i][j] = sim(i,j) / sum_k(sim(i,k)) for i≠j; P[i][i] = 0
+ * sim(i,j) = exp(-L2_distance(profile[i], profile[j]))
+ * Returns number[][] (n×n row-stochastic matrix).
+ * For n=1: [[1]], for n=0: []
+ */
+export function tuningFamilySocraticRadarSimilarityWalkMatrix(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [[1]];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const matrix: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    const row: number[] = new Array(n).fill(0) as number[];
+    let rowSum = 0;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      let l2sq = 0;
+      for (let k = 0; k < 5; k++) {
+        const diff = scores[i]![k]! - scores[j]![k]!;
+        l2sq += diff * diff;
+      }
+      const sim = Math.exp(-Math.sqrt(l2sq));
+      row[j] = sim;
+      rowSum += sim;
+    }
+    if (rowSum > 0) {
+      for (let j = 0; j < n; j++) {
+        row[j] = row[j]! / rowSum;
+      }
+    }
+    matrix.push(row);
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1376 — tuningFamilySocraticRadarPowerIteration
+/**
+ * Run 50 power iterations on the similarity walk matrix to find stationary distribution.
+ * Start with uniform [1/n, ..., 1/n], multiply by matrix 50 times.
+ * Returns number[] (stationary distribution, sums to ~1).
+ * For n=0: [], for n=1: [1]
+ */
+export function tuningFamilySocraticRadarPowerIteration(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [1];
+  const matrix = tuningFamilySocraticRadarSimilarityWalkMatrix(tunings, spectrum, rootHz);
+  let dist: number[] = new Array(n).fill(1 / n) as number[];
+  for (let iter = 0; iter < 50; iter++) {
+    const next: number[] = new Array(n).fill(0) as number[];
+    for (let j = 0; j < n; j++) {
+      for (let i = 0; i < n; i++) {
+        next[j] = next[j]! + dist[i]! * matrix[i]![j]!;
+      }
+    }
+    dist = next;
+  }
+  return dist;
+}
+
+// ---------------------------------------------------------------------------
+// Q1378 — tuningFamilySocraticRadarConvergenceSteps
+/**
+ * Estimate how many power iterations needed for the distribution to converge to within epsilon=0.01 (L1 norm).
+ * Start from uniform, iterate until ||dist_new - dist_old||_1 < 0.01 (or max 100 iterations).
+ * Returns number (iteration count). Returns 0 for n <= 1.
+ */
+export function tuningFamilySocraticRadarConvergenceSteps(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const matrix = tuningFamilySocraticRadarSimilarityWalkMatrix(tunings, spectrum, rootHz);
+  let dist: number[] = new Array(n).fill(1 / n) as number[];
+  for (let iter = 0; iter < 100; iter++) {
+    const next: number[] = new Array(n).fill(0) as number[];
+    for (let j = 0; j < n; j++) {
+      for (let i = 0; i < n; i++) {
+        next[j] = next[j]! + dist[i]! * matrix[i]![j]!;
+      }
+    }
+    let l1 = 0;
+    for (let j = 0; j < n; j++) {
+      l1 += Math.abs(next[j]! - dist[j]!);
+    }
+    dist = next;
+    if (l1 < 0.01) return iter + 1;
+  }
+  return 100;
+}
+
+// ---------------------------------------------------------------------------
+// Q1380 — tuningFamilySocraticRadarEigenGap
+/**
+ * Estimate the eigen-gap of the similarity walk matrix (gap between 1st and 2nd largest eigenvalues).
+ * Simplified: use 1 - max_off_diagonal_entry_in_row as a proxy for spectral gap.
+ * Returns number (proxy for mixing speed; larger gap = faster mixing). Returns 1 for n <= 1.
+ */
+export function tuningFamilySocraticRadarEigenGap(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n <= 1) return 1;
+  const matrix = tuningFamilySocraticRadarSimilarityWalkMatrix(tunings, spectrum, rootHz);
+  let maxOffDiag = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i !== j && matrix[i]![j]! > maxOffDiag) {
+        maxOffDiag = matrix[i]![j]!;
+      }
+    }
+  }
+  return 1 - maxOffDiag;
+}
+
+// ---------------------------------------------------------------------------
+// Q1382 — tuningFamilySocraticRadarSelfReturnStep
+/**
+ * For each tuning, return the probability mass remaining at the tuning after one full round
+ * of power iteration starting from that tuning (as a proxy for self-return rate).
+ * Returns number[] (one value per tuning in [0, 1]).
+ */
+export function tuningFamilySocraticRadarSelfReturnStep(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const n = tunings.length;
+  if (n === 0) return [];
+  const matrix = tuningFamilySocraticRadarSimilarityWalkMatrix(tunings, spectrum, rootHz);
+  const result: number[] = [];
+  for (let i = 0; i < n; i++) {
+    // Start with all mass at tuning i, apply walk matrix once
+    const next: number[] = new Array(n).fill(0) as number[];
+    for (let j = 0; j < n; j++) {
+      // only row i contributes (start[i] = 1, rest = 0)
+      next[j] = matrix[i]![j]!;
+    }
+    // Return probability mass that came back to i via one step
+    // P[i][i] = 0 by definition, so after one step from i there's no self-return
+    // Instead: sum of contributions flowing back, approximate by squaring matrix row
+    let selfReturn = 0;
+    for (let k = 0; k < n; k++) {
+      selfReturn += next[k]! * matrix[k]![i]!;
+    }
+    result.push(selfReturn);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1384 — tuningFamilySocraticRadarClusterCount
+/**
+ * Estimate the number of natural clusters by counting tunings whose composite score
+ * (mean of axes) deviates from the family mean by > 0.1.
+ * Returns number (cluster count estimate).
+ */
+export function tuningFamilySocraticRadarClusterCount(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const composites = profiles.map((p) => axes.reduce((s, axis) => s + p[axis], 0) / 5);
+  const familyMean = composites.reduce((s, c) => s + c, 0) / n;
+  let clusterCount = 0;
+  for (let i = 0; i < n; i++) {
+    if (Math.abs(composites[i]! - familyMean) > 0.1) {
+      clusterCount++;
+    }
+  }
+  return clusterCount;
+}
+
+// ---------------------------------------------------------------------------
 // UU1 — scalePitchClustering
 export function scalePitchClustering(
   scaleCents: readonly number[],
@@ -30286,4 +30486,94 @@ export function scaleModularStepPattern(
     }
   }
   return divisibleCount / steps.length;
+}
+
+// VV1 — scaleToChromaticNames
+export function scaleToChromaticNames(
+  scaleCents: readonly number[],
+  tolerance: number = 50,
+): string[] {
+  if (scaleCents.length === 0) return [];
+  const chromaticNames: readonly string[] = [
+    'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+  ];
+  const result: string[] = [];
+  for (const pitch of scaleCents) {
+    const pitchMod = ((pitch % 1200) + 1200) % 1200;
+    let bestName = '?';
+    let bestDist = Infinity;
+    for (let i = 0; i < 12; i++) {
+      const chromaCents = i * 100;
+      const dist = Math.abs(pitchMod - chromaCents);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestName = chromaticNames[i]!;
+      }
+    }
+    result.push(bestDist <= tolerance ? bestName : '?');
+  }
+  return result;
+}
+
+// VV2 — tuningMeantoneDeviation
+export function tuningMeantoneDeviation(tuning: TuningSystem): number {
+  if (tuning.degrees.length === 0) return 0;
+  const meantoneFifth = 696.578;
+  const meantoneDegrees: number[] = [];
+  for (let k = 0; k < 12; k++) {
+    meantoneDegrees.push(((k * meantoneFifth) % 1200 + 1200) % 1200);
+  }
+  meantoneDegrees.sort((a, b) => a - b);
+  let totalMinDist = 0;
+  for (const deg of tuning.degrees) {
+    const degCents = pitchToCents(deg);
+    const pitchMod = ((degCents % 1200) + 1200) % 1200;
+    let minDist = Infinity;
+    for (const mp of meantoneDegrees) {
+      const dist = Math.abs(pitchMod - mp);
+      if (dist < minDist) minDist = dist;
+    }
+    totalMinDist += minDist;
+  }
+  return totalMinDist / tuning.degrees.length;
+}
+
+// VV3 — spectrumDominantPartial
+export function spectrumDominantPartial(
+  spectrum: Spectrum,
+): { ratio: number; amplitude: number } | null {
+  if (spectrum.length === 0) return null;
+  let bestPartial = spectrum[0]!;
+  for (let i = 1; i < spectrum.length; i++) {
+    const p = spectrum[i]!;
+    if (
+      p.amplitude > bestPartial.amplitude ||
+      (p.amplitude === bestPartial.amplitude && p.ratio < bestPartial.ratio)
+    ) {
+      bestPartial = p;
+    }
+  }
+  return { ratio: bestPartial.ratio, amplitude: bestPartial.amplitude };
+}
+
+// VV4 — scaleFundamentalBassScore
+export function scaleFundamentalBassScore(
+  scaleCents: readonly number[],
+  bassNote: number = 0,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const smallIntegers = [1, 2, 3, 4, 5, 6, 7, 8];
+  let totalScore = 0;
+  for (const pitch of scaleCents) {
+    const ratio = Math.pow(2, (pitch - bassNote) / 1200);
+    let scored = false;
+    for (const k of smallIntegers) {
+      if (Math.abs(ratio - k) / k < 0.01) {
+        scored = true;
+        break;
+      }
+    }
+    totalScore += scored ? 1 : 0;
+  }
+  return totalScore / scaleCents.length;
 }

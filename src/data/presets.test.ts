@@ -490,6 +490,12 @@ import {
   presetFamilySocraticRadarChangePointIndex,
   presetFamilySocraticRadarLocalExtremaCount,
   presetFamilySocraticRadarSignChanges,
+  presetFamilySocraticRadarSimilarityWalkMatrix,
+  presetFamilySocraticRadarPowerIteration,
+  presetFamilySocraticRadarConvergenceSteps,
+  presetFamilySocraticRadarEigenGap,
+  presetFamilySocraticRadarSelfReturnStep,
+  presetFamilySocraticRadarClusterCount,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -14767,5 +14773,115 @@ describe('presetFamilySocraticRadarSignChanges (Q1373)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarSignChanges(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q1375 — presetFamilySocraticRadarSimilarityWalkMatrix
+describe('presetFamilySocraticRadarSimilarityWalkMatrix (Q1375)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns [] for empty presetIds', () => {
+    expect(presetFamilySocraticRadarSimilarityWalkMatrix([], spectrum)).toEqual([]);
+  });
+  it('returns 2×2 row-stochastic matrix for two presets', () => {
+    const matrix = presetFamilySocraticRadarSimilarityWalkMatrix(presetIds, spectrum);
+    expect(matrix.length).toBe(2);
+    for (let i = 0; i < 2; i++) {
+      expect(matrix[i]!.length).toBe(2);
+      const rowSum = matrix[i]!.reduce((s, v) => s + v, 0);
+      expect(rowSum).toBeCloseTo(1, 9);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSimilarityWalkMatrix(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q1377 — presetFamilySocraticRadarPowerIteration
+describe('presetFamilySocraticRadarPowerIteration (Q1377)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns [] for empty presetIds', () => {
+    expect(presetFamilySocraticRadarPowerIteration([], spectrum)).toEqual([]);
+  });
+  it('returns stationary distribution summing to ~1 for two presets', () => {
+    const dist = presetFamilySocraticRadarPowerIteration(presetIds, spectrum);
+    expect(dist.length).toBe(2);
+    const sum = dist.reduce((s, v) => s + v, 0);
+    expect(sum).toBeCloseTo(1, 9);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPowerIteration(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q1379 — presetFamilySocraticRadarConvergenceSteps
+describe('presetFamilySocraticRadarConvergenceSteps (Q1379)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for empty presetIds', () => {
+    expect(presetFamilySocraticRadarConvergenceSteps([], spectrum)).toBe(0);
+  });
+  it('returns a non-negative integer for two presets', () => {
+    const steps = presetFamilySocraticRadarConvergenceSteps(presetIds, spectrum);
+    expect(steps).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(steps)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarConvergenceSteps(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q1381 — presetFamilySocraticRadarEigenGap
+describe('presetFamilySocraticRadarEigenGap (Q1381)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 1 for empty presetIds', () => {
+    expect(presetFamilySocraticRadarEigenGap([], spectrum)).toBe(1);
+  });
+  it('returns a number in [0, 1] for two presets', () => {
+    const gap = presetFamilySocraticRadarEigenGap(presetIds, spectrum);
+    expect(gap).toBeGreaterThanOrEqual(0);
+    expect(gap).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEigenGap(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q1383 — presetFamilySocraticRadarSelfReturnStep
+describe('presetFamilySocraticRadarSelfReturnStep (Q1383)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns [] for empty presetIds', () => {
+    expect(presetFamilySocraticRadarSelfReturnStep([], spectrum)).toEqual([]);
+  });
+  it('returns values in [0, 1] for two presets', () => {
+    const result = presetFamilySocraticRadarSelfReturnStep(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSelfReturnStep(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q1385 — presetFamilySocraticRadarClusterCount
+describe('presetFamilySocraticRadarClusterCount (Q1385)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for empty presetIds', () => {
+    expect(presetFamilySocraticRadarClusterCount([], spectrum)).toBe(0);
+  });
+  it('returns non-negative integer for two presets', () => {
+    const count = presetFamilySocraticRadarClusterCount(presetIds, spectrum);
+    expect(count).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(count)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarClusterCount(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

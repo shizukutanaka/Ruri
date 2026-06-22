@@ -599,3 +599,15 @@
 | `tuningGoldenRatioProximity` | 黄金比音程への近似度 |
 | `spectrumAmplitudeKurtosis` | スペクトル振幅の超過尖度 |
 | `scaleModularStepPattern` | 基本音程の倍数ステップ割合 |
+
+## Round 39: 音名変換・ミーントーン偏差・基音サポート (VV1–VV4)
+
+**テーマ**: 半音音名マッピング・クォーターコンマミーントーン近似・支配倍音・基音バス支持  
+**実装**: VV1–VV4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleToChromaticNames` | スケール音度の半音名マッピング |
+| `tuningMeantoneDeviation` | クォーターコンマミーントーンへの偏差 |
+| `spectrumDominantPartial` | 最大振幅の倍音成分 |
+| `scaleFundamentalBassScore` | 基音バス支持（整数比近似） |

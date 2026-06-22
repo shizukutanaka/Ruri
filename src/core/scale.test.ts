@@ -845,6 +845,16 @@ import {
   tuningFamilySocraticRadarChangePointIndex,
   tuningFamilySocraticRadarLocalExtremaCount,
   tuningFamilySocraticRadarSignChanges,
+  tuningFamilySocraticRadarSimilarityWalkMatrix,
+  tuningFamilySocraticRadarPowerIteration,
+  tuningFamilySocraticRadarConvergenceSteps,
+  tuningFamilySocraticRadarEigenGap,
+  tuningFamilySocraticRadarSelfReturnStep,
+  tuningFamilySocraticRadarClusterCount,
+  scaleToChromaticNames,
+  tuningMeantoneDeviation,
+  spectrumDominantPartial,
+  scaleFundamentalBassScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -26241,5 +26251,215 @@ describe('tuningFamilySocraticRadarSignChanges (Q1372)', () => {
     for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
       expect(result[axis]).toBeGreaterThanOrEqual(0);
     }
+  });
+});
+
+// VV1 — scaleToChromaticNames
+describe('scaleToChromaticNames (VV1)', () => {
+  it('maps major scale degrees to correct note names', () => {
+    expect(scaleToChromaticNames([0, 200, 400, 500, 700, 900, 1100])).toEqual([
+      'C', 'D', 'E', 'F', 'G', 'A', 'B',
+    ]);
+  });
+  it('returns empty array for empty scale', () => {
+    expect(scaleToChromaticNames([])).toEqual([]);
+  });
+  it('returns ? for pitch outside tolerance', () => {
+    const result = scaleToChromaticNames([50], 20);
+    expect(result).toEqual(['?']);
+  });
+  it('maps chromatic scale to 12 note names', () => {
+    const chromatic = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    const names = scaleToChromaticNames(chromatic);
+    expect(names).toEqual(['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']);
+  });
+});
+
+// VV2 — tuningMeantoneDeviation
+describe('tuningMeantoneDeviation (VV2)', () => {
+  it('returns positive value for 12-TET (differs from meantone)', () => {
+    expect(tuningMeantoneDeviation(equalTemperament12(440))).toBeGreaterThan(0);
+  });
+  it('returns 0 for single-degree edo (unison matches meantone 0)', () => {
+    expect(tuningMeantoneDeviation(edo(1, 440))).toBe(0);
+  });
+  it('returns a finite number for 12-TET', () => {
+    expect(Number.isFinite(tuningMeantoneDeviation(equalTemperament12(440)))).toBe(true);
+  });
+  it('returns 0 for empty tuning degrees', () => {
+    const emptyTuning: TuningSystem = { id: 'empty', name: 'Empty', degrees: [], referenceHz: 440, periodCents: 1200, source: 'theoretical' };
+    expect(tuningMeantoneDeviation(emptyTuning)).toBe(0);
+  });
+});
+
+// VV3 — spectrumDominantPartial
+describe('spectrumDominantPartial (VV3)', () => {
+  it('returns null for empty spectrum', () => {
+    expect(spectrumDominantPartial([])).toBeNull();
+  });
+  it('returns the partial with highest amplitude from harmonicSpectrum', () => {
+    const result = spectrumDominantPartial(harmonicSpectrum(4));
+    expect(result).not.toBeNull();
+    expect(result!.ratio).toBe(1);
+  });
+  it('returns single partial from single-element spectrum', () => {
+    const result = spectrumDominantPartial([{ ratio: 3, amplitude: 0.5 }]);
+    expect(result).toEqual({ ratio: 3, amplitude: 0.5 });
+  });
+  it('prefers lower ratio when amplitudes are equal', () => {
+    const spectrum = [
+      { ratio: 3, amplitude: 0.5 },
+      { ratio: 2, amplitude: 0.5 },
+      { ratio: 5, amplitude: 0.5 },
+    ];
+    const result = spectrumDominantPartial(spectrum);
+    expect(result!.ratio).toBe(2);
+  });
+});
+
+// VV4 — scaleFundamentalBassScore
+describe('scaleFundamentalBassScore (VV4)', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleFundamentalBassScore([])).toBe(0);
+  });
+  it('scores unison and octave as 1 (ratio 1 and 2 are integers)', () => {
+    const score = scaleFundamentalBassScore([0, 1200], 0);
+    expect(score).toBe(1);
+  });
+  it('returns value between 0 and 1', () => {
+    const score = scaleFundamentalBassScore([0, 200, 400, 500, 700, 900, 1100], 0);
+    expect(score).toBeGreaterThanOrEqual(0);
+    expect(score).toBeLessThanOrEqual(1);
+  });
+  it('unison alone scores 1', () => {
+    expect(scaleFundamentalBassScore([0], 0)).toBe(1);
+  });
+});
+
+// Q1374 — tuningFamilySocraticRadarSimilarityWalkMatrix
+describe('tuningFamilySocraticRadarSimilarityWalkMatrix (Q1374)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns [] for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSimilarityWalkMatrix([], spectrum)).toEqual([]);
+  });
+  it('returns [[1]] for a single tuning', () => {
+    expect(tuningFamilySocraticRadarSimilarityWalkMatrix([t1], spectrum)).toEqual([[1]]);
+  });
+  it('returns row-stochastic n×n matrix for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const matrix = tuningFamilySocraticRadarSimilarityWalkMatrix([t1, t2, t3], spectrum);
+    expect(matrix.length).toBe(3);
+    for (let i = 0; i < 3; i++) {
+      expect(matrix[i]!.length).toBe(3);
+      expect(matrix[i]![i]).toBe(0);
+      const rowSum = matrix[i]!.reduce((s, v) => s + v, 0);
+      expect(rowSum).toBeCloseTo(1, 9);
+    }
+  });
+});
+
+// Q1376 — tuningFamilySocraticRadarPowerIteration
+describe('tuningFamilySocraticRadarPowerIteration (Q1376)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns [] for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPowerIteration([], spectrum)).toEqual([]);
+  });
+  it('returns [1] for a single tuning', () => {
+    expect(tuningFamilySocraticRadarPowerIteration([t1], spectrum)).toEqual([1]);
+  });
+  it('returns stationary distribution summing to ~1 for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const dist = tuningFamilySocraticRadarPowerIteration([t1, t2, t3], spectrum);
+    expect(dist.length).toBe(3);
+    const sum = dist.reduce((s, v) => s + v, 0);
+    expect(sum).toBeCloseTo(1, 9);
+    for (const v of dist) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// Q1378 — tuningFamilySocraticRadarConvergenceSteps
+describe('tuningFamilySocraticRadarConvergenceSteps (Q1378)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarConvergenceSteps([], spectrum)).toBe(0);
+  });
+  it('returns 0 for a single tuning', () => {
+    expect(tuningFamilySocraticRadarConvergenceSteps([t1], spectrum)).toBe(0);
+  });
+  it('returns a non-negative integer for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const steps = tuningFamilySocraticRadarConvergenceSteps([t1, t2, t3], spectrum);
+    expect(steps).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(steps)).toBe(true);
+  });
+});
+
+// Q1380 — tuningFamilySocraticRadarEigenGap
+describe('tuningFamilySocraticRadarEigenGap (Q1380)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 1 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEigenGap([], spectrum)).toBe(1);
+  });
+  it('returns 1 for a single tuning', () => {
+    expect(tuningFamilySocraticRadarEigenGap([t1], spectrum)).toBe(1);
+  });
+  it('returns a number in [0, 1] for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const gap = tuningFamilySocraticRadarEigenGap([t1, t2, t3], spectrum);
+    expect(gap).toBeGreaterThanOrEqual(0);
+    expect(gap).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q1382 — tuningFamilySocraticRadarSelfReturnStep
+describe('tuningFamilySocraticRadarSelfReturnStep (Q1382)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns [] for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSelfReturnStep([], spectrum)).toEqual([]);
+  });
+  it('returns array of length 1 for a single tuning', () => {
+    const result = tuningFamilySocraticRadarSelfReturnStep([t1], spectrum);
+    expect(result.length).toBe(1);
+    expect(result[0]).toBeGreaterThanOrEqual(0);
+  });
+  it('returns values in [0, 1] for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const result = tuningFamilySocraticRadarSelfReturnStep([t1, t2, t3], spectrum);
+    expect(result.length).toBe(3);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// Q1384 — tuningFamilySocraticRadarClusterCount
+describe('tuningFamilySocraticRadarClusterCount (Q1384)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarClusterCount([], spectrum)).toBe(0);
+  });
+  it('returns 0 for a single tuning (no deviation from self)', () => {
+    expect(tuningFamilySocraticRadarClusterCount([t1], spectrum)).toBe(0);
+  });
+  it('returns non-negative integer for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const count = tuningFamilySocraticRadarClusterCount([t1, t2, t3], spectrum);
+    expect(count).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(count)).toBe(true);
   });
 });
