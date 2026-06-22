@@ -895,6 +895,10 @@ import {
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
   scaleTonalGravity,
+  scaleTranspositionDistance,
+  scaleModulationGraph,
+  scaleModulationConnectivity,
+  scaleBestModulationTarget,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -27233,5 +27237,81 @@ describe('Q1432 tuningFamilySocraticRadarSpectralBandwidthMean', () => {
   it('returns non-negative for two tunings', () => {
     const t2 = edo(19, 440);
     expect(tuningFamilySocraticRadarSpectralBandwidthMean([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('AAA1 scaleTranspositionDistance', () => {
+  it('transposition by 0 → distance 0', () => {
+    expect(scaleTranspositionDistance([0,200,400,700], 0)).toBe(0);
+  });
+  it('returns non-negative', () => {
+    expect(scaleTranspositionDistance([0,200,400,700], 100)).toBeGreaterThanOrEqual(0);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleTranspositionDistance([], 100)).toBe(0);
+  });
+  it('transposition by period → distance 0', () => {
+    expect(scaleTranspositionDistance([0,200,400,700], 1200)).toBe(0);
+  });
+});
+
+describe('AAA2 scaleModulationGraph', () => {
+  it('returns n×n matrix', () => {
+    const g = scaleModulationGraph([0,200,400,700]);
+    expect(g).toHaveLength(4);
+    expect(g[0]).toHaveLength(4);
+  });
+  it('diagonal is 1 (self-transposition = 0 distance)', () => {
+    const g = scaleModulationGraph([0,200,400,700]);
+    for (let i = 0; i < 4; i++) expect(g[i]![i]).toBe(1);
+  });
+  it('empty scale returns []', () => {
+    expect(scaleModulationGraph([])).toEqual([]);
+  });
+  it('values are 0 or 1', () => {
+    const g = scaleModulationGraph([0,200,400,700]);
+    g.forEach(row => row.forEach(v => expect([0,1]).toContain(v)));
+  });
+});
+
+describe('AAA3 scaleModulationConnectivity', () => {
+  it('returns value in [0,1]', () => {
+    const r = scaleModulationConnectivity([0,200,400,700]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleModulationConnectivity([0])).toBe(0);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleModulationConnectivity([])).toBe(0);
+  });
+  it('chromatic scale with high threshold → high connectivity', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    const r = scaleModulationConnectivity(chromatic, 1200, 200);
+    expect(r).toBeGreaterThan(0);
+  });
+});
+
+describe('AAA4 scaleBestModulationTarget', () => {
+  it('returns a number', () => {
+    const r = scaleBestModulationTarget([0,200,400,700]);
+    expect(typeof r).toBe('number');
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleBestModulationTarget([])).toBe(0);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleBestModulationTarget([0])).toBe(0);
+  });
+  it('best target has minimum distance', () => {
+    const scale = [0,200,400,500,700,900,1100];
+    const best = scaleBestModulationTarget(scale);
+    const dist = scaleTranspositionDistance(scale, best);
+    // All other intervals should have >= this distance
+    const intervals = scale.map(p => p);
+    intervals.forEach(t => {
+      expect(scaleTranspositionDistance(scale, t)).toBeGreaterThanOrEqual(dist - 0.001);
+    });
   });
 });

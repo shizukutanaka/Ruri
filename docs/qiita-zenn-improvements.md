@@ -656,3 +656,14 @@
 | ZZ4 | `scaleTonalGravity` | トニックへの距離に基づく調性引力スコア |
 
 **参考**: 調性引力はLerdahl「Tonal Pitch Space」; 和声複雑度はHarmonicity metrics (Gill & Purves 2009)。
+
+## Round 44: スケール転調・モジュレーション分析 (AAA1–AAA4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| AAA1 | `scaleTranspositionDistance` | 転調量に対する最小距離(最近傍マッチング) |
+| AAA2 | `scaleModulationGraph` | 音度間モジュレーション可能性の隣接行列 |
+| AAA3 | `scaleModulationConnectivity` | モジュレーショングラフの連結度(接続ペア率) |
+| AAA4 | `scaleBestModulationTarget` | 最小転調距離を与える最適転調先 |
+
+**参考**: Modulation distance in Neo-Riemannian theory; Transposition networks in Lewin (1987)。

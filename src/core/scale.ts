@@ -32359,3 +32359,365 @@ export function tuningFamilySocraticRadarSpectralBandwidthMean(
   }
   return totalBandwidth / tunings.length;
 }
+
+// ---------------------------------------------------------------------------
+// Q1434 — tuningFamilySocraticRadarCriticalBandRatio
+// ---------------------------------------------------------------------------
+
+/**
+ * For each tuning, compute the fraction of adjacent degree-frequency pairs
+ * whose frequency ratio falls within a critical band (Zwicker Bark scale).
+ * CB_width ≈ 25 + 75*(1 + 1.4*(f/1000)^2)^0.69 Hz.
+ * Returns mean fraction across tunings. rootHz defaults to 440.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency override.
+ * @returns number in [0,1] — mean critical-band ratio fraction.
+ */
+export function tuningFamilySocraticRadarCriticalBandRatio(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  let totalFraction = 0;
+  for (const t of tunings) {
+    const refHz = rootHz ?? t.referenceHz ?? 440;
+    const degrees = t.degrees;
+    if (degrees.length === 0) {
+      totalFraction += 0;
+      continue;
+    }
+    const freqs = degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    let withinCB = 0;
+    const n = freqs.length;
+    for (let i = 0; i < n; i++) {
+      const f1 = freqs[i]!;
+      const f2 = freqs[(i + 1) % n]!;
+      const meanF = (f1 + f2) / 2;
+      const cbWidth = 25 + 75 * Math.pow(1 + 1.4 * Math.pow(meanF / 1000, 2), 0.69);
+      if (Math.abs(f2 - f1) < cbWidth) withinCB++;
+    }
+    totalFraction += withinCB / n;
+  }
+  return totalFraction / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1436 — tuningFamilySocraticRadarLoudnessWeightedProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Radar profile weighted by A-weighting loudness of the spectrum.
+ * A(f) = (12200^2 * f^4) / ((f^2+20.6^2) * sqrt((f^2+107.7^2)*(f^2+737.9^2)) * (f^2+12200^2)).
+ * Normalize to max=1. Returns RadarProfile (the 5-axis record).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency override.
+ * @returns RadarProfile axes record.
+ */
+export function tuningFamilySocraticRadarLoudnessWeightedProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) {
+    return { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  }
+  const refHz = rootHz ?? (tunings[0]?.referenceHz ?? 440);
+  const aWeighted = spectrum.map((component) => {
+    const f = refHz * component.ratio;
+    const f2 = f * f;
+    const num = 12200 * 12200 * f2 * f2;
+    const den =
+      (f2 + 20.6 * 20.6) *
+      Math.sqrt((f2 + 107.7 * 107.7) * (f2 + 737.9 * 737.9)) *
+      (f2 + 12200 * 12200);
+    const aVal = den > 0 ? num / den : 0;
+    return { ratio: component.ratio, amplitude: Math.max(0, component.amplitude) * aVal };
+  });
+  const maxAmp = aWeighted.reduce((m, c) => Math.max(m, c.amplitude), 0);
+  const normSpectrum: Spectrum = maxAmp > 0
+    ? aWeighted.map((c) => ({ ratio: c.ratio, amplitude: c.amplitude / maxAmp }))
+    : aWeighted;
+  const profiles = (tunings as TuningSystem[]).map((t) =>
+    tuningFamilySocraticRadarProfile([t], normSpectrum, rootHz),
+  );
+  const result = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  for (const p of profiles) {
+    for (const ax of axes) {
+      result[ax] += p[ax];
+    }
+  }
+  for (const ax of axes) {
+    result[ax] = Math.max(0, result[ax] / profiles.length);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1438 — tuningFamilySocraticRadarRoughnessProfile
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes mean pairwise roughness between adjacent tuning degree frequencies
+ * using the Plomp-Levelt roughness model. r = 4*s*(1-s)^3 where
+ * s = min(f_diff/CB, 1) and CB = CB_width(mean_f).
+ * Returns number[] of length n (one per tuning).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum (unused, for API consistency).
+ * @param rootHz - Reference frequency override.
+ * @returns number[] — per-tuning mean pairwise roughness.
+ */
+export function tuningFamilySocraticRadarRoughnessProfile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  return tunings.map((t) => {
+    const refHz = rootHz ?? t.referenceHz ?? 440;
+    const degrees = t.degrees;
+    if (degrees.length === 0) return 0;
+    const freqs = degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    const n = freqs.length;
+    let totalRoughness = 0;
+    for (let i = 0; i < n; i++) {
+      const f1 = freqs[i]!;
+      const f2 = freqs[(i + 1) % n]!;
+      const meanF = (f1 + f2) / 2;
+      const cbWidth = 25 + 75 * Math.pow(1 + 1.4 * Math.pow(meanF / 1000, 2), 0.69);
+      const fDiff = Math.abs(f2 - f1);
+      const s = Math.min(fDiff / cbWidth, 1);
+      totalRoughness += Math.max(0, 4 * s * Math.pow(1 - s, 3));
+    }
+    return totalRoughness / n;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1440 — tuningFamilySocraticRadarMaskingThresholdMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Estimate auditory masking: for each tuning, sum the "masking"
+ * = Σ_{i≠j} amp_i * exp(-|log2(f_i/f_j)|/0.5) for all spectrum component pairs.
+ * Return mean across tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency override.
+ * @returns number — mean masking threshold >= 0.
+ */
+export function tuningFamilySocraticRadarMaskingThresholdMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  let totalMasking = 0;
+  for (const t of tunings) {
+    const refHz = rootHz ?? t.referenceHz ?? 440;
+    const degrees = t.degrees;
+    if (degrees.length === 0 || spectrum.length === 0) continue;
+    const components = degrees.map((d) => {
+      const f = refHz * Math.pow(2, pitchToCents(d) / 1200);
+      return spectrum.map((sc) => ({ freq: f * sc.ratio, amp: Math.max(0, sc.amplitude) }));
+    }).flat();
+    let masking = 0;
+    for (let i = 0; i < components.length; i++) {
+      for (let j = 0; j < components.length; j++) {
+        if (i === j) continue;
+        const ci = components[i]!;
+        const cj = components[j]!;
+        if (ci.freq <= 0 || cj.freq <= 0) continue;
+        masking += ci.amp * Math.exp(-Math.abs(Math.log2(ci.freq / cj.freq)) / 0.5);
+      }
+    }
+    totalMasking += masking;
+  }
+  return Math.max(0, totalMasking / tunings.length);
+}
+
+// ---------------------------------------------------------------------------
+// Q1442 — tuningFamilySocraticRadarPitchSalienceMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Pitch salience based on subharmonic summation (Terhardt).
+ * For each tuning degree, compute salience as Σ_k amp(k*Hz)/k for k=1..6
+ * where amp(f) = nearest spectrum component amplitude within 5% of f.
+ * Return mean salience across all degrees and tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency override.
+ * @returns number — mean pitch salience >= 0.
+ */
+export function tuningFamilySocraticRadarPitchSalienceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  let totalSalience = 0;
+  let totalCount = 0;
+  for (const t of tunings) {
+    const refHz = rootHz ?? t.referenceHz ?? 440;
+    const degrees = t.degrees;
+    if (degrees.length === 0 || spectrum.length === 0) continue;
+    for (const d of degrees) {
+      const degreeHz = refHz * Math.pow(2, pitchToCents(d) / 1200);
+      let salience = 0;
+      for (let k = 1; k <= 6; k++) {
+        const targetHz = k * degreeHz;
+        let bestAmp = 0;
+        let bestDist = Infinity;
+        for (const sc of spectrum) {
+          const scHz = refHz * sc.ratio;
+          const dist = Math.abs(scHz - targetHz);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestAmp = Math.max(0, sc.amplitude);
+          }
+        }
+        if (targetHz > 0 && bestDist / targetHz <= 0.05) {
+          salience += bestAmp / k;
+        }
+      }
+      totalSalience += salience;
+      totalCount++;
+    }
+  }
+  if (totalCount === 0) return 0;
+  return Math.max(0, totalSalience / totalCount);
+}
+
+// ---------------------------------------------------------------------------
+// Q1444 — tuningFamilySocraticRadarAuditoryDistanceMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Mean "auditory distance" between adjacent tuning radar profiles using a
+ * perceptually-weighted Euclidean metric. Weight each axis by
+ * [2.0, 1.5, 1.0, 1.5, 1.0] for [diversity, versatility, maturity, benchmark, convergence].
+ * Returns 0 for n<2.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency override.
+ * @returns number — mean auditory distance >= 0.
+ */
+export function tuningFamilySocraticRadarAuditoryDistanceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const weights: Record<AxisKey, number> = {
+    diversity: 2.0,
+    versatility: 1.5,
+    maturity: 1.0,
+    benchmark: 1.5,
+    convergence: 1.0,
+  };
+  if (tunings.length < 2) return 0;
+  const profiles = (tunings as TuningSystem[]).map((t) =>
+    tuningFamilySocraticRadarProfile([t], spectrum, rootHz),
+  );
+  let totalDist = 0;
+  const n = profiles.length;
+  for (let i = 0; i < n - 1; i++) {
+    const pA = profiles[i]!;
+    const pB = profiles[i + 1]!;
+    let sumSq = 0;
+    for (const ax of axes) {
+      const diff = pA[ax] - pB[ax];
+      sumSq += weights[ax] * diff * diff;
+    }
+    totalDist += Math.sqrt(sumSq);
+  }
+  return Math.max(0, totalDist / (n - 1));
+}
+
+export function scaleTranspositionDistance(
+  scaleCents: readonly number[],
+  transpositionCents: number,
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  let total = 0;
+  for (let i = 0; i < scaleCents.length; i++) {
+    const transposed = ((scaleCents[i]! + transpositionCents) % periodCents + periodCents) % periodCents;
+    let minDist = Infinity;
+    for (let j = 0; j < scaleCents.length; j++) {
+      const orig = ((scaleCents[j]! % periodCents) + periodCents) % periodCents;
+      const d = Math.abs(transposed - orig);
+      const dist = Math.min(d, periodCents - d);
+      if (dist < minDist) minDist = dist;
+    }
+    total += minDist;
+  }
+  return total / scaleCents.length;
+}
+
+export function scaleModulationGraph(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+  threshold: number = 50,
+): number[][] {
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0) as number[]);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const transposition = (scaleCents[j]! - scaleCents[i]! + periodCents) % periodCents;
+      const dist = scaleTranspositionDistance(scaleCents, transposition, periodCents);
+      matrix[i]![j] = dist < threshold ? 1 : 0;
+    }
+  }
+  return matrix;
+}
+
+export function scaleModulationConnectivity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+  threshold: number = 50,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const graph = scaleModulationGraph(scaleCents, periodCents, threshold);
+  let connected = 0;
+  const totalPairs = n * (n - 1);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i !== j && graph[i]![j] === 1) {
+        connected++;
+      }
+    }
+  }
+  return connected / totalPairs;
+}
+
+export function scaleBestModulationTarget(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length <= 1) return 0;
+  let bestTarget = scaleCents[0]!;
+  let bestDist = Infinity;
+  for (let i = 0; i < scaleCents.length; i++) {
+    const t = scaleCents[i]!;
+    const dist = scaleTranspositionDistance(scaleCents, t, periodCents);
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestTarget = t;
+    }
+  }
+  return bestTarget;
+}
