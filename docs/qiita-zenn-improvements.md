@@ -611,3 +611,15 @@
 | `tuningMeantoneDeviation` | クォーターコンマミーントーンへの偏差 |
 | `spectrumDominantPartial` | 最大振幅の倍音成分 |
 | `scaleFundamentalBassScore` | 基音バス支持（整数比近似） |
+
+## Round 40: 半音密度・調律規則性・スペクトル拡散 (WW1–WW4)
+
+**テーマ**: 半音音程密度・等分律規則性・スペクトル拡散・倍音系列マッチ数  
+**実装**: WW1–WW4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleHemitonicDensity` | 半音（<150c）音程の密度 |
+| `tuningRegularityScore` | ステップ幅の変動係数逆数 |
+| `spectralSpread` | 周波数重心周りのRMS拡散（Hz） |
+| `harmonicSeriesMatchCount` | 倍音列ピッチクラスへの一致数 |

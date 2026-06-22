@@ -30411,6 +30411,263 @@ export function tuningFamilySocraticRadarClusterCount(
 }
 
 // ---------------------------------------------------------------------------
+// Q1386 — tuningFamilySocraticRadarGraphConnectivity
+/**
+ * Build an adjacency graph where edge (i,j) exists if cosine similarity >= 0.8.
+ * Returns { components: number, isConnected: boolean }.
+ * For n=0 or 1: components=n, isConnected=true.
+ */
+export function tuningFamilySocraticRadarGraphConnectivity(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { components: number; isConnected: boolean } {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return { components: 0, isConnected: true };
+  if (n === 1) return { components: 1, isConnected: true };
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  // Union-Find
+  const parent: number[] = Array.from({ length: n }, (_, i) => i);
+  function find(x: number): number {
+    while (parent[x] !== x) {
+      parent[x] = parent[parent[x]!]!;
+      x = parent[x]!;
+    }
+    return x;
+  }
+  function union(a: number, b: number): void {
+    const ra = find(a);
+    const rb = find(b);
+    if (ra !== rb) parent[ra] = rb;
+  }
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let dot = 0;
+      let magI = 0;
+      let magJ = 0;
+      for (let k = 0; k < 5; k++) {
+        const vi = scores[i]![k]!;
+        const vj = scores[j]![k]!;
+        dot += vi * vj;
+        magI += vi * vi;
+        magJ += vj * vj;
+      }
+      const denom = Math.sqrt(magI) * Math.sqrt(magJ);
+      const cosine = denom > 0 ? dot / denom : 0;
+      if (cosine >= 0.8) {
+        union(i, j);
+      }
+    }
+  }
+  const roots = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    roots.add(find(i));
+  }
+  const components = roots.size;
+  return { components, isConnected: components === 1 };
+}
+
+// ---------------------------------------------------------------------------
+// Q1388 — tuningFamilySocraticRadarShortestPathMatrix
+/**
+ * Floyd-Warshall shortest paths (hop-count) in the similarity graph (edge if cosine similarity >= 0.8).
+ * Returns number[][] (n×n; 0 on diagonal; Infinity if no path).
+ */
+export function tuningFamilySocraticRadarShortestPathMatrix(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  // Initialize distance matrix
+  const dist: number[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => (i === j ? 0 : Infinity)),
+  );
+  // Set direct edges
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let dot = 0;
+      let magI = 0;
+      let magJ = 0;
+      for (let k = 0; k < 5; k++) {
+        const vi = scores[i]![k]!;
+        const vj = scores[j]![k]!;
+        dot += vi * vj;
+        magI += vi * vi;
+        magJ += vj * vj;
+      }
+      const denom = Math.sqrt(magI) * Math.sqrt(magJ);
+      const cosine = denom > 0 ? dot / denom : 0;
+      if (cosine >= 0.8) {
+        dist[i]![j] = 1;
+        dist[j]![i] = 1;
+      }
+    }
+  }
+  // Floyd-Warshall
+  for (let mid = 0; mid < n; mid++) {
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        const through = dist[i]![mid]! + dist[mid]![j]!;
+        if (through < dist[i]![j]!) {
+          dist[i]![j] = through;
+        }
+      }
+    }
+  }
+  return dist;
+}
+
+// ---------------------------------------------------------------------------
+// Q1390 — tuningFamilySocraticRadarSpanningTreeWeight
+/**
+ * Minimum spanning tree weight using Prim's algorithm on the complete graph
+ * with edge weight = 1 - cosine_similarity.
+ * Returns total MST weight (0 for n <= 1; 0 if all disconnected/no edges).
+ */
+export function tuningFamilySocraticRadarSpanningTreeWeight(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  // Compute cosine similarity matrix
+  const sim: number[][] = Array.from({ length: n }, () => new Array(n).fill(0) as number[]);
+  for (let i = 0; i < n; i++) {
+    sim[i]![i] = 1;
+    for (let j = i + 1; j < n; j++) {
+      let dot = 0;
+      let magI = 0;
+      let magJ = 0;
+      for (let k = 0; k < 5; k++) {
+        const vi = scores[i]![k]!;
+        const vj = scores[j]![k]!;
+        dot += vi * vj;
+        magI += vi * vi;
+        magJ += vj * vj;
+      }
+      const denom = Math.sqrt(magI) * Math.sqrt(magJ);
+      const cosine = denom > 0 ? dot / denom : 0;
+      sim[i]![j] = cosine;
+      sim[j]![i] = cosine;
+    }
+  }
+  // Prim's MST on complete graph with weight = 1 - cosine
+  const inMST: boolean[] = new Array(n).fill(false) as boolean[];
+  const minEdge: number[] = new Array(n).fill(Infinity) as number[];
+  minEdge[0] = 0;
+  let totalWeight = 0;
+  for (let step = 0; step < n; step++) {
+    // Pick vertex with minimum minEdge not in MST
+    let u = -1;
+    for (let v = 0; v < n; v++) {
+      if (!inMST[v] && (u === -1 || minEdge[v]! < minEdge[u]!)) {
+        u = v;
+      }
+    }
+    if (u === -1 || minEdge[u] === Infinity) break;
+    inMST[u] = true;
+    totalWeight += minEdge[u]!;
+    // Update minEdge for neighbors
+    for (let v = 0; v < n; v++) {
+      if (!inMST[v]) {
+        const w = Math.max(0, 1 - sim[u]![v]!);
+        if (w < minEdge[v]!) {
+          minEdge[v] = w;
+        }
+      }
+    }
+  }
+  return totalWeight;
+}
+
+// ---------------------------------------------------------------------------
+// Q1392 — tuningFamilySocraticRadarEccentricity
+/**
+ * Eccentricity of each node = max shortest-path distance to any other node.
+ * If any node is unreachable, eccentricity = Infinity.
+ * Returns number[] (one per tuning). For n=1: [0].
+ */
+export function tuningFamilySocraticRadarEccentricity(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [0];
+  const dist = tuningFamilySocraticRadarShortestPathMatrix(tunings, spectrum, rootHz);
+  return dist.map((row) => {
+    let maxDist = 0;
+    for (let j = 0; j < n; j++) {
+      const d = row[j]!;
+      if (d === Infinity) return Infinity;
+      if (d > maxDist) maxDist = d;
+    }
+    return maxDist;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1394 — tuningFamilySocraticRadarGraphDiameter
+/**
+ * Diameter = max(eccentricities) if finite, else Infinity.
+ * Returns 0 for n <= 1.
+ */
+export function tuningFamilySocraticRadarGraphDiameter(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const eccentricities = tuningFamilySocraticRadarEccentricity(tunings, spectrum, rootHz);
+  let diameter = 0;
+  for (const ecc of eccentricities) {
+    if (ecc === Infinity) return Infinity;
+    if (ecc > diameter) diameter = ecc;
+  }
+  return diameter;
+}
+
+// ---------------------------------------------------------------------------
+// Q1396 — tuningFamilySocraticRadarGraphRadius
+/**
+ * Radius = min(eccentricities) if finite, else Infinity.
+ * Returns 0 for n <= 1.
+ */
+export function tuningFamilySocraticRadarGraphRadius(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const eccentricities = tuningFamilySocraticRadarEccentricity(tunings, spectrum, rootHz);
+  let radius = Infinity;
+  for (const ecc of eccentricities) {
+    if (ecc < radius) radius = ecc;
+  }
+  return radius;
+}
+
+// ---------------------------------------------------------------------------
 // UU1 — scalePitchClustering
 export function scalePitchClustering(
   scaleCents: readonly number[],
@@ -30576,4 +30833,105 @@ export function scaleFundamentalBassScore(
     totalScore += scored ? 1 : 0;
   }
   return totalScore / scaleCents.length;
+}
+
+// ── Round 40: WW1–WW4 ──────────────────────────────────────────────────────
+
+/**
+ * WW1: Fraction of all pairwise intervals that are "hemitonic" (< 150 cents).
+ * For all C(n,2) pairs, compute |interval| mod 1200, fold to min(x, 1200-x).
+ * Returns hemitonic_count / C(n,2), 0 for n < 2.
+ */
+export function scaleHemitonicDensity(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const total = (n * (n - 1)) / 2;
+  let hemitonic = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let interval = Math.abs(scaleCents[i]! - scaleCents[j]!) % 1200;
+      const folded = Math.min(interval, 1200 - interval);
+      if (folded < 150) hemitonic++;
+    }
+  }
+  return hemitonic / total;
+}
+
+/**
+ * WW2: Measures how regularly (evenly) spaced the tuning degrees are.
+ * regularity = 1 - stddev(steps) / mean(steps), clamped to [0, 1].
+ * Returns 1 for 0 or 1 degree (no steps).
+ */
+export function tuningRegularityScore(tuning: TuningSystem): number {
+  const degrees = tuning.degrees;
+  if (degrees.length <= 1) return 1;
+  const cents = degrees.map((d) => pitchToCents(d));
+  cents.sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    steps.push(cents[i]! - cents[i - 1]!);
+  }
+  if (steps.length === 0) return 1;
+  const mean = steps.reduce((s, v) => s + v, 0) / steps.length;
+  if (mean === 0) return 1;
+  const variance =
+    steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
+  const cv = Math.sqrt(variance) / mean;
+  return Math.max(0, Math.min(1, 1 - cv));
+}
+
+/**
+ * WW3: Spectral spread = RMS deviation of partial frequencies from the centroid.
+ * spread = sqrt(sum(amp * (ratio * refHz - centroid_hz)^2) / sum(amp))
+ * Returns 0 for empty or single-partial spectrum.
+ */
+export function spectralSpread(
+  spectrum: Spectrum,
+  referenceHz: number = 440,
+): number {
+  if (spectrum.length === 0) return 0;
+  const totalAmp = spectrum.reduce((s, p) => s + p.amplitude, 0);
+  if (totalAmp === 0) return 0;
+  const centroidHz =
+    spectrum.reduce((s, p) => s + p.amplitude * p.ratio * referenceHz, 0) /
+    totalAmp;
+  const spread = Math.sqrt(
+    spectrum.reduce(
+      (s, p) => s + p.amplitude * (p.ratio * referenceHz - centroidHz) ** 2,
+      0,
+    ) / totalAmp,
+  );
+  return spread;
+}
+
+/**
+ * WW4: Count how many scale pitches match any harmonic series pitch class
+ * (1200*log2(k) mod 1200 for k=1..harmonics) within `tolerance` cents.
+ */
+export function harmonicSeriesMatchCount(
+  scaleCents: readonly number[],
+  harmonics: number = 12,
+  tolerance: number = 25,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const harmonicPitches: number[] = [];
+  for (let k = 1; k <= harmonics; k++) {
+    const c = (1200 * Math.log2(k)) % 1200;
+    harmonicPitches.push(c);
+  }
+  let count = 0;
+  for (const sc of scaleCents) {
+    const pc = ((sc % 1200) + 1200) % 1200;
+    let matched = false;
+    for (const hc of harmonicPitches) {
+      const dist = Math.abs(pc - hc);
+      const minDist = Math.min(dist, 1200 - dist);
+      if (minDist <= tolerance) {
+        matched = true;
+        break;
+      }
+    }
+    if (matched) count++;
+  }
+  return count;
 }
