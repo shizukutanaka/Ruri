@@ -1052,3 +1052,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | JJJ2 | `scaleJustIntonationProximity` | 5リミット純正律音程との近接度の平均 |
 | JJJ3 | `scaleEqualTemperamentDeviationV2` | 12平均律半音からの逸脱度(0=完全平均律) |
 | JJJ4 | `scaleMelodyCentroid` | 音程空間における旋律重心（周期音程比） |
+
+## Round 80: 音階対称性 (LLL1–LLL4)
+
+音階の対称性・自己相似性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| LLL1 | `scaleChiralityScore` | 音階と鏡像との非対称度（カイラリティ） |
+| LLL2 | `scaleTranspositionClosureCount` | 音階を自己に写す移調の数（正規化） |
+| LLL3 | `scaleInversionClosureCount` | 音階を自己に写す反転の数（正規化） |
+| LLL4 | `scalePerfectBalance` | 音程空間における重心の均衡度 |
