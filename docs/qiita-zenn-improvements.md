@@ -1074,3 +1074,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | MMM2 | `scaleIntervalVarietyIndex` | 異なる音程クラス数の多様性指数 |
 | MMM3 | `scaleMaximalEvenness` | 最大均等性スコア（等間隔からの逸脱度の逆数） |
 | MMM4 | `scaleDeepScaleProperty` | 深スケール特性（音程倍数の多様性） |
+
+## Round 82: 旋法的中心性 (NNN1–NNN4)
+
+調性重力・旋法中心の多様性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| NNN1 | `scaleModalCenterDiversity` | 旋法的中心の多様性（回転パターン数、正規化） |
+| NNN2 | `scaleLeadingToneStrengthV2` | 導音の強度（近傍導音を持つ音の割合） |
+| NNN3 | `scaleGravityField` | 調性重力場（安定音程への引力の平均） |
+| NNN4 | `scaleResolutionTendency` | 解決傾向（不安定音が安定音へ解決する割合） |
