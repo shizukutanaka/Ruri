@@ -42368,6 +42368,133 @@ export function tuningFamilySocraticRadarCorrosionResistanceProxy(
   return Math.min(1, Math.max(0, total / vecs.length));
 }
 
+// Q2022 — tuningFamilySocraticRadarWaveFunctionProxy
+export function tuningFamilySocraticRadarWaveFunctionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const mean = vec.reduce((a, b) => a + b, 0) / n;
+    const variance = vec.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+    totalScore += 1 - Math.min(1, variance * 4);
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2024 — tuningFamilySocraticRadarEntanglementProxyV2
+export function tuningFamilySocraticRadarEntanglementProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    let pairSum = 0;
+    let pairCount = 0;
+    for (let i = 0; i < vec.length; i++) {
+      for (let j = i + 1; j < vec.length; j++) {
+        pairSum += Math.abs(vec[i]! - vec[j]!);
+        pairCount++;
+      }
+    }
+    const meanDiff = pairCount > 0 ? pairSum / pairCount : 0;
+    totalScore += 1 - Math.min(1, meanDiff);
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2026 — tuningFamilySocraticRadarTunnelingProxyV2
+export function tuningFamilySocraticRadarTunnelingProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const farFromMean = vec.filter((x) => Math.abs(x - mean) > 0.25).length;
+    totalScore += farFromMean / vec.length;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2028 — tuningFamilySocraticRadarQuantumCoherenceProxy
+export function tuningFamilySocraticRadarQuantumCoherenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const product = vec.reduce((a, b) => a * b, 1);
+    const geoMean = Math.pow(product, 1 / 5);
+    totalScore += geoMean;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2030 — tuningFamilySocraticRadarDecoherenceProxyV2
+export function tuningFamilySocraticRadarDecoherenceProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const product = vec.reduce((a, b) => a * b, 1);
+    const geoMean = Math.pow(product, 1 / 5);
+    totalScore += 1 - geoMean;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
+// Q2032 — tuningFamilySocraticRadarZeroPointEnergyProxy
+export function tuningFamilySocraticRadarZeroPointEnergyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const minVal = vec.reduce((a, b) => Math.min(a, b), 1);
+    totalScore += minVal;
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -46472,4 +46599,75 @@ export function scaleRegisterBalance(scaleCents: readonly number[], periodCents:
   const lower = scaleLowerDensity(scaleCents, periodCents);
   const upper = scaleUpperDensity(scaleCents, periodCents);
   return Math.min(1, Math.max(0, 1 - Math.abs(lower - upper)));
+}
+
+/**
+ * ZZZ1 — scaleIntervalClassDiversity
+ * How many distinct interval sizes (classes) exist, normalized.
+ * Sort cents, compute n step sizes (including wrap-around).
+ * Count distinct sizes (rounded to nearest 10 cents for tolerance).
+ * Return: min(1, distinctCount / n)
+ * Empty/single → 0.
+ */
+export function scaleIntervalClassDiversity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const rounded = new Set(steps.map(s => Math.round(s / 10) * 10));
+  const distinctCount = rounded.size;
+  return Math.min(1, Math.max(0, distinctCount / n));
+}
+
+/**
+ * ZZZ2 — scaleMajorIntervalRatio
+ * Fraction of steps that are "major" (≥ 180 cents).
+ * Compute n step sizes, count steps ≥ 180.
+ * Return: count / n
+ * Empty/single → 0.
+ */
+export function scaleMajorIntervalRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  let count = 0;
+  for (const s of steps) {
+    if (s >= 180) count++;
+  }
+  return Math.min(1, Math.max(0, count / n));
+}
+
+/**
+ * ZZZ3 — scaleMinorIntervalRatio
+ * Fraction of steps that are "minor" (< 180 cents).
+ * Return: 1 - scaleMajorIntervalRatio result
+ * Empty/single → 0.
+ */
+export function scaleMinorIntervalRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  return Math.min(1, Math.max(0, 1 - scaleMajorIntervalRatio(scaleCents, periodCents)));
+}
+
+/**
+ * ZZZ4 — scaleIntervalClassBalance
+ * Balance between major and minor intervals.
+ * Return: 1 - |majorRatio - minorRatio|
+ * Empty → 1.
+ */
+export function scaleIntervalClassBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  const majorRatio = scaleMajorIntervalRatio(scaleCents, periodCents);
+  const minorRatio = scaleMinorIntervalRatio(scaleCents, periodCents);
+  return Math.min(1, Math.max(0, 1 - Math.abs(majorRatio - minorRatio)));
 }

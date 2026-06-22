@@ -1206,3 +1206,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | YYY2 | `scaleLowerDensity` | 音域下半部の音密度 |
 | YYY3 | `scaleUpperDensity` | 音域上半部の音密度 |
 | YYY4 | `scaleRegisterBalance` | 上下半部の密度均衡指数 |
+
+## Round 94: 音階音程クラス分析 (ZZZ1–ZZZ4)
+
+音階の音程クラス（ステップサイズ）分布を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| ZZZ1 | `scaleIntervalClassDiversity` | 異なる音程クラス数（正規化） |
+| ZZZ2 | `scaleMajorIntervalRatio` | 大音程（180セント以上）の比率 |
+| ZZZ3 | `scaleMinorIntervalRatio` | 小音程（180セント未満）の比率 |
+| ZZZ4 | `scaleIntervalClassBalance` | 大音程と小音程の均衡指数 |
