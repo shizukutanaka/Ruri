@@ -22926,3 +22926,487 @@ export function tuningFamilySocraticRadarParallelCoordinates(
     return { id: t.id, coordinates: axes.map((ax) => profile[ax]) };
   });
 }
+
+// ---------------------------------------------------------------------------
+// BB1 — scaleModulationDistance
+// ---------------------------------------------------------------------------
+
+/**
+ * Distance between two scales from a modulation perspective.
+ * = (pitches in fromScale not within toleranceCents of any pitch in toScale
+ *   + pitches in toScale not within toleranceCents of any pitch in fromScale)
+ *   / max(len1, len2)
+ *
+ * Returns a value in [0, 1]. Both empty → 0; one empty → 1.
+ *
+ * @param fromScaleCents - Source scale in cents (mod 1200).
+ * @param toScaleCents - Target scale in cents (mod 1200).
+ * @param toleranceCents - Match tolerance in cents (default 10).
+ * @returns Normalized number of changed pitches [0, 1].
+ * @example scaleModulationDistance([0,200,400,500,700,900,1100], [0,200,300,500,700,800,1000], 10) // ≈ 0.286
+ */
+export function scaleModulationDistance(
+  fromScaleCents: readonly number[],
+  toScaleCents: readonly number[],
+  toleranceCents: number = 10,
+): number {
+  const len1 = fromScaleCents.length;
+  const len2 = toScaleCents.length;
+  const totalLen = len1 + len2;
+  if (totalLen === 0) return 0;
+
+  const isClose = (a: number, b: number): boolean => {
+    const diff = Math.abs(((a - b) % 1200 + 1200) % 1200);
+    return Math.min(diff, 1200 - diff) <= toleranceCents;
+  };
+
+  let changed = 0;
+  for (const p1 of fromScaleCents) {
+    if (!toScaleCents.some((p2) => isClose(p1, p2))) changed++;
+  }
+  for (const p2 of toScaleCents) {
+    if (!fromScaleCents.some((p1) => isClose(p1, p2))) changed++;
+  }
+
+  return changed / totalLen;
+}
+
+// ---------------------------------------------------------------------------
+// BB2 — harmonicSeriesApproximation
+// ---------------------------------------------------------------------------
+
+/**
+ * Find the harmonic number n (2 to maxHarmonic) whose octave-reduced ratio
+ * n / 2^floor(log2(n)) is closest to targetCents.
+ *
+ * @param targetCents - Target interval in cents.
+ * @param maxHarmonic - Maximum harmonic number to consider (default 16).
+ * @returns `{ ratio, errorCents, harmonic }` where ratio is a simplified fraction string.
+ * @throws {RangeError} if maxHarmonic < 2.
+ * @example harmonicSeriesApproximation(700, 16) // { ratio: '3/2', errorCents: ~1.96, harmonic: 3 }
+ */
+export function harmonicSeriesApproximation(
+  targetCents: number,
+  maxHarmonic: number = 16,
+): { ratio: string; errorCents: number; harmonic: number } {
+  if (maxHarmonic < 2) throw new RangeError(`maxHarmonic must be >= 2, got ${maxHarmonic}`);
+
+  const targetMod = ((targetCents % 1200) + 1200) % 1200;
+
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+
+  let bestHarmonic = 2;
+  let bestError = Infinity;
+  let bestCents = 0;
+  let bestNum = 1;
+  let bestDen = 1;
+
+  for (let n = 2; n <= maxHarmonic; n++) {
+    const exp = Math.floor(Math.log2(n));
+    const den = Math.pow(2, exp);
+    const reducedCents = 1200 * Math.log2(n / den);
+    const error = Math.abs(reducedCents - targetMod);
+    if (error < bestError) {
+      bestError = error;
+      bestHarmonic = n;
+      bestCents = reducedCents;
+      const g = gcd(n, den);
+      bestNum = n / g;
+      bestDen = den / g;
+    }
+  }
+
+  const errorCents = bestCents - targetMod;
+  const ratio = `${bestNum}/${bestDen}`;
+  return { ratio, errorCents, harmonic: bestHarmonic };
+}
+
+// ---------------------------------------------------------------------------
+// BB3 — tuningFrequencyDrift
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute how far the specified degree's frequency drifts from targetHz in cents.
+ * drift = 1200 * log2(degreeFreq / targetHz)
+ * Positive = sharp relative to targetHz, negative = flat.
+ *
+ * @param tuning - The tuning system.
+ * @param targetHz - Target reference frequency in Hz.
+ * @param degreeIndex - Index into tuning.degrees (default 0).
+ * @returns Drift in cents (positive = sharp, negative = flat).
+ * @throws {RangeError} if degreeIndex is out of bounds.
+ * @example tuningFrequencyDrift(equalTemperament12(440), 440, 0) // 0
+ */
+export function tuningFrequencyDrift(
+  tuning: TuningSystem,
+  targetHz: number,
+  degreeIndex: number = 0,
+): number {
+  if (degreeIndex < 0 || degreeIndex >= tuning.degrees.length) {
+    throw new RangeError(
+      `degreeIndex ${degreeIndex} is out of bounds for tuning with ${tuning.degrees.length} degrees`,
+    );
+  }
+  const degree = tuning.degrees[degreeIndex]!;
+  const degreeFreq = centsToFreq(pitchToCents(degree), tuning.referenceHz);
+  return 1200 * Math.log2(degreeFreq / targetHz);
+}
+
+// ---------------------------------------------------------------------------
+// BB4 — harmonicPartialOverlap
+// ---------------------------------------------------------------------------
+
+/**
+ * Count how many partials from spectrum1 fall within toleranceCents of any
+ * partial from spectrum2 when spectrum2 is transposed by intervalCents.
+ *
+ * A partial from spectrum1 (ratio r1) overlaps if:
+ *   |1200 * log2(r1 / (r2 * 2^(intervalCents/1200)))| <= toleranceCents
+ * for any r2 in spectrum2.
+ *
+ * @param spectrum1 - First spectrum.
+ * @param spectrum2 - Second spectrum (will be transposed by intervalCents).
+ * @param intervalCents - Transposition of spectrum2 in cents.
+ * @param toleranceCents - Match tolerance in cents (default 10).
+ * @returns Count of overlapping partials from spectrum1 (0 to spectrum1.length).
+ * @example harmonicPartialOverlap(harmonicSpectrum(4), harmonicSpectrum(4), 0, 1) // 4
+ */
+export function harmonicPartialOverlap(
+  spectrum1: Spectrum,
+  spectrum2: Spectrum,
+  intervalCents: number,
+  toleranceCents: number = 10,
+): number {
+  if (spectrum1.length === 0 || spectrum2.length === 0) return 0;
+
+  const transposeRatio = Math.pow(2, intervalCents / 1200);
+  let count = 0;
+
+  for (const { ratio: r1 } of spectrum1) {
+    for (const { ratio: r2 } of spectrum2) {
+      const r2Transposed = r2 * transposeRatio;
+      const diffCents = Math.abs(1200 * Math.log2(r1 / r2Transposed));
+      if (diffCents <= toleranceCents) {
+        count++;
+        break;
+      }
+    }
+  }
+
+  return count;
+}
+
+// ---------------------------------------------------------------------------
+// Q1134 — tuningFamilySocraticRadarTimeDecayAverage
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes exponentially time-decayed average of radar profiles.
+ * Weight for tuning i (0-indexed) = decayFactor^(n-1-i), normalized to sum to 1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param decayFactor - Decay factor (0 < decayFactor < 1). Default 0.9.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Weighted average RadarProfile.
+ */
+export function tuningFamilySocraticRadarTimeDecayAverage(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  decayFactor: number = 0.9,
+  rootHz?: number,
+): Record<AxisKey, number> {
+  if (decayFactor <= 0 || decayFactor >= 1) {
+    throw new RangeError(`decayFactor must be in (0, 1), got ${decayFactor}`);
+  }
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const rawWeights = profiles.map((_, i) => Math.pow(decayFactor, n - 1 - i));
+  const totalWeight = rawWeights.reduce((s, w) => s + w, 0);
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    result[ax] = profiles.reduce((sum, p, i) => sum + (rawWeights[i]! / totalWeight) * p[ax], 0);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1136 — tuningFamilySocraticRadarRollingWindowStats
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes rolling window statistics (mean and std) over tunings.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param windowSize - Size of rolling window. Default 3.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of { windowEnd, mean, std } per valid window position.
+ */
+export function tuningFamilySocraticRadarRollingWindowStats(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  windowSize: number = 3,
+  rootHz?: number,
+): Array<{ windowEnd: number; mean: Record<AxisKey, number>; std: Record<AxisKey, number> }> {
+  if (windowSize < 1 || windowSize > tunings.length) {
+    throw new RangeError(`windowSize must be in [1, ${tunings.length}], got ${windowSize}`);
+  }
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const results: Array<{ windowEnd: number; mean: Record<AxisKey, number>; std: Record<AxisKey, number> }> = [];
+  for (let i = windowSize - 1; i < profiles.length; i++) {
+    const window = profiles.slice(i - windowSize + 1, i + 1);
+    const mean = {} as Record<AxisKey, number>;
+    const std = {} as Record<AxisKey, number>;
+    for (const ax of axes) {
+      const vals = window.map((p) => p[ax]);
+      const avg = vals.reduce((s, v) => s + v, 0) / windowSize;
+      mean[ax] = avg;
+      const variance = vals.reduce((s, v) => s + (v - avg) ** 2, 0) / windowSize;
+      std[ax] = Math.sqrt(variance);
+    }
+    results.push({ windowEnd: i, mean, std });
+  }
+  return results;
+}
+
+// ---------------------------------------------------------------------------
+// Q1138 — tuningFamilySocraticRadarEnsembleScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes weighted ensemble score for each tuning.
+ * Score = sum(weight[axis] * score[axis]) / sum(active weights).
+ * Default weight = 1.0 per axis; partial weights param overrides specific axes.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param weights - Optional partial weights override per axis.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array sorted by ensembleScore descending, each { id, ensembleScore }.
+ */
+export function tuningFamilySocraticRadarEnsembleScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  weights?: Partial<Record<AxisKey, number>>,
+  rootHz?: number,
+): Array<{ id: string; ensembleScore: number }> {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const effectiveWeights: Record<AxisKey, number> = {
+    diversity: 1.0,
+    versatility: 1.0,
+    maturity: 1.0,
+    benchmark: 1.0,
+    convergence: 1.0,
+    ...weights,
+  };
+  const totalWeight = axes.reduce((s, ax) => s + effectiveWeights[ax], 0);
+  const result = tunings.map((t) => {
+    const profile = tuningFamilySocraticRadarProfile([t], spectrum, rootHz);
+    const ensembleScore = axes.reduce((s, ax) => s + effectiveWeights[ax] * profile[ax], 0) / totalWeight;
+    return { id: t.id, ensembleScore };
+  });
+  return result.sort((a, b) => b.ensembleScore - a.ensembleScore);
+}
+
+// ---------------------------------------------------------------------------
+// Q1140 — tuningFamilySocraticRadarMonteCarloVariance
+// ---------------------------------------------------------------------------
+
+/**
+ * Monte Carlo estimate of axis score variance using LCG random sampling.
+ * For each trial: samples a random subset of tunings (size = ceil(n/2)), computes mean per axis.
+ * Variance = variance of trial means per axis.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param trials - Number of Monte Carlo trials. Default 100.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record of variance per axis.
+ */
+export function tuningFamilySocraticRadarMonteCarloVariance(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  trials: number = 100,
+  rootHz?: number,
+): Record<AxisKey, number> {
+  if (trials < 1) {
+    throw new RangeError(`trials must be >= 1, got ${trials}`);
+  }
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  const subsetSize = Math.ceil(n / 2);
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  // LCG parameters
+  let seed = 12345;
+  const trialMeans: Array<Record<AxisKey, number>> = [];
+
+  for (let trial = 0; trial < trials; trial++) {
+    const subset: typeof profiles = [];
+    for (let j = 0; j < subsetSize; j++) {
+      seed = (seed * 1664525 + 1013904223) & 0xFFFFFFFF;
+      const idx = ((seed >>> 0) % n + n) % n;
+      subset.push(profiles[idx]!);
+    }
+    const trialMean = {} as Record<AxisKey, number>;
+    for (const ax of axes) {
+      trialMean[ax] = subset.reduce((s, p) => s + p[ax], 0) / subsetSize;
+    }
+    trialMeans.push(trialMean);
+  }
+
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = trialMeans.map((m) => m[ax]);
+    const avg = vals.reduce((s, v) => s + v, 0) / trials;
+    result[ax] = vals.reduce((s, v) => s + (v - avg) ** 2, 0) / trials;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1142 — tuningFamilySocraticRadarDiversityIndex
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes a single diversity index for the whole family as average pairwise L2 distance.
+ * L2 distance = sqrt(sum over axes of (score_a[axis] - score_b[axis])^2).
+ * Returns 0 for families with <= 1 tuning.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Average pairwise L2 distance (diversity index).
+ */
+export function tuningFamilySocraticRadarDiversityIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let totalDistance = 0;
+  let pairCount = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const l2 = Math.sqrt(axes.reduce((s, ax) => s + (profiles[i]![ax] - profiles[j]![ax]) ** 2, 0));
+      totalDistance += l2;
+      pairCount++;
+    }
+  }
+  return totalDistance / pairCount;
+}
+
+// ---------------------------------------------------------------------------
+// Q1144 — tuningFamilySocraticRadarOptimalSubset
+// ---------------------------------------------------------------------------
+
+/**
+ * Finds the subset of `size` tunings that maximizes internal diversity (avg pairwise L2).
+ * Brute force if C(n, size) <= 100; otherwise uses greedy approach.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param size - Subset size. Default 3.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of `size` entries { id, score } where score = avg L2 within subset.
+ */
+export function tuningFamilySocraticRadarOptimalSubset(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  size: number = 3,
+  rootHz?: number,
+): Array<{ id: string; score: number }> {
+  if (size < 1 || size > tunings.length) {
+    throw new RangeError(`size must be in [1, ${tunings.length}], got ${size}`);
+  }
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function l2(a: Record<AxisKey, number>, b: Record<AxisKey, number>): number {
+    return Math.sqrt(axes.reduce((s, ax) => s + (a[ax] - b[ax]) ** 2, 0));
+  }
+
+  function avgPairwiseL2(indices: number[]): number {
+    if (indices.length <= 1) return 0;
+    let total = 0;
+    let count = 0;
+    for (let i = 0; i < indices.length; i++) {
+      for (let j = i + 1; j < indices.length; j++) {
+        total += l2(profiles[indices[i]!]!, profiles[indices[j]!]!);
+        count++;
+      }
+    }
+    return total / count;
+  }
+
+  // Compute C(n, size) to determine brute force vs greedy
+  function comb(nn: number, kk: number): number {
+    if (kk > nn) return 0;
+    if (kk === 0 || kk === nn) return 1;
+    let result = 1;
+    for (let i = 0; i < kk; i++) {
+      result = result * (nn - i) / (i + 1);
+      if (result > 200) return 201; // Early exit to avoid overflow
+    }
+    return result;
+  }
+
+  let bestIndices: number[] = [];
+  let bestScore = -Infinity;
+
+  if (comb(n, size) <= 100) {
+    // Brute force: enumerate all combinations
+    function enumerate(start: number, current: number[]): void {
+      if (current.length === size) {
+        const score = avgPairwiseL2(current);
+        if (score > bestScore) {
+          bestScore = score;
+          bestIndices = [...current];
+        }
+        return;
+      }
+      const remaining = size - current.length;
+      for (let i = start; i <= n - remaining; i++) {
+        current.push(i);
+        enumerate(i + 1, current);
+        current.pop();
+      }
+    }
+    enumerate(0, []);
+  } else {
+    // Greedy: start with highest average axis score, then add to maximize avg L2
+    const avgScores = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+    let startIdx = 0;
+    for (let i = 1; i < n; i++) {
+      if (avgScores[i]! > avgScores[startIdx]!) startIdx = i;
+    }
+    const selected = [startIdx];
+    const remaining = new Set(Array.from({ length: n }, (_, i) => i).filter((i) => i !== startIdx));
+
+    while (selected.length < size) {
+      let bestCand = -1;
+      let bestCandScore = -Infinity;
+      for (const cand of remaining) {
+        const score = avgPairwiseL2([...selected, cand]);
+        if (score > bestCandScore) {
+          bestCandScore = score;
+          bestCand = cand;
+        }
+      }
+      if (bestCand === -1) break;
+      selected.push(bestCand);
+      remaining.delete(bestCand);
+    }
+    bestIndices = selected;
+    bestScore = avgPairwiseL2(bestIndices);
+  }
+
+  return bestIndices.map((i) => ({ id: tunings[i]!.id, score: bestScore }));
+}

@@ -370,6 +370,12 @@ import {
   presetFamilySocraticRadarAdaptiveThreshold,
   presetFamilySocraticRadarSensitivityAnalysis,
   presetFamilySocraticRadarParallelCoordinates,
+  presetFamilySocraticRadarTimeDecayAverage,
+  presetFamilySocraticRadarRollingWindowStats,
+  presetFamilySocraticRadarEnsembleScore,
+  presetFamilySocraticRadarMonteCarloVariance,
+  presetFamilySocraticRadarDiversityIndex,
+  presetFamilySocraticRadarOptimalSubset,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12307,5 +12313,107 @@ describe('presetFamilySocraticRadarParallelCoordinates (Q1133)', () => {
     expect(result[0]).toHaveProperty('id');
     expect(result[0]).toHaveProperty('coordinates');
     expect(result[0]!.coordinates).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1135 — presetFamilySocraticRadarTimeDecayAverage
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTimeDecayAverage (Q1135)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarTimeDecayAverage(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      0.9,
+    );
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1137 — presetFamilySocraticRadarRollingWindowStats
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRollingWindowStats (Q1137)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarRollingWindowStats(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      2,
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(1);
+    expect(result[0]).toHaveProperty('mean');
+    expect(result[0]).toHaveProperty('std');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1139 — presetFamilySocraticRadarEnsembleScore
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarEnsembleScore (Q1139)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarEnsembleScore(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      { diversity: 1.5 },
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('ensembleScore');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1141 — presetFamilySocraticRadarMonteCarloVariance
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMonteCarloVariance (Q1141)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarMonteCarloVariance(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      50,
+    );
+    expect(result).toBeDefined();
+    expect(Object.keys(result)).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1143 — presetFamilySocraticRadarDiversityIndex
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarDiversityIndex (Q1143)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarDiversityIndex(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(typeof result).toBe('number');
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1145 — presetFamilySocraticRadarOptimalSubset
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarOptimalSubset (Q1145)', () => {
+  it('returns defined result with expected shape', () => {
+    const result = presetFamilySocraticRadarOptimalSubset(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      2,
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toHaveProperty('id');
+    expect(result[0]).toHaveProperty('score');
   });
 });

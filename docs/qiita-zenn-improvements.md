@@ -345,3 +345,17 @@
 - AA2: scaleConnectedness — Jaccard類似度による音階連結性
 - AA3: chordVoiceLeadingDistance — 最小声部進行距離（総変位量）
 - AA4: melodicContourSimilarity — 旋律輪郭類似度（符号列比較）
+
+## Round 19: モジュレーション・倍音近似・チューニングドリフト (BB1–BB4)
+
+**テーマ**: 音階モジュレーション距離・倍音列近似・チューニングドリフト・倍音部分重複
+
+### 研究トピック
+- Qiita: 転調の数値的表現 — 音階変化量とモジュレーション距離
+- Zenn: 倍音列近似とチューニング精度分析
+
+### 実装
+- BB1: scaleModulationDistance — モジュレーション距離（正規化変化音数）
+- BB2: harmonicSeriesApproximation — 目標音程の倍音列近似
+- BB3: tuningFrequencyDrift — 音度の目標周波数からのドリフト（セント）
+- BB4: harmonicPartialOverlap — 音程転置後の倍音重複数

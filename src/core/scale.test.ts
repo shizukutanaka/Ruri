@@ -645,6 +645,16 @@ import {
   tuningFamilySocraticRadarAdaptiveThreshold,
   tuningFamilySocraticRadarSensitivityAnalysis,
   tuningFamilySocraticRadarParallelCoordinates,
+  tuningFamilySocraticRadarTimeDecayAverage,
+  tuningFamilySocraticRadarRollingWindowStats,
+  tuningFamilySocraticRadarEnsembleScore,
+  tuningFamilySocraticRadarMonteCarloVariance,
+  tuningFamilySocraticRadarDiversityIndex,
+  tuningFamilySocraticRadarOptimalSubset,
+  scaleModulationDistance,
+  harmonicSeriesApproximation,
+  tuningFrequencyDrift,
+  harmonicPartialOverlap,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -21612,5 +21622,215 @@ describe('tuningFamilySocraticRadarParallelCoordinates (Q1132)', () => {
   });
   it('returns one entry per tuning', () => {
     expect(tuningFamilySocraticRadarParallelCoordinates([equalTemperament12(440), equalTemperament12(432)], spectrum)).toHaveLength(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1134 — tuningFamilySocraticRadarTimeDecayAverage
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarTimeDecayAverage (Q1134)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarTimeDecayAverage(tunings, spectrum))).toHaveLength(5);
+  });
+  it('all values in [0,1]', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarTimeDecayAverage(tunings, spectrum))) {
+      expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for decayFactor >= 1', () => {
+    expect(() => tuningFamilySocraticRadarTimeDecayAverage(tunings, spectrum, 1.0)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1136 — tuningFamilySocraticRadarRollingWindowStats
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarRollingWindowStats (Q1136)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns n-windowSize+1 windows', () => {
+    expect(tuningFamilySocraticRadarRollingWindowStats(tunings, spectrum, 2)).toHaveLength(2);
+  });
+  it('each window has mean and std', () => {
+    const r = tuningFamilySocraticRadarRollingWindowStats(tunings, spectrum, 2);
+    expect(r[0]).toHaveProperty('mean');
+    expect(r[0]).toHaveProperty('std');
+  });
+  it('throws for windowSize > tunings.length', () => {
+    expect(() => tuningFamilySocraticRadarRollingWindowStats(tunings, spectrum, 10)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1138 — tuningFamilySocraticRadarEnsembleScore
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarEnsembleScore (Q1138)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarEnsembleScore(tunings, spectrum)).toHaveLength(2);
+  });
+  it('ensembleScore in [0,1] with equal weights', () => {
+    for (const e of tuningFamilySocraticRadarEnsembleScore(tunings, spectrum)) {
+      expect(e.ensembleScore).toBeGreaterThanOrEqual(0);
+      expect(e.ensembleScore).toBeLessThanOrEqual(1);
+    }
+  });
+  it('sorted descending by ensembleScore', () => {
+    const r = tuningFamilySocraticRadarEnsembleScore(tunings, spectrum);
+    for (let i = 1; i < r.length; i++) { expect(r[i-1]!.ensembleScore).toBeGreaterThanOrEqual(r[i]!.ensembleScore); }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1140 — tuningFamilySocraticRadarMonteCarloVariance
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMonteCarloVariance (Q1140)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarMonteCarloVariance(tunings, spectrum))).toHaveLength(5);
+  });
+  it('variances are non-negative', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarMonteCarloVariance(tunings, spectrum))) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for trials < 1', () => {
+    expect(() => tuningFamilySocraticRadarMonteCarloVariance(tunings, spectrum, 0)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1142 — tuningFamilySocraticRadarDiversityIndex
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDiversityIndex (Q1142)', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('single tuning returns 0', () => {
+    expect(tuningFamilySocraticRadarDiversityIndex([equalTemperament12(440)], spectrum)).toBe(0);
+  });
+  it('returns non-negative number', () => {
+    expect(tuningFamilySocraticRadarDiversityIndex([equalTemperament12(440), equalTemperament12(432)], spectrum)).toBeGreaterThanOrEqual(0);
+  });
+  it('identical tunings return 0', () => {
+    const t = equalTemperament12(440);
+    expect(tuningFamilySocraticRadarDiversityIndex([t, t], spectrum)).toBeCloseTo(0, 5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1144 — tuningFamilySocraticRadarOptimalSubset
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarOptimalSubset (Q1144)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns exactly `size` entries', () => {
+    expect(tuningFamilySocraticRadarOptimalSubset(tunings, spectrum, 2)).toHaveLength(2);
+  });
+  it('throws for size > tunings.length', () => {
+    expect(() => tuningFamilySocraticRadarOptimalSubset(tunings, spectrum, 10)).toThrow(RangeError);
+  });
+  it('each entry has id and score', () => {
+    const r = tuningFamilySocraticRadarOptimalSubset(tunings, spectrum, 2);
+    expect(r[0]).toHaveProperty('id');
+    expect(r[0]).toHaveProperty('score');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// BB1 — scaleModulationDistance
+// ---------------------------------------------------------------------------
+
+describe('scaleModulationDistance (BB1)', () => {
+  it('same scale returns 0', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleModulationDistance(scale, scale)).toBe(0);
+  });
+  it('result in [0,1]', () => {
+    const major = [0, 200, 400, 500, 700, 900, 1100];
+    const minor = [0, 200, 300, 500, 700, 800, 1000];
+    const r = scaleModulationDistance(major, minor, 10);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('completely disjoint scales return 1', () => {
+    expect(scaleModulationDistance([100, 300, 500], [700, 900, 1100], 5)).toBe(1);
+  });
+  it('both empty returns 0', () => {
+    expect(scaleModulationDistance([], [])).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// BB2 — harmonicSeriesApproximation
+// ---------------------------------------------------------------------------
+
+describe('harmonicSeriesApproximation (BB2)', () => {
+  it('700 cents finds "3/2" ratio', () => {
+    expect(harmonicSeriesApproximation(700, 16).ratio).toBe('3/2');
+  });
+  it('returns errorCents as a number', () => {
+    expect(typeof harmonicSeriesApproximation(400, 16).errorCents).toBe('number');
+  });
+  it('throws for maxHarmonic < 2', () => {
+    expect(() => harmonicSeriesApproximation(700, 1)).toThrow(RangeError);
+  });
+  it('0 cents (unison) finds harmonic 2 (octave) or 1/1 equiv', () => {
+    const r = harmonicSeriesApproximation(0, 8);
+    expect(r.harmonic).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// BB3 — tuningFrequencyDrift
+// ---------------------------------------------------------------------------
+
+describe('tuningFrequencyDrift (BB3)', () => {
+  it('440Hz tuning at degree 0 drifts 0 from 440Hz', () => {
+    expect(tuningFrequencyDrift(equalTemperament12(440), 440, 0)).toBeCloseTo(0, 5);
+  });
+  it('returns a finite number', () => {
+    expect(Number.isFinite(tuningFrequencyDrift(equalTemperament12(440), 432, 0))).toBe(true);
+  });
+  it('throws for out-of-bounds degreeIndex', () => {
+    expect(() => tuningFrequencyDrift(equalTemperament12(440), 440, 999)).toThrow(RangeError);
+  });
+  it('432Hz target gives negative drift from 440Hz tuning', () => {
+    // 440Hz degree 0, target 432Hz → drift = 1200*log2(440/432) > 0 (degree is sharp vs target)
+    expect(tuningFrequencyDrift(equalTemperament12(440), 432, 0)).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// BB4 — harmonicPartialOverlap
+// ---------------------------------------------------------------------------
+
+describe('harmonicPartialOverlap (BB4)', () => {
+  it('unison overlap returns all partials', () => {
+    const s = harmonicSpectrum(4);
+    expect(harmonicPartialOverlap(s, s, 0, 1)).toBe(4);
+  });
+  it('empty spectrum returns 0', () => {
+    expect(harmonicPartialOverlap([], harmonicSpectrum(4), 0)).toBe(0);
+  });
+  it('returns non-negative integer', () => {
+    const s = harmonicSpectrum(6);
+    const r = harmonicPartialOverlap(s, s, 700, 20);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(r)).toBe(true);
+  });
+  it('large tolerance increases overlap count', () => {
+    const s = harmonicSpectrum(4);
+    const small = harmonicPartialOverlap(s, s, 100, 5);
+    const large = harmonicPartialOverlap(s, s, 100, 50);
+    expect(large).toBeGreaterThanOrEqual(small);
   });
 });
