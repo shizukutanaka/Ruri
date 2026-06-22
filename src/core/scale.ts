@@ -37783,6 +37783,194 @@ export function tuningFamilySocraticRadarQuantumDiscordProxy(
   return Math.max(0, Math.min(1, sum / tunings.length));
 }
 
+// Q1674 — tuningFamilySocraticRadarPersistenceEntropyMean
+export function tuningFamilySocraticRadarPersistenceEntropyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    // Treat profile values as "birth times"; persistence lifetimes = sorted differences
+    const sorted = [...vec].sort((a, b) => a - b);
+    const lifetimes: number[] = [];
+    for (let i = 1; i < sorted.length; i++) {
+      lifetimes.push(sorted[i]! - sorted[i - 1]!);
+    }
+    let total = 0;
+    for (let i = 0; i < lifetimes.length; i++) total += lifetimes[i]!;
+    let H = 0;
+    for (let i = 0; i < lifetimes.length; i++) {
+      const p = total > 0 ? lifetimes[i]! / total : 1 / lifetimes.length;
+      H += -p * Math.log2(p + 1e-10);
+    }
+    const maxH = Math.log2(lifetimes.length > 1 ? lifetimes.length : 2);
+    sum += Math.max(0, Math.min(1, maxH > 0 ? H / maxH : 0));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1676 — tuningFamilySocraticRadarBettiNumberProxy
+export function tuningFamilySocraticRadarBettiNumberProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    // Betti-0 proxy: number of connected components when thresholding at 0.5
+    let components = 0;
+    let inComponent = false;
+    for (let i = 0; i < vec.length; i++) {
+      if (vec[i]! >= 0.5) {
+        if (!inComponent) { components++; inComponent = true; }
+      } else {
+        inComponent = false;
+      }
+    }
+    sum += Math.max(0, Math.min(1, components / 5));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1678 — tuningFamilySocraticRadarTopologicalComplexityMean
+export function tuningFamilySocraticRadarTopologicalComplexityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    // Second differences
+    const d1: number[] = [];
+    for (let i = 1; i < sorted.length; i++) d1.push(sorted[i]! - sorted[i - 1]!);
+    const d2: number[] = [];
+    for (let i = 1; i < d1.length; i++) d2.push(d1[i]! - d1[i - 1]!);
+    // Count sign changes in second differences
+    let signChanges = 0;
+    for (let i = 1; i < d2.length; i++) {
+      if (d2[i - 1]! * d2[i]! < 0) signChanges++;
+    }
+    sum += Math.max(0, Math.min(1, signChanges / 4));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1680 — tuningFamilySocraticRadarWassersteinDistanceMean
+export function tuningFamilySocraticRadarWassersteinDistanceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length === 1) {
+    // Single tuning: Wasserstein distance between sorted profile and uniform distribution
+    const sorted = [...vecs[0]!].sort((a, b) => a - b);
+    const uniform = sorted.map((_, i) => (i + 1) / sorted.length);
+    let w = 0;
+    let cumP = 0;
+    let cumQ = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      cumP += sorted[i]! / (sorted.reduce((a, b) => a + b, 0) || 1);
+      cumQ += uniform[i]!;
+      w += Math.abs(cumP - cumQ);
+    }
+    return Math.max(0, Math.min(1, w / sorted.length));
+  }
+  let sum = 0;
+  for (let idx = 0; idx < vecs.length - 1; idx++) {
+    const p = [...vecs[idx]!].sort((a, b) => a - b);
+    const q = [...vecs[idx + 1]!].sort((a, b) => a - b);
+    // Wasserstein-1: sum of |p_i - q_i| on sorted distributions
+    let w = 0;
+    for (let i = 0; i < p.length; i++) w += Math.abs(p[i]! - q[i]!);
+    sum += Math.max(0, Math.min(1, w / p.length));
+  }
+  return Math.max(0, Math.min(1, sum / (vecs.length - 1)));
+}
+
+// Q1682 — tuningFamilySocraticRadarBottleneckDistanceMean
+export function tuningFamilySocraticRadarBottleneckDistanceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length === 1) {
+    // Single tuning: bottleneck distance between sorted profile and uniform [0.2, 0.4, 0.6, 0.8, 1.0]
+    const sorted = [...vecs[0]!].sort((a, b) => a - b);
+    const uniform = [0.2, 0.4, 0.6, 0.8, 1.0];
+    let maxDiff = 0;
+    for (let i = 0; i < sorted.length; i++) {
+      const diff = Math.abs(sorted[i]! - uniform[i]!);
+      if (diff > maxDiff) maxDiff = diff;
+    }
+    return Math.max(0, Math.min(1, maxDiff));
+  }
+  let sum = 0;
+  for (let idx = 0; idx < vecs.length - 1; idx++) {
+    const p = [...vecs[idx]!].sort((a, b) => a - b);
+    const q = [...vecs[idx + 1]!].sort((a, b) => a - b);
+    let maxDiff = 0;
+    for (let i = 0; i < p.length; i++) {
+      const diff = Math.abs(p[i]! - q[i]!);
+      if (diff > maxDiff) maxDiff = diff;
+    }
+    sum += Math.max(0, Math.min(1, maxDiff));
+  }
+  return Math.max(0, Math.min(1, sum / (vecs.length - 1)));
+}
+
+// Q1684 — tuningFamilySocraticRadarEulerCharacteristicProxy
+export function tuningFamilySocraticRadarEulerCharacteristicProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    // V = axes above 0.5, E = pairs of adjacent axes both above 0.5
+    let V = 0;
+    let E = 0;
+    for (let i = 0; i < vec.length; i++) {
+      if (vec[i]! > 0.5) V++;
+      if (i > 0 && vec[i - 1]! > 0.5 && vec[i]! > 0.5) E++;
+    }
+    const euler = V - E;
+    sum += Math.max(0, Math.min(1, euler / 5));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -38808,4 +38996,133 @@ export function scaleBridgingCoefficient(scaleCents: readonly number[], periodCe
     activeCount++;
   }
   return activeCount > 0 ? bridgingSum / activeCount : 0;
+}
+
+/**
+ * VVV1: scaleRotationalSymmetry (step-rotation variant)
+ *
+ * Proportion of non-trivial rotations that produce the same interval step pattern.
+ * Computes interval steps (diffs between consecutive sorted degrees including wrap),
+ * then for each rotation r in 1..n-1 checks if rotating the steps array by r gives
+ * the same pattern. Returns count_of_symmetric_rotations / (n-1); 0 for n<2.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Proportion of symmetric rotations in [0,1]
+ */
+export function scaleRotationalSymmetrySteps(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    steps.push(Math.round(((i < n - 1 ? sorted[i + 1]! : periodCents) - sorted[i]!) * 10) / 10);
+  }
+  let count = 0;
+  for (let r = 1; r < n; r++) {
+    const rotated = [...steps.slice(r), ...steps.slice(0, r)];
+    if (rotated.every((v, i) => Math.abs(v - steps[i]!) < 0.5)) count++;
+  }
+  return count / (n - 1);
+}
+
+/**
+ * VVV2: scaleReflectionSymmetrySteps (step-reversal variant)
+ *
+ * Proportion of reflections (inverting interval sequence starting from each degree)
+ * that match the original step pattern. For each starting point k in 0..n-1,
+ * checks if reversing the step sequence matches the original. Returns count / n; 0 for n<2.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Proportion of symmetric reflections in [0,1]
+ */
+export function scaleReflectionSymmetrySteps(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    steps.push(Math.round(((i < n - 1 ? sorted[i + 1]! : periodCents) - sorted[i]!) * 10) / 10);
+  }
+  let count = 0;
+  for (let k = 0; k < n; k++) {
+    const rotated = [...steps.slice(k), ...steps.slice(0, k)];
+    const reversed = [...rotated].reverse();
+    if (reversed.every((v, i) => Math.abs(v - steps[i]!) < 0.5)) count++;
+  }
+  return count / n;
+}
+
+/**
+ * VVV3: scaleTranspositionInvariance
+ *
+ * How many transpositions by scale steps preserve the scale (mod period)?
+ * For each degree d of the scale, shifts all pitches by scaleCents[d] and checks
+ * overlap with the original scale (±1 cent tolerance). Returns
+ * count_matching_transpositions / n; 0 for n<1.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Proportion of invariant transpositions in [0,1]
+ */
+export function scaleTranspositionInvariance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let count = 0;
+  for (let d = 0; d < n; d++) {
+    const shift = sorted[d]!;
+    const transposed = sorted.map(p => ((p - shift) % periodCents + periodCents) % periodCents).sort((a, b) => a - b);
+    let allMatch = true;
+    for (let i = 0; i < n; i++) {
+      let found = false;
+      for (let j = 0; j < n; j++) {
+        const diff = Math.abs(transposed[i]! - sorted[j]!);
+        const wrappedDiff = Math.min(diff, periodCents - diff);
+        if (wrappedDiff < 1) { found = true; break; }
+      }
+      if (!found) { allMatch = false; break; }
+    }
+    if (allMatch) count++;
+  }
+  return count / n;
+}
+
+/**
+ * VVV4: scaleComplementSymmetry
+ *
+ * How similar is the scale to its complement (the pitches NOT in the scale
+ * within the 12-EDO chromatic context)? Assumes 12-EDO chromatic context
+ * (100-cent grid, period 1200). Builds chromatic set, finds complement, measures
+ * overlap using Jaccard-like similarity. Returns matched_pitches / 12; 0 for n=0.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Complement similarity score in [0,1]
+ */
+export function scaleComplementSymmetry(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const chromaSize = Math.round(periodCents / 100);
+  // Map scale pitches to chromatic bins (0..chromaSize-1)
+  const scaleBins = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    const bin = Math.round(((scaleCents[i]! % periodCents) + periodCents) % periodCents / 100) % chromaSize;
+    scaleBins.add(bin);
+  }
+  // Find complement bins
+  const complementBins = new Set<number>();
+  for (let b = 0; b < chromaSize; b++) {
+    if (!scaleBins.has(b)) complementBins.add(b);
+  }
+  // Jaccard-like: intersection size / union size
+  let intersection = 0;
+  for (const b of scaleBins) {
+    if (complementBins.has(b)) intersection++;
+  }
+  const union = scaleBins.size + complementBins.size - intersection;
+  if (union === 0) return 0;
+  // Normalize to [0,1] relative to chromaSize
+  return intersection / chromaSize;
 }
