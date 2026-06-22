@@ -460,6 +460,12 @@ import {
   presetFamilySocraticRadarOutlierScore,
   presetFamilySocraticRadarCentroidDistance,
   presetFamilySocraticRadarDensityEstimate,
+  presetFamilySocraticRadarFuzzyUnion,
+  presetFamilySocraticRadarFuzzyIntersection,
+  presetFamilySocraticRadarFuzzyComplement,
+  presetFamilySocraticRadarSugenoIntegral,
+  presetFamilySocraticRadarChoquetIntegral,
+  presetFamilySocraticRadarLukasiewiczNorm,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -14102,5 +14108,143 @@ describe('presetFamilySocraticRadarDensityEstimate (Q1313)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarDensityEstimate(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1315 — presetFamilySocraticRadarFuzzyUnion
+describe('presetFamilySocraticRadarFuzzyUnion (Q1315)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with all 5 axes', () => {
+    const result = presetFamilySocraticRadarFuzzyUnion(presetIds, spectrum);
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.versatility).toBe('number');
+    expect(typeof result.maturity).toBe('number');
+    expect(typeof result.benchmark).toBe('number');
+    expect(typeof result.convergence).toBe('number');
+  });
+  it('all axis values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarFuzzyUnion(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFuzzyUnion(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1317 — presetFamilySocraticRadarFuzzyIntersection
+describe('presetFamilySocraticRadarFuzzyIntersection (Q1317)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with all 5 axes', () => {
+    const result = presetFamilySocraticRadarFuzzyIntersection(presetIds, spectrum);
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.versatility).toBe('number');
+    expect(typeof result.maturity).toBe('number');
+    expect(typeof result.benchmark).toBe('number');
+    expect(typeof result.convergence).toBe('number');
+  });
+  it('intersection <= union for each axis', () => {
+    const union = presetFamilySocraticRadarFuzzyUnion(presetIds, spectrum);
+    const intersection = presetFamilySocraticRadarFuzzyIntersection(presetIds, spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(intersection[axis]).toBeLessThanOrEqual(union[axis]);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFuzzyIntersection(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1319 — presetFamilySocraticRadarFuzzyComplement
+describe('presetFamilySocraticRadarFuzzyComplement (Q1319)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one row per preset with 5 values', () => {
+    const result = presetFamilySocraticRadarFuzzyComplement(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]!.length).toBe(5);
+    expect(result[1]!.length).toBe(5);
+  });
+  it('all complement values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarFuzzyComplement(presetIds, spectrum);
+    for (const row of result) {
+      for (const v of row) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFuzzyComplement(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1321 — presetFamilySocraticRadarSugenoIntegral
+describe('presetFamilySocraticRadarSugenoIntegral (Q1321)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one value per preset', () => {
+    const result = presetFamilySocraticRadarSugenoIntegral(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarSugenoIntegral(presetIds, spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSugenoIntegral(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1323 — presetFamilySocraticRadarChoquetIntegral
+describe('presetFamilySocraticRadarChoquetIntegral (Q1323)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one value per preset', () => {
+    const result = presetFamilySocraticRadarChoquetIntegral(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarChoquetIntegral(presetIds, spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarChoquetIntegral(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1325 — presetFamilySocraticRadarLukasiewiczNorm
+describe('presetFamilySocraticRadarLukasiewiczNorm (Q1325)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one value per preset', () => {
+    const result = presetFamilySocraticRadarLukasiewiczNorm(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarLukasiewiczNorm(presetIds, spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLukasiewiczNorm(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

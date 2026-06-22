@@ -28621,6 +28621,150 @@ export function tuningFamilySocraticRadarDensityEstimate(
 }
 
 // ---------------------------------------------------------------------------
+// Q1314 — tuningFamilySocraticRadarFuzzyUnion
+
+export function tuningFamilySocraticRadarFuzzyUnion(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const zero = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  if (tunings.length === 0) return zero;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  for (const axis of axes) {
+    let max = 0;
+    for (const p of profiles) {
+      if (p[axis] > max) max = p[axis];
+    }
+    result[axis] = max;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1316 — tuningFamilySocraticRadarFuzzyIntersection
+
+export function tuningFamilySocraticRadarFuzzyIntersection(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const zero = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  if (tunings.length === 0) return zero;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  for (const axis of axes) {
+    let min = Infinity;
+    for (const p of profiles) {
+      if (p[axis] < min) min = p[axis];
+    }
+    result[axis] = min === Infinity ? 0 : min;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1318 — tuningFamilySocraticRadarFuzzyComplement
+
+export function tuningFamilySocraticRadarFuzzyComplement(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  return profiles.map((p) => axes.map((axis) => 1 - p[axis]));
+}
+
+// ---------------------------------------------------------------------------
+// Q1320 — tuningFamilySocraticRadarSugenoIntegral
+
+export function tuningFamilySocraticRadarSugenoIntegral(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  return profiles.map((p) => {
+    const scores = axes.map((axis) => p[axis]);
+    scores.sort((a, b) => b - a); // descending
+    let integral = 0;
+    for (let k = 0; k < scores.length; k++) {
+      const lambda = (k + 1) / 5;
+      const val = Math.min(scores[k]!, lambda);
+      if (val > integral) integral = val;
+    }
+    return integral;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1322 — tuningFamilySocraticRadarChoquetIntegral
+
+export function tuningFamilySocraticRadarChoquetIntegral(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  return profiles.map((p) => {
+    const scores = axes.map((axis) => p[axis]);
+    scores.sort((a, b) => a - b); // ascending: x_(1) <= x_(2) <= ... <= x_(5)
+    let choquet = 0;
+    let prev = 0;
+    for (let k = 0; k < scores.length; k++) {
+      const xk = scores[k]!;
+      const capacity = (5 - k) / 5; // capacity of top (5-k) elements
+      choquet += (xk - prev) * capacity;
+      prev = xk;
+    }
+    return choquet;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1324 — tuningFamilySocraticRadarLukasiewiczNorm
+
+export function tuningFamilySocraticRadarLukasiewiczNorm(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  return profiles.map((p) => {
+    const scores = axes.map((axis) => p[axis]);
+    // T(a,b) = max(0, a+b-1), applied iteratively
+    let result = scores[0]!;
+    for (let i = 1; i < scores.length; i++) {
+      result = Math.max(0, result + scores[i]! - 1);
+    }
+    return result;
+  });
+}
+
+// ---------------------------------------------------------------------------
 // OO1 — tuningResolutionFactor
 // ---------------------------------------------------------------------------
 export function tuningResolutionFactor(
@@ -28863,4 +29007,102 @@ export function spectralOvertoneBalance(
     }
   }
   return below / (below + above + 1e-10);
+}
+
+// ---------------------------------------------------------------------------
+// Round 34: QQ1–QQ4
+// ---------------------------------------------------------------------------
+
+/**
+ * QQ1 – Compute all consecutive step sizes between adjacent sorted pitches,
+ * group by step size (rounded to nearest 10 cents), and count occurrences.
+ * Returns array sorted by count descending, then stepCents ascending.
+ * Returns empty array for scales with fewer than 2 pitches.
+ */
+export function scaleStepProfile(
+  scaleCents: readonly number[],
+): { stepCents: number; count: number }[] {
+  if (scaleCents.length < 2) return [];
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const buckets = new Map<number, number>();
+  for (let i = 1; i < sorted.length; i++) {
+    const diff = sorted[i]! - sorted[i - 1]!;
+    const rounded = Math.round(diff / 10) * 10;
+    buckets.set(rounded, (buckets.get(rounded) ?? 0) + 1);
+  }
+  return [...buckets.entries()]
+    .map(([stepCents, count]) => ({ stepCents, count }))
+    .sort((a, b) => b.count - a.count || a.stepCents - b.stepCents);
+}
+
+/**
+ * QQ2 – Measures how evenly distributed the tuning's pitches are within one
+ * octave. Maps each degree to a pitch class bucket and returns the fraction
+ * of occupied pitch classes.
+ * Returns 0 for empty tuning. Throws RangeError for octaveDivisions <= 0.
+ */
+export function tuningPitchClassBalance(
+  tuning: TuningSystem,
+  octaveDivisions: number = 12,
+): number {
+  if (octaveDivisions <= 0) {
+    throw new RangeError(`octaveDivisions must be > 0, got ${octaveDivisions}`);
+  }
+  if (tuning.degrees.length === 0) return 0;
+  const occupied = new Set<number>();
+  const classWidth = 1200 / octaveDivisions;
+  for (let i = 0; i < tuning.degrees.length; i++) {
+    const cents = pitchToCents(tuning.degrees[i]!);
+    const cls = Math.floor(((cents % 1200) + 1200) % 1200 / classWidth);
+    occupied.add(cls);
+  }
+  return occupied.size / octaveDivisions;
+}
+
+/**
+ * QQ3 – Measures how well the tuning converges to the harmonic series.
+ * For harmonics k=1..harmonics, finds the nearest tuning degree and computes
+ * the mean deviation. Returns 1 / (1 + mean_deviation).
+ * Returns 0 for empty tuning.
+ */
+export function harmonicSeriesConvergence(
+  tuning: TuningSystem,
+  harmonics: number = 16,
+): number {
+  if (tuning.degrees.length === 0) return 0;
+  const tuningCents: number[] = [];
+  for (let i = 0; i < tuning.degrees.length; i++) {
+    tuningCents.push(pitchToCents(tuning.degrees[i]!));
+  }
+  let totalDeviation = 0;
+  for (let k = 1; k <= harmonics; k++) {
+    const expectedCents = 1200 * Math.log2(k);
+    // Reduce to within one period by modulo
+    const period = tuning.periodCents;
+    const expected = ((expectedCents % period) + period) % period;
+    let minDist = Infinity;
+    for (let j = 0; j < tuningCents.length; j++) {
+      const dist = Math.abs(tuningCents[j]! - expected);
+      if (dist < minDist) minDist = dist;
+    }
+    totalDeviation += minDist;
+  }
+  const meanDeviation = totalDeviation / harmonics;
+  return 1 / (1 + meanDeviation);
+}
+
+/**
+ * QQ4 – Identify "gaps" in the scale: intervals larger than 250 cents between
+ * consecutive sorted pitches. Returns sorted array of gap sizes in cents.
+ * Returns empty array for scales with fewer than 2 pitches or no gaps > 250.
+ */
+export function scaleGapsProfile(scaleCents: readonly number[]): number[] {
+  if (scaleCents.length < 2) return [];
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const gaps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    const diff = sorted[i]! - sorted[i - 1]!;
+    if (diff > 250) gaps.push(diff);
+  }
+  return gaps.sort((a, b) => a - b);
 }

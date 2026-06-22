@@ -763,6 +763,12 @@ import {
   tuningFamilySocraticRadarOutlierScore,
   tuningFamilySocraticRadarCentroidDistance,
   tuningFamilySocraticRadarDensityEstimate,
+  tuningFamilySocraticRadarFuzzyUnion,
+  tuningFamilySocraticRadarFuzzyIntersection,
+  tuningFamilySocraticRadarFuzzyComplement,
+  tuningFamilySocraticRadarSugenoIntegral,
+  tuningFamilySocraticRadarChoquetIntegral,
+  tuningFamilySocraticRadarLukasiewiczNorm,
   barkScale,
   pitchSalience,
   scaleStepVariety,
@@ -795,6 +801,10 @@ import {
   tuningTranspositionInvariance,
   chordFactorBalance,
   spectralOvertoneBalance,
+  scaleStepProfile,
+  tuningPitchClassBalance,
+  harmonicSeriesConvergence,
+  scaleGapsProfile,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -25045,6 +25055,246 @@ describe('tuningFamilySocraticRadarDensityEstimate (Q1312)', () => {
     const result = tuningFamilySocraticRadarDensityEstimate([t1, t2], spectrum);
     for (const d of result) {
       expect(d).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1314 — tuningFamilySocraticRadarFuzzyUnion
+describe('tuningFamilySocraticRadarFuzzyUnion (Q1314)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns all zeros for empty input', () => {
+    const result = tuningFamilySocraticRadarFuzzyUnion([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.versatility).toBe(0);
+    expect(result.maturity).toBe(0);
+    expect(result.benchmark).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns record with all 5 axes', () => {
+    const result = tuningFamilySocraticRadarFuzzyUnion([t1, t2], spectrum);
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.versatility).toBe('number');
+    expect(typeof result.maturity).toBe('number');
+    expect(typeof result.benchmark).toBe('number');
+    expect(typeof result.convergence).toBe('number');
+  });
+  it('all axis values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarFuzzyUnion([t1, t2], spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1316 — tuningFamilySocraticRadarFuzzyIntersection
+describe('tuningFamilySocraticRadarFuzzyIntersection (Q1316)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns all zeros for empty input', () => {
+    const result = tuningFamilySocraticRadarFuzzyIntersection([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.versatility).toBe(0);
+    expect(result.maturity).toBe(0);
+    expect(result.benchmark).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns record with all 5 axes', () => {
+    const result = tuningFamilySocraticRadarFuzzyIntersection([t1, t2], spectrum);
+    expect(typeof result.diversity).toBe('number');
+    expect(typeof result.versatility).toBe('number');
+    expect(typeof result.maturity).toBe('number');
+    expect(typeof result.benchmark).toBe('number');
+    expect(typeof result.convergence).toBe('number');
+  });
+  it('intersection <= union for each axis', () => {
+    const union = tuningFamilySocraticRadarFuzzyUnion([t1, t2], spectrum);
+    const intersection = tuningFamilySocraticRadarFuzzyIntersection([t1, t2], spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(intersection[axis]).toBeLessThanOrEqual(union[axis]);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1318 — tuningFamilySocraticRadarFuzzyComplement
+describe('tuningFamilySocraticRadarFuzzyComplement (Q1318)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarFuzzyComplement([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one row per tuning with 5 values', () => {
+    const result = tuningFamilySocraticRadarFuzzyComplement([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]!.length).toBe(5);
+    expect(result[1]!.length).toBe(5);
+  });
+  it('all complement values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarFuzzyComplement([t1, t2], spectrum);
+    for (const row of result) {
+      for (const v of row) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1320 — tuningFamilySocraticRadarSugenoIntegral
+describe('tuningFamilySocraticRadarSugenoIntegral (Q1320)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarSugenoIntegral([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one value per tuning', () => {
+    const result = tuningFamilySocraticRadarSugenoIntegral([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarSugenoIntegral([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1322 — tuningFamilySocraticRadarChoquetIntegral
+describe('tuningFamilySocraticRadarChoquetIntegral (Q1322)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarChoquetIntegral([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one value per tuning', () => {
+    const result = tuningFamilySocraticRadarChoquetIntegral([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarChoquetIntegral([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1324 — tuningFamilySocraticRadarLukasiewiczNorm
+describe('tuningFamilySocraticRadarLukasiewiczNorm (Q1324)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarLukasiewiczNorm([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one value per tuning', () => {
+    const result = tuningFamilySocraticRadarLukasiewiczNorm([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarLukasiewiczNorm([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 34: QQ1–QQ4
+// ---------------------------------------------------------------------------
+
+describe('scaleStepProfile', () => {
+  it('major scale has 200c(×5) and 100c(×1) steps', () => {
+    const result = scaleStepProfile([0, 200, 400, 500, 700, 900, 1100]);
+    const entry200 = result.find((e) => e.stepCents === 200);
+    const entry100 = result.find((e) => e.stepCents === 100);
+    expect(entry200?.count).toBe(5);
+    expect(entry100?.count).toBe(1);
+  });
+  it('sorted descending by count', () => {
+    const result = scaleStepProfile([0, 200, 400, 500, 700, 900, 1100]);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i - 1]!.count).toBeGreaterThanOrEqual(result[i]!.count);
+    }
+  });
+  it('returns empty for single pitch', () => {
+    expect(scaleStepProfile([0])).toEqual([]);
+  });
+  it('returns empty for empty input', () => {
+    expect(scaleStepProfile([])).toEqual([]);
+  });
+});
+
+describe('tuningPitchClassBalance', () => {
+  it('12-TET occupies all 12 pitch classes → 1', () => {
+    expect(tuningPitchClassBalance(equalTemperament12(440), 12)).toBe(1);
+  });
+  it('6-EDO occupies 6 of 12 classes → 0.5', () => {
+    expect(tuningPitchClassBalance(edo(6, 440), 12)).toBeCloseTo(0.5, 5);
+  });
+  it('throws RangeError for octaveDivisions <= 0', () => {
+    expect(() => tuningPitchClassBalance(equalTemperament12(440), 0)).toThrow(RangeError);
+  });
+  it('result in (0, 1] for valid tuning', () => {
+    const v = tuningPitchClassBalance(equalTemperament12(440), 24);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('harmonicSeriesConvergence', () => {
+  it('12-TET convergence is in (0, 1]', () => {
+    const v = harmonicSeriesConvergence(equalTemperament12(440), 16);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for empty-degree tuning (edo(1) has degree 0 only; test via low division)', () => {
+    // edo(1) has a single degree at 0 cents; convergence should be > 0
+    expect(harmonicSeriesConvergence(edo(1, 440))).toBeGreaterThan(0);
+  });
+  it('more divisions generally increase convergence', () => {
+    const v12 = harmonicSeriesConvergence(equalTemperament12(440), 16);
+    const v24 = harmonicSeriesConvergence(edo(24, 440), 16);
+    expect(v24).toBeGreaterThanOrEqual(v12);
+  });
+  it('default harmonics=16 gives same result as explicit 16', () => {
+    const t = equalTemperament12(440);
+    expect(harmonicSeriesConvergence(t)).toBeCloseTo(harmonicSeriesConvergence(t, 16), 10);
+  });
+});
+
+describe('scaleGapsProfile', () => {
+  it('detects gap of 500c between 200 and 700', () => {
+    expect(scaleGapsProfile([0, 200, 700, 900])).toEqual([500]);
+  });
+  it('no gaps when all steps are small', () => {
+    expect(scaleGapsProfile([0, 200, 400])).toEqual([]);
+  });
+  it('returns empty for single pitch', () => {
+    expect(scaleGapsProfile([0])).toEqual([]);
+  });
+  it('result is sorted ascending', () => {
+    const result = scaleGapsProfile([0, 300, 900, 1200]);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i]!).toBeGreaterThanOrEqual(result[i - 1]!);
     }
   });
 });

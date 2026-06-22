@@ -539,3 +539,15 @@
 | `tuningTranspositionInvariance` | 転調後の自己相似性 |
 | `chordFactorBalance` | 和音因子（根・3・5・7度）カバレッジ |
 | `spectralOvertoneBalance` | カットオフ以下/以上の振幅バランス |
+
+## Round 34: ステッププロファイル・ピッチクラス均衡 (QQ1–QQ4)
+
+**テーマ**: スケールステップ分布・ピッチクラスバランス・倍音収束・ギャップ分析  
+**実装**: QQ1–QQ4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleStepProfile` | ステップ幅のグループ化頻度プロファイル |
+| `tuningPitchClassBalance` | ピッチクラス占有率（均衡度） |
+| `harmonicSeriesConvergence` | 調律の倍音列収束度 |
+| `scaleGapsProfile` | 250セント超のギャップ一覧 |
