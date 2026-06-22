@@ -359,3 +359,17 @@
 - BB2: harmonicSeriesApproximation — 目標音程の倍音列近似
 - BB3: tuningFrequencyDrift — 音度の目標周波数からのドリフト（セント）
 - BB4: harmonicPartialOverlap — 音程転置後の倍音重複数
+
+## Round 20: クロマ・重心・コヒーレンス・リズム (CC1–CC4)
+
+**テーマ**: 音階クロマベクトル・音高重心・音階一貫性・リズムインターロッキング
+
+### 研究トピック
+- Qiita: クロマ特徴ベクトルによる音階の指紋化（MIR応用）
+- Zenn: アフリカのリズムインターロッキングの定量化
+
+### 実装
+- CC1: scaleChromaVector — EDOビン加重クロマベクトル
+- CC2: pitchGravityCenter — 円周平均による音高重心
+- CC3: scaleCoherenceScore — 参照音階との整合スコア
+- CC4: rhythmicInterlockingScore — XORベースのリズム噛み合わせ指数

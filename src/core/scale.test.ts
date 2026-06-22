@@ -655,6 +655,16 @@ import {
   harmonicSeriesApproximation,
   tuningFrequencyDrift,
   harmonicPartialOverlap,
+  scaleChromaVector,
+  pitchGravityCenter,
+  scaleCoherenceScore,
+  rhythmicInterlockingScore,
+  tuningFamilySocraticRadarSpearmanRank,
+  tuningFamilySocraticRadarCumulativeDistribution,
+  tuningFamilySocraticRadarRunningMean,
+  tuningFamilySocraticRadarExponentialSmoothing,
+  tuningFamilySocraticRadarOutlierReport,
+  tuningFamilySocraticRadarDendrogramOrder,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -21832,5 +21842,221 @@ describe('harmonicPartialOverlap (BB4)', () => {
     const small = harmonicPartialOverlap(s, s, 100, 5);
     const large = harmonicPartialOverlap(s, s, 100, 50);
     expect(large).toBeGreaterThanOrEqual(small);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CC1 — scaleChromaVector
+// ---------------------------------------------------------------------------
+
+describe('scaleChromaVector (CC1)', () => {
+  it('returns array of length edo', () => {
+    expect(scaleChromaVector([0, 200, 400, 500, 700, 900, 1100], 12)).toHaveLength(12);
+  });
+  it('all values in [0,1]', () => {
+    for (const v of scaleChromaVector([0, 200, 400], 12)) {
+      expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for edo < 1', () => {
+    expect(() => scaleChromaVector([0], 0)).toThrow(RangeError);
+  });
+  it('empty scale returns all zeros', () => {
+    expect(scaleChromaVector([], 12).every(v => v === 0)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CC2 — pitchGravityCenter
+// ---------------------------------------------------------------------------
+
+describe('pitchGravityCenter (CC2)', () => {
+  it('single pitch returns that pitch', () => {
+    expect(pitchGravityCenter([500])).toBeCloseTo(500, 1);
+  });
+  it('result in [0, 1200)', () => {
+    const r = pitchGravityCenter([0, 400, 700, 1100]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThan(1200);
+  });
+  it('throws if weights.length !== scaleCents.length', () => {
+    expect(() => pitchGravityCenter([0, 400], [1])).toThrow(RangeError);
+  });
+  it('empty scale returns 0', () => {
+    expect(pitchGravityCenter([])).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CC3 — scaleCoherenceScore
+// ---------------------------------------------------------------------------
+
+describe('scaleCoherenceScore (CC3)', () => {
+  it('major scale vs itself = 1.0', () => {
+    const major = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleCoherenceScore(major, major, 5)).toBeCloseTo(1.0, 5);
+  });
+  it('result in [0,1]', () => {
+    const r = scaleCoherenceScore([100, 300, 600], [0, 200, 400, 500, 700, 900, 1100], 30);
+    expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty scale returns 1.0', () => {
+    expect(scaleCoherenceScore([])).toBe(1.0);
+  });
+  it('completely mismatched scale returns 0', () => {
+    expect(scaleCoherenceScore([50, 150], [0, 200, 400, 500, 700, 900, 1100], 5)).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CC4 — rhythmicInterlockingScore
+// ---------------------------------------------------------------------------
+
+describe('rhythmicInterlockingScore (CC4)', () => {
+  it('identical patterns return 0', () => {
+    expect(rhythmicInterlockingScore([1,0,1,0], [1,0,1,0])).toBe(0);
+  });
+  it('perfectly interlocking returns 1', () => {
+    expect(rhythmicInterlockingScore([1,0,1,0], [0,1,0,1])).toBe(1);
+  });
+  it('result in [0,1]', () => {
+    const r = rhythmicInterlockingScore([1,1,0,0], [0,0,1,1]);
+    expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty patterns return 0', () => {
+    expect(rhythmicInterlockingScore([], [])).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarSpearmanRank (Q1146)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSpearmanRank (Q1146)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('rho in [-1,1]', () => {
+    const r = tuningFamilySocraticRadarSpearmanRank(tunings, spectrum, 'diversity', 'maturity');
+    expect(r.rho).toBeGreaterThanOrEqual(-1);
+    expect(r.rho).toBeLessThanOrEqual(1);
+  });
+  it('n equals tunings.length', () => {
+    expect(tuningFamilySocraticRadarSpearmanRank(tunings, spectrum, 'diversity', 'maturity').n).toBe(2);
+  });
+  it('same axis gives rho=1', () => {
+    expect(tuningFamilySocraticRadarSpearmanRank(tunings, spectrum, 'diversity', 'diversity').rho).toBeCloseTo(1, 5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarCumulativeDistribution (Q1148)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCumulativeDistribution (Q1148)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns points+1 or points entries', () => {
+    const r = tuningFamilySocraticRadarCumulativeDistribution(tunings, spectrum, 'diversity', 5);
+    expect(r.length).toBeGreaterThanOrEqual(5);
+  });
+  it('cdf values in [0,1]', () => {
+    for (const e of tuningFamilySocraticRadarCumulativeDistribution(tunings, spectrum, 'maturity')) {
+      expect(e.cdf).toBeGreaterThanOrEqual(0);
+      expect(e.cdf).toBeLessThanOrEqual(1);
+    }
+  });
+  it('last cdf value is 1.0', () => {
+    const r = tuningFamilySocraticRadarCumulativeDistribution(tunings, spectrum, 'convergence');
+    expect(r[r.length - 1]!.cdf).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarRunningMean (Q1150)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarRunningMean (Q1150)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns n entries', () => {
+    expect(tuningFamilySocraticRadarRunningMean(tunings, spectrum)).toHaveLength(2);
+  });
+  it('each entry has runningMean with 5 keys', () => {
+    const r = tuningFamilySocraticRadarRunningMean(tunings, spectrum);
+    expect(Object.keys(r[0]!.runningMean)).toHaveLength(5);
+  });
+  it('last entry runningMean values in [0,1]', () => {
+    const r = tuningFamilySocraticRadarRunningMean(tunings, spectrum);
+    const last = r[r.length - 1]!.runningMean;
+    for (const v of Object.values(last)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarExponentialSmoothing (Q1152)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarExponentialSmoothing (Q1152)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns n entries', () => {
+    expect(tuningFamilySocraticRadarExponentialSmoothing(tunings, spectrum)).toHaveLength(2);
+  });
+  it('throws for alpha >= 1', () => {
+    expect(() => tuningFamilySocraticRadarExponentialSmoothing(tunings, spectrum, 1.0)).toThrow(RangeError);
+  });
+  it('smoothed values in [0,1]', () => {
+    for (const entry of tuningFamilySocraticRadarExponentialSmoothing(tunings, spectrum)) {
+      for (const v of Object.values(entry.smoothed)) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarOutlierReport (Q1154)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarOutlierReport (Q1154)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one entry per tuning', () => {
+    expect(tuningFamilySocraticRadarOutlierReport(tunings, spectrum)).toHaveLength(2);
+  });
+  it('maxZScore is non-negative', () => {
+    for (const e of tuningFamilySocraticRadarOutlierReport(tunings, spectrum)) {
+      expect(e.maxZScore).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('isOutlier is boolean', () => {
+    for (const e of tuningFamilySocraticRadarOutlierReport(tunings, spectrum)) {
+      expect(typeof e.isOutlier).toBe('boolean');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarDendrogramOrder (Q1156)
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDendrogramOrder (Q1156)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns n ids', () => {
+    expect(tuningFamilySocraticRadarDendrogramOrder(tunings, spectrum)).toHaveLength(2);
+  });
+  it('all tuning ids present', () => {
+    const order = tuningFamilySocraticRadarDendrogramOrder(tunings, spectrum);
+    expect(order).toContain(tunings[0]!.id);
+    expect(order).toContain(tunings[1]!.id);
+  });
+  it('returns string array', () => {
+    const order = tuningFamilySocraticRadarDendrogramOrder(tunings, spectrum);
+    expect(order.every((s) => typeof s === 'string')).toBe(true);
   });
 });

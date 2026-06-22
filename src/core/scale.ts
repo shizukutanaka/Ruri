@@ -23410,3 +23410,436 @@ export function tuningFamilySocraticRadarOptimalSubset(
 
   return bestIndices.map((i) => ({ id: tunings[i]!.id, score: bestScore }));
 }
+
+// ---------------------------------------------------------------------------
+// CC1 — scaleChromaVector
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a chroma feature vector of length `edo`.
+ * For each scale degree, find nearest EDO bin:
+ *   bin = Math.round((cents mod 1200) / (1200/edo)) mod edo
+ * Normalize by dividing by max count (if max > 0).
+ * Returns array of length `edo` with values in [0,1].
+ */
+export function scaleChromaVector(
+  scaleCents: readonly number[],
+  edo: number = 12,
+): number[] {
+  if (edo < 1) throw new RangeError(`edo must be >= 1, got ${edo}`);
+  const bins = new Array<number>(edo).fill(0);
+  const binWidth = 1200 / edo;
+  for (const cents of scaleCents) {
+    const mod = ((cents % 1200) + 1200) % 1200;
+    const bin = Math.round(mod / binWidth) % edo;
+    bins[bin] = (bins[bin] ?? 0) + 1;
+  }
+  const maxCount = Math.max(...bins);
+  if (maxCount > 0) {
+    for (let i = 0; i < edo; i++) {
+      bins[i] = (bins[i] ?? 0) / maxCount;
+    }
+  }
+  return bins;
+}
+
+// ---------------------------------------------------------------------------
+// CC2 — pitchGravityCenter
+// ---------------------------------------------------------------------------
+
+/**
+ * Amplitude-weighted mean of scale pitches in cents (circular mean on [0,1200)).
+ * Uses circular mean: atan2(sum(w_i*sin(angle_i)), sum(w_i*cos(angle_i)))
+ * Returns cents in [0, 1200). Empty scale → 0.
+ */
+export function pitchGravityCenter(
+  scaleCents: readonly number[],
+  weights?: readonly number[],
+): number {
+  if (scaleCents.length === 0) return 0;
+  if (weights !== undefined && weights.length !== scaleCents.length) {
+    throw new RangeError(
+      `weights.length (${weights.length}) must equal scaleCents.length (${scaleCents.length})`,
+    );
+  }
+  const TWO_PI = 2 * Math.PI;
+  let sumSin = 0;
+  let sumCos = 0;
+  let sumW = 0;
+  for (let i = 0; i < scaleCents.length; i++) {
+    const c = scaleCents[i] ?? 0;
+    const w = weights !== undefined ? (weights[i] ?? 1) : 1;
+    const angle = (TWO_PI * c) / 1200;
+    sumSin += w * Math.sin(angle);
+    sumCos += w * Math.cos(angle);
+    sumW += w;
+  }
+  const meanSin = sumSin / sumW;
+  const meanCos = sumCos / sumW;
+  const meanAngle = Math.atan2(meanSin, meanCos);
+  const meanCents = ((meanAngle * 1200) / TWO_PI + 1200) % 1200;
+  return meanCents;
+}
+
+// ---------------------------------------------------------------------------
+// CC3 — scaleCoherenceScore
+// ---------------------------------------------------------------------------
+
+/**
+ * How well a scale "fits" a reference scale (default: 12-TET major).
+ * = (number of scale degrees within toleranceCents of any reference degree) / scaleCents.length
+ * Returns value in [0, 1]. Empty scale → 1.0.
+ */
+export function scaleCoherenceScore(
+  scaleCents: readonly number[],
+  referenceCents: readonly number[] = [0, 200, 400, 500, 700, 900, 1100],
+  toleranceCents: number = 30,
+): number {
+  if (scaleCents.length === 0) return 1.0;
+  let matches = 0;
+  for (const cents of scaleCents) {
+    const modCents = ((cents % 1200) + 1200) % 1200;
+    for (const ref of referenceCents) {
+      const refMod = ((ref % 1200) + 1200) % 1200;
+      const diff = Math.abs(modCents - refMod);
+      const circDiff = Math.min(diff, 1200 - diff);
+      if (circDiff <= toleranceCents) {
+        matches++;
+        break;
+      }
+    }
+  }
+  return matches / scaleCents.length;
+}
+
+// ---------------------------------------------------------------------------
+// CC4 — rhythmicInterlockingScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Given two binary patterns (arrays of 0/1 representing beats in a cycle),
+ * compute how well they interlock.
+ * Interlocking score = XOR count / total positions (up to min length).
+ * Returns value in [0, 1]. Empty patterns → 0.
+ */
+export function rhythmicInterlockingScore(
+  pattern1: readonly number[],
+  pattern2: readonly number[],
+): number {
+  const len = Math.min(pattern1.length, pattern2.length);
+  if (len === 0) return 0;
+  let xorCount = 0;
+  for (let i = 0; i < len; i++) {
+    const a = pattern1[i] ?? 0;
+    const b = pattern2[i] ?? 0;
+    if ((a === 0 || a === 1) && (b === 0 || b === 1) && a !== b) {
+      xorCount++;
+    }
+  }
+  return xorCount / len;
+}
+
+// ---------------------------------------------------------------------------
+// Q1146 — tuningFamilySocraticRadarSpearmanRank
+// ---------------------------------------------------------------------------
+
+/**
+ * Spearman rank correlation between two radar axes across a family of tunings.
+ * Each tuning is ranked by its score on axis1 and axis2 (1=lowest).
+ * Ties are handled by average rank.
+ * rho = 1 - (6 * sum(d_i^2)) / (n * (n^2 - 1))
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis1 - First axis key.
+ * @param axis2 - Second axis key.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { rho, n }
+ */
+export function tuningFamilySocraticRadarSpearmanRank(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis1: AxisKey,
+  axis2: AxisKey,
+  rootHz?: number,
+): { rho: number; n: number } {
+  const n = tunings.length;
+  if (n === 0) return { rho: 0, n: 0 };
+  if (n === 1) return { rho: 1, n: 1 };
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function averageRank(scores: number[]): number[] {
+    const indexed = scores.map((v, i) => ({ v, i }));
+    indexed.sort((a, b) => a.v - b.v);
+    const ranks = new Array<number>(scores.length);
+    let i = 0;
+    while (i < indexed.length) {
+      let j = i;
+      while (j < indexed.length && indexed[j]!.v === indexed[i]!.v) j++;
+      const avgRank = (i + j - 1) / 2 + 1;
+      for (let k = i; k < j; k++) ranks[indexed[k]!.i] = avgRank;
+      i = j;
+    }
+    return ranks;
+  }
+
+  const scores1 = profiles.map((p) => p[axis1]);
+  const scores2 = profiles.map((p) => p[axis2]);
+  const ranks1 = averageRank(scores1);
+  const ranks2 = averageRank(scores2);
+
+  let sumD2 = 0;
+  for (let i = 0; i < n; i++) {
+    const d = ranks1[i]! - ranks2[i]!;
+    sumD2 += d * d;
+  }
+
+  const rho = 1 - (6 * sumD2) / (n * (n * n - 1));
+  return { rho, n };
+}
+
+// ---------------------------------------------------------------------------
+// Q1148 — tuningFamilySocraticRadarCumulativeDistribution
+// ---------------------------------------------------------------------------
+
+/**
+ * Empirical CDF of radar axis scores across a family of tunings.
+ * Evaluates at `points` evenly spaced values from 0 to 1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Axis to compute CDF for.
+ * @param points - Number of evaluation points (default 11: 0.0, 0.1, ..., 1.0).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array sorted by value ascending, each with { value, cdf }.
+ */
+export function tuningFamilySocraticRadarCumulativeDistribution(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  points: number = 11,
+  rootHz?: number,
+): Array<{ value: number; cdf: number }> {
+  const n = tunings.length;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => p[axis]);
+
+  const result: Array<{ value: number; cdf: number }> = [];
+  for (let i = 0; i < points; i++) {
+    const value = i / (points - 1);
+    const cdf = n === 0 ? 0 : scores.filter((s) => s <= value).length / n;
+    result.push({ value, cdf });
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1150 — tuningFamilySocraticRadarRunningMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Running (cumulative) mean of radar profiles as tunings are added in array order.
+ * `runningMean[i][axis] = mean of axis scores for tunings[0..i]`
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of length n, each with { index, runningMean }.
+ */
+export function tuningFamilySocraticRadarRunningMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Array<{ index: number; runningMean: Record<AxisKey, number> }> {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result: Array<{ index: number; runningMean: Record<AxisKey, number> }> = [];
+  const running = {} as Record<AxisKey, number>;
+  for (const ax of axes) running[ax] = 0;
+
+  for (let i = 0; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    const mean = {} as Record<AxisKey, number>;
+    for (const ax of axes) {
+      running[ax] += p[ax];
+      mean[ax] = running[ax] / (i + 1);
+    }
+    result.push({ index: i, runningMean: mean });
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1152 — tuningFamilySocraticRadarExponentialSmoothing
+// ---------------------------------------------------------------------------
+
+/**
+ * Holt simple exponential smoothing of radar profiles.
+ * S[0] = profile[0], S[i] = alpha * profile[i] + (1-alpha) * S[i-1]
+ * Throws RangeError if alpha <= 0 or alpha >= 1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param alpha - Smoothing factor in (0, 1). Default 0.3.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of length n, each with { index, smoothed }.
+ */
+export function tuningFamilySocraticRadarExponentialSmoothing(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  alpha: number = 0.3,
+  rootHz?: number,
+): Array<{ index: number; smoothed: Record<AxisKey, number> }> {
+  if (alpha <= 0 || alpha >= 1) {
+    throw new RangeError(
+      `tuningFamilySocraticRadarExponentialSmoothing: alpha must be in (0,1), got ${alpha}`,
+    );
+  }
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result: Array<{ index: number; smoothed: Record<AxisKey, number> }> = [];
+  let prev: Record<AxisKey, number> | null = null;
+
+  for (let i = 0; i < profiles.length; i++) {
+    const p = profiles[i]!;
+    const smoothed = {} as Record<AxisKey, number>;
+    if (prev === null) {
+      for (const ax of axes) smoothed[ax] = p[ax];
+    } else {
+      for (const ax of axes) smoothed[ax] = alpha * p[ax] + (1 - alpha) * prev[ax];
+    }
+    prev = smoothed;
+    result.push({ index: i, smoothed });
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1154 — tuningFamilySocraticRadarOutlierReport
+// ---------------------------------------------------------------------------
+
+/**
+ * For each tuning, compute z-score on each axis, take max |z-score| across axes.
+ * isOutlier = maxZScore > threshold. Results sorted by maxZScore descending.
+ * If only 1 tuning or std=0 on all axes, isOutlier=false for all.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param threshold - Z-score threshold. Default 2.0.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array (one per tuning) sorted by maxZScore descending.
+ */
+export function tuningFamilySocraticRadarOutlierReport(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  threshold: number = 2.0,
+  rootHz?: number,
+): Array<{ id: string; isOutlier: boolean; maxZScore: number }> {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  if (n <= 1) {
+    return tunings.map((t) => ({ id: t.id, isOutlier: false, maxZScore: 0 }));
+  }
+
+  const meanPerAxis = {} as Record<AxisKey, number>;
+  const stdPerAxis = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const vals = profiles.map((p) => p[ax]);
+    const mean = vals.reduce((s, v) => s + v, 0) / n;
+    const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    meanPerAxis[ax] = mean;
+    stdPerAxis[ax] = Math.sqrt(variance);
+  }
+
+  const entries = tunings.map((t, i) => {
+    const p = profiles[i]!;
+    let maxZ = 0;
+    for (const ax of axes) {
+      const std = stdPerAxis[ax];
+      if (std === 0) continue;
+      const z = Math.abs((p[ax] - meanPerAxis[ax]) / std);
+      if (z > maxZ) maxZ = z;
+    }
+    return { id: t.id, isOutlier: maxZ > threshold, maxZScore: maxZ };
+  });
+
+  entries.sort((a, b) => b.maxZScore - a.maxZScore);
+  return entries;
+}
+
+// ---------------------------------------------------------------------------
+// Q1156 — tuningFamilySocraticRadarDendrogramOrder
+// ---------------------------------------------------------------------------
+
+/**
+ * Single-linkage hierarchical clustering dendrogram order.
+ * Distance metric: L2 distance between radar profiles.
+ * At each merge step, the two closest clusters are joined.
+ * Returns tuning ids in dendrogram leaf order.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of tuning ids in dendrogram leaf order.
+ */
+export function tuningFamilySocraticRadarDendrogramOrder(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): string[] {
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [tunings[0]!.id];
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function l2(i: number, j: number): number {
+    let sum = 0;
+    for (const ax of axes) {
+      const d = profiles[i]![ax] - profiles[j]![ax];
+      sum += d * d;
+    }
+    return Math.sqrt(sum);
+  }
+
+  // Initialize clusters as singleton arrays of original indices
+  let clusters: number[][] = profiles.map((_, i) => [i]);
+
+  while (clusters.length > 1) {
+    let minDist = Infinity;
+    let mergeA = 0;
+    let mergeB = 1;
+
+    for (let a = 0; a < clusters.length; a++) {
+      for (let b = a + 1; b < clusters.length; b++) {
+        // Single linkage: min distance between any two members
+        let minLink = Infinity;
+        for (const i of clusters[a]!) {
+          for (const j of clusters[b]!) {
+            const d = l2(i, j);
+            if (d < minLink) minLink = d;
+          }
+        }
+        if (minLink < minDist) {
+          minDist = minLink;
+          mergeA = a;
+          mergeB = b;
+        }
+      }
+    }
+
+    const merged = [...clusters[mergeA]!, ...clusters[mergeB]!];
+    const newClusters: number[][] = [];
+    for (let i = 0; i < clusters.length; i++) {
+      if (i !== mergeA && i !== mergeB) newClusters.push(clusters[i]!);
+    }
+    newClusters.push(merged);
+    clusters = newClusters;
+  }
+
+  return (clusters[0] ?? []).map((i) => tunings[i]!.id);
+}
