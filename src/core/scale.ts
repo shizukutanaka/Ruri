@@ -39194,6 +39194,156 @@ export function tuningFamilySocraticRadarIteratedFunctionProxy(
   return Math.max(0, Math.min(1, avg));
 }
 
+// Q1770 — tuningFamilySocraticRadarNashEquilibriumProxyV2
+export function tuningFamilySocraticRadarNashEquilibriumProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // For each axis, find which profile has the maximum value (axis-wise maximum position).
+  // Count axes where only one profile is the unique maximum (consensus maximum).
+  let consensusCount = 0;
+  for (let axIdx = 0; axIdx < axes.length; axIdx++) {
+    const axVals = vecs.map((v) => v[axIdx]!);
+    const maxVal = Math.max(...axVals);
+    const maxProfiles = axVals.filter((v) => v === maxVal).length;
+    // consensus: only one profile is the unique maximum
+    if (maxProfiles === 1) consensusCount++;
+  }
+  const proportion = consensusCount / axes.length;
+  return Math.max(0, Math.min(1, proportion));
+}
+
+// Q1772 — tuningFamilySocraticRadarCooperationIndexMean
+export function tuningFamilySocraticRadarCooperationIndexMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    // single profile: cooperation with itself = 1
+    return 1;
+  }
+  let total = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const p = vecs[i]!;
+    const q = vecs[i + 1]!;
+    let sumMin = 0;
+    let sumMax = 0;
+    for (let k = 0; k < axes.length; k++) {
+      sumMin += Math.min(p[k]!, q[k]!);
+      sumMax += Math.max(p[k]!, q[k]!);
+    }
+    const coop = sumMax === 0 ? 1 : sumMin / sumMax;
+    total += coop;
+    pairs++;
+  }
+  const avg = pairs === 0 ? 0 : total / pairs;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1774 — tuningFamilySocraticRadarCompetitionIndexMean
+export function tuningFamilySocraticRadarCompetitionIndexMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  return 1 - tuningFamilySocraticRadarCooperationIndexMean(tunings, spectrum, rootHz);
+}
+
+// Q1776 — tuningFamilySocraticRadarParetoDominanceMean
+export function tuningFamilySocraticRadarParetoDominanceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) return 0;
+  const nAxes = axes.length;
+  let total = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const p = vecs[i]!;
+    const q = vecs[i + 1]!;
+    // count axes where p dominates q (p_i > q_i)
+    let domCount = 0;
+    for (let k = 0; k < nAxes; k++) {
+      if (p[k]! > q[k]!) domCount++;
+    }
+    total += domCount / nAxes;
+    pairs++;
+  }
+  const avg = pairs === 0 ? 0 : total / pairs;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1778 — tuningFamilySocraticRadarShapleyValueProxy
+export function tuningFamilySocraticRadarShapleyValueProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n === 0) return 0;
+  if (n <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // mean profile across all tunings
+  const meanAll = axes.map((_, axIdx) => {
+    let s = 0;
+    for (const v of vecs) s += v[axIdx]!;
+    return s / n;
+  });
+  // marginal contribution of each tuning: mean absolute change in mean profile when removed
+  let totalMarginal = 0;
+  for (let i = 0; i < n; i++) {
+    const removed = vecs[i]!;
+    let marginalSum = 0;
+    for (let axIdx = 0; axIdx < axes.length; axIdx++) {
+      const meanWithout = (meanAll[axIdx]! * n - removed[axIdx]!) / (n - 1);
+      marginalSum += Math.abs(meanAll[axIdx]! - meanWithout);
+    }
+    totalMarginal += marginalSum / axes.length;
+  }
+  const meanMarginal = totalMarginal / n;
+  // normalize to [0,1]: max possible marginal is 1 (axis value range is [0,1])
+  return Math.max(0, Math.min(1, meanMarginal));
+}
+
+// Q1780 — tuningFamilySocraticRadarMinimaxProxy
+export function tuningFamilySocraticRadarMinimaxProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // for each profile, compute max over axes; then take min over profiles
+  const profileMaxes = vecs.map((v) => Math.max(...v));
+  const minimaxVal = Math.min(...profileMaxes);
+  return Math.max(0, Math.min(1, minimaxVal));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],

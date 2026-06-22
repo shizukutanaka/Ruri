@@ -1171,6 +1171,10 @@ import {
   scaleSpectralBandwidth,
   scaleSpectralSkewness,
   scaleSpectralKurtosis,
+  scaleHarmonicSeriesAlignment,
+  scaleSubharmonicDensity,
+  scaleResonanceScore,
+  scaleNodeDensity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -32294,5 +32298,109 @@ describe('Q1768 tuningFamilySocraticRadarIteratedFunctionProxy', () => {
     const v = tuningFamilySocraticRadarIteratedFunctionProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// DDD1 — scaleHarmonicSeriesAlignment
+describe('scaleHarmonicSeriesAlignment', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleHarmonicSeriesAlignment([])).toBe(0);
+  });
+  it('single pitch [0] → finite and in [0,1]', () => {
+    const v = scaleHarmonicSeriesAlignment([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('just-intonation scale [0,386,702,969] → finite and in [0,1] (expected high)', () => {
+    const v = scaleHarmonicSeriesAlignment([0, 386, 702, 969]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite and in [0,1]', () => {
+    const v = scaleHarmonicSeriesAlignment(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// DDD2 — scaleSubharmonicDensity
+describe('scaleSubharmonicDensity', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleSubharmonicDensity([])).toBe(0);
+  });
+  it('single pitch [0] → finite and in [0,1]', () => {
+    const v = scaleSubharmonicDensity([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('just-intonation scale [0,386,702,969] → finite and in [0,1]', () => {
+    const v = scaleSubharmonicDensity([0, 386, 702, 969]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite and in [0,1]', () => {
+    const v = scaleSubharmonicDensity(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// DDD3 — scaleResonanceScore
+describe('scaleResonanceScore', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleResonanceScore([])).toBe(0);
+  });
+  it('single pitch [0] → finite and in [0,1]', () => {
+    const v = scaleResonanceScore([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('just-intonation scale [0,386,702,969] → finite and in [0,1]', () => {
+    const v = scaleResonanceScore([0, 386, 702, 969]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite and in [0,1]', () => {
+    const v = scaleResonanceScore(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// DDD4 — scaleNodeDensity
+describe('scaleNodeDensity', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleNodeDensity([])).toBe(0);
+  });
+  it('single pitch [0] → finite and in [0,1]', () => {
+    const v = scaleNodeDensity([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('just-intonation scale [0,386,702,969] → finite and in [0,1]', () => {
+    const v = scaleNodeDensity([0, 386, 702, 969]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite and in [0,1]', () => {
+    const v = scaleNodeDensity(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

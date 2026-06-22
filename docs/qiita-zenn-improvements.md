@@ -975,3 +975,14 @@
 | CCC2 | `scaleSpectralBandwidth` | ピッチ分布の標準偏差/周期 |
 | CCC3 | `scaleSpectralSkewness` | ピッチ分布の歪度（正規化[0,1]） |
 | CCC4 | `scaleSpectralKurtosis` | ピッチ分布の尖度（正規化[0,1]） |
+
+## Round 73: 音響共鳴・弦振動 (DDD1–DDD4)
+
+音階の倍音列整合性と音響共鳴特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| DDD1 | `scaleHarmonicSeriesAlignment` | 倍音列との整合度（整数比近傍） |
+| DDD2 | `scaleSubharmonicDensity` | 下倍音関係の密度 |
+| DDD3 | `scaleResonanceScore` | 複合共鳴スコア（加重平均） |
+| DDD4 | `scaleNodeDensity` | 根音との整数比「節音」の密度 |
