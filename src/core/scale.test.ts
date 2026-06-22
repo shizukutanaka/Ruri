@@ -1095,6 +1095,12 @@ import {
   tuningFamilySocraticRadarMutualInformationProxy,
   tuningFamilySocraticRadarFisherInformationProxy,
   tuningFamilySocraticRadarTsallisEntropyProxy,
+  tuningFamilySocraticRadarClusteringCoefficientProxy,
+  tuningFamilySocraticRadarPathLengthProxy,
+  tuningFamilySocraticRadarDegreeDistributionEntropy,
+  tuningFamilySocraticRadarBetweennessCentralityProxy,
+  tuningFamilySocraticRadarSmallWorldnessProxy,
+  tuningFamilySocraticRadarScaleFreeProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1241,6 +1247,10 @@ import {
   scaleJustIntonationProximity,
   scaleEqualTemperamentDeviationV2,
   scaleMelodyCentroid,
+  scaleChiralityScore,
+  scaleTranspositionClosureCount,
+  scaleInversionClosureCount,
+  scalePerfectBalance,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -33797,5 +33807,182 @@ describe('Q1852 tuningFamilySocraticRadarTsallisEntropyProxy', () => {
     const v = tuningFamilySocraticRadarTsallisEntropyProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1854 — tuningFamilySocraticRadarClusteringCoefficientProxy
+describe('Q1854 tuningFamilySocraticRadarClusteringCoefficientProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarClusteringCoefficientProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarClusteringCoefficientProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarClusteringCoefficientProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1856 — tuningFamilySocraticRadarPathLengthProxy
+describe('Q1856 tuningFamilySocraticRadarPathLengthProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPathLengthProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPathLengthProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPathLengthProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1858 — tuningFamilySocraticRadarDegreeDistributionEntropy
+describe('Q1858 tuningFamilySocraticRadarDegreeDistributionEntropy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDegreeDistributionEntropy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarDegreeDistributionEntropy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarDegreeDistributionEntropy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1860 — tuningFamilySocraticRadarBetweennessCentralityProxy
+describe('Q1860 tuningFamilySocraticRadarBetweennessCentralityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBetweennessCentralityProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarBetweennessCentralityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarBetweennessCentralityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1862 — tuningFamilySocraticRadarSmallWorldnessProxy
+describe('Q1862 tuningFamilySocraticRadarSmallWorldnessProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSmallWorldnessProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSmallWorldnessProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSmallWorldnessProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1864 — tuningFamilySocraticRadarScaleFreeProxy
+describe('Q1864 tuningFamilySocraticRadarScaleFreeProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarScaleFreeProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarScaleFreeProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarScaleFreeProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// LLL1 — scaleChiralityScore
+describe('LLL1 scaleChiralityScore', () => {
+  it('empty returns 0', () => {
+    expect(scaleChiralityScore([])).toBe(0);
+  });
+  it('12-TET returns value in [0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleChiralityScore(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('symmetric scale [0,300,600,900] returns 0', () => {
+    const v = scaleChiralityScore([0, 300, 600, 900], 1200);
+    expect(v).toBeCloseTo(0, 5);
+  });
+});
+
+// LLL2 — scaleTranspositionClosureCount
+describe('LLL2 scaleTranspositionClosureCount', () => {
+  it('empty returns 0', () => {
+    expect(scaleTranspositionClosureCount([])).toBe(0);
+  });
+  it('[0,400,800] (3-fold symmetric) has transposition count > 0', () => {
+    const v = scaleTranspositionClosureCount([0, 400, 800], 1200);
+    expect(v).toBeGreaterThan(0);
+  });
+  it('12-TET returns finite value in [0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleTranspositionClosureCount(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// LLL3 — scaleInversionClosureCount
+describe('LLL3 scaleInversionClosureCount', () => {
+  it('empty returns 0', () => {
+    expect(scaleInversionClosureCount([])).toBe(0);
+  });
+  it('[0,400,800] has inversion closure count > 0', () => {
+    const v = scaleInversionClosureCount([0, 400, 800], 1200);
+    expect(v).toBeGreaterThan(0);
+  });
+  it('12-TET returns finite value in [0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleInversionClosureCount(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// LLL4 — scalePerfectBalance
+describe('LLL4 scalePerfectBalance', () => {
+  it('empty returns 0', () => {
+    expect(scalePerfectBalance([])).toBe(0);
+  });
+  it('[0,400,800] is close to 1 (perfectly balanced)', () => {
+    const v = scalePerfectBalance([0, 400, 800], 1200);
+    expect(v).toBeCloseTo(1, 5);
+  });
+  it('[0] (single note) returns 0', () => {
+    const v = scalePerfectBalance([0], 1200);
+    expect(v).toBeCloseTo(0, 5);
   });
 });

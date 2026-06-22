@@ -40461,6 +40461,147 @@ export function tuningFamilySocraticRadarTsallisEntropyProxy(
   return total / vecs.length;
 }
 
+/** Q1854 複雑ネットワーク: clustering coefficient proxy from axis values. */
+export function tuningFamilySocraticRadarClusteringCoefficientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let pairSum = 0;
+    let pairCount = 0;
+    for (let i = 0; i < vec.length; i++) {
+      for (let j = i + 1; j < vec.length; j++) {
+        pairSum += (vec[i]!) * (vec[j]!);
+        pairCount++;
+      }
+    }
+    const cc = pairCount > 0 ? pairSum / pairCount / 0.25 : 0;
+    total += Math.max(0, Math.min(1, cc));
+  }
+  return total / vecs.length;
+}
+
+/** Q1856 複雑ネットワーク: average path length proxy (inverse of connectivity). */
+export function tuningFamilySocraticRadarPathLengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const connectivity = vec.reduce((a, b) => a + b, 0) / vec.length;
+    total += 1 - connectivity;
+  }
+  return total / vecs.length;
+}
+
+/** Q1858 複雑ネットワーク: entropy of degree distribution proxy. */
+export function tuningFamilySocraticRadarDegreeDistributionEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-10;
+  const log2of5 = Math.log2(5);
+  let total = 0;
+  for (const vec of vecs) {
+    const shifted = vec.map((v) => v + eps);
+    const sum = shifted.reduce((a, b) => a + b, 0);
+    const p = shifted.map((v) => v / sum);
+    const H = -p.reduce((acc, pi) => acc + pi * Math.log2(pi), 0);
+    total += H / log2of5;
+  }
+  return total / vecs.length;
+}
+
+/** Q1860 複雑ネットワーク: betweenness centrality proxy (median axis value). */
+export function tuningFamilySocraticRadarBetweennessCentralityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    total += sorted[2]!;
+  }
+  return total / vecs.length;
+}
+
+/** Q1862 複雑ネットワーク: small-worldness proxy (high clustering + low path length). */
+export function tuningFamilySocraticRadarSmallWorldnessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let pairSum = 0;
+    let pairCount = 0;
+    for (let i = 0; i < vec.length; i++) {
+      for (let j = i + 1; j < vec.length; j++) {
+        pairSum += (vec[i]!) * (vec[j]!);
+        pairCount++;
+      }
+    }
+    const cc = pairCount > 0 ? Math.max(0, Math.min(1, pairSum / pairCount / 0.25)) : 0;
+    const meanV = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const smallWorld = Math.max(0, Math.min(1, cc * meanV));
+    total += smallWorld;
+  }
+  return total / vecs.length;
+}
+
+/** Q1864 複雑ネットワーク: scale-free network proxy (power-law degree distribution proxy). */
+export function tuningFamilySocraticRadarScaleFreeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => b - a);
+    const top = sorted[0]!;
+    const bottom = sorted[sorted.length - 1]!;
+    const ratio = top / (bottom + 1e-10);
+    const scaleFree = Math.min(1, Math.log2(1 + ratio) / Math.log2(1 + 5));
+    total += scaleFree;
+  }
+  return total / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -43115,4 +43256,109 @@ export function scaleMelodyCentroid(scale: TuningSystem): number {
   const sum = degreeCents.reduce((acc, c) => acc + c, 0);
   const mean = sum / degreeCents.length;
   return Math.min(1, Math.max(0, mean / scale.periodCents));
+}
+
+/**
+ * LLL1 scaleChiralityScore
+ * Chirality — degree of asymmetry between scale and its mirror image.
+ * - Mirror: for each note c, mirror[i] = ((periodCents - c) % periodCents) sorted ascending
+ * - chirality = mean |scaleCents[i] - mirror[i]| / (periodCents / 2)
+ * - Returns 0 if n < 2 (symmetric by definition), otherwise value in [0,1]
+ */
+export function scaleChiralityScore(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const mirror = sorted
+    .map((c) => ((periodCents - c) % periodCents + periodCents) % periodCents)
+    .sort((a, b) => a - b);
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += Math.abs(sorted[i]! - mirror[i]!);
+  }
+  const diff = sum / n;
+  return Math.min(1, diff / (periodCents / 2));
+}
+
+/**
+ * LLL2 scaleTranspositionClosureCount
+ * Count how many transpositions (by scale steps) map the scale to itself, normalized by n.
+ * - For each degree d in scale: transpose all notes by d (mod periodCents)
+ * - Check if transposed set equals original set (within 1 cent tolerance)
+ * - Return count / n; 0 for n=0
+ */
+export function scaleTranspositionClosureCount(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let count = 0;
+  for (const d of sorted) {
+    const transposed = sorted
+      .map((c) => ((c + d) % periodCents + periodCents) % periodCents)
+      .sort((a, b) => a - b);
+    const isMatch = transposed.every(
+      (t, i) => Math.abs(t - sorted[i]!) < 1.0,
+    );
+    if (isMatch) count++;
+  }
+  return count / n;
+}
+
+/**
+ * LLL3 scaleInversionClosureCount
+ * Count how many inversions (negate + transpose) map scale to itself, normalized by n.
+ * - Inversion around axis a: each note c → (2a - c) mod periodCents
+ * - Check each note c in scale as inversion axis
+ * - Return count of matching inversions / n; 0 for n=0
+ */
+export function scaleInversionClosureCount(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let count = 0;
+  for (const a of sorted) {
+    const inverted = sorted
+      .map((c) => ((2 * a - c) % periodCents + periodCents) % periodCents)
+      .sort((a2, b) => a2 - b);
+    const isMatch = inverted.every(
+      (v, i) => Math.abs(v - sorted[i]!) < 1.0,
+    );
+    if (isMatch) count++;
+  }
+  return count / n;
+}
+
+/**
+ * LLL4 scalePerfectBalance
+ * Perfect balance score — how close the center of mass (sum of unit vectors on circle) is to zero.
+ * - Each pitch c maps to angle θ = 2π * c / periodCents on unit circle
+ * - sumX = sum(cos(θ)), sumY = sum(sin(θ))
+ * - magnitude = sqrt(sumX^2 + sumY^2) / n  (normalized to [0,1])
+ * - balance = 1 - magnitude (0 = perfectly balanced, 1 = all same note)
+ * - Return 0 for n=0
+ */
+export function scalePerfectBalance(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let sumX = 0;
+  let sumY = 0;
+  for (const c of scaleCents) {
+    const theta = (2 * Math.PI * c) / periodCents;
+    sumX += Math.cos(theta);
+    sumY += Math.sin(theta);
+  }
+  const magnitude = Math.sqrt(sumX * sumX + sumY * sumY) / n;
+  return 1 - magnitude;
 }
