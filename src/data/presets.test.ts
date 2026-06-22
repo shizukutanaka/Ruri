@@ -17947,3 +17947,87 @@ describe('Q1781 presetFamilySocraticRadarMinimaxProxy', () => {
     expect(() => presetFamilySocraticRadarMinimaxProxy(['unknown'], s)).toThrow(RangeError);
   });
 });
+
+// Q1783 — presetFamilySocraticRadarMorphismCountProxy
+describe('Q1783 presetFamilySocraticRadarMorphismCountProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarMorphismCountProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarMorphismCountProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMorphismCountProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1785 — presetFamilySocraticRadarFunctorFaithfulnessProxy
+describe('Q1785 presetFamilySocraticRadarFunctorFaithfulnessProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarFunctorFaithfulnessProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarFunctorFaithfulnessProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFunctorFaithfulnessProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1787 — presetFamilySocraticRadarNaturalTransformationMean
+describe('Q1787 presetFamilySocraticRadarNaturalTransformationMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarNaturalTransformationMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarNaturalTransformationMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNaturalTransformationMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1789 — presetFamilySocraticRadarAdjunctionProxy
+describe('Q1789 presetFamilySocraticRadarAdjunctionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarAdjunctionProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarAdjunctionProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAdjunctionProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1791 — presetFamilySocraticRadarLimitProxy
+describe('Q1791 presetFamilySocraticRadarLimitProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarLimitProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarLimitProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLimitProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1793 — presetFamilySocraticRadarColimitProxy
+describe('Q1793 presetFamilySocraticRadarColimitProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarColimitProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarColimitProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarColimitProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
