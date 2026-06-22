@@ -832,3 +832,14 @@
 | PPP4 | `scaleMaxStepCents` | 最大ステップサイズ（セント） |
 
 **参考**: 7-limit just intonation (Partch 1949); Scale step distribution analysis (Clough & Myerson 1985).
+
+## Round 60: 声部導音距離・自己相似性 (QQQ1–QQQ4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| QQQ1 | `scaleVoiceLeadingDistance` | 2つのスケール間の最小声部導音距離 |
+| QQQ2 | `scaleVoiceLeadingRadius` | 最大均等スケールへの声部導音距離（半径） |
+| QQQ3 | `scaleParsimonyCost` | 最小移調パーシモニーコスト |
+| QQQ4 | `scaleSelfSimilarityScore` | 逆行（後退形）との自己相似性スコア |
+
+**参考**: Voice-leading geometry (Tymoczko 2011); Parsimonious voice leading (Cohn 1996).
