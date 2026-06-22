@@ -527,3 +527,15 @@
 | `scalePentaSubsetQuality` | ペンタトニックサブセット充足率 |
 | `harmonicFluxAcrossDegrees` | 隣接音度間の調波フラックス |
 | `intervalGroupSymmetryScore` | ステップ音程の回文対称性スコア |
+
+## Round 33: 導音・転調不変性・倍音バランス (PP1–PP4)
+
+**テーマ**: 導音効果・転調不変性・和音因子バランス・倍音エネルギー配分  
+**実装**: PP1–PP4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleLeadingToneStrength` | 半音下の導音効果強度 |
+| `tuningTranspositionInvariance` | 転調後の自己相似性 |
+| `chordFactorBalance` | 和音因子（根・3・5・7度）カバレッジ |
+| `spectralOvertoneBalance` | カットオフ以下/以上の振幅バランス |

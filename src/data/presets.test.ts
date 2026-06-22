@@ -454,6 +454,12 @@ import {
   presetFamilySocraticRadarBootstrapMeanCI,
   presetFamilySocraticRadarJackknifeVariance,
   presetFamilySocraticRadarWilcoxonSignedRank,
+  presetFamilySocraticRadarAxisBinarize,
+  presetFamilySocraticRadarHammingDistance,
+  presetFamilySocraticRadarMahalanobisDistance,
+  presetFamilySocraticRadarOutlierScore,
+  presetFamilySocraticRadarCentroidDistance,
+  presetFamilySocraticRadarDensityEstimate,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -13971,5 +13977,130 @@ describe('presetFamilySocraticRadarWilcoxonSignedRank (Q1301)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarWilcoxonSignedRank(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1303 — presetFamilySocraticRadarAxisBinarize
+describe('presetFamilySocraticRadarAxisBinarize (Q1303)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns number[][] with values only 0 or 1', () => {
+    const result = presetFamilySocraticRadarAxisBinarize(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+      for (const val of row) {
+        expect(val === 0 || val === 1).toBe(true);
+      }
+    }
+  });
+  it('returns empty array for empty preset list', () => {
+    const result = presetFamilySocraticRadarAxisBinarize([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAxisBinarize(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1305 — presetFamilySocraticRadarHammingDistance
+describe('presetFamilySocraticRadarHammingDistance (Q1305)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns n×n symmetric matrix', () => {
+    const result = presetFamilySocraticRadarHammingDistance(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]!.length).toBe(2);
+    expect(result[0]![1]).toBe(result[1]![0]);
+  });
+  it('diagonal is always 0', () => {
+    const result = presetFamilySocraticRadarHammingDistance(presetIds, spectrum);
+    expect(result[0]![0]).toBe(0);
+    expect(result[1]![1]).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHammingDistance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1307 — presetFamilySocraticRadarMahalanobisDistance
+describe('presetFamilySocraticRadarMahalanobisDistance (Q1307)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one distance per preset', () => {
+    const result = presetFamilySocraticRadarMahalanobisDistance(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all distances are non-negative', () => {
+    const result = presetFamilySocraticRadarMahalanobisDistance(presetIds, spectrum);
+    for (const d of result) {
+      expect(d).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMahalanobisDistance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1309 — presetFamilySocraticRadarOutlierScore
+describe('presetFamilySocraticRadarOutlierScore (Q1309)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one score per preset', () => {
+    const result = presetFamilySocraticRadarOutlierScore(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all scores are non-negative', () => {
+    const result = presetFamilySocraticRadarOutlierScore(presetIds, spectrum);
+    for (const s of result) {
+      expect(s).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarOutlierScore(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1311 — presetFamilySocraticRadarCentroidDistance
+describe('presetFamilySocraticRadarCentroidDistance (Q1311)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one distance per preset', () => {
+    const result = presetFamilySocraticRadarCentroidDistance(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all distances are non-negative', () => {
+    const result = presetFamilySocraticRadarCentroidDistance(presetIds, spectrum);
+    for (const d of result) {
+      expect(d).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCentroidDistance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1313 — presetFamilySocraticRadarDensityEstimate
+describe('presetFamilySocraticRadarDensityEstimate (Q1313)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one density per preset', () => {
+    const result = presetFamilySocraticRadarDensityEstimate(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all densities are non-negative', () => {
+    const result = presetFamilySocraticRadarDensityEstimate(presetIds, spectrum);
+    for (const d of result) {
+      expect(d).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDensityEstimate(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

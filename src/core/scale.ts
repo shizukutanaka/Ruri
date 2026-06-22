@@ -28422,6 +28422,205 @@ export function tuningFamilySocraticRadarWilcoxonSignedRank(
 }
 
 // ---------------------------------------------------------------------------
+// Q1302 — tuningFamilySocraticRadarAxisBinarize
+
+export function tuningFamilySocraticRadarAxisBinarize(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  if (tunings.length === 0) return [];
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  // Compute median for each axis
+  const medians: number[] = axes.map((axis) => {
+    const vals = profiles.map((p) => p[axis]).sort((a, b) => a - b);
+    const n = vals.length;
+    if (n % 2 === 1) return vals[Math.floor(n / 2)]!;
+    return (vals[Math.floor(n / 2) - 1]! + vals[Math.floor(n / 2)]!) / 2;
+  });
+  return profiles.map((p) =>
+    axes.map((axis, ai) => (p[axis] >= medians[ai]! ? 1 : 0)),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Q1304 — tuningFamilySocraticRadarHammingDistance
+
+export function tuningFamilySocraticRadarHammingDistance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  if (n === 0) return [];
+  const binary = tuningFamilySocraticRadarAxisBinarize(tunings, spectrum, rootHz);
+  const result: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let dist = 0;
+      for (let k = 0; k < 5; k++) {
+        if (binary[i]![k] !== binary[j]![k]) dist++;
+      }
+      result[i]![j] = dist;
+      result[j]![i] = dist;
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1306 — tuningFamilySocraticRadarMahalanobisDistance
+
+export function tuningFamilySocraticRadarMahalanobisDistance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = tunings.length;
+  // Compute centroid
+  const centroid: number[] = axes.map((axis) => {
+    let sum = 0;
+    for (const p of profiles) sum += p[axis];
+    return sum / n;
+  });
+  // Compute per-axis variance (diagonal covariance)
+  const variances: number[] = axes.map((axis, ai) => {
+    let sum = 0;
+    for (const p of profiles) {
+      const diff = p[axis] - centroid[ai]!;
+      sum += diff * diff;
+    }
+    return sum / n;
+  });
+  // Mahalanobis distance using diagonal covariance; skip axes with zero variance
+  return profiles.map((p) => {
+    let sum = 0;
+    for (let ai = 0; ai < 5; ai++) {
+      const v = variances[ai]!;
+      if (v < 1e-14) continue;
+      const diff = p[axes[ai]!]! - centroid[ai]!;
+      sum += (diff * diff) / v;
+    }
+    return Math.sqrt(sum);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1308 — tuningFamilySocraticRadarOutlierScore
+
+export function tuningFamilySocraticRadarOutlierScore(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = tunings.length;
+  // Per-axis mean and std
+  const means: number[] = axes.map((axis) => {
+    let sum = 0;
+    for (const p of profiles) sum += p[axis];
+    return sum / n;
+  });
+  const stds: number[] = axes.map((axis, ai) => {
+    let sum = 0;
+    for (const p of profiles) {
+      const diff = p[axis] - means[ai]!;
+      sum += diff * diff;
+    }
+    return Math.sqrt(sum / n);
+  });
+  return profiles.map((p) => {
+    let totalAbs = 0;
+    for (let ai = 0; ai < 5; ai++) {
+      const zscore = (p[axes[ai]!]! - means[ai]!) / (stds[ai]! + 1e-10);
+      totalAbs += Math.abs(zscore);
+    }
+    return totalAbs / 5;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1310 — tuningFamilySocraticRadarCentroidDistance
+
+export function tuningFamilySocraticRadarCentroidDistance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = tunings.length;
+  const centroid: number[] = axes.map((axis) => {
+    let sum = 0;
+    for (const p of profiles) sum += p[axis];
+    return sum / n;
+  });
+  return profiles.map((p) => {
+    let sum = 0;
+    for (let ai = 0; ai < 5; ai++) {
+      const diff = p[axes[ai]!]! - centroid[ai]!;
+      sum += diff * diff;
+    }
+    return Math.sqrt(sum);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1312 — tuningFamilySocraticRadarDensityEstimate
+
+export function tuningFamilySocraticRadarDensityEstimate(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = tunings.length;
+  // Composite score = mean of 5 axes
+  const scores: number[] = profiles.map((p) => {
+    let sum = 0;
+    for (const axis of axes) sum += p[axis];
+    return sum / 5;
+  });
+  // Silverman's bandwidth
+  let mean = 0;
+  for (const s of scores) mean += s;
+  mean /= n;
+  let variance = 0;
+  for (const s of scores) variance += (s - mean) * (s - mean);
+  variance /= n;
+  const std = Math.sqrt(variance);
+  const h = Math.max(0.1, 1.06 * std * Math.pow(n, -0.2));
+  const inv_sqrt2pi = 1 / Math.sqrt(2 * Math.PI);
+  return scores.map((xi) => {
+    let sum = 0;
+    for (const xj of scores) {
+      const u = (xi - xj) / h;
+      sum += Math.exp(-0.5 * u * u) * inv_sqrt2pi;
+    }
+    return sum / (n * h);
+  });
+}
+
+// ---------------------------------------------------------------------------
 // OO1 — tuningResolutionFactor
 // ---------------------------------------------------------------------------
 export function tuningResolutionFactor(
@@ -28513,4 +28712,155 @@ export function intervalGroupSymmetryScore(scaleCents: readonly number[]): numbe
     }
   }
   return matching / totalPairs;
+}
+
+// ---------------------------------------------------------------------------
+// Round 33: PP1–PP4
+// ---------------------------------------------------------------------------
+
+/**
+ * PP1 — Leading-tone strength of a scale.
+ *
+ * A "leading tone" is a pitch that falls within 100 cents below a reference
+ * point (the tonic or the octave above the tonic).
+ *
+ * Score = (count of leading-tone pitches) / n
+ * Returns 0 for an empty scale.
+ */
+export function scaleLeadingToneStrength(
+  scaleCents: readonly number[],
+  tonicCents: number = 0,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    const p = scaleCents[i]!;
+    const below1 = tonicCents - 100;
+    const below2 = tonicCents + 1200 - 100;
+    if ((p >= below1 && p < tonicCents) || (p >= below2 && p < tonicCents + 1200)) {
+      count++;
+    }
+  }
+  return count / n;
+}
+
+/**
+ * PP2 — Transposition invariance of a tuning system.
+ *
+ * Measures how self-similar the tuning looks after transposing each degree by
+ * `transpositionCents` (mod 1200).  Fraction of original degrees that have a
+ * match within 15 cents in the transposed set.
+ *
+ * Returns a value in [0, 1]; 0 for an empty tuning.
+ */
+export function tuningTranspositionInvariance(
+  tuning: TuningSystem,
+  transpositionCents: number = 100,
+): number {
+  const n = tuning.degrees.length;
+  if (n === 0) return 0;
+
+  const original: number[] = tuning.degrees.map((p) => pitchToCents(p));
+  original.sort((a, b) => a - b);
+
+  const transposed: number[] = original.map((c) => ((c + transpositionCents) % 1200 + 1200) % 1200);
+  transposed.sort((a, b) => a - b);
+
+  let matched = 0;
+  for (let i = 0; i < n; i++) {
+    const orig = original[i]!;
+    let found = false;
+    for (let j = 0; j < n; j++) {
+      const diff = Math.abs(transposed[j]! - orig);
+      const wrapped = Math.min(diff, 1200 - diff);
+      if (wrapped <= 15) {
+        found = true;
+        break;
+      }
+    }
+    if (found) matched++;
+  }
+  return matched / n;
+}
+
+/**
+ * PP3 — Chord factor balance.
+ *
+ * Checks coverage of four harmonic factor groups (root, third, fifth, seventh).
+ * Factor targets (mod 1200, relative to rootCents):
+ *   root = 0, third = 386 or 400, fifth = 702, seventh = 969 or 1000.
+ * A group is covered if any chord pitch is within 30 cents of its target.
+ *
+ * Balance = (covered groups) / 4.
+ * Returns 0 for an empty chord.
+ */
+export function chordFactorBalance(
+  chordCents: readonly number[],
+  rootCents: number = 0,
+): number {
+  const n = chordCents.length;
+  if (n === 0) return 0;
+
+  const factorGroups: number[][] = [
+    [0],         // root
+    [386, 400],  // third
+    [702],       // fifth
+    [969, 1000], // seventh
+  ];
+
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    intervals.push(((chordCents[i]! - rootCents) % 1200 + 1200) % 1200);
+  }
+
+  let covered = 0;
+  for (let g = 0; g < factorGroups.length; g++) {
+    const targets = factorGroups[g]!;
+    let groupCovered = false;
+    outer: for (let t = 0; t < targets.length; t++) {
+      const target = targets[t]!;
+      for (let k = 0; k < intervals.length; k++) {
+        if (Math.abs(intervals[k]! - target) <= 30) {
+          groupCovered = true;
+          break outer;
+        }
+      }
+    }
+    if (groupCovered) covered++;
+  }
+  return covered / 4;
+}
+
+/**
+ * PP4 — Spectral overtone balance.
+ *
+ * Ratio of total amplitude in overtones below `cutoffRatio` vs the whole.
+ *   below_power = sum(amplitude for ratio < cutoffRatio)
+ *   above_power = sum(amplitude for ratio >= cutoffRatio)
+ *   result = below_power / (below_power + above_power + 1e-10)
+ *
+ * Returns 0.5 for an empty spectrum (neutral balance).
+ * Throws RangeError if cutoffRatio <= 1.
+ */
+export function spectralOvertoneBalance(
+  spectrum: Spectrum,
+  cutoffRatio: number = 4,
+): number {
+  if (cutoffRatio <= 1) {
+    throw new RangeError(`cutoffRatio must be > 1, got ${cutoffRatio}`);
+  }
+  if (spectrum.length === 0) return 0.5;
+
+  let below = 0;
+  let above = 0;
+  for (let i = 0; i < spectrum.length; i++) {
+    const entry = spectrum[i]!;
+    if (entry.ratio < cutoffRatio) {
+      below += entry.amplitude;
+    } else {
+      above += entry.amplitude;
+    }
+  }
+  return below / (below + above + 1e-10);
 }

@@ -757,6 +757,12 @@ import {
   tuningFamilySocraticRadarBootstrapMeanCI,
   tuningFamilySocraticRadarJackknifeVariance,
   tuningFamilySocraticRadarWilcoxonSignedRank,
+  tuningFamilySocraticRadarAxisBinarize,
+  tuningFamilySocraticRadarHammingDistance,
+  tuningFamilySocraticRadarMahalanobisDistance,
+  tuningFamilySocraticRadarOutlierScore,
+  tuningFamilySocraticRadarCentroidDistance,
+  tuningFamilySocraticRadarDensityEstimate,
   barkScale,
   pitchSalience,
   scaleStepVariety,
@@ -785,6 +791,10 @@ import {
   scalePentaSubsetQuality,
   harmonicFluxAcrossDegrees,
   intervalGroupSymmetryScore,
+  scaleLeadingToneStrength,
+  tuningTranspositionInvariance,
+  chordFactorBalance,
+  spectralOvertoneBalance,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -24814,5 +24824,227 @@ describe('tuningFamilySocraticRadarWilcoxonSignedRank (Q1300)', () => {
   it('Wplus + Wminus >= 0', () => {
     const result = tuningFamilySocraticRadarWilcoxonSignedRank([t1, t2], spectrum, 'benchmark', 'convergence');
     expect(result.Wplus + result.Wminus).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 33 — PP1: scaleLeadingToneStrength
+describe('scaleLeadingToneStrength (PP1)', () => {
+  it('detects leading tone a semitone below tonic octave', () => {
+    // 1100 is 100 cents below 1200 (the octave of tonic 0)
+    expect(scaleLeadingToneStrength([0, 900, 1100])).toBeGreaterThan(0);
+  });
+  it('returns 0 for empty scale', () => {
+    expect(scaleLeadingToneStrength([])).toBe(0);
+  });
+  it('returns 0 when no leading tones present', () => {
+    // pitches at 0, 400, 700 — none within (−100,0) or (1100,1200)
+    expect(scaleLeadingToneStrength([0, 400, 700])).toBe(0);
+  });
+  it('score is within [0, 1]', () => {
+    const score = scaleLeadingToneStrength([0, 200, 400, 600, 800, 1000, 1100]);
+    expect(score).toBeGreaterThanOrEqual(0);
+    expect(score).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 33 — PP2: tuningTranspositionInvariance
+describe('tuningTranspositionInvariance (PP2)', () => {
+  it('12-TET is perfectly transposition-invariant at 100 cents', () => {
+    expect(tuningTranspositionInvariance(equalTemperament12(440), 100)).toBe(1);
+  });
+  it('12-TET at 50 cents is less than perfectly invariant', () => {
+    expect(tuningTranspositionInvariance(equalTemperament12(440), 50)).toBeLessThan(1);
+  });
+  it('returns value in [0, 1]', () => {
+    const val = tuningTranspositionInvariance(equalTemperament12(440), 70);
+    expect(val).toBeGreaterThanOrEqual(0);
+    expect(val).toBeLessThanOrEqual(1);
+  });
+  it('12-TET is perfectly invariant at any multiple of 100 cents', () => {
+    expect(tuningTranspositionInvariance(equalTemperament12(440), 200)).toBe(1);
+    expect(tuningTranspositionInvariance(equalTemperament12(440), 700)).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 33 — PP3: chordFactorBalance
+describe('chordFactorBalance (PP3)', () => {
+  it('major triad covers root, third, fifth — balance >= 0.5', () => {
+    const val = chordFactorBalance([0, 400, 700]);
+    expect(val).toBeGreaterThanOrEqual(0.5);
+    expect(val).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for empty chord', () => {
+    expect(chordFactorBalance([])).toBe(0);
+  });
+  it('dominant seventh chord covers all 4 factor groups', () => {
+    // root=0, third=400, fifth=700, seventh=1000
+    expect(chordFactorBalance([0, 400, 700, 1000])).toBe(1);
+  });
+  it('returns value in [0, 1]', () => {
+    const val = chordFactorBalance([0, 300]);
+    expect(val).toBeGreaterThanOrEqual(0);
+    expect(val).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 33 — PP4: spectralOvertoneBalance
+describe('spectralOvertoneBalance (PP4)', () => {
+  it('harmonicSpectrum(6) has more energy below cutoff 4 than above', () => {
+    expect(spectralOvertoneBalance(harmonicSpectrum(6), 4)).toBeGreaterThan(0.5);
+  });
+  it('returns 0.5 for empty spectrum', () => {
+    expect(spectralOvertoneBalance([], 4)).toBe(0.5);
+  });
+  it('throws RangeError when cutoffRatio <= 1', () => {
+    expect(() => spectralOvertoneBalance(harmonicSpectrum(4), 1)).toThrow(RangeError);
+    expect(() => spectralOvertoneBalance(harmonicSpectrum(4), 0.5)).toThrow(RangeError);
+  });
+  it('returns value in [0, 1]', () => {
+    const val = spectralOvertoneBalance(harmonicSpectrum(8), 3);
+    expect(val).toBeGreaterThanOrEqual(0);
+    expect(val).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1302 — tuningFamilySocraticRadarAxisBinarize
+describe('tuningFamilySocraticRadarAxisBinarize (Q1302)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarAxisBinarize([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns number[][] with values only 0 or 1', () => {
+    const result = tuningFamilySocraticRadarAxisBinarize([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+      for (const val of row) {
+        expect(val === 0 || val === 1).toBe(true);
+      }
+    }
+  });
+  it('single tuning returns all 1s (score >= median of itself)', () => {
+    const result = tuningFamilySocraticRadarAxisBinarize([t1], spectrum);
+    expect(result.length).toBe(1);
+    expect(result[0]).toEqual([1, 1, 1, 1, 1]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1304 — tuningFamilySocraticRadarHammingDistance
+describe('tuningFamilySocraticRadarHammingDistance (Q1304)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarHammingDistance([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns n×n symmetric matrix', () => {
+    const result = tuningFamilySocraticRadarHammingDistance([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]!.length).toBe(2);
+    expect(result[1]!.length).toBe(2);
+    expect(result[0]![1]).toBe(result[1]![0]);
+  });
+  it('diagonal is always 0', () => {
+    const result = tuningFamilySocraticRadarHammingDistance([t1, t2], spectrum);
+    expect(result[0]![0]).toBe(0);
+    expect(result[1]![1]).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1306 — tuningFamilySocraticRadarMahalanobisDistance
+describe('tuningFamilySocraticRadarMahalanobisDistance (Q1306)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarMahalanobisDistance([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one distance per tuning', () => {
+    const result = tuningFamilySocraticRadarMahalanobisDistance([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all distances are non-negative', () => {
+    const result = tuningFamilySocraticRadarMahalanobisDistance([t1, t2], spectrum);
+    for (const d of result) {
+      expect(d).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1308 — tuningFamilySocraticRadarOutlierScore
+describe('tuningFamilySocraticRadarOutlierScore (Q1308)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarOutlierScore([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one score per tuning', () => {
+    const result = tuningFamilySocraticRadarOutlierScore([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all scores are non-negative', () => {
+    const result = tuningFamilySocraticRadarOutlierScore([t1, t2], spectrum);
+    for (const s of result) {
+      expect(s).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1310 — tuningFamilySocraticRadarCentroidDistance
+describe('tuningFamilySocraticRadarCentroidDistance (Q1310)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarCentroidDistance([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one distance per tuning', () => {
+    const result = tuningFamilySocraticRadarCentroidDistance([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all distances are non-negative', () => {
+    const result = tuningFamilySocraticRadarCentroidDistance([t1, t2], spectrum);
+    for (const d of result) {
+      expect(d).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1312 — tuningFamilySocraticRadarDensityEstimate
+describe('tuningFamilySocraticRadarDensityEstimate (Q1312)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty input', () => {
+    const result = tuningFamilySocraticRadarDensityEstimate([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one density per tuning', () => {
+    const result = tuningFamilySocraticRadarDensityEstimate([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all densities are non-negative', () => {
+    const result = tuningFamilySocraticRadarDensityEstimate([t1, t2], spectrum);
+    for (const d of result) {
+      expect(d).toBeGreaterThanOrEqual(0);
+    }
   });
 });
