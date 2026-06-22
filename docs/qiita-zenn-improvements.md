@@ -1217,3 +1217,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | ZZZ2 | `scaleMajorIntervalRatio` | 大音程（180セント以上）の比率 |
 | ZZZ3 | `scaleMinorIntervalRatio` | 小音程（180セント未満）の比率 |
 | ZZZ4 | `scaleIntervalClassBalance` | 大音程と小音程の均衡指数 |
+
+## Round 95: 音階和声リズム分析 (AAAA1–AAAA4)
+
+音階のステップサイズ変化（和声リズム）を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| AAAA1 | `scaleHarmonicRhythmDensity` | 音程サイズの変化頻度（遷移比率） |
+| AAAA2 | `scaleHarmonicAccelerationProxy` | 音程変化の加速度（2階差分の平均） |
+| AAAA3 | `scaleHarmonicSteadinessProxy` | 和声リズムの安定性（加速度の補数） |
+| AAAA4 | `scaleHarmonicComplexityProxy` | 密度と加速度の重み付き複合指数 |
