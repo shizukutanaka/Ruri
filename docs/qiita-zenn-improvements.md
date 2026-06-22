@@ -289,3 +289,17 @@
 - W2: modeOf — 指定旋法の返却（正規化済み）
 - W3: chordTension — 音階内コンテキストでの和音緊張度
 - W4: melodicDensity — 旋律密度（持続時間加重変化率）
+
+## Round 15: スペクトル・音程分析ヘルパ (X1–X4)
+
+**テーマ**: 倍音スペクトルと音階の統計的分析ツール
+
+### 研究トピック
+- Qiita: 音楽情報処理における倍音重心（スペクトル重心）の応用
+- Zenn: Scala/KBMフォーマットを超えた微分音音階の異名同音検出
+
+### 実装
+- X1: spectralCentroid — 振幅加重倍音重心（セント）
+- X2: edoEnharmonicEquivalents — EDO度数の異名同音候補検索
+- X3: commonTonesUnderTransposition — 移調時の共通音検出
+- X4: scaleToIntervalHistogram — 音程ヒストグラム（ビン化）

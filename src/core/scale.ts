@@ -21270,3 +21270,392 @@ export function melodicDensity(
   if (weightedDuration === 0) return 0;
   return densityEvents / weightedDuration;
 }
+
+// ---------------------------------------------------------------------------
+// Q1086 — tuningFamilySocraticRadarKullbackLeiblerDivergence
+// ---------------------------------------------------------------------------
+
+/**
+ * KL-divergence of each axis score distribution from its mean.
+ * For each axis, computes the average KL divergence: sum_i( p_i * ln(p_i / q) )
+ * where p_i is each tuning's score clamped to [epsilon, 1] and q is the mean clamped to [epsilon, 1].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param epsilon - Small value to avoid log(0), default 1e-10.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of { axis, klFromMean } for all 5 axes.
+ */
+export function tuningFamilySocraticRadarKullbackLeiblerDivergence(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  epsilon = 1e-10,
+  rootHz?: number,
+): { axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; klFromMean: number }[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  return axes.map((ax) => {
+    if (n === 0) return { axis: ax, klFromMean: 0 };
+    const scores = profiles.map((p) => p[ax]);
+    const mean = scores.reduce((s, v) => s + v, 0) / n;
+    const q = Math.max(epsilon, Math.min(1, mean));
+    let klSum = 0;
+    for (const score of scores) {
+      const p = Math.max(epsilon, Math.min(1, score));
+      klSum += p * Math.log(p / q);
+    }
+    return { axis: ax, klFromMean: klSum / n };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1088 — tuningFamilySocraticRadarCentroidMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Centroid (mean per axis) of all tunings' radar scores.
+ * Returns the "center of mass" in radar space.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, number> — mean score per axis.
+ */
+export function tuningFamilySocraticRadarCentroidMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    result[ax] = n === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / n;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1090 — tuningFamilySocraticRadarShannonEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Shannon entropy of the score distribution per axis.
+ * Bins scores into `bins` equal buckets over [0, 1], computes -sum(p*log2(p)).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param bins - Number of equal-width bins over [0,1], default 5.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of { axis, entropy } for all 5 axes.
+ */
+export function tuningFamilySocraticRadarShannonEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  bins = 5,
+  rootHz?: number,
+): { axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; entropy: number }[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  return axes.map((ax) => {
+    if (n === 0) return { axis: ax, entropy: 0 };
+    const scores = profiles.map((p) => p[ax]);
+    const counts = new Array<number>(bins).fill(0);
+    for (const score of scores) {
+      const binIdx = Math.min(bins - 1, Math.floor(score * bins));
+      counts[binIdx]! += 1;
+    }
+    let entropy = 0;
+    for (const count of counts) {
+      if (count > 0) {
+        const p = count / n;
+        entropy -= p * Math.log2(p);
+      }
+    }
+    return { axis: ax, entropy };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1092 — tuningFamilySocraticRadarHarmonicMeanPerAxis
+// ---------------------------------------------------------------------------
+
+/**
+ * Harmonic mean of axis scores across all tunings (with epsilon guard).
+ * harmonic_mean = n / sum(1 / (score + epsilon))
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param epsilon - Small value to avoid division by zero, default 1e-10.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Record<AxisKey, number> — harmonic mean per axis.
+ */
+export function tuningFamilySocraticRadarHarmonicMeanPerAxis(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  epsilon = 1e-10,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const result = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    if (n === 0) {
+      result[ax] = 0;
+    } else {
+      const sumReciprocal = profiles.reduce((s, p) => s + 1 / (p[ax] + epsilon), 0);
+      result[ax] = n / sumReciprocal;
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1094 — tuningFamilySocraticRadarGiniCoefficient
+// ---------------------------------------------------------------------------
+
+/**
+ * Gini coefficient of axis scores across all tunings.
+ * Standard formula: (2 * sum((i+1)*x_i)) / (n * sum(x_i)) - (n+1)/n
+ * where x is sorted ascending. Clamped to [0, 1].
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of { axis, gini } for all 5 axes.
+ */
+export function tuningFamilySocraticRadarGiniCoefficient(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; gini: number }[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  return axes.map((ax) => {
+    if (n === 0) return { axis: ax, gini: 0 };
+    const sorted = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    const sumX = sorted.reduce((s, v) => s + v, 0);
+    if (sumX === 0) return { axis: ax, gini: 0 };
+    let weightedSum = 0;
+    for (let i = 0; i < n; i++) {
+      weightedSum += (i + 1) * sorted[i]!;
+    }
+    const gini = (2 * weightedSum) / (n * sumX) - (n + 1) / n;
+    return { axis: ax, gini: Math.max(0, Math.min(1, gini)) };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1096 — tuningFamilySocraticRadarNormalizedL1Distance
+// ---------------------------------------------------------------------------
+
+/**
+ * L1 distance of each tuning from the centroid, normalized by number of axes (5).
+ * centroid[ax] = mean of all tunings' scores for that axis.
+ * l1[i] = sum over axes |score[ax] - centroid[ax]| / 5
+ * Returns sorted by l1 ascending.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of { id, l1 } sorted by l1 ascending.
+ */
+export function tuningFamilySocraticRadarNormalizedL1Distance(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { id: string; l1: number }[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n === 0) return [];
+  const centroid = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    centroid[ax] = profiles.reduce((s, p) => s + p[ax], 0) / n;
+  }
+  const result = tunings.map((t, i) => {
+    const profile = profiles[i]!;
+    const l1 = axes.reduce((s, ax) => s + Math.abs(profile[ax] - centroid[ax]), 0) / axes.length;
+    return { id: t.id, l1 };
+  });
+  return result.sort((a, b) => a.l1 - b.l1);
+}
+
+// ---------------------------------------------------------------------------
+// X1 — spectralCentroid
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the amplitude-weighted mean of partial ratios in cents relative to the fundamental.
+ *
+ * Formula: `sum(amp_i * cents_i) / sum(amp_i)` where `cents_i = 1200 * log2(ratio_i)`.
+ *
+ * @param spectrum - Array of `{ ratio, amplitude }` partials.
+ * @returns Amplitude-weighted centroid in cents (can be > 0).
+ * @throws {RangeError} If `spectrum` is empty or all amplitudes are zero.
+ *
+ * @example
+ * spectralCentroid(harmonicSpectrum(4));
+ * // → ~1376 cents (amplitude-weighted mean of 0, 1200, 1902, 2400 cents)
+ */
+export function spectralCentroid(spectrum: Spectrum): number {
+  if (spectrum.length === 0) {
+    throw new RangeError('spectralCentroid: spectrum must not be empty');
+  }
+  let weightedSum = 0;
+  let totalAmp = 0;
+  for (const partial of spectrum) {
+    const cents = 1200 * Math.log2(partial.ratio);
+    weightedSum += partial.amplitude * cents;
+    totalAmp += partial.amplitude;
+  }
+  if (totalAmp === 0) {
+    throw new RangeError('spectralCentroid: all amplitudes are zero');
+  }
+  return weightedSum / totalAmp;
+}
+
+// ---------------------------------------------------------------------------
+// X2 — edoEnharmonicEquivalents
+// ---------------------------------------------------------------------------
+
+/**
+ * Find which EDO degrees (0 to edoDivisions-1) are within `toleranceCents` of `targetCents` (mod 1200).
+ *
+ * EDO step size = 1200 / edoDivisions cents.
+ * Compares `targetCents mod 1200` against each `(degree * stepSize) mod 1200`.
+ *
+ * @param targetCents - The target pitch in cents.
+ * @param edoDivisions - Number of equal divisions of the octave (>= 1).
+ * @param toleranceCents - Maximum distance in cents to consider a match (>= 0, default 10).
+ * @returns Sorted list of EDO degree numbers within tolerance.
+ * @throws {RangeError} If `edoDivisions < 1` or `toleranceCents < 0`.
+ *
+ * @example
+ * edoEnharmonicEquivalents(700, 12, 10); // → [7] (perfect fifth ≈ 700c in 12-EDO)
+ */
+export function edoEnharmonicEquivalents(
+  targetCents: number,
+  edoDivisions: number,
+  toleranceCents: number = 10,
+): number[] {
+  if (edoDivisions < 1) {
+    throw new RangeError(`edoEnharmonicEquivalents: edoDivisions must be >= 1, got ${edoDivisions}`);
+  }
+  if (toleranceCents < 0) {
+    throw new RangeError(`edoEnharmonicEquivalents: toleranceCents must be >= 0, got ${toleranceCents}`);
+  }
+  const stepSize = 1200 / edoDivisions;
+  const targetMod = ((targetCents % 1200) + 1200) % 1200;
+  const matches: number[] = [];
+  for (let degree = 0; degree < edoDivisions; degree++) {
+    const degreeCents = ((degree * stepSize) % 1200 + 1200) % 1200;
+    let diff = Math.abs(degreeCents - targetMod);
+    // Wrap-around distance (e.g., 0 and 1190 are 10 cents apart)
+    if (diff > 600) diff = 1200 - diff;
+    if (diff <= toleranceCents) {
+      matches.push(degree);
+    }
+  }
+  return matches.sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// X3 — commonTonesUnderTransposition
+// ---------------------------------------------------------------------------
+
+/**
+ * Find pitches (in cents) from `scaleCents` that remain in the scale when transposed by `transpositionCents`.
+ *
+ * A pitch `p` is "common" if `(p + transpositionCents) mod 1200` is within `toleranceCents`
+ * of any pitch in `scaleCents mod 1200`.
+ *
+ * @param scaleCents - Scale degrees in cents.
+ * @param transpositionCents - Transposition interval in cents.
+ * @param toleranceCents - Maximum distance in cents to consider a match (default 5).
+ * @returns Original (untransposed) pitch values that survive, sorted ascending. Returns [] for empty scale.
+ *
+ * @example
+ * const major = [0, 200, 400, 500, 700, 900, 1100];
+ * commonTonesUnderTransposition(major, 700, 5); // → 5 common tones
+ */
+export function commonTonesUnderTransposition(
+  scaleCents: readonly number[],
+  transpositionCents: number,
+  toleranceCents: number = 5,
+): number[] {
+  if (scaleCents.length === 0) return [];
+  // Build set of scale pitch classes (mod 1200)
+  const scaleMod = scaleCents.map((p) => ((p % 1200) + 1200) % 1200);
+  const common: number[] = [];
+  for (const p of scaleCents) {
+    const transposed = (((p + transpositionCents) % 1200) + 1200) % 1200;
+    // Check if transposed is within tolerance of any scale pitch class
+    let found = false;
+    for (const sc of scaleMod) {
+      let diff = Math.abs(transposed - sc);
+      if (diff > 600) diff = 1200 - diff;
+      if (diff <= toleranceCents) {
+        found = true;
+        break;
+      }
+    }
+    if (found) common.push(p);
+  }
+  return common.sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// X4 — scaleToIntervalHistogram
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute all pairwise ascending intervals between scale degrees (wrapping at 1200),
+ * bin each interval into `floor(interval / binSizeCents) * binSizeCents`, and return
+ * a Map from bin-start-cents to count.
+ *
+ * Zero intervals (same degree) are skipped.
+ *
+ * @param scaleCents - Scale degrees in cents.
+ * @param binSizeCents - Size of each histogram bin in cents (default 100). Must be > 0.
+ * @returns Map from bin-start-cents to interval count.
+ * @throws {RangeError} If `binSizeCents <= 0`.
+ *
+ * @example
+ * const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+ * scaleToIntervalHistogram(chromatic, 100); // uniform distribution across bins
+ */
+export function scaleToIntervalHistogram(
+  scaleCents: readonly number[],
+  binSizeCents: number = 100,
+): Map<number, number> {
+  if (binSizeCents <= 0) {
+    throw new RangeError(`scaleToIntervalHistogram: binSizeCents must be > 0, got ${binSizeCents}`);
+  }
+  const hist = new Map<number, number>();
+  const n = scaleCents.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const pi = scaleCents[i]!;
+      const pj = scaleCents[j]!;
+      // Ascending interval (wrap at 1200)
+      const interval = ((pj - pi) % 1200 + 1200) % 1200;
+      if (interval === 0) continue; // same pitch class
+      const bin = Math.floor(interval / binSizeCents) * binSizeCents;
+      hist.set(bin, (hist.get(bin) ?? 0) + 1);
+    }
+  }
+  return hist;
+}

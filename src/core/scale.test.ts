@@ -565,6 +565,12 @@ import {
   tuningFamilySocraticRadarAxisCorrelationWith,
   tuningFamilySocraticRadarSignalToNoise,
   tuningFamilySocraticRadarExponentialMovingAverage,
+  tuningFamilySocraticRadarKullbackLeiblerDivergence,
+  tuningFamilySocraticRadarCentroidMean,
+  tuningFamilySocraticRadarShannonEntropy,
+  tuningFamilySocraticRadarHarmonicMeanPerAxis,
+  tuningFamilySocraticRadarGiniCoefficient,
+  tuningFamilySocraticRadarNormalizedL1Distance,
   snapHzToScaleDegree,
   melodicContour,
   harmonicRhythm,
@@ -605,6 +611,10 @@ import {
   modeOf,
   chordTension,
   melodicDensity,
+  spectralCentroid,
+  edoEnharmonicEquivalents,
+  commonTonesUnderTransposition,
+  scaleToIntervalHistogram,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -20651,5 +20661,280 @@ describe('melodicDensity (W4)', () => {
   });
   it('test_throws_on_length_mismatch', () => {
     expect(() => melodicDensity([0, 2], [1])).toThrow(RangeError);
+  });
+});
+
+describe('spectralCentroid (X1)', () => {
+  it('returns positive value for harmonicSpectrum(4)', () => {
+    expect(spectralCentroid(harmonicSpectrum(4))).toBeGreaterThan(0);
+  });
+  it('throws for empty spectrum', () => {
+    expect(() => spectralCentroid([])).toThrow(RangeError);
+  });
+  it('single partial returns its cents value', () => {
+    // ratio=2, amp=1 → 1200 cents
+    expect(spectralCentroid([{ ratio: 2, amplitude: 1 }])).toBeCloseTo(1200, 1);
+  });
+  it('amplitude-weighted: higher amp partial dominates', () => {
+    const s = [{ ratio: 2, amplitude: 10 }, { ratio: 3, amplitude: 1 }];
+    const result = spectralCentroid(s);
+    // centroid should be much closer to 1200 than to 1902
+    expect(result).toBeLessThan(1400);
+  });
+});
+
+describe('edoEnharmonicEquivalents (X2)', () => {
+  it('finds perfect fifth in 12-EDO', () => {
+    expect(edoEnharmonicEquivalents(700, 12, 10)).toEqual([7]);
+  });
+  it('returns empty when no match', () => {
+    expect(edoEnharmonicEquivalents(650, 12, 5)).toEqual([]);
+  });
+  it('throws for invalid edoDivisions', () => {
+    expect(() => edoEnharmonicEquivalents(700, 0, 10)).toThrow(RangeError);
+  });
+  it('tolerance=50 finds multiple matches', () => {
+    // 700c is between degree 6 (600c) and 7 (700c) in 12-EDO with tol=50
+    const matches = edoEnharmonicEquivalents(700, 12, 50);
+    expect(matches.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('commonTonesUnderTransposition (X3)', () => {
+  it('returns empty for empty scale', () => {
+    expect(commonTonesUnderTransposition([], 700)).toEqual([]);
+  });
+  it('12-TET major scale transposed by 700c has 6 common tones', () => {
+    // C major: {0,200,400,500,700,900,1100}
+    // G major: {0,200,400,600,700,900,1100} → 6 tones in common
+    const major = [0, 200, 400, 500, 700, 900, 1100];
+    const common = commonTonesUnderTransposition(major, 700, 5);
+    expect(common.length).toBe(6);
+  });
+  it('transposition by 0 returns all tones', () => {
+    const scale = [0, 300, 600, 900];
+    expect(commonTonesUnderTransposition(scale, 0, 1)).toEqual([0, 300, 600, 900]);
+  });
+  it('returns sorted ascending', () => {
+    const scale = [0, 200, 400, 700];
+    const result = commonTonesUnderTransposition(scale, 700, 5);
+    const sorted = [...result].sort((a, b) => a - b);
+    expect(result).toEqual(sorted);
+  });
+});
+
+describe('scaleToIntervalHistogram (X4)', () => {
+  it('throws for binSize <= 0', () => {
+    expect(() => scaleToIntervalHistogram([0, 100], 0)).toThrow(RangeError);
+  });
+  it('returns Map instance', () => {
+    expect(scaleToIntervalHistogram([0, 200, 400])).toBeInstanceOf(Map);
+  });
+  it('chromatic scale has all 100-cent bins', () => {
+    const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+    const hist = scaleToIntervalHistogram(chromatic, 100);
+    expect(hist.size).toBeGreaterThan(0);
+  });
+  it('empty scale returns empty map', () => {
+    expect(scaleToIntervalHistogram([]).size).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1086 — tuningFamilySocraticRadarKullbackLeiblerDivergence
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarKullbackLeiblerDivergence (Q1086)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+
+  it('klFromMean is non-negative for all axes', () => {
+    const result = tuningFamilySocraticRadarKullbackLeiblerDivergence(tunings, spectrum);
+    for (const entry of result) {
+      expect(entry.klFromMean).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('returns 5 elements with all axis keys present', () => {
+    const result = tuningFamilySocraticRadarKullbackLeiblerDivergence(tunings, spectrum);
+    expect(result).toHaveLength(5);
+    const axisNames = result.map((e) => e.axis);
+    expect(axisNames).toContain('diversity');
+    expect(axisNames).toContain('versatility');
+    expect(axisNames).toContain('maturity');
+    expect(axisNames).toContain('benchmark');
+    expect(axisNames).toContain('convergence');
+  });
+
+  it('single tuning yields klFromMean of 0 (p_i equals mean)', () => {
+    const single = [equalTemperament12(440)];
+    const result = tuningFamilySocraticRadarKullbackLeiblerDivergence(single, spectrum);
+    for (const entry of result) {
+      expect(entry.klFromMean).toBeCloseTo(0, 5);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1088 — tuningFamilySocraticRadarCentroidMean
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCentroidMean (Q1088)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+
+  it('all axis scores are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarCentroidMean(tunings, spectrum);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(result[ax]).toBeGreaterThanOrEqual(0);
+      expect(result[ax]).toBeLessThanOrEqual(1 + 1e-9);
+    }
+  });
+
+  it('all 5 AXIS_KEYS are present in the result', () => {
+    const result = tuningFamilySocraticRadarCentroidMean(tunings, spectrum);
+    expect('diversity' in result).toBe(true);
+    expect('versatility' in result).toBe(true);
+    expect('maturity' in result).toBe(true);
+    expect('benchmark' in result).toBe(true);
+    expect('convergence' in result).toBe(true);
+  });
+
+  it('centroid of a single tuning equals its own profile', () => {
+    const single = [equalTemperament12(440)];
+    const centroid = tuningFamilySocraticRadarCentroidMean(single, spectrum);
+    const profile = tuningFamilySocraticRadarProfile(single, spectrum);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(centroid[ax]).toBeCloseTo(profile[ax], 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1090 — tuningFamilySocraticRadarShannonEntropy
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarShannonEntropy (Q1090)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+
+  it('entropy is non-negative for all axes', () => {
+    const result = tuningFamilySocraticRadarShannonEntropy(tunings, spectrum);
+    for (const entry of result) {
+      expect(entry.entropy).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('returns 5 elements for all axes', () => {
+    const result = tuningFamilySocraticRadarShannonEntropy(tunings, spectrum);
+    expect(result).toHaveLength(5);
+    const axisNames = result.map((e) => e.axis);
+    expect(axisNames).toContain('diversity');
+    expect(axisNames).toContain('convergence');
+  });
+
+  it('bins=1 forces all into single bin, entropy=0', () => {
+    const result = tuningFamilySocraticRadarShannonEntropy(tunings, spectrum, 1);
+    for (const entry of result) {
+      expect(entry.entropy).toBeCloseTo(0, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1092 — tuningFamilySocraticRadarHarmonicMeanPerAxis
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarHarmonicMeanPerAxis (Q1092)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+
+  it('all 5 axis keys are present in the result', () => {
+    const result = tuningFamilySocraticRadarHarmonicMeanPerAxis(tunings, spectrum);
+    expect('diversity' in result).toBe(true);
+    expect('versatility' in result).toBe(true);
+    expect('maturity' in result).toBe(true);
+    expect('benchmark' in result).toBe(true);
+    expect('convergence' in result).toBe(true);
+  });
+
+  it('harmonic mean is <= arithmetic mean for all axes', () => {
+    const hm = tuningFamilySocraticRadarHarmonicMeanPerAxis(tunings, spectrum);
+    const cm = tuningFamilySocraticRadarCentroidMean(tunings, spectrum);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(hm[ax]).toBeLessThanOrEqual(cm[ax] + 1e-9);
+    }
+  });
+
+  it('harmonic mean values are non-negative', () => {
+    const result = tuningFamilySocraticRadarHarmonicMeanPerAxis(tunings, spectrum);
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const;
+    for (const ax of axes) {
+      expect(result[ax]).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1094 — tuningFamilySocraticRadarGiniCoefficient
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarGiniCoefficient (Q1094)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+
+  it('gini is in [0, 1] for all axes', () => {
+    const result = tuningFamilySocraticRadarGiniCoefficient(tunings, spectrum);
+    for (const entry of result) {
+      expect(entry.gini).toBeGreaterThanOrEqual(0);
+      expect(entry.gini).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('returns 5 elements', () => {
+    const result = tuningFamilySocraticRadarGiniCoefficient(tunings, spectrum);
+    expect(result).toHaveLength(5);
+  });
+
+  it('single tuning yields gini=0 for all axes', () => {
+    const single = [equalTemperament12(440)];
+    const result = tuningFamilySocraticRadarGiniCoefficient(single, spectrum);
+    for (const entry of result) {
+      expect(entry.gini).toBeCloseTo(0, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1096 — tuningFamilySocraticRadarNormalizedL1Distance
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarNormalizedL1Distance (Q1096)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+
+  it('result is sorted by l1 ascending', () => {
+    const result = tuningFamilySocraticRadarNormalizedL1Distance(tunings, spectrum);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i]!.l1).toBeGreaterThanOrEqual(result[i - 1]!.l1);
+    }
+  });
+
+  it('each entry has an id string and non-negative l1', () => {
+    const result = tuningFamilySocraticRadarNormalizedL1Distance(tunings, spectrum);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.l1).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('single tuning has l1=0 (it is the centroid)', () => {
+    const single = [equalTemperament12(440)];
+    const result = tuningFamilySocraticRadarNormalizedL1Distance(single, spectrum);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.l1).toBeCloseTo(0, 10);
   });
 });

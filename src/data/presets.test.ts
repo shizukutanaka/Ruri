@@ -346,6 +346,12 @@ import {
   presetFamilySocraticRadarAxisCorrelationWith,
   presetFamilySocraticRadarSignalToNoise,
   presetFamilySocraticRadarExponentialMovingAverage,
+  presetFamilySocraticRadarKullbackLeiblerDivergence,
+  presetFamilySocraticRadarCentroidMean,
+  presetFamilySocraticRadarShannonEntropy,
+  presetFamilySocraticRadarHarmonicMeanPerAxis,
+  presetFamilySocraticRadarGiniCoefficient,
+  presetFamilySocraticRadarNormalizedL1Distance,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -11832,5 +11838,120 @@ describe('presetFamilySocraticRadarExponentialMovingAverage (Q1085)', () => {
     expect(() =>
       presetFamilySocraticRadarExponentialMovingAverage(['not-a-preset'], spec, 0.5, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1087 — presetFamilySocraticRadarKullbackLeiblerDivergence
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarKullbackLeiblerDivergence (Q1087)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarKullbackLeiblerDivergence(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      1e-10,
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(5);
+    for (const entry of result) {
+      expect(entry.klFromMean).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1089 — presetFamilySocraticRadarCentroidMean
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCentroidMean (Q1089)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarCentroidMean(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect('diversity' in result).toBe(true);
+    expect('versatility' in result).toBe(true);
+    expect('maturity' in result).toBe(true);
+    expect('benchmark' in result).toBe(true);
+    expect('convergence' in result).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1091 — presetFamilySocraticRadarShannonEntropy
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarShannonEntropy (Q1091)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarShannonEntropy(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      5,
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(5);
+    for (const entry of result) {
+      expect(entry.entropy).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1093 — presetFamilySocraticRadarHarmonicMeanPerAxis
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarHarmonicMeanPerAxis (Q1093)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarHarmonicMeanPerAxis(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+      1e-10,
+    );
+    expect(result).toBeDefined();
+    expect('diversity' in result).toBe(true);
+    expect('versatility' in result).toBe(true);
+    expect('maturity' in result).toBe(true);
+    expect('benchmark' in result).toBe(true);
+    expect('convergence' in result).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1095 — presetFamilySocraticRadarGiniCoefficient
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarGiniCoefficient (Q1095)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarGiniCoefficient(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(5);
+    for (const entry of result) {
+      expect(entry.gini).toBeGreaterThanOrEqual(0);
+      expect(entry.gini).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1097 — presetFamilySocraticRadarNormalizedL1Distance
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarNormalizedL1Distance (Q1097)', () => {
+  it('returns expected shape for two presets', () => {
+    const result = presetFamilySocraticRadarNormalizedL1Distance(
+      ['12-tet', 'just-5-limit'],
+      harmonicSpectrum(6),
+    );
+    expect(result).toBeDefined();
+    expect(result).toHaveLength(2);
+    for (const entry of result) {
+      expect(typeof entry.id).toBe('string');
+      expect(entry.l1).toBeGreaterThanOrEqual(0);
+    }
   });
 });
