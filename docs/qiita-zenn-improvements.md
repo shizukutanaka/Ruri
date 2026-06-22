@@ -898,3 +898,14 @@
 | VVV2 | `scaleReflectionSymmetrySteps` | 反射対称なステップパターンの割合 |
 | VVV3 | `scaleTranspositionInvariance` | スケール内移調で自己合同な移調数/n |
 | VVV4 | `scaleComplementSymmetry` | 12-EDO補集合スケールとのJaccard類似度 |
+
+## Round 66: 旋律輪郭分析 (WWW1–WWW4)
+
+音階のステップ列から旋律輪郭特性を抽出する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| WWW1 | `scaleMelodicAscent` | 上昇ステップペアの割合 |
+| WWW2 | `scaleMelodicDescent` | 下降ステップペアの割合 |
+| WWW3 | `scaleMelodicPeakRatio` | 旋律的ピーク音の割合（円環上） |
+| WWW4 | `scaleMelodicContourEntropy` | 輪郭3記号列のShannon entropy |

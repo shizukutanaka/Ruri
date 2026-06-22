@@ -37971,6 +37971,197 @@ export function tuningFamilySocraticRadarEulerCharacteristicProxy(
   return Math.max(0, Math.min(1, sum / tunings.length));
 }
 
+// Q1686 — tuningFamilySocraticRadarAttractorDimensionMean
+export function tuningFamilySocraticRadarAttractorDimensionMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    return 0;
+  }
+  let sum = 0;
+  let count = 0;
+  for (let i = 0; i < vecs.length; i++) {
+    for (let j = i + 1; j < vecs.length; j++) {
+      const vi = vecs[i]!;
+      const vj = vecs[j]!;
+      let distSq = 0;
+      for (let k = 0; k < vi.length; k++) {
+        const diff = vi[k]! - vj[k]!;
+        distSq += diff * diff;
+      }
+      const d = Math.sqrt(distSq);
+      const eps1 = 0.1;
+      const eps2 = 0.3;
+      const c1 = d < eps1 ? 1 : 0;
+      const c2 = d < eps2 ? 1 : 0;
+      const logEps1 = Math.log(eps1);
+      const logEps2 = Math.log(eps2);
+      let dim = 0;
+      if (c2 > 0 && logEps2 !== logEps1) {
+        dim = (Math.log(c2 + 1e-9) - Math.log(c1 + 1e-9)) / (logEps2 - logEps1);
+      }
+      sum += Math.max(0, Math.min(1, Math.abs(dim) / 5));
+      count++;
+    }
+  }
+  return count > 0 ? Math.max(0, Math.min(1, sum / count)) : 0;
+}
+
+// Q1688 — tuningFamilySocraticRadarLyapunovSpectrumMean
+export function tuningFamilySocraticRadarLyapunovSpectrumMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    let positiveCount = 0;
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i - 1]!;
+      const curr = sorted[i]!;
+      if (prev > 1e-9 && curr / prev > 1) positiveCount++;
+    }
+    sum += sorted.length > 1 ? positiveCount / (sorted.length - 1) : 0;
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1690 — tuningFamilySocraticRadarPhaseSpaceVolumeMean
+export function tuningFamilySocraticRadarPhaseSpaceVolumeMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    return 0;
+  }
+  // C(5,2) = 10 pairs of axes
+  const axisPairs = axes.length * (axes.length - 1) / 2;
+  let sum = 0;
+  let count = 0;
+  for (let i = 0; i < vecs.length; i++) {
+    for (let j = i + 1; j < vecs.length; j++) {
+      const p = vecs[i]!;
+      const q = vecs[j]!;
+      let crossSum = 0;
+      for (let a = 0; a < p.length; a++) {
+        for (let b = a + 1; b < p.length; b++) {
+          crossSum += Math.abs(p[a]! * q[b]! - p[b]! * q[a]!);
+        }
+      }
+      sum += Math.max(0, Math.min(1, crossSum / (axisPairs + 1e-9)));
+      count++;
+    }
+  }
+  return count > 0 ? Math.max(0, Math.min(1, sum / count)) : 0;
+}
+
+// Q1692 — tuningFamilySocraticRadarBifurcationProxyMean
+export function tuningFamilySocraticRadarBifurcationProxyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const discretize = (v: number): number => v < 1 / 3 ? 0 : v < 2 / 3 ? 1 : 2;
+  if (vecs.length < 2) {
+    return 0;
+  }
+  let sum = 0;
+  let count = 0;
+  for (let i = 1; i < vecs.length; i++) {
+    const prev = vecs[i - 1]!;
+    const curr = vecs[i]!;
+    let diffCount = 0;
+    for (let k = 0; k < axes.length; k++) {
+      if (discretize(prev[k]!) !== discretize(curr[k]!)) diffCount++;
+    }
+    sum += Math.max(0, Math.min(1, diffCount / 5));
+    count++;
+  }
+  return count > 0 ? Math.max(0, Math.min(1, sum / count)) : 0;
+}
+
+// Q1694 — tuningFamilySocraticRadarPoincareReturnMean
+export function tuningFamilySocraticRadarPoincareReturnMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    let returnCount = 0;
+    for (let k = 0; k < vec.length; k++) {
+      if (Math.abs(vec[k]! - mean) <= 0.1) returnCount++;
+    }
+    sum += returnCount / vec.length;
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1696 — tuningFamilySocraticRadarChaosIndexMean
+export function tuningFamilySocraticRadarChaosIndexMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    return 0;
+  }
+  let sum = 0;
+  let count = 0;
+  for (let i = 1; i < vecs.length; i++) {
+    const p = vecs[i - 1]!;
+    const q = vecs[i]!;
+    let dot = 0;
+    let normP = 0;
+    let normQ = 0;
+    for (let k = 0; k < p.length; k++) {
+      dot += p[k]! * q[k]!;
+      normP += p[k]! * p[k]!;
+      normQ += q[k]! * q[k]!;
+    }
+    const denom = Math.sqrt(normP * normQ);
+    const corr = denom > 1e-9 ? dot / denom : 1;
+    sum += Math.max(0, Math.min(1, 1 - corr));
+    count++;
+  }
+  return count > 0 ? Math.max(0, Math.min(1, sum / count)) : 0;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -39125,4 +39316,129 @@ export function scaleComplementSymmetry(scaleCents: readonly number[], periodCen
   if (union === 0) return 0;
   // Normalize to [0,1] relative to chromaSize
   return intersection / chromaSize;
+}
+
+/**
+ * WWW1 — scaleMelodicAscent
+ *
+ * Proportion of consecutive interval pairs (in sorted order, including wrap)
+ * where the second step is larger than the first.
+ *
+ * Steps are computed as consecutive diffs of sorted pitches plus the wrap step.
+ * Count pairs where steps[i+1] > steps[i], return count / (n-1); 0 for n<2.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Proportion of ascending step pairs in [0,1]
+ */
+export function scaleMelodicAscent(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    steps.push(i < n - 1 ? sorted[i + 1]! - sorted[i]! : periodCents - sorted[i]!);
+  }
+  let count = 0;
+  for (let i = 0; i < n - 1; i++) {
+    if (steps[i + 1]! > steps[i]!) count++;
+  }
+  return count / (n - 1);
+}
+
+/**
+ * WWW2 — scaleMelodicDescent
+ *
+ * Like WWW1 but counts pairs where steps[i+1] < steps[i].
+ * Return count / (n-1); 0 for n<2.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Proportion of descending step pairs in [0,1]
+ */
+export function scaleMelodicDescent(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    steps.push(i < n - 1 ? sorted[i + 1]! - sorted[i]! : periodCents - sorted[i]!);
+  }
+  let count = 0;
+  for (let i = 0; i < n - 1; i++) {
+    if (steps[i + 1]! < steps[i]!) count++;
+  }
+  return count / (n - 1);
+}
+
+/**
+ * WWW3 — scaleMelodicPeakRatio
+ *
+ * Proportion of pitches that are local maxima in step size context.
+ * A pitch at index k is a "melodic peak" if step[k] > step[k-1] AND step[k] > step[k+1] (circular).
+ * Return count / n; 0 for n<2.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Proportion of melodic peak pitches in [0,1]
+ */
+export function scaleMelodicPeakRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    steps.push(i < n - 1 ? sorted[i + 1]! - sorted[i]! : periodCents - sorted[i]!);
+  }
+  let count = 0;
+  for (let k = 0; k < n; k++) {
+    const prev = steps[(k - 1 + n) % n]!;
+    const curr = steps[k]!;
+    const next = steps[(k + 1) % n]!;
+    if (curr > prev && curr > next) count++;
+  }
+  return count / n;
+}
+
+/**
+ * WWW4 — scaleMelodicContourEntropy
+ *
+ * Shannon entropy of the three-symbol contour sequence (up/flat/down) of consecutive steps.
+ * For each pair of consecutive steps, classify: up (ratio>1.05), down (ratio<0.95), flat otherwise.
+ * Compute entropy of the distribution of these 3 symbols, normalized by log2(3).
+ * Return 0 for n<3.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Normalized Shannon entropy in [0,1]
+ */
+export function scaleMelodicContourEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 3) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    steps.push(i < n - 1 ? sorted[i + 1]! - sorted[i]! : periodCents - sorted[i]!);
+  }
+  // Classify each consecutive pair of steps
+  let up = 0, flat = 0, down = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const s1 = steps[i]!;
+    const s2 = steps[i + 1]!;
+    if (s1 === 0) {
+      flat++;
+    } else {
+      const ratio = s2 / s1;
+      if (ratio > 1.05) up++;
+      else if (ratio < 0.95) down++;
+      else flat++;
+    }
+  }
+  const total = n - 1;
+  const entropy = (count: number): number => {
+    if (count === 0) return 0;
+    const p = count / total;
+    return -p * Math.log2(p);
+  };
+  return (entropy(up) + entropy(flat) + entropy(down)) / Math.log2(3);
 }

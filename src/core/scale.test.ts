@@ -1011,6 +1011,12 @@ import {
   tuningFamilySocraticRadarWassersteinDistanceMean,
   tuningFamilySocraticRadarBottleneckDistanceMean,
   tuningFamilySocraticRadarEulerCharacteristicProxy,
+  tuningFamilySocraticRadarAttractorDimensionMean,
+  tuningFamilySocraticRadarLyapunovSpectrumMean,
+  tuningFamilySocraticRadarPhaseSpaceVolumeMean,
+  tuningFamilySocraticRadarBifurcationProxyMean,
+  tuningFamilySocraticRadarPoincareReturnMean,
+  tuningFamilySocraticRadarChaosIndexMean,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1101,6 +1107,10 @@ import {
   scaleReflectionSymmetrySteps,
   scaleTranspositionInvariance,
   scaleComplementSymmetry,
+  scaleMelodicAscent,
+  scaleMelodicDescent,
+  scaleMelodicPeakRatio,
+  scaleMelodicContourEntropy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -30878,6 +30888,102 @@ describe('VVV4 scaleComplementSymmetry', () => {
   });
   it('tritone [0,600] → finite, in [0,1]', () => {
     const v = scaleComplementSymmetry([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('WWW1 scaleMelodicAscent', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleMelodicAscent([])).toBe(0);
+  });
+  it('two-note scale [0, 600] → finite, in [0,1]', () => {
+    const v = scaleMelodicAscent([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic scale → finite, ≥0', () => {
+    const v = scaleMelodicAscent(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('ascending steps [0, 100, 300, 600, 1000] → finite, in [0,1]', () => {
+    const v = scaleMelodicAscent([0, 100, 300, 600, 1000]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('WWW2 scaleMelodicDescent', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleMelodicDescent([])).toBe(0);
+  });
+  it('two-note scale [0, 600] → finite, in [0,1]', () => {
+    const v = scaleMelodicDescent([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic scale → finite, ≥0', () => {
+    const v = scaleMelodicDescent(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('ascending steps [0, 100, 300, 600, 1000] → finite, in [0,1]', () => {
+    const v = scaleMelodicDescent([0, 100, 300, 600, 1000]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('WWW3 scaleMelodicPeakRatio', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleMelodicPeakRatio([])).toBe(0);
+  });
+  it('two-note scale [0, 600] → finite, in [0,1]', () => {
+    const v = scaleMelodicPeakRatio([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic scale → finite, ≥0', () => {
+    const v = scaleMelodicPeakRatio(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('ascending steps [0, 100, 300, 600, 1000] → finite, in [0,1]', () => {
+    const v = scaleMelodicPeakRatio([0, 100, 300, 600, 1000]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('WWW4 scaleMelodicContourEntropy', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('n<3 → 0', () => {
+    expect(scaleMelodicContourEntropy([])).toBe(0);
+    expect(scaleMelodicContourEntropy([0])).toBe(0);
+    expect(scaleMelodicContourEntropy([0, 600])).toBe(0);
+  });
+  it('two-note scale [0, 600] → 0', () => {
+    const v = scaleMelodicContourEntropy([0, 600]);
+    expect(v).toBe(0);
+  });
+  it('12-TET chromatic scale → finite, ≥0', () => {
+    const v = scaleMelodicContourEntropy(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('ascending steps [0, 100, 300, 600, 1000] → finite, in [0,1]', () => {
+    const v = scaleMelodicContourEntropy([0, 100, 300, 600, 1000]);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
