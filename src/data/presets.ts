@@ -387,6 +387,12 @@ import {
   tuningFamilySocraticRadarWaveletEnergy,
   tuningFamilySocraticRadarFourierAmplitude,
   tuningFamilySocraticRadarRecurrenceRate,
+  tuningFamilySocraticRadarMutualInformation,
+  tuningFamilySocraticRadarApproximateEntropy,
+  tuningFamilySocraticRadarFractalDimension,
+  tuningFamilySocraticRadarSampleEntropy,
+  tuningFamilySocraticRadarTransferEntropy,
+  tuningFamilySocraticRadarLyapunovExponent,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -10347,4 +10353,127 @@ export function presetFamilySocraticRadarRecurrenceRate(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarRecurrenceRate(tunings, spectrum, axis, epsilon, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1183 — presetFamilySocraticRadarMutualInformation
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarMutualInformation(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis1: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  axis2: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  bins: number = 5,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMutualInformation> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMutualInformation(tunings, spectrum, axis1, axis2, bins, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1185 — presetFamilySocraticRadarApproximateEntropy
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarApproximateEntropy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  m: number = 2,
+  r: number = 0.2,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarApproximateEntropy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarApproximateEntropy(tunings, spectrum, axis, m, r, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1187 — presetFamilySocraticRadarFractalDimension
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarFractalDimension(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarFractalDimension> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarFractalDimension(tunings, spectrum, axis, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1189 — presetFamilySocraticRadarSampleEntropy
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarSampleEntropy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  m: number = 2,
+  r: number = 0.2,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSampleEntropy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSampleEntropy(tunings, spectrum, axis, m, r, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1191 — presetFamilySocraticRadarTransferEntropy
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarTransferEntropy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  fromAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  toAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  lag: number = 1,
+  bins: number = 3,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTransferEntropy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTransferEntropy(tunings, spectrum, fromAxis, toAxis, lag, bins, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1193 — presetFamilySocraticRadarLyapunovExponent
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarLyapunovExponent(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarLyapunovExponent> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarLyapunovExponent(tunings, spectrum, axis, rootHz);
 }

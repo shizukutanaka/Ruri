@@ -394,6 +394,12 @@ import {
   presetFamilySocraticRadarWaveletEnergy,
   presetFamilySocraticRadarFourierAmplitude,
   presetFamilySocraticRadarRecurrenceRate,
+  presetFamilySocraticRadarMutualInformation,
+  presetFamilySocraticRadarApproximateEntropy,
+  presetFamilySocraticRadarFractalDimension,
+  presetFamilySocraticRadarSampleEntropy,
+  presetFamilySocraticRadarTransferEntropy,
+  presetFamilySocraticRadarLyapunovExponent,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12754,5 +12760,83 @@ describe('presetFamilySocraticRadarRecurrenceRate (Q1181)', () => {
     const r = presetFamilySocraticRadarRecurrenceRate(presetIds, spectrum, 'diversity', 0.05);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1183 — presetFamilySocraticRadarMutualInformation
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMutualInformation (Q1183)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns non-negative value', () => {
+    const r = presetFamilySocraticRadarMutualInformation(presetIds, spectrum, 'diversity', 'maturity', 3);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1185 — presetFamilySocraticRadarApproximateEntropy
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarApproximateEntropy (Q1185)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns non-negative value', () => {
+    const r = presetFamilySocraticRadarApproximateEntropy(presetIds, spectrum, 'diversity', 2, 0.2);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1187 — presetFamilySocraticRadarFractalDimension
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarFractalDimension (Q1187)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a finite number', () => {
+    const r = presetFamilySocraticRadarFractalDimension(presetIds, spectrum, 'diversity');
+    expect(Number.isFinite(r)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1189 — presetFamilySocraticRadarSampleEntropy
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarSampleEntropy (Q1189)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns non-negative value', () => {
+    const r = presetFamilySocraticRadarSampleEntropy(presetIds, spectrum, 'diversity', 2, 0.2);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1191 — presetFamilySocraticRadarTransferEntropy
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTransferEntropy (Q1191)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns non-negative value', () => {
+    const r = presetFamilySocraticRadarTransferEntropy(presetIds, spectrum, 'diversity', 'maturity', 1, 3);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1193 — presetFamilySocraticRadarLyapunovExponent
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarLyapunovExponent (Q1193)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a finite number', () => {
+    const r = presetFamilySocraticRadarLyapunovExponent(presetIds, spectrum, 'diversity');
+    expect(Number.isFinite(r)).toBe(true);
   });
 });

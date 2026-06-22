@@ -401,3 +401,17 @@
 - EE2: scaleCognitiveParsimony — 認知的パーシモニー（音数×変動係数の逆数）
 - EE3: harmonicEntropyApproximation — 調和エントロピー近似（ガウス重み付き）
 - EE4: tuningComplexityRatio — 有理数近似に基づく音律複雑度比
+
+## Round 23: 音程一貫性・音律同型・スケールグラフ・倍音格子 (FF1–FF4)
+
+**テーマ**: 音程パターンの一貫性・音律トポロジー・倍音格子座標系
+
+### 研究トピック
+- Qiita: Tonnetzeと倍音格子のTypeScript実装 — ピッチクラスの幾何学的表現
+- Zenn: 音律の同型性分析と音程一貫性スコア
+
+### 実装
+- FF1: intervalConsistency — 音程クラス繰り返し率（一貫性）
+- FF2: tuningIsomorphismScore — 音律間の音程構造同型スコア
+- FF3: scaleGraphDensity — 音程閾値グラフの密度
+- FF4: harmonicLatticePosition — 素数限界格子座標と最近傍有理比率

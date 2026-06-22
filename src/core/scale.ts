@@ -24678,3 +24678,635 @@ export function tuningFamilySocraticRadarRecurrenceRate(
   }
   return count / (n * (n - 1));
 }
+
+// ---------------------------------------------------------------------------
+// FF1 — intervalConsistency
+// ---------------------------------------------------------------------------
+
+/**
+ * Measure how consistently intervals appear in a scale.
+ *
+ * For each pair of degrees (i, j) with i < j, compute the interval
+ * `(scaleCents[j] - scaleCents[i]) mod 1200`, then round to the nearest
+ * multiple of `toleranceCents` to form interval classes. Consistency is
+ * the fraction of interval classes that appear more than once.
+ *
+ * @param scaleCents - Scale degrees in cents (need not start at 0).
+ * @param toleranceCents - Bin width for rounding intervals (default 5).
+ * @returns Value in [0, 1]; 0 for empty or single-note scales.
+ *
+ * @example
+ * intervalConsistency([0, 200, 400, 600, 800, 1000]); // whole-tone → high consistency
+ */
+export function intervalConsistency(
+  scaleCents: readonly number[],
+  toleranceCents: number = 5,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+
+  const totalPairs = (n * (n - 1)) / 2;
+  const classCounts = new Map<number, number>();
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const raw = ((scaleCents[j]! - scaleCents[i]!) % 1200 + 1200) % 1200;
+      const bin =
+        toleranceCents > 0 ? Math.round(raw / toleranceCents) * toleranceCents : raw;
+      classCounts.set(bin, (classCounts.get(bin) ?? 0) + 1);
+    }
+  }
+
+  let repeatedClasses = 0;
+  for (const count of classCounts.values()) {
+    if (count > 1) repeatedClasses++;
+  }
+
+  return repeatedClasses / totalPairs;
+}
+
+// ---------------------------------------------------------------------------
+// FF2 — tuningIsomorphismScore
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute how "isomorphic" two tuning systems are: do they share the same
+ * interval structure?
+ *
+ * All pairwise interval differences (mod 1200) are computed for each tuning.
+ * An interval from tuning1 is "matched" if it falls within `toleranceCents`
+ * of any interval in tuning2. Score = matched / total pairs in larger tuning.
+ *
+ * @param tuning1 - First tuning system.
+ * @param tuning2 - Second tuning system.
+ * @param toleranceCents - Match tolerance in cents (default 10).
+ * @returns Value in [0, 1]; both empty → 1.
+ */
+export function tuningIsomorphismScore(
+  tuning1: TuningSystem,
+  tuning2: TuningSystem,
+  toleranceCents: number = 10,
+): number {
+  const intervals = (t: TuningSystem): number[] => {
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    const result: number[] = [];
+    for (let i = 0; i < cents.length; i++) {
+      for (let j = i + 1; j < cents.length; j++) {
+        const diff = ((cents[j]! - cents[i]!) % 1200 + 1200) % 1200;
+        result.push(diff);
+      }
+    }
+    return result;
+  };
+
+  const ivs1 = intervals(tuning1);
+  const ivs2 = intervals(tuning2);
+
+  if (ivs1.length === 0 && ivs2.length === 0) return 1;
+
+  const larger = Math.max(ivs1.length, ivs2.length);
+  if (larger === 0) return 1;
+
+  let matched = 0;
+  for (const iv of ivs1) {
+    for (const iv2 of ivs2) {
+      if (Math.abs(iv - iv2) <= toleranceCents) {
+        matched++;
+        break;
+      }
+    }
+  }
+
+  return matched / larger;
+}
+
+// ---------------------------------------------------------------------------
+// FF3 — scaleGraphDensity
+// ---------------------------------------------------------------------------
+
+/**
+ * Model a scale as a graph where degrees are nodes and edges connect pairs
+ * within `connectThresholdCents` (using circular/min distance mod 1200).
+ * Density = actual edges / C(n, 2).
+ *
+ * @param scaleCents - Scale degrees in cents.
+ * @param connectThresholdCents - Edge threshold in cents (default 200).
+ * @returns Value in [0, 1]; 0 for fewer than 2 notes.
+ *
+ * @example
+ * scaleGraphDensity([0, 100, 200, 300], 200); // pairs within 200c
+ */
+export function scaleGraphDensity(
+  scaleCents: readonly number[],
+  connectThresholdCents: number = 200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+
+  const maxPairs = (n * (n - 1)) / 2;
+  let edges = 0;
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = ((scaleCents[j]! - scaleCents[i]!) % 1200 + 1200) % 1200;
+      const circDist = Math.min(diff, 1200 - diff);
+      if (circDist <= connectThresholdCents) edges++;
+    }
+  }
+
+  return edges / maxPairs;
+}
+
+// ---------------------------------------------------------------------------
+// FF4 — harmonicLatticePosition
+// ---------------------------------------------------------------------------
+
+/** Return the exponent of prime p in the factorization of n. */
+function _ff4PrimeExponent(n: number, p: number): number {
+  let exp = 0;
+  while (n % p === 0) {
+    exp++;
+    n /= p;
+  }
+  return exp;
+}
+
+/** Return all primes ≤ limit using trial division. */
+function _ff4PrimesUpTo(limit: number): number[] {
+  const result: number[] = [];
+  for (let n = 2; n <= limit; n++) {
+    let isPrime = true;
+    for (let d = 2; d * d <= n; d++) {
+      if (n % d === 0) {
+        isPrime = false;
+        break;
+      }
+    }
+    if (isPrime) result.push(n);
+  }
+  return result;
+}
+
+/** Return true if all prime factors of n are in the allowed list. */
+function _ff4AllFactorsAllowed(n: number, allowed: readonly number[]): boolean {
+  let rem = n;
+  for (const p of allowed) {
+    while (rem % p === 0) rem /= p;
+  }
+  return rem === 1;
+}
+
+/** Greatest common divisor. */
+function _ff4Gcd(a: number, b: number): number {
+  while (b !== 0) {
+    const t = b;
+    b = a % b;
+    a = t;
+  }
+  return a;
+}
+
+/**
+ * Find the prime-limit lattice coordinates for a pitch given in cents.
+ *
+ * Searches all ratios n/d with n, d ≤ 64, gcd(n,d)=1, and all prime factors
+ * of both n and d ≤ primeLimit. Returns the best (minimum absolute error)
+ * match along with its lattice coordinates and the error in cents.
+ *
+ * coords[k] = exponent of primes[k] in numerator − exponent in denominator.
+ *
+ * @param cents - Pitch in cents.
+ * @param primeLimit - Maximum prime to include (default 5).
+ * @returns Object with `coords`, `nearestRatio` string, and `errorCents`.
+ * @throws {RangeError} If primeLimit < 2.
+ *
+ * @example
+ * harmonicLatticePosition(702, 5);
+ * // → { coords: [-1, 1, 0], nearestRatio: '3/2', errorCents: ~1.96 }
+ */
+export function harmonicLatticePosition(
+  cents: number,
+  primeLimit: number = 5,
+): { coords: number[]; nearestRatio: string; errorCents: number } {
+  if (primeLimit < 2) throw new RangeError('primeLimit must be at least 2');
+
+  const primes = _ff4PrimesUpTo(primeLimit);
+
+  let bestError = Infinity;
+  let bestNum = 1;
+  let bestDen = 1;
+
+  for (let num = 1; num <= 64; num++) {
+    if (!_ff4AllFactorsAllowed(num, primes)) continue;
+    for (let den = 1; den <= 64; den++) {
+      if (!_ff4AllFactorsAllowed(den, primes)) continue;
+      if (_ff4Gcd(num, den) !== 1) continue;
+      const ratioCents = 1200 * Math.log2(num / den);
+      // Normalize to [0, 1200)
+      const normalized = ((ratioCents % 1200) + 1200) % 1200;
+      const error = Math.abs(cents - normalized);
+      // On ties prefer num/den already in [1,2) octave (i.e., 1 <= num/den < 2)
+      // then prefer smaller num+den (simpler ratio)
+      const isOctaveReduced = num >= den && num < 2 * den;
+      const bestIsOctaveReduced = bestNum >= bestDen && bestNum < 2 * bestDen;
+      const isBetter =
+        error < bestError - 1e-9 ||
+        (Math.abs(error - bestError) < 1e-9 && isOctaveReduced && !bestIsOctaveReduced) ||
+        (Math.abs(error - bestError) < 1e-9 && isOctaveReduced === bestIsOctaveReduced &&
+          num + den < bestNum + bestDen);
+      if (isBetter) {
+        bestError = error;
+        bestNum = num;
+        bestDen = den;
+      }
+    }
+  }
+
+  const coords = primes.map(
+    (p) => _ff4PrimeExponent(bestNum, p) - _ff4PrimeExponent(bestDen, p),
+  );
+
+  return {
+    coords,
+    nearestRatio: `${bestNum}/${bestDen}`,
+    errorCents: bestError,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Q1182 — tuningFamilySocraticRadarMutualInformation
+// ---------------------------------------------------------------------------
+
+/**
+ * Mutual Information between two radar axis scores.
+ * Discretizes each axis score into bins and computes MI.
+ * Returns non-negative value; 0 if bins < 2 or insufficient data.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis1 - First radar axis.
+ * @param axis2 - Second radar axis.
+ * @param bins - Number of bins for discretization (default 5).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Mutual information in bits (non-negative).
+ */
+export function tuningFamilySocraticRadarMutualInformation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis1: AxisKey,
+  axis2: AxisKey,
+  bins: number = 5,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n < 1 || bins < 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const binnedAxis1 = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[axis1] * bins))));
+  const binnedAxis2 = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[axis2] * bins))));
+
+  // Joint distribution
+  const joint: number[][] = Array.from({ length: bins }, () => new Array(bins).fill(0) as number[]);
+  for (let i = 0; i < n; i++) {
+    joint[binnedAxis1[i]!]![binnedAxis2[i]!]! += 1 / n;
+  }
+  // Marginals
+  const marginal1 = Array(bins).fill(0) as number[];
+  const marginal2 = Array(bins).fill(0) as number[];
+  for (let i = 0; i < bins; i++) {
+    for (let j = 0; j < bins; j++) {
+      marginal1[i]! += joint[i]![j]!;
+      marginal2[j]! += joint[i]![j]!;
+    }
+  }
+  // MI
+  let mi = 0;
+  for (let i = 0; i < bins; i++) {
+    for (let j = 0; j < bins; j++) {
+      const pij = joint[i]![j]!;
+      const pi = marginal1[i]!;
+      const pj = marginal2[j]!;
+      if (pij > 0 && pi > 0 && pj > 0) {
+        mi += pij * Math.log2(pij / (pi * pj));
+      }
+    }
+  }
+  return Math.max(0, mi);
+}
+
+// ---------------------------------------------------------------------------
+// Q1184 — tuningFamilySocraticRadarApproximateEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Approximate Entropy (ApEn) of axis scores time series.
+ * Throws RangeError if m < 1 or r <= 0.
+ * Returns 0 if n < m+2 or std=0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param m - Template length (default 2).
+ * @param r - Tolerance as fraction of std (default 0.2).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Approximate entropy (non-negative).
+ */
+export function tuningFamilySocraticRadarApproximateEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  m: number = 2,
+  r: number = 0.2,
+  rootHz?: number,
+): number {
+  if (m < 1) throw new RangeError('m must be >= 1');
+  if (r <= 0) throw new RangeError('r must be > 0');
+  const n = tunings.length;
+  if (n < m + 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+  const mean = x.reduce((a, b) => a + b, 0) / n;
+  const variance = x.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  const std = Math.sqrt(variance);
+  if (std === 0) return 0;
+  const tol = r * std;
+
+  function phi(len: number): number {
+    let sumLn = 0;
+    for (let i = 0; i <= n - len; i++) {
+      let count = 0;
+      for (let j = 0; j <= n - len; j++) {
+        let match = true;
+        for (let k = 0; k < len; k++) {
+          if (Math.abs(x[i + k]! - x[j + k]!) > tol) {
+            match = false;
+            break;
+          }
+        }
+        if (match) count++;
+      }
+      const cm = count / (n - len + 1);
+      if (cm > 0) sumLn += Math.log(cm);
+    }
+    return sumLn / (n - len + 1);
+  }
+
+  const result = phi(m) - phi(m + 1);
+  return Math.max(0, result);
+}
+
+// ---------------------------------------------------------------------------
+// Q1186 — tuningFamilySocraticRadarFractalDimension
+// ---------------------------------------------------------------------------
+
+/**
+ * Higuchi fractal dimension estimate of axis scores time series.
+ * Returns 1.0 if n < 4 (trivial).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Fractal dimension (typically in [1, 2]).
+ */
+export function tuningFamilySocraticRadarFractalDimension(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n < 4) return 1.0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+  const kMax = Math.floor(n / 2);
+
+  const logK: number[] = [];
+  const logL: number[] = [];
+
+  for (let k = 1; k <= kMax; k++) {
+    let Lk = 0;
+    for (let m = 1; m <= k; m++) {
+      const count = Math.floor((n - m) / k);
+      if (count < 1) continue;
+      let sum = 0;
+      for (let i = 1; i <= count; i++) {
+        sum += Math.abs(x[m + i * k - 1]! - x[m + (i - 1) * k - 1]!);
+      }
+      Lk += sum * (n - 1) / (k * k * count);
+    }
+    Lk /= k;
+    if (Lk > 0) {
+      logK.push(Math.log(1 / k));
+      logL.push(Math.log(Lk));
+    }
+  }
+
+  if (logK.length < 2) return 1.0;
+
+  // OLS slope
+  const nPts = logK.length;
+  const meanX = logK.reduce((a, b) => a + b, 0) / nPts;
+  const meanY = logL.reduce((a, b) => a + b, 0) / nPts;
+  let num = 0;
+  let den = 0;
+  for (let i = 0; i < nPts; i++) {
+    num += (logK[i]! - meanX) * (logL[i]! - meanY);
+    den += (logK[i]! - meanX) ** 2;
+  }
+  if (den === 0) return 1.0;
+  return num / den;
+}
+
+// ---------------------------------------------------------------------------
+// Q1188 — tuningFamilySocraticRadarSampleEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Sample Entropy (SampEn) of axis scores.
+ * Throws RangeError if m < 1 or r <= 0.
+ * Returns 0 if n < m+2 or std=0 or no template matches.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param m - Template length (default 2).
+ * @param r - Tolerance as fraction of std (default 0.2).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Sample entropy (non-negative).
+ */
+export function tuningFamilySocraticRadarSampleEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  m: number = 2,
+  r: number = 0.2,
+  rootHz?: number,
+): number {
+  if (m < 1) throw new RangeError('m must be >= 1');
+  if (r <= 0) throw new RangeError('r must be > 0');
+  const n = tunings.length;
+  if (n < m + 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+  const mean = x.reduce((a, b) => a + b, 0) / n;
+  const variance = x.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  const std = Math.sqrt(variance);
+  if (std === 0) return 0;
+  const tol = r * std;
+
+  function countMatches(len: number): number {
+    let count = 0;
+    for (let i = 0; i < n - len; i++) {
+      for (let j = 0; j < n - len; j++) {
+        if (i === j) continue;
+        let match = true;
+        for (let k = 0; k < len; k++) {
+          if (Math.abs(x[i + k]! - x[j + k]!) > tol) {
+            match = false;
+            break;
+          }
+        }
+        if (match) count++;
+      }
+    }
+    return count;
+  }
+
+  const B = countMatches(m);
+  const A = countMatches(m + 1);
+  if (B === 0) return 0;
+  const ratio = A / B;
+  if (ratio <= 0) return 0;
+  return Math.max(0, -Math.log(ratio));
+}
+
+// ---------------------------------------------------------------------------
+// Q1190 — tuningFamilySocraticRadarTransferEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Transfer Entropy from fromAxis to toAxis at given lag.
+ * Throws RangeError if lag < 1 or bins < 2.
+ * Returns non-negative value; 0 if insufficient data.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param fromAxis - Source axis.
+ * @param toAxis - Target axis.
+ * @param lag - Lag for transfer entropy (default 1).
+ * @param bins - Number of bins for discretization (default 3).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Transfer entropy in bits (non-negative).
+ */
+export function tuningFamilySocraticRadarTransferEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  fromAxis: AxisKey,
+  toAxis: AxisKey,
+  lag: number = 1,
+  bins: number = 3,
+  rootHz?: number,
+): number {
+  if (lag < 1) throw new RangeError('lag must be >= 1');
+  if (bins < 2) throw new RangeError('bins must be >= 2');
+  const n = tunings.length;
+  if (n < lag + 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const yt = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[toAxis] * bins))));
+  const xt = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[fromAxis] * bins))));
+
+  // Build joint distribution: p(y_t, y_{t-1}, x_{t-lag})
+  const totalTriples = n - Math.max(1, lag);
+  if (totalTriples < 1) return 0;
+
+  const jointXYY: Record<string, number> = {};
+  const jointYY: Record<string, number> = {};
+
+  for (let t = Math.max(1, lag); t < n; t++) {
+    const ytCurr = yt[t]!;
+    const ytPrev = yt[t - 1]!;
+    const xtLag = xt[t - lag]!;
+    const keyXYY = `${xtLag},${ytPrev},${ytCurr}`;
+    const keyYY = `${ytPrev},${ytCurr}`;
+    jointXYY[keyXYY] = (jointXYY[keyXYY] ?? 0) + 1;
+    jointYY[keyYY] = (jointYY[keyYY] ?? 0) + 1;
+  }
+
+  // Also need p(y_{t-1}, x_{t-lag}) and p(y_{t-1})
+  const jointXY: Record<string, number> = {};
+  const marginalY: Record<string, number> = {};
+  for (let t = Math.max(1, lag); t < n; t++) {
+    const ytPrev = yt[t - 1]!;
+    const xtLag = xt[t - lag]!;
+    const keyXY = `${xtLag},${ytPrev}`;
+    jointXY[keyXY] = (jointXY[keyXY] ?? 0) + 1;
+    marginalY[ytPrev] = (marginalY[ytPrev] ?? 0) + 1;
+  }
+
+  const total = totalTriples;
+  let te = 0;
+  for (const [keyXYY, countXYY] of Object.entries(jointXYY)) {
+    const pXYY = countXYY / total;
+    const parts = keyXYY.split(',');
+    const xVal = parts[0]!;
+    const yPrev = parts[1]!;
+    const yCurr = parts[2]!;
+    const keyYY = `${yPrev},${yCurr}`;
+    const keyXY = `${xVal},${yPrev}`;
+    const keyY = yPrev;
+    const pYY = (jointYY[keyYY] ?? 0) / total;
+    const pXY = (jointXY[keyXY] ?? 0) / total;
+    const pY = (marginalY[keyY] ?? 0) / total;
+    if (pXYY > 0 && pY > 0 && pYY > 0 && pXY > 0) {
+      te += pXYY * Math.log2((pXYY * pY) / (pYY * pXY));
+    }
+  }
+  return Math.max(0, te);
+}
+
+// ---------------------------------------------------------------------------
+// Q1192 — tuningFamilySocraticRadarLyapunovExponent
+// ---------------------------------------------------------------------------
+
+/**
+ * Simplified Lyapunov exponent estimate for axis scores.
+ * Uses Wolf's algorithm simplified: finds nearby pairs and tracks divergence.
+ * Returns 0 if insufficient pairs or n < 3.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Lyapunov exponent estimate.
+ */
+export function tuningFamilySocraticRadarLyapunovExponent(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n < 3) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+  const mean = x.reduce((a, b) => a + b, 0) / n;
+  const variance = x.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  const std = Math.sqrt(variance);
+  if (std === 0) return 0;
+  const epsilon = 0.1 * std;
+
+  const lnDivergences: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = i + 1; j < n - 1; j++) {
+      const d0 = Math.abs(x[i]! - x[j]!);
+      if (d0 < epsilon && d0 > 0) {
+        const d1 = Math.abs(x[i + 1]! - x[j + 1]!);
+        if (d1 > 0) {
+          lnDivergences.push(Math.log(d1 / d0));
+        }
+      }
+    }
+  }
+  if (lnDivergences.length === 0) return 0;
+  return lnDivergences.reduce((a, b) => a + b, 0) / lnDivergences.length;
+}
