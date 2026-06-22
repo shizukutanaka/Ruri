@@ -887,3 +887,14 @@
 | UUU2 | `scaleSmallWorldIndex` | スモールワールド係数（クラスタリング/経路効率） |
 | UUU3 | `scaleHubScore` | 最大ハブ度数（150セント隣接グラフ） |
 | UUU4 | `scaleBridgingCoefficient` | ブリッジング係数（Valente-Fujimoto） |
+
+## Round 65: 音階対称性・不変量 (VVV1–VVV4)
+
+音階の対称性と変換不変量を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| VVV1 | `scaleRotationalSymmetrySteps` | ステップパターンを保つ回転の割合 |
+| VVV2 | `scaleReflectionSymmetrySteps` | 反射対称なステップパターンの割合 |
+| VVV3 | `scaleTranspositionInvariance` | スケール内移調で自己合同な移調数/n |
+| VVV4 | `scaleComplementSymmetry` | 12-EDO補集合スケールとのJaccard類似度 |

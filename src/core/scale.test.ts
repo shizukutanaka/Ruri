@@ -30787,3 +30787,99 @@ describe('Q1684 tuningFamilySocraticRadarEulerCharacteristicProxy', () => {
     expect(v).toBeGreaterThanOrEqual(0);
   });
 });
+
+describe('VVV1 scaleRotationalSymmetrySteps', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleRotationalSymmetrySteps([])).toBe(0);
+  });
+  it('12-TET chromatic scale → finite, in [0,1]', () => {
+    const v = scaleRotationalSymmetrySteps(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,200,400,700,900] → finite, ≥0', () => {
+    const v = scaleRotationalSymmetrySteps([0, 200, 400, 700, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('tritone [0,600] → finite, in [0,1]', () => {
+    const v = scaleRotationalSymmetrySteps([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('VVV2 scaleReflectionSymmetrySteps', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleReflectionSymmetrySteps([])).toBe(0);
+  });
+  it('12-TET chromatic scale → finite, in [0,1]', () => {
+    const v = scaleReflectionSymmetrySteps(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,200,400,700,900] → finite, ≥0', () => {
+    const v = scaleReflectionSymmetrySteps([0, 200, 400, 700, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('tritone [0,600] → finite, in [0,1]', () => {
+    const v = scaleReflectionSymmetrySteps([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('VVV3 scaleTranspositionInvariance', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleTranspositionInvariance([])).toBe(0);
+  });
+  it('12-TET chromatic scale → finite, in [0,1]', () => {
+    const v = scaleTranspositionInvariance(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,200,400,700,900] → finite, ≥0', () => {
+    const v = scaleTranspositionInvariance([0, 200, 400, 700, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('tritone [0,600] → finite, in [0,1]', () => {
+    const v = scaleTranspositionInvariance([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('VVV4 scaleComplementSymmetry', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  it('empty → 0', () => {
+    expect(scaleComplementSymmetry([])).toBe(0);
+  });
+  it('12-TET chromatic scale → finite, in [0,1]', () => {
+    const v = scaleComplementSymmetry(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,200,400,700,900] → finite, ≥0', () => {
+    const v = scaleComplementSymmetry([0, 200, 400, 700, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('tritone [0,600] → finite, in [0,1]', () => {
+    const v = scaleComplementSymmetry([0, 600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
