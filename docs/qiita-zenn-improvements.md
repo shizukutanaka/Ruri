@@ -443,3 +443,15 @@
 - HH2: roughnessCurvePoints — 音程別ラフネス曲線（Sethares）
 - HH3: scaleExpressiveness — 音程多様性×音域による表現性スコア
 - HH4: tuningHistoricalDistance — 絶対Hz基準の音律RMS距離
+
+## Round 26: 音響・スペクトル分析ヘルパ (II1–II4)
+
+**テーマ**: 音響心理学の基本変換とスペクトル分析  
+**実装**: II1–II4
+
+| 関数 | 説明 |
+|------|------|
+| `barkScale` | Hz → Bark尺度変換（Zwicker公式） |
+| `pitchSalience` | スペクトル重心（振幅重み付き比の平均） |
+| `scaleStepVariety` | スケールのステップ種類数（ビン丸め） |
+| `spectrumFlux` | 2スペクトル間の差分量（正規化RMS） |

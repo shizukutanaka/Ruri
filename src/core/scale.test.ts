@@ -715,6 +715,16 @@ import {
   tuningFamilySocraticRadarModeProfile,
   tuningFamilySocraticRadarGeometricMeanV2,
   tuningFamilySocraticRadarTrimmedMeanV2,
+  tuningFamilySocraticRadarHarmonicMeanV2,
+  tuningFamilySocraticRadarWeightedMedian,
+  tuningFamilySocraticRadarCoefficientOfVariation,
+  tuningFamilySocraticRadarSkewness,
+  tuningFamilySocraticRadarKurtosis,
+  tuningFamilySocraticRadarZScoreMatrix,
+  barkScale,
+  pitchSalience,
+  scaleStepVariety,
+  spectrumFlux,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -23150,6 +23160,201 @@ describe('tuningFamilySocraticRadarTrimmedMeanV2 (Q1216)', () => {
     for (const v of Object.values(tuningFamilySocraticRadarTrimmedMeanV2(tunings, spectrum, 0.1))) {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+describe('barkScale', () => {
+  it('returns 0 for 0 Hz', () => {
+    expect(barkScale(0)).toBe(0);
+  });
+  it('returns approximately 8.5 for 1000 Hz', () => {
+    expect(barkScale(1000)).toBeCloseTo(8.5, 0);
+  });
+  it('returns a positive value for positive Hz', () => {
+    expect(barkScale(500)).toBeGreaterThan(0);
+  });
+  it('returns ~24 for 20000 Hz', () => {
+    expect(barkScale(20000)).toBeGreaterThan(20);
+  });
+});
+
+describe('pitchSalience', () => {
+  it('returns 0 for empty spectrum', () => {
+    expect(pitchSalience([])).toBe(0);
+  });
+  it('returns > 1 for harmonicSpectrum(4)', () => {
+    expect(pitchSalience(harmonicSpectrum(4))).toBeGreaterThan(1);
+  });
+  it('returns ratio for single-partial spectrum', () => {
+    expect(pitchSalience([{ ratio: 3, amplitude: 1 }])).toBeCloseTo(3, 10);
+  });
+  it('is amplitude-weighted average of ratios', () => {
+    const s = [
+      { ratio: 1, amplitude: 2 },
+      { ratio: 3, amplitude: 2 },
+    ];
+    expect(pitchSalience(s)).toBeCloseTo(2, 10);
+  });
+});
+
+describe('scaleStepVariety', () => {
+  it('returns 2 for major scale [0,200,400,500,700,900,1100]', () => {
+    expect(scaleStepVariety([0, 200, 400, 500, 700, 900, 1100])).toBe(2);
+  });
+  it('returns 0 for single-note scale', () => {
+    expect(scaleStepVariety([0])).toBe(0);
+  });
+  it('throws RangeError for binSize <= 0', () => {
+    expect(() => scaleStepVariety([0, 200, 400], 0)).toThrow(RangeError);
+  });
+  it('returns 1 for equal-step scale', () => {
+    expect(scaleStepVariety([0, 200, 400, 600, 800], 10)).toBe(1);
+  });
+});
+
+describe('spectrumFlux', () => {
+  it('returns 0 for two identical spectra', () => {
+    expect(spectrumFlux(harmonicSpectrum(4), harmonicSpectrum(4))).toBe(0);
+  });
+  it('returns > 0 for different spectra', () => {
+    expect(spectrumFlux(harmonicSpectrum(4), harmonicSpectrum(2))).toBeGreaterThan(0);
+  });
+  it('returns 0 for two empty spectra', () => {
+    expect(spectrumFlux([], [])).toBe(0);
+  });
+  it('is symmetric', () => {
+    const s1 = harmonicSpectrum(4);
+    const s2 = harmonicSpectrum(6);
+    expect(spectrumFlux(s1, s2)).toBeCloseTo(spectrumFlux(s2, s1), 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1218 — tuningFamilySocraticRadarHarmonicMeanV2
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarHarmonicMeanV2 (Q1218)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarHarmonicMeanV2(tunings, spectrum))).toHaveLength(5);
+  });
+  it('all values are positive', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarHarmonicMeanV2(tunings, spectrum))) {
+      expect(v).toBeGreaterThan(0);
+    }
+  });
+  it('empty tunings returns all zeros', () => {
+    const r = tuningFamilySocraticRadarHarmonicMeanV2([], spectrum);
+    for (const v of Object.values(r)) expect(v).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1220 — tuningFamilySocraticRadarWeightedMedian
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarWeightedMedian (Q1220)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarWeightedMedian(tunings, spectrum, [1, 1]))).toHaveLength(5);
+  });
+  it('throws RangeError when weights length does not match tunings', () => {
+    expect(() => tuningFamilySocraticRadarWeightedMedian(tunings, spectrum, [1])).toThrow(RangeError);
+  });
+  it('all values in [0,1]', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarWeightedMedian(tunings, spectrum, [0.3, 0.7]))) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1222 — tuningFamilySocraticRadarCoefficientOfVariation
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarCoefficientOfVariation (Q1222)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarCoefficientOfVariation(tunings, spectrum))).toHaveLength(5);
+  });
+  it('all values are non-negative', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarCoefficientOfVariation(tunings, spectrum))) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('single tuning returns zero CV', () => {
+    const r = tuningFamilySocraticRadarCoefficientOfVariation([equalTemperament12(440)], spectrum);
+    for (const v of Object.values(r)) expect(v).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1224 — tuningFamilySocraticRadarSkewness
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarSkewness (Q1224)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarSkewness(tunings, spectrum))).toHaveLength(5);
+  });
+  it('single tuning returns zero skewness', () => {
+    const r = tuningFamilySocraticRadarSkewness([equalTemperament12(440)], spectrum);
+    for (const v of Object.values(r)) expect(v).toBe(0);
+  });
+  it('returns finite values for two tunings', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarSkewness(tunings, spectrum))) {
+      expect(isFinite(v)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1226 — tuningFamilySocraticRadarKurtosis
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarKurtosis (Q1226)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    expect(Object.keys(tuningFamilySocraticRadarKurtosis(tunings, spectrum))).toHaveLength(5);
+  });
+  it('single tuning returns zero kurtosis', () => {
+    const r = tuningFamilySocraticRadarKurtosis([equalTemperament12(440)], spectrum);
+    for (const v of Object.values(r)) expect(v).toBe(0);
+  });
+  it('returns finite values for two tunings', () => {
+    for (const v of Object.values(tuningFamilySocraticRadarKurtosis(tunings, spectrum))) {
+      expect(isFinite(v)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1228 — tuningFamilySocraticRadarZScoreMatrix
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarZScoreMatrix (Q1228)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a matrix with tunings rows and 5 columns', () => {
+    const m = tuningFamilySocraticRadarZScoreMatrix(tunings, spectrum);
+    expect(m).toHaveLength(2);
+    expect(m[0]!).toHaveLength(5);
+  });
+  it('single tuning returns all zeros', () => {
+    const m = tuningFamilySocraticRadarZScoreMatrix([equalTemperament12(440)], spectrum);
+    expect(m[0]!.every((v) => v === 0)).toBe(true);
+  });
+  it('z-scores for two tunings are negations of each other', () => {
+    const m = tuningFamilySocraticRadarZScoreMatrix(tunings, spectrum);
+    for (let ai = 0; ai < 5; ai++) {
+      expect(m[0]![ai]!).toBeCloseTo(-(m[1]![ai]!), 10);
     }
   });
 });

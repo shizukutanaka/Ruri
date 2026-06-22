@@ -26283,3 +26283,270 @@ export function tuningFamilySocraticRadarTrimmedMeanV2(
   }
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Q1218 — tuningFamilySocraticRadarHarmonicMeanV2
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarHarmonicMeanV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  epsilon: number = 1e-10,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+  if (n === 0) {
+    for (const ax of axes) result[ax] = 0;
+    return result;
+  }
+  for (const ax of axes) {
+    const sumRecip = profiles.reduce((s, p) => s + 1 / (p[ax] + epsilon), 0);
+    result[ax] = n / sumRecip;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1220 — tuningFamilySocraticRadarWeightedMedian
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarWeightedMedian(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  weights: number[],
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  if (weights.length !== tunings.length) {
+    throw new RangeError(`weights.length (${weights.length}) must equal tunings.length (${tunings.length})`);
+  }
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+  if (n === 0) {
+    for (const ax of axes) result[ax] = 0;
+    return result;
+  }
+  const weightSum = weights.reduce((s, w) => s + w, 0);
+  const normWeights = weightSum === 0 ? weights.map(() => 1 / n) : weights.map((w) => w / weightSum);
+  for (const ax of axes) {
+    const pairs = profiles.map((p, i) => ({ score: p[ax], weight: normWeights[i]! }));
+    pairs.sort((a, b) => a.score - b.score);
+    let cumulative = 0;
+    let median = pairs[0]!.score;
+    for (const pair of pairs) {
+      cumulative += pair.weight;
+      if (cumulative >= 0.5) {
+        median = pair.score;
+        break;
+      }
+    }
+    result[ax] = median;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1222 — tuningFamilySocraticRadarCoefficientOfVariation
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarCoefficientOfVariation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+  if (n === 0) {
+    for (const ax of axes) result[ax] = 0;
+    return result;
+  }
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]);
+    const mean = scores.reduce((s, v) => s + v, 0) / n;
+    if (mean === 0) {
+      result[ax] = 0;
+    } else {
+      const variance = scores.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+      result[ax] = Math.sqrt(variance) / mean;
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1224 — tuningFamilySocraticRadarSkewness
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarSkewness(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+  if (n === 0) {
+    for (const ax of axes) result[ax] = 0;
+    return result;
+  }
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]).sort((a, b) => a - b);
+    const mean = scores.reduce((s, v) => s + v, 0) / n;
+    const variance = scores.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    const stddev = Math.sqrt(variance);
+    if (stddev === 0) {
+      result[ax] = 0;
+    } else {
+      const mid = Math.floor(n / 2);
+      const median = n % 2 === 1 ? scores[mid]! : (scores[mid - 1]! + scores[mid]!) / 2;
+      result[ax] = (3 * (mean - median)) / stddev;
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1226 — tuningFamilySocraticRadarKurtosis
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarKurtosis(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = {} as Record<AxisKey, number>;
+  const n = profiles.length;
+  if (n === 0) {
+    for (const ax of axes) result[ax] = 0;
+    return result;
+  }
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]);
+    const mean = scores.reduce((s, v) => s + v, 0) / n;
+    const variance = scores.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    if (variance === 0) {
+      result[ax] = 0;
+    } else {
+      const m4 = scores.reduce((s, v) => s + (v - mean) ** 4, 0) / n;
+      result[ax] = m4 / variance ** 2 - 3;
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1228 — tuningFamilySocraticRadarZScoreMatrix
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarZScoreMatrix(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const axisStats = axes.map((ax) => {
+    const scores = profiles.map((p) => p[ax]);
+    const mean = n === 0 ? 0 : scores.reduce((s, v) => s + v, 0) / n;
+    const variance = n === 0 ? 0 : scores.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+    return { mean, stddev: Math.sqrt(variance) };
+  });
+  return profiles.map((p) =>
+    axes.map((ax, ai) => {
+      const stat = axisStats[ai]!;
+      return stat.stddev === 0 ? 0 : (p[ax] - stat.mean) / stat.stddev;
+    }),
+  );
+}
+
+// Round 26: II1–II4 — 音響心理学の基本変換とスペクトル分析
+
+/**
+ * II1: Converts frequency in Hz to Bark scale value using Zwicker's formula.
+ * bark = 13 * atan(0.00076 * hz) + 3.5 * atan((hz / 7500) ** 2)
+ * Returns 0 for 0 Hz, ~24 for 20 kHz.
+ */
+export function barkScale(hz: number): number {
+  return 13 * Math.atan(0.00076 * hz) + 3.5 * Math.atan((hz / 7500) ** 2);
+}
+
+/**
+ * II2: Spectral salience — amplitude-weighted average ratio.
+ * sum(amp * ratio) / sum(amp). Returns 0 for empty spectrum.
+ */
+export function pitchSalience(spectrum: readonly { ratio: number; amplitude: number }[]): number {
+  if (spectrum.length === 0) return 0;
+  let sumAmp = 0;
+  let sumWeighted = 0;
+  for (const { ratio, amplitude } of spectrum) {
+    sumAmp += amplitude;
+    sumWeighted += amplitude * ratio;
+  }
+  return sumAmp === 0 ? 0 : sumWeighted / sumAmp;
+}
+
+/**
+ * II3: Count the number of distinct step sizes in the scale.
+ * Steps = differences between consecutive sorted pitches, each rounded to
+ * the nearest binSize cents before counting unique values.
+ * Returns 0 for scales with fewer than 2 notes.
+ * Throws RangeError if binSize <= 0.
+ */
+export function scaleStepVariety(scaleCents: readonly number[], binSize: number = 10): number {
+  if (binSize <= 0) throw new RangeError('binSize must be positive');
+  if (scaleCents.length < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const seen = new Set<number>();
+  for (let i = 1; i < sorted.length; i++) {
+    const step = sorted[i]! - sorted[i - 1]!;
+    const rounded = Math.round(step / binSize) * binSize;
+    seen.add(rounded);
+  }
+  return seen.size;
+}
+
+/**
+ * II4: Spectral flux between two spectra.
+ * Aligns by ratio; squared differences summed, normalised by max(n1, n2, 1),
+ * then square-rooted. Returns 0 for identical spectra.
+ */
+export function spectrumFlux(
+  spectrum1: readonly { ratio: number; amplitude: number }[],
+  spectrum2: readonly { ratio: number; amplitude: number }[],
+): number {
+  const map2 = new Map<number, number>();
+  for (const { ratio, amplitude } of spectrum2) {
+    map2.set(ratio, amplitude);
+  }
+  const seen = new Set<number>();
+  let sumSq = 0;
+  for (const { ratio, amplitude: amp1 } of spectrum1) {
+    const amp2 = map2.get(ratio) ?? 0;
+    const diff = amp1 - amp2;
+    sumSq += diff * diff;
+    seen.add(ratio);
+  }
+  for (const { ratio, amplitude: amp2 } of spectrum2) {
+    if (!seen.has(ratio)) {
+      sumSq += amp2 * amp2;
+    }
+  }
+  const n = Math.max(spectrum1.length, spectrum2.length, 1);
+  return Math.sqrt(sumSq / n);
+}

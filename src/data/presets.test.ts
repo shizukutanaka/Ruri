@@ -412,6 +412,12 @@ import {
   presetFamilySocraticRadarModeProfile,
   presetFamilySocraticRadarGeometricMeanV2,
   presetFamilySocraticRadarTrimmedMeanV2,
+  presetFamilySocraticRadarHarmonicMeanV2,
+  presetFamilySocraticRadarWeightedMedian,
+  presetFamilySocraticRadarCoefficientOfVariation,
+  presetFamilySocraticRadarSkewness,
+  presetFamilySocraticRadarKurtosis,
+  presetFamilySocraticRadarZScoreMatrix,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -13045,5 +13051,131 @@ describe('presetFamilySocraticRadarTrimmedMeanV2 (Q1217)', () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1219 — presetFamilySocraticRadarHarmonicMeanV2
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarHarmonicMeanV2 (Q1219)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    const r = presetFamilySocraticRadarHarmonicMeanV2(presetIds, spectrum);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+  it('all values are positive', () => {
+    const r = presetFamilySocraticRadarHarmonicMeanV2(presetIds, spectrum);
+    for (const v of Object.values(r)) expect(v).toBeGreaterThan(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHarmonicMeanV2(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1221 — presetFamilySocraticRadarWeightedMedian
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarWeightedMedian (Q1221)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    const r = presetFamilySocraticRadarWeightedMedian(presetIds, spectrum, [1, 1]);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarWeightedMedian(['unknown-preset'], spectrum, [1])).toThrow(RangeError);
+  });
+  it('all values in [0,1]', () => {
+    const r = presetFamilySocraticRadarWeightedMedian(presetIds, spectrum, [0.3, 0.7]);
+    for (const v of Object.values(r)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1223 — presetFamilySocraticRadarCoefficientOfVariation
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCoefficientOfVariation (Q1223)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    const r = presetFamilySocraticRadarCoefficientOfVariation(presetIds, spectrum);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+  it('all values are non-negative', () => {
+    const r = presetFamilySocraticRadarCoefficientOfVariation(presetIds, spectrum);
+    for (const v of Object.values(r)) expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCoefficientOfVariation(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1225 — presetFamilySocraticRadarSkewness
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarSkewness (Q1225)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    const r = presetFamilySocraticRadarSkewness(presetIds, spectrum);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+  it('returns finite values', () => {
+    const r = presetFamilySocraticRadarSkewness(presetIds, spectrum);
+    for (const v of Object.values(r)) expect(isFinite(v)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSkewness(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1227 — presetFamilySocraticRadarKurtosis
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarKurtosis (Q1227)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns all 5 axis keys', () => {
+    const r = presetFamilySocraticRadarKurtosis(presetIds, spectrum);
+    expect(Object.keys(r)).toHaveLength(5);
+  });
+  it('returns finite values', () => {
+    const r = presetFamilySocraticRadarKurtosis(presetIds, spectrum);
+    for (const v of Object.values(r)) expect(isFinite(v)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarKurtosis(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1229 — presetFamilySocraticRadarZScoreMatrix
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarZScoreMatrix (Q1229)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns matrix with 2 rows and 5 columns', () => {
+    const m = presetFamilySocraticRadarZScoreMatrix(presetIds, spectrum);
+    expect(m).toHaveLength(2);
+    expect(m[0]!).toHaveLength(5);
+  });
+  it('rows are negations of each other for two presets', () => {
+    const m = presetFamilySocraticRadarZScoreMatrix(presetIds, spectrum);
+    for (let ai = 0; ai < 5; ai++) {
+      expect(m[0]![ai]!).toBeCloseTo(-(m[1]![ai]!), 10);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarZScoreMatrix(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });
