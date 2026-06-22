@@ -37111,6 +37111,183 @@ export function tuningFamilySocraticRadarSpectralRadiusMean(
   return eigenvalue / n;
 }
 
+// Q1626 — tuningFamilySocraticRadarErgodicityScore
+export function tuningFamilySocraticRadarErgodicityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const k = axes.length;
+  // ensemble average = mean over all tunings × all axes
+  let total = 0;
+  for (let i = 0; i < n; i++) for (let j = 0; j < k; j++) total += vecs[i]![j]!;
+  const ensembleAvg = total / (n * k);
+  if (ensembleAvg === 0) return 0;
+  // time average per tuning = mean of 5 axes
+  let sumDiff = 0;
+  for (let i = 0; i < n; i++) {
+    const timeAvg = vecs[i]!.reduce((s, v) => s + v, 0) / k;
+    sumDiff += Math.abs(timeAvg - ensembleAvg);
+  }
+  const score = 1 - sumDiff / n / ensembleAvg;
+  return Math.max(0, Math.min(1, score));
+}
+
+// Q1628 — tuningFamilySocraticRadarMixingCoefficient
+export function tuningFamilySocraticRadarMixingCoefficient(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const k = axes.length;
+  let totalAutocorr = 0;
+  for (let j = 0; j < k; j++) {
+    // sort tuning profiles by their j-th axis value
+    const sorted = [...vecs].sort((a, b) => a[j]! - b[j]!).map((v) => v[j]!);
+    let num = 0;
+    let denom = 0;
+    for (let i = 0; i < sorted.length - 1; i++) {
+      num += sorted[i]! * sorted[i + 1]!;
+      denom += sorted[i]! * sorted[i]!;
+    }
+    const autocorr = denom === 0 ? 0 : num / denom - 1;
+    totalAutocorr += Math.abs(autocorr);
+  }
+  void n;
+  const meanAutocorr = totalAutocorr / k;
+  return Math.max(0, Math.min(1, 1 - meanAutocorr));
+}
+
+// Q1630 — tuningFamilySocraticRadarLyapunovExponentProxy
+export function tuningFamilySocraticRadarLyapunovExponentProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  let totalLogDiv = 0;
+  let count = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const vi = vecs[i]!;
+    const vi1 = vecs[i + 1]!;
+    let dist = 0;
+    for (let j = 0; j < vi.length; j++) dist += (vi1[j]! - vi[j]!) * (vi1[j]! - vi[j]!);
+    dist = Math.sqrt(dist);
+    totalLogDiv += Math.log(dist + 1e-10);
+    count++;
+  }
+  return count === 0 ? 0 : totalLogDiv / count;
+}
+
+// Q1632 — tuningFamilySocraticRadarRecurrenceRateMean
+export function tuningFamilySocraticRadarRecurrenceRateMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  let recurrences = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      // Chebyshev distance
+      let maxDiff = 0;
+      for (let kk = 0; kk < vecs[i]!.length; kk++) {
+        const diff = Math.abs(vecs[i]![kk]! - vecs[j]![kk]!);
+        if (diff > maxDiff) maxDiff = diff;
+      }
+      if (maxDiff < 0.1) recurrences++;
+    }
+  }
+  return recurrences / (n * (n - 1));
+}
+
+// Q1634 — tuningFamilySocraticRadarInvariantMeasureEntropy
+export function tuningFamilySocraticRadarInvariantMeasureEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const bins = new Array<number>(10).fill(0);
+  let total = 0;
+  for (const vec of vecs) {
+    for (const v of vec) {
+      const binIdx = Math.min(9, Math.floor(v * 10));
+      bins[binIdx]!++;
+      total++;
+    }
+  }
+  if (total === 0) return 0;
+  let entropy = 0;
+  for (const b of bins) {
+    if (b === 0) continue;
+    const p = b / total;
+    entropy -= p * Math.log(p);
+  }
+  return entropy;
+}
+
+// Q1636 — tuningFamilySocraticRadarCorrelationDimensionProxy
+export function tuningFamilySocraticRadarCorrelationDimensionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const n = vecs.length;
+  const r = 0.2;
+  let pairs = 0;
+  let totalPairs = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      let dist = 0;
+      for (let kk = 0; kk < vecs[i]!.length; kk++) {
+        const d = vecs[i]![kk]! - vecs[j]![kk]!;
+        dist += d * d;
+      }
+      dist = Math.sqrt(dist);
+      if (dist < r) pairs++;
+      totalPairs++;
+    }
+  }
+  if (totalPairs === 0) return 0;
+  const cr = pairs / totalPairs;
+  if (cr === 0) return 0;
+  return Math.max(0, Math.log(cr) / Math.log(r));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -37818,4 +37995,68 @@ export function scaleSelfSimilarityScore(scaleCents: readonly number[], periodCe
   const dist = scaleVoiceLeadingDistance(scaleCents, reversed, periodCents);
   const normalizedDist = dist / (periodCents * n);
   return 1 - normalizedDist;
+}
+
+// RRR1
+export function scaleIntervalComplexityRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const totalPairs = (n * (n - 1)) / 2;
+  const simpleRatiosCents = [0, 315.64, 386.31, 498.04, 701.96, 884.36, 1200];
+  let countSimple = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const interval = sorted[j]! - sorted[i]!;
+      const isSimple = simpleRatiosCents.some(r => Math.abs(interval - r) < 10);
+      if (isSimple) countSimple++;
+    }
+  }
+  return countSimple / totalPairs;
+}
+
+// RRR2
+export function scaleUniquePitchClassCount(scaleCents: readonly number[], _periodCents: number = 1200): number {
+  if (scaleCents.length === 0) return 0;
+  const rounded = new Set(scaleCents.map(c => Math.round(c)));
+  return rounded.size;
+}
+
+// RRR3
+export function scaleClusteringScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  let clustered = 0;
+  for (let i = 0; i < n; i++) {
+    const pi = scaleCents[i]!;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const pj = scaleCents[j]!;
+      const diff = Math.abs(pi - pj);
+      const wrapped = Math.min(diff, periodCents - diff);
+      if (wrapped < 50) {
+        clustered++;
+        break;
+      }
+    }
+  }
+  return clustered / n;
+}
+
+// RRR4
+export function scaleDispersionIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const next = sorted[(i + 1) % n]!;
+    let step = next - sorted[i]!;
+    if (step < 0) step += periodCents;
+    steps.push(step);
+  }
+  const mean = steps.reduce((s, x) => s + x, 0) / steps.length;
+  if (mean === 0) return 0;
+  const variance = steps.reduce((s, x) => s + (x - mean) ** 2, 0) / steps.length;
+  return variance / mean;
 }
