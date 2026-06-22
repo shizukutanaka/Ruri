@@ -1085,3 +1085,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | NNN2 | `scaleLeadingToneStrengthV2` | 導音の強度（近傍導音を持つ音の割合） |
 | NNN3 | `scaleGravityField` | 調性重力場（安定音程への引力の平均） |
 | NNN4 | `scaleResolutionTendency` | 解決傾向（不安定音が安定音へ解決する割合） |
+
+## Round 83: 音響心理学 (OOO1–OOO4)
+
+知覚的な音響特性（可聴閾・臨界帯域・マスキング・音高知覚）を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| OOO1 | `scaleJNDStepCount` | 最小可聴差(JND)を超えるステップ数の割合 |
+| OOO2 | `scaleCriticalBandDensity` | 臨界帯域内に収まる音程対の密度 |
+| OOO3 | `scaleMaskingIndex` | スペクトルマスキングによる隠蔽音の割合 |
+| OOO4 | `scalePitchHeightSpread` | Barkスケールでの音高高さの広がり |
