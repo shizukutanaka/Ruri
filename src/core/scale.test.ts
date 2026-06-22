@@ -1137,6 +1137,12 @@ import {
   tuningFamilySocraticRadarPragmaticAmbiguityProxy,
   tuningFamilySocraticRadarSemanticCoherenceProxy,
   tuningFamilySocraticRadarProsodyProxy,
+  tuningFamilySocraticRadarFiringRateProxy,
+  tuningFamilySocraticRadarSynapticWeightProxy,
+  tuningFamilySocraticRadarNeuralPlasticityProxy,
+  tuningFamilySocraticRadarInhibitionProxy,
+  tuningFamilySocraticRadarReceptiveFieldProxy,
+  tuningFamilySocraticRadarOscillationProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -35163,5 +35169,113 @@ describe('SSS4 scaleDFTSpectralFlatness', () => {
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q1938 — tuningFamilySocraticRadarFiringRateProxy
+describe('Q1938 tuningFamilySocraticRadarFiringRateProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarFiringRateProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarFiringRateProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarFiringRateProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1940 — tuningFamilySocraticRadarSynapticWeightProxy
+describe('Q1940 tuningFamilySocraticRadarSynapticWeightProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarSynapticWeightProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSynapticWeightProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSynapticWeightProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1942 — tuningFamilySocraticRadarNeuralPlasticityProxy
+describe('Q1942 tuningFamilySocraticRadarNeuralPlasticityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarNeuralPlasticityProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarNeuralPlasticityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarNeuralPlasticityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1944 — tuningFamilySocraticRadarInhibitionProxy
+describe('Q1944 tuningFamilySocraticRadarInhibitionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarInhibitionProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarInhibitionProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarInhibitionProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1946 — tuningFamilySocraticRadarReceptiveFieldProxy
+describe('Q1946 tuningFamilySocraticRadarReceptiveFieldProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarReceptiveFieldProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarReceptiveFieldProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarReceptiveFieldProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1948 — tuningFamilySocraticRadarOscillationProxy
+describe('Q1948 tuningFamilySocraticRadarOscillationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarOscillationProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarOscillationProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarOscillationProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
   });
 });
