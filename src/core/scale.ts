@@ -37447,6 +37447,153 @@ export function tuningFamilySocraticRadarAdaptabilityMean(
   return sum / tunings.length;
 }
 
+// Q1650 — tuningFamilySocraticRadarGradientMagnitudeMean
+export function tuningFamilySocraticRadarGradientMagnitudeMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const a = vecs[i]!;
+    const b = vecs[i + 1]!;
+    let sq = 0;
+    for (let k = 0; k < 5; k++) sq += (b[k]! - a[k]!) ** 2;
+    sum += Math.sqrt(sq) / Math.sqrt(5);
+  }
+  return sum / (vecs.length - 1);
+}
+
+// Q1652 — tuningFamilySocraticRadarLaplacianMean
+export function tuningFamilySocraticRadarLaplacianMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (let i = 1; i < vecs.length - 1; i++) {
+    const prev = vecs[i - 1]!;
+    const cur = vecs[i]!;
+    const next = vecs[i + 1]!;
+    let sq = 0;
+    for (let k = 0; k < 5; k++) sq += (prev[k]! - 2 * cur[k]! + next[k]!) ** 2;
+    sum += Math.sqrt(sq) / Math.sqrt(5);
+  }
+  return sum / (vecs.length - 2);
+}
+
+// Q1654 — tuningFamilySocraticRadarPotentialEnergyMean
+export function tuningFamilySocraticRadarPotentialEnergyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    let pe = 0;
+    for (let k = 0; k < 5; k++) pe += (vec[k]! - 0.5) ** 2;
+    sum += pe / 5;
+  }
+  return sum / tunings.length;
+}
+
+// Q1656 — tuningFamilySocraticRadarKineticEnergyMean
+export function tuningFamilySocraticRadarKineticEnergyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const a = vecs[i]!;
+    const b = vecs[i + 1]!;
+    let sq = 0;
+    for (let k = 0; k < 5; k++) sq += (b[k]! - a[k]!) ** 2;
+    const velocity = Math.sqrt(sq) / Math.sqrt(5);
+    sum += 0.5 * velocity ** 2;
+  }
+  return sum / (vecs.length - 1);
+}
+
+// Q1658 — tuningFamilySocraticRadarFreeEnergyMean
+export function tuningFamilySocraticRadarFreeEnergyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark' , 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const T = 0.5;
+  let sum = 0;
+  for (const vec of vecs) {
+    let pe = 0;
+    for (let k = 0; k < 5; k++) pe += (vec[k]! - 0.5) ** 2;
+    const U = pe / 5;
+    let S = 0;
+    for (let k = 0; k < 5; k++) {
+      const p = vec[k]!;
+      S += -p * Math.log2(p + 1e-10);
+    }
+    const F = U - T * S / Math.log2(5);
+    sum += F;
+  }
+  return sum / tunings.length;
+}
+
+// Q1660 — tuningFamilySocraticRadarActionMeanProxy
+export function tuningFamilySocraticRadarActionMeanProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // Compute PE for each tuning
+  const pe = vecs.map((vec) => {
+    let p = 0;
+    for (let k = 0; k < 5; k++) p += (vec[k]! - 0.5) ** 2;
+    return p / 5;
+  });
+  let sum = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const a = vecs[i]!;
+    const b = vecs[i + 1]!;
+    let sq = 0;
+    for (let k = 0; k < 5; k++) sq += (b[k]! - a[k]!) ** 2;
+    const velocity = Math.sqrt(sq) / Math.sqrt(5);
+    const ke = 0.5 * velocity ** 2;
+    const action = ke + (pe[i]! + pe[i + 1]!) / 2;
+    sum += action;
+  }
+  return sum / (vecs.length - 1);
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -38300,4 +38447,57 @@ export function scaleOvertoneRichness(scaleCents: readonly number[], periodCents
     }
   }
   return Math.min(1, matchCount / (n * 7));
+}
+
+// TTT1 — Working memory load: number of distinct step sizes (rounded to nearest 10 cents)
+export function scaleWorkingMemoryLoad(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (n === 1) return 1;
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const curr = scaleCents[i]!;
+    const next = i + 1 < n ? scaleCents[i + 1]! : scaleCents[0]! + periodCents;
+    const step = next - curr;
+    steps.push(Math.round(step / 10) * 10);
+  }
+  return new Set(steps).size;
+}
+
+// TTT2 — Cognitive clusters: group pitches where each is within 75 cents of another in the same cluster
+export function scaleCognitiveClusters(scaleCents: readonly number[], _periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let clusters = 1;
+  for (let i = 1; i < n; i++) {
+    if (sorted[i]! - sorted[i - 1]! > 75) {
+      clusters++;
+    }
+  }
+  return clusters;
+}
+
+// TTT4 — Pattern regularity: smallest repeating period / n
+export function scalePatternRegularity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (n <= 2) return 1;
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const curr = scaleCents[i]!;
+    const next = i + 1 < n ? scaleCents[i + 1]! : scaleCents[0]! + periodCents;
+    steps.push(Math.round(next - curr));
+  }
+  for (let p = 1; p <= Math.floor(n / 2); p++) {
+    let valid = true;
+    for (let i = 0; i < n; i++) {
+      if (steps[i]! !== steps[i % p]!) {
+        valid = false;
+        break;
+      }
+    }
+    if (valid) return p / n;
+  }
+  return 1;
 }

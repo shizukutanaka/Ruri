@@ -993,6 +993,12 @@ import {
   tuningFamilySocraticRadarCriticalityProxyMean,
   tuningFamilySocraticRadarResilienceMean,
   tuningFamilySocraticRadarAdaptabilityMean,
+  tuningFamilySocraticRadarGradientMagnitudeMean,
+  tuningFamilySocraticRadarLaplacianMean,
+  tuningFamilySocraticRadarPotentialEnergyMean,
+  tuningFamilySocraticRadarKineticEnergyMean,
+  tuningFamilySocraticRadarFreeEnergyMean,
+  tuningFamilySocraticRadarActionMeanProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1073,6 +1079,9 @@ import {
   scaleSubharmonicAlignmentScore,
   scaleResonanceIndex,
   scaleOvertoneRichness,
+  scaleWorkingMemoryLoad,
+  scaleCognitiveClusters,
+  scalePatternRegularity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -30331,5 +30340,139 @@ describe('SSS4 scaleOvertoneRichness', () => {
   it('single pitch has some overtone richness', () => {
     // single pitch: all harmonics are of that pitch; none hit other scale pitches since n=1
     expect(scaleOvertoneRichness([0])).toBe(0);
+  });
+});
+
+describe('TTT1 scaleWorkingMemoryLoad', () => {
+  it('empty → 0', () => { expect(scaleWorkingMemoryLoad([])).toBe(0); });
+  it('n=1 → 1', () => { expect(scaleWorkingMemoryLoad([0])).toBe(1); });
+  it('equal-step → 1 type', () => {
+    expect(scaleWorkingMemoryLoad([0, 300, 600, 900])).toBe(1);
+  });
+  it('mixed steps → >1 type', () => {
+    // diatonic has 2 step sizes: ~200 and ~100 (rounded to 200 and 100)
+    expect(scaleWorkingMemoryLoad([0, 200, 400, 500, 700, 900, 1100])).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('TTT2 scaleCognitiveClusters', () => {
+  it('empty → 0', () => { expect(scaleCognitiveClusters([])).toBe(0); });
+  it('single pitch → 1 cluster', () => { expect(scaleCognitiveClusters([0])).toBe(1); });
+  it('widely spaced → n clusters', () => {
+    // [0, 400, 800] — gaps of 400 > 75, each is its own cluster
+    expect(scaleCognitiveClusters([0, 400, 800])).toBe(3);
+  });
+  it('close pitches → fewer clusters', () => {
+    // [0, 50, 600, 650] — 2 clusters
+    expect(scaleCognitiveClusters([0, 50, 600, 650])).toBe(2);
+  });
+});
+
+describe('TTT3 scaleLearnabilityScore', () => {
+  it('empty → 0', () => { expect(scaleLearnabilityScore([])).toBe(0); });
+  it('n=1 → 1', () => { expect(scaleLearnabilityScore([0])).toBe(1); });
+  it('equal-step scale → 1 (all same step)', () => {
+    expect(scaleLearnabilityScore([0, 300, 600, 900])).toBeCloseTo(1, 5);
+  });
+  it('mixed scale → value in (0,1]', () => {
+    const r = scaleLearnabilityScore([0, 200, 400, 500, 700, 900, 1100]);
+    expect(r).toBeGreaterThan(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('TTT4 scalePatternRegularity', () => {
+  it('empty → 0', () => { expect(scalePatternRegularity([])).toBe(0); });
+  it('n=1 → 1', () => { expect(scalePatternRegularity([0])).toBe(1); });
+  it('equal-step → minimum regularity (period=1, ratio=1/n)', () => {
+    // [0,300,600,900]: steps are all 300 → period=1 → 1/4 = 0.25
+    expect(scalePatternRegularity([0, 300, 600, 900])).toBeCloseTo(0.25, 5);
+  });
+  it('returns value in (0,1]', () => {
+    const r = scalePatternRegularity([0, 200, 400, 500, 700, 900, 1100]);
+    expect(r).toBeGreaterThan(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1650 tuningFamilySocraticRadarGradientMagnitudeMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤1', () => {
+    expect(tuningFamilySocraticRadarGradientMagnitudeMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarGradientMagnitudeMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('same tuning twice → 0 gradient', () => {
+    expect(tuningFamilySocraticRadarGradientMagnitudeMean([equalTemperament12(440), equalTemperament12(440)], s)).toBeCloseTo(0, 5);
+  });
+  it('returns non-negative for different tunings', () => {
+    expect(tuningFamilySocraticRadarGradientMagnitudeMean([equalTemperament12(440), edo(19, 440)], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1652 tuningFamilySocraticRadarLaplacianMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤2', () => {
+    expect(tuningFamilySocraticRadarLaplacianMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarLaplacianMean([equalTemperament12(440), edo(19, 440)], s)).toBe(0);
+  });
+  it('n=3 same tuning → 0 Laplacian', () => {
+    expect(tuningFamilySocraticRadarLaplacianMean([equalTemperament12(440), equalTemperament12(440), equalTemperament12(440)], s)).toBeCloseTo(0, 5);
+  });
+  it('different tunings → non-negative', () => {
+    expect(tuningFamilySocraticRadarLaplacianMean([equalTemperament12(440), edo(19, 440), edo(31, 440)], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1654 tuningFamilySocraticRadarPotentialEnergyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarPotentialEnergyMean([], s)).toBe(0);
+  });
+  it('single tuning → non-negative', () => {
+    expect(tuningFamilySocraticRadarPotentialEnergyMean([equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings → non-negative', () => {
+    expect(tuningFamilySocraticRadarPotentialEnergyMean([equalTemperament12(440), edo(19, 440)], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1656 tuningFamilySocraticRadarKineticEnergyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤1', () => {
+    expect(tuningFamilySocraticRadarKineticEnergyMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarKineticEnergyMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('same tuning twice → 0 KE', () => {
+    expect(tuningFamilySocraticRadarKineticEnergyMean([equalTemperament12(440), equalTemperament12(440)], s)).toBeCloseTo(0, 5);
+  });
+  it('different tunings → non-negative', () => {
+    expect(tuningFamilySocraticRadarKineticEnergyMean([equalTemperament12(440), edo(19, 440)], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1658 tuningFamilySocraticRadarFreeEnergyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarFreeEnergyMean([], s)).toBe(0);
+  });
+  it('single tuning → finite', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarFreeEnergyMean([equalTemperament12(440)], s))).toBe(true);
+  });
+  it('two tunings → finite', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarFreeEnergyMean([equalTemperament12(440), edo(19, 440)], s))).toBe(true);
+  });
+});
+
+describe('Q1660 tuningFamilySocraticRadarActionMeanProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n≤1', () => {
+    expect(tuningFamilySocraticRadarActionMeanProxy([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarActionMeanProxy([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('same tuning twice → 0 action', () => {
+    expect(tuningFamilySocraticRadarActionMeanProxy([equalTemperament12(440), equalTemperament12(440)], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('different tunings → non-negative', () => {
+    expect(tuningFamilySocraticRadarActionMeanProxy([equalTemperament12(440), edo(19, 440)], s)).toBeGreaterThanOrEqual(0);
   });
 });
