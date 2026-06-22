@@ -415,3 +415,17 @@
 - FF2: tuningIsomorphismScore — 音律間の音程構造同型スコア
 - FF3: scaleGraphDensity — 音程閾値グラフの密度
 - FF4: harmonicLatticePosition — 素数限界格子座標と最近傍有理比率
+
+## Round 24: ピッチクラスエントロピー・音程曖昧性・音律ネットワーク中心性 (GG1–GG4)
+
+**テーマ**: 音階の情報理論的・ネットワーク理論的分析
+
+### 研究トピック
+- Qiita: 音楽ネットワーク理論のTypeScript実装 — 調性中心性とモード親族関係
+- Zenn: ピッチクラス分布のエントロピー分析と音程曖昧性
+
+### 実装
+- GG1: pitchClassEntropy — EDOビン分布のシャノンエントロピー（正規化）
+- GG2: intervalAmbiguity — 近接音程ペアの曖昧性スコア
+- GG3: tuningNetworkCentrality — 完全五度近傍ネットワーク中心性
+- GG4: scaleModalNetwork — 旋法間共通音ネットワーク（降順ソート）

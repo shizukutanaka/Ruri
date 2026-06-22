@@ -25310,3 +25310,558 @@ export function tuningFamilySocraticRadarLyapunovExponent(
   if (lnDivergences.length === 0) return 0;
   return lnDivergences.reduce((a, b) => a + b, 0) / lnDivergences.length;
 }
+
+// ---------------------------------------------------------------------------
+// Q1194 — tuningFamilySocraticRadarHurstExponent
+// ---------------------------------------------------------------------------
+
+/**
+ * Hurst Exponent estimate via R/S analysis of axis scores.
+ * Returns 0.5 if n < 2 or std = 0 (random walk default).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Hurst exponent typically in (0, 1).
+ */
+export function tuningFamilySocraticRadarHurstExponent(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n < 2) return 0.5;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+  const mean = x.reduce((a, b) => a + b, 0) / n;
+  const variance = x.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  const S = Math.sqrt(variance);
+  if (S === 0) return 0.5;
+  // Cumulative deviations from mean
+  const Y: number[] = [];
+  let cumSum = 0;
+  for (let i = 0; i < n; i++) {
+    cumSum += x[i]! - mean;
+    Y.push(cumSum);
+  }
+  const R = Math.max(...Y) - Math.min(...Y);
+  if (R === 0) return 0.5;
+  return Math.log(R / S) / Math.log(n);
+}
+
+// ---------------------------------------------------------------------------
+// Q1196 — tuningFamilySocraticRadarPermutationEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Permutation Entropy of axis scores.
+ * Throws RangeError if order < 2.
+ * Returns 0 if n < order.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param order - Embedding order (default 3).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Normalized permutation entropy in [0, 1].
+ */
+export function tuningFamilySocraticRadarPermutationEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  order: number = 3,
+  rootHz?: number,
+): number {
+  if (order < 2) throw new RangeError('order must be >= 2');
+  const n = tunings.length;
+  if (n < order) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+
+  // Count frequency of each permutation pattern
+  const counts = new Map<string, number>();
+  for (let i = 0; i <= n - order; i++) {
+    const sub = x.slice(i, i + order) as number[];
+    // argsort: indices sorted by value
+    const indices = Array.from({ length: order }, (_, k) => k);
+    indices.sort((a, b) => sub[a]! - sub[b]!);
+    const key = indices.join(',');
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  const total = n - order + 1;
+  let entropy = 0;
+  for (const count of counts.values()) {
+    const p = count / total;
+    entropy -= p * Math.log2(p);
+  }
+
+  // Factorial of order for normalization
+  let orderFactorial = 1;
+  for (let i = 2; i <= order; i++) orderFactorial *= i;
+
+  const maxEntropy = Math.log2(orderFactorial);
+  if (maxEntropy === 0) return 0;
+  return entropy / maxEntropy;
+}
+
+// ---------------------------------------------------------------------------
+// Q1198 — tuningFamilySocraticRadarLempelZivComplexity
+// ---------------------------------------------------------------------------
+
+/**
+ * Lempel-Ziv complexity of binarized axis scores.
+ * Returns 0 if n < 2.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param threshold - Binarization threshold (default 0.5).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Normalized LZ complexity in [0, 1].
+ */
+export function tuningFamilySocraticRadarLempelZivComplexity(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  threshold: number = 0.5,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n < 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+  // Binarize
+  const binary = x.map((v) => (v > threshold ? '1' : '0')).join('');
+
+  // Sequential LZ parse: count distinct new substrings
+  let complexity = 0;
+  const seen = new Set<string>();
+  let start = 0;
+  while (start < n) {
+    let end = start + 1;
+    while (end <= n) {
+      const sub = binary.slice(start, end);
+      if (!seen.has(sub)) {
+        seen.add(sub);
+        complexity++;
+        start = end;
+        break;
+      }
+      end++;
+      if (end > n) {
+        start = n;
+        break;
+      }
+    }
+  }
+
+  // Normalize by n/log2(n)
+  const maxComplexity = n / Math.log2(n);
+  if (maxComplexity === 0) return 0;
+  return complexity / maxComplexity;
+}
+
+// ---------------------------------------------------------------------------
+// Q1200 — tuningFamilySocraticRadarDetrendedFluctuation
+// ---------------------------------------------------------------------------
+
+/**
+ * Detrended Fluctuation Analysis (DFA) exponent α (simplified).
+ * Returns 0.5 if n < 8.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param rootHz - Reference frequency (optional).
+ * @returns DFA exponent α, typically in (0.5, 1.5).
+ */
+export function tuningFamilySocraticRadarDetrendedFluctuation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n < 8) return 0.5;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+  const mean = x.reduce((a, b) => a + b, 0) / n;
+
+  // Compute cumulative sum (integrated series)
+  const cumSum: number[] = [];
+  let s = 0;
+  for (let i = 0; i < n; i++) {
+    s += x[i]! - mean;
+    cumSum.push(s);
+  }
+
+  // Detrend in windows and compute RMS at two window sizes
+  function computeF(winSize: number): number {
+    const numWindows = Math.floor(n / winSize);
+    if (numWindows === 0) return 0;
+    let totalSq = 0;
+    let count = 0;
+    for (let w = 0; w < numWindows; w++) {
+      const start = w * winSize;
+      const seg = cumSum.slice(start, start + winSize);
+      const len = seg.length;
+      // Linear fit via least squares
+      const xIdx = Array.from({ length: len }, (_, i) => i);
+      const xMean = (len - 1) / 2;
+      const yMean = seg.reduce((a, b) => a + b, 0) / len;
+      let num = 0;
+      let den = 0;
+      for (let i = 0; i < len; i++) {
+        num += (xIdx[i]! - xMean) * (seg[i]! - yMean);
+        den += (xIdx[i]! - xMean) ** 2;
+      }
+      const slope = den !== 0 ? num / den : 0;
+      const intercept = yMean - slope * xMean;
+      // Residuals
+      for (let i = 0; i < len; i++) {
+        const residual = seg[i]! - (slope * i + intercept);
+        totalSq += residual ** 2;
+        count++;
+      }
+    }
+    return count > 0 ? Math.sqrt(totalSq / count) : 0;
+  }
+
+  // Use two window sizes: n/4 and n/2
+  const winSmall = Math.floor(n / 4);
+  const winLarge = Math.floor(n / 2);
+  const fSmall = computeF(winSmall);
+  const fLarge = computeF(winLarge);
+
+  if (fSmall <= 0 || fLarge <= 0) return 0.5;
+  const alpha = Math.log(fLarge / fSmall) / Math.log(winLarge / winSmall);
+  return alpha;
+}
+
+// ---------------------------------------------------------------------------
+// Q1202 — tuningFamilySocraticRadarKolmogorovComplexity
+// ---------------------------------------------------------------------------
+
+/**
+ * Estimate Kolmogorov complexity via LZ77-style compression ratio.
+ * Returns 0 if all scores identical.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param precision - Decimal places for quantization (default 2).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Normalized complexity in [0, 1].
+ */
+export function tuningFamilySocraticRadarKolmogorovComplexity(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  precision: number = 2,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+
+  // Quantize and serialize as comma-separated string
+  const factor = Math.pow(10, precision);
+  const quantized = x.map((v) => Math.round(v * factor));
+
+  // Check if all identical
+  if (quantized.every((v) => v === quantized[0])) return 0;
+
+  // LZ parse on the quantized array (treat each element as a symbol)
+  const totalLen = quantized.length;
+  let complexity = 0;
+  const seen = new Set<string>();
+  let start = 0;
+  while (start < totalLen) {
+    let end = start + 1;
+    while (end <= totalLen) {
+      const sub = quantized.slice(start, end).join(',');
+      if (!seen.has(sub)) {
+        seen.add(sub);
+        complexity++;
+        start = end;
+        break;
+      }
+      end++;
+      if (end > totalLen) {
+        start = totalLen;
+        break;
+      }
+    }
+  }
+
+  return complexity / totalLen;
+}
+
+// ---------------------------------------------------------------------------
+// Q1204 — tuningFamilySocraticRadarMultiScaleEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Multi-Scale Entropy: SampEn at multiple time scales.
+ * Throws RangeError if maxScale < 1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - Radar axis to analyze.
+ * @param maxScale - Maximum scale τ (default 3).
+ * @param m - Template length for SampEn (default 2).
+ * @param r - Tolerance fraction of std for SampEn (default 0.2).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of length maxScale (one SampEn per scale).
+ */
+export function tuningFamilySocraticRadarMultiScaleEntropy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  maxScale: number = 3,
+  m: number = 2,
+  r: number = 0.2,
+  rootHz?: number,
+): number[] {
+  if (maxScale < 1) throw new RangeError('maxScale must be >= 1');
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis]);
+
+  function sampEn(series: number[]): number {
+    const len = series.length;
+    if (len < m + 2) return 0;
+    const mn = series.reduce((a, b) => a + b, 0) / len;
+    const variance = series.reduce((a, b) => a + (b - mn) ** 2, 0) / len;
+    const std = Math.sqrt(variance);
+    if (std === 0) return 0;
+    const tol = r * std;
+
+    function countMatches(embedLen: number): number {
+      let count = 0;
+      for (let i = 0; i < len - embedLen; i++) {
+        for (let j = 0; j < len - embedLen; j++) {
+          if (i === j) continue;
+          let match = true;
+          for (let k = 0; k < embedLen; k++) {
+            if (Math.abs(series[i + k]! - series[j + k]!) > tol) {
+              match = false;
+              break;
+            }
+          }
+          if (match) count++;
+        }
+      }
+      return count;
+    }
+
+    const B = countMatches(m);
+    const A = countMatches(m + 1);
+    if (B === 0) return 0;
+    const ratio = A / B;
+    if (ratio <= 0) return 0;
+    return Math.max(0, -Math.log(ratio));
+  }
+
+  const result: number[] = [];
+  for (let tau = 1; tau <= maxScale; tau++) {
+    // Coarse-grain: average non-overlapping windows of size tau
+    const coarseLen = Math.floor(x.length / tau);
+    const coarse: number[] = [];
+    for (let j = 0; j < coarseLen; j++) {
+      let sum = 0;
+      for (let k = 0; k < tau; k++) {
+        sum += x[j * tau + k]!;
+      }
+      coarse.push(sum / tau);
+    }
+    result.push(sampEn(coarse));
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// GG1 — pitchClassEntropy
+// ---------------------------------------------------------------------------
+
+/**
+ * Shannon entropy of the pitch-class distribution of `scaleCents` in a given EDO.
+ *
+ * Each pitch is mapped to the nearest EDO bin (0..edo-1). Bin counts are
+ * normalised to probabilities and H = -∑ p·log₂(p) is computed then
+ * normalised by log₂(edo) so the result is in [0, 1].
+ *
+ * @param scaleCents - Scale pitches in cents (mod 1200 applied internally).
+ * @param edo - Number of equal-division bins (must be ≥ 1).
+ * @returns Normalised entropy in [0, 1]; 0 for empty scale.
+ * @throws {RangeError} if edo < 1.
+ */
+export function pitchClassEntropy(
+  scaleCents: readonly number[],
+  edo: number = 12,
+): number {
+  if (edo < 1) throw new RangeError(`edo must be >= 1, got ${edo}`);
+  if (scaleCents.length === 0) return 0;
+  const centsPerBin = 1200 / edo;
+  const counts = new Array<number>(edo).fill(0);
+  for (const c of scaleCents) {
+    const normalized = ((c % 1200) + 1200) % 1200;
+    const bin = Math.round(normalized / centsPerBin) % edo;
+    counts[bin] = (counts[bin] ?? 0) + 1;
+  }
+  const total = scaleCents.length;
+  let h = 0;
+  for (const count of counts) {
+    if (count > 0) {
+      const p = count / total;
+      h -= p * Math.log2(p);
+    }
+  }
+  const maxH = Math.log2(edo);
+  return maxH === 0 ? 0 : h / maxH;
+}
+
+// ---------------------------------------------------------------------------
+// GG2 — intervalAmbiguity
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures the fraction of interval pairs in `scaleCents` that are "ambiguous":
+ * within `ambiguityThresholdCents` of each other but not identical.
+ *
+ * Intervals are all C(n,2) pairwise differences (mod 1200, taking
+ * the smaller of x and 1200-x for octave equivalence). Then every
+ * pair of those interval values is tested; a pair is ambiguous when
+ * |int1 - int2| > 0 and |int1 - int2| ≤ threshold.
+ *
+ * @param scaleCents - Scale pitches in cents.
+ * @param ambiguityThresholdCents - Proximity window (default 50 cents).
+ * @returns Fraction of ambiguous interval pairs in [0, 1].
+ */
+export function intervalAmbiguity(
+  scaleCents: readonly number[],
+  ambiguityThresholdCents: number = 50,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  // Collect all pairwise intervals
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = (((scaleCents[j]! - scaleCents[i]!) % 1200) + 1200) % 1200;
+      const sym = Math.min(diff, 1200 - diff);
+      intervals.push(sym);
+    }
+  }
+  const m = intervals.length;
+  if (m < 2) return 0;
+  let ambiguousCount = 0;
+  let totalPairs = 0;
+  for (let a = 0; a < m; a++) {
+    for (let b = a + 1; b < m; b++) {
+      totalPairs++;
+      const delta = Math.abs(intervals[a]! - intervals[b]!);
+      if (delta > 0 && delta <= ambiguityThresholdCents) {
+        ambiguousCount++;
+      }
+    }
+  }
+  return totalPairs === 0 ? 0 : ambiguousCount / totalPairs;
+}
+
+// ---------------------------------------------------------------------------
+// GG3 — tuningNetworkCentrality
+// ---------------------------------------------------------------------------
+
+/**
+ * Measures how "central" a tuning's pitches are in a harmonic network
+ * based on perfect-fifth proximity.
+ *
+ * For each pair of degrees the circular distance (mod 1200) is computed;
+ * if it falls within [702 − toleranceCents, 702 + toleranceCents] the two
+ * degrees are considered connected by a fifth. Centrality = mean connection
+ * count / (n − 1), normalised to [0, 1].
+ *
+ * @param tuning - Tuning system whose degrees are analysed.
+ * @param toleranceCents - Half-width of the fifth window (default 5 cents).
+ * @returns Centrality value in [0, 1]; 0 for tunings with fewer than 2 degrees.
+ */
+export function tuningNetworkCentrality(
+  tuning: TuningSystem,
+  toleranceCents: number = 5,
+): number {
+  const degrees = tuning.degrees;
+  const n = degrees.length;
+  if (n < 2) return 0;
+  const lo = 702 - toleranceCents;
+  const hi = 702 + toleranceCents;
+  const connectionCounts = new Array<number>(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const ci = pitchToCents(degrees[i]!);
+      const cj = pitchToCents(degrees[j]!);
+      const diff = (((cj - ci) % 1200) + 1200) % 1200;
+      const dist = Math.min(diff, 1200 - diff);
+      if (dist >= lo && dist <= hi) {
+        connectionCounts[i] = (connectionCounts[i] ?? 0) + 1;
+      }
+    }
+  }
+  const meanConnections =
+    connectionCounts.reduce((a, b) => a + b, 0) / n;
+  return meanConnections / (n - 1);
+}
+
+// ---------------------------------------------------------------------------
+// GG4 — scaleModalNetwork
+// ---------------------------------------------------------------------------
+
+/**
+ * For each mode (rotation) of `scaleCents`, counts how many tones are shared
+ * with the original scale (pitch-class equality within 1 cent tolerance).
+ *
+ * Mode k is computed by rotating the scale by k positions and normalising to
+ * start at 0 (subtract the first element, mod 1200). Modes 1..n−1 are
+ * returned sorted by `commonTones` descending.
+ *
+ * @param scaleCents - Scale pitches in cents (assumed sorted ascending).
+ * @returns Array of `{ mode, commonTones }` for modes 1..n−1, sorted descending.
+ *
+ * @example
+ * // Diatonic scale — modes sharing 5+ tones are closely related.
+ * scaleModalNetwork([0, 200, 400, 500, 700, 900, 1100]);
+ */
+export function scaleModalNetwork(
+  scaleCents: readonly number[],
+): Array<{ mode: number; commonTones: number }> {
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  // Build a set of pitch classes for the original scale (mod 1200)
+  const originalSet = scaleCents.map((c) => ((c % 1200) + 1200) % 1200);
+  const results: Array<{ mode: number; commonTones: number }> = [];
+  for (let k = 1; k < n; k++) {
+    // Rotate: take scaleCents[k..n-1, 0..k-1], normalise to start at 0
+    const root = scaleCents[k]!;
+    const modeCents = [
+      ...scaleCents.slice(k),
+      ...scaleCents.slice(0, k),
+    ].map((c) => {
+      const shifted = ((c - root) % 1200 + 1200) % 1200;
+      return shifted;
+    });
+    // Count tones in modeCents that appear in originalSet (within 1 cent)
+    let common = 0;
+    for (const mc of modeCents) {
+      const mcNorm = ((mc % 1200) + 1200) % 1200;
+      const found = originalSet.some((oc) => Math.abs(oc - mcNorm) < 1);
+      if (found) common++;
+    }
+    results.push({ mode: k, commonTones: common });
+  }
+  results.sort((a, b) => b.commonTones - a.commonTones);
+  return results;
+}

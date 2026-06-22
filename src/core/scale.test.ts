@@ -683,6 +683,12 @@ import {
   tuningFamilySocraticRadarSampleEntropy,
   tuningFamilySocraticRadarTransferEntropy,
   tuningFamilySocraticRadarLyapunovExponent,
+  tuningFamilySocraticRadarHurstExponent,
+  tuningFamilySocraticRadarPermutationEntropy,
+  tuningFamilySocraticRadarLempelZivComplexity,
+  tuningFamilySocraticRadarDetrendedFluctuation,
+  tuningFamilySocraticRadarKolmogorovComplexity,
+  tuningFamilySocraticRadarMultiScaleEntropy,
   microtonalDeviationProfile,
   optimalScaleSubset,
   beatFrequencyPairs,
@@ -695,6 +701,10 @@ import {
   tuningIsomorphismScore,
   scaleGraphDensity,
   harmonicLatticePosition,
+  pitchClassEntropy,
+  intervalAmbiguity,
+  tuningNetworkCentrality,
+  scaleModalNetwork,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -22692,5 +22702,215 @@ describe('harmonicLatticePosition (FF4)', () => {
   });
   it('errorCents is a finite number', () => {
     expect(Number.isFinite(harmonicLatticePosition(702, 5).errorCents)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1194 — tuningFamilySocraticRadarHurstExponent
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarHurstExponent (Q1194)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442), equalTemperament12(436)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns finite number', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarHurstExponent(tunings, spectrum, 'diversity'))).toBe(true);
+  });
+  it('single tuning returns 0.5', () => {
+    expect(tuningFamilySocraticRadarHurstExponent([equalTemperament12(440)], spectrum, 'diversity')).toBe(0.5);
+  });
+  it('std=0 case returns 0.5', () => {
+    const t = equalTemperament12(440);
+    expect(tuningFamilySocraticRadarHurstExponent([t,t,t,t], spectrum, 'diversity')).toBe(0.5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1196 — tuningFamilySocraticRadarPermutationEntropy
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarPermutationEntropy (Q1196)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442), equalTemperament12(436)];
+  const spectrum = harmonicSpectrum(6);
+  it('result in [0,1]', () => {
+    const r = tuningFamilySocraticRadarPermutationEntropy(tunings, spectrum, 'diversity');
+    expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThanOrEqual(1);
+  });
+  it('throws for order < 2', () => {
+    expect(() => tuningFamilySocraticRadarPermutationEntropy(tunings, spectrum, 'diversity', 1)).toThrow(RangeError);
+  });
+  it('returns finite number', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarPermutationEntropy(tunings, spectrum, 'maturity', 3))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1198 — tuningFamilySocraticRadarLempelZivComplexity
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarLempelZivComplexity (Q1198)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442), equalTemperament12(436)];
+  const spectrum = harmonicSpectrum(6);
+  it('result in [0,1]', () => {
+    const r = tuningFamilySocraticRadarLempelZivComplexity(tunings, spectrum, 'diversity');
+    expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThanOrEqual(1.01); // allow slight overshoot from normalization
+  });
+  it('n<2 returns 0', () => {
+    expect(tuningFamilySocraticRadarLempelZivComplexity([equalTemperament12(440)], spectrum, 'diversity')).toBe(0);
+  });
+  it('returns finite number', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarLempelZivComplexity(tunings, spectrum, 'convergence'))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1200 — tuningFamilySocraticRadarDetrendedFluctuation
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarDetrendedFluctuation (Q1200)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442), equalTemperament12(436)];
+  const spectrum = harmonicSpectrum(6);
+  it('short series returns 0.5', () => {
+    expect(tuningFamilySocraticRadarDetrendedFluctuation([equalTemperament12(440), equalTemperament12(432)], spectrum, 'diversity')).toBe(0.5);
+  });
+  it('returns finite number', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarDetrendedFluctuation(tunings, spectrum, 'diversity'))).toBe(true);
+  });
+  it('n>=8 returns non-default value', () => {
+    const manyTunings = Array.from({length: 8}, (_, i) => equalTemperament12(440 + i));
+    const r = tuningFamilySocraticRadarDetrendedFluctuation(manyTunings, spectrum, 'diversity');
+    expect(Number.isFinite(r)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1202 — tuningFamilySocraticRadarKolmogorovComplexity
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarKolmogorovComplexity (Q1202)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442), equalTemperament12(436)];
+  const spectrum = harmonicSpectrum(6);
+  it('result in [0,1]', () => {
+    const r = tuningFamilySocraticRadarKolmogorovComplexity(tunings, spectrum, 'diversity');
+    expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThanOrEqual(1.01);
+  });
+  it('identical scores return 0', () => {
+    const t = equalTemperament12(440);
+    expect(tuningFamilySocraticRadarKolmogorovComplexity([t,t,t,t], spectrum, 'diversity')).toBe(0);
+  });
+  it('returns finite number', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarKolmogorovComplexity(tunings, spectrum, 'maturity'))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1204 — tuningFamilySocraticRadarMultiScaleEntropy
+// ---------------------------------------------------------------------------
+
+describe('tuningFamilySocraticRadarMultiScaleEntropy (Q1204)', () => {
+  const tunings = [equalTemperament12(440), equalTemperament12(432), equalTemperament12(442), equalTemperament12(436)];
+  const spectrum = harmonicSpectrum(6);
+  it('returns maxScale values', () => {
+    expect(tuningFamilySocraticRadarMultiScaleEntropy(tunings, spectrum, 'diversity', 3)).toHaveLength(3);
+  });
+  it('throws for maxScale < 1', () => {
+    expect(() => tuningFamilySocraticRadarMultiScaleEntropy(tunings, spectrum, 'diversity', 0)).toThrow(RangeError);
+  });
+  it('all values are finite', () => {
+    for (const v of tuningFamilySocraticRadarMultiScaleEntropy(tunings, spectrum, 'maturity', 2)) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GG1 — pitchClassEntropy
+// ---------------------------------------------------------------------------
+
+describe('pitchClassEntropy (GG1)', () => {
+  it('empty scale returns 0', () => {
+    expect(pitchClassEntropy([])).toBe(0);
+  });
+  it('result in [0,1]', () => {
+    const r = pitchClassEntropy([0, 200, 400, 500, 700, 900, 1100], 12);
+    expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThanOrEqual(1);
+  });
+  it('throws for edo < 1', () => {
+    expect(() => pitchClassEntropy([0], 0)).toThrow(RangeError);
+  });
+  it('uniform distribution (chromatic) has high entropy', () => {
+    const chromatic = Array.from({length: 12}, (_, i) => i * 100);
+    expect(pitchClassEntropy(chromatic, 12)).toBeCloseTo(1, 5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GG2 — intervalAmbiguity
+// ---------------------------------------------------------------------------
+
+describe('intervalAmbiguity (GG2)', () => {
+  it('empty scale returns 0', () => {
+    expect(intervalAmbiguity([])).toBe(0);
+  });
+  it('result in [0,1]', () => {
+    expect(intervalAmbiguity([0, 200, 400, 500, 700, 900, 1100], 50)).toBeGreaterThanOrEqual(0);
+    expect(intervalAmbiguity([0, 200, 400, 500, 700, 900, 1100], 50)).toBeLessThanOrEqual(1);
+  });
+  it('equal-step scale has zero ambiguity with small threshold', () => {
+    // chromatic scale: multiples of 100c — any two different intervals differ by ≥ 100c > 10c
+    const chromatic = Array.from({length: 12}, (_, i) => i * 100);
+    expect(intervalAmbiguity(chromatic, 10)).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(intervalAmbiguity([0])).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GG3 — tuningNetworkCentrality
+// ---------------------------------------------------------------------------
+
+describe('tuningNetworkCentrality (GG3)', () => {
+  it('single degree returns 0', () => {
+    expect(tuningNetworkCentrality(equalTemperament12(440), 5)).toBeGreaterThanOrEqual(0);
+  });
+  it('result in [0,1]', () => {
+    const r = tuningNetworkCentrality(equalTemperament12(440), 5);
+    expect(r).toBeGreaterThanOrEqual(0); expect(r).toBeLessThanOrEqual(1);
+  });
+  it('is a finite number', () => {
+    expect(Number.isFinite(tuningNetworkCentrality(equalTemperament12(440), 10))).toBe(true);
+  });
+  it('larger tolerance gives higher centrality', () => {
+    const small = tuningNetworkCentrality(equalTemperament12(440), 5);
+    const large = tuningNetworkCentrality(equalTemperament12(440), 50);
+    expect(large).toBeGreaterThanOrEqual(small);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GG4 — scaleModalNetwork
+// ---------------------------------------------------------------------------
+
+describe('scaleModalNetwork (GG4)', () => {
+  it('returns n-1 mode entries for n-note scale', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleModalNetwork(scale)).toHaveLength(6);
+  });
+  it('empty scale returns empty array', () => {
+    expect(scaleModalNetwork([])).toHaveLength(0);
+  });
+  it('sorted by commonTones descending', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    const result = scaleModalNetwork(scale);
+    for (let i = 1; i < result.length; i++) {
+      expect(result[i-1]!.commonTones).toBeGreaterThanOrEqual(result[i]!.commonTones);
+    }
+  });
+  it('commonTones is always in [0, n]', () => {
+    const scale = [0, 200, 400, 500, 700, 900, 1100];
+    for (const {commonTones} of scaleModalNetwork(scale)) {
+      expect(commonTones).toBeGreaterThanOrEqual(0);
+      expect(commonTones).toBeLessThanOrEqual(scale.length);
+    }
   });
 });

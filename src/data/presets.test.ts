@@ -400,6 +400,12 @@ import {
   presetFamilySocraticRadarSampleEntropy,
   presetFamilySocraticRadarTransferEntropy,
   presetFamilySocraticRadarLyapunovExponent,
+  presetFamilySocraticRadarHurstExponent,
+  presetFamilySocraticRadarPermutationEntropy,
+  presetFamilySocraticRadarLempelZivComplexity,
+  presetFamilySocraticRadarDetrendedFluctuation,
+  presetFamilySocraticRadarKolmogorovComplexity,
+  presetFamilySocraticRadarMultiScaleEntropy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12838,5 +12844,96 @@ describe('presetFamilySocraticRadarLyapunovExponent (Q1193)', () => {
   it('returns a finite number', () => {
     const r = presetFamilySocraticRadarLyapunovExponent(presetIds, spectrum, 'diversity');
     expect(Number.isFinite(r)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1195 — presetFamilySocraticRadarHurstExponent
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarHurstExponent (Q1195)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined finite number', () => {
+    const r = presetFamilySocraticRadarHurstExponent(presetIds, spectrum, 'diversity');
+    expect(r).toBeDefined();
+    expect(Number.isFinite(r)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1197 — presetFamilySocraticRadarPermutationEntropy
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarPermutationEntropy (Q1197)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined number in [0,1]', () => {
+    const r = presetFamilySocraticRadarPermutationEntropy(presetIds, spectrum, 'diversity', 3);
+    expect(r).toBeDefined();
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1199 — presetFamilySocraticRadarLempelZivComplexity
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarLempelZivComplexity (Q1199)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined non-negative finite number', () => {
+    const r = presetFamilySocraticRadarLempelZivComplexity(presetIds, spectrum, 'diversity', 0.5);
+    expect(r).toBeDefined();
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1201 — presetFamilySocraticRadarDetrendedFluctuation
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarDetrendedFluctuation (Q1201)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined finite number', () => {
+    const r = presetFamilySocraticRadarDetrendedFluctuation(presetIds, spectrum, 'diversity');
+    expect(r).toBeDefined();
+    expect(Number.isFinite(r)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1203 — presetFamilySocraticRadarKolmogorovComplexity
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarKolmogorovComplexity (Q1203)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined non-negative finite number', () => {
+    const r = presetFamilySocraticRadarKolmogorovComplexity(presetIds, spectrum, 'diversity', 2);
+    expect(r).toBeDefined();
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1205 — presetFamilySocraticRadarMultiScaleEntropy
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarMultiScaleEntropy (Q1205)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns array of length maxScale with finite values', () => {
+    const r = presetFamilySocraticRadarMultiScaleEntropy(presetIds, spectrum, 'diversity', 2);
+    expect(r).toBeDefined();
+    expect(Array.isArray(r)).toBe(true);
+    expect(r).toHaveLength(2);
+    for (const v of r) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
   });
 });

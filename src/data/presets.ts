@@ -393,6 +393,12 @@ import {
   tuningFamilySocraticRadarSampleEntropy,
   tuningFamilySocraticRadarTransferEntropy,
   tuningFamilySocraticRadarLyapunovExponent,
+  tuningFamilySocraticRadarHurstExponent,
+  tuningFamilySocraticRadarPermutationEntropy,
+  tuningFamilySocraticRadarLempelZivComplexity,
+  tuningFamilySocraticRadarDetrendedFluctuation,
+  tuningFamilySocraticRadarKolmogorovComplexity,
+  tuningFamilySocraticRadarMultiScaleEntropy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -10476,4 +10482,124 @@ export function presetFamilySocraticRadarLyapunovExponent(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarLyapunovExponent(tunings, spectrum, axis, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1195 — presetFamilySocraticRadarHurstExponent
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarHurstExponent(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarHurstExponent> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarHurstExponent(tunings, spectrum, axis, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1197 — presetFamilySocraticRadarPermutationEntropy
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarPermutationEntropy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  order: number = 3,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPermutationEntropy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPermutationEntropy(tunings, spectrum, axis, order, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1199 — presetFamilySocraticRadarLempelZivComplexity
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarLempelZivComplexity(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  threshold: number = 0.5,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarLempelZivComplexity> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarLempelZivComplexity(tunings, spectrum, axis, threshold, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1201 — presetFamilySocraticRadarDetrendedFluctuation
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarDetrendedFluctuation(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarDetrendedFluctuation> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarDetrendedFluctuation(tunings, spectrum, axis, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1203 — presetFamilySocraticRadarKolmogorovComplexity
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarKolmogorovComplexity(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  precision: number = 2,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarKolmogorovComplexity> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarKolmogorovComplexity(tunings, spectrum, axis, precision, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1205 — presetFamilySocraticRadarMultiScaleEntropy
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarMultiScaleEntropy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  maxScale: number = 3,
+  m: number = 2,
+  r: number = 0.2,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMultiScaleEntropy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMultiScaleEntropy(tunings, spectrum, axis, maxScale, m, r, rootHz);
 }
