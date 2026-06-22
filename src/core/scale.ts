@@ -41267,6 +41267,127 @@ export function tuningFamilySocraticRadarMarketEfficiencyProxy(
   return totalEfficiency / vecs.length;
 }
 
+// Q1926 — tuningFamilySocraticRadarLexicalDensityProxy
+export function tuningFamilySocraticRadarLexicalDensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalDensity = 0;
+  for (const vec of vecs) {
+    const contentCount = vec.filter((vi) => vi > 0.5).length;
+    totalDensity += contentCount / 5;
+  }
+  return totalDensity / vecs.length;
+}
+
+// Q1928 — tuningFamilySocraticRadarPhonemeVarietyProxy
+export function tuningFamilySocraticRadarPhonemeVarietyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalVariety = 0;
+  for (const vec of vecs) {
+    const levels = vec.map((vi) => Math.min(4, Math.floor(vi * 5)));
+    const distinct = new Set(levels).size;
+    totalVariety += distinct / 5;
+  }
+  return totalVariety / vecs.length;
+}
+
+// Q1930 — tuningFamilySocraticRadarSyntacticComplexityProxy
+export function tuningFamilySocraticRadarSyntacticComplexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalComplexity = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    let gapCount = 0;
+    for (let i = 1; i < sorted.length; i++) {
+      if ((sorted[i]! - sorted[i - 1]!) > 0.15) gapCount++;
+    }
+    totalComplexity += gapCount / 4;
+  }
+  return totalComplexity / vecs.length;
+}
+
+// Q1932 — tuningFamilySocraticRadarPragmaticAmbiguityProxy
+export function tuningFamilySocraticRadarPragmaticAmbiguityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalAmbiguity = 0;
+  for (const vec of vecs) {
+    const ambiguity = vec.reduce((acc, vi) => acc + (1 - Math.abs(vi - 0.5) * 2), 0) / vec.length;
+    totalAmbiguity += ambiguity;
+  }
+  return totalAmbiguity / vecs.length;
+}
+
+// Q1934 — tuningFamilySocraticRadarSemanticCoherenceProxy
+export function tuningFamilySocraticRadarSemanticCoherenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalCoherence = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, vi) => acc + vi, 0) / vec.length;
+    const variance = vec.reduce((acc, vi) => acc + (vi - mean) ** 2, 0) / vec.length;
+    totalCoherence += 1 - Math.min(1, 4 * variance);
+  }
+  return totalCoherence / vecs.length;
+}
+
+// Q1936 — tuningFamilySocraticRadarProsodyProxy
+export function tuningFamilySocraticRadarProsodyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const ideal = [0.7, 0.3, 0.7, 0.3, 0.7];
+  let totalProsody = 0;
+  for (const vec of vecs) {
+    const meanDev = vec.reduce((acc, vi, i) => acc + Math.abs(vi - ideal[i]!), 0) / vec.length;
+    totalProsody += Math.max(0, Math.min(1, 1 - meanDev / 0.4));
+  }
+  return totalProsody / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -44529,4 +44650,105 @@ export function scaleSpectralRadius(
     if (degree > maxDegree) maxDegree = degree;
   }
   return maxDegree / (n - 1);
+}
+
+// RRR1
+export function scaleIntervalProbabilityEntropy(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  bucketSize = 50,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const freq = new Map<number, number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const interval = ((scaleCents[j]! - scaleCents[i]! + periodCents) % periodCents);
+      const bucket = Math.floor(interval / bucketSize);
+      freq.set(bucket, (freq.get(bucket) ?? 0) + 1);
+    }
+  }
+  const total = (n * (n - 1)) / 2;
+  let H = 0;
+  for (const count of freq.values()) {
+    const p = count / total;
+    H -= p * Math.log2(p);
+  }
+  const maxH = Math.log2(periodCents / bucketSize);
+  return Math.min(1, H / maxH);
+}
+
+// RRR2
+export function scaleMarkovTransitionEntropy(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  bucketSize = 100,
+): number {
+  const n = scaleCents.length;
+  if (n < 3) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const bucketed = steps.map(s => Math.floor(s / bucketSize));
+  const transFreq = new Map<string, number>();
+  for (let i = 0; i < n; i++) {
+    const key = `${bucketed[i]!},${bucketed[(i + 1) % n]!}`;
+    transFreq.set(key, (transFreq.get(key) ?? 0) + 1);
+  }
+  const total = n;
+  let H = 0;
+  for (const count of transFreq.values()) {
+    const p = count / total;
+    H -= p * Math.log2(p);
+  }
+  return Math.min(1, H / Math.log2(n));
+}
+
+// RRR3
+export function scaleExpectedIntervalSize(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let sum = 0;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      sum += Math.min(diff, periodCents - diff);
+      count++;
+    }
+  }
+  return Math.min(1, sum / count / (periodCents / 2));
+}
+
+// RRR4
+export function scaleIntervalSkewness(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      intervals.push(Math.min(diff, periodCents - diff));
+    }
+  }
+  const nPairs = intervals.length;
+  const mean_i = intervals.reduce((a, b) => a + b, 0) / nPairs;
+  const sorted_i = [...intervals].sort((a, b) => a - b);
+  const median_i =
+    nPairs % 2 === 1
+      ? sorted_i[(nPairs - 1) / 2]!
+      : (sorted_i[nPairs / 2 - 1]! + sorted_i[nPairs / 2]!) / 2;
+  const variance = intervals.reduce((a, b) => a + (b - mean_i) ** 2, 0) / nPairs;
+  const std_i = Math.sqrt(variance);
+  const skewness = (mean_i - median_i) / (std_i + 1);
+  return Math.min(1, Math.abs(skewness) / 200);
 }

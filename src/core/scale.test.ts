@@ -1131,6 +1131,12 @@ import {
   tuningFamilySocraticRadarUtilityFunctionProxy,
   tuningFamilySocraticRadarNashEquilibriumProxyV3,
   tuningFamilySocraticRadarMarketEfficiencyProxy,
+  tuningFamilySocraticRadarLexicalDensityProxy,
+  tuningFamilySocraticRadarPhonemeVarietyProxy,
+  tuningFamilySocraticRadarSyntacticComplexityProxy,
+  tuningFamilySocraticRadarPragmaticAmbiguityProxy,
+  tuningFamilySocraticRadarSemanticCoherenceProxy,
+  tuningFamilySocraticRadarProsodyProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1301,6 +1307,10 @@ import {
   scaleChordal,
   scaleChromatic,
   scaleSpectralRadius,
+  scaleIntervalProbabilityEntropy,
+  scaleMarkovTransitionEntropy,
+  scaleExpectedIntervalSize,
+  scaleIntervalSkewness,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -34898,6 +34908,179 @@ describe('QQQ4 scaleSpectralRadius', () => {
   it('12-TET → finite in [0,1]', () => {
     const cents = Array.from({length: 12}, (_, i) => i * 100);
     const v = scaleSpectralRadius(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q1926 — tuningFamilySocraticRadarLexicalDensityProxy
+describe('Q1926 tuningFamilySocraticRadarLexicalDensityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarLexicalDensityProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarLexicalDensityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarLexicalDensityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1928 — tuningFamilySocraticRadarPhonemeVarietyProxy
+describe('Q1928 tuningFamilySocraticRadarPhonemeVarietyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarPhonemeVarietyProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarPhonemeVarietyProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarPhonemeVarietyProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1930 — tuningFamilySocraticRadarSyntacticComplexityProxy
+describe('Q1930 tuningFamilySocraticRadarSyntacticComplexityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarSyntacticComplexityProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSyntacticComplexityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSyntacticComplexityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1932 — tuningFamilySocraticRadarPragmaticAmbiguityProxy
+describe('Q1932 tuningFamilySocraticRadarPragmaticAmbiguityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarPragmaticAmbiguityProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarPragmaticAmbiguityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarPragmaticAmbiguityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1934 — tuningFamilySocraticRadarSemanticCoherenceProxy
+describe('Q1934 tuningFamilySocraticRadarSemanticCoherenceProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarSemanticCoherenceProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSemanticCoherenceProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarSemanticCoherenceProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1936 — tuningFamilySocraticRadarProsodyProxy
+describe('Q1936 tuningFamilySocraticRadarProsodyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarProsodyProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarProsodyProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarProsodyProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// RRR1 — scaleIntervalProbabilityEntropy
+describe('RRR1 scaleIntervalProbabilityEntropy', () => {
+  it('empty returns 0', () => {
+    expect(scaleIntervalProbabilityEntropy([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleIntervalProbabilityEntropy([0])).toBe(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleIntervalProbabilityEntropy(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// RRR2 — scaleMarkovTransitionEntropy
+describe('RRR2 scaleMarkovTransitionEntropy', () => {
+  it('empty returns 0', () => {
+    expect(scaleMarkovTransitionEntropy([])).toBe(0);
+  });
+  it('two notes returns 0 (need ≥3)', () => {
+    expect(scaleMarkovTransitionEntropy([0, 600])).toBe(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleMarkovTransitionEntropy(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// RRR3 — scaleExpectedIntervalSize
+describe('RRR3 scaleExpectedIntervalSize', () => {
+  it('empty returns 0', () => {
+    expect(scaleExpectedIntervalSize([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleExpectedIntervalSize([0])).toBe(0);
+  });
+  it('octave apart → max expected = 1', () => {
+    // Two notes at 0 and 600 → interval 600, expected = 600/600 = 1
+    expect(scaleExpectedIntervalSize([0, 600])).toBeCloseTo(1, 5);
+  });
+});
+
+// RRR4 — scaleIntervalSkewness
+describe('RRR4 scaleIntervalSkewness', () => {
+  it('empty returns 0', () => {
+    expect(scaleIntervalSkewness([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleIntervalSkewness([0])).toBe(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({length: 12}, (_, i) => i * 100);
+    const v = scaleIntervalSkewness(cents);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);

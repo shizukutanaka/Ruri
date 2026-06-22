@@ -1118,3 +1118,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | QQQ2 | `scaleChordal` | 弦グラフ性スコア（3連続音程の最大区間が三全音以内） |
 | QQQ3 | `scaleChromatic` | 半音階性スコア（12平均律半音への近接度） |
 | QQQ4 | `scaleSpectralRadius` | スペクトル半径近似（最大次数／(n-1)） |
+
+## Round 86: 音程確率論 (RRR1–RRR4)
+
+音程分布の確率論的特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| RRR1 | `scaleIntervalProbabilityEntropy` | 音程分布のShannonエントロピー（正規化） |
+| RRR2 | `scaleMarkovTransitionEntropy` | ステップ系列のMarkov遷移エントロピー |
+| RRR3 | `scaleExpectedIntervalSize` | 音程期待値（半周期で正規化） |
+| RRR4 | `scaleIntervalSkewness` | 音程分布の歪度（Pearson第2係数の絶対値） |
