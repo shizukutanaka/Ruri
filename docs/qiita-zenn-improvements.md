@@ -744,3 +744,14 @@
 | HHH4 | `scaleRoughnessSum` | 全ペアのVassilakis粗さモデル総和 |
 
 **参考**: Vassilakis (2001) roughness model; Overtone matching in just intonation theory。
+
+## Round 52: スケール対称性・逆行・回文分析 (III1–III4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| III1 | `scaleInversionSymmetry` | 反転(周期反射)対称性スコア |
+| III2 | `scaleRetrograde` | スケールの逆行形(降順ソート) |
+| III3 | `scaleRetrogradeInversion` | 逆行反転形(逆行+反転) |
+| III4 | `scalePalindromicScore` | 音程列の回文度スコア |
+
+**参考**: Retrograde and inversion in serial music theory (Schoenberg); Scale palindromes in music set theory。

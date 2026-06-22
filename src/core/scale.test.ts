@@ -963,6 +963,10 @@ import {
   scaleSubharmonicMatchScore,
   scaleBeatFrequency,
   scaleRoughnessSum,
+  scaleInversionSymmetry,
+  scaleRetrograde,
+  scaleRetrogradeInversion,
+  scalePalindromicScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -28491,6 +28495,82 @@ describe('Q1516 tuningFamilySocraticRadarPredictabilityScore', () => {
   });
   it('returns value in [0,1] for two tunings', () => {
     const r = tuningFamilySocraticRadarPredictabilityScore([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('III1 scaleInversionSymmetry', () => {
+  it('empty → 0', () => {
+    expect(scaleInversionSymmetry([])).toBe(0);
+  });
+  it('symmetric scale has high score', () => {
+    // [0, 600] is symmetric under inversion: 1200-0=1200≡0, 1200-600=600
+    expect(scaleInversionSymmetry([0, 600])).toBeGreaterThan(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleInversionSymmetry([0,200,400,700,900,1100]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('single pitch at 0 → 1 (0 inverts to 0 mod 1200)', () => {
+    // 1200-0=1200≡0, so [0] maps to itself
+    expect(scaleInversionSymmetry([0])).toBe(1);
+  });
+});
+
+describe('III2 scaleRetrograde', () => {
+  it('empty → []', () => {
+    expect(scaleRetrograde([])).toEqual([]);
+  });
+  it('single element unchanged', () => {
+    expect(scaleRetrograde([500])).toEqual([500]);
+  });
+  it('reverses sorted scale', () => {
+    expect(scaleRetrograde([0,400,700])).toEqual([700,400,0]);
+  });
+  it('length preserved', () => {
+    const s2 = [0,200,400,700,900];
+    expect(scaleRetrograde(s2)).toHaveLength(s2.length);
+  });
+});
+
+describe('III3 scaleRetrogradeInversion', () => {
+  it('empty → []', () => {
+    expect(scaleRetrogradeInversion([])).toEqual([]);
+  });
+  it('inverts pitches', () => {
+    // [0, 400, 700] → invert → [1200-0, 1200-400, 1200-700] = [1200≡0, 800, 500] → sort → [0, 500, 800]
+    const r = scaleRetrogradeInversion([0,400,700]);
+    expect(r).toHaveLength(3);
+    expect(r[0]).toBeCloseTo(0, 1);
+  });
+  it('length preserved', () => {
+    const s2 = [0,200,400,700];
+    expect(scaleRetrogradeInversion(s2)).toHaveLength(s2.length);
+  });
+  it('all values in [0, period)', () => {
+    const r = scaleRetrogradeInversion([0,300,600,900]);
+    r.forEach(v => {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThan(1200);
+    });
+  });
+});
+
+describe('III4 scalePalindromicScore', () => {
+  it('empty → 0', () => {
+    expect(scalePalindromicScore([])).toBe(0);
+  });
+  it('scale with ≤2 pitches → 1', () => {
+    expect(scalePalindromicScore([0,600])).toBe(1);
+  });
+  it('equal-step scale is palindromic → 1', () => {
+    const ed = Array.from({length:6},(_,i)=>i*200);
+    expect(scalePalindromicScore(ed)).toBe(1);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scalePalindromicScore([0,100,500,700,1100]);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(1);
   });

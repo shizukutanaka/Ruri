@@ -34800,3 +34800,351 @@ export function tuningFamilySocraticRadarPredictabilityScore(
   }
   return total / tunings.length;
 }
+
+/**
+ * III1: scaleInversionSymmetry
+ * Measures how symmetric the scale is under inversion (reflection around the period midpoint).
+ * For each pitch p, check if (periodCents - p) mod periodCents is also in the scale (within 10 cents).
+ * Returns fraction of pitches that have their inversion in the scale. Returns 0 for empty.
+ */
+export function scaleInversionSymmetry(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let count = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    const p = sorted[i]!;
+    let inv = (periodCents - p) % periodCents;
+    if (inv < 0) inv += periodCents;
+    let found = false;
+    for (let j = 0; j < sorted.length; j++) {
+      const q = sorted[j]!;
+      if (Math.abs(q - inv) < 10) {
+        found = true;
+        break;
+      }
+    }
+    if (found) count++;
+  }
+  return count / sorted.length;
+}
+
+/**
+ * III2: scaleRetrograde
+ * Returns the retrograde (reversed) form of the scale as a list of cents.
+ * Sort the scale ascending, then reverse. Returns [] for empty.
+ */
+export function scaleRetrograde(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number[] {
+  void periodCents;
+  if (scaleCents.length === 0) return [];
+  return [...scaleCents].sort((a, b) => a - b).reverse();
+}
+
+/**
+ * III3: scaleRetrogradeInversion
+ * Returns the retrograde inversion: invert each pitch p → (periodCents - p) mod periodCents,
+ * then sort in ascending order. Returns [] for empty.
+ */
+export function scaleRetrogradeInversion(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number[] {
+  if (scaleCents.length === 0) return [];
+  return scaleCents
+    .map((p) => {
+      let inv = (periodCents - p) % periodCents;
+      if (inv < 0) inv += periodCents;
+      return inv;
+    })
+    .sort((a, b) => a - b);
+}
+
+/**
+ * III4: scalePalindromicScore
+ * Measures how palindromic the scale's interval sequence is.
+ * Sort the scale, compute consecutive intervals (including wrap-around).
+ * Compare first half with reverse of second half.
+ * Return fraction of matching interval pairs (within tolerance).
+ * Returns 1 for scale with ≤2 pitches (trivially palindromic), 0 for empty.
+ */
+export function scalePalindromicScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+  tolerance: number = 10,
+): number {
+  if (scaleCents.length === 0) return 0;
+  if (scaleCents.length <= 2) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const n = sorted.length;
+  const gaps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    gaps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  gaps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const pairs = Math.floor(n / 2);
+  let matches = 0;
+  for (let i = 0; i < pairs; i++) {
+    const a = gaps[i]!;
+    const b = gaps[n - 1 - i]!;
+    if (Math.abs(a - b) <= tolerance) matches++;
+  }
+  return matches / pairs;
+}
+
+// ---------------------------------------------------------------------------
+// Q1518 — tuningFamilySocraticRadarNashEquilibriumProxy
+
+/**
+ * Nash equilibrium proxy: for each tuning, find the set of degrees where no
+ * degree can improve its dissonance score by "defecting" to another degree.
+ * A degree d is in Nash equilibrium if its total pairwise dissonance to all
+ * others is less than the mean total dissonance across all degrees. Return
+ * fraction of Nash degrees. Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum for dissonance computation.
+ * @param rootHz - Reference frequency (default 440).
+ * @returns Mean fraction of Nash-equilibrium degrees in [0,1] (0 for empty).
+ */
+export function tuningFamilySocraticRadarNashEquilibriumProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  void axes;
+  if (tunings.length === 0) return 0;
+  const refHz = rootHz ?? 440;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) {
+      total += 0;
+      continue;
+    }
+    const freqs = t.degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    // Compute total pairwise dissonance for each degree
+    const degreeDissonance: number[] = [];
+    for (let i = 0; i < n; i++) {
+      let sum = 0;
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        sum += chordDissonance([freqs[i]!, freqs[j]!], spectrum);
+      }
+      degreeDissonance.push(sum);
+    }
+    const meanDis = degreeDissonance.reduce((s, v) => s + v, 0) / n;
+    const nashCount = degreeDissonance.filter((v) => v < meanDis).length;
+    total += nashCount / n;
+  }
+  return total / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1520 — tuningFamilySocraticRadarGameValueMean
+
+/**
+ * Game value: for each tuning, compute the "game value" as the ratio of the
+ * best individual degree dissonance to the mean group dissonance. Best =
+ * degree with minimum total dissonance to all others. Returns mean ratio
+ * across tunings. Returns 1 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum for dissonance computation.
+ * @param rootHz - Reference frequency (default 440).
+ * @returns Mean game value ratio (positive, 1 for empty).
+ */
+export function tuningFamilySocraticRadarGameValueMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  void axes;
+  if (tunings.length === 0) return 1;
+  const refHz = rootHz ?? 440;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) {
+      total += 1;
+      continue;
+    }
+    const freqs = t.degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    const degreeDissonance: number[] = [];
+    for (let i = 0; i < n; i++) {
+      let sum = 0;
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        sum += chordDissonance([freqs[i]!, freqs[j]!], spectrum);
+      }
+      degreeDissonance.push(sum);
+    }
+    const meanDis = degreeDissonance.reduce((s, v) => s + v, 0) / n;
+    const bestDis = Math.min(...degreeDissonance);
+    const ratio = meanDis === 0 ? 1 : bestDis / meanDis;
+    total += Math.max(0, ratio);
+  }
+  return total / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1522 — tuningFamilySocraticRadarCooperationIndex
+
+/**
+ * Cooperation index: fraction of tuning pairs (i,j) where their combined
+ * radar profile mean > each individual profile mean. Returns 0 for n≤1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Cooperation index in [0,1] (0 for n≤1).
+ */
+export function tuningFamilySocraticRadarCooperationIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length <= 1) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const means = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+  let cooperateCount = 0;
+  let pairCount = 0;
+  for (let i = 0; i < tunings.length; i++) {
+    for (let j = i + 1; j < tunings.length; j++) {
+      const combined = axes.map((ax) => (profiles[i]![ax] + profiles[j]![ax]) / 2);
+      const combinedMean = combined.reduce((s, v) => s + v, 0) / combined.length;
+      if (combinedMean > means[i]! && combinedMean > means[j]!) {
+        cooperateCount++;
+      }
+      pairCount++;
+    }
+  }
+  return pairCount === 0 ? 0 : cooperateCount / pairCount;
+}
+
+// ---------------------------------------------------------------------------
+// Q1524 — tuningFamilySocraticRadarParetoDominanceCount
+
+/**
+ * Count of Pareto-dominant tunings in the family. Tuning A dominates B if
+ * A's radar profile is ≥ B's on all 5 axes and strictly > on at least one.
+ * Return count of non-dominated tunings / n. Returns 1 for n=0 or n=1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Fraction of non-dominated tunings in [0,1] (1 for n=0 or n=1).
+ */
+export function tuningFamilySocraticRadarParetoDominanceCount(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n === 0) return 1;
+  if (n === 1) return 1;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let nonDominated = 0;
+  for (let i = 0; i < n; i++) {
+    let dominated = false;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      // Check if j dominates i: j >= i on all axes and strictly > on at least one
+      const allGeq = axes.every((ax) => profiles[j]![ax] >= profiles[i]![ax]);
+      const someGt = axes.some((ax) => profiles[j]![ax] > profiles[i]![ax]);
+      if (allGeq && someGt) {
+        dominated = true;
+        break;
+      }
+    }
+    if (!dominated) nonDominated++;
+  }
+  return nonDominated / n;
+}
+
+// ---------------------------------------------------------------------------
+// Q1526 — tuningFamilySocraticRadarStrategicDiversityIndex
+
+/**
+ * Strategic diversity: entropy of the distribution of "winning" axes across
+ * all tunings. For each tuning, find its peak axis (highest radar score).
+ * Compute entropy of the distribution of peak axes. Returns 0 for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Shannon entropy of peak axis distribution (0 for empty).
+ */
+export function tuningFamilySocraticRadarStrategicDiversityIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const axisCount = new Map<string, number>();
+  for (const ax of axes) axisCount.set(ax, 0);
+  for (const p of profiles) {
+    let peakAxis: AxisKey = axes[0]!;
+    let peakVal = p[axes[0]!];
+    for (let ai = 1; ai < axes.length; ai++) {
+      const ax = axes[ai]!;
+      if (p[ax] > peakVal) {
+        peakVal = p[ax];
+        peakAxis = ax;
+      }
+    }
+    axisCount.set(peakAxis, (axisCount.get(peakAxis) ?? 0) + 1);
+  }
+  const total = tunings.length;
+  let entropy = 0;
+  for (const count of axisCount.values()) {
+    if (count > 0) {
+      const prob = count / total;
+      entropy -= prob * Math.log(prob);
+    }
+  }
+  return Math.max(0, entropy);
+}
+
+// ---------------------------------------------------------------------------
+// Q1528 — tuningFamilySocraticRadarBargainingPower
+
+/**
+ * Bargaining power: for each tuning, its "bargaining power" = its mean radar
+ * profile value relative to the max mean profile value in the family. Returns
+ * a number[] of length n. Returns [] for empty.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency.
+ * @returns Array of bargaining power values in [0,1] ([] for empty).
+ */
+export function tuningFamilySocraticRadarBargainingPower(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const means = profiles.map((p) => axes.reduce((s, ax) => s + p[ax], 0) / axes.length);
+  const maxMean = Math.max(...means);
+  if (maxMean === 0) return means.map(() => 1);
+  return means.map((m) => Math.max(0, m / maxMean));
+}
