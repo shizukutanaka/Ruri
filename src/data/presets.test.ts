@@ -550,6 +550,12 @@ import {
   presetFamilySocraticRadarModalAmbiguity,
   presetFamilySocraticRadarPentatonicCorrelation,
   presetFamilySocraticRadarDiatonicCorrelation,
+  presetFamilySocraticRadarKolmogorovProxy,
+  presetFamilySocraticRadarLempelZivProxy,
+  presetFamilySocraticRadarFractalDimensionProxy,
+  presetFamilySocraticRadarSelfSimilarityScore,
+  presetFamilySocraticRadarRepetitiveness,
+  presetFamilySocraticRadarPredictabilityScore,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -15805,5 +15811,103 @@ describe('Q1493 presetFamilySocraticRadarDiatonicCorrelation', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarDiatonicCorrelation(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 51: Q1507–Q1517 — Complexity Theory / Algorithmic Information bridges
+// ---------------------------------------------------------------------------
+
+// Q1507 — presetFamilySocraticRadarKolmogorovProxy
+describe('Q1507 presetFamilySocraticRadarKolmogorovProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in (0,1] for single preset', () => {
+    const r = presetFamilySocraticRadarKolmogorovProxy(['12-tet'], s);
+    expect(r).toBeGreaterThan(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarKolmogorovProxy([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarKolmogorovProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1509 — presetFamilySocraticRadarLempelZivProxy
+describe('Q1509 presetFamilySocraticRadarLempelZivProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns > 0 for single preset', () => {
+    expect(presetFamilySocraticRadarLempelZivProxy(['12-tet'], s)).toBeGreaterThan(0);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarLempelZivProxy([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLempelZivProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1511 — presetFamilySocraticRadarFractalDimensionProxy
+describe('Q1511 presetFamilySocraticRadarFractalDimensionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,2] for single preset', () => {
+    const r = presetFamilySocraticRadarFractalDimensionProxy(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(2);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarFractalDimensionProxy([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFractalDimensionProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1513 — presetFamilySocraticRadarSelfSimilarityScore
+describe('Q1513 presetFamilySocraticRadarSelfSimilarityScore', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for single preset', () => {
+    const r = presetFamilySocraticRadarSelfSimilarityScore(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarSelfSimilarityScore([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSelfSimilarityScore(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1515 — presetFamilySocraticRadarRepetitiveness
+describe('Q1515 presetFamilySocraticRadarRepetitiveness', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for single preset', () => {
+    const r = presetFamilySocraticRadarRepetitiveness(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarRepetitiveness([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarRepetitiveness(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1517 — presetFamilySocraticRadarPredictabilityScore
+describe('Q1517 presetFamilySocraticRadarPredictabilityScore', () => {
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1] for single preset', () => {
+    const r = presetFamilySocraticRadarPredictabilityScore(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty returns 0', () => {
+    expect(presetFamilySocraticRadarPredictabilityScore([], s)).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPredictabilityScore(['unknown'], s)).toThrow(RangeError);
   });
 });
