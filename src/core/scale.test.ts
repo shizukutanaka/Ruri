@@ -927,6 +927,12 @@ import {
   tuningFamilySocraticRadarSelfSimilarityScore,
   tuningFamilySocraticRadarRepetitiveness,
   tuningFamilySocraticRadarPredictabilityScore,
+  tuningFamilySocraticRadarNashEquilibriumProxy,
+  tuningFamilySocraticRadarGameValueMean,
+  tuningFamilySocraticRadarCooperationIndex,
+  tuningFamilySocraticRadarParetoDominanceCount,
+  tuningFamilySocraticRadarStrategicDiversityIndex,
+  tuningFamilySocraticRadarBargainingPower,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -28573,5 +28579,101 @@ describe('III4 scalePalindromicScore', () => {
     const r = scalePalindromicScore([0,100,500,700,1100]);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1518 tuningFamilySocraticRadarNashEquilibriumProxy', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns value in [0,1]', () => {
+    const r = tuningFamilySocraticRadarNashEquilibriumProxy([t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarNashEquilibriumProxy([], s)).toBe(0);
+  });
+  it('two tunings in [0,1]', () => {
+    const r = tuningFamilySocraticRadarNashEquilibriumProxy([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1520 tuningFamilySocraticRadarGameValueMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty → 1', () => {
+    expect(tuningFamilySocraticRadarGameValueMean([], s)).toBe(1);
+  });
+  it('single tuning → positive', () => {
+    expect(tuningFamilySocraticRadarGameValueMean([t], s)).toBeGreaterThan(0);
+  });
+  it('two tunings → positive', () => {
+    expect(tuningFamilySocraticRadarGameValueMean([t, t], s)).toBeGreaterThan(0);
+  });
+});
+
+describe('Q1522 tuningFamilySocraticRadarCooperationIndex', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n≤1 → 0', () => {
+    expect(tuningFamilySocraticRadarCooperationIndex([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarCooperationIndex([t], s)).toBe(0);
+  });
+  it('two identical tunings → value in [0,1]', () => {
+    const r = tuningFamilySocraticRadarCooperationIndex([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns non-negative', () => {
+    expect(tuningFamilySocraticRadarCooperationIndex([t, t], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1524 tuningFamilySocraticRadarParetoDominanceCount', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n=0 → 1', () => {
+    expect(tuningFamilySocraticRadarParetoDominanceCount([], s)).toBe(1);
+  });
+  it('n=1 → 1', () => {
+    expect(tuningFamilySocraticRadarParetoDominanceCount([t], s)).toBe(1);
+  });
+  it('two tunings → value in [0,1]', () => {
+    const r = tuningFamilySocraticRadarParetoDominanceCount([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1526 tuningFamilySocraticRadarStrategicDiversityIndex', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty → 0', () => {
+    expect(tuningFamilySocraticRadarStrategicDiversityIndex([], s)).toBe(0);
+  });
+  it('n=1 → 0 (single peak, zero entropy)', () => {
+    expect(tuningFamilySocraticRadarStrategicDiversityIndex([t], s)).toBe(0);
+  });
+  it('n>1 → non-negative', () => {
+    expect(tuningFamilySocraticRadarStrategicDiversityIndex([t, t], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1528 tuningFamilySocraticRadarBargainingPower', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty → []', () => {
+    expect(tuningFamilySocraticRadarBargainingPower([], s)).toEqual([]);
+  });
+  it('n=1 → [1] (100% of max)', () => {
+    const r = tuningFamilySocraticRadarBargainingPower([t], s);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toBe(1);
+  });
+  it('n=2 → length 2', () => {
+    const r = tuningFamilySocraticRadarBargainingPower([t, t], s);
+    expect(r).toHaveLength(2);
   });
 });
