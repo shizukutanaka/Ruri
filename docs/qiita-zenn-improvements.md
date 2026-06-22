@@ -563,3 +563,15 @@
 | `tuningFifthDeviation` | 純正五度（702c）からの平均偏差 |
 | `scaleHarmonicAcceleration` | スケール音度間の調波複雑度分散 |
 | `spectrumPurityScore` | スペクトル比の整数純度スコア |
+
+## Round 36: クロマカバレッジ・オクターブ一貫性・素因数複雑度 (SS1–SS4)
+
+**テーマ**: 半音被覆率・オクターブ整合性・素因数複雑度・音程多様性
+**実装**: SS1–SS4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleChromaticCoverage` | 12半音クラスの被覆率 |
+| `tuningOctaveConsistency` | オクターブ対の一貫性スコア |
+| `primeFactorComplexity` | 周波数比の素因数総数 |
+| `scaleIntervalicRichness` | 50cビン単位の音程多様性 |

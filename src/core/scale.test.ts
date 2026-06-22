@@ -775,6 +775,12 @@ import {
   tuningFamilySocraticRadarPheromoneWeight,
   tuningFamilySocraticRadarGradientApproximation,
   tuningFamilySocraticRadarNelderMeadCentroid,
+  tuningFamilySocraticRadarELECTRE,
+  tuningFamilySocraticRadarPROMETHEE,
+  tuningFamilySocraticRadarCOPRAS,
+  tuningFamilySocraticRadarARAS,
+  tuningFamilySocraticRadarWASPAS,
+  tuningFamilySocraticRadarEDAS,
   barkScale,
   pitchSalience,
   scaleStepVariety,
@@ -815,6 +821,10 @@ import {
   tuningFifthDeviation,
   scaleHarmonicAcceleration,
   spectrumPurityScore,
+  scaleChromaticCoverage,
+  tuningOctaveConsistency,
+  primeFactorComplexity,
+  scaleIntervalicRichness,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -25529,5 +25539,240 @@ describe('tuningFamilySocraticRadarNelderMeadCentroid (Q1336)', () => {
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1338 — tuningFamilySocraticRadarELECTRE
+describe('tuningFamilySocraticRadarELECTRE (Q1338)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarELECTRE([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns n×n matrix of 0/1 values', () => {
+    const result = tuningFamilySocraticRadarELECTRE([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]!.length).toBe(2);
+    for (const row of result) {
+      for (const v of row) {
+        expect(v === 0 || v === 1).toBe(true);
+      }
+    }
+  });
+  it('diagonal is always 0', () => {
+    const result = tuningFamilySocraticRadarELECTRE([t1, t2], spectrum);
+    expect(result[0]![0]).toBe(0);
+    expect(result[1]![1]).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1340 — tuningFamilySocraticRadarPROMETHEE
+describe('tuningFamilySocraticRadarPROMETHEE (Q1340)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarPROMETHEE([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns [0] for single tuning', () => {
+    const result = tuningFamilySocraticRadarPROMETHEE([t1], spectrum);
+    expect(result).toEqual([0]);
+  });
+  it('returns one net flow per tuning in [-1, 1]', () => {
+    const result = tuningFamilySocraticRadarPROMETHEE([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(-1);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1342 — tuningFamilySocraticRadarCOPRAS
+describe('tuningFamilySocraticRadarCOPRAS (Q1342)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarCOPRAS([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one utility value per tuning', () => {
+    const result = tuningFamilySocraticRadarCOPRAS([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('max utility is 1 and all values in (0, 1]', () => {
+    const result = tuningFamilySocraticRadarCOPRAS([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThan(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+    expect(Math.max(...result)).toBeCloseTo(1, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1344 — tuningFamilySocraticRadarARAS
+describe('tuningFamilySocraticRadarARAS (Q1344)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarARAS([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one optimality ratio per tuning', () => {
+    const result = tuningFamilySocraticRadarARAS([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in (0, 1]', () => {
+    const result = tuningFamilySocraticRadarARAS([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThan(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1346 — tuningFamilySocraticRadarWASPAS
+describe('tuningFamilySocraticRadarWASPAS (Q1346)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarWASPAS([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one score per tuning', () => {
+    const result = tuningFamilySocraticRadarWASPAS([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarWASPAS([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1348 — tuningFamilySocraticRadarEDAS
+describe('tuningFamilySocraticRadarEDAS (Q1348)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarEDAS([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one appraisal score per tuning', () => {
+    const result = tuningFamilySocraticRadarEDAS([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarEDAS([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 36: SS1–SS4
+// ---------------------------------------------------------------------------
+
+describe('scaleChromaticCoverage', () => {
+  it('returns 7/12 for a 7-note major-like scale', () => {
+    // 0, 200, 400, 500, 700, 900, 1100 each land exactly on a chromatic pitch
+    const result = scaleChromaticCoverage([0, 200, 400, 500, 700, 900, 1100]);
+    expect(result).toBeCloseTo(7 / 12, 6);
+  });
+
+  it('returns 0 for an empty scale', () => {
+    expect(scaleChromaticCoverage([])).toBe(0);
+  });
+
+  it('throws RangeError for tolerance <= 0', () => {
+    expect(() => scaleChromaticCoverage([0], -1)).toThrow(RangeError);
+    expect(() => scaleChromaticCoverage([0], 0)).toThrow(RangeError);
+  });
+
+  it('returns 1 for all 12 chromatic pitches', () => {
+    const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+    expect(scaleChromaticCoverage(chromatic)).toBe(1);
+  });
+});
+
+describe('tuningOctaveConsistency', () => {
+  it('returns close to 1 for 12-TET (perfect octave pairs)', () => {
+    const result = tuningOctaveConsistency(equalTemperament12(440));
+    expect(result).toBeGreaterThan(0.99);
+  });
+
+  it('returns 1 for a single-degree tuning (no octave pairs)', () => {
+    expect(tuningOctaveConsistency(edo(1, 440))).toBe(1);
+  });
+
+  it('returns a value in [0, 1]', () => {
+    const result = tuningOctaveConsistency(equalTemperament12(440));
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(result).toBeLessThanOrEqual(1);
+  });
+
+  it('returns 1 for edo(2, 440) which has no 1200-cent pairs within degrees', () => {
+    // edo(2, 440): two degrees in the octave, e.g. 0 and 600 cents — diff is 600, not ~1200
+    const result = tuningOctaveConsistency(edo(2, 440));
+    expect(result).toBe(1);
+  });
+});
+
+describe('primeFactorComplexity', () => {
+  it('returns 0 for ratio = 1', () => {
+    expect(primeFactorComplexity(1)).toBe(0);
+  });
+
+  it('returns 2 for ratio 3/2 (one factor each)', () => {
+    expect(primeFactorComplexity(3 / 2)).toBe(2);
+  });
+
+  it('returns 3 for ratio 4/3 (2^2 in numerator, 3^1 in denominator)', () => {
+    expect(primeFactorComplexity(4 / 3)).toBe(3);
+  });
+
+  it('throws RangeError for ratio <= 0', () => {
+    expect(() => primeFactorComplexity(0)).toThrow(RangeError);
+    expect(() => primeFactorComplexity(-1)).toThrow(RangeError);
+  });
+});
+
+describe('scaleIntervalicRichness', () => {
+  it('returns > 0 and <= 1 for a 7-note scale', () => {
+    const result = scaleIntervalicRichness([0, 200, 400, 500, 700, 900, 1100]);
+    expect(result).toBeGreaterThan(0);
+    expect(result).toBeLessThanOrEqual(1);
+  });
+
+  it('returns 0 for a single-note scale', () => {
+    expect(scaleIntervalicRichness([0])).toBe(0);
+  });
+
+  it('returns 0 for an empty scale', () => {
+    expect(scaleIntervalicRichness([])).toBe(0);
+  });
+
+  it('returns a value in [0, 1] for the full chromatic scale', () => {
+    const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+    const result = scaleIntervalicRichness(chromatic);
+    expect(result).toBeGreaterThan(0);
+    expect(result).toBeLessThanOrEqual(1);
   });
 });

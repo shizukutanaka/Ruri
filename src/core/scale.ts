@@ -29351,3 +29351,345 @@ export function spectrumPurityScore(spectrum: Spectrum): number {
   if (totalAmplitude === 0) return 0;
   return weightedSum / totalAmplitude;
 }
+
+// ---------------------------------------------------------------------------
+// Q1338 — tuningFamilySocraticRadarELECTRE
+
+export function tuningFamilySocraticRadarELECTRE(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const matrix: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const si = scores[i]!;
+      const sj = scores[j]!;
+      let concordantCount = 0;
+      let maxDisadvantage = 0;
+      for (let k = 0; k < 5; k++) {
+        if (si[k]! >= sj[k]!) concordantCount++;
+        const disadvantage = sj[k]! - si[k]!;
+        if (disadvantage > maxDisadvantage) maxDisadvantage = disadvantage;
+      }
+      const concordance = concordantCount / 5;
+      const discordance = maxDisadvantage;
+      if (concordance >= 0.6 && discordance <= 0.4) {
+        matrix[i]![j] = 1;
+      }
+    }
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1340 — tuningFamilySocraticRadarPROMETHEE
+
+export function tuningFamilySocraticRadarPROMETHEE(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  if (n === 1) return [0];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const pi: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const si = scores[i]!;
+      const sj = scores[j]!;
+      let prefSum = 0;
+      for (let k = 0; k < 5; k++) {
+        prefSum += Math.max(0, si[k]! - sj[k]!);
+      }
+      pi[i]![j] = prefSum / 5;
+    }
+  }
+  const phiPlus = new Array<number>(n).fill(0);
+  const phiMinus = new Array<number>(n).fill(0);
+  for (let i = 0; i < n; i++) {
+    let plusSum = 0;
+    let minusSum = 0;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      plusSum += pi[i]![j]!;
+      minusSum += pi[j]![i]!;
+    }
+    phiPlus[i] = plusSum / (n - 1);
+    phiMinus[i] = minusSum / (n - 1);
+  }
+  return phiPlus.map((plus, i) => plus - phiMinus[i]!);
+}
+
+// ---------------------------------------------------------------------------
+// Q1342 — tuningFamilySocraticRadarCOPRAS
+
+export function tuningFamilySocraticRadarCOPRAS(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const colSums = axes.map((_, k) => scores.reduce((s, row) => s + row[k]!, 0));
+  const allZero = colSums.every((v) => v === 0);
+  if (allZero) {
+    return new Array<number>(n).fill(1 / n);
+  }
+  const sPlus = scores.map((row) => {
+    let sum = 0;
+    for (let k = 0; k < 5; k++) {
+      const colSum = colSums[k]!;
+      sum += colSum === 0 ? 0 : row[k]! / colSum;
+    }
+    return sum / 5;
+  });
+  const maxQ = Math.max(...sPlus);
+  if (maxQ === 0) return new Array<number>(n).fill(1 / n);
+  return sPlus.map((q) => q / maxQ);
+}
+
+// ---------------------------------------------------------------------------
+// Q1344 — tuningFamilySocraticRadarARAS
+
+export function tuningFamilySocraticRadarARAS(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  // Optimal alternative A0[k] = max over i
+  const a0 = axes.map((_, k) => Math.max(...scores.map((row) => row[k]!)));
+  // Augmented matrix: rows are [a0, ...scores], sum includes a0
+  const augmentedColSums = axes.map((_, k) => {
+    let sum = a0[k]!;
+    for (const row of scores) sum += row[k]!;
+    return sum;
+  });
+  // Normalized: each row[k] / augColSum[k]
+  const normalizeRow = (row: number[]) => row.map((v, k) => augmentedColSums[k]! === 0 ? 0 : v / augmentedColSums[k]!);
+  const normA0 = normalizeRow(a0);
+  const normScores = scores.map((row) => normalizeRow(row));
+  const sA0 = normA0.reduce((s, v) => s + v, 0);
+  const si = normScores.map((row) => row.reduce((s, v) => s + v, 0));
+  if (sA0 === 0) return new Array<number>(n).fill(1);
+  return si.map((s) => s / sA0);
+}
+
+// ---------------------------------------------------------------------------
+// Q1346 — tuningFamilySocraticRadarWASPAS
+
+export function tuningFamilySocraticRadarWASPAS(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  return scores.map((row) => {
+    const wsm = row.reduce((s, v) => s + v, 0) / 5;
+    let wpm = 1;
+    for (const v of row) wpm *= Math.pow(v, 0.2);
+    return 0.5 * wsm + 0.5 * wpm;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1348 — tuningFamilySocraticRadarEDAS
+
+export function tuningFamilySocraticRadarEDAS(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  // Average solution
+  const av = axes.map((_, k) => scores.reduce((s, row) => s + row[k]!, 0) / n);
+  // PDA and NDA
+  const pda = scores.map((row) =>
+    row.map((v, k) => av[k]! > 0 ? Math.max(0, v - av[k]!) / av[k]! : 0),
+  );
+  const nda = scores.map((row) =>
+    row.map((v, k) => av[k]! > 0 ? Math.max(0, av[k]! - v) / av[k]! : 0),
+  );
+  // SP, SN
+  const sp = pda.map((row) => row.reduce((s, v) => s + v, 0) / 5);
+  const sn = nda.map((row) => row.reduce((s, v) => s + v, 0) / 5);
+  const maxSP = Math.max(...sp);
+  const maxSN = Math.max(...sn);
+  const nsp = sp.map((v) => maxSP === 0 ? 0 : v / maxSP);
+  const nsn = sn.map((v) => maxSN === 0 ? 1 : 1 - v / maxSN);
+  return nsp.map((v, i) => 0.5 * (v + nsn[i]!));
+}
+
+/**
+ * SS1 — Chromatic coverage.
+ *
+ * Measures what fraction of the 12 chromatic pitch classes (at 0, 100, 200, …,
+ * 1100 cents) are represented in `scaleCents`. A chromatic pitch is "covered"
+ * if any scale pitch is within `tolerance` cents of it.
+ *
+ * Returns `covered / 12`; 0 for an empty scale.
+ * Throws `RangeError` if `tolerance <= 0`.
+ */
+export function scaleChromaticCoverage(
+  scaleCents: readonly number[],
+  tolerance: number = 25,
+): number {
+  if (tolerance <= 0) throw new RangeError('tolerance must be > 0');
+  if (scaleCents.length === 0) return 0;
+  let covered = 0;
+  for (let c = 0; c < 12; c++) {
+    const target = c * 100;
+    for (const sc of scaleCents) {
+      if (Math.abs(sc - target) <= tolerance) {
+        covered++;
+        break;
+      }
+    }
+  }
+  return covered / 12;
+}
+
+/**
+ * SS2 — Tuning octave consistency.
+ *
+ * For each pair of degrees (i, j) whose pitch difference is within 10 cents of
+ * 1200, computes `score = 1 - deviation / 10` (clamped to [0, 1]).
+ * Returns the mean score across all such pairs; 1 if none found (vacuously
+ * consistent). Returns 1 for an empty tuning.
+ */
+export function tuningOctaveConsistency(tuning: TuningSystem): number {
+  const degrees = tuning.degrees;
+  if (degrees.length === 0) return 1;
+  const cents = degrees.map(pitchToCents);
+  const scores: number[] = [];
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = 0; j < cents.length; j++) {
+      if (i === j) continue;
+      const diff = cents[j]! - cents[i]!;
+      const dev = Math.abs(diff - 1200);
+      if (dev <= 10) {
+        scores.push(Math.max(0, 1 - dev / 10));
+      }
+    }
+  }
+  if (scores.length === 0) return 1;
+  let sum = 0;
+  for (const s of scores) sum += s;
+  return sum / scores.length;
+}
+
+/**
+ * SS3 — Prime factor complexity.
+ *
+ * Measures the total prime factor count (with multiplicity, i.e. Omega) of
+ * numerator p and denominator q from the best rational approximation of
+ * `ratio` (continued fractions, max denominator 1000 — same as
+ * `frequencyRatioComplexity`).
+ *
+ * Example: 3/2 → 1 + 1 = 2; 4/3 → 2 + 1 = 3.
+ * Returns 0 for ratio = 1. Throws `RangeError` if ratio <= 0.
+ */
+export function primeFactorComplexity(ratio: number): number {
+  if (ratio <= 0) throw new RangeError('ratio must be > 0');
+  if (ratio === 1) return 0;
+
+  // Continued-fraction rational approximation, max denominator 1000.
+  let h0 = 1, k0 = 0;
+  let h1 = 0, k1 = 1;
+  let x = ratio;
+  for (let iter = 0; iter < 50; iter++) {
+    const a = Math.floor(x);
+    const h2 = a * h1 + h0;
+    const k2 = a * k1 + k0;
+    if (k2 > 1000) break;
+    h0 = h1; k0 = k1;
+    h1 = h2; k1 = k2;
+    const frac = x - a;
+    if (frac < 1e-8) break;
+    x = 1 / frac;
+  }
+  const p = Math.max(h1, 1);
+  const q = Math.max(k1, 1);
+
+  // Count prime factors with multiplicity (Omega function).
+  function omega(n: number): number {
+    let count = 0;
+    let m = n;
+    for (let f = 2; f * f <= m; f++) {
+      while (m % f === 0) {
+        count++;
+        m = Math.floor(m / f);
+      }
+    }
+    if (m > 1) count++;
+    return count;
+  }
+
+  return omega(p) + omega(q);
+}
+
+/**
+ * SS4 — Scale intervalic richness.
+ *
+ * Measures how many distinct interval classes (in 50-cent bins) are present
+ * among all pairwise intervals of the scale, relative to the maximum possible
+ * (13 bins: 0 c to 600 c in 50 c steps).
+ *
+ * All pairwise intervals are taken mod 1200, then folded to [0, 600] by
+ * taking `min(interval, 1200 - interval)`, then binned by rounding to the
+ * nearest 50 cents.
+ *
+ * Returns `unique_bins / 13`; 0 for fewer than 2 notes.
+ */
+export function scaleIntervalicRichness(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const bins = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const raw = ((scaleCents[j]! - scaleCents[i]!) % 1200 + 1200) % 1200;
+      const folded = Math.min(raw, 1200 - raw);
+      const bin = Math.round(folded / 50) * 50;
+      bins.add(bin);
+    }
+  }
+  return bins.size / 13;
+}
