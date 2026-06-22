@@ -964,3 +964,14 @@
 | BBB2 | `scaleVoiceLeadingEfficiencyV2` | 1ステップ上移調時の声部導音効率 |
 | BBB3 | `scaleCrowdingIndex` | 50セント以内の隣接音を持つ音の割合 |
 | BBB4 | `scaleSpreadIndex` | 音域カバー率（最高-最低/周期） |
+
+## Round 72: スペクトル重心・帯域特性 (CCC1–CCC4)
+
+音階のピッチ分布のスペクトル統計量を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| CCC1 | `scaleSpectralCentroid` | ピッチ分布の重心（平均/周期） |
+| CCC2 | `scaleSpectralBandwidth` | ピッチ分布の標準偏差/周期 |
+| CCC3 | `scaleSpectralSkewness` | ピッチ分布の歪度（正規化[0,1]） |
+| CCC4 | `scaleSpectralKurtosis` | ピッチ分布の尖度（正規化[0,1]） |

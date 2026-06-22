@@ -1161,6 +1161,10 @@ import {
   scaleVoiceLeadingEfficiencyV2,
   scaleCrowdingIndex,
   scaleSpreadIndex,
+  scaleSpectralCentroid,
+  scaleSpectralBandwidth,
+  scaleSpectralSkewness,
+  scaleSpectralKurtosis,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -32086,6 +32090,93 @@ describe('scaleSpreadIndex', () => {
   });
   it('clustered scale [0,50,100,150] → finite, in [0,1]', () => {
     const v = scaleSpreadIndex([0, 50, 100, 150]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSpectralCentroid', () => {
+  it('empty → 0', () => {
+    expect(scaleSpectralCentroid([])).toBe(0);
+  });
+  it('n=1 → finite, in [0,1]', () => {
+    const v = scaleSpectralCentroid([600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('uniform [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleSpectralCentroid([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleSpectralCentroid([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSpectralBandwidth', () => {
+  it('empty → 0', () => {
+    expect(scaleSpectralBandwidth([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleSpectralBandwidth([600])).toBe(0);
+  });
+  it('uniform [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleSpectralBandwidth([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleSpectralBandwidth([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSpectralSkewness', () => {
+  it('empty → 0', () => {
+    expect(scaleSpectralSkewness([])).toBe(0);
+  });
+  it('n=2 → 0', () => {
+    expect(scaleSpectralSkewness([0, 600])).toBe(0);
+  });
+  it('uniform [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleSpectralSkewness([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleSpectralSkewness([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSpectralKurtosis', () => {
+  it('empty → 0', () => {
+    expect(scaleSpectralKurtosis([])).toBe(0);
+  });
+  it('n=3 → 0', () => {
+    expect(scaleSpectralKurtosis([0, 400, 700])).toBe(0);
+  });
+  it('uniform [0,300,600,900] → finite, in [0,1]', () => {
+    const v = scaleSpectralKurtosis([0, 300, 600, 900]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleSpectralKurtosis([0, 200, 400, 500, 700, 900, 1100]);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
