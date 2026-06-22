@@ -1195,3 +1195,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | XXX2 | `scaleCrowdingIndexV2` | 混雑区間（50セント未満）の比率 |
 | XXX3 | `scaleSparsityIndex` | 疎区間（300セント超）の比率 |
 | XXX4 | `scaleGapBalance` | 混雑度と疎密度の均衡指数 |
+
+## Round 93: 音階音域分析 (YYY1–YYY4)
+
+音階の音域（アンビトゥス）特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| YYY1 | `scaleAmbitusRatio` | 音域が周期に占める割合 |
+| YYY2 | `scaleLowerDensity` | 音域下半部の音密度 |
+| YYY3 | `scaleUpperDensity` | 音域上半部の音密度 |
+| YYY4 | `scaleRegisterBalance` | 上下半部の密度均衡指数 |

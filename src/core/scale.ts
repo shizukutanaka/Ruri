@@ -42242,6 +42242,132 @@ export function tuningFamilySocraticRadarMigrationProxy(
   return Math.min(1, Math.max(0, total / vecs.length));
 }
 
+// Q2010 — tuningFamilySocraticRadarHardnessProxy
+export function tuningFamilySocraticRadarHardnessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let min = vec[0]!;
+    for (const x of vec) {
+      if (x < min) min = x;
+    }
+    total += min;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2012 — tuningFamilySocraticRadarDuctilityProxy
+export function tuningFamilySocraticRadarDuctilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let min = vec[0]!;
+    let max = vec[0]!;
+    for (const x of vec) {
+      if (x < min) min = x;
+      if (x > max) max = x;
+    }
+    total += max - min;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2014 — tuningFamilySocraticRadarConductivityProxy
+export function tuningFamilySocraticRadarConductivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    let max = vec[0]!;
+    for (const x of vec) {
+      if (x > max) max = x;
+    }
+    total += mean * max;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2016 — tuningFamilySocraticRadarBrittlenessProxy
+export function tuningFamilySocraticRadarBrittlenessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const extremes = vec.filter((x) => x < 0.2 || x > 0.8).length;
+    total += extremes / vec.length;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2018 — tuningFamilySocraticRadarElasticityProxyV2
+export function tuningFamilySocraticRadarElasticityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const meanDev = vec.reduce((acc, x) => acc + Math.abs(x - 0.5), 0) / vec.length;
+    total += 1 - 2 * meanDev;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2020 — tuningFamilySocraticRadarCorrosionResistanceProxy
+export function tuningFamilySocraticRadarCorrosionResistanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const lowFraction = vec.filter((x) => x < 0.4).length / vec.length;
+    total += 1 - lowFraction;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -46267,4 +46393,83 @@ export function scaleGapBalance(scaleCents: readonly number[], periodCents: numb
   const crowding = scaleCrowdingIndexV2(scaleCents, periodCents);
   const sparsity = scaleSparsityIndex(scaleCents, periodCents);
   return Math.min(1, Math.max(0, 1 - Math.abs(crowding - sparsity)));
+}
+
+/**
+ * YYY1 — scaleAmbitusRatio
+ * How much of the period the scale spans (ambitus / periodCents).
+ * Empty/single → 0.
+ */
+export function scaleAmbitusRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let lo = scaleCents[0]!;
+  let hi = scaleCents[0]!;
+  for (let i = 1; i < n; i++) {
+    const v = scaleCents[i]!;
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  const ambitus = hi - lo;
+  return Math.min(1, Math.max(0, ambitus / periodCents));
+}
+
+/**
+ * YYY2 — scaleLowerDensity
+ * Fraction of notes in the lower half of the ambitus (≤ midpoint).
+ * Empty/single → 0.
+ */
+export function scaleLowerDensity(scaleCents: readonly number[], _periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let lo = scaleCents[0]!;
+  let hi = scaleCents[0]!;
+  for (let i = 1; i < n; i++) {
+    const v = scaleCents[i]!;
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  const mid = (lo + hi) / 2;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    if (scaleCents[i]! <= mid) count++;
+  }
+  return Math.min(1, Math.max(0, count / n));
+}
+
+/**
+ * YYY3 — scaleUpperDensity
+ * Fraction of notes in the upper half of the ambitus (> midpoint).
+ * Empty/single → 0.
+ */
+export function scaleUpperDensity(scaleCents: readonly number[], _periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let lo = scaleCents[0]!;
+  let hi = scaleCents[0]!;
+  for (let i = 1; i < n; i++) {
+    const v = scaleCents[i]!;
+    if (v < lo) lo = v;
+    if (v > hi) hi = v;
+  }
+  const mid = (lo + hi) / 2;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    if (scaleCents[i]! > mid) count++;
+  }
+  return Math.min(1, Math.max(0, count / n));
+}
+
+/**
+ * YYY4 — scaleRegisterBalance
+ * Balance between lower and upper halves of the ambitus.
+ * Return: 1 - |lowerDensity - upperDensity|
+ * Empty → 1.
+ */
+export function scaleRegisterBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  const lower = scaleLowerDensity(scaleCents, periodCents);
+  const upper = scaleUpperDensity(scaleCents, periodCents);
+  return Math.min(1, Math.max(0, 1 - Math.abs(lower - upper)));
 }

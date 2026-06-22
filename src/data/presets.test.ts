@@ -802,6 +802,12 @@ import {
   presetFamilySocraticRadarNicheOverlapProxy,
   presetFamilySocraticRadarExtinctionRiskProxy,
   presetFamilySocraticRadarMigrationProxy,
+  presetFamilySocraticRadarHardnessProxy,
+  presetFamilySocraticRadarDuctilityProxy,
+  presetFamilySocraticRadarConductivityProxy,
+  presetFamilySocraticRadarBrittlenessProxy,
+  presetFamilySocraticRadarElasticityProxyV2,
+  presetFamilySocraticRadarCorrosionResistanceProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
