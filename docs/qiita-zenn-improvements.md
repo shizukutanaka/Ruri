@@ -1063,3 +1063,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | LLL2 | `scaleTranspositionClosureCount` | 音階を自己に写す移調の数（正規化） |
 | LLL3 | `scaleInversionClosureCount` | 音階を自己に写す反転の数（正規化） |
 | LLL4 | `scalePerfectBalance` | 音程空間における重心の均衡度 |
+
+## Round 81: 音程クラスタ分析 (MMM1–MMM4)
+
+音階の音程クラスタ構造・均等性・深スケール性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| MMM1 | `scaleIntervalClusterCount` | 音程クラスタ数（類似ステップのグループ数、正規化） |
+| MMM2 | `scaleIntervalVarietyIndex` | 異なる音程クラス数の多様性指数 |
+| MMM3 | `scaleMaximalEvenness` | 最大均等性スコア（等間隔からの逸脱度の逆数） |
+| MMM4 | `scaleDeepScaleProperty` | 深スケール特性（音程倍数の多様性） |

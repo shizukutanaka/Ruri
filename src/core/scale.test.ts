@@ -1101,6 +1101,12 @@ import {
   tuningFamilySocraticRadarBetweennessCentralityProxy,
   tuningFamilySocraticRadarSmallWorldnessProxy,
   tuningFamilySocraticRadarScaleFreeProxy,
+  tuningFamilySocraticRadarBettiNumberProxyV2,
+  tuningFamilySocraticRadarPersistentHomologyProxyV2,
+  tuningFamilySocraticRadarEulerCharacteristicProxyV2,
+  tuningFamilySocraticRadarConnectednessProxy,
+  tuningFamilySocraticRadarCovexHullVolumeProxy,
+  tuningFamilySocraticRadarManifoldDimensionProxyV2,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1251,6 +1257,10 @@ import {
   scaleTranspositionClosureCount,
   scaleInversionClosureCount,
   scalePerfectBalance,
+  scaleIntervalClusterCount,
+  scaleIntervalVarietyIndex,
+  scaleMaximalEvenness,
+  scaleDeepScaleProperty,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -33984,5 +33994,182 @@ describe('LLL4 scalePerfectBalance', () => {
   it('[0] (single note) returns 0', () => {
     const v = scalePerfectBalance([0], 1200);
     expect(v).toBeCloseTo(0, 5);
+  });
+});
+
+// Q1866 — tuningFamilySocraticRadarBettiNumberProxyV2
+describe('Q1866 tuningFamilySocraticRadarBettiNumberProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBettiNumberProxyV2([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarBettiNumberProxyV2([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarBettiNumberProxyV2([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1868 — tuningFamilySocraticRadarPersistentHomologyProxyV2
+describe('Q1868 tuningFamilySocraticRadarPersistentHomologyProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPersistentHomologyProxyV2([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPersistentHomologyProxyV2([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPersistentHomologyProxyV2([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1870 — tuningFamilySocraticRadarEulerCharacteristicProxyV2
+describe('Q1870 tuningFamilySocraticRadarEulerCharacteristicProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEulerCharacteristicProxyV2([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarEulerCharacteristicProxyV2([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarEulerCharacteristicProxyV2([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1872 — tuningFamilySocraticRadarConnectednessProxy
+describe('Q1872 tuningFamilySocraticRadarConnectednessProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarConnectednessProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarConnectednessProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarConnectednessProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1874 — tuningFamilySocraticRadarCovexHullVolumeProxy
+describe('Q1874 tuningFamilySocraticRadarCovexHullVolumeProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCovexHullVolumeProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarCovexHullVolumeProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarCovexHullVolumeProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1876 — tuningFamilySocraticRadarManifoldDimensionProxyV2
+describe('Q1876 tuningFamilySocraticRadarManifoldDimensionProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarManifoldDimensionProxyV2([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarManifoldDimensionProxyV2([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarManifoldDimensionProxyV2([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// MMM1 — scaleIntervalClusterCount
+describe('MMM1 scaleIntervalClusterCount', () => {
+  it('empty returns 0', () => {
+    expect(scaleIntervalClusterCount([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleIntervalClusterCount([0])).toBe(0);
+  });
+  it('12-TET (all steps equal) → 1 cluster / 12 = 1/12', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleIntervalClusterCount(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// MMM2 — scaleIntervalVarietyIndex
+describe('MMM2 scaleIntervalVarietyIndex', () => {
+  it('empty returns 0', () => {
+    expect(scaleIntervalVarietyIndex([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleIntervalVarietyIndex([0])).toBe(0);
+  });
+  it('12-TET → finite value in [0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleIntervalVarietyIndex(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// MMM3 — scaleMaximalEvenness
+describe('MMM3 scaleMaximalEvenness', () => {
+  it('empty returns 0', () => {
+    expect(scaleMaximalEvenness([])).toBe(0);
+  });
+  it('12-TET (maximally even) → close to 1', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleMaximalEvenness(cents);
+    expect(v).toBeGreaterThan(0.99);
+  });
+  it('19-EDO cents → finite in [0,1]', () => {
+    const cents = Array.from({ length: 19 }, (_, i) => i * (1200 / 19));
+    const v = scaleMaximalEvenness(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThan(0.99);
+  });
+});
+
+// MMM4 — scaleDeepScaleProperty
+describe('MMM4 scaleDeepScaleProperty', () => {
+  it('empty returns 0', () => {
+    expect(scaleDeepScaleProperty([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleDeepScaleProperty([0])).toBe(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleDeepScaleProperty(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });
