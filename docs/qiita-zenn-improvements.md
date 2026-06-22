@@ -282,3 +282,10 @@
 - V2: roughnessProfile — 周波数ペアの粗さプロファイル配列
 - V3: normalizeSpectrum — スペクトル振幅の正規化
 - V4: spectrumSimilarity — スペクトル間のコサイン類似度
+
+## Round 14 — 音階輝度・旋法・和音緊張感・旋律密度 (W1–W4)
+
+- W1: scaleBrightness — 音階の輝度（上昇度/12n）
+- W2: modeOf — 指定旋法の返却（正規化済み）
+- W3: chordTension — 音階内コンテキストでの和音緊張度
+- W4: melodicDensity — 旋律密度（持続時間加重変化率）

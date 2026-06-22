@@ -333,6 +333,12 @@ import {
   tuningFamilySocraticRadarGradientVector,
   tuningFamilySocraticRadarCrossAxisCorrelation,
   tuningFamilySocraticRadarCompositeRank,
+  tuningFamilySocraticRadarAxisMoment,
+  tuningFamilySocraticRadarAxisPercentile,
+  tuningFamilySocraticRadarPareto,
+  tuningFamilySocraticRadarAxisCorrelationWith,
+  tuningFamilySocraticRadarSignalToNoise,
+  tuningFamilySocraticRadarExponentialMovingAverage,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -9271,4 +9277,118 @@ export function presetFamilySocraticRadarCompositeRank(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarCompositeRank(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1075 — presetFamilySocraticRadarAxisMoment
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarAxisMoment(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarAxisMoment> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarAxisMoment(tunings, spectrum, axis, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1077 — presetFamilySocraticRadarAxisPercentile
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarAxisPercentile(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  queryValue: number,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarAxisPercentile> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarAxisPercentile(tunings, spectrum, axis, queryValue, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1079 — presetFamilySocraticRadarPareto
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarPareto(
+  presetIds: string[],
+  spectrum: Spectrum,
+  candidates: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>[],
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPareto> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPareto(tunings, spectrum, candidates, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1081 — presetFamilySocraticRadarAxisCorrelationWith
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarAxisCorrelationWith(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarAxisCorrelationWith> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarAxisCorrelationWith(tunings, spectrum, axis, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1083 — presetFamilySocraticRadarSignalToNoise
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarSignalToNoise(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSignalToNoise> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSignalToNoise(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+// Q1085 — presetFamilySocraticRadarExponentialMovingAverage
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarExponentialMovingAverage(
+  presetIds: string[],
+  spectrum: Spectrum,
+  alpha: number,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarExponentialMovingAverage> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarExponentialMovingAverage(tunings, spectrum, alpha, rootHz);
 }

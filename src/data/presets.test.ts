@@ -340,6 +340,12 @@ import {
   presetFamilySocraticRadarGradientVector,
   presetFamilySocraticRadarCrossAxisCorrelation,
   presetFamilySocraticRadarCompositeRank,
+  presetFamilySocraticRadarAxisMoment,
+  presetFamilySocraticRadarAxisPercentile,
+  presetFamilySocraticRadarPareto,
+  presetFamilySocraticRadarAxisCorrelationWith,
+  presetFamilySocraticRadarSignalToNoise,
+  presetFamilySocraticRadarExponentialMovingAverage,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -11667,6 +11673,164 @@ describe('presetFamilySocraticRadarCompositeRank (Q1073)', () => {
     const spec = harmonicSpectrum(6);
     expect(() =>
       presetFamilySocraticRadarCompositeRank(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1075 — presetFamilySocraticRadarAxisMoment
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAxisMoment (Q1075)', () => {
+  it('returns mean, variance, skewness for single preset', () => {
+    const spec = harmonicSpectrum(6);
+    const { mean, variance, skewness } = presetFamilySocraticRadarAxisMoment(
+      ['12-tet'],
+      spec,
+      'diversity',
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof mean).toBe('number');
+    expect(variance).toBe(0);
+    expect(skewness).toBe(0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAxisMoment(['not-a-preset'], spec, 'diversity', undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1077 — presetFamilySocraticRadarAxisPercentile
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAxisPercentile (Q1077)', () => {
+  it('returns percentile in [0,1] for single preset', () => {
+    const spec = harmonicSpectrum(6);
+    const { percentile } = presetFamilySocraticRadarAxisPercentile(
+      ['12-tet'],
+      spec,
+      'diversity',
+      0.5,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(percentile).toBeGreaterThanOrEqual(0);
+    expect(percentile).toBeLessThanOrEqual(1);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAxisPercentile(['not-a-preset'], spec, 'diversity', 0.5, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1079 — presetFamilySocraticRadarPareto
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarPareto (Q1079)', () => {
+  it('isParetoOptimal is boolean', () => {
+    const spec = harmonicSpectrum(6);
+    const candidates = [{ diversity: 0.5, versatility: 0.5, maturity: 0.5, benchmark: 0.5, convergence: 0.5 }];
+    const { isParetoOptimal } = presetFamilySocraticRadarPareto(
+      ['12-tet'],
+      spec,
+      candidates,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof isParetoOptimal).toBe('boolean');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    const candidates = [{ diversity: 0.5, versatility: 0.5, maturity: 0.5, benchmark: 0.5, convergence: 0.5 }];
+    expect(() =>
+      presetFamilySocraticRadarPareto(['not-a-preset'], spec, candidates, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1081 — presetFamilySocraticRadarAxisCorrelationWith
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAxisCorrelationWith (Q1081)', () => {
+  it('self correlation is 1.0', () => {
+    const spec = harmonicSpectrum(6);
+    const { correlations } = presetFamilySocraticRadarAxisCorrelationWith(
+      ['12-tet'],
+      spec,
+      'diversity',
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(correlations['diversity']).toBe(1.0);
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarAxisCorrelationWith(['not-a-preset'], spec, 'diversity', undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1083 — presetFamilySocraticRadarSignalToNoise
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarSignalToNoise (Q1083)', () => {
+  it('meanSNR is a number', () => {
+    const spec = harmonicSpectrum(6);
+    const { meanSNR } = presetFamilySocraticRadarSignalToNoise(
+      ['12-tet'],
+      spec,
+      undefined,
+      [TWELVE_TET],
+    );
+    expect(typeof meanSNR).toBe('number');
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarSignalToNoise(['not-a-preset'], spec, undefined, [TWELVE_TET]),
+    ).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1085 — presetFamilySocraticRadarExponentialMovingAverage
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarExponentialMovingAverage (Q1085)', () => {
+  it('ema has all 5 axes', () => {
+    const spec = harmonicSpectrum(6);
+    const { ema } = presetFamilySocraticRadarExponentialMovingAverage(
+      ['12-tet'],
+      spec,
+      0.5,
+      undefined,
+      [TWELVE_TET],
+    );
+    const axes = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+    for (const ax of axes) {
+      expect(typeof ema[ax as keyof typeof ema]).toBe('number');
+    }
+  });
+
+  it('throws RangeError for unknown preset', () => {
+    const spec = harmonicSpectrum(6);
+    expect(() =>
+      presetFamilySocraticRadarExponentialMovingAverage(['not-a-preset'], spec, 0.5, undefined, [TWELVE_TET]),
     ).toThrow(RangeError);
   });
 });

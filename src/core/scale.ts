@@ -19585,6 +19585,250 @@ export function tuningFamilySocraticRadarCompositeRank(
 }
 
 // ---------------------------------------------------------------------------
+// Q1074 — tuningFamilySocraticRadarAxisMoment
+// ---------------------------------------------------------------------------
+
+/**
+ * Statistical moments (mean, variance, skewness) of a given axis across family members.
+ * skewness = E[(X-μ)^3] / σ^3  (0 if σ=0 or n<3)
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to analyse.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { mean, variance, skewness }
+ */
+export function tuningFamilySocraticRadarAxisMoment(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): { mean: number; variance: number; skewness: number } {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n === 0) return { mean: 0, variance: 0, skewness: 0 };
+  const scores = profiles.map((p) => p[axis]);
+  const mean = scores.reduce((s, v) => s + v, 0) / n;
+  const variance = scores.reduce((s, v) => s + (v - mean) * (v - mean), 0) / n;
+  if (n < 3 || variance === 0) return { mean, variance, skewness: 0 };
+  const std = Math.sqrt(variance);
+  const skewness = scores.reduce((s, v) => s + Math.pow(v - mean, 3), 0) / n / Math.pow(std, 3);
+  return { mean, variance, skewness };
+}
+
+// ---------------------------------------------------------------------------
+// Q1076 — tuningFamilySocraticRadarAxisPercentile
+// ---------------------------------------------------------------------------
+
+/**
+ * The percentile position of a query value within the distribution of a given axis.
+ * percentile = fraction of members with score < queryValue (0-1)
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to analyse.
+ * @param queryValue - The value to compute the percentile for.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { percentile }
+ */
+export function tuningFamilySocraticRadarAxisPercentile(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  queryValue: number,
+  rootHz?: number,
+): { percentile: number } {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  if (n === 0) return { percentile: 0 };
+  const scores = profiles.map((p) => p[axis]);
+  const below = scores.filter((v) => v < queryValue).length;
+  return { percentile: below / n };
+}
+
+// ---------------------------------------------------------------------------
+// Q1078 — tuningFamilySocraticRadarPareto
+// ---------------------------------------------------------------------------
+
+/**
+ * Pareto optimality: is this family "Pareto optimal" compared to a set of candidate profiles?
+ * The family mean profile dominates a candidate if it's >= on all axes AND > on at least one.
+ * A candidate dominates the family mean if the candidate >= family on all AND > on at least one.
+ * isParetoOptimal = true if no candidate dominates the family mean
+ * dominatedByCount = number of candidates that dominate the family mean
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param candidates - Array of candidate profiles to compare against.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { isParetoOptimal, dominatedByCount }
+ */
+export function tuningFamilySocraticRadarPareto(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  candidates: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>[],
+  rootHz?: number,
+): { isParetoOptimal: boolean; dominatedByCount: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const familyMean = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    familyMean[ax] =
+      n === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / n;
+  }
+  let dominatedByCount = 0;
+  for (const candidate of candidates) {
+    // candidate dominates family mean if candidate >= family on all AND > on at least one
+    const allGte = axes.every((ax) => candidate[ax] >= familyMean[ax]);
+    const atLeastOneGt = axes.some((ax) => candidate[ax] > familyMean[ax]);
+    if (allGte && atLeastOneGt) dominatedByCount++;
+  }
+  return { isParetoOptimal: dominatedByCount === 0, dominatedByCount };
+}
+
+// ---------------------------------------------------------------------------
+// Q1080 — tuningFamilySocraticRadarAxisCorrelationWith
+// ---------------------------------------------------------------------------
+
+/**
+ * Pearson correlation between a specific axis and all other axes across family members.
+ * The axis itself gets correlation 1.0.
+ * Single tuning: all correlations 0 (undefined → 0).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to correlate against all others.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { correlations }
+ */
+export function tuningFamilySocraticRadarAxisCorrelationWith(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): { correlations: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+
+  function pearsonR(axA: AxisKey, axB: AxisKey): number {
+    if (n <= 1) return 0;
+    const xs = profiles.map((p) => p[axA]);
+    const ys = profiles.map((p) => p[axB]);
+    const meanX = xs.reduce((s, v) => s + v, 0) / n;
+    const meanY = ys.reduce((s, v) => s + v, 0) / n;
+    let num = 0;
+    let denomX = 0;
+    let denomY = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = xs[i]! - meanX;
+      const dy = ys[i]! - meanY;
+      num += dx * dy;
+      denomX += dx * dx;
+      denomY += dy * dy;
+    }
+    const denom = Math.sqrt(denomX * denomY);
+    return denom === 0 ? 0 : num / denom;
+  }
+
+  const correlations = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    correlations[ax] = ax === axis ? 1.0 : pearsonR(axis, ax);
+  }
+  return { correlations };
+}
+
+// ---------------------------------------------------------------------------
+// Q1082 — tuningFamilySocraticRadarSignalToNoise
+// ---------------------------------------------------------------------------
+
+/**
+ * For each axis, compute signal-to-noise ratio: mean / std.
+ * snrProfile[ax] = mean[ax] / std[ax]  (Inf→10.0 cap, 0/0→0)
+ * meanSNR = mean of all 5 snr values
+ * Single tuning: all stds=0, so snr=cap (10.0) for non-zero axes, 0 for zero axes.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { snrProfile, meanSNR }
+ */
+export function tuningFamilySocraticRadarSignalToNoise(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { snrProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>; meanSNR: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const SNR_CAP = 10.0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const snrProfile = {} as Record<AxisKey, number>;
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]);
+    const mean = n === 0 ? 0 : scores.reduce((s, v) => s + v, 0) / n;
+    const variance = n === 0 ? 0 : scores.reduce((s, v) => s + (v - mean) * (v - mean), 0) / n;
+    const std = Math.sqrt(variance);
+    if (std === 0) {
+      snrProfile[ax] = mean === 0 ? 0 : SNR_CAP;
+    } else {
+      snrProfile[ax] = Math.min(SNR_CAP, mean / std);
+    }
+  }
+  const meanSNR = axes.reduce((s, ax) => s + snrProfile[ax], 0) / axes.length;
+  return { snrProfile, meanSNR };
+}
+
+// ---------------------------------------------------------------------------
+// Q1084 — tuningFamilySocraticRadarExponentialMovingAverage
+// ---------------------------------------------------------------------------
+
+/**
+ * EMA of axis scores treating the tuning order as a time series.
+ * alpha ∈ (0,1]: smoothing factor (higher = more weight on recent)
+ * EMA computation: ema[0] = profile[0][ax]; ema[i] = alpha*profile[i][ax] + (1-alpha)*ema[i-1]
+ * Return the final EMA value per axis (ema[n-1])
+ * Single tuning: ema = that tuning's profile
+ * Throws RangeError if alpha <= 0 or alpha > 1
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param alpha - Smoothing factor.
+ * @param rootHz - Reference frequency (optional).
+ * @returns { ema }
+ */
+export function tuningFamilySocraticRadarExponentialMovingAverage(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  alpha: number,
+  rootHz?: number,
+): { ema: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+  if (alpha <= 0 || alpha > 1) {
+    throw new RangeError(`tuningFamilySocraticRadarExponentialMovingAverage: alpha must be in (0,1], got ${alpha}`);
+  }
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const ema = {} as Record<AxisKey, number>;
+  if (n === 0) {
+    for (const ax of axes) ema[ax] = 0;
+    return { ema };
+  }
+  for (const ax of axes) {
+    let val = profiles[0]![ax];
+    for (let i = 1; i < n; i++) {
+      val = alpha * profiles[i]![ax] + (1 - alpha) * val;
+    }
+    ema[ax] = val;
+  }
+  return { ema };
+}
+
+// ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
 
@@ -20902,4 +21146,127 @@ export function spectrumSimilarity(a: Spectrum, b: Spectrum): number {
   const denom = Math.sqrt(normA) * Math.sqrt(normB);
   if (denom === 0) return 0;
   return dot / denom;
+}
+
+// ---------------------------------------------------------------------------
+// W1 — scaleBrightness
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the "brightness" of a scale based on the average degree value.
+ *
+ * Brightness = sum(degrees) / (12 * n) where n = degrees.length.
+ * Higher values indicate brighter (Lydian-like) scales; lower values
+ * indicate darker (Locrian-like) scales. Range: [0, 1).
+ *
+ * @param degrees - Array of pitch class values (typically 0–11).
+ * @returns Brightness value in [0, 1). Returns 0 for empty input.
+ *
+ * @example
+ * scaleBrightness([0,2,4,6,7,9,11]); // Lydian — bright
+ * scaleBrightness([0,1,3,5,6,8,10]); // Locrian — dark
+ */
+export function scaleBrightness(degrees: readonly number[]): number {
+  if (degrees.length === 0) return 0;
+  const sum = degrees.reduce((acc, d) => acc + d, 0);
+  return sum / (12 * degrees.length);
+}
+
+// ---------------------------------------------------------------------------
+// W2 — modeOf
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the modeIndex-th mode of a scale, normalized to start at 0.
+ *
+ * Equivalent to `scaleRotations(degrees)[modeIndex % degrees.length]`.
+ * modeIndex wraps around using modulo.
+ *
+ * @param degrees - Sorted array of scale degrees (pitch classes 0–11).
+ * @param modeIndex - Which mode to return (wraps with modulo).
+ * @returns Normalized mode array starting at 0. Returns [] for empty input.
+ *
+ * @example
+ * modeOf([0,2,4,5,7,9,11], 1); // Dorian: [0,2,3,5,7,9,10]
+ */
+export function modeOf(degrees: readonly number[], modeIndex: number): number[] {
+  if (degrees.length === 0) return [];
+  const i = ((modeIndex % degrees.length) + degrees.length) % degrees.length;
+  const root = degrees[i]!;
+  return degrees.map((d) => ((d - root) % 12 + 12) % 12).sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// W3 — chordTension
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute the "tension" of a chord within a scale context.
+ *
+ * Tension = number of chord tones NOT in the scale / chord.length.
+ * Both arrays are treated as pitch classes (mod 12).
+ * Returns 0 (fully diatonic) to 1 (fully outside scale).
+ *
+ * @param chord - Array of pitch classes for the chord.
+ * @param scaleContext - Array of pitch classes for the scale.
+ * @returns Fraction of non-diatonic chord tones in [0, 1]. Returns 0 for empty chord.
+ *
+ * @example
+ * chordTension([0,4,7], [0,2,4,5,7,9,11]); // C major in C major scale → 0
+ * chordTension([1,3,6], [0,2,4,5,7,9,11]); // all outside → 1
+ */
+export function chordTension(chord: readonly number[], scaleContext: readonly number[]): number {
+  if (chord.length === 0) return 0;
+  const scaleSet = new Set(scaleContext.map((pc) => ((pc % 12) + 12) % 12));
+  let outsideCount = 0;
+  for (const pc of chord) {
+    const normalized = ((pc % 12) + 12) % 12;
+    if (!scaleSet.has(normalized)) {
+      outsideCount++;
+    }
+  }
+  return outsideCount / chord.length;
+}
+
+// ---------------------------------------------------------------------------
+// W4 — melodicDensity
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute "melodic density" — the weighted rate of pitch class changes per unit time.
+ *
+ * density = densityEvents / weightedDuration
+ * where densityEvents = count of consecutive pairs where pc[i] != pc[i+1],
+ * and weightedDuration = sum of durationRatios.
+ *
+ * @param pitchClasses - Sequence of pitch classes.
+ * @param durationRatios - Duration of each note (same length as pitchClasses).
+ * @returns Density value >= 0. Returns 0 for empty or single-note input.
+ * @throws {RangeError} If pitchClasses.length !== durationRatios.length.
+ *
+ * @example
+ * melodicDensity([0, 2, 4, 2], [1, 1, 1, 1]); // 3 changes / 4 units = 0.75
+ * melodicDensity([0, 0, 0], [1, 1, 1]);         // 0 changes → 0
+ */
+export function melodicDensity(
+  pitchClasses: readonly number[],
+  durationRatios: readonly number[],
+): number {
+  if (pitchClasses.length !== durationRatios.length) {
+    throw new RangeError(
+      `pitchClasses.length (${pitchClasses.length}) must equal durationRatios.length (${durationRatios.length})`,
+    );
+  }
+  if (pitchClasses.length <= 1) return 0;
+
+  let densityEvents = 0;
+  for (let i = 0; i < pitchClasses.length - 1; i++) {
+    if (pitchClasses[i] !== pitchClasses[i + 1]) {
+      densityEvents++;
+    }
+  }
+
+  const weightedDuration = durationRatios.reduce((acc, d) => acc + d, 0);
+  if (weightedDuration === 0) return 0;
+  return densityEvents / weightedDuration;
 }
