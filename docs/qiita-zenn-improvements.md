@@ -688,4 +688,15 @@
 
 **参考**: Neo-Riemannian Tonnetz (Cohn 1998); Pitch-class neighborhood graphs in voice-leading geometry。
 
+## Round 47: ピッチクラス集合・フォルテ記号・音程クラスベクトル (DDD1–DDD4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| DDD1 | `scalePitchClassSet` | クロマチック音階への写像によるピッチクラス集合 |
+| DDD2 | `scalePrimeForm` | Forte流プライム形式(最コンパクト回転・逆行) |
+| DDD3 | `scaleForteNumber` | "n-m"形式のForte番号(簡易版) |
+| DDD4 | `scaleIntervalClassContent` | IC1〜IC6の音程クラス内容ベクトル |
+
+**参考**: Allen Forte「The Structure of Atonal Music」(1973); Set-Theory in music analysis。
+
 **参考**: Scale complement theory (Forte 1973); Necklace enumeration in combinatorics on words。

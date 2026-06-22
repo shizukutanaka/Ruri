@@ -33374,3 +33374,115 @@ export function tuningFamilySocraticRadarNetworkDensityV2(
   }
   return (2 * edgeCount) / (n * (n - 1));
 }
+
+// ---------------------------------------------------------------------------
+// DDD1 — scalePitchClassSet
+// ---------------------------------------------------------------------------
+
+export function scalePitchClassSet(
+  scaleCents: readonly number[],
+  divisions: number = 12,
+  periodCents: number = 1200,
+): number[] {
+  if (scaleCents.length === 0) return [];
+  const step = periodCents / divisions;
+  const seen = new Set<number>();
+  for (const pitch of scaleCents) {
+    const raw = Math.round(pitch / step) % divisions;
+    const pc = ((raw % divisions) + divisions) % divisions;
+    seen.add(pc);
+  }
+  return Array.from(seen).sort((a, b) => a - b);
+}
+
+// ---------------------------------------------------------------------------
+// DDD2 — scalePrimeForm
+// ---------------------------------------------------------------------------
+
+export function scalePrimeForm(
+  scaleCents: readonly number[],
+  divisions: number = 12,
+  periodCents: number = 1200,
+): number[] {
+  const pcs = scalePitchClassSet(scaleCents, divisions, periodCents);
+  if (pcs.length === 0) return [];
+  const n = pcs.length;
+
+  function normalize(rotation: number[]): number[] {
+    const first = rotation[0]!;
+    return rotation.map((x) => ((x - first) % divisions + divisions) % divisions);
+  }
+
+  function invert(pcsArr: number[]): number[] {
+    return pcsArr.map((x) => ((divisions - x) % divisions + divisions) % divisions).sort((a, b) => a - b);
+  }
+
+  function allRotations(arr: number[]): number[][] {
+    const rots: number[][] = [];
+    for (let i = 0; i < arr.length; i++) {
+      const rot = [...arr.slice(i), ...arr.slice(0, i)];
+      rots.push(normalize(rot));
+    }
+    return rots;
+  }
+
+  function compareArrays(a: number[], b: number[]): number {
+    for (let i = a.length - 1; i >= 0; i--) {
+      const diff = (a[i] ?? 0) - (b[i] ?? 0);
+      if (diff !== 0) return diff;
+    }
+    return 0;
+  }
+
+  const candidates: number[][] = [
+    ...allRotations([...pcs]),
+    ...allRotations(invert([...pcs])),
+  ];
+
+  let best = candidates[0]!;
+  for (const c of candidates) {
+    if (compareArrays(c, best) < 0) {
+      best = c;
+    }
+  }
+  return best;
+}
+
+// ---------------------------------------------------------------------------
+// DDD3 — scaleForteNumber
+// ---------------------------------------------------------------------------
+
+export function scaleForteNumber(
+  scaleCents: readonly number[],
+  divisions: number = 12,
+  periodCents: number = 1200,
+): string {
+  const pcs = scalePitchClassSet(scaleCents, divisions, periodCents);
+  if (pcs.length === 0) return '0-1';
+  return `${pcs.length}-?`;
+}
+
+// ---------------------------------------------------------------------------
+// DDD4 — scaleIntervalClassContent
+// ---------------------------------------------------------------------------
+
+export function scaleIntervalClassContent(
+  scaleCents: readonly number[],
+  divisions: number = 12,
+  periodCents: number = 1200,
+): number[] {
+  const halfDivisions = Math.floor(divisions / 2);
+  const icVector = new Array<number>(halfDivisions).fill(0);
+  const pcs = scalePitchClassSet(scaleCents, divisions, periodCents);
+  if (pcs.length <= 1) return icVector;
+  for (let i = 0; i < pcs.length; i++) {
+    for (let j = i + 1; j < pcs.length; j++) {
+      const diff = Math.abs(pcs[i]! - pcs[j]!);
+      const ic = Math.min(diff, divisions - diff);
+      if (ic >= 1 && ic <= halfDivisions) {
+        icVector[ic - 1]!++;
+      }
+    }
+  }
+  return icVector;
+}

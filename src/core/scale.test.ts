@@ -925,6 +925,10 @@ import {
   scaleTonnetzSpan,
   scaleNeighborhoodGraph,
   scaleNeighborhoodDensity,
+  scalePitchClassSet,
+  scalePrimeForm,
+  scaleForteNumber,
+  scaleIntervalClassContent,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -27812,5 +27816,76 @@ describe('Q1468 tuningFamilySocraticRadarNetworkDensityV2', () => {
     const r = tuningFamilySocraticRadarNetworkDensityV2([t, t2, t], s);
     expect(r).toBeGreaterThanOrEqual(0);
     expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('DDD1 scalePitchClassSet', () => {
+  it('major triad maps to [0,4,7]', () => {
+    const r = scalePitchClassSet([0, 400, 700]);
+    expect(r).toEqual([0, 4, 7]);
+  });
+  it('empty → []', () => {
+    expect(scalePitchClassSet([])).toEqual([]);
+  });
+  it('deduplicates', () => {
+    const r = scalePitchClassSet([0, 1200]);
+    expect(r).toEqual([0]);
+  });
+  it('chromatic scale → 12 pitch classes', () => {
+    const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+    expect(scalePitchClassSet(chromatic)).toHaveLength(12);
+  });
+});
+
+describe('DDD2 scalePrimeForm', () => {
+  it('empty → []', () => {
+    expect(scalePrimeForm([])).toEqual([]);
+  });
+  it('major triad prime form starts with 0', () => {
+    const r = scalePrimeForm([0, 400, 700]);
+    expect(r[0]).toBe(0);
+  });
+  it('returns array', () => {
+    expect(Array.isArray(scalePrimeForm([0, 400, 700]))).toBe(true);
+  });
+  it('length = # distinct pitch classes', () => {
+    const r = scalePrimeForm([0, 400, 700]);
+    expect(r).toHaveLength(3);
+  });
+});
+
+describe('DDD3 scaleForteNumber', () => {
+  it('empty → "0-1"', () => {
+    expect(scaleForteNumber([])).toBe('0-1');
+  });
+  it('returns string in "n-m" format', () => {
+    const s = scaleForteNumber([0, 400, 700]);
+    expect(s).toMatch(/^\d+-/);
+  });
+  it('cardinality matches pitch class count', () => {
+    const s = scaleForteNumber([0, 400, 700]);
+    expect(s.startsWith('3-')).toBe(true);
+  });
+  it('diatonic → starts with "7-"', () => {
+    const diatonic = [0, 200, 400, 500, 700, 900, 1100];
+    expect(scaleForteNumber(diatonic).startsWith('7-')).toBe(true);
+  });
+});
+
+describe('DDD4 scaleIntervalClassContent', () => {
+  it('returns array of 6 values', () => {
+    expect(scaleIntervalClassContent([0, 400, 700])).toHaveLength(6);
+  });
+  it('major triad has IC3=1, IC4=1, IC5=1', () => {
+    const ic = scaleIntervalClassContent([0, 400, 700]);
+    expect(ic[2]).toBe(1); // IC3 (minor third / major sixth)
+    expect(ic[3]).toBe(1); // IC4 (major third / minor sixth)
+    expect(ic[4]).toBe(1); // IC5 (perfect fourth/fifth)
+  });
+  it('single pitch → all zeros', () => {
+    expect(scaleIntervalClassContent([0])).toEqual([0, 0, 0, 0, 0, 0]);
+  });
+  it('empty → all zeros', () => {
+    expect(scaleIntervalClassContent([])).toEqual([0, 0, 0, 0, 0, 0]);
   });
 });
