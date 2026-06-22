@@ -634,3 +634,14 @@
 | XX4 | `scaleMaximallyEven` | n等分からk音を選ぶ最大均等集合生成(Bresenham法) |
 
 **参考**: IC vector はAllen Forte「Set Theory」; Maximally Even Sets はClough & Douthett (1991)。
+
+## Round 42: スケール対称性・自己相似性分析 (YY1–YY4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| YY1 | `scaleReflectionSymmetry` | スケールの反射対称性スコア(最大対称軸でのマッチ率) |
+| YY2 | `scaleRotationalSymmetry` | 回転対称性カウント(k段シフトで同一音程パターンとなる割合) |
+| YY3 | `scaleFractalDimension` | ボックスカウンティング法によるフラクタル次元推定 |
+| YY4 | `scaleSelfSimilarityScore` | ズームレベル間の音程列相関による自己相似スコア |
+
+**参考**: Fractal dimension of musical scales; Messiaen の限定移調音階は高い回転対称性を持つ。

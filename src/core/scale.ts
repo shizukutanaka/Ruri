@@ -31430,3 +31430,266 @@ export function scaleMaximallyEven(n: number, k: number): number[] {
   }
   return result;
 }
+
+/**
+ * YY1: scaleReflectionSymmetry
+ *
+ * Measures reflection symmetry of a scale. For each possible axis of
+ * reflection a (each unique midpoint between pairs of pitches mod periodCents),
+ * counts how many pitches have their mirror (2a - pitch) mod periodCents
+ * within 10 cents of another scale pitch. Returns the maximum symmetry ratio
+ * found (matched / total pitches). Returns 0 for empty or single-pitch scales.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Maximum reflection symmetry ratio in [0,1]
+ */
+export function scaleReflectionSymmetry(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+
+  // Collect candidate axes: midpoints between all pairs of pitches mod periodCents
+  const axes = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i; j < n; j++) {
+      const mid = ((scaleCents[i]! + scaleCents[j]!) / 2) % periodCents;
+      // Round to avoid floating point duplicates at 1-cent resolution
+      axes.add(Math.round(mid * 10) / 10);
+    }
+  }
+
+  let maxRatio = 0;
+
+  for (const axis of axes) {
+    let matched = 0;
+    for (let i = 0; i < n; i++) {
+      const mirror = ((2 * axis - scaleCents[i]!) % periodCents + periodCents) % periodCents;
+      // Check if mirror is within 10 cents of any pitch in the scale
+      let found = false;
+      for (let j = 0; j < n; j++) {
+        const diff = Math.abs(mirror - scaleCents[j]!);
+        const wrappedDiff = Math.min(diff, periodCents - diff);
+        if (wrappedDiff <= 10) {
+          found = true;
+          break;
+        }
+      }
+      if (found) matched++;
+    }
+    const ratio = matched / n;
+    if (ratio > maxRatio) maxRatio = ratio;
+  }
+
+  return Math.max(0, maxRatio);
+}
+
+/**
+ * YY2: scaleRotationalSymmetry
+ *
+ * Counts the number of rotational symmetries of the scale (how many k-step
+ * shifts of the scale produce the same interval pattern). For each shift
+ * amount s = k * periodCents / n (k=1..n-1), checks if shifting all pitches
+ * by s mod periodCents and sorting gives the same intervals (within 5 cents
+ * tolerance). Returns count of matching shifts / (n-1). Returns 0 for empty
+ * or single-pitch scales.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Rotational symmetry ratio in [0,1]
+ */
+export function scaleRotationalSymmetry(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+
+  // Build sorted scale and compute interval pattern
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+
+  // Compute intervals (differences between consecutive pitches, including wrap)
+  function getIntervals(pitches: number[]): number[] {
+    const intervals: number[] = [];
+    for (let i = 1; i < pitches.length; i++) {
+      intervals.push(pitches[i]! - pitches[i - 1]!);
+    }
+    // Add wrap-around interval
+    intervals.push(periodCents - pitches[pitches.length - 1]! + pitches[0]!);
+    return intervals;
+  }
+
+  const baseIntervals = getIntervals(sorted);
+
+  let matchCount = 0;
+
+  for (let k = 1; k < n; k++) {
+    const s = (k * periodCents) / n;
+    // Shift all pitches by s and wrap into [0, periodCents)
+    const shifted = sorted.map(p => ((p + s) % periodCents + periodCents) % periodCents);
+    shifted.sort((a, b) => a - b);
+    const shiftedIntervals = getIntervals(shifted);
+
+    // Compare interval sequences within 5 cents tolerance
+    let matches = true;
+    for (let i = 0; i < baseIntervals.length; i++) {
+      if (Math.abs(baseIntervals[i]! - shiftedIntervals[i]!) > 5) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) matchCount++;
+  }
+
+  return Math.max(0, matchCount / (n - 1));
+}
+
+/**
+ * YY3: scaleFractalDimension
+ *
+ * Estimates the "fractal dimension" of a scale using box-counting at multiple
+ * resolutions. At resolution r (r = 1, 2, 4, 8, 16, 32, 64 cents), counts
+ * the number of boxes of size r that contain at least one pitch. Fits
+ * log(count) vs log(1/r) using least-squares; returns the slope (fractal
+ * dimension). Returns 0 for empty or single-pitch scales.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Estimated fractal dimension (non-negative)
+ */
+export function scaleFractalDimension(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+
+  const resolutions = [1, 2, 4, 8, 16, 32, 64];
+  const xs: number[] = []; // log(1/r)
+  const ys: number[] = []; // log(count)
+
+  for (const r of resolutions) {
+    const numBoxes = Math.ceil(periodCents / r);
+    const occupied = new Set<number>();
+    for (let i = 0; i < n; i++) {
+      const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+      const boxIndex = Math.floor(pitch / r);
+      occupied.add(Math.min(boxIndex, numBoxes - 1));
+    }
+    const count = occupied.size;
+    if (count > 0) {
+      xs.push(Math.log(1 / r));
+      ys.push(Math.log(count));
+    }
+  }
+
+  const m = xs.length;
+  if (m < 2) return 0;
+
+  // Check if all counts are the same (undefined slope)
+  const firstY = ys[0]!;
+  const allSame = ys.every(y => Math.abs(y - firstY) < 1e-10);
+  if (allSame) return 0;
+
+  // Least-squares linear fit: slope = (Σxy - n*x̄*ȳ) / (Σx² - n*x̄²)
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  for (let i = 0; i < m; i++) {
+    sumX += xs[i]!;
+    sumY += ys[i]!;
+    sumXY += xs[i]! * ys[i]!;
+    sumX2 += xs[i]! * xs[i]!;
+  }
+  const xMean = sumX / m;
+  const yMean = sumY / m;
+  const denom = sumX2 - m * xMean * xMean;
+  if (Math.abs(denom) < 1e-10) return 0;
+
+  const slope = (sumXY - m * xMean * yMean) / denom;
+  return Math.max(0, slope);
+}
+
+/**
+ * YY4: scaleSelfSimilarityScore
+ *
+ * Measures self-similarity: for each pair of scales at different zoom levels
+ * (subsample at every 2nd, 3rd pitch), computes the correlation of interval
+ * sequences. Returns mean Pearson correlation. Uses Pearson correlation on
+ * interval vectors (differences between consecutive pitches). Returns 0 for
+ * scales with fewer than 4 pitches.
+ *
+ * @param scaleCents - Array of pitch positions in cents
+ * @param periodCents - Period of the scale in cents (default 1200)
+ * @returns Mean self-similarity score (Pearson correlation, in [-1,1])
+ */
+export function scaleSelfSimilarityScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 4) return 0;
+
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+
+  // Compute interval vector for an array of pitches (consecutive differences)
+  function intervalVector(pitches: number[]): number[] {
+    if (pitches.length < 2) return [];
+    const intervals: number[] = [];
+    for (let i = 1; i < pitches.length; i++) {
+      intervals.push(pitches[i]! - pitches[i - 1]!);
+    }
+    return intervals;
+  }
+
+  // Pearson correlation
+  function pearson(a: number[], b: number[]): number {
+    const len = Math.min(a.length, b.length);
+    if (len < 2) return 0;
+    let sumA = 0, sumB = 0, sumAB = 0, sumA2 = 0, sumB2 = 0;
+    for (let i = 0; i < len; i++) {
+      sumA += a[i]!;
+      sumB += b[i]!;
+      sumAB += a[i]! * b[i]!;
+      sumA2 += a[i]! * a[i]!;
+      sumB2 += b[i]! * b[i]!;
+    }
+    const aMean = sumA / len;
+    const bMean = sumB / len;
+    const num = sumAB - len * aMean * bMean;
+    const denomA = sumA2 - len * aMean * aMean;
+    const denomB = sumB2 - len * bMean * bMean;
+    const denom = Math.sqrt(Math.max(0, denomA) * Math.max(0, denomB));
+    if (denom < 1e-10) return 0;
+    return num / denom;
+  }
+
+  const baseIntervals = intervalVector(sorted);
+
+  // Subsample at every 2nd and 3rd pitch
+  const subsamples: number[][] = [];
+  for (const step of [2, 3]) {
+    const sub: number[] = [];
+    for (let i = 0; i < sorted.length; i += step) {
+      sub.push(sorted[i]!);
+    }
+    if (sub.length >= 2) {
+      subsamples.push(sub);
+    }
+  }
+
+  if (subsamples.length === 0) return 0;
+
+  let totalCorr = 0;
+  let count = 0;
+  for (const sub of subsamples) {
+    const subIntervals = intervalVector(sub);
+    if (subIntervals.length >= 1 && baseIntervals.length >= 1) {
+      totalCorr += pearson(baseIntervals, subIntervals);
+      count++;
+    }
+  }
+
+  if (count === 0) return 0;
+  return totalCorr / count;
+}

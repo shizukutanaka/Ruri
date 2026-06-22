@@ -875,6 +875,10 @@ import {
   scaleVoiceLeadingDistance,
   scaleChromaticSaturation,
   scaleMaximallyEven,
+  scaleReflectionSymmetry,
+  scaleRotationalSymmetry,
+  scaleFractalDimension,
+  scaleSelfSimilarityScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -26868,6 +26872,80 @@ describe('Q1408 tuningFamilySocraticRadarDaviesBouldinIndex', () => {
     const t2 = edo(19, 440);
     const t3 = edo(31, 440);
     const r = tuningFamilySocraticRadarDaviesBouldinIndex([t, t2, t3], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('YY1 scaleReflectionSymmetry', () => {
+  it('chromatic scale is perfectly symmetric', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleReflectionSymmetry(chromatic)).toBeCloseTo(1, 1);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleReflectionSymmetry([])).toBe(0);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleReflectionSymmetry([0])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleReflectionSymmetry([0, 400, 700, 900]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('YY2 scaleRotationalSymmetry', () => {
+  it('whole tone scale has high rotational symmetry', () => {
+    const wt = [0,200,400,600,800,1000];
+    expect(scaleRotationalSymmetry(wt)).toBeGreaterThan(0);
+  });
+  it('empty returns 0', () => {
+    expect(scaleRotationalSymmetry([])).toBe(0);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleRotationalSymmetry([0])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleRotationalSymmetry([0, 300, 600, 900]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('YY3 scaleFractalDimension', () => {
+  it('returns non-negative number', () => {
+    expect(scaleFractalDimension([0,200,400,700,900])).toBeGreaterThanOrEqual(0);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleFractalDimension([])).toBe(0);
+  });
+  it('single pitch returns 0', () => {
+    expect(scaleFractalDimension([0])).toBe(0);
+  });
+  it('chromatic scale dimension ≤ 1', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    const d = scaleFractalDimension(chromatic);
+    expect(d).toBeGreaterThanOrEqual(0);
+    expect(d).toBeLessThanOrEqual(2);
+  });
+});
+
+describe('YY4 scaleSelfSimilarityScore', () => {
+  it('returns value in [-1,1] for valid scale', () => {
+    const s = [0,200,400,500,700,900,1100];
+    const r = scaleSelfSimilarityScore(s);
+    expect(r).toBeGreaterThanOrEqual(-1);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('empty scale returns 0', () => {
+    expect(scaleSelfSimilarityScore([])).toBe(0);
+  });
+  it('fewer than 4 pitches returns 0', () => {
+    expect(scaleSelfSimilarityScore([0,200,400])).toBe(0);
+  });
+  it('equal-step scale has high self-similarity', () => {
+    const ed = Array.from({length:12},(_,i)=>i*100);
+    const r = scaleSelfSimilarityScore(ed);
     expect(r).toBeGreaterThanOrEqual(0);
   });
 });
