@@ -865,3 +865,14 @@
 | SSS4 | `scaleOvertoneRichness` | 各音の倍音（2-8次）が他の音高と一致する割合 |
 
 **参考**: Harmonic series alignment in music theory; Overtone richness (Helmholtz 1877).
+
+## Round 63: スケール認知複雑性・学習可能性 (TTT1–TTT4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| TTT1 | `scaleWorkingMemoryLoad` | 異なるステップタイプ数（作業記憶負荷） |
+| TTT2 | `scaleCognitiveClusters` | 知覚的クラスター数（75セント閾値） |
+| TTT3 | `scaleLearnabilityScore` | 最頻ステップが占める割合（学習容易性） |
+| TTT4 | `scalePatternRegularity` | ステップパターンの最小周期/n（規則性） |
+
+**参考**: Miller's Law (1956); Scale learnability in cognitive musicology (Krumhansl 1990).
