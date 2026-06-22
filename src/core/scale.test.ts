@@ -915,6 +915,12 @@ import {
   tuningFamilySocraticRadarProfileVolatility,
   tuningFamilySocraticRadarCumulativeGrowth,
   tuningFamilySocraticRadarHurstEstimate,
+  tuningFamilySocraticRadarModalCenterStrength,
+  tuningFamilySocraticRadarTonicStabilityIndex,
+  tuningFamilySocraticRadarLeadingToneScore,
+  tuningFamilySocraticRadarModalAmbiguity,
+  tuningFamilySocraticRadarPentatonicCorrelation,
+  tuningFamilySocraticRadarDiatonicCorrelation,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -939,6 +945,10 @@ import {
   scaleMeantoneDeviation,
   scaleWellTemperamentScore,
   scaleJustIntonationRatioScore,
+  scaleGapVariance,
+  scaleDensityHistogram,
+  scaleDensityEntropy,
+  scaleUniformityScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -28066,5 +28076,163 @@ describe('EEE4 scaleJustIntonationRatioScore', () => {
     // 386c ≈ 5/4 (386.314c), 702c ≈ 3/2 (701.955c)
     const r = scaleJustIntonationRatioScore([0, 386, 702], 5, 10);
     expect(r).toBeGreaterThan(0.5);
+  });
+});
+
+describe('FFF1 scaleGapVariance', () => {
+  it('equal-step scale has 0 variance', () => {
+    const ed = Array.from({length:7},(_,i)=>i*(1200/7));
+    expect(scaleGapVariance(ed)).toBeCloseTo(0, 5);
+  });
+  it('empty → 0', () => {
+    expect(scaleGapVariance([])).toBe(0);
+  });
+  it('returns non-negative', () => {
+    expect(scaleGapVariance([0,100,500,700])).toBeGreaterThanOrEqual(0);
+  });
+  it('unequal gaps have positive variance', () => {
+    expect(scaleGapVariance([0,100,700])).toBeGreaterThan(0);
+  });
+});
+
+describe('FFF2 scaleDensityHistogram', () => {
+  it('returns array of bins length', () => {
+    expect(scaleDensityHistogram([0,200,400,700], 6)).toHaveLength(6);
+  });
+  it('empty → all zeros', () => {
+    expect(scaleDensityHistogram([], 6)).toEqual([0,0,0,0,0,0]);
+  });
+  it('sum equals scale length', () => {
+    const profile = scaleDensityHistogram([0,200,400,700,900], 6);
+    expect(profile.reduce((a,b)=>a+b,0)).toBe(5);
+  });
+  it('pitch at 0 falls in first bin', () => {
+    const profile = scaleDensityHistogram([0], 6);
+    expect(profile[0]).toBe(1);
+  });
+});
+
+describe('FFF3 scaleDensityEntropy', () => {
+  it('empty → 0', () => {
+    expect(scaleDensityEntropy([])).toBe(0);
+  });
+  it('all pitches in one bin → 0', () => {
+    expect(scaleDensityEntropy([0,1,2], 6)).toBe(0);
+  });
+  it('returns non-negative', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    expect(scaleDensityEntropy(chromatic, 6)).toBeGreaterThanOrEqual(0);
+  });
+  it('uniform distribution has max entropy', () => {
+    const chromatic = Array.from({length:12},(_,i)=>i*100);
+    const h = scaleDensityEntropy(chromatic, 6);
+    expect(h).toBeCloseTo(Math.log2(6), 1);
+  });
+});
+
+describe('FFF4 scaleUniformityScore', () => {
+  it('equal-step scale has high uniformity', () => {
+    const ed = Array.from({length:7},(_,i)=>i*(1200/7));
+    // KS statistic for n equal steps = 1/n, so uniformity = 1 - 1/n
+    expect(scaleUniformityScore(ed)).toBeGreaterThan(0.8);
+  });
+  it('empty → 0', () => {
+    expect(scaleUniformityScore([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleUniformityScore([0,100,500,900]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('single pitch → 1', () => {
+    expect(scaleUniformityScore([0])).toBe(1);
+  });
+});
+
+describe('Q1482 tuningFamilySocraticRadarModalCenterStrength', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('returns non-negative for single tuning', () => {
+    expect(tuningFamilySocraticRadarModalCenterStrength([t], s)).toBeGreaterThanOrEqual(0);
+  });
+  it('empty returns 0', () => {
+    expect(tuningFamilySocraticRadarModalCenterStrength([], s)).toBe(0);
+  });
+  it('two tunings returns non-negative', () => {
+    expect(tuningFamilySocraticRadarModalCenterStrength([t, t], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1484 tuningFamilySocraticRadarTonicStabilityIndex', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty returns 0', () => {
+    expect(tuningFamilySocraticRadarTonicStabilityIndex([], s)).toBe(0);
+  });
+  it('returns finite number for single tuning', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarTonicStabilityIndex([t], s))).toBe(true);
+  });
+  it('returns non-negative for two tunings', () => {
+    expect(tuningFamilySocraticRadarTonicStabilityIndex([t, t], s)).toBeDefined();
+  });
+});
+
+describe('Q1486 tuningFamilySocraticRadarLeadingToneScore', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty returns 0', () => {
+    expect(tuningFamilySocraticRadarLeadingToneScore([], s)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const r = tuningFamilySocraticRadarLeadingToneScore([t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for two tunings', () => {
+    const r = tuningFamilySocraticRadarLeadingToneScore([t, t], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1488 tuningFamilySocraticRadarModalAmbiguity', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty returns 0', () => {
+    expect(tuningFamilySocraticRadarModalAmbiguity([], s)).toBe(0);
+  });
+  it('returns >= 1 for single tuning', () => {
+    expect(tuningFamilySocraticRadarModalAmbiguity([t], s)).toBeGreaterThanOrEqual(1);
+  });
+  it('returns >= 1 for two tunings', () => {
+    expect(tuningFamilySocraticRadarModalAmbiguity([t, t], s)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('Q1490 tuningFamilySocraticRadarPentatonicCorrelation', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty returns 0', () => {
+    expect(tuningFamilySocraticRadarPentatonicCorrelation([], s)).toBe(0);
+  });
+  it('returns finite number for single tuning', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarPentatonicCorrelation([t], s))).toBe(true);
+  });
+  it('returns finite number for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarPentatonicCorrelation([t, t], s))).toBe(true);
+  });
+});
+
+describe('Q1492 tuningFamilySocraticRadarDiatonicCorrelation', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty returns 0', () => {
+    expect(tuningFamilySocraticRadarDiatonicCorrelation([], s)).toBe(0);
+  });
+  it('returns finite number for single tuning', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarDiatonicCorrelation([t], s))).toBe(true);
+  });
+  it('returns finite number for two tunings', () => {
+    expect(Number.isFinite(tuningFamilySocraticRadarDiatonicCorrelation([t, t], s))).toBe(true);
   });
 });

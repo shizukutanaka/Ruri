@@ -711,3 +711,14 @@
 | EEE4 | `scaleJustIntonationRatioScore` | 純正律比への近接度スコア(素数制限付き) |
 
 **参考**: Meantone temperament (Barbour 1951); Well temperament criteria (Lindley 1984)。
+
+## Round 49: スケール密度・分布分析 (FFF1–FFF4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| FFF1 | `scaleGapVariance` | 音程ギャップサイズの分散 |
+| FFF2 | `scaleDensityHistogram` | 周期をbin分割した音高密度ヒストグラム |
+| FFF3 | `scaleDensityEntropy` | 密度プロファイルのシャノンエントロピー |
+| FFF4 | `scaleUniformityScore` | KS統計量ベースの均一分布スコア(1=完全均一) |
+
+**参考**: Scale uniformity and gap distribution analysis; KS test for pitch uniformity。

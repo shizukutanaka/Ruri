@@ -4,6 +4,7 @@ import {
   degreeToCents,
   degreeToFreq,
   tuningToIntervalVector,
+  equalTemperament12,
 } from './tuning.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { midiToFreq } from './midi.js';
@@ -33772,4 +33773,319 @@ export function tuningFamilySocraticRadarHurstEstimate(
   if (S === 0) return 0.5;
   const H = Math.log(R / S) / Math.log(n);
   return Math.max(0, Math.min(1, H));
+}
+
+// ---------------------------------------------------------------------------
+// Q1482 — tuningFamilySocraticRadarModalCenterStrength
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarModalCenterStrength(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  const refHz = rootHz ?? 440;
+  let totalStrength = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) continue;
+    const freqs = t.degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    // Compute pairwise dissonance matrix
+    const pairDiss: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const d = chordDissonance([freqs[i]!, freqs[j]!], spectrum);
+        pairDiss[i]![j] = d;
+        pairDiss[j]![i] = d;
+      }
+    }
+    // Total dissonance for each degree
+    const totals = pairDiss.map((row) => row.reduce((a, b) => a + b, 0));
+    const minTotal = Math.min(...totals);
+    const allMean = totals.reduce((a, b) => a + b, 0) / n;
+    const strength = allMean / Math.max(1, minTotal);
+    totalStrength += strength;
+  }
+  return totalStrength / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1484 — tuningFamilySocraticRadarTonicStabilityIndex
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarTonicStabilityIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  const refHz = rootHz ?? 440;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n <= 1) {
+      total += 1;
+      continue;
+    }
+    const freqs = t.degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    const tonicFreq = freqs[0]!;
+    const scores: number[] = [];
+    for (let j = 1; j < n; j++) {
+      scores.push(chordDissonance([tonicFreq, freqs[j]!], spectrum));
+    }
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const variance = scores.reduce((s, v) => s + (v - mean) ** 2, 0) / scores.length;
+    const maxDiss = Math.max(...scores);
+    const stability = 1 - variance / Math.max(1, maxDiss ** 2);
+    total += stability;
+  }
+  return total / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1486 — tuningFamilySocraticRadarLeadingToneScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarLeadingToneScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  void spectrum;
+  void rootHz;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) continue;
+    const period = t.periodCents;
+    let count = 0;
+    for (const d of t.degrees) {
+      const c = pitchToCents(d);
+      const distFromPeriod = period - c;
+      if (distFromPeriod >= 50 && distFromPeriod <= 250) {
+        count++;
+      }
+    }
+    total += count / n;
+  }
+  return total / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1488 — tuningFamilySocraticRadarModalAmbiguity
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarModalAmbiguity(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  const refHz = rootHz ?? 440;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n <= 1) {
+      total += 1;
+      continue;
+    }
+    const freqs = t.degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    // Compute total dissonance for each degree as potential tonal center
+    const totals: number[] = [];
+    for (let i = 0; i < n; i++) {
+      let sum = 0;
+      for (let j = 0; j < n; j++) {
+        if (i !== j) {
+          sum += chordDissonance([freqs[i]!, freqs[j]!], spectrum);
+        }
+      }
+      totals.push(sum);
+    }
+    const minTotal = Math.min(...totals);
+    const threshold = minTotal * 1.1;
+    const ambiguousCount = totals.filter((v) => v <= threshold).length;
+    total += Math.max(1, ambiguousCount);
+  }
+  return total / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1490 — tuningFamilySocraticRadarPentatonicCorrelation
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarPentatonicCorrelation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  const refHz = rootHz ?? 440;
+  // Reference 5-note pentatonic from 12-TET [0, 200, 400, 700, 900]
+  const refTuning = defineTuning({
+    id: 'pentatonic-ref',
+    name: 'Pentatonic Reference',
+    referenceHz: refHz,
+    periodCents: 1200,
+    degrees: [
+      { kind: 'cents', cents: 0 },
+      { kind: 'cents', cents: 200 },
+      { kind: 'cents', cents: 400 },
+      { kind: 'cents', cents: 700 },
+      { kind: 'cents', cents: 900 },
+    ],
+    source: 'theoretical',
+  });
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const refProfile = tuningFamilySocraticRadarProfile([refTuning], spectrum, refHz);
+  const refVec = axes.map((a) => refProfile[a]);
+  const refMean = refVec.reduce((s, v) => s + v, 0) / refVec.length;
+  const refDev = refVec.map((v) => v - refMean);
+  const refSS = refDev.reduce((s, v) => s + v * v, 0);
+  let totalCorr = 0;
+  for (const t of tunings) {
+    const profile = tuningFamilySocraticRadarProfile([t], spectrum, rootHz);
+    const vec = axes.map((a) => profile[a]);
+    const mean = vec.reduce((s, v) => s + v, 0) / vec.length;
+    const dev = vec.map((v) => v - mean);
+    const ss = dev.reduce((s, v) => s + v * v, 0);
+    if (refSS === 0 || ss === 0) {
+      totalCorr += 0;
+    } else {
+      const cov = dev.reduce((s, v, i) => s + v * refDev[i]!, 0);
+      totalCorr += cov / Math.sqrt(refSS * ss);
+    }
+  }
+  return totalCorr / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1492 — tuningFamilySocraticRadarDiatonicCorrelation
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarDiatonicCorrelation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  const refHz = rootHz ?? 440;
+  // Reference 7-note diatonic from 12-TET [0, 200, 400, 500, 700, 900, 1100]
+  const refTuning = defineTuning({
+    id: 'diatonic-ref',
+    name: 'Diatonic Reference',
+    referenceHz: refHz,
+    periodCents: 1200,
+    degrees: [
+      { kind: 'cents', cents: 0 },
+      { kind: 'cents', cents: 200 },
+      { kind: 'cents', cents: 400 },
+      { kind: 'cents', cents: 500 },
+      { kind: 'cents', cents: 700 },
+      { kind: 'cents', cents: 900 },
+      { kind: 'cents', cents: 1100 },
+    ],
+    source: 'theoretical',
+  });
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const refProfile = tuningFamilySocraticRadarProfile([refTuning], spectrum, refHz);
+  const refVec = axes.map((a) => refProfile[a]);
+  const refMean = refVec.reduce((s, v) => s + v, 0) / refVec.length;
+  const refDev = refVec.map((v) => v - refMean);
+  const refSS = refDev.reduce((s, v) => s + v * v, 0);
+  let totalCorr = 0;
+  for (const t of tunings) {
+    const profile = tuningFamilySocraticRadarProfile([t], spectrum, rootHz);
+    const vec = axes.map((a) => profile[a]);
+    const mean = vec.reduce((s, v) => s + v, 0) / vec.length;
+    const dev = vec.map((v) => v - mean);
+    const ss = dev.reduce((s, v) => s + v * v, 0);
+    if (refSS === 0 || ss === 0) {
+      totalCorr += 0;
+    } else {
+      const cov = dev.reduce((s, v, i) => s + v * refDev[i]!, 0);
+      totalCorr += cov / Math.sqrt(refSS * ss);
+    }
+  }
+  return totalCorr / tunings.length;
+}
+
+// ---------------------------------------------------------------------------
+// Round 49: FFF1–FFF4 — スケール密度・分布分析
+// ---------------------------------------------------------------------------
+
+// FFF1
+export function scaleGapVariance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const gaps: number[] = [];
+  for (let i = 1; i < n; i++) {
+    gaps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  // wrap-around gap: from last pitch back to first pitch via period
+  gaps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  const mean = gaps.reduce((s, v) => s + v, 0) / gaps.length;
+  const variance = gaps.reduce((s, v) => s + (v - mean) ** 2, 0) / gaps.length;
+  return variance;
+}
+
+// FFF2
+export function scaleDensityHistogram(
+  scaleCents: readonly number[],
+  bins: number = 6,
+  periodCents: number = 1200,
+): number[] {
+  const counts = Array.from({ length: bins }, () => 0);
+  if (scaleCents.length === 0) return counts;
+  const binWidth = periodCents / bins;
+  for (const pitch of scaleCents) {
+    const idx = Math.min(Math.floor(pitch / binWidth), bins - 1);
+    counts[idx]!;
+    counts[idx] = (counts[idx] ?? 0) + 1;
+  }
+  return counts;
+}
+
+// FFF3
+export function scaleDensityEntropy(
+  scaleCents: readonly number[],
+  bins: number = 6,
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const counts = scaleDensityHistogram(scaleCents, bins, periodCents);
+  let h = 0;
+  for (const c of counts) {
+    if (c === 0) continue;
+    const p = c / n;
+    h -= p * Math.log2(p);
+  }
+  return h;
+}
+
+// FFF4
+export function scaleUniformityScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (n === 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let maxD = 0;
+  for (let i = 0; i < n; i++) {
+    const empirical = i / n;
+    const expected = sorted[i]! / periodCents;
+    const d = Math.abs(empirical - expected);
+    if (d > maxD) maxD = d;
+  }
+  return 1 - maxD;
 }
