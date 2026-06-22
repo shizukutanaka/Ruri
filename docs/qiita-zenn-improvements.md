@@ -854,3 +854,14 @@
 | RRR4 | `scaleDispersionIndex` | ステップサイズの分散/平均（Fano因子） |
 
 **参考**: Intervallic complexity in scale theory; Fano factor in statistics.
+
+## Round 62: 音響倍音共鳴・倍音豊かさ (SSS1–SSS4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| SSS1 | `scaleHarmonicAlignmentScore` | 倍音列（1-16）との音高一致率 |
+| SSS2 | `scaleSubharmonicAlignmentScore` | 下倍音列（1-16）との音高一致率 |
+| SSS3 | `scaleResonanceIndex` | 倍音・下倍音一致率の平均（共鳴指数） |
+| SSS4 | `scaleOvertoneRichness` | 各音の倍音（2-8次）が他の音高と一致する割合 |
+
+**参考**: Harmonic series alignment in music theory; Overtone richness (Helmholtz 1877).

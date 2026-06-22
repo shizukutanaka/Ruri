@@ -38282,11 +38282,14 @@ export function scaleOvertoneRichness(scaleCents: readonly number[], periodCents
   const n = scaleCents.length;
   if (n === 0) return 0;
   let matchCount = 0;
-  for (const p of scaleCents) {
+  for (let i = 0; i < n; i++) {
+    const p = scaleCents[i]!;
+    const pc = ((p % periodCents) + periodCents) % periodCents;
     for (let k = 2; k <= 8; k++) {
       const harmonicCents = ((p + 1200 * Math.log2(k)) % periodCents + periodCents) % periodCents;
-      for (const q of scaleCents) {
-        const qc = ((q % periodCents) + periodCents) % periodCents;
+      for (let j = 0; j < n; j++) {
+        if (j === i) continue; // skip self
+        const qc = ((scaleCents[j]! % periodCents) + periodCents) % periodCents;
         const dist = Math.abs(harmonicCents - qc);
         const minDist = Math.min(dist, periodCents - dist);
         if (minDist < 15) {
