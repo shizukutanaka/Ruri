@@ -1239,3 +1239,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | BBBB2 | `scaleHashVariance` | 正規化ピッチの分散フィンガープリント |
 | BBBB3 | `scalePeriodicityFingerprint` | 等分割音律へのフィット度（2-12等分） |
 | BBBB4 | `scaleUniquenessProxy` | 周期性の補数（音階の独自性指数） |
+
+## Round 97: 音階トーン重心分析 (CCCC1–CCCC4)
+
+音階のピッチ重心と引力バランスを測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| CCCC1 | `scaleTonalCenterOfGravity` | ピッチ正規化値の重心（centroid） |
+| CCCC2 | `scaleTonalGravityBalance` | 重心の中点（0.5）からの対称性 |
+| CCCC3 | `scaleTonalPolarization` | 極端値への偏向度（中心からの距離の平均） |
+| CCCC4 | `scaleTonalCentripetal` | 向心性（分極度の補数） |
