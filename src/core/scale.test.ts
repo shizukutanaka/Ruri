@@ -30486,6 +30486,28 @@ describe('Q1660 tuningFamilySocraticRadarActionMeanProxy', () => {
   });
 });
 
+describe('UUU1 scaleGraphDensity (50-cent threshold)', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const pentatonic = [0, 240, 480, 720, 960];
+  it('empty → 0', () => {
+    expect(scaleGraphDensity([], 50)).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleGraphDensity([0], 50)).toBe(0);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const r = scaleGraphDensity(chromatic, 50);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,240,480,720,960] → finite, >=0', () => {
+    const r = scaleGraphDensity(pentatonic, 50);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
 describe('UUU2 scaleSmallWorldIndex', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   const pentatonic = [0, 240, 480, 720, 960];
