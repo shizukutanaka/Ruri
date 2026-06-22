@@ -568,6 +568,12 @@ import {
   presetFamilySocraticRadarELECTREOutranking,
   presetFamilySocraticRadarPROMETHEEFlowMean,
   presetFamilySocraticRadarCOPRASRatio,
+  presetFamilySocraticRadarFitnessVariance,
+  presetFamilySocraticRadarMutationDistance,
+  presetFamilySocraticRadarSelectionPressure,
+  presetFamilySocraticRadarCrossoverDiversity,
+  presetFamilySocraticRadarFitnessLandscapeRuggedness,
+  presetFamilySocraticRadarGenotypePhenotypeMean,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -16109,5 +16115,96 @@ describe('Q1541 presetFamilySocraticRadarCOPRASRatio', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarCOPRASRatio(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1543 — presetFamilySocraticRadarFitnessVariance
+describe('Q1543 presetFamilySocraticRadarFitnessVariance', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for single preset (n<=1)', () => {
+    expect(presetFamilySocraticRadarFitnessVariance(['12-tet'], s)).toBe(0);
+  });
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarFitnessVariance(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFitnessVariance(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1545 — presetFamilySocraticRadarMutationDistance
+describe('Q1545 presetFamilySocraticRadarMutationDistance', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for single preset (n<=1)', () => {
+    expect(presetFamilySocraticRadarMutationDistance(['12-tet'], s)).toBe(0);
+  });
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarMutationDistance(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMutationDistance(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1547 — presetFamilySocraticRadarSelectionPressure
+describe('Q1547 presetFamilySocraticRadarSelectionPressure', () => {
+  const s = harmonicSpectrum(6);
+  it('returns >=1 for single preset', () => {
+    expect(presetFamilySocraticRadarSelectionPressure(['12-tet'], s)).toBeGreaterThanOrEqual(1);
+  });
+  it('returns >=1 for two presets', () => {
+    const r = presetFamilySocraticRadarSelectionPressure(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSelectionPressure(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1549 — presetFamilySocraticRadarCrossoverDiversity
+describe('Q1549 presetFamilySocraticRadarCrossoverDiversity', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for single preset (n<=1)', () => {
+    expect(presetFamilySocraticRadarCrossoverDiversity(['12-tet'], s)).toBe(0);
+  });
+  it('returns non-negative for two presets', () => {
+    const r = presetFamilySocraticRadarCrossoverDiversity(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCrossoverDiversity(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1551 — presetFamilySocraticRadarFitnessLandscapeRuggedness
+describe('Q1551 presetFamilySocraticRadarFitnessLandscapeRuggedness', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for single preset (n<=2)', () => {
+    expect(presetFamilySocraticRadarFitnessLandscapeRuggedness(['12-tet'], s)).toBe(0);
+  });
+  it('returns non-negative for three presets', () => {
+    const r = presetFamilySocraticRadarFitnessLandscapeRuggedness(['12-tet', 'just-5-limit', '12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFitnessLandscapeRuggedness(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1553 — presetFamilySocraticRadarGenotypePhenotypeMean
+describe('Q1553 presetFamilySocraticRadarGenotypePhenotypeMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for single preset (n<=1)', () => {
+    expect(presetFamilySocraticRadarGenotypePhenotypeMean(['12-tet'], s)).toBe(0);
+  });
+  it('returns non-negative finite for two presets', () => {
+    const r = presetFamilySocraticRadarGenotypePhenotypeMean(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGenotypePhenotypeMean(['unknown'], s)).toThrow(RangeError);
   });
 });

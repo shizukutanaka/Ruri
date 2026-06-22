@@ -28885,6 +28885,104 @@ describe('Q1540 tuningFamilySocraticRadarCOPRASRatio', () => {
   });
 });
 
+describe('Q1542 tuningFamilySocraticRadarFitnessVariance', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=1 → 0', () => {
+    expect(tuningFamilySocraticRadarFitnessVariance([t], s)).toBe(0);
+    expect(tuningFamilySocraticRadarFitnessVariance([], s)).toBe(0);
+  });
+  it('identical tunings → 0', () => {
+    expect(tuningFamilySocraticRadarFitnessVariance([t, t], s)).toBeCloseTo(0, 8);
+  });
+  it('returns non-negative', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarFitnessVariance([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1544 tuningFamilySocraticRadarMutationDistance', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=1 → 0', () => {
+    expect(tuningFamilySocraticRadarMutationDistance([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarMutationDistance([t], s)).toBe(0);
+  });
+  it('identical tunings → 0', () => {
+    expect(tuningFamilySocraticRadarMutationDistance([t, t], s)).toBeCloseTo(0, 8);
+  });
+  it('two different tunings → >=0', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarMutationDistance([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1546 tuningFamilySocraticRadarSelectionPressure', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('empty → 1', () => {
+    expect(tuningFamilySocraticRadarSelectionPressure([], s)).toBe(1);
+  });
+  it('n=1 → 1', () => {
+    expect(tuningFamilySocraticRadarSelectionPressure([t], s)).toBeGreaterThanOrEqual(1);
+  });
+  it('two tunings → ratio >=1', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarSelectionPressure([t, t2], s)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('Q1548 tuningFamilySocraticRadarCrossoverDiversity', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=1 → 0', () => {
+    expect(tuningFamilySocraticRadarCrossoverDiversity([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarCrossoverDiversity([t], s)).toBe(0);
+  });
+  it('identical tunings → 0', () => {
+    expect(tuningFamilySocraticRadarCrossoverDiversity([t, t], s)).toBeCloseTo(0, 8);
+  });
+  it('two different tunings → >=0', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarCrossoverDiversity([t, t2], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1550 tuningFamilySocraticRadarFitnessLandscapeRuggedness', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=2 → 0', () => {
+    expect(tuningFamilySocraticRadarFitnessLandscapeRuggedness([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarFitnessLandscapeRuggedness([t], s)).toBe(0);
+    expect(tuningFamilySocraticRadarFitnessLandscapeRuggedness([t, t], s)).toBe(0);
+  });
+  it('three identical tunings → 0', () => {
+    expect(tuningFamilySocraticRadarFitnessLandscapeRuggedness([t, t, t], s)).toBeCloseTo(0, 8);
+  });
+  it('three different tunings → >=0', () => {
+    const t2 = edo(19, 440);
+    expect(tuningFamilySocraticRadarFitnessLandscapeRuggedness([t, t2, t], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1552 tuningFamilySocraticRadarGenotypePhenotypeMean', () => {
+  const t = equalTemperament12(440);
+  const s = harmonicSpectrum(6);
+  it('n<=1 → 0', () => {
+    expect(tuningFamilySocraticRadarGenotypePhenotypeMean([], s)).toBe(0);
+    expect(tuningFamilySocraticRadarGenotypePhenotypeMean([t], s)).toBe(0);
+  });
+  it('two tunings → non-negative finite', () => {
+    const t2 = edo(19, 440);
+    const r = tuningFamilySocraticRadarGenotypePhenotypeMean([t, t2], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(r)).toBe(true);
+  });
+  it('identical tunings → 0 (no variation)', () => {
+    expect(tuningFamilySocraticRadarGenotypePhenotypeMean([t, t], s)).toBe(0);
+  });
+});
+
 describe('KKK1 scaleMorphDistance', () => {
   it('same scale → 0', () => {
     expect(scaleMorphDistance([0,400,700],[0,400,700])).toBe(0);
