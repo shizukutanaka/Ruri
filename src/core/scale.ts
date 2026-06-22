@@ -38583,6 +38583,167 @@ export function tuningFamilySocraticRadarSusceptibilityProxy(
   return Math.max(0, Math.min(1, variance / (variance + 0.01)));
 }
 
+// Q1734 — tuningFamilySocraticRadarLaplacianEigenvalueProxy
+export function tuningFamilySocraticRadarLaplacianEigenvalueProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    let laplacian = 0;
+    for (let i = 0; i < 5; i++) {
+      const diff = vec[i]! - vec[(i + 1) % 5]!;
+      laplacian += diff * diff;
+    }
+    sum += laplacian / 5;
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1736 — tuningFamilySocraticRadarSpectralGapProxy
+export function tuningFamilySocraticRadarSpectralGapProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => b - a);
+    const maxVal = sorted[0]!;
+    const secondMax = sorted[1]!;
+    const gap = maxVal > 0 ? (maxVal - secondMax) / maxVal : 0;
+    sum += gap;
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1738 — tuningFamilySocraticRadarAlgebraicConnectivityMean
+export function tuningFamilySocraticRadarAlgebraicConnectivityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const nonZero = vec.filter((v) => v > 0);
+    if (nonZero.length === 0) {
+      sum += 0;
+      continue;
+    }
+    const minAbsDev = Math.min(...nonZero.map((v) => Math.abs(v - mean)));
+    const maxVal = Math.max(...vec);
+    const normalized = maxVal > 0 ? minAbsDev / maxVal : 0;
+    sum += normalized;
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1740 — tuningFamilySocraticRadarCheegerConstantProxy
+export function tuningFamilySocraticRadarCheegerConstantProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const n = sorted.length;
+    const half = Math.floor(n / 2);
+    const firstHalf = sorted.slice(0, half).reduce((a, b) => a + b, 0);
+    const secondHalf = sorted.slice(half).reduce((a, b) => a + b, 0);
+    const total = firstHalf + secondHalf;
+    const eps = 1e-9;
+    const cheeger = Math.min(firstHalf, secondHalf) / (total * 0.5 + eps);
+    sum += cheeger;
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1742 — tuningFamilySocraticRadarSpectralRadiusProxy
+export function tuningFamilySocraticRadarSpectralRadiusProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const maxVal = Math.max(...vec);
+    sum += maxVal;
+  }
+  return sum / tunings.length;
+}
+
+// Q1744 — tuningFamilySocraticRadarExpansionConstantMean
+export function tuningFamilySocraticRadarExpansionConstantMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    // Try all subsets S of size 1..floor(n/2): approximate min(|boundary|/|S|)
+    let minExpansion = Infinity;
+    const maxSubsetSize = Math.floor(n / 2);
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j <= i + maxSubsetSize; j++) {
+        const inS = new Set<number>();
+        for (let k = i; k < j; k++) inS.add(k % n);
+        let boundary = 0;
+        for (const idx of inS) {
+          const left = (idx - 1 + n) % n;
+          const right = (idx + 1) % n;
+          if (!inS.has(left)) boundary++;
+          if (!inS.has(right)) boundary++;
+        }
+        const expansion = boundary / inS.size;
+        if (expansion < minExpansion) minExpansion = expansion;
+      }
+    }
+    // In a ring of 5, singleton expansion = 2, pair = 2, so normalize by 2
+    const normalized = Number.isFinite(minExpansion) ? Math.min(minExpansion / 2, 1) : 0;
+    sum += normalized;
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -40126,4 +40287,119 @@ export function scaleLeadingNoteProximity(scaleCents: readonly number[], periodC
     if (dist <= 100) count++;
   }
   return count / n;
+}
+
+/**
+ * AAA1 — scaleIntervalVariety
+ * Number of distinct interval classes (rounded to nearest 50 cents) present,
+ * normalized by 12 (max in 12-EDO).
+ * Computes all pairwise intervals (i<j), wraps to [0, period/2], rounds to
+ * nearest 50 cents, counts unique classes.
+ * Returns unique_count / 12; clamped to [0,1]; 0 for n<2.
+ */
+export function scaleIntervalVariety(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const half = periodCents / 2;
+  const seen = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let interval = Math.abs(scaleCents[j]! - scaleCents[i]!);
+      interval = ((interval % periodCents) + periodCents) % periodCents;
+      if (interval > half) interval = periodCents - interval;
+      const bin = Math.round(interval / 50) * 50;
+      seen.add(bin);
+    }
+  }
+  return Math.max(0, Math.min(1, seen.size / 12));
+}
+
+/**
+ * AAA2 — scaleIntervalBalance
+ * How balanced the interval histogram is: 1 - coefficient_of_variation of
+ * interval class counts.
+ * Same bins as AAA1 (50-cent rounded classes).
+ * CV = std_dev / mean of bin counts.
+ * Returns 1 - CV / (CV + 1); value in [0,1]; 0 for n<2.
+ */
+export function scaleIntervalBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const half = periodCents / 2;
+  const counts = new Map<number, number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let interval = Math.abs(scaleCents[j]! - scaleCents[i]!);
+      interval = ((interval % periodCents) + periodCents) % periodCents;
+      if (interval > half) interval = periodCents - interval;
+      const bin = Math.round(interval / 50) * 50;
+      counts.set(bin, (counts.get(bin) ?? 0) + 1);
+    }
+  }
+  const vals = Array.from(counts.values());
+  const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+  if (mean === 0) return 0;
+  const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length;
+  const cv = Math.sqrt(variance) / mean;
+  return Math.max(0, Math.min(1, 1 - cv / (cv + 1)));
+}
+
+/**
+ * AAA3 — scaleIntervalDominance
+ * Proportion of all pairs occupied by the most common interval class.
+ * Same bins as AAA1 (50-cent rounded classes).
+ * Returns max_count / total_pairs; 0 for n<2.
+ */
+export function scaleIntervalDominance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const half = periodCents / 2;
+  const counts = new Map<number, number>();
+  let totalPairs = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let interval = Math.abs(scaleCents[j]! - scaleCents[i]!);
+      interval = ((interval % periodCents) + periodCents) % periodCents;
+      if (interval > half) interval = periodCents - interval;
+      const bin = Math.round(interval / 50) * 50;
+      counts.set(bin, (counts.get(bin) ?? 0) + 1);
+      totalPairs++;
+    }
+  }
+  if (totalPairs === 0) return 0;
+  const maxCount = Math.max(...counts.values());
+  return maxCount / totalPairs;
+}
+
+/**
+ * AAA4 — scaleIntervalEntropy
+ * Shannon entropy of the interval class distribution (50-cent bins).
+ * Normalized by log2(max_bins) where max_bins = ceil(period/2/50).
+ * Returns 0 for n<2 or single interval class.
+ */
+export function scaleIntervalEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const half = periodCents / 2;
+  const maxBins = Math.ceil(half / 50);
+  if (maxBins <= 1) return 0;
+  const counts = new Map<number, number>();
+  let totalPairs = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let interval = Math.abs(scaleCents[j]! - scaleCents[i]!);
+      interval = ((interval % periodCents) + periodCents) % periodCents;
+      if (interval > half) interval = periodCents - interval;
+      const bin = Math.round(interval / 50) * 50;
+      counts.set(bin, (counts.get(bin) ?? 0) + 1);
+      totalPairs++;
+    }
+  }
+  if (totalPairs === 0 || counts.size <= 1) return 0;
+  let entropy = 0;
+  for (const count of counts.values()) {
+    const p = count / totalPairs;
+    if (p > 0) entropy -= p * Math.log2(p);
+  }
+  return Math.max(0, Math.min(1, entropy / Math.log2(maxBins)));
 }
