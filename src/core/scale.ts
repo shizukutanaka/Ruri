@@ -33028,3 +33028,75 @@ export function tuningFamilySocraticRadarObjectiveSpaceVolume(
   }
   return Math.max(0, hypervolume);
 }
+
+export function scaleTonnetzCoordinates(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): Array<[number, number]> {
+  if (scaleCents.length === 0) return [];
+  return scaleCents.map((p) => {
+    const x = ((Math.round(p / 700) % 12) + 12) % 12;
+    const y = ((Math.round(p / 400) % 12) + 12) % 12;
+    return [x, y];
+  });
+}
+
+export function scaleTonnetzSpan(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  if (scaleCents.length <= 1) return 0;
+  const coords = scaleTonnetzCoordinates(scaleCents, periodCents);
+  let maxDist = 0;
+  for (let i = 0; i < coords.length; i++) {
+    for (let j = i + 1; j < coords.length; j++) {
+      const ci = coords[i]!;
+      const cj = coords[j]!;
+      const dx = ci[0] - cj[0];
+      const dy = ci[1] - cj[1];
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > maxDist) maxDist = dist;
+    }
+  }
+  return maxDist;
+}
+
+export function scaleNeighborhoodGraph(
+  scaleCents: readonly number[],
+  radius: number = 150,
+  periodCents: number = 1200,
+): number[][] {
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  const matrix: number[][] = Array.from({ length: n }, () => Array(n).fill(0) as number[]);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const pi = scaleCents[i]!;
+      const pj = scaleCents[j]!;
+      const raw = Math.abs(pi - pj) % periodCents;
+      const dist = Math.min(raw, periodCents - raw);
+      if (dist <= radius) {
+        matrix[i]![j] = 1;
+      }
+    }
+  }
+  return matrix;
+}
+
+export function scaleNeighborhoodDensity(
+  scaleCents: readonly number[],
+  radius: number = 150,
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const matrix = scaleNeighborhoodGraph(scaleCents, radius, periodCents);
+  let totalEdges = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i !== j) totalEdges += matrix[i]![j]!;
+    }
+  }
+  return totalEdges / n / (n - 1);
+}

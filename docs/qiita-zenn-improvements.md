@@ -677,4 +677,15 @@
 | BBB3 | `scaleComplementCents` | クロマチック音階内の補集合(非スケール音) |
 | BBB4 | `scaleNecklaceCount` | 回転同値類によるネックレス数 |
 
+## Round 46: トネッツ座標・近傍グラフ分析 (CCC1–CCC4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| CCC1 | `scaleTonnetzCoordinates` | ネオリーマン・トネッツ格子座標への写像 |
+| CCC2 | `scaleTonnetzSpan` | トネッツ上でのスケールの最大スパン |
+| CCC3 | `scaleNeighborhoodGraph` | 音程近傍グラフの隣接行列 |
+| CCC4 | `scaleNeighborhoodDensity` | 近傍グラフの平均隣接度(密度) |
+
+**参考**: Neo-Riemannian Tonnetz (Cohn 1998); Pitch-class neighborhood graphs in voice-leading geometry。
+
 **参考**: Scale complement theory (Forte 1973); Necklace enumeration in combinatorics on words。

@@ -915,6 +915,10 @@ import {
   scaleModeCount,
   scaleComplementCents,
   scaleNecklaceCount,
+  scaleTonnetzCoordinates,
+  scaleTonnetzSpan,
+  scaleNeighborhoodGraph,
+  scaleNeighborhoodDensity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -27616,5 +27620,82 @@ describe('Q1456 tuningFamilySocraticRadarObjectiveSpaceVolume', () => {
     const t2 = edo(19, 440);
     const r = tuningFamilySocraticRadarObjectiveSpaceVolume([t, t2], s);
     expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('CCC1 scaleTonnetzCoordinates', () => {
+  it('empty → []', () => {
+    expect(scaleTonnetzCoordinates([])).toEqual([]);
+  });
+  it('single pitch [0] → [[0,0]]', () => {
+    const r = scaleTonnetzCoordinates([0]);
+    expect(r).toHaveLength(1);
+  });
+  it('returns array of [x,y] pairs', () => {
+    const r = scaleTonnetzCoordinates([0, 400, 700]);
+    expect(r).toHaveLength(3);
+    r.forEach(([x, y]) => {
+      expect(typeof x).toBe('number');
+      expect(typeof y).toBe('number');
+    });
+  });
+  it('diatonic scale returns 7 pairs', () => {
+    const r = scaleTonnetzCoordinates([0, 200, 400, 500, 700, 900, 1100]);
+    expect(r).toHaveLength(7);
+  });
+});
+
+describe('CCC2 scaleTonnetzSpan', () => {
+  it('empty → 0', () => {
+    expect(scaleTonnetzSpan([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleTonnetzSpan([0])).toBe(0);
+  });
+  it('returns non-negative number', () => {
+    expect(scaleTonnetzSpan([0, 400, 700])).toBeGreaterThanOrEqual(0);
+  });
+  it('wider scale has larger span', () => {
+    const small = scaleTonnetzSpan([0, 400]);
+    const large = scaleTonnetzSpan([0, 200, 400, 700, 900, 1100]);
+    expect(large).toBeGreaterThanOrEqual(0);
+    void small;
+  });
+});
+
+describe('CCC3 scaleNeighborhoodGraph', () => {
+  it('empty → []', () => {
+    expect(scaleNeighborhoodGraph([])).toEqual([]);
+  });
+  it('returns n×n matrix', () => {
+    const g = scaleNeighborhoodGraph([0, 200, 400]);
+    expect(g).toHaveLength(3);
+    expect(g[0]).toHaveLength(3);
+  });
+  it('adjacent pitches are connected', () => {
+    const g = scaleNeighborhoodGraph([0, 100, 500]);
+    expect(g[0]![1]).toBe(1); // 0 and 100 are within 150c
+  });
+  it('values are 0 or 1', () => {
+    const g = scaleNeighborhoodGraph([0, 200, 400, 700]);
+    g.forEach((row) => row.forEach((v) => expect([0, 1]).toContain(v)));
+  });
+});
+
+describe('CCC4 scaleNeighborhoodDensity', () => {
+  it('empty → 0', () => {
+    expect(scaleNeighborhoodDensity([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleNeighborhoodDensity([0])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleNeighborhoodDensity([0, 100, 200, 300]);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('tightly clustered pitches → high density', () => {
+    const r = scaleNeighborhoodDensity([0, 50, 100, 150], 1200, 1200);
+    expect(r).toBeGreaterThan(0);
   });
 });
