@@ -466,6 +466,12 @@ import {
   presetFamilySocraticRadarSugenoIntegral,
   presetFamilySocraticRadarChoquetIntegral,
   presetFamilySocraticRadarLukasiewiczNorm,
+  presetFamilySocraticRadarSimulatedAnnealingProxy,
+  presetFamilySocraticRadarGeneticFitness,
+  presetFamilySocraticRadarParticleBest,
+  presetFamilySocraticRadarPheromoneWeight,
+  presetFamilySocraticRadarGradientApproximation,
+  presetFamilySocraticRadarNelderMeadCentroid,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -14246,5 +14252,131 @@ describe('presetFamilySocraticRadarLukasiewiczNorm (Q1325)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarLukasiewiczNorm(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1327 — presetFamilySocraticRadarSimulatedAnnealingProxy
+describe('presetFamilySocraticRadarSimulatedAnnealingProxy (Q1327)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with all five axes', () => {
+    const result = presetFamilySocraticRadarSimulatedAnnealingProxy(presetIds, spectrum);
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']));
+  });
+  it('all values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarSimulatedAnnealingProxy(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSimulatedAnnealingProxy(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1329 — presetFamilySocraticRadarGeneticFitness
+describe('presetFamilySocraticRadarGeneticFitness (Q1329)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one fitness per preset', () => {
+    const result = presetFamilySocraticRadarGeneticFitness(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('max fitness is 1 and all values in (0, 1]', () => {
+    const result = presetFamilySocraticRadarGeneticFitness(presetIds, spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThan(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+    expect(Math.max(...result)).toBeCloseTo(1, 10);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGeneticFitness(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1331 — presetFamilySocraticRadarParticleBest
+describe('presetFamilySocraticRadarParticleBest (Q1331)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with all five axes', () => {
+    const result = presetFamilySocraticRadarParticleBest(presetIds, spectrum);
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']));
+  });
+  it('all values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarParticleBest(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarParticleBest(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1333 — presetFamilySocraticRadarPheromoneWeight
+describe('presetFamilySocraticRadarPheromoneWeight (Q1333)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one weight per preset', () => {
+    const result = presetFamilySocraticRadarPheromoneWeight(presetIds, spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('weights sum to 1', () => {
+    const result = presetFamilySocraticRadarPheromoneWeight(presetIds, spectrum);
+    const sum = result.reduce((s, v) => s + v, 0);
+    expect(sum).toBeCloseTo(1, 10);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPheromoneWeight(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1335 — presetFamilySocraticRadarGradientApproximation
+describe('presetFamilySocraticRadarGradientApproximation (Q1335)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns one row per preset with 5 values', () => {
+    const result = presetFamilySocraticRadarGradientApproximation(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]!.length).toBe(5);
+  });
+  it('per-axis deviations sum to ~0', () => {
+    const result = presetFamilySocraticRadarGradientApproximation(presetIds, spectrum);
+    for (let ai = 0; ai < 5; ai++) {
+      const sum = result.reduce((s, row) => s + row[ai]!, 0);
+      expect(sum).toBeCloseTo(0, 10);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGradientApproximation(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1337 — presetFamilySocraticRadarNelderMeadCentroid
+describe('presetFamilySocraticRadarNelderMeadCentroid (Q1337)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns record with all five axes', () => {
+    const result = presetFamilySocraticRadarNelderMeadCentroid(presetIds, spectrum);
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']));
+  });
+  it('all values are in [0, 1]', () => {
+    const result = presetFamilySocraticRadarNelderMeadCentroid(presetIds, spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNelderMeadCentroid(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

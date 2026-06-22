@@ -28765,6 +28765,162 @@ export function tuningFamilySocraticRadarLukasiewiczNorm(
 }
 
 // ---------------------------------------------------------------------------
+// Q1326 — tuningFamilySocraticRadarSimulatedAnnealingProxy
+
+export function tuningFamilySocraticRadarSimulatedAnnealingProxy(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const zero: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> = {
+    diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0,
+  };
+  if (tunings.length === 0) return zero;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const composites = profiles.map((p) => axes.reduce((sum, axis) => sum + p[axis], 0) / 5);
+  const indexed = composites.map((c, i) => ({ c, i }));
+  indexed.sort((a, b) => b.c - a.c);
+  const ranks = new Array<number>(tunings.length);
+  for (let r = 0; r < indexed.length; r++) {
+    ranks[indexed[r]!.i] = r + 1;
+  }
+  const weights = ranks.map((rank) => Math.exp(-rank));
+  const sumW = weights.reduce((s, w) => s + w, 0);
+  const result = { ...zero };
+  for (let i = 0; i < profiles.length; i++) {
+    const w = weights[i]! / sumW;
+    for (const axis of axes) {
+      result[axis] += profiles[i]![axis] * w;
+    }
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1328 — tuningFamilySocraticRadarGeneticFitness
+
+export function tuningFamilySocraticRadarGeneticFitness(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const fitnesses = profiles.map((p) => {
+    let product = 1;
+    for (const axis of axes) {
+      product *= (p[axis] + 0.01);
+    }
+    return product;
+  });
+  const maxFitness = Math.max(...fitnesses);
+  return fitnesses.map((f) => f / maxFitness);
+}
+
+// ---------------------------------------------------------------------------
+// Q1330 — tuningFamilySocraticRadarParticleBest
+
+export function tuningFamilySocraticRadarParticleBest(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const zero: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> = {
+    diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0,
+  };
+  if (tunings.length === 0) return zero;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const result = { ...zero };
+  for (const axis of axes) {
+    let best = -Infinity;
+    for (const p of profiles) {
+      if (p[axis] > best) best = p[axis];
+    }
+    result[axis] = best;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1332 — tuningFamilySocraticRadarPheromoneWeight
+
+export function tuningFamilySocraticRadarPheromoneWeight(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const composites = profiles.map((p) => axes.reduce((sum, axis) => sum + p[axis], 0) / 5);
+  const squaredComposites = composites.map((c) => c * c);
+  const sumSquared = squaredComposites.reduce((s, v) => s + v, 0);
+  if (sumSquared === 0) {
+    return composites.map(() => 1 / tunings.length);
+  }
+  return squaredComposites.map((sq) => sq / sumSquared);
+}
+
+// ---------------------------------------------------------------------------
+// Q1334 — tuningFamilySocraticRadarGradientApproximation
+
+export function tuningFamilySocraticRadarGradientApproximation(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  if (tunings.length === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const means = axes.map((axis) => {
+    const total = profiles.reduce((s, p) => s + p[axis], 0);
+    return total / profiles.length;
+  });
+  return profiles.map((p) => axes.map((axis, ai) => p[axis] - means[ai]!));
+}
+
+// ---------------------------------------------------------------------------
+// Q1336 — tuningFamilySocraticRadarNelderMeadCentroid
+
+export function tuningFamilySocraticRadarNelderMeadCentroid(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const zero: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> = {
+    diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0,
+  };
+  if (tunings.length === 0) return zero;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const composites = profiles.map((p, i) => ({ composite: axes.reduce((s, axis) => s + p[axis], 0) / 5, i }));
+  composites.sort((a, b) => b.composite - a.composite);
+  const topCount = Math.ceil(tunings.length / 2);
+  const topProfiles = composites.slice(0, topCount).map((entry) => profiles[entry.i]!);
+  const result = { ...zero };
+  for (const axis of axes) {
+    const total = topProfiles.reduce((s, p) => s + p[axis], 0);
+    result[axis] = total / topProfiles.length;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
 // OO1 — tuningResolutionFactor
 // ---------------------------------------------------------------------------
 export function tuningResolutionFactor(
@@ -29105,4 +29261,93 @@ export function scaleGapsProfile(scaleCents: readonly number[]): number[] {
     if (diff > 250) gaps.push(diff);
   }
   return gaps.sort((a, b) => a - b);
+}
+
+/**
+ * RR1 – Measures the proportion of pitch pairs that form tritone-adjacent
+ * intervals (550–650 cents range).
+ * For all C(n,2) pairs of scale pitches, compute |interval| mod 1200, then
+ * take min(interval, 1200-interval). Count pairs where this distance is in
+ * [550, 650] cents. Returns count / C(n,2), or 0 for fewer than 2 pitches.
+ */
+export function scaleTritoneSaturation(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const total = (n * (n - 1)) / 2;
+  let tritoneCount = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const raw = Math.abs(scaleCents[i]! - scaleCents[j]!) % 1200;
+      const dist = Math.min(raw, 1200 - raw);
+      if (dist >= 550 && dist <= 650) tritoneCount++;
+    }
+  }
+  return tritoneCount / total;
+}
+
+/**
+ * RR2 – Measures average deviation of fifths from the just fifth (702 cents).
+ * For each consecutive pair of degrees (in cents order), compute the interval.
+ * For each interval closest to 702c (within 150c): deviation = |interval - 702|.
+ * Returns mean deviation for such intervals; 0 if no fifth-like intervals found.
+ */
+export function tuningFifthDeviation(tuning: TuningSystem): number {
+  const cents = tuning.degrees.map((_, i) => degreeToCents(tuning, i)).sort((a, b) => a - b);
+  if (cents.length < 2) return 0;
+  const deviations: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    const interval = cents[i]! - cents[i - 1]!;
+    if (Math.abs(interval - 702) <= 150) {
+      deviations.push(Math.abs(interval - 702));
+    }
+  }
+  if (deviations.length === 0) return 0;
+  return deviations.reduce((sum, d) => sum + d, 0) / deviations.length;
+}
+
+/**
+ * RR3 – Measures rate of change of harmonic content across scale pitches.
+ * For each pitch p, compute "harmonic complexity" = min_k(|p - 1200*log2(k)|)
+ * for k=1..harmonics. Acceleration = variance of these complexity values.
+ * Returns 0 for empty scale or single pitch.
+ */
+export function scaleHarmonicAcceleration(
+  scaleCents: readonly number[],
+  harmonics: number = 8,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const complexities = scaleCents.map((p) => {
+    let minDist = Infinity;
+    for (let k = 1; k <= harmonics; k++) {
+      const harmonicCents = 1200 * Math.log2(k);
+      const dist = Math.abs(p - harmonicCents);
+      if (dist < minDist) minDist = dist;
+    }
+    return minDist;
+  });
+  const mean = complexities.reduce((sum, c) => sum + c, 0) / n;
+  const variance = complexities.reduce((sum, c) => sum + (c - mean) ** 2, 0) / n;
+  return variance;
+}
+
+/**
+ * RR4 – Measures how close the spectrum's ratios are to small integers.
+ * For each partial: find nearest integer N = round(ratio),
+ * score_k = 1 / (1 + |ratio - N| * 10).
+ * Returns amplitude-weighted mean: sum(amplitude * score) / sum(amplitude).
+ * Returns 0 for empty spectrum.
+ */
+export function spectrumPurityScore(spectrum: Spectrum): number {
+  if (spectrum.length === 0) return 0;
+  let weightedSum = 0;
+  let totalAmplitude = 0;
+  for (const partial of spectrum) {
+    const nearest = Math.round(partial.ratio);
+    const score = 1 / (1 + Math.abs(partial.ratio - nearest) * 10);
+    weightedSum += partial.amplitude * score;
+    totalAmplitude += partial.amplitude;
+  }
+  if (totalAmplitude === 0) return 0;
+  return weightedSum / totalAmplitude;
 }

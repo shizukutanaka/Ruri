@@ -551,3 +551,15 @@
 | `tuningPitchClassBalance` | ピッチクラス占有率（均衡度） |
 | `harmonicSeriesConvergence` | 調律の倍音列収束度 |
 | `scaleGapsProfile` | 250セント超のギャップ一覧 |
+
+## Round 35: トリトーン飽和度・五度偏差・調波加速度 (RR1–RR4)
+
+**テーマ**: 半音毒性・純正五度偏差・調波複雑度加速度・スペクトル純度  
+**実装**: RR1–RR4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleTritoneSaturation` | トリトーン音程ペアの密度 |
+| `tuningFifthDeviation` | 純正五度（702c）からの平均偏差 |
+| `scaleHarmonicAcceleration` | スケール音度間の調波複雑度分散 |
+| `spectrumPurityScore` | スペクトル比の整数純度スコア |

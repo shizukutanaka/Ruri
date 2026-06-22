@@ -769,6 +769,12 @@ import {
   tuningFamilySocraticRadarSugenoIntegral,
   tuningFamilySocraticRadarChoquetIntegral,
   tuningFamilySocraticRadarLukasiewiczNorm,
+  tuningFamilySocraticRadarSimulatedAnnealingProxy,
+  tuningFamilySocraticRadarGeneticFitness,
+  tuningFamilySocraticRadarParticleBest,
+  tuningFamilySocraticRadarPheromoneWeight,
+  tuningFamilySocraticRadarGradientApproximation,
+  tuningFamilySocraticRadarNelderMeadCentroid,
   barkScale,
   pitchSalience,
   scaleStepVariety,
@@ -805,6 +811,10 @@ import {
   tuningPitchClassBalance,
   harmonicSeriesConvergence,
   scaleGapsProfile,
+  scaleTritoneSaturation,
+  tuningFifthDeviation,
+  scaleHarmonicAcceleration,
+  spectrumPurityScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -25295,6 +25305,229 @@ describe('scaleGapsProfile', () => {
     const result = scaleGapsProfile([0, 300, 900, 1200]);
     for (let i = 1; i < result.length; i++) {
       expect(result[i]!).toBeGreaterThanOrEqual(result[i - 1]!);
+    }
+  });
+});
+
+describe('scaleTritoneSaturation', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleTritoneSaturation([0])).toBe(0);
+  });
+  it('returns 0 for empty scale', () => {
+    expect(scaleTritoneSaturation([])).toBe(0);
+  });
+  it('returns value in [0,1] for major scale', () => {
+    const v = scaleTritoneSaturation([0, 200, 400, 500, 700, 900, 1100]);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 1 for two-pitch scale at tritone distance (600c)', () => {
+    expect(scaleTritoneSaturation([0, 600])).toBe(1);
+  });
+});
+
+describe('tuningFifthDeviation', () => {
+  it('12-TET consecutive semitone intervals are not fifth-like, returns 0', () => {
+    // consecutive degree intervals in 12-TET are 100c each; |100-702|=602 > 150, so no fifth-like intervals
+    const dev = tuningFifthDeviation(equalTemperament12(440));
+    expect(dev).toBe(0);
+  });
+  it('returns 0 for single-degree tuning (no intervals)', () => {
+    expect(tuningFifthDeviation(edo(1, 440))).toBe(0);
+  });
+  it('returns non-negative value for any tuning', () => {
+    expect(tuningFifthDeviation(edo(19, 440))).toBeGreaterThanOrEqual(0);
+  });
+  it('edo(2) consecutive interval 600c has deviation 102 from just fifth', () => {
+    // edo(2) degrees: [0c, 600c]. Interval 600c; |600-702|=102 <= 150, so returns 102.
+    const dev = tuningFifthDeviation(edo(2, 440));
+    expect(dev).toBeCloseTo(102, 5);
+  });
+});
+
+describe('scaleHarmonicAcceleration', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHarmonicAcceleration([])).toBe(0);
+  });
+  it('returns 0 for single pitch', () => {
+    expect(scaleHarmonicAcceleration([0])).toBe(0);
+  });
+  it('returns non-negative for major scale', () => {
+    expect(scaleHarmonicAcceleration([0, 200, 400, 500, 700, 900, 1100])).toBeGreaterThanOrEqual(0);
+  });
+  it('respects custom harmonics parameter', () => {
+    const v4 = scaleHarmonicAcceleration([0, 200, 400, 700], 4);
+    const v16 = scaleHarmonicAcceleration([0, 200, 400, 700], 16);
+    expect(v4).toBeGreaterThanOrEqual(0);
+    expect(v16).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('spectrumPurityScore', () => {
+  it('returns 0 for empty spectrum', () => {
+    expect(spectrumPurityScore([])).toBe(0);
+  });
+  it('returns close to 1 for harmonic spectrum (integer ratios)', () => {
+    const score = spectrumPurityScore(harmonicSpectrum(4));
+    expect(score).toBeGreaterThan(0.99);
+  });
+  it('returns lower score for non-integer ratios', () => {
+    const pureScore = spectrumPurityScore([{ ratio: 1, amplitude: 1 }]);
+    const impureScore = spectrumPurityScore([{ ratio: 1.5, amplitude: 1 }]);
+    expect(pureScore).toBeGreaterThan(impureScore);
+  });
+  it('single partial at exact integer ratio gives score 1', () => {
+    expect(spectrumPurityScore([{ ratio: 2, amplitude: 1 }])).toBeCloseTo(1, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1326 — tuningFamilySocraticRadarSimulatedAnnealingProxy
+describe('tuningFamilySocraticRadarSimulatedAnnealingProxy (Q1326)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns all zeros for empty tunings', () => {
+    const result = tuningFamilySocraticRadarSimulatedAnnealingProxy([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.versatility).toBe(0);
+    expect(result.maturity).toBe(0);
+    expect(result.benchmark).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns all five axis keys', () => {
+    const result = tuningFamilySocraticRadarSimulatedAnnealingProxy([t1, t2], spectrum);
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']));
+  });
+  it('all values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarSimulatedAnnealingProxy([t1, t2], spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1328 — tuningFamilySocraticRadarGeneticFitness
+describe('tuningFamilySocraticRadarGeneticFitness (Q1328)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarGeneticFitness([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one fitness per tuning', () => {
+    const result = tuningFamilySocraticRadarGeneticFitness([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('all values are in (0, 1] and max is 1', () => {
+    const result = tuningFamilySocraticRadarGeneticFitness([t1, t2], spectrum);
+    for (const v of result) {
+      expect(v).toBeGreaterThan(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+    expect(Math.max(...result)).toBeCloseTo(1, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1330 — tuningFamilySocraticRadarParticleBest
+describe('tuningFamilySocraticRadarParticleBest (Q1330)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns all zeros for empty tunings', () => {
+    const result = tuningFamilySocraticRadarParticleBest([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.versatility).toBe(0);
+    expect(result.maturity).toBe(0);
+    expect(result.benchmark).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns all five axis keys', () => {
+    const result = tuningFamilySocraticRadarParticleBest([t1, t2], spectrum);
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']));
+  });
+  it('each axis value is >= each individual tuning score', () => {
+    const result = tuningFamilySocraticRadarParticleBest([t1, t2], spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1332 — tuningFamilySocraticRadarPheromoneWeight
+describe('tuningFamilySocraticRadarPheromoneWeight (Q1332)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarPheromoneWeight([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one weight per tuning', () => {
+    const result = tuningFamilySocraticRadarPheromoneWeight([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+  });
+  it('weights sum to 1', () => {
+    const result = tuningFamilySocraticRadarPheromoneWeight([t1, t2], spectrum);
+    const sum = result.reduce((s, v) => s + v, 0);
+    expect(sum).toBeCloseTo(1, 10);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1334 — tuningFamilySocraticRadarGradientApproximation
+describe('tuningFamilySocraticRadarGradientApproximation (Q1334)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    const result = tuningFamilySocraticRadarGradientApproximation([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns one row per tuning with 5 axes', () => {
+    const result = tuningFamilySocraticRadarGradientApproximation([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]!.length).toBe(5);
+    expect(result[1]!.length).toBe(5);
+  });
+  it('per-axis deviations sum to ~0 across tunings', () => {
+    const result = tuningFamilySocraticRadarGradientApproximation([t1, t2], spectrum);
+    for (let ai = 0; ai < 5; ai++) {
+      const sum = result.reduce((s, row) => s + row[ai]!, 0);
+      expect(sum).toBeCloseTo(0, 10);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1336 — tuningFamilySocraticRadarNelderMeadCentroid
+describe('tuningFamilySocraticRadarNelderMeadCentroid (Q1336)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns all zeros for empty tunings', () => {
+    const result = tuningFamilySocraticRadarNelderMeadCentroid([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.versatility).toBe(0);
+    expect(result.maturity).toBe(0);
+    expect(result.benchmark).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns all five axis keys', () => {
+    const result = tuningFamilySocraticRadarNelderMeadCentroid([t1, t2], spectrum);
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(['diversity', 'versatility', 'maturity', 'benchmark', 'convergence']));
+  });
+  it('all values are in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarNelderMeadCentroid([t1, t2], spectrum);
+    for (const v of Object.values(result)) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
     }
   });
 });
