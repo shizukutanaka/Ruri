@@ -448,6 +448,12 @@ import {
   presetFamilySocraticRadarVarianceExplained,
   presetFamilySocraticRadarSpectralBandwidth,
   presetFamilySocraticRadarAutoCorrelationLag1,
+  presetFamilySocraticRadarKendallTau,
+  presetFamilySocraticRadarConcordancePairs,
+  presetFamilySocraticRadarMannWhitneyU,
+  presetFamilySocraticRadarBootstrapMeanCI,
+  presetFamilySocraticRadarJackknifeVariance,
+  presetFamilySocraticRadarWilcoxonSignedRank,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -13849,5 +13855,121 @@ describe('presetFamilySocraticRadarAutoCorrelationLag1 (Q1289)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarAutoCorrelationLag1(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarKendallTau (Q1291)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns value in [-1, 1]', () => {
+    const result = presetFamilySocraticRadarKendallTau(presetIds, spectrum, 'diversity', 'versatility');
+    expect(result).toBeGreaterThanOrEqual(-1);
+    expect(result).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for single preset (no pairs)', () => {
+    const result = presetFamilySocraticRadarKendallTau(['12-tet'], spectrum, 'diversity', 'maturity');
+    expect(result).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarKendallTau(['unknown-preset'], spectrum, 'diversity', 'versatility')).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarConcordancePairs (Q1293)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns object with concordant/discordant/tied', () => {
+    const result = presetFamilySocraticRadarConcordancePairs(presetIds, spectrum, 'diversity', 'versatility');
+    expect('concordant' in result).toBe(true);
+    expect('discordant' in result).toBe(true);
+    expect('tied' in result).toBe(true);
+  });
+  it('all counts are non-negative', () => {
+    const result = presetFamilySocraticRadarConcordancePairs(presetIds, spectrum, 'maturity', 'benchmark');
+    expect(result.concordant).toBeGreaterThanOrEqual(0);
+    expect(result.discordant).toBeGreaterThanOrEqual(0);
+    expect(result.tied).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarConcordancePairs(['unknown-preset'], spectrum, 'diversity', 'versatility')).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarMannWhitneyU (Q1295)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns non-negative U with default groups', () => {
+    const result = presetFamilySocraticRadarMannWhitneyU(presetIds, spectrum, 'diversity');
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+  it('U is at most groupA.length * groupB.length', () => {
+    const result = presetFamilySocraticRadarMannWhitneyU(presetIds, spectrum, 'maturity', [0], [1]);
+    expect(result).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMannWhitneyU(['unknown-preset'], spectrum, 'diversity')).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarBootstrapMeanCI (Q1297)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns object with mean/lower/upper', () => {
+    const result = presetFamilySocraticRadarBootstrapMeanCI(presetIds, spectrum, 'diversity');
+    expect(typeof result.mean).toBe('number');
+    expect(typeof result.lower).toBe('number');
+    expect(typeof result.upper).toBe('number');
+  });
+  it('lower <= upper', () => {
+    const result = presetFamilySocraticRadarBootstrapMeanCI(presetIds, spectrum, 'maturity');
+    expect(result.lower).toBeLessThanOrEqual(result.upper + 1e-9);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBootstrapMeanCI(['unknown-preset'], spectrum, 'diversity')).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarJackknifeVariance (Q1299)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns object with all 5 axis keys', () => {
+    const result = presetFamilySocraticRadarJackknifeVariance(presetIds, spectrum);
+    expect('diversity' in result).toBe(true);
+    expect('versatility' in result).toBe(true);
+    expect('maturity' in result).toBe(true);
+    expect('benchmark' in result).toBe(true);
+    expect('convergence' in result).toBe(true);
+  });
+  it('all variances are non-negative', () => {
+    const result = presetFamilySocraticRadarJackknifeVariance(presetIds, spectrum);
+    for (const key of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[key]).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarJackknifeVariance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('presetFamilySocraticRadarWilcoxonSignedRank (Q1301)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns { Wplus, Wminus } with default axes diversity vs versatility', () => {
+    const result = presetFamilySocraticRadarWilcoxonSignedRank(presetIds, spectrum);
+    expect(result.Wplus).toBeGreaterThanOrEqual(0);
+    expect(result.Wminus).toBeGreaterThanOrEqual(0);
+  });
+  it('Wplus + Wminus >= 0', () => {
+    const result = presetFamilySocraticRadarWilcoxonSignedRank(presetIds, spectrum, 'maturity', 'benchmark');
+    expect(result.Wplus + result.Wminus).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarWilcoxonSignedRank(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

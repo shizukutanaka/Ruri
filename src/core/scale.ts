@@ -28240,3 +28240,277 @@ export function tuningFamilySocraticRadarAutoCorrelationLag1(
     return denom === 0 ? 0 : num / denom;
   });
 }
+
+// ---------------------------------------------------------------------------
+// Q1290 — tuningFamilySocraticRadarKendallTau
+
+export function tuningFamilySocraticRadarKendallTau(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  axis1: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  axis2: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): number {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis1]);
+  const y = profiles.map((p) => p[axis2]);
+  const n = x.length;
+  if (n < 2) return 0;
+  let C = 0;
+  let D = 0;
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const dx = x[i]! - x[j]!;
+      const dy = y[i]! - y[j]!;
+      const prod = dx * dy;
+      if (prod > 0) C++;
+      else if (prod < 0) D++;
+    }
+  }
+  const total = C + D;
+  return total === 0 ? 0 : (C - D) / total;
+}
+
+// ---------------------------------------------------------------------------
+// Q1292 — tuningFamilySocraticRadarConcordancePairs
+
+export function tuningFamilySocraticRadarConcordancePairs(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  axis1: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  axis2: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): { concordant: number; discordant: number; tied: number } {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis1]);
+  const y = profiles.map((p) => p[axis2]);
+  const n = x.length;
+  let concordant = 0;
+  let discordant = 0;
+  let tied = 0;
+  for (let i = 0; i < n - 1; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const dx = x[i]! - x[j]!;
+      const dy = y[i]! - y[j]!;
+      const prod = dx * dy;
+      if (prod > 0) concordant++;
+      else if (prod < 0) discordant++;
+      else tied++;
+    }
+  }
+  return { concordant, discordant, tied };
+}
+
+// ---------------------------------------------------------------------------
+// Q1294 — tuningFamilySocraticRadarMannWhitneyU
+
+export function tuningFamilySocraticRadarMannWhitneyU(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  groupA: number[],
+  groupB: number[],
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  for (const idx of [...groupA, ...groupB]) {
+    if (idx < 0 || idx >= n) throw new RangeError(`Index ${idx} out of range for tunings array of length ${n}`);
+  }
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let U = 0;
+  for (const a of groupA) {
+    const scoreA = profiles[a]![axis];
+    for (const b of groupB) {
+      const scoreB = profiles[b]![axis];
+      if (scoreA > scoreB) U += 1;
+      else if (scoreA === scoreB) U += 0.5;
+    }
+  }
+  return U;
+}
+
+// ---------------------------------------------------------------------------
+// Q1296 — tuningFamilySocraticRadarBootstrapMeanCI
+
+export function tuningFamilySocraticRadarBootstrapMeanCI(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): { mean: number; lower: number; upper: number } {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => p[axis]);
+  const n = scores.length;
+  if (n === 0) return { mean: 0, lower: 0, upper: 0 };
+  const grandMean = scores.reduce((s, v) => s + v, 0) / n;
+  const B = 100;
+  const bootstrapMeans: number[] = [];
+  for (let i = 0; i < B; i++) {
+    let sum = 0;
+    for (let j = 0; j < n; j++) {
+      const rand = Math.abs(Math.sin(i * i + axis.length + j * 7));
+      const idx = Math.floor(rand * n) % n;
+      sum += scores[idx]!;
+    }
+    bootstrapMeans.push(sum / n);
+  }
+  bootstrapMeans.sort((a, b) => a - b);
+  const lower = bootstrapMeans[Math.floor(0.05 * B)]!;
+  const upper = bootstrapMeans[Math.floor(0.95 * B)]!;
+  return { mean: grandMean, lower, upper };
+}
+
+// ---------------------------------------------------------------------------
+// Q1298 — tuningFamilySocraticRadarJackknifeVariance
+
+export function tuningFamilySocraticRadarJackknifeVariance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const result = {} as Record<AxisKey, number>;
+  const n = tunings.length;
+  if (n <= 1) {
+    for (const ax of axes) result[ax] = 0;
+    return result;
+  }
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  for (const ax of axes) {
+    const scores = profiles.map((p) => p[ax]);
+    const grandMean = scores.reduce((s, v) => s + v, 0) / n;
+    let sumSq = 0;
+    for (let k = 0; k < n; k++) {
+      const meanK = (scores.reduce((s, v) => s + v, 0) - scores[k]!) / (n - 1);
+      sumSq += (meanK - grandMean) * (meanK - grandMean);
+    }
+    result[ax] = ((n - 1) / n) * sumSq;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1300 — tuningFamilySocraticRadarWilcoxonSignedRank
+
+export function tuningFamilySocraticRadarWilcoxonSignedRank(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  axis1: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  axis2: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+): { Wplus: number; Wminus: number } {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const diffs = profiles.map((p) => p[axis1] - p[axis2]);
+  const nonZero = diffs.filter((d) => d !== 0);
+  const absSorted = nonZero.map((d, i) => ({ abs: Math.abs(d), sign: d > 0 ? 1 : -1, origIdx: i }));
+  absSorted.sort((a, b) => a.abs - b.abs);
+  let Wplus = 0;
+  let Wminus = 0;
+  let i = 0;
+  while (i < absSorted.length) {
+    let j = i;
+    while (j < absSorted.length && absSorted[j]!.abs === absSorted[i]!.abs) j++;
+    const rank = (i + 1 + j) / 2;
+    for (let k = i; k < j; k++) {
+      if (absSorted[k]!.sign > 0) Wplus += rank;
+      else Wminus += rank;
+    }
+    i = j;
+  }
+  return { Wplus, Wminus };
+}
+
+// ---------------------------------------------------------------------------
+// OO1 — tuningResolutionFactor
+// ---------------------------------------------------------------------------
+export function tuningResolutionFactor(
+  tuning: TuningSystem,
+  targetRatios: readonly number[] = [1, 1.5, 1.25, 1.333, 2],
+): number {
+  if (targetRatios.length === 0) return 1;
+  const degreeCents = tuning.degrees.map((d) => pitchToCents(d));
+  const degreeRatios = degreeCents.map((c) => Math.pow(2, c / 1200));
+  let sum = 0;
+  for (const target of targetRatios) {
+    let minDev = Infinity;
+    for (const dr of degreeRatios) {
+      const dev = Math.abs(dr - target) / target;
+      if (dev < minDev) minDev = dev;
+    }
+    sum += Math.max(0, 1 - minDev * 10);
+  }
+  return sum / targetRatios.length;
+}
+
+// ---------------------------------------------------------------------------
+// OO2 — scalePentaSubsetQuality
+// ---------------------------------------------------------------------------
+export function scalePentaSubsetQuality(
+  scaleCents: readonly number[],
+  pentatonicIntervals: readonly number[] = [0, 204, 498, 702, 996],
+): number {
+  if (scaleCents.length === 0) return 0;
+  if (pentatonicIntervals.length === 0) return 1;
+  let covered = 0;
+  for (const pInterval of pentatonicIntervals) {
+    for (const sc of scaleCents) {
+      if (Math.abs(sc - pInterval) <= 30) {
+        covered++;
+        break;
+      }
+    }
+  }
+  return covered / pentatonicIntervals.length;
+}
+
+// ---------------------------------------------------------------------------
+// OO3 — harmonicFluxAcrossDegrees
+// ---------------------------------------------------------------------------
+export function harmonicFluxAcrossDegrees(
+  tuning: TuningSystem,
+  spectrum: Spectrum,
+  maxDegrees: number = 12,
+): number {
+  if (maxDegrees < 2) return 0;
+  const degrees = tuning.degrees.slice(0, maxDegrees);
+  if (degrees.length < 2) return 0;
+  const freqs = degrees.map((d) => centsToFreq(pitchToCents(d), tuning.referenceHz));
+  let fluxSum = 0;
+  let count = 0;
+  for (let i = 0; i < freqs.length - 1; i++) {
+    const f1 = freqs[i]!;
+    const f2 = freqs[i + 1]!;
+    if (f1 === 0) continue;
+    const ratio = f2 / f1;
+    const nearest = Math.round(ratio);
+    if (nearest === 0) continue;
+    fluxSum += Math.abs(ratio - nearest) / nearest;
+    count++;
+  }
+  return count === 0 ? 0 : fluxSum / count;
+  void spectrum;
+}
+
+// ---------------------------------------------------------------------------
+// OO4 — intervalGroupSymmetryScore
+// ---------------------------------------------------------------------------
+export function intervalGroupSymmetryScore(scaleCents: readonly number[]): number {
+  if (scaleCents.length <= 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  const n = steps.length;
+  if (n <= 1) return 1;
+  const totalPairs = Math.floor(n / 2);
+  if (totalPairs === 0) return 1;
+  let matching = 0;
+  for (let i = 0; i < totalPairs; i++) {
+    if (Math.abs(steps[i]! - steps[n - 1 - i]!) < 1e-9) {
+      matching++;
+    }
+  }
+  return matching / totalPairs;
+}

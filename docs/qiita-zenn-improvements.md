@@ -515,3 +515,15 @@
 | `intervalDirectionalityBias` | 音程の上下半分への偏在度 |
 | `chordRootAmbiguity` | 和音根音の曖昧性指標 |
 | `scaleColorfulness` | 基準EDO比の色彩度（偏差正規化） |
+
+## Round 32: 調律解像度・ペンタトニック・対称性 (OO1–OO4)
+
+**テーマ**: 調律の純正律解像度・ペンタサブセット品質・調波流束・音程対称性  
+**実装**: OO1–OO4
+
+| 関数 | 説明 |
+|------|------|
+| `tuningResolutionFactor` | 純正率目標比への解像度スコア |
+| `scalePentaSubsetQuality` | ペンタトニックサブセット充足率 |
+| `harmonicFluxAcrossDegrees` | 隣接音度間の調波フラックス |
+| `intervalGroupSymmetryScore` | ステップ音程の回文対称性スコア |

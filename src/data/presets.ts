@@ -441,6 +441,12 @@ import {
   tuningFamilySocraticRadarVarianceExplained,
   tuningFamilySocraticRadarSpectralBandwidth,
   tuningFamilySocraticRadarAutoCorrelationLag1,
+  tuningFamilySocraticRadarKendallTau,
+  tuningFamilySocraticRadarConcordancePairs,
+  tuningFamilySocraticRadarMannWhitneyU,
+  tuningFamilySocraticRadarBootstrapMeanCI,
+  tuningFamilySocraticRadarJackknifeVariance,
+  tuningFamilySocraticRadarWilcoxonSignedRank,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -11372,4 +11378,110 @@ export function presetFamilySocraticRadarAutoCorrelationLag1(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarAutoCorrelationLag1(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarKendallTau(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis1: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  axis2: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarKendallTau> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarKendallTau(tunings, spectrum, axis1, axis2, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarConcordancePairs(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis1: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  axis2: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarConcordancePairs> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarConcordancePairs(tunings, spectrum, axis1, axis2, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarMannWhitneyU(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  groupA: number[] = [0],
+  groupB: number[] = [1],
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMannWhitneyU> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMannWhitneyU(tunings, spectrum, axis, groupA, groupB, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarBootstrapMeanCI(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarBootstrapMeanCI> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarBootstrapMeanCI(tunings, spectrum, axis, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarJackknifeVariance(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarJackknifeVariance> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarJackknifeVariance(tunings, spectrum, rootHz);
+}
+
+// ---------------------------------------------------------------------------
+
+export function presetFamilySocraticRadarWilcoxonSignedRank(
+  presetIds: string[],
+  spectrum: Spectrum,
+  axis1: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence' = 'diversity',
+  axis2: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence' = 'versatility',
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarWilcoxonSignedRank> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarWilcoxonSignedRank(tunings, spectrum, axis1, axis2, rootHz);
 }
