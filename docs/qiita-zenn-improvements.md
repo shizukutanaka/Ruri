@@ -788,3 +788,14 @@
 | LLL4 | `scaleCompetitionIndex` | ニッチ幅の変動係数による競争指数 |
 
 **参考**: Co-occurrence analysis in musicology; Voronoi diagrams applied to pitch space (Tymoczko 2011)。
+
+## Round 56: スケール様式論・対称性メトリクス (MMM1–MMM4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| MMM1 | `scaleModalBrightness` | 各音高の相対的高さの平均（様式的明るさ） |
+| MMM2 | `scaleMaximalEvennessScore` | 最大均等性スコア（ステップ幅の均等度） |
+| MMM3 | `scaleMyhillPropertyScore` | Myhillの性質スコア（汎用音程ごとに2種のみ） |
+| MMM4 | `scaleInversionSymmetryScore` | 反転対称性スコア（音楽的逆行との一致度） |
+
+**参考**: Myhill's property (Clough & Myerson 1985); Modal brightness theory (Rothenberg 1978); Maximal evenness (Clough & Douthett 1991).
