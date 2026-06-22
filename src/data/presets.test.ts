@@ -388,6 +388,12 @@ import {
   presetFamilySocraticRadarMomentumProfile,
   presetFamilySocraticRadarFamilyConvergence,
   presetFamilySocraticRadarRegimeDetection,
+  presetFamilySocraticRadarAutoCorrelation,
+  presetFamilySocraticRadarCrossCorrelation,
+  presetFamilySocraticRadarPhaseSpaceEmbedding,
+  presetFamilySocraticRadarWaveletEnergy,
+  presetFamilySocraticRadarFourierAmplitude,
+  presetFamilySocraticRadarRecurrenceRate,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12657,5 +12663,96 @@ describe('presetFamilySocraticRadarRegimeDetection (Q1169)', () => {
   it('returns array with threshold=0.1', () => {
     const result = presetFamilySocraticRadarRegimeDetection(presetIds, spectrum, 0.1);
     expect(Array.isArray(result)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1171 — presetFamilySocraticRadarAutoCorrelation
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarAutoCorrelation (Q1171)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns finite number in [-1,1]', () => {
+    const r = presetFamilySocraticRadarAutoCorrelation(presetIds, spectrum, 'diversity', 1);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(-1);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1173 — presetFamilySocraticRadarCrossCorrelation
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCrossCorrelation (Q1173)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns finite number in [-1,1]', () => {
+    const r = presetFamilySocraticRadarCrossCorrelation(presetIds, spectrum, 'diversity', 'maturity', 0);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(-1);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1175 — presetFamilySocraticRadarPhaseSpaceEmbedding
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarPhaseSpaceEmbedding (Q1175)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns array of arrays', () => {
+    const r = presetFamilySocraticRadarPhaseSpaceEmbedding(presetIds, spectrum, 'diversity', 2);
+    expect(Array.isArray(r)).toBe(true);
+    expect(Array.isArray(r[0])).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1177 — presetFamilySocraticRadarWaveletEnergy
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarWaveletEnergy (Q1177)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns array of length levels+1 with non-negative energies', () => {
+    const r = presetFamilySocraticRadarWaveletEnergy(presetIds, spectrum, 'diversity', 2);
+    expect(r).toHaveLength(3);
+    for (const e of r) {
+      expect(e).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1179 — presetFamilySocraticRadarFourierAmplitude
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarFourierAmplitude (Q1179)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns array of non-negative finite amplitudes', () => {
+    const r = presetFamilySocraticRadarFourierAmplitude(presetIds, spectrum, 'diversity');
+    expect(Array.isArray(r)).toBe(true);
+    for (const a of r) {
+      expect(Number.isFinite(a)).toBe(true);
+      expect(a).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1181 — presetFamilySocraticRadarRecurrenceRate
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRecurrenceRate (Q1181)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns value in [0,1]', () => {
+    const r = presetFamilySocraticRadarRecurrenceRate(presetIds, spectrum, 'diversity', 0.05);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
   });
 });

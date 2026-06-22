@@ -387,3 +387,17 @@
 - DD2: optimalScaleSubset — 参照音階最大整合の貪欲部分集合選択
 - DD3: beatFrequencyPairs — ビート周波数閾値内の音頻ペア列挙
 - DD4: timbreBasedConsonance — 音色スペクトルに基づく協和度（1/(1+roughness)）
+
+## Round 22: 知覚的距離・認知パーシモニー・調和エントロピー・複雑度比 (EE1–EE4)
+
+**テーマ**: 音律の知覚的・認知的・情報理論的分析
+
+### 研究トピック
+- Qiita: 調和エントロピー（Harmonic Entropy）のTypeScript実装
+- Zenn: 音律の認知的パーシモニーとスケール設計の最適化
+
+### 実装
+- EE1: perceptualTuningDistance — 音律間の知覚的距離（平均ピッチ差）
+- EE2: scaleCognitiveParsimony — 認知的パーシモニー（音数×変動係数の逆数）
+- EE3: harmonicEntropyApproximation — 調和エントロピー近似（ガウス重み付き）
+- EE4: tuningComplexityRatio — 有理数近似に基づく音律複雑度比

@@ -24217,3 +24217,464 @@ export function tuningFamilySocraticRadarRegimeDetection(
   }
   return changePoints.sort((a, b) => a - b);
 }
+
+// ---------------------------------------------------------------------------
+// EE1 — perceptualTuningDistance
+// ---------------------------------------------------------------------------
+
+/**
+ * Perceptual distance between two tunings in cents.
+ *
+ * Converts each degree of both tunings to absolute Hz (using their respective
+ * referenceHz), then computes the log-frequency difference in cents for each
+ * matched pair (by index mod min length). Returns the mean absolute difference.
+ *
+ * Using Hz-based comparison ensures tunings with the same interval structure
+ * but different reference pitches (e.g. A=440 vs A=432) yield non-zero distance.
+ *
+ * @param tuning1 - First tuning system.
+ * @param tuning2 - Second tuning system.
+ * @returns Mean perceptual distance in cents; 0 if either tuning has 0 degrees.
+ *
+ * @example
+ * perceptualTuningDistance(equalTemperament12(440), equalTemperament12(432));
+ */
+export function perceptualTuningDistance(
+  tuning1: TuningSystem,
+  tuning2: TuningSystem,
+): number {
+  const n1 = tuning1.degrees.length;
+  const n2 = tuning2.degrees.length;
+  const n = Math.min(n1, n2);
+  if (n === 0) return 0;
+
+  let totalDist = 0;
+  for (let i = 0; i < n; i++) {
+    const cents1 = pitchToCents(tuning1.degrees[i]!);
+    const cents2 = pitchToCents(tuning2.degrees[i]!);
+    const hz1 = centsToFreq(cents1, tuning1.referenceHz);
+    const hz2 = centsToFreq(cents2, tuning2.referenceHz);
+    totalDist += Math.abs(1200 * Math.log2(hz1 / hz2));
+  }
+  return totalDist / n;
+}
+
+// ---------------------------------------------------------------------------
+// EE2 — scaleCognitiveParsimony
+// ---------------------------------------------------------------------------
+
+/**
+ * Cognitive parsimony of a scale: how easy it is to remember.
+ *
+ * Based on note count and evenness of interval sizes.
+ * Formula: `1 / (1 + (n/7) * cv)` where cv = std/mean of step sizes (wrapping
+ * the octave). Returns 1 for empty or single-note scales.
+ *
+ * @param scaleCents - Sorted scale degrees in cents (ascending).
+ * @returns Value in (0, 1]; higher = more parsimonious.
+ *
+ * @example
+ * scaleCognitiveParsimony([0, 200, 400, 500, 700, 900, 1100]); // diatonic
+ */
+export function scaleCognitiveParsimony(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 1;
+
+  // Compute step sizes including wrap-around
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(scaleCents[i + 1]! - scaleCents[i]!);
+  }
+  // Wrap: from last degree back to first + 1200
+  steps.push(scaleCents[0]! + 1200 - scaleCents[n - 1]!);
+
+  const mean = steps.reduce((s, v) => s + v, 0) / steps.length;
+  if (mean === 0) return 1;
+
+  const variance = steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
+  const std = Math.sqrt(variance);
+  const cv = std / mean;
+
+  // (n/7) multiplies (1 + cv) so that note count always contributes to complexity,
+  // even for perfectly equal-step scales.
+  return 1 / (1 + (n / 7) * (1 + cv));
+}
+
+// ---------------------------------------------------------------------------
+// EE3 — harmonicEntropyApproximation
+// ---------------------------------------------------------------------------
+
+/**
+ * Approximation of Tenney-Harmonic Entropy for an interval.
+ *
+ * Builds a distribution over simple ratios n/d (n,d ≤ maxHarmonic, gcd=1,
+ * ratio in (0.25, 4]), weighted by a Gaussian centred on `intervalCents`.
+ * Returns the Shannon entropy of the normalized distribution.
+ *
+ * Higher values indicate less perceptual definition (more dissonant/ambiguous).
+ *
+ * @param intervalCents - Interval size in cents.
+ * @param spread - Standard deviation of Gaussian kernel in cents (default 15).
+ * @param maxHarmonic - Maximum numerator/denominator (default 16).
+ * @returns Non-negative entropy value.
+ * @throws {RangeError} If maxHarmonic < 2 or spread <= 0.
+ *
+ * @example
+ * harmonicEntropyApproximation(702, 15, 16); // perfect fifth
+ */
+export function harmonicEntropyApproximation(
+  intervalCents: number,
+  spread: number = 15,
+  maxHarmonic: number = 16,
+): number {
+  if (maxHarmonic < 2) throw new RangeError('maxHarmonic must be >= 2');
+  if (spread <= 0) throw new RangeError('spread must be > 0');
+
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+
+  const weights: number[] = [];
+  for (let n = 1; n <= maxHarmonic; n++) {
+    for (let d = 1; d <= maxHarmonic; d++) {
+      if (gcd(n, d) !== 1) continue;
+      const ratio = n / d;
+      if (ratio <= 0.25 || ratio >= 4) continue;
+      const centsRatio = 1200 * Math.log2(ratio);
+      const diff = centsRatio - intervalCents;
+      const w = Math.exp(-(diff * diff) / (2 * spread * spread));
+      weights.push(w);
+    }
+  }
+
+  const totalWeight = weights.reduce((s, w) => s + w, 0);
+  if (totalWeight === 0) return 0;
+
+  let entropy = 0;
+  for (const w of weights) {
+    const p = w / totalWeight;
+    if (p > 0) entropy -= p * Math.log2(p);
+  }
+  return entropy;
+}
+
+// ---------------------------------------------------------------------------
+// EE4 — tuningComplexityRatio
+// ---------------------------------------------------------------------------
+
+/**
+ * Average "simplicity" of rational approximations for each degree in a tuning.
+ *
+ * For each degree, finds the best rational approximation n/d (n,d ≤ maxNumerator,
+ * gcd=1) minimising |pitchRatio - n/d|. Simplicity = 1 / log2(n*d + 1).
+ * Degree 0 = unison = 1/1 contributes simplicity 1 (= 1/log2(2)).
+ *
+ * @param tuning - Tuning system to analyse.
+ * @param maxNumerator - Maximum n and d for rational search (default 32).
+ * @returns Mean simplicity in (0, 1]; higher = simpler tuning.
+ * @throws {RangeError} If maxNumerator < 2.
+ *
+ * @example
+ * tuningComplexityRatio(equalTemperament12(440));
+ */
+export function tuningComplexityRatio(
+  tuning: TuningSystem,
+  maxNumerator: number = 32,
+): number {
+  if (maxNumerator < 2) throw new RangeError('maxNumerator must be >= 2');
+
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+
+  const degrees = tuning.degrees;
+  if (degrees.length === 0) return 1;
+
+  let totalSimplicity = 0;
+  for (const deg of degrees) {
+    const cents = pitchToCents(deg);
+    // Convert cents to pitch ratio relative to reference (ratio = 2^(cents/1200))
+    const pitchRatio = Math.pow(2, cents / 1200);
+
+    let minDiff = Infinity;
+    let bestSimplicity = 0;
+    for (let n = 1; n <= maxNumerator; n++) {
+      for (let d = 1; d <= maxNumerator; d++) {
+        if (gcd(n, d) !== 1) continue;
+        const diff = Math.abs(pitchRatio - n / d);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestSimplicity = 1 / Math.log2(n * d + 1);
+        }
+      }
+    }
+    totalSimplicity += bestSimplicity;
+  }
+  return totalSimplicity / degrees.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1170 — tuningFamilySocraticRadarAutoCorrelation
+// ---------------------------------------------------------------------------
+
+/**
+ * Autocorrelation of axis scores at a given lag.
+ * r(lag) = sum((x[i]-mean)(x[i+lag]-mean)) / sum((x[i]-mean)^2) for i=0..n-lag-1
+ * If n <= lag, returns 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to compute autocorrelation for.
+ * @param lag - Lag value (default 1).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Autocorrelation value in [-1,1].
+ */
+export function tuningFamilySocraticRadarAutoCorrelation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  lag: number = 1,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n <= lag) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => p[axis]);
+  const mean = scores.reduce((s, v) => s + v, 0) / n;
+  let numerator = 0;
+  let denominator = 0;
+  for (let i = 0; i < n - lag; i++) {
+    numerator += (scores[i]! - mean) * (scores[i + lag]! - mean);
+  }
+  for (let i = 0; i < n; i++) {
+    denominator += (scores[i]! - mean) * (scores[i]! - mean);
+  }
+  if (denominator === 0) return 0;
+  return numerator / denominator;
+}
+
+// ---------------------------------------------------------------------------
+// Q1172 — tuningFamilySocraticRadarCrossCorrelation
+// ---------------------------------------------------------------------------
+
+/**
+ * Cross-correlation between two axes at a given lag.
+ * r(lag) = cov(x[i], y[i+lag]) / (std_x * std_y) for i=0..n-|lag|-1
+ * If std is 0, returns 0. Supports negative lag.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis1 - First radar axis.
+ * @param axis2 - Second radar axis.
+ * @param lag - Lag value (default 0). Negative lag shifts y left.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Cross-correlation value in [-1,1].
+ */
+export function tuningFamilySocraticRadarCrossCorrelation(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis1: AxisKey,
+  axis2: AxisKey,
+  lag: number = 0,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const x = profiles.map((p) => p[axis1]);
+  const y = profiles.map((p) => p[axis2]);
+  const absLag = Math.abs(lag);
+  const m = n - absLag;
+  if (m <= 0) return 0;
+
+  const meanX = x.reduce((s, v) => s + v, 0) / n;
+  const meanY = y.reduce((s, v) => s + v, 0) / n;
+
+  let cov = 0;
+  if (lag >= 0) {
+    for (let i = 0; i < m; i++) {
+      cov += (x[i]! - meanX) * (y[i + lag]! - meanY);
+    }
+  } else {
+    for (let i = 0; i < m; i++) {
+      cov += (x[i + absLag]! - meanX) * (y[i]! - meanY);
+    }
+  }
+  cov /= m;
+
+  let stdX = 0;
+  let stdY = 0;
+  for (let i = 0; i < n; i++) {
+    stdX += (x[i]! - meanX) ** 2;
+    stdY += (y[i]! - meanY) ** 2;
+  }
+  stdX = Math.sqrt(stdX / n);
+  stdY = Math.sqrt(stdY / n);
+
+  if (stdX === 0 || stdY === 0) return 0;
+  return cov / (stdX * stdY);
+}
+
+// ---------------------------------------------------------------------------
+// Q1174 — tuningFamilySocraticRadarPhaseSpaceEmbedding
+// ---------------------------------------------------------------------------
+
+/**
+ * Embed axis scores in phase space using delay embedding.
+ * Each point: [x[i], x[i+1], ..., x[i+embeddingDim-1]] for i=0..n-embeddingDim
+ * Returns n-embeddingDim+1 points, each of length embeddingDim.
+ * Throws RangeError if embeddingDim < 1 or embeddingDim > tunings.length.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to embed.
+ * @param embeddingDim - Embedding dimension (default 2).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of points in phase space.
+ */
+export function tuningFamilySocraticRadarPhaseSpaceEmbedding(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  embeddingDim: number = 2,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  if (embeddingDim < 1 || embeddingDim > n) {
+    throw new RangeError(`embeddingDim must be between 1 and ${n}`);
+  }
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => p[axis]);
+  const numPoints = n - embeddingDim + 1;
+  const result: number[][] = [];
+  for (let i = 0; i < numPoints; i++) {
+    const point: number[] = [];
+    for (let d = 0; d < embeddingDim; d++) {
+      point.push(scores[i + d]!);
+    }
+    result.push(point);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1176 — tuningFamilySocraticRadarWaveletEnergy
+// ---------------------------------------------------------------------------
+
+/**
+ * Simplified Haar wavelet decomposition energy at each scale level.
+ * Level 0: original signal energy = sum(x^2) / n
+ * Level k: average pairs from level k-1 signal (drop last if odd length)
+ * Returns array of length levels+1 with energy at each level.
+ * Throws RangeError if levels < 1.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to analyze.
+ * @param levels - Number of wavelet levels (default 3).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of energy values at each level.
+ */
+export function tuningFamilySocraticRadarWaveletEnergy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  levels: number = 3,
+  rootHz?: number,
+): number[] {
+  if (levels < 1) throw new RangeError('levels must be at least 1');
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  let signal = profiles.map((p) => p[axis]);
+  const energies: number[] = [];
+  const n0 = signal.length;
+  const e0 = n0 > 0 ? signal.reduce((s, v) => s + v * v, 0) / n0 : 0;
+  energies.push(e0);
+  for (let lvl = 0; lvl < levels; lvl++) {
+    const len = signal.length % 2 === 0 ? signal.length : signal.length - 1;
+    const next: number[] = [];
+    for (let i = 0; i < len; i += 2) {
+      next.push((signal[i]! + signal[i + 1]!) / 2);
+    }
+    if (next.length === 0) {
+      energies.push(0);
+    } else {
+      const energy = next.reduce((s, v) => s + v * v, 0) / next.length;
+      energies.push(energy);
+    }
+    signal = next;
+  }
+  return energies;
+}
+
+// ---------------------------------------------------------------------------
+// Q1178 — tuningFamilySocraticRadarFourierAmplitude
+// ---------------------------------------------------------------------------
+
+/**
+ * DFT amplitudes of axis scores (magnitude spectrum).
+ * Returns first ceil(n/2)+1 amplitudes (non-redundant half).
+ * Each amplitude = |X[k]| / n where X[k] = sum(x[j] * exp(-2πi*j*k/n)).
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to transform.
+ * @param rootHz - Reference frequency (optional).
+ * @returns Array of DFT amplitudes.
+ */
+export function tuningFamilySocraticRadarFourierAmplitude(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  rootHz?: number,
+): number[] {
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const scores = profiles.map((p) => p[axis]);
+  const numBins = Math.ceil(n / 2) + 1;
+  const amplitudes: number[] = [];
+  for (let k = 0; k < numBins; k++) {
+    let re = 0;
+    let im = 0;
+    for (let j = 0; j < n; j++) {
+      const angle = (2 * Math.PI * j * k) / n;
+      re += scores[j]! * Math.cos(angle);
+      im -= scores[j]! * Math.sin(angle);
+    }
+    amplitudes.push(Math.sqrt(re * re + im * im) / n);
+  }
+  return amplitudes;
+}
+
+// ---------------------------------------------------------------------------
+// Q1180 — tuningFamilySocraticRadarRecurrenceRate
+// ---------------------------------------------------------------------------
+
+/**
+ * Recurrence Rate from Recurrence Quantification Analysis.
+ * Count pairs (i,j) with i≠j where |x[i] - x[j]| ≤ epsilon.
+ * RR = count / (n*(n-1)) — fraction of recurrent pairs.
+ * Returns value in [0,1]. If n < 2, returns 0.
+ *
+ * @param tunings - Array of tunings in the family.
+ * @param spectrum - Timbre spectrum.
+ * @param axis - The radar axis to analyze.
+ * @param epsilon - Distance threshold (default 0.05).
+ * @param rootHz - Reference frequency (optional).
+ * @returns Recurrence rate in [0,1].
+ */
+export function tuningFamilySocraticRadarRecurrenceRate(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  axis: AxisKey,
+  epsilon: number = 0.05,
+  rootHz?: number,
+): number {
+  const n = tunings.length;
+  if (n < 2) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => p[axis]);
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i !== j && Math.abs(scores[i]! - scores[j]!) <= epsilon) {
+        count++;
+      }
+    }
+  }
+  return count / (n * (n - 1));
+}
