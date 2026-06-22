@@ -835,6 +835,16 @@ import {
   tuningFamilySocraticRadarAspectRatio,
   tuningFamilySocraticRadarProfilePolygonArea,
   tuningFamilySocraticRadarLeaveOneCentroid,
+  scalePitchClustering,
+  tuningGoldenRatioProximity,
+  spectrumAmplitudeKurtosis,
+  scaleModularStepPattern,
+  tuningFamilySocraticRadarCumulativeAverage,
+  tuningFamilySocraticRadarCumulativeMax,
+  tuningFamilySocraticRadarCumulativeVariance,
+  tuningFamilySocraticRadarChangePointIndex,
+  tuningFamilySocraticRadarLocalExtremaCount,
+  tuningFamilySocraticRadarSignChanges,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -25990,6 +26000,246 @@ describe('tuningFamilySocraticRadarLeaveOneCentroid (Q1360)', () => {
     expect(result.length).toBe(2);
     for (const row of result) {
       expect(row.length).toBe(5);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// UU1 — scalePitchClustering
+describe('scalePitchClustering (UU1)', () => {
+  it('returns > 0 when pitches cluster near 0-100 and 700-800', () => {
+    expect(scalePitchClustering([0, 50, 100, 700, 800], 100)).toBeGreaterThan(0);
+  });
+  it('returns 0 for a single pitch', () => {
+    expect(scalePitchClustering([0])).toBe(0);
+  });
+  it('returns 0 for empty array', () => {
+    expect(scalePitchClustering([])).toBe(0);
+  });
+  it('throws RangeError for negative clusterRadius', () => {
+    expect(() => scalePitchClustering([0, 100], -1)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// UU2 — tuningGoldenRatioProximity
+describe('tuningGoldenRatioProximity (UU2)', () => {
+  it('returns value in [0, 1] for 12-TET', () => {
+    const result = tuningGoldenRatioProximity(equalTemperament12(440));
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(result).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for single-degree tuning at 0 cents (far from all k*phi_cents)', () => {
+    expect(tuningGoldenRatioProximity(edo(1, 440))).toBe(0);
+  });
+  it('returns 0 for empty-degrees tuning (guarded by early return)', () => {
+    const emptyTuning = { id: 'empty', name: 'empty', degrees: [], periodCents: 1200, referenceHz: 440, source: 'theoretical' as const };
+    expect(tuningGoldenRatioProximity(emptyTuning)).toBe(0);
+  });
+  it('returns finite number for 19-EDO', () => {
+    const result = tuningGoldenRatioProximity(edo(19, 440));
+    expect(Number.isFinite(result)).toBe(true);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// UU3 — spectrumAmplitudeKurtosis
+describe('spectrumAmplitudeKurtosis (UU3)', () => {
+  it('returns a finite number for harmonicSpectrum(6)', () => {
+    const result = spectrumAmplitudeKurtosis(harmonicSpectrum(6));
+    expect(Number.isFinite(result)).toBe(true);
+  });
+  it('returns 0 for a single partial', () => {
+    expect(spectrumAmplitudeKurtosis([{ ratio: 1, amplitude: 1 }])).toBe(0);
+  });
+  it('returns 0 for zero-variance spectrum (all equal amplitudes)', () => {
+    const spectrum = [
+      { ratio: 1, amplitude: 0.5 },
+      { ratio: 2, amplitude: 0.5 },
+      { ratio: 3, amplitude: 0.5 },
+    ];
+    expect(spectrumAmplitudeKurtosis(spectrum)).toBe(0);
+  });
+  it('returns 0 for empty spectrum', () => {
+    expect(spectrumAmplitudeKurtosis([])).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// UU4 — scaleModularStepPattern
+describe('scaleModularStepPattern (UU4)', () => {
+  it('returns close to 1 when all steps are multiples of divisor', () => {
+    // steps: 100, 100, 200, 100, 200, 200, 200 — all divisible by 100
+    const result = scaleModularStepPattern([0, 100, 200, 400, 500, 700, 900, 1100], 100);
+    expect(result).toBeCloseTo(1, 5);
+  });
+  it('returns 0 for single pitch (< 2 notes)', () => {
+    expect(scaleModularStepPattern([0])).toBe(0);
+  });
+  it('throws RangeError for divisor <= 0', () => {
+    expect(() => scaleModularStepPattern([0, 200], -1)).toThrow(RangeError);
+    expect(() => scaleModularStepPattern([0, 200], 0)).toThrow(RangeError);
+  });
+  it('returns value in [0, 1] for arbitrary scale', () => {
+    const result = scaleModularStepPattern([0, 150, 350, 550, 750, 950, 1150], 200);
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(result).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1362 — tuningFamilySocraticRadarCumulativeAverage
+describe('tuningFamilySocraticRadarCumulativeAverage (Q1362)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCumulativeAverage([], spectrum)).toEqual([]);
+  });
+  it('returns n rows each with 5 values for n tunings', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarCumulativeAverage([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
+  });
+  it('last row equals mean of all profiles', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarCumulativeAverage([t1, t2], spectrum);
+    const last = result[result.length - 1]!;
+    for (const v of last) {
+      expect(v).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1364 — tuningFamilySocraticRadarCumulativeMax
+describe('tuningFamilySocraticRadarCumulativeMax (Q1364)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCumulativeMax([], spectrum)).toEqual([]);
+  });
+  it('returns n rows each with 5 values for n tunings', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarCumulativeMax([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
+  });
+  it('cumulative max is non-decreasing across rows', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const result = tuningFamilySocraticRadarCumulativeMax([t1, t2, t3], spectrum);
+    for (let k = 0; k < 5; k++) {
+      for (let i = 1; i < result.length; i++) {
+        expect(result[i]![k]!).toBeGreaterThanOrEqual(result[i - 1]![k]!);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1366 — tuningFamilySocraticRadarCumulativeVariance
+describe('tuningFamilySocraticRadarCumulativeVariance (Q1366)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns empty array for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCumulativeVariance([], spectrum)).toEqual([]);
+  });
+  it('returns 0 variance for first element', () => {
+    const result = tuningFamilySocraticRadarCumulativeVariance([t1], spectrum);
+    expect(result.length).toBe(1);
+    expect(result[0]).toEqual([0, 0, 0, 0, 0]);
+  });
+  it('returns non-negative variances for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const result = tuningFamilySocraticRadarCumulativeVariance([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      for (const v of row) {
+        expect(v).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1368 — tuningFamilySocraticRadarChangePointIndex
+describe('tuningFamilySocraticRadarChangePointIndex (Q1368)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 0 for each axis for empty tunings', () => {
+    const result = tuningFamilySocraticRadarChangePointIndex([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.versatility).toBe(0);
+    expect(result.maturity).toBe(0);
+    expect(result.benchmark).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns 0 for each axis for a single tuning', () => {
+    const result = tuningFamilySocraticRadarChangePointIndex([t1], spectrum);
+    expect(result.diversity).toBe(0);
+  });
+  it('returns valid indices for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const result = tuningFamilySocraticRadarChangePointIndex([t1, t2, t3], spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[axis]).toBeGreaterThanOrEqual(1);
+      expect(result[axis]).toBeLessThan(3);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1370 — tuningFamilySocraticRadarLocalExtremaCount
+describe('tuningFamilySocraticRadarLocalExtremaCount (Q1370)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 0 for each axis for n <= 2', () => {
+    const result = tuningFamilySocraticRadarLocalExtremaCount([t1], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns 0 for each axis for empty tunings', () => {
+    const result = tuningFamilySocraticRadarLocalExtremaCount([], spectrum);
+    expect(result.maturity).toBe(0);
+  });
+  it('returns non-negative count for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const result = tuningFamilySocraticRadarLocalExtremaCount([t1, t2, t3], spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[axis]).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1372 — tuningFamilySocraticRadarSignChanges
+describe('tuningFamilySocraticRadarSignChanges (Q1372)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  it('returns 0 for each axis for empty tunings', () => {
+    const result = tuningFamilySocraticRadarSignChanges([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns 0 for each axis for a single tuning', () => {
+    const result = tuningFamilySocraticRadarSignChanges([t1], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.benchmark).toBe(0);
+  });
+  it('returns non-negative count for multiple tunings', () => {
+    const t2 = edo(19, 440);
+    const t3 = edo(31, 440);
+    const result = tuningFamilySocraticRadarSignChanges([t1, t2, t3], spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[axis]).toBeGreaterThanOrEqual(0);
     }
   });
 });

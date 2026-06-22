@@ -29998,3 +29998,292 @@ export function tuningFamilySocraticRadarLeaveOneCentroid(
     axes.map((_, k) => (fullSum[k]! - row[k]!) / (n - 1)),
   );
 }
+
+// ---------------------------------------------------------------------------
+// Q1362 — tuningFamilySocraticRadarCumulativeAverage
+/**
+ * Running cumulative average of axis scores across tunings in array order.
+ * cumAvg[i][axis] = mean(profiles[0..i][axis])
+ * Returns number[][] (n × 5 axes). Returns empty for empty tunings.
+ */
+export function tuningFamilySocraticRadarCumulativeAverage(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const result: number[][] = [];
+  const runningSum = [0, 0, 0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    for (let k = 0; k < 5; k++) {
+      runningSum[k]! += scores[i]![k]!;
+    }
+    result.push(axes.map((_, k) => runningSum[k]! / (i + 1)));
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1364 — tuningFamilySocraticRadarCumulativeMax
+/**
+ * Running cumulative maximum per axis across tunings.
+ * cumMax[i][axis] = max(profiles[0..i][axis])
+ * Returns number[][] (n × 5 axes). Returns empty for empty tunings.
+ */
+export function tuningFamilySocraticRadarCumulativeMax(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const result: number[][] = [];
+  const runningMax = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < n; i++) {
+    for (let k = 0; k < 5; k++) {
+      runningMax[k] = Math.max(runningMax[k]!, scores[i]![k]!);
+    }
+    result.push(axes.map((_, k) => runningMax[k]!));
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1366 — tuningFamilySocraticRadarCumulativeVariance
+/**
+ * Running cumulative variance (population) per axis across tunings.
+ * cumVar[i][axis] = variance of profiles[0..i][axis]
+ * Variance of single element = 0.
+ * Returns number[][] (n × 5 axes). Returns empty for empty tunings.
+ */
+export function tuningFamilySocraticRadarCumulativeVariance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  if (n === 0) return [];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const result: number[][] = [];
+  // Use Welford's online algorithm for numerical stability
+  const mean = [0, 0, 0, 0, 0];
+  const m2 = [0, 0, 0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    for (let k = 0; k < 5; k++) {
+      const x = scores[i]![k]!;
+      const delta = x - mean[k]!;
+      mean[k]! += delta / (i + 1);
+      const delta2 = x - mean[k]!;
+      m2[k]! += delta * delta2;
+    }
+    result.push(axes.map((_, k) => (i === 0 ? 0 : m2[k]! / (i + 1))));
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1368 — tuningFamilySocraticRadarChangePointIndex
+/**
+ * For each axis, find the index of maximum change between consecutive profiles.
+ * change[i] = |profile[i][axis] - profile[i-1][axis]| for i=1..n-1
+ * Returns Record<AxisKey, number> (0-indexed index of maximum change; 0 if n <= 1)
+ */
+export function tuningFamilySocraticRadarChangePointIndex(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  const defaultResult = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  if (n <= 1) return defaultResult;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const result = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  for (let k = 0; k < 5; k++) {
+    let maxChange = -Infinity;
+    let maxIdx = 1;
+    for (let i = 1; i < n; i++) {
+      const change = Math.abs(scores[i]![k]! - scores[i - 1]![k]!);
+      if (change > maxChange) {
+        maxChange = change;
+        maxIdx = i;
+      }
+    }
+    result[axes[k]!] = maxIdx;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1370 — tuningFamilySocraticRadarLocalExtremaCount
+/**
+ * For each axis, count how many local extrema (maxima OR minima) exist in the axis score sequence.
+ * Local max at i: profile[i][axis] > profile[i-1][axis] AND profile[i][axis] > profile[i+1][axis]
+ * Local min at i: profile[i][axis] < profile[i-1][axis] AND profile[i][axis] < profile[i+1][axis]
+ * Returns Record<AxisKey, number> (count per axis; 0 for n <= 2)
+ */
+export function tuningFamilySocraticRadarLocalExtremaCount(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  const defaultResult = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  if (n <= 2) return defaultResult;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const result = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  for (let k = 0; k < 5; k++) {
+    let count = 0;
+    for (let i = 1; i < n - 1; i++) {
+      const prev = scores[i - 1]![k]!;
+      const curr = scores[i]![k]!;
+      const next = scores[i + 1]![k]!;
+      if ((curr > prev && curr > next) || (curr < prev && curr < next)) {
+        count++;
+      }
+    }
+    result[axes[k]!] = count;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Q1372 — tuningFamilySocraticRadarSignChanges
+/**
+ * For each axis, count sign changes in the deviation sequence: dev[i] = profile[i][axis] - mean[axis]
+ * Sign change at i: sign(dev[i]) != sign(dev[i-1]) (ignoring zeros)
+ * Returns Record<AxisKey, number> (count per axis). Returns 0 for each axis if n <= 1.
+ */
+export function tuningFamilySocraticRadarSignChanges(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+  const n = tunings.length;
+  const defaultResult = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  if (n <= 1) return defaultResult;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const scores = profiles.map((p) => axes.map((axis) => p[axis]));
+  const result = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
+  for (let k = 0; k < 5; k++) {
+    const mean = scores.reduce((s, row) => s + row[k]!, 0) / n;
+    const devs = scores.map((row) => row[k]! - mean);
+    let count = 0;
+    let lastSign = 0;
+    for (let i = 0; i < n; i++) {
+      const d = devs[i]!;
+      if (d !== 0) {
+        const sign = d > 0 ? 1 : -1;
+        if (lastSign !== 0 && sign !== lastSign) {
+          count++;
+        }
+        lastSign = sign;
+      }
+    }
+    result[axes[k]!] = count;
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// UU1 — scalePitchClustering
+export function scalePitchClustering(
+  scaleCents: readonly number[],
+  clusterRadius: number = 100,
+): number {
+  if (clusterRadius < 0) throw new RangeError('clusterRadius must be >= 0');
+  const n = scaleCents.length;
+  if (n <= 1 || clusterRadius === 0) return 0;
+  let totalCount = 0;
+  for (let i = 0; i < n; i++) {
+    let count = 0;
+    for (let j = 0; j < n; j++) {
+      if (i !== j && Math.abs(scaleCents[i]! - scaleCents[j]!) <= clusterRadius) {
+        count++;
+      }
+    }
+    totalCount += count;
+  }
+  return totalCount / n / (n - 1);
+}
+
+// ---------------------------------------------------------------------------
+// UU2 — tuningGoldenRatioProximity
+export function tuningGoldenRatioProximity(tuning: TuningSystem): number {
+  const degrees = tuning.degrees;
+  if (degrees.length === 0) return 0;
+  const phi = (1 + Math.sqrt(5)) / 2;
+  const phiCents = 1200 * Math.log2(phi);
+  let totalScore = 0;
+  for (let i = 0; i < degrees.length; i++) {
+    const cents = pitchToCents(degrees[i]!);
+    let best = 0;
+    for (let k = 1; k <= 5; k++) {
+      const score = Math.max(0, 1 - Math.abs(cents - k * phiCents) / 100);
+      if (score > best) best = score;
+    }
+    totalScore += best;
+  }
+  return totalScore / degrees.length;
+}
+
+// ---------------------------------------------------------------------------
+// UU3 — spectrumAmplitudeKurtosis
+export function spectrumAmplitudeKurtosis(spectrum: Spectrum): number {
+  if (spectrum.length < 2) return 0;
+  const amps = spectrum.map((p) => p.amplitude);
+  const mean = amps.reduce((s, a) => s + a, 0) / amps.length;
+  const variance = amps.reduce((s, a) => s + (a - mean) ** 2, 0) / amps.length;
+  if (variance === 0) return 0;
+  const m4 = amps.reduce((s, a) => s + (a - mean) ** 4, 0) / amps.length;
+  return m4 / variance ** 2 - 3;
+}
+
+// ---------------------------------------------------------------------------
+// UU4 — scaleModularStepPattern
+export function scaleModularStepPattern(
+  scaleCents: readonly number[],
+  divisor: number = 100,
+): number {
+  if (divisor <= 0) throw new RangeError('divisor must be > 0');
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    steps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  let divisibleCount = 0;
+  for (const step of steps) {
+    const rem = ((step % divisor) + divisor) % divisor;
+    if (rem <= 15 || rem >= divisor - 15) {
+      divisibleCount++;
+    }
+  }
+  return divisibleCount / steps.length;
+}

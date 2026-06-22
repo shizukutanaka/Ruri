@@ -484,6 +484,12 @@ import {
   presetFamilySocraticRadarAspectRatio,
   presetFamilySocraticRadarProfilePolygonArea,
   presetFamilySocraticRadarLeaveOneCentroid,
+  presetFamilySocraticRadarCumulativeAverage,
+  presetFamilySocraticRadarCumulativeMax,
+  presetFamilySocraticRadarCumulativeVariance,
+  presetFamilySocraticRadarChangePointIndex,
+  presetFamilySocraticRadarLocalExtremaCount,
+  presetFamilySocraticRadarSignChanges,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -14635,5 +14641,131 @@ describe('presetFamilySocraticRadarLeaveOneCentroid (Q1361)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarLeaveOneCentroid(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1363 — presetFamilySocraticRadarCumulativeAverage
+describe('presetFamilySocraticRadarCumulativeAverage (Q1363)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns empty array for empty presetIds', () => {
+    const result = presetFamilySocraticRadarCumulativeAverage([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns n rows each with 5 values for n presets', () => {
+    const result = presetFamilySocraticRadarCumulativeAverage(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCumulativeAverage(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1365 — presetFamilySocraticRadarCumulativeMax
+describe('presetFamilySocraticRadarCumulativeMax (Q1365)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns empty array for empty presetIds', () => {
+    const result = presetFamilySocraticRadarCumulativeMax([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns n rows each with 5 values for n presets', () => {
+    const result = presetFamilySocraticRadarCumulativeMax(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCumulativeMax(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1367 — presetFamilySocraticRadarCumulativeVariance
+describe('presetFamilySocraticRadarCumulativeVariance (Q1367)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns empty array for empty presetIds', () => {
+    const result = presetFamilySocraticRadarCumulativeVariance([], spectrum);
+    expect(result).toEqual([]);
+  });
+  it('returns n rows each with 5 values for n presets', () => {
+    const result = presetFamilySocraticRadarCumulativeVariance(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    for (const row of result) {
+      expect(row.length).toBe(5);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCumulativeVariance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1369 — presetFamilySocraticRadarChangePointIndex
+describe('presetFamilySocraticRadarChangePointIndex (Q1369)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for each axis for empty presetIds', () => {
+    const result = presetFamilySocraticRadarChangePointIndex([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns valid indices for two presets', () => {
+    const result = presetFamilySocraticRadarChangePointIndex(presetIds, spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[axis]).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarChangePointIndex(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1371 — presetFamilySocraticRadarLocalExtremaCount
+describe('presetFamilySocraticRadarLocalExtremaCount (Q1371)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for each axis for empty presetIds', () => {
+    const result = presetFamilySocraticRadarLocalExtremaCount([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns non-negative counts for two presets', () => {
+    const result = presetFamilySocraticRadarLocalExtremaCount(presetIds, spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[axis]).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLocalExtremaCount(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1373 — presetFamilySocraticRadarSignChanges
+describe('presetFamilySocraticRadarSignChanges (Q1373)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns 0 for each axis for empty presetIds', () => {
+    const result = presetFamilySocraticRadarSignChanges([], spectrum);
+    expect(result.diversity).toBe(0);
+    expect(result.convergence).toBe(0);
+  });
+  it('returns non-negative counts for two presets', () => {
+    const result = presetFamilySocraticRadarSignChanges(presetIds, spectrum);
+    for (const axis of ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'] as const) {
+      expect(result[axis]).toBeGreaterThanOrEqual(0);
+    }
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSignChanges(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

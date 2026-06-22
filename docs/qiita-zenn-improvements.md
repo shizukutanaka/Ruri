@@ -587,3 +587,15 @@
 | `chordJustIntonationScore` | 和音の純正律近似スコア |
 | `spectrumHarmonicDeviation` | スペクトル比の整数倍音偏差 |
 | `scaleVoiceLeadingEfficiency` | スケール間の声部進行距離 |
+
+## Round 38: ピッチクラスタリング・黄金比・スペクトル尖度 (UU1–UU4)
+
+**テーマ**: ピッチ密集度・黄金比近似・振幅尖度・ステップ周期性  
+**実装**: UU1–UU4
+
+| 関数 | 説明 |
+|------|------|
+| `scalePitchClustering` | ピッチのクラスタリング密度 |
+| `tuningGoldenRatioProximity` | 黄金比音程への近似度 |
+| `spectrumAmplitudeKurtosis` | スペクトル振幅の超過尖度 |
+| `scaleModularStepPattern` | 基本音程の倍数ステップ割合 |
