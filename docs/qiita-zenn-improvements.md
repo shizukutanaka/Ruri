@@ -843,3 +843,14 @@
 | QQQ4 | `scaleSelfSimilarityScore` | 逆行（後退形）との自己相似性スコア |
 
 **参考**: Voice-leading geometry (Tymoczko 2011); Parsimonious voice leading (Cohn 1996).
+
+## Round 61: 音程複雑性・クラスタリング・分散指数 (RRR1–RRR4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| RRR1 | `scaleIntervalComplexityRatio` | 単純比率音程（5-limit以下）が占める割合 |
+| RRR2 | `scaleUniquePitchClassCount` | 一意の音高クラス数（セント整数丸め） |
+| RRR3 | `scaleClusteringScore` | 50セント以内に隣接音を持つ音の割合 |
+| RRR4 | `scaleDispersionIndex` | ステップサイズの分散/平均（Fano因子） |
+
+**参考**: Intervallic complexity in scale theory; Fano factor in statistics.
