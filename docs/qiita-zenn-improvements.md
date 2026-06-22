@@ -1096,3 +1096,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | OOO2 | `scaleCriticalBandDensity` | 臨界帯域内に収まる音程対の密度 |
 | OOO3 | `scaleMaskingIndex` | スペクトルマスキングによる隠蔽音の割合 |
 | OOO4 | `scalePitchHeightSpread` | Barkスケールでの音高高さの広がり |
+
+## Round 84: 音脈分凝分析 (PPP1–PPP4)
+
+聴覚ストリーム分凝・融合・ゲシュタルト近接性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| PPP1 | `scaleStreamSegregationIndex` | 音脈分凝指数（大跳躍によるストリーム分割確率） |
+| PPP2 | `scaleFusionIndex` | 聴覚融合指数（小ステップによる単一知覚確率） |
+| PPP3 | `scalePitchProximityGrouping` | ゲシュタルト近接性によるグルーピング指数 |
+| PPP4 | `scaleTonalFusion` | 倍音列との整数比近接度による調性融合スコア |
