@@ -1088,6 +1088,9 @@ import {
   scaleWorkingMemoryLoad,
   scaleCognitiveClusters,
   scalePatternRegularity,
+  scaleSmallWorldIndex,
+  scaleHubScore,
+  scaleBridgingCoefficient,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -30480,6 +30483,72 @@ describe('Q1660 tuningFamilySocraticRadarActionMeanProxy', () => {
   });
   it('different tunings → non-negative', () => {
     expect(tuningFamilySocraticRadarActionMeanProxy([equalTemperament12(440), edo(19, 440)], s)).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('UUU2 scaleSmallWorldIndex', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const pentatonic = [0, 240, 480, 720, 960];
+  it('empty → 0', () => {
+    expect(scaleSmallWorldIndex([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleSmallWorldIndex([0])).toBe(0);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const r = scaleSmallWorldIndex(chromatic);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,240,480,720,960] → finite, >=0', () => {
+    const r = scaleSmallWorldIndex(pentatonic);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('UUU3 scaleHubScore', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const pentatonic = [0, 240, 480, 720, 960];
+  it('empty → 0', () => {
+    expect(scaleHubScore([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleHubScore([0])).toBe(0);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const r = scaleHubScore(chromatic);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,240,480,720,960] → finite, >=0', () => {
+    const r = scaleHubScore(pentatonic);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('UUU4 scaleBridgingCoefficient', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const pentatonic = [0, 240, 480, 720, 960];
+  it('empty → 0', () => {
+    expect(scaleBridgingCoefficient([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleBridgingCoefficient([0])).toBe(0);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const r = scaleBridgingCoefficient(chromatic);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('pentatonic [0,240,480,720,960] → finite, >=0', () => {
+    const r = scaleBridgingCoefficient(pentatonic);
+    expect(Number.isFinite(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
   });
 });
 
