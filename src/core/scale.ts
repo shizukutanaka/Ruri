@@ -40755,6 +40755,136 @@ export function tuningFamilySocraticRadarManifoldDimensionProxyV2(
   return Math.max(0, Math.min(1, sum / vecs.length));
 }
 
+// Q1878 — tuningFamilySocraticRadarGradientDescentProxy
+export function tuningFamilySocraticRadarGradientDescentProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const maxV = Math.max(...vec);
+    const minV = Math.min(...vec);
+    const gradient = maxV - minV;
+    sum += gradient;
+  }
+  return Math.max(0, Math.min(1, sum / vecs.length));
+}
+
+// Q1880 — tuningFamilySocraticRadarLossLandscapeProxy
+export function tuningFamilySocraticRadarLossLandscapeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    let d2sum = 0;
+    for (let i = 0; i <= 2; i++) {
+      const d2 = Math.abs(sorted[i + 2]! - 2 * sorted[i + 1]! + sorted[i]!);
+      d2sum += d2;
+    }
+    const roughness = Math.max(0, Math.min(1, d2sum / 3 / 2));
+    sum += roughness;
+  }
+  return Math.max(0, Math.min(1, sum / vecs.length));
+}
+
+// Q1882 — tuningFamilySocraticRadarOverfittingProxy
+export function tuningFamilySocraticRadarOverfittingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const mean_v = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const var_v = vec.reduce((a, b) => a + (b - mean_v) * (b - mean_v), 0) / vec.length;
+    const overfitting = Math.max(0, Math.min(1, var_v / (mean_v * (1 - mean_v) + 1e-10)));
+    sum += overfitting;
+  }
+  return Math.max(0, Math.min(1, sum / vecs.length));
+}
+
+// Q1884 — tuningFamilySocraticRadarRegularizationProxy
+export function tuningFamilySocraticRadarRegularizationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const l1 = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const sparsity = 1 - l1;
+    sum += sparsity;
+  }
+  return Math.max(0, Math.min(1, sum / vecs.length));
+}
+
+// Q1886 — tuningFamilySocraticRadarBiasVarianceProxy
+export function tuningFamilySocraticRadarBiasVarianceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const bias = Math.abs(mean - 0.5);
+    const variance = vec.reduce((a, b) => a + (b - mean) * (b - mean), 0) / vec.length;
+    const tradeoff = 1 - Math.min(1, bias * 2 + variance * 4);
+    sum += tradeoff;
+  }
+  return Math.max(0, Math.min(1, sum / vecs.length));
+}
+
+// Q1888 — tuningFamilySocraticRadarDimensionalityCurseProxy
+export function tuningFamilySocraticRadarDimensionalityCurseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const maxV = Math.max(...vec);
+    const minV = Math.min(...vec);
+    const concentration = 1 - (maxV - minV);
+    sum += concentration;
+  }
+  return Math.max(0, Math.min(1, sum / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -43596,4 +43726,109 @@ export function scaleDeepScaleProperty(
   }
   const distinctMultiplicities = new Set(multiplicities).size;
   return distinctMultiplicities / (n - 1);
+}
+
+// Round 82: 旋法的中心性 (Modal Centricity)
+
+/**
+ * NNN1: scaleModalCenterDiversity
+ * How many distinct "modal centers" the scale supports —
+ * count of distinct step patterns when rotated, normalized by n.
+ */
+export function scaleModalCenterDiversity(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  tolerance = 5,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const fingerprints = new Set<string>();
+  for (let k = 0; k < n; k++) {
+    const steps: number[] = [];
+    for (let i = 0; i < n; i++) {
+      const curr = sorted[(k + i) % n]!;
+      const next = sorted[(k + i + 1) % n]!;
+      const step = ((next - curr + periodCents) % periodCents);
+      steps.push(Math.round(step / tolerance));
+    }
+    fingerprints.add(steps.join(','));
+  }
+  return fingerprints.size / n;
+}
+
+/**
+ * NNN2: scaleLeadingToneStrengthV2
+ * Presence and strength of leading tones (notes within leadingToneRange cents of a scale degree from below).
+ * (V2 because scaleLeadingToneStrength already exists)
+ */
+export function scaleLeadingToneStrengthV2(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  leadingToneRange = 150,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let leadingToneCount = 0;
+  for (const d of sorted) {
+    let hasLeadingTone = false;
+    for (const dp of sorted) {
+      if (dp === d) continue;
+      // Check d' -> d from below (in normal or wrapped sense)
+      const diff = ((d - dp + periodCents) % periodCents);
+      if (diff > 0 && diff <= leadingToneRange) {
+        hasLeadingTone = true;
+        break;
+      }
+    }
+    if (hasLeadingTone) leadingToneCount++;
+  }
+  return leadingToneCount / n;
+}
+
+/**
+ * NNN3: scaleGravityField
+ * Tonal gravity — weighted pull toward stable scale degrees (root, fifth, octave).
+ */
+export function scaleGravityField(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const stableTargets = [0, (periodCents * 7) / 12, periodCents];
+  let totalGravity = 0;
+  for (const c of scaleCents) {
+    const minDist = Math.min(...stableTargets.map((s) => Math.abs(c - s)));
+    const gravity = 1 / (minDist + 1);
+    totalGravity += gravity;
+  }
+  return Math.min(1, totalGravity / n);
+}
+
+/**
+ * NNN4: scaleResolutionTendency
+ * Resolution tendency — proportion of unstable degrees that resolve stepwise to a stable degree.
+ */
+export function scaleResolutionTendency(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+  stableThreshold = 50,
+  stepRange = 200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const stableTargets = [0, (periodCents * 7) / 12, periodCents];
+  const isStable = (c: number): boolean =>
+    Math.min(...stableTargets.map((s) => Math.abs(c - s))) < stableThreshold;
+  const stableDegrees = scaleCents.filter(isStable);
+  const unstableDegrees = scaleCents.filter((c) => !isStable(c));
+  if (unstableDegrees.length === 0) return 1;
+  let resolving = 0;
+  for (const d of unstableDegrees) {
+    const resolves = stableDegrees.some((s) => Math.abs(d - s) <= stepRange);
+    if (resolves) resolving++;
+  }
+  return resolving / unstableDegrees.length;
 }
