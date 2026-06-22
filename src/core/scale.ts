@@ -37463,6 +37463,7 @@ export function scaleJustProximityScore(scaleCents: readonly number[], periodCen
 export function scaleMaxGapRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
+  if (n === 1) return 1;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   const steps: number[] = [];
   for (let i = 0; i < n; i++) {

@@ -821,3 +821,14 @@
 | OOO4 | `scaleStepRatioVariance` | 連続ステップサイズ比の分散 |
 
 **参考**: Transpositional symmetry in pitch-class set theory (Forte 1977); Rothenberg's scale coherence model.
+
+## Round 59: スケール純正律近似・ステップ幅分析 (PPP1–PPP4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| PPP1 | `scaleJustProximityScore` | 7-limit純正律音程に近い音高の割合 |
+| PPP2 | `scaleMaxGapRatio` | 最大ステップ/最小ステップの比（不均等度） |
+| PPP3 | `scaleMinStepCents` | 最小ステップサイズ（セント） |
+| PPP4 | `scaleMaxStepCents` | 最大ステップサイズ（セント） |
+
+**参考**: 7-limit just intonation (Partch 1949); Scale step distribution analysis (Clough & Myerson 1985).
