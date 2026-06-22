@@ -942,3 +942,14 @@
 | ZZZ2 | `scaleDominantStrength` | 属音強度（700セント近傍） |
 | ZZZ3 | `scaleModalCenterDispersion` | モーダルセンター分散（円形平均偏差） |
 | ZZZ4 | `scaleLeadingNoteProximity` | 導音近傍度（±100セント以内の音の割合） |
+
+## Round 70: 音程多様性・分布 (AAA1–AAA4)
+
+音階内の音程クラス分布を分析する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| AAA1 | `scaleIntervalVariety` | 音程クラス種類数/12（多様性） |
+| AAA2 | `scaleIntervalBalance` | 音程ヒストグラムの均衡度（1-CV） |
+| AAA3 | `scaleIntervalDominance` | 最頻音程クラスの占有率 |
+| AAA4 | `scaleIntervalEntropy` | 音程クラス分布のShannon entropy |
