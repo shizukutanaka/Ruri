@@ -38455,6 +38455,134 @@ export function tuningFamilySocraticRadarSrOptimalNoiseProxy(
   return Math.max(0, Math.min(1, sum / tunings.length));
 }
 
+// Q1722 — tuningFamilySocraticRadarPartitionFunctionProxy
+export function tuningFamilySocraticRadarPartitionFunctionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const beta = 2;
+  let sum = 0;
+  for (const vec of vecs) {
+    const nAxes = vec.length;
+    const Z = vec.reduce((acc, pi) => acc + Math.exp(beta * pi), 0);
+    const normalized = Z / (nAxes * Math.exp(beta));
+    sum += Math.max(0, Math.min(1, normalized));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1724 — tuningFamilySocraticRadarBoltzmannEntropyMean
+export function tuningFamilySocraticRadarBoltzmannEntropyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-10;
+  let sum = 0;
+  for (const vec of vecs) {
+    const entropy = -vec.reduce((acc, pi) => acc + pi * Math.log(pi + eps), 0);
+    const normalized = entropy / Math.log(5);
+    sum += Math.max(0, Math.min(1, normalized));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1726 — tuningFamilySocraticRadarFreeEnergyDifferenceMean
+export function tuningFamilySocraticRadarFreeEnergyDifferenceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-10;
+  const T = 0.5;
+  const freeEnergies = vecs.map((vec) => {
+    const U = vec.reduce((a, b) => a + b, 0);
+    const S = -vec.reduce((acc, pi) => acc + pi * Math.log(pi + eps), 0);
+    return U - T * S;
+  });
+  if (freeEnergies.length < 2) return 0;
+  let sum = 0;
+  let count = 0;
+  for (let i = 1; i < freeEnergies.length; i++) {
+    sum += Math.abs(freeEnergies[i]! - freeEnergies[i - 1]!);
+    count++;
+  }
+  return count > 0 ? sum / count : 0;
+}
+
+// Q1728 — tuningFamilySocraticRadarHeatCapacityProxy
+export function tuningFamilySocraticRadarHeatCapacityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    const variance = vec.reduce((a, b) => a + (b - mean) ** 2, 0) / vec.length;
+    sum += variance / (variance + 0.1);
+  }
+  return sum / tunings.length;
+}
+
+// Q1730 — tuningFamilySocraticRadarMagnetizationProxy
+export function tuningFamilySocraticRadarMagnetizationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
+    sum += Math.abs(mean - 0.5) * 2;
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1732 — tuningFamilySocraticRadarSusceptibilityProxy
+export function tuningFamilySocraticRadarSusceptibilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const tuningMeans = vecs.map((vec) => vec.reduce((a, b) => a + b, 0) / vec.length);
+  const globalMean = tuningMeans.reduce((a, b) => a + b, 0) / tuningMeans.length;
+  const variance =
+    tuningMeans.reduce((a, b) => a + (b - globalMean) ** 2, 0) / tuningMeans.length;
+  return Math.max(0, Math.min(1, variance / (variance + 0.01)));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -39915,4 +40043,87 @@ export function scaleWellformedness(scaleCents: readonly number[], periodCents: 
     if (coverage > bestCoverage) bestCoverage = coverage;
   }
   return bestCoverage / n;
+}
+
+/**
+ * ZZZ1 — scaleTonicStrengthV2
+ * How strong the tonic (first degree = 0 cents) is relative to other pitches.
+ * Computes intervals from 0 to each other pitch (wrapped), counts how many are
+ * perfect unison (0), perfect 5th (700±30), perfect 4th (500±30), or octave (1200).
+ * Returns (count + 1) / (n + 1); 0 for n=0.
+ */
+export function scaleTonicStrengthV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    const interval = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+    if (
+      interval === 0 ||
+      Math.abs(interval - 700) <= 30 ||
+      Math.abs(interval - 500) <= 30 ||
+      interval === 1200
+    ) {
+      count++;
+    }
+  }
+  return (count + 1) / (n + 1);
+}
+
+/**
+ * ZZZ2 — scaleDominantStrength
+ * Strength of the dominant (closest pitch to 700 cents, wrapped).
+ * Finds the pitch closest to 700 cents (mod period).
+ * Returns 1 - (min_distance / 350); clamped to [0,1]; 0 for n=0.
+ */
+export function scaleDominantStrength(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const target = 700;
+  let minDist = Infinity;
+  for (let i = 0; i < n; i++) {
+    const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+    const dist = Math.abs(pitch - target);
+    if (dist < minDist) minDist = dist;
+  }
+  return Math.max(0, Math.min(1, 1 - minDist / 350));
+}
+
+/**
+ * ZZZ3 — scaleModalCenterDispersion
+ * How dispersed the scale is around the modal center (mean pitch, mod period).
+ * Computes circular mean via sin/cos vectors.
+ * Mean angular deviation = 1 - (norm of mean vector / n).
+ * Returns value in [0,1]; 0 for n=0.
+ */
+export function scaleModalCenterDispersion(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let sumSin = 0;
+  let sumCos = 0;
+  for (let i = 0; i < n; i++) {
+    const angle = (2 * Math.PI * (((scaleCents[i]! % periodCents) + periodCents) % periodCents)) / periodCents;
+    sumSin += Math.sin(angle);
+    sumCos += Math.cos(angle);
+  }
+  const R = Math.sqrt(sumSin * sumSin + sumCos * sumCos);
+  return Math.max(0, Math.min(1, 1 - R / n));
+}
+
+/**
+ * ZZZ4 — scaleLeadingNoteProximity
+ * How many pitches are within a semitone (100 cents) of the tonic (0 or periodCents).
+ * Counts pitches where min(pitch mod period, period - pitch mod period) <= 100.
+ * Returns count / n; 0 for n=0.
+ */
+export function scaleLeadingNoteProximity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+    const dist = Math.min(pitch, periodCents - pitch);
+    if (dist <= 100) count++;
+  }
+  return count / n;
 }

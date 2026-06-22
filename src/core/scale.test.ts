@@ -1131,6 +1131,10 @@ import {
   scaleMaxStepRatio,
   scaleIrregularityIndex,
   scaleWellformedness,
+  scaleTonicStrengthV2,
+  scaleDominantStrength,
+  scaleModalCenterDispersion,
+  scaleLeadingNoteProximity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -31480,6 +31484,104 @@ describe('scaleWellformedness', () => {
   });
   it('uneven scale [0, 100, 400, 700, 1100] → finite, in [0,1]', () => {
     const v = scaleWellformedness([0, 100, 400, 700, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+
+describe('scaleTonicStrengthV2', () => {
+  it('empty → 0', () => {
+    expect(scaleTonicStrengthV2([])).toBe(0);
+  });
+  it('single pitch [0] → finite, in [0,1]', () => {
+    const v = scaleTonicStrengthV2([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale → finite, in [0,1]', () => {
+    const v = scaleTonicStrengthV2([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleTonicStrengthV2(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleDominantStrength', () => {
+  it('empty → 0', () => {
+    expect(scaleDominantStrength([])).toBe(0);
+  });
+  it('single pitch [0] → finite, in [0,1]', () => {
+    const v = scaleDominantStrength([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale → finite, in [0,1]', () => {
+    const v = scaleDominantStrength([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleDominantStrength(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleModalCenterDispersion', () => {
+  it('empty → 0', () => {
+    expect(scaleModalCenterDispersion([])).toBe(0);
+  });
+  it('single pitch [0] → finite, in [0,1]', () => {
+    const v = scaleModalCenterDispersion([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale → finite, in [0,1]', () => {
+    const v = scaleModalCenterDispersion([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleModalCenterDispersion(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleLeadingNoteProximity', () => {
+  it('empty → 0', () => {
+    expect(scaleLeadingNoteProximity([])).toBe(0);
+  });
+  it('single pitch [0] → finite, in [0,1]', () => {
+    const v = scaleLeadingNoteProximity([0]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('major scale → finite, in [0,1]', () => {
+    const v = scaleLeadingNoteProximity([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('chromatic 12-TET → finite, in [0,1]', () => {
+    const v = scaleLeadingNoteProximity(chromatic);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);

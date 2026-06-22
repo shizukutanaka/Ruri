@@ -931,3 +931,14 @@
 | YYY2 | `scaleMaxStepRatio` | 最大/最小ステップ比の非均等度 |
 | YYY3 | `scaleIrregularityIndex` | Entner式非規則性指数（円環） |
 | YYY4 | `scaleWellformedness` | 生成子カバレッジによる整形性 |
+
+## Round 69: モーダルセンター・安定音 (ZZZ1–ZZZ4)
+
+音階の調性中心・安定音特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| ZZZ1 | `scaleTonicStrengthV2` | 主音強度（完全音程との一致度） |
+| ZZZ2 | `scaleDominantStrength` | 属音強度（700セント近傍） |
+| ZZZ3 | `scaleModalCenterDispersion` | モーダルセンター分散（円形平均偏差） |
+| ZZZ4 | `scaleLeadingNoteProximity` | 導音近傍度（±100セント以内の音の割合） |
