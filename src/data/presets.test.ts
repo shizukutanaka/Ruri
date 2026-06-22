@@ -628,6 +628,12 @@ import {
   presetFamilySocraticRadarKineticEnergyMean,
   presetFamilySocraticRadarFreeEnergyMean,
   presetFamilySocraticRadarActionMeanProxy,
+  presetFamilySocraticRadarVonNeumannEntropyMean,
+  presetFamilySocraticRadarQuantumFidelityMean,
+  presetFamilySocraticRadarEntanglementProxyMean,
+  presetFamilySocraticRadarQuantumCoherenceMean,
+  presetFamilySocraticRadarDecoherenceMean,
+  presetFamilySocraticRadarQuantumDiscordProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -17039,5 +17045,89 @@ describe('Q1661 presetFamilySocraticRadarActionMeanProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarActionMeanProxy(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1663 — presetFamilySocraticRadarVonNeumannEntropyMean
+describe('Q1663 presetFamilySocraticRadarVonNeumannEntropyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarVonNeumannEntropyMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarVonNeumannEntropyMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarVonNeumannEntropyMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1665 — presetFamilySocraticRadarQuantumFidelityMean
+describe('Q1665 presetFamilySocraticRadarQuantumFidelityMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarQuantumFidelityMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarQuantumFidelityMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarQuantumFidelityMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1667 — presetFamilySocraticRadarEntanglementProxyMean
+describe('Q1667 presetFamilySocraticRadarEntanglementProxyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarEntanglementProxyMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarEntanglementProxyMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEntanglementProxyMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1669 — presetFamilySocraticRadarQuantumCoherenceMean
+describe('Q1669 presetFamilySocraticRadarQuantumCoherenceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarQuantumCoherenceMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarQuantumCoherenceMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarQuantumCoherenceMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1671 — presetFamilySocraticRadarDecoherenceMean
+describe('Q1671 presetFamilySocraticRadarDecoherenceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarDecoherenceMean(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarDecoherenceMean(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDecoherenceMean(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1673 — presetFamilySocraticRadarQuantumDiscordProxy
+describe('Q1673 presetFamilySocraticRadarQuantumDiscordProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarQuantumDiscordProxy(['12-tet'], s))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarQuantumDiscordProxy(['12-tet', 'just-5-limit'], s))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarQuantumDiscordProxy(['unknown'], s)).toThrow(RangeError);
   });
 });

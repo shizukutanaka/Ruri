@@ -37594,6 +37594,195 @@ export function tuningFamilySocraticRadarActionMeanProxy(
   return sum / (vecs.length - 1);
 }
 
+// Q1662 — tuningFamilySocraticRadarVonNeumannEntropyMean
+export function tuningFamilySocraticRadarVonNeumannEntropyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    let H = 0;
+    for (let k = 0; k < 5; k++) {
+      const p = vec[k]!;
+      H += -p * Math.log2(p + 1e-10);
+    }
+    sum += H / Math.log2(5);
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1664 — tuningFamilySocraticRadarQuantumFidelityMean
+export function tuningFamilySocraticRadarQuantumFidelityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length === 1) {
+    const vec = vecs[0]!;
+    let s = 0;
+    for (let k = 0; k < 5; k++) s += vec[k]!;
+    return s > 0 ? 1 : 0;
+  }
+  let sum = 0;
+  let count = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const p = vecs[i]!;
+    const q = vecs[i + 1]!;
+    let num = 0;
+    let sp = 0;
+    let sq = 0;
+    for (let k = 0; k < 5; k++) {
+      num += Math.sqrt(p[k]! * q[k]!);
+      sp += p[k]!;
+      sq += q[k]!;
+    }
+    const denom = Math.sqrt(sp * sq);
+    sum += denom > 0 ? num / denom : 0;
+    count++;
+  }
+  return count > 0 ? Math.max(0, Math.min(1, sum / count)) : 0;
+}
+
+// Q1666 — tuningFamilySocraticRadarEntanglementProxyMean
+export function tuningFamilySocraticRadarEntanglementProxyMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const entropy = (v: number[]): number => {
+    let H = 0;
+    let s = 0;
+    for (let k = 0; k < v.length; k++) s += v[k]!;
+    for (let k = 0; k < v.length; k++) {
+      const p = s > 0 ? v[k]! / s : 1 / v.length;
+      H += -p * Math.log2(p + 1e-10);
+    }
+    return H;
+  };
+  let sum = 0;
+  for (const vec of vecs) {
+    const A = [vec[0]!, vec[1]!, vec[2]!];
+    const B = [vec[3]!, vec[4]!];
+    const AB = vec.slice();
+    const HA = entropy(A) / Math.log2(3);
+    const HB = entropy(B) / Math.log2(2);
+    const HAB = entropy(AB) / Math.log2(5);
+    const mi = (HA + HB - HAB);
+    sum += Math.max(0, Math.min(1, mi));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1668 — tuningFamilySocraticRadarQuantumCoherenceMean
+export function tuningFamilySocraticRadarQuantumCoherenceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // C(5,2) = 10
+  const pairs = 10;
+  let sum = 0;
+  for (const vec of vecs) {
+    let coh = 0;
+    for (let i = 0; i < 5; i++) {
+      for (let j = i + 1; j < 5; j++) {
+        coh += Math.abs(vec[i]! - vec[j]!);
+      }
+    }
+    sum += coh / pairs;
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1670 — tuningFamilySocraticRadarDecoherenceMean
+export function tuningFamilySocraticRadarDecoherenceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const pairs = 10;
+  let sum = 0;
+  for (const vec of vecs) {
+    let coh = 0;
+    for (let i = 0; i < 5; i++) {
+      for (let j = i + 1; j < 5; j++) {
+        coh += Math.abs(vec[i]! - vec[j]!);
+      }
+    }
+    sum += 1 - coh / pairs;
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
+// Q1672 — tuningFamilySocraticRadarQuantumDiscordProxy
+export function tuningFamilySocraticRadarQuantumDiscordProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const entropy = (v: number[]): number => {
+    let H = 0;
+    let s = 0;
+    for (let k = 0; k < v.length; k++) s += v[k]!;
+    for (let k = 0; k < v.length; k++) {
+      const p = s > 0 ? v[k]! / s : 1 / v.length;
+      H += -p * Math.log2(p + 1e-10);
+    }
+    return H;
+  };
+  let sum = 0;
+  for (const vec of vecs) {
+    const A = [vec[0]!, vec[1]!, vec[2]!];
+    const B = [vec[3]!, vec[4]!];
+    const AB = vec.slice();
+    const HA = entropy(A) / Math.log2(3);
+    const HB = entropy(B) / Math.log2(2);
+    const HAB = entropy(AB) / Math.log2(5);
+    const totalCorr = (HA + HB - HAB);
+    // Classical correlation: max single-axis contribution
+    let maxSingle = 0;
+    for (let k = 0; k < 5; k++) {
+      const p = vec[k]!;
+      const h = -p * Math.log2(p + 1e-10) / Math.log2(5);
+      if (h > maxSingle) maxSingle = h;
+    }
+    const discord = totalCorr - maxSingle;
+    sum += Math.max(0, Math.min(1, discord));
+  }
+  return Math.max(0, Math.min(1, sum / tunings.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -38500,4 +38689,123 @@ export function scalePatternRegularity(scaleCents: readonly number[], periodCent
     if (valid) return p / n;
   }
   return 1;
+}
+
+// UUU2 — Small-world index: clustering coefficient / (path efficiency + 1e-9), clamped to [0,1]
+export function scaleSmallWorldIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  // Build adjacency (interval diff <= 100 cents, wrapped)
+  const adj: boolean[][] = Array.from({ length: n }, () => new Array(n).fill(false) as boolean[]);
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const wrapped = Math.min(diff, periodCents - diff);
+      if (wrapped <= 100) {
+        adj[i]![j] = true;
+        adj[j]![i] = true;
+      }
+    }
+  }
+  // Local clustering coefficient for each node
+  let clusteringSum = 0;
+  for (let i = 0; i < n; i++) {
+    const neighbors: number[] = [];
+    for (let j = 0; j < n; j++) {
+      if (adj[i]![j]) neighbors.push(j);
+    }
+    const ki = neighbors.length;
+    if (ki < 2) continue;
+    let triangles = 0;
+    for (let a = 0; a < ki; a++) {
+      for (let b = a + 1; b < ki; b++) {
+        if (adj[neighbors[a]!]![neighbors[b]!]) triangles++;
+      }
+    }
+    clusteringSum += (2 * triangles) / (ki * (ki - 1));
+  }
+  const clusteringCoeff = clusteringSum / n;
+  // Path efficiency: average 1/dist for reachable pairs using BFS
+  let efficiencySum = 0;
+  let pairCount = 0;
+  for (let src = 0; src < n; src++) {
+    const dist: number[] = new Array(n).fill(-1) as number[];
+    dist[src] = 0;
+    const queue: number[] = [src];
+    let qi = 0;
+    while (qi < queue.length) {
+      const cur = queue[qi++]!;
+      for (let nb = 0; nb < n; nb++) {
+        if (adj[cur]![nb] && dist[nb] === -1) {
+          dist[nb] = dist[cur]! + 1;
+          queue.push(nb);
+        }
+      }
+    }
+    for (let tgt = 0; tgt < n; tgt++) {
+      if (tgt !== src && dist[tgt]! > 0) {
+        efficiencySum += 1 / dist[tgt]!;
+        pairCount++;
+      }
+    }
+  }
+  const pathEfficiency = pairCount > 0 ? efficiencySum / pairCount : 0;
+  const result = clusteringCoeff / (pathEfficiency + 1e-9);
+  return Math.min(result, 1);
+}
+
+// UUU3 — Hub score: max degree / (n-1) in 150-cent adjacency graph
+export function scaleHubScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  let maxDegree = 0;
+  for (let i = 0; i < n; i++) {
+    let degree = 0;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const wrapped = Math.min(diff, periodCents - diff);
+      if (wrapped <= 150) degree++;
+    }
+    if (degree > maxDegree) maxDegree = degree;
+  }
+  return maxDegree / (n - 1);
+}
+
+// UUU4 — Bridging coefficient (Valente & Fujimoto 2010): mean bridging score over nodes with degree>=1
+export function scaleBridgingCoefficient(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  // Build adjacency using 100-cent threshold (same as UUU2)
+  const degrees: number[] = new Array(n).fill(0) as number[];
+  const adj: boolean[][] = Array.from({ length: n }, () => new Array(n).fill(false) as boolean[]);
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const wrapped = Math.min(diff, periodCents - diff);
+      if (wrapped <= 100) {
+        adj[i]![j] = true;
+        adj[j]![i] = true;
+        degrees[i]!++;
+        degrees[j]!++;
+      }
+    }
+  }
+  let bridgingSum = 0;
+  let activeCount = 0;
+  for (let i = 0; i < n; i++) {
+    const di = degrees[i]!;
+    if (di === 0) continue;
+    // Sum of 1/degree_j for neighbors j
+    let neighborDegreeInvSum = 0;
+    for (let j = 0; j < n; j++) {
+      if (adj[i]![j]) {
+        neighborDegreeInvSum += 1 / degrees[j]!;
+      }
+    }
+    const bridging_i = neighborDegreeInvSum > 0 ? (1 / di) / neighborDegreeInvSum : 0;
+    bridgingSum += bridging_i;
+    activeCount++;
+  }
+  return activeCount > 0 ? bridgingSum / activeCount : 0;
 }
