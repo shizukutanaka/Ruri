@@ -963,6 +963,12 @@ import {
   tuningFamilySocraticRadarProfileContrastMean,
   tuningFamilySocraticRadarProfilePeaknessMean,
   tuningFamilySocraticRadarProfileFlatnessMean,
+  tuningFamilySocraticRadarSpearmanMean,
+  tuningFamilySocraticRadarKendallTauMean,
+  tuningFamilySocraticRadarConcordanceMean,
+  tuningFamilySocraticRadarFootruleDistanceMean,
+  tuningFamilySocraticRadarRankEntropyMean,
+  tuningFamilySocraticRadarProfileMadMean,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -29592,5 +29598,93 @@ describe('OOO4 scaleStepRatioVariance', () => {
   });
   it('non-uniform scale → positive variance', () => {
     expect(scaleStepRatioVariance([0, 100, 700, 900])).toBeGreaterThan(0);
+  });
+});
+
+describe('Q1590 tuningFamilySocraticRadarSpearmanMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarSpearmanMean([], s)).toBe(0);
+  });
+  it('returns 0 for single tuning (n≤1)', () => {
+    expect(tuningFamilySocraticRadarSpearmanMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns value in [-1,1] for two tunings', () => {
+    const r = tuningFamilySocraticRadarSpearmanMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(-1);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1592 tuningFamilySocraticRadarKendallTauMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarKendallTauMean([], s)).toBe(0);
+  });
+  it('returns 0 for single tuning (n≤1)', () => {
+    expect(tuningFamilySocraticRadarKendallTauMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns value in [-1,1] for two tunings', () => {
+    const r = tuningFamilySocraticRadarKendallTauMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(-1);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1594 tuningFamilySocraticRadarConcordanceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarConcordanceMean([], s)).toBe(0);
+  });
+  it('returns 0 for single tuning (n≤1)', () => {
+    expect(tuningFamilySocraticRadarConcordanceMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns value in [0,1] for two tunings', () => {
+    const r = tuningFamilySocraticRadarConcordanceMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q1596 tuningFamilySocraticRadarFootruleDistanceMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarFootruleDistanceMean([], s)).toBe(0);
+  });
+  it('returns 0 for single tuning (n≤1)', () => {
+    expect(tuningFamilySocraticRadarFootruleDistanceMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarFootruleDistanceMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1598 tuningFamilySocraticRadarRankEntropyMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarRankEntropyMean([], s)).toBe(0);
+  });
+  it('returns 0 for single tuning (n≤1)', () => {
+    expect(tuningFamilySocraticRadarRankEntropyMean([equalTemperament12(440)], s)).toBe(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarRankEntropyMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1600 tuningFamilySocraticRadarProfileMadMean', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for empty', () => {
+    expect(tuningFamilySocraticRadarProfileMadMean([], s)).toBe(0);
+  });
+  it('returns non-negative for single tuning', () => {
+    const r = tuningFamilySocraticRadarProfileMadMean([equalTemperament12(440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+  });
+  it('returns non-negative for two tunings', () => {
+    const r = tuningFamilySocraticRadarProfileMadMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(r).toBeGreaterThanOrEqual(0);
   });
 });
