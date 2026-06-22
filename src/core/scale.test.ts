@@ -949,6 +949,10 @@ import {
   scaleDensityHistogram,
   scaleDensityEntropy,
   scaleUniformityScore,
+  scaleReachabilityMatrix,
+  scaleReachabilityScore,
+  scaleAveragePath,
+  scaleWienerIndex,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -28234,5 +28238,75 @@ describe('Q1492 tuningFamilySocraticRadarDiatonicCorrelation', () => {
   });
   it('returns finite number for two tunings', () => {
     expect(Number.isFinite(tuningFamilySocraticRadarDiatonicCorrelation([t, t], s))).toBe(true);
+  });
+});
+
+describe('GGG1 scaleReachabilityMatrix', () => {
+  it('empty → []', () => {
+    expect(scaleReachabilityMatrix([])).toEqual([]);
+  });
+  it('n=3 matrix is 3×3', () => {
+    const r = scaleReachabilityMatrix([0, 400, 700]);
+    expect(r).toHaveLength(3);
+    expect(r[0]).toHaveLength(3);
+  });
+  it('diagonal is 0', () => {
+    const r = scaleReachabilityMatrix([0, 400, 700]);
+    for (let i = 0; i < 3; i++) expect(r[i]![i]).toBe(0);
+  });
+  it('adjacent pitches have distance 1', () => {
+    const r = scaleReachabilityMatrix([0, 400, 700], 3);
+    expect(r[0]![1]).toBe(1);
+  });
+});
+
+describe('GGG2 scaleReachabilityScore', () => {
+  it('n<=1 → 0', () => {
+    expect(scaleReachabilityScore([0])).toBe(0);
+    expect(scaleReachabilityScore([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const r = scaleReachabilityScore([0, 400, 700, 900], 2);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('with maxSteps=n → 1 (all reachable)', () => {
+    const scale = [0, 400, 700, 900];
+    expect(scaleReachabilityScore(scale, scale.length)).toBe(1);
+  });
+  it('n=2 → 1', () => {
+    expect(scaleReachabilityScore([0, 600])).toBe(1);
+  });
+});
+
+describe('GGG3 scaleAveragePath', () => {
+  it('n<=1 → 0', () => {
+    expect(scaleAveragePath([0])).toBe(0);
+  });
+  it('n=2 → 1', () => {
+    expect(scaleAveragePath([0, 600])).toBe(1);
+  });
+  it('n=4 → average is 4/3 ≈ 1.333', () => {
+    // distances: (0,1)=1,(0,2)=2,(0,3)=1,(1,2)=1,(1,3)=2,(2,3)=1 → mean=8/6=4/3
+    expect(scaleAveragePath([0, 300, 600, 900])).toBeCloseTo(4 / 3, 5);
+  });
+  it('returns non-negative', () => {
+    expect(scaleAveragePath([0, 200, 400, 700, 900])).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('GGG4 scaleWienerIndex', () => {
+  it('n<=1 → 0', () => {
+    expect(scaleWienerIndex([0])).toBe(0);
+  });
+  it('n=2 → 1', () => {
+    expect(scaleWienerIndex([0, 600])).toBe(1);
+  });
+  it('n=4 → 8', () => {
+    // sum of all pairwise distances: 1+2+1+1+2+1 = 8
+    expect(scaleWienerIndex([0, 300, 600, 900])).toBe(8);
+  });
+  it('returns non-negative', () => {
+    expect(scaleWienerIndex([0, 200, 400, 700, 900])).toBeGreaterThanOrEqual(0);
   });
 });

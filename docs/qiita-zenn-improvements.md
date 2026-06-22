@@ -722,3 +722,14 @@
 | FFF4 | `scaleUniformityScore` | KS統計量ベースの均一分布スコア(1=完全均一) |
 
 **参考**: Scale uniformity and gap distribution analysis; KS test for pitch uniformity。
+
+## Round 50: スケール到達可能性・ウィーナー指数 (GGG1–GGG4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| GGG1 | `scaleReachabilityMatrix` | 円形スケールグラフの到達可能性行列(最小ステップ数) |
+| GGG2 | `scaleReachabilityScore` | maxSteps以内で到達可能なペア率 |
+| GGG3 | `scaleAveragePath` | 全ペア間の平均最短ステップ数 |
+| GGG4 | `scaleWienerIndex` | 全ペア最短パス距離の総和(Wiener指数) |
+
+**参考**: Wiener index in chemical graph theory (Wiener 1947); Pitch-class graphs in music theory。
