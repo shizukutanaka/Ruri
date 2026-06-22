@@ -436,6 +436,12 @@ import {
   presetFamilySocraticRadarBetweennessProxy,
   presetFamilySocraticRadarModularityScore,
   presetFamilySocraticRadarNetworkDensity,
+  presetFamilySocraticRadarJensenShannonDivergence,
+  presetFamilySocraticRadarEarthMoverDistance,
+  presetFamilySocraticRadarTotalVariationDistance,
+  presetFamilySocraticRadarHellingerDistance,
+  presetFamilySocraticRadarBhattacharyyaCoefficient,
+  presetFamilySocraticRadarKLDivergenceAsymmetric,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -13595,5 +13601,127 @@ describe('presetFamilySocraticRadarNetworkDensity (Q1265)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarNetworkDensity(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarJensenShannonDivergence (Q1267)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a 2×2 matrix with zeros on diagonal', () => {
+    const result = presetFamilySocraticRadarJensenShannonDivergence(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('is symmetric', () => {
+    const result = presetFamilySocraticRadarJensenShannonDivergence(presetIds, spectrum);
+    expect(result[0]![1]).toBeCloseTo(result[1]![0]!, 5);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarJensenShannonDivergence(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarEarthMoverDistance (Q1269)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a 2×2 matrix with zeros on diagonal', () => {
+    const result = presetFamilySocraticRadarEarthMoverDistance(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('is symmetric', () => {
+    const result = presetFamilySocraticRadarEarthMoverDistance(presetIds, spectrum);
+    expect(result[0]![1]).toBeCloseTo(result[1]![0]!, 5);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEarthMoverDistance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarTotalVariationDistance (Q1271)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a 2×2 matrix with values in [0, 0.5]', () => {
+    const result = presetFamilySocraticRadarTotalVariationDistance(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[0]![1]).toBeLessThanOrEqual(0.5);
+  });
+  it('is symmetric', () => {
+    const result = presetFamilySocraticRadarTotalVariationDistance(presetIds, spectrum);
+    expect(result[0]![1]).toBeCloseTo(result[1]![0]!, 5);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTotalVariationDistance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarHellingerDistance (Q1273)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a 2×2 matrix with values in [0, 1]', () => {
+    const result = presetFamilySocraticRadarHellingerDistance(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[0]![1]).toBeLessThanOrEqual(1);
+  });
+  it('is symmetric', () => {
+    const result = presetFamilySocraticRadarHellingerDistance(presetIds, spectrum);
+    expect(result[0]![1]).toBeCloseTo(result[1]![0]!, 5);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHellingerDistance(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarBhattacharyyaCoefficient (Q1275)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a 2×2 matrix with diagonal close to 1', () => {
+    const result = presetFamilySocraticRadarBhattacharyyaCoefficient(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(1, 5);
+    expect(result[1]![1]).toBeCloseTo(1, 5);
+  });
+  it('off-diagonal values in [0, 1]', () => {
+    const result = presetFamilySocraticRadarBhattacharyyaCoefficient(presetIds, spectrum);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[0]![1]).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBhattacharyyaCoefficient(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarKLDivergenceAsymmetric (Q1277)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns a 2×2 matrix with zeros on diagonal', () => {
+    const result = presetFamilySocraticRadarKLDivergenceAsymmetric(presetIds, spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('non-negative values off-diagonal', () => {
+    const result = presetFamilySocraticRadarKLDivergenceAsymmetric(presetIds, spectrum);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[1]![0]).toBeGreaterThanOrEqual(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarKLDivergenceAsymmetric(['unknown-preset'], spectrum)).toThrow(RangeError);
   });
 });

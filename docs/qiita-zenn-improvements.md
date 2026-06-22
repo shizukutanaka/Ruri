@@ -491,3 +491,15 @@
 | `spectralFlatness` | スペクトル平坦度（Wienerエントロピー） |
 | `scaleRootedness` | スケールの根音支持度（倍音整合スコア） |
 | `partialMaskingScore` | 倍音間マスキング度（スペクトル密集度） |
+
+## Round 30: スケール密度・和音カバレッジ分析 (MM1–MM4)
+
+**テーマ**: スケール密度・調律ステップ分散・和音カバレッジ・倍音偏差  
+**実装**: MM1–MM4
+
+| 関数 | 説明 |
+|------|------|
+| `scaleDensityProfile` | ウィンドウ内の音密度プロファイル |
+| `tuningStepsVariance` | 調律ステップ幅の分散 |
+| `scaleChordCoverage` | スケールによる和音音程カバレッジ率 |
+| `harmonicSeriesDeviation` | 倍音列への近似偏差（平均セント） |

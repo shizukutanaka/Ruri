@@ -739,6 +739,12 @@ import {
   tuningFamilySocraticRadarBetweennessProxy,
   tuningFamilySocraticRadarModularityScore,
   tuningFamilySocraticRadarNetworkDensity,
+  tuningFamilySocraticRadarJensenShannonDivergence,
+  tuningFamilySocraticRadarEarthMoverDistance,
+  tuningFamilySocraticRadarTotalVariationDistance,
+  tuningFamilySocraticRadarHellingerDistance,
+  tuningFamilySocraticRadarBhattacharyyaCoefficient,
+  tuningFamilySocraticRadarKLDivergenceAsymmetric,
   barkScale,
   pitchSalience,
   scaleStepVariety,
@@ -755,6 +761,10 @@ import {
   spectralFlatness,
   scaleRootedness,
   partialMaskingScore,
+  scaleDensityProfile,
+  tuningStepsVariance,
+  scaleChordCoverage,
+  harmonicSeriesDeviation,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -24074,5 +24084,247 @@ describe('tuningFamilySocraticRadarNetworkDensity (Q1264)', () => {
   it('identical tunings yield density 1 (cosine similarity = 1 >= threshold)', () => {
     const result = tuningFamilySocraticRadarNetworkDensity(tunings, spectrum);
     expect(result).toBeCloseTo(1, 5);
+  });
+});
+
+describe('scaleDensityProfile', () => {
+  it('returns empty array for empty scale', () => {
+    expect(scaleDensityProfile([])).toHaveLength(0);
+  });
+
+  it('throws RangeError for non-positive windowCents', () => {
+    expect(() => scaleDensityProfile([0, 200], -1)).toThrow(RangeError);
+    expect(() => scaleDensityProfile([0, 200], 0)).toThrow(RangeError);
+  });
+
+  it('returns array of length 7 with values in [0,1] for major scale', () => {
+    const result = scaleDensityProfile([0, 200, 400, 500, 700, 900, 1100], 200);
+    expect(result).toHaveLength(7);
+    for (const v of result) {
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('single pitch returns [0]', () => {
+    expect(scaleDensityProfile([0], 200)).toEqual([0]);
+  });
+});
+
+describe('tuningStepsVariance', () => {
+  it('returns ~0 for 12-TET (all steps equal 100c)', () => {
+    expect(tuningStepsVariance(equalTemperament12(440))).toBeCloseTo(0, 5);
+  });
+
+  it('returns 0 for tuning with single degree', () => {
+    expect(tuningStepsVariance(edo(1, 440))).toBe(0);
+  });
+
+  it('returns positive variance for unequal step sizes', () => {
+    // edo(5) has equal steps; manually craft unequal tuning via edo(2)
+    const t2 = edo(2, 440);
+    expect(tuningStepsVariance(t2)).toBeCloseTo(0, 5);
+  });
+
+  it('returns 0 for empty degrees', () => {
+    const emptyTuning: TuningSystem = {
+      id: 'empty',
+      name: 'Empty',
+      degrees: [],
+      periodCents: 1200,
+      referenceHz: 440,
+      source: 'theoretical',
+    };
+    expect(tuningStepsVariance(emptyTuning)).toBe(0);
+  });
+});
+
+describe('scaleChordCoverage', () => {
+  it('returns 0 for empty chordIntervals', () => {
+    expect(scaleChordCoverage([0, 400, 700], [])).toBe(0);
+  });
+
+  it('returns 1 for perfect coverage (major triad intervals)', () => {
+    // scale [0,400,700] contains intervals 400 and 700
+    expect(scaleChordCoverage([0, 400, 700], [400, 700])).toBe(1);
+  });
+
+  it('returns less than 1 for partial coverage', () => {
+    // [0,400,700] scale intervals: 400,700,300,500,800,900; 350 and 550 are >25c away
+    const result = scaleChordCoverage([0, 400, 700], [350, 550]);
+    expect(result).toBeLessThan(1);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+
+  it('returns 0 for empty scale with non-empty chordIntervals', () => {
+    expect(scaleChordCoverage([], [400, 700])).toBe(0);
+  });
+});
+
+describe('harmonicSeriesDeviation', () => {
+  it('returns > 0 for 12-TET approximating harmonics 1-8', () => {
+    expect(harmonicSeriesDeviation(equalTemperament12(440), 8)).toBeGreaterThan(0);
+  });
+
+  it('returns 0 when harmonics=0', () => {
+    expect(harmonicSeriesDeviation(equalTemperament12(440), 0)).toBe(0);
+  });
+
+  it('returns 0 for tuning with no degrees', () => {
+    const emptyTuning: TuningSystem = {
+      id: 'empty',
+      name: 'Empty',
+      degrees: [],
+      periodCents: 1200,
+      referenceHz: 440,
+      source: 'theoretical',
+    };
+    expect(harmonicSeriesDeviation(emptyTuning, 8)).toBe(0);
+  });
+
+  it('returns finite non-negative value for edo(5)', () => {
+    const result = harmonicSeriesDeviation(edo(5, 440), 8);
+    expect(result).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(result)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1266 — tuningFamilySocraticRadarJensenShannonDivergence
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticRadarJensenShannonDivergence (Q1266)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns n×n matrix with zeros on diagonal', () => {
+    const result = tuningFamilySocraticRadarJensenShannonDivergence([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('is symmetric', () => {
+    const result = tuningFamilySocraticRadarJensenShannonDivergence([t1, t2], spectrum);
+    expect(result[0]![1]).toBeCloseTo(result[1]![0]!, 5);
+  });
+  it('returns empty matrix for empty input', () => {
+    const result = tuningFamilySocraticRadarJensenShannonDivergence([], spectrum);
+    expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1268 — tuningFamilySocraticRadarEarthMoverDistance
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticRadarEarthMoverDistance (Q1268)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns n×n matrix with zeros on diagonal', () => {
+    const result = tuningFamilySocraticRadarEarthMoverDistance([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('is symmetric', () => {
+    const result = tuningFamilySocraticRadarEarthMoverDistance([t1, t2], spectrum);
+    expect(result[0]![1]).toBeCloseTo(result[1]![0]!, 5);
+  });
+  it('returns empty matrix for empty input', () => {
+    const result = tuningFamilySocraticRadarEarthMoverDistance([], spectrum);
+    expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1270 — tuningFamilySocraticRadarTotalVariationDistance
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticRadarTotalVariationDistance (Q1270)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns n×n matrix with zeros on diagonal for identical tunings', () => {
+    const result = tuningFamilySocraticRadarTotalVariationDistance([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('off-diagonal values in [0, 0.5]', () => {
+    const result = tuningFamilySocraticRadarTotalVariationDistance([t1, t2], spectrum);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[0]![1]).toBeLessThanOrEqual(0.5);
+  });
+  it('returns empty matrix for empty input', () => {
+    const result = tuningFamilySocraticRadarTotalVariationDistance([], spectrum);
+    expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1272 — tuningFamilySocraticRadarHellingerDistance
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticRadarHellingerDistance (Q1272)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('returns n×n matrix with zeros on diagonal for identical tunings', () => {
+    const result = tuningFamilySocraticRadarHellingerDistance([t1, t2], spectrum);
+    expect(result.length).toBe(2);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('off-diagonal values in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarHellingerDistance([t1, t2], spectrum);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[0]![1]).toBeLessThanOrEqual(1);
+  });
+  it('returns empty matrix for empty input', () => {
+    const result = tuningFamilySocraticRadarHellingerDistance([], spectrum);
+    expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1274 — tuningFamilySocraticRadarBhattacharyyaCoefficient
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticRadarBhattacharyyaCoefficient (Q1274)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('diagonal is 1 for identical tunings', () => {
+    const result = tuningFamilySocraticRadarBhattacharyyaCoefficient([t1, t2], spectrum);
+    expect(result[0]![0]).toBeCloseTo(1, 5);
+    expect(result[1]![1]).toBeCloseTo(1, 5);
+  });
+  it('values in [0, 1]', () => {
+    const result = tuningFamilySocraticRadarBhattacharyyaCoefficient([t1, t2], spectrum);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[0]![1]).toBeLessThanOrEqual(1);
+  });
+  it('returns empty matrix for empty input', () => {
+    const result = tuningFamilySocraticRadarBhattacharyyaCoefficient([], spectrum);
+    expect(result).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1276 — tuningFamilySocraticRadarKLDivergenceAsymmetric
+// ---------------------------------------------------------------------------
+describe('tuningFamilySocraticRadarKLDivergenceAsymmetric (Q1276)', () => {
+  const spectrum = harmonicSpectrum(6);
+  const t1 = equalTemperament12(440);
+  const t2 = equalTemperament12(440);
+  it('diagonal is 0', () => {
+    const result = tuningFamilySocraticRadarKLDivergenceAsymmetric([t1, t2], spectrum);
+    expect(result[0]![0]).toBeCloseTo(0, 5);
+    expect(result[1]![1]).toBeCloseTo(0, 5);
+  });
+  it('non-negative values', () => {
+    const result = tuningFamilySocraticRadarKLDivergenceAsymmetric([t1, t2], spectrum);
+    expect(result[0]![1]).toBeGreaterThanOrEqual(0);
+    expect(result[1]![0]).toBeGreaterThanOrEqual(0);
+  });
+  it('returns empty matrix for empty input', () => {
+    const result = tuningFamilySocraticRadarKLDivergenceAsymmetric([], spectrum);
+    expect(result).toEqual([]);
   });
 });

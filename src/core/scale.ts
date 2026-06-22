@@ -27526,3 +27526,373 @@ export function partialMaskingScore(
   }
   return totalMasking / pairs;
 }
+
+// ---------------------------------------------------------------------------
+// Q1266 — tuningFamilySocraticRadarJensenShannonDivergence
+// ---------------------------------------------------------------------------
+export function tuningFamilySocraticRadarJensenShannonDivergence(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  if (n === 0) return matrix;
+
+  const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  // Normalize a profile to a PMF
+  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+    const vals = axes.map((k) => profile[k]);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
+    return vals.map((v) => v / sum);
+  }
+
+  function klDiv(P: number[], M: number[]): number {
+    let kl = 0;
+    for (let k = 0; k < P.length; k++) {
+      const p = P[k]!;
+      const m = M[k]!;
+      if (p > 0 && m > 0) kl += p * Math.log2(p / m);
+    }
+    return kl;
+  }
+
+  const pmfs = profiles.map(toPMF);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const P = pmfs[i]!;
+      const Q = pmfs[j]!;
+      const M = P.map((p, k) => (p + Q[k]!) / 2);
+      const jsd = 0.5 * klDiv(P, M) + 0.5 * klDiv(Q, M);
+      matrix[i]![j] = jsd;
+      matrix[j]![i] = jsd;
+    }
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1268 — tuningFamilySocraticRadarEarthMoverDistance
+// ---------------------------------------------------------------------------
+export function tuningFamilySocraticRadarEarthMoverDistance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  if (n === 0) return matrix;
+
+  const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function toSortedScores(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+    return axes.map((k) => profile[k]).sort((a, b) => a - b);
+  }
+
+  function emd(sortedA: number[], sortedB: number[]): number {
+    const len = sortedA.length;
+    const maxVal = Math.max(...sortedA, ...sortedB);
+    if (maxVal === 0) return 0;
+    // Uniform weights — compute CDFs and integrate L1 difference
+    let totalVar = 0;
+    let cdfA = 0;
+    let cdfB = 0;
+    for (let k = 0; k < len; k++) {
+      cdfA += sortedA[k]! / (maxVal * len);
+      cdfB += sortedB[k]! / (maxVal * len);
+      totalVar += Math.abs(cdfA - cdfB);
+    }
+    return totalVar / len;
+  }
+
+  const sortedProfiles = profiles.map(toSortedScores);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const d = emd(sortedProfiles[i]!, sortedProfiles[j]!);
+      matrix[i]![j] = d;
+      matrix[j]![i] = d;
+    }
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1270 — tuningFamilySocraticRadarTotalVariationDistance
+// ---------------------------------------------------------------------------
+export function tuningFamilySocraticRadarTotalVariationDistance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  if (n === 0) return matrix;
+
+  const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+    const vals = axes.map((k) => profile[k]);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
+    return vals.map((v) => v / sum);
+  }
+
+  const pmfs = profiles.map(toPMF);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const P = pmfs[i]!;
+      const Q = pmfs[j]!;
+      let tv = 0;
+      for (let k = 0; k < P.length; k++) {
+        tv += Math.abs(P[k]! - Q[k]!);
+      }
+      const d = 0.5 * tv;
+      matrix[i]![j] = d;
+      matrix[j]![i] = d;
+    }
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1272 — tuningFamilySocraticRadarHellingerDistance
+// ---------------------------------------------------------------------------
+export function tuningFamilySocraticRadarHellingerDistance(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  if (n === 0) return matrix;
+
+  const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+    const vals = axes.map((k) => profile[k]);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
+    return vals.map((v) => v / sum);
+  }
+
+  const pmfs = profiles.map(toPMF);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const P = pmfs[i]!;
+      const Q = pmfs[j]!;
+      let sumSq = 0;
+      for (let k = 0; k < P.length; k++) {
+        const diff = Math.sqrt(P[k]!) - Math.sqrt(Q[k]!);
+        sumSq += diff * diff;
+      }
+      const d = (1 / Math.SQRT2) * Math.sqrt(sumSq);
+      matrix[i]![j] = d;
+      matrix[j]![i] = d;
+    }
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1274 — tuningFamilySocraticRadarBhattacharyyaCoefficient
+// ---------------------------------------------------------------------------
+export function tuningFamilySocraticRadarBhattacharyyaCoefficient(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  if (n === 0) return matrix;
+
+  const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+    const vals = axes.map((k) => profile[k]);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
+    return vals.map((v) => v / sum);
+  }
+
+  const pmfs = profiles.map(toPMF);
+
+  for (let i = 0; i < n; i++) {
+    // Diagonal = 1 (identical)
+    matrix[i]![i] = 1;
+    for (let j = i + 1; j < n; j++) {
+      const P = pmfs[i]!;
+      const Q = pmfs[j]!;
+      let bc = 0;
+      for (let k = 0; k < P.length; k++) {
+        bc += Math.sqrt(P[k]! * Q[k]!);
+      }
+      matrix[i]![j] = bc;
+      matrix[j]![i] = bc;
+    }
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1276 — tuningFamilySocraticRadarKLDivergenceAsymmetric
+// ---------------------------------------------------------------------------
+export function tuningFamilySocraticRadarKLDivergenceAsymmetric(
+  tunings: TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const n = tunings.length;
+  const matrix: number[][] = Array.from({ length: n }, () => new Array(n).fill(0));
+  if (n === 0) return matrix;
+
+  const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
+    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+  ];
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+
+  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+    const vals = axes.map((k) => profile[k]);
+    const sum = vals.reduce((a, b) => a + b, 0);
+    if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
+    return vals.map((v) => v / sum);
+  }
+
+  const pmfs = profiles.map(toPMF);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) {
+        matrix[i]![j] = 0;
+        continue;
+      }
+      const P = pmfs[i]!;
+      const Q = pmfs[j]!;
+      let kl = 0;
+      for (let k = 0; k < P.length; k++) {
+        const p = P[k]!;
+        const q = Q[k]! + 1e-10;
+        if (p > 0) kl += p * Math.log2(p / q);
+      }
+      matrix[i]![j] = Math.max(0, kl);
+    }
+  }
+  return matrix;
+}
+
+// MM1
+export function scaleDensityProfile(
+  scaleCents: readonly number[],
+  windowCents: number = 200,
+): number[] {
+  if (windowCents <= 0) {
+    throw new RangeError('windowCents must be positive');
+  }
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  if (n === 1) return [0];
+  const result: number[] = [];
+  for (let i = 0; i < n; i++) {
+    let count = 0;
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      if (Math.abs(scaleCents[i]! - scaleCents[j]!) <= windowCents) {
+        count++;
+      }
+    }
+    result.push(count / (n - 1));
+  }
+  return result;
+}
+
+// MM2
+export function tuningStepsVariance(tuning: TuningSystem): number {
+  const degrees = tuning.degrees;
+  if (degrees.length <= 1) return 0;
+  const sorted = [...degrees].sort(
+    (a, b) => pitchToCents(a) - pitchToCents(b),
+  );
+  const steps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    steps.push(pitchToCents(sorted[i]!) - pitchToCents(sorted[i - 1]!));
+  }
+  if (steps.length === 0) return 0;
+  const mean = steps.reduce((s, v) => s + v, 0) / steps.length;
+  const variance =
+    steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
+  return variance;
+}
+
+// MM3
+export function scaleChordCoverage(
+  scaleCents: readonly number[],
+  chordIntervals: readonly number[],
+): number {
+  if (chordIntervals.length === 0) return 0;
+  const n = scaleCents.length;
+  const scaleIntervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      let diff = (scaleCents[j]! - scaleCents[i]!) % 1200;
+      if (diff < 0) diff += 1200;
+      if (diff > 0) scaleIntervals.push(diff);
+    }
+  }
+  const tolerance = 25;
+  let covered = 0;
+  for (const ci of chordIntervals) {
+    const isCovered = scaleIntervals.some(
+      (si) => Math.abs(si - ci) <= tolerance,
+    );
+    if (isCovered) covered++;
+  }
+  return covered / chordIntervals.length;
+}
+
+// MM4
+export function harmonicSeriesDeviation(
+  tuning: TuningSystem,
+  harmonics: number = 8,
+): number {
+  const degrees = tuning.degrees;
+  if (degrees.length === 0 || harmonics === 0) return 0;
+  const degreeCents = degrees.map((d) => pitchToCents(d));
+  let totalDeviation = 0;
+  for (let k = 1; k <= harmonics; k++) {
+    const harmonicCents = 1200 * Math.log2(k);
+    let minDist = Infinity;
+    for (const dc of degreeCents) {
+      const dist = Math.abs(dc - harmonicCents);
+      if (dist < minDist) minDist = dist;
+    }
+    totalDeviation += minDist;
+  }
+  return totalDeviation / harmonics;
+}
