@@ -31902,6 +31902,108 @@ describe('scaleIntervalEntropy', () => {
   });
 });
 
+describe('Q1746 tuningFamilySocraticRadarKolmogorovComplexityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarKolmogorovComplexityProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarKolmogorovComplexityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarKolmogorovComplexityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1748 tuningFamilySocraticRadarLempelZivComplexityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarLempelZivComplexityProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarLempelZivComplexityProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarLempelZivComplexityProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1750 tuningFamilySocraticRadarApproximateEntropyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarApproximateEntropyProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarApproximateEntropyProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarApproximateEntropyProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1752 tuningFamilySocraticRadarSampleEntropyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarSampleEntropyProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSampleEntropyProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSampleEntropyProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1754 tuningFamilySocraticRadarPermutationEntropyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarPermutationEntropyProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPermutationEntropyProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarPermutationEntropyProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1756 tuningFamilySocraticRadarMultiscaleEntropyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarMultiscaleEntropyProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarMultiscaleEntropyProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarMultiscaleEntropyProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Round 71: BBB1–BBB4 — ピッチ近接性・声部導音
 // ---------------------------------------------------------------------------
