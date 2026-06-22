@@ -41948,6 +41948,146 @@ export function tuningFamilySocraticRadarRichterScaleProxy(
   return total / vecs.length;
 }
 
+// Q1986 — tuningFamilySocraticRadarAirTemperatureProxy
+export function tuningFamilySocraticRadarAirTemperatureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    total += sum / vec.length;
+  }
+  return total / vecs.length;
+}
+
+// Q1988 — tuningFamilySocraticRadarHumidityProxy
+export function tuningFamilySocraticRadarHumidityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    const mean = sum / vec.length;
+    // Saturation analog: how close mean is to 0.5 (peak "humidity")
+    total += 1 - 2 * Math.abs(mean - 0.5);
+  }
+  return Math.max(0, total / vecs.length);
+}
+
+// Q1990 — tuningFamilySocraticRadarPrecipitationProxy
+export function tuningFamilySocraticRadarPrecipitationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let aboveThreshold = 0;
+    for (const x of vec) {
+      if (x > 0.6) aboveThreshold++;
+    }
+    total += aboveThreshold / vec.length;
+  }
+  return total / vecs.length;
+}
+
+// Q1992 — tuningFamilySocraticRadarWindSpeedProxy
+export function tuningFamilySocraticRadarWindSpeedProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    const mean = sum / vec.length;
+    let variance = 0;
+    for (const x of vec) variance += (x - mean) ** 2;
+    const stdDev = Math.sqrt(variance / vec.length);
+    // Standard deviation as turbulent wind analog, max theoretical stdDev for [0,1] is 0.5
+    total += Math.min(1, stdDev / 0.5);
+  }
+  return total / vecs.length;
+}
+
+// Q1994 — tuningFamilySocraticRadarAtmosphericPressureProxy
+export function tuningFamilySocraticRadarAtmosphericPressureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let minVal = 1;
+    for (const x of vec) {
+      if (x < minVal) minVal = x;
+    }
+    // Pressure floor: minimum axis value across the radar
+    total += minVal;
+  }
+  return total / vecs.length;
+}
+
+// Q1996 — tuningFamilySocraticRadarCO2ConcentrationProxy
+export function tuningFamilySocraticRadarCO2ConcentrationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    const mean = sum / vec.length;
+    // Greenhouse gas buildup: max excess above mean, normalized by (1 - mean)
+    let maxExcess = 0;
+    for (const x of vec) {
+      const excess = x - mean;
+      if (excess > maxExcess) maxExcess = excess;
+    }
+    const denominator = 1 - mean;
+    total += denominator > 0 ? Math.min(1, maxExcess / denominator) : 0;
+  }
+  return total / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -45745,4 +45885,160 @@ export function scaleModeBalanceSpread(
     if (brightness < minBrightness) minBrightness = brightness;
   }
   return Math.max(0, maxBrightness - minBrightness);
+}
+
+/**
+ * WWW1 — Scale Reflection Symmetry (V2).
+ * Measures how symmetric the scale is under inversion (reflection around the
+ * period midpoint). For each pitch c, checks if periodCents - c also appears
+ * within 5 cents tolerance.
+ * Returns (number of mirrored pitches) / n, clamped to [0, 1].
+ * Returns 0 for empty input.
+ */
+export function scaleReflectionSymmetryV2(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const tol = 5;
+  let mirrored = 0;
+  for (let i = 0; i < n; i++) {
+    const target = periodCents - scaleCents[i]!;
+    for (let j = 0; j < n; j++) {
+      if (Math.abs(scaleCents[j]! - target) <= tol) {
+        mirrored++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, mirrored / n));
+}
+
+/**
+ * WWW2 — Scale Translation Symmetry.
+ * Measures how often the scale is invariant under transposition by its own
+ * intervals. For each interval d = (cents[j] - cents[i]) mod periodCents,
+ * checks if shifting all notes by d produces the same pitch set within 5 cents.
+ * Returns (count of valid shifts including 0) / n, capped at 1.0.
+ * Returns 0 for empty; 1/n for single note.
+ */
+export function scaleTranslationSymmetry(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (n === 1) return Math.min(1, 1 / n);
+  const tol = 5;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+
+  const isInvariantUnderShift = (d: number): boolean => {
+    for (let i = 0; i < n; i++) {
+      const shifted = ((sorted[i]! + d) % periodCents + periodCents) % periodCents;
+      let found = false;
+      for (let j = 0; j < n; j++) {
+        if (Math.abs(sorted[j]! - shifted) <= tol) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) return false;
+    }
+    return true;
+  };
+
+  let validShifts = 0;
+  // Always count d=0 as valid
+  validShifts++;
+
+  const seen = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      const raw = ((sorted[j]! - sorted[i]!) % periodCents + periodCents) % periodCents;
+      const key = Math.round(raw * 10);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (raw > tol && isInvariantUnderShift(raw)) {
+        validShifts++;
+      }
+    }
+  }
+
+  return Math.min(1, Math.max(0, validShifts / n));
+}
+
+/**
+ * WWW3 — Scale Palindrome Ratio.
+ * Measures how palindrome-like the step sequence is. Sorts cents, computes n
+ * step sizes (including the wrap-around step), then checks pairs steps[i] ≈
+ * steps[n-1-i] within 2 cents tolerance.
+ * Returns (matching pairs * 2) / n, or (pairs*2+1)/n if n is odd and the
+ * center step matches itself.
+ * Returns 1.0 for empty or single-note input.
+ */
+export function scalePalindromeRatio(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 1;
+  const tol = 2;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) {
+      steps.push(sorted[i + 1]! - sorted[i]!);
+    } else {
+      steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+    }
+  }
+
+  let pairs = 0;
+  const half = Math.floor(n / 2);
+  for (let i = 0; i < half; i++) {
+    if (Math.abs(steps[i]! - steps[n - 1 - i]!) <= tol) {
+      pairs++;
+    }
+  }
+
+  let score: number;
+  if (n % 2 === 1) {
+    // Odd: center step always "matches itself"
+    score = (pairs * 2 + 1) / n;
+  } else {
+    score = (pairs * 2) / n;
+  }
+  return Math.min(1, Math.max(0, score));
+}
+
+/**
+ * WWW4 — Scale Inversion Equivalence.
+ * Measures how similar the scale is to its own inversion. The inversion
+ * replaces each pitch c with periodCents - c and re-sorts. Then computes the
+ * mean absolute difference between original sorted pitches and inverted sorted
+ * pitches, normalized to periodCents / 2.
+ * Returns 1 - (mean_diff / (periodCents / 2)), clamped to [0, 1].
+ * Returns 1.0 for empty input.
+ */
+export function scaleInversionEquivalence(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const inverted = sorted
+    .map((c) => periodCents - c)
+    .sort((a, b) => a - b);
+
+  let sumDiff = 0;
+  for (let i = 0; i < n; i++) {
+    sumDiff += Math.abs(sorted[i]! - inverted[i]!);
+  }
+  const meanDiff = sumDiff / n;
+  const half = periodCents / 2;
+  return Math.min(1, Math.max(0, 1 - meanDiff / half));
 }
