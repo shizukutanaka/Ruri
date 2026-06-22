@@ -920,3 +920,14 @@
 | XXX2 | `scaleLeadingToneTension` | 導音的音程（50–150セント）の割合 |
 | XXX3 | `scaleSuspensionDensity` | 完全4度・5度（±30セント）音程の密度 |
 | XXX4 | `scaleHarmonicTensionIndex` | テンション複合指数（加重平均） |
+
+## Round 68: リズム的均等性・整形性 (YYY1–YYY4)
+
+音階の均等性・非規則性・整形性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| YYY1 | `scaleEvenness` | ステップ均等性（偏差の逆数） |
+| YYY2 | `scaleMaxStepRatio` | 最大/最小ステップ比の非均等度 |
+| YYY3 | `scaleIrregularityIndex` | Entner式非規則性指数（円環） |
+| YYY4 | `scaleWellformedness` | 生成子カバレッジによる整形性 |

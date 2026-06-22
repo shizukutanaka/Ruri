@@ -1023,6 +1023,12 @@ import {
   tuningFamilySocraticRadarFlowDirectionMean,
   tuningFamilySocraticRadarAnomalousDimensionMean,
   tuningFamilySocraticRadarCriticalSlowingMean,
+  tuningFamilySocraticRadarSignalToNoiseProxy,
+  tuningFamilySocraticRadarNoiseAmplitudeMean,
+  tuningFamilySocraticRadarStochasticResonanceProxy,
+  tuningFamilySocraticRadarFluctuationDissipationProxy,
+  tuningFamilySocraticRadarNoiseInducedTransitionMean,
+  tuningFamilySocraticRadarSrOptimalNoiseProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1121,6 +1127,10 @@ import {
   scaleLeadingToneTension,
   scaleSuspensionDensity,
   scaleHarmonicTensionIndex,
+  scaleEvenness,
+  scaleMaxStepRatio,
+  scaleIrregularityIndex,
+  scaleWellformedness,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -31012,6 +31022,108 @@ describe('Q1708 tuningFamilySocraticRadarCriticalSlowingMean', () => {
   });
 });
 
+describe('Q1710 tuningFamilySocraticRadarSignalToNoiseProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarSignalToNoiseProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSignalToNoiseProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSignalToNoiseProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1712 tuningFamilySocraticRadarNoiseAmplitudeMean', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarNoiseAmplitudeMean([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarNoiseAmplitudeMean([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarNoiseAmplitudeMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1714 tuningFamilySocraticRadarStochasticResonanceProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarStochasticResonanceProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarStochasticResonanceProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarStochasticResonanceProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1716 tuningFamilySocraticRadarFluctuationDissipationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarFluctuationDissipationProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarFluctuationDissipationProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarFluctuationDissipationProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1718 tuningFamilySocraticRadarNoiseInducedTransitionMean', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarNoiseInducedTransitionMean([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarNoiseInducedTransitionMean([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarNoiseInducedTransitionMean([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('Q1720 tuningFamilySocraticRadarSrOptimalNoiseProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings → 0', () => {
+    expect(tuningFamilySocraticRadarSrOptimalNoiseProxy([], s)).toBe(0);
+  });
+  it('single tuning → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSrOptimalNoiseProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two different tunings → finite and ≥0', () => {
+    const v = tuningFamilySocraticRadarSrOptimalNoiseProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
 describe('VVV1 scaleRotationalSymmetrySteps', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   it('empty → 0', () => {
@@ -31286,6 +31398,88 @@ describe('scaleHarmonicTensionIndex', () => {
   });
   it('chromatic 12-TET → finite, in [0,1]', () => {
     const v = scaleHarmonicTensionIndex(chromatic67);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+const chromatic68 = Array.from({ length: 12 }, (_, i) => i * 100);
+
+describe('scaleEvenness', () => {
+  it('empty array → 0', () => {
+    expect(scaleEvenness([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleEvenness([0])).toBe(0);
+  });
+  it('perfectly even 12-TET chromatic → close to 1', () => {
+    const v = scaleEvenness(chromatic68);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThan(0.99);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('uneven scale [0, 100, 400, 700, 1100] → finite, in [0,1]', () => {
+    const v = scaleEvenness([0, 100, 400, 700, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMaxStepRatio', () => {
+  it('empty array → 0', () => {
+    expect(scaleMaxStepRatio([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleMaxStepRatio([0])).toBe(0);
+  });
+  it('perfectly even 12-TET chromatic → 0 (all steps equal)', () => {
+    const v = scaleMaxStepRatio(chromatic68);
+    expect(v).toBe(0);
+  });
+  it('uneven scale [0, 100, 400, 700, 1100] → finite, in [0,1]', () => {
+    const v = scaleMaxStepRatio([0, 100, 400, 700, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleIrregularityIndex', () => {
+  it('empty array → 0', () => {
+    expect(scaleIrregularityIndex([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleIrregularityIndex([0])).toBe(0);
+  });
+  it('perfectly even 12-TET chromatic → 0 (no irregularity)', () => {
+    const v = scaleIrregularityIndex(chromatic68);
+    expect(v).toBeCloseTo(0, 10);
+  });
+  it('uneven scale [0, 100, 400, 700, 1100] → finite, in [0,1]', () => {
+    const v = scaleIrregularityIndex([0, 100, 400, 700, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleWellformedness', () => {
+  it('empty array → 0', () => {
+    expect(scaleWellformedness([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleWellformedness([0])).toBe(0);
+  });
+  it('perfectly even 12-TET chromatic → close to 1', () => {
+    const v = scaleWellformedness(chromatic68);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('uneven scale [0, 100, 400, 700, 1100] → finite, in [0,1]', () => {
+    const v = scaleWellformedness([0, 100, 400, 700, 1100]);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
