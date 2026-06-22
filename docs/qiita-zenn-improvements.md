@@ -997,3 +997,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | EEE2 | `scaleClusterSeparation` | クラスタ重心間距離（正規化） |
 | EEE3 | `scaleSilhouetteScore` | シルエットスコア（[0,1]正規化） |
 | EEE4 | `scaleClusterBalance` | クラスタサイズ均衡度 |
+
+## Round 75: マイクロトーナル密度・粒度 (FFF1–FFF4)
+
+音階のマイクロトーナル（100セント未満）音程特性を分析する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| FFF1 | `scaleMicrotonalDensity` | 100セント未満ステップの割合 |
+| FFF2 | `scaleQuarterToneAlignment` | 四分音グリッド（50セント）への整合度 |
+| FFF3 | `scaleMicrotonalComplexity` | マイクロトーナル固有ステップ比 |
+| FFF4 | `scaleEdoApproximationQuality` | 小整数EDO近似カバレッジ |

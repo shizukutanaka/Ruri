@@ -39518,6 +39518,168 @@ export function tuningFamilySocraticRadarColimitProxy(
   return Math.max(0, Math.min(1, meanMax / 1.0));
 }
 
+// Q1794 — tuningFamilySocraticRadarHomologyGroupProxy
+export function tuningFamilySocraticRadarHomologyGroupProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const threshold = 0.4;
+  let total = 0;
+  for (const vec of vecs) {
+    // H0: count connected components at threshold (axes above threshold form nodes; count clusters)
+    const above = vec.map((v) => v >= threshold);
+    let components = 0;
+    const visited = new Array<boolean>(axes.length).fill(false);
+    for (let i = 0; i < axes.length; i++) {
+      if (!visited[i] && above[i]) {
+        components++;
+        // BFS over adjacent above-threshold axes
+        const queue = [i];
+        while (queue.length > 0) {
+          const cur = queue.shift()!;
+          if (visited[cur]) continue;
+          visited[cur] = true;
+          if (cur + 1 < axes.length && above[cur + 1] && !visited[cur + 1]) queue.push(cur + 1);
+          if (cur - 1 >= 0 && above[cur - 1]! && !visited[cur - 1]) queue.push(cur - 1);
+        }
+      }
+    }
+    total += components / 5;
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
+// Q1796 — tuningFamilySocraticRadarCohomologyRingProxy
+export function tuningFamilySocraticRadarCohomologyRingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    // ring multiplication analog: product of all axis values
+    const product = vec.reduce((acc, v) => acc * Math.max(v, 1e-9), 1);
+    // normalize via product^(1/5)
+    const normalized = Math.pow(product, 1 / 5);
+    total += normalized;
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
+// Q1798 — tuningFamilySocraticRadarFundamentalGroupProxy
+export function tuningFamilySocraticRadarFundamentalGroupProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const threshold = 0.5;
+  // C(5,2) = 10
+  const maxPairs = 10;
+  let total = 0;
+  for (const vec of vecs) {
+    // count "loops": pairs of axes both above threshold (forming a cycle analog)
+    let loops = 0;
+    for (let i = 0; i < axes.length; i++) {
+      for (let j = i + 1; j < axes.length; j++) {
+        if (vec[i]! >= threshold && vec[j]! >= threshold) loops++;
+      }
+    }
+    total += loops / maxPairs;
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
+// Q1800 — tuningFamilySocraticRadarExactSequenceProxy
+export function tuningFamilySocraticRadarExactSequenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    // exact sequence proxy: check image(f) = kernel(g) for consecutive projections
+    // "exact" at i+1 if |vec[i+1] - vec[i]| ≈ |vec[i+2] - vec[i+1]| (balanced transition)
+    let exactCount = 0;
+    const n = axes.length;
+    for (let i = 0; i < n - 2; i++) {
+      const imgF = Math.abs(vec[i + 1]! - vec[i]!);
+      const kerG = Math.abs(vec[i + 2]! - vec[i + 1]!);
+      if (Math.abs(imgF - kerG) < 0.1) exactCount++;
+    }
+    total += exactCount / (n - 2);
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
+// Q1802 — tuningFamilySocraticRadarFibrationProxy
+export function tuningFamilySocraticRadarFibrationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // fibration proxy: variance of fibers across profiles per axis
+  let totalVariance = 0;
+  for (let ai = 0; ai < axes.length; ai++) {
+    const fiberValues = vecs.map((v) => v[ai]!);
+    const mean = fiberValues.reduce((s, v) => s + v, 0) / fiberValues.length;
+    const variance = fiberValues.reduce((s, v) => s + (v - mean) ** 2, 0) / fiberValues.length;
+    totalVariance += variance;
+  }
+  const meanVariance = totalVariance / axes.length;
+  // normalize via v/(v+0.1)
+  return Math.max(0, Math.min(1, meanVariance / (meanVariance + 0.1)));
+}
+
+// Q1804 — tuningFamilySocraticRadarSuspensionProxy
+export function tuningFamilySocraticRadarSuspensionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    // suspension proxy: mean of |profile - reversed_profile|
+    const reversed = [...vec].reverse();
+    let sumDiff = 0;
+    for (let i = 0; i < axes.length; i++) {
+      sumDiff += Math.abs(vec[i]! - reversed[i]!);
+    }
+    total += sumDiff / axes.length;
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -41667,4 +41829,94 @@ export function scaleClusterBalance(scaleCents: readonly number[], periodCents: 
     ((sizes[0] - mean) ** 2 + (sizes[1] - mean) ** 2 + (sizes[2] - mean) ** 2) / 3;
   const stdDev = Math.sqrt(variance);
   return Math.max(0, Math.min(1, 1 - stdDev / mean));
+}
+
+/**
+ * FFF1 — scaleMicrotonalDensity
+ * Density of "microtonal" intervals (smaller than a semitone = 100 cents).
+ * - For each consecutive step pair (sorted + wrap), count steps < 100 cents
+ * - Return count / n; 0 for n<2
+ */
+export function scaleMicrotonalDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let microCount = 0;
+  for (let i = 0; i < n; i++) {
+    const curr = sorted[i]!;
+    const next = i + 1 < n ? sorted[i + 1]! : sorted[0]! + periodCents;
+    const step = next - curr;
+    if (step < 100) microCount++;
+  }
+  return microCount / n;
+}
+
+/**
+ * FFF2 — scaleQuarterToneAlignment
+ * How many pitches align with quarter-tone grid (50-cent multiples).
+ * - For each pitch, check if round(pitch / 50) * 50 ≈ pitch (within 5 cents)
+ * - Return count / n; 0 for n=0
+ */
+export function scaleQuarterToneAlignment(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let alignCount = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    const nearest = Math.round(pitch / 50) * 50;
+    if (Math.abs(pitch - nearest) <= 5) alignCount++;
+  }
+  return alignCount / n;
+}
+
+/**
+ * FFF3 — scaleMicrotonalComplexity
+ * Microtonal complexity: number of distinct step sizes smaller than 100 cents /
+ * total distinct step sizes.
+ * - Steps = consecutive diffs (sorted + wrap)
+ * - Return microtonal_distinct / total_distinct; 0 for n<2 or no distinct steps
+ */
+export function scaleMicrotonalComplexity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const curr = sorted[i]!;
+    const next = i + 1 < n ? sorted[i + 1]! : sorted[0]! + periodCents;
+    steps.push(Math.round((next - curr) * 1000) / 1000);
+  }
+  const distinctAll = new Set(steps);
+  const totalDistinct = distinctAll.size;
+  if (totalDistinct === 0) return 0;
+  let microDistinct = 0;
+  for (const s of distinctAll) {
+    if (s < 100) microDistinct++;
+  }
+  return microDistinct / totalDistinct;
+}
+
+/**
+ * FFF4 — scaleEdoApproximationQuality
+ * How well the scale approximates some small EDO (n=5,7,10,12,19,24,31).
+ * - For each EDO n, compute how many scale pitches are within 10 cents of an EDO degree
+ * - Return best coverage / n_scale_pitches; 0 for n=0
+ */
+export function scaleEdoApproximationQuality(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const edoSizes = [5, 7, 10, 12, 19, 24, 31];
+  let bestCoverage = 0;
+  for (const edoN of edoSizes) {
+    let coverage = 0;
+    for (let i = 0; i < n; i++) {
+      const pitch = scaleCents[i]!;
+      const edoStep = periodCents / edoN;
+      const nearestDegree = Math.round(pitch / edoStep);
+      const nearestCents = nearestDegree * edoStep;
+      if (Math.abs(pitch - nearestCents) <= 10) coverage++;
+    }
+    if (coverage > bestCoverage) bestCoverage = coverage;
+  }
+  return bestCoverage / n;
 }

@@ -1065,6 +1065,12 @@ import {
   tuningFamilySocraticRadarAdjunctionProxy,
   tuningFamilySocraticRadarLimitProxy,
   tuningFamilySocraticRadarColimitProxy,
+  tuningFamilySocraticRadarHomologyGroupProxy,
+  tuningFamilySocraticRadarCohomologyRingProxy,
+  tuningFamilySocraticRadarFundamentalGroupProxy,
+  tuningFamilySocraticRadarExactSequenceProxy,
+  tuningFamilySocraticRadarFibrationProxy,
+  tuningFamilySocraticRadarSuspensionProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1191,6 +1197,10 @@ import {
   scaleClusterSeparation,
   scaleSilhouetteScore,
   scaleClusterBalance,
+  scaleMicrotonalDensity,
+  scaleQuarterToneAlignment,
+  scaleMicrotonalComplexity,
+  scaleEdoApproximationQuality,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -32729,5 +32739,107 @@ describe('Q1792 tuningFamilySocraticRadarColimitProxy', () => {
     const v = tuningFamilySocraticRadarColimitProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// FFF1 — scaleMicrotonalDensity
+describe('FFF1 scaleMicrotonalDensity', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scaleMicrotonalDensity([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleMicrotonalDensity([600])).toBe(0);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scaleMicrotonalDensity(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleMicrotonalDensity(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// FFF2 — scaleQuarterToneAlignment
+describe('FFF2 scaleQuarterToneAlignment', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scaleQuarterToneAlignment([])).toBe(0);
+  });
+  it('single pitch → finite safe value', () => {
+    const v = scaleQuarterToneAlignment([600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scaleQuarterToneAlignment(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleQuarterToneAlignment(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// FFF3 — scaleMicrotonalComplexity
+describe('FFF3 scaleMicrotonalComplexity', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scaleMicrotonalComplexity([])).toBe(0);
+  });
+  it('single pitch → 0', () => {
+    expect(scaleMicrotonalComplexity([600])).toBe(0);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scaleMicrotonalComplexity(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleMicrotonalComplexity(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// FFF4 — scaleEdoApproximationQuality
+describe('FFF4 scaleEdoApproximationQuality', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scaleEdoApproximationQuality([])).toBe(0);
+  });
+  it('single pitch → finite safe value', () => {
+    const v = scaleEdoApproximationQuality([600]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scaleEdoApproximationQuality(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleEdoApproximationQuality(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });
