@@ -41520,6 +41520,149 @@ export function tuningFamilySocraticRadarOscillationProxy(
   return total / vecs.length;
 }
 
+// Q1950 — tuningFamilySocraticRadarTemperatureProxy
+export function tuningFamilySocraticRadarTemperatureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sumSq = 0;
+    for (const x of vec) sumSq += x * x;
+    total += sumSq / vec.length;
+  }
+  return total / vecs.length;
+}
+
+// Q1952 — tuningFamilySocraticRadarEntropyFlowProxy
+export function tuningFamilySocraticRadarEntropyFlowProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let entropySum = 0;
+    for (const x of vec) entropySum += x * Math.log(x + 1e-10);
+    const entropy = -entropySum / vec.length / Math.log(5);
+    total += entropy;
+  }
+  return total / vecs.length;
+}
+
+// Q1954 — tuningFamilySocraticRadarFreeEnergyProxy
+export function tuningFamilySocraticRadarFreeEnergyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sumU = 0;
+    let sumSq = 0;
+    let sumS = 0;
+    for (const x of vec) {
+      sumU += x;
+      sumSq += x * x;
+      sumS += x * Math.log(x + 1e-10);
+    }
+    const U = sumU / vec.length;
+    const T = sumSq / vec.length;
+    const S = -sumS / vec.length / Math.log(5);
+    const F = U - T * S;
+    const normalized = Math.max(0, Math.min(1, (F + 1) / 2));
+    total += normalized;
+  }
+  return total / vecs.length;
+}
+
+// Q1956 — tuningFamilySocraticRadarHeatCapacityProxyV2
+export function tuningFamilySocraticRadarHeatCapacityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    const dU = sorted[4]! - sorted[0]!;
+    let sumX = 0;
+    let sumX2 = 0;
+    for (const x of vec) { sumX += x; sumX2 += x * x; }
+    const mean = sumX / vec.length;
+    const dT = sumX2 / vec.length - mean * mean;
+    const heatCapacity = dU / (dT + 1e-10);
+    total += Math.min(1, heatCapacity / 5);
+  }
+  return total / vecs.length;
+}
+
+// Q1958 — tuningFamilySocraticRadarPhaseTransitionProxy
+export function tuningFamilySocraticRadarPhaseTransitionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sumX = 0;
+    let sumX2 = 0;
+    for (const x of vec) { sumX += x; sumX2 += x * x; }
+    const mean = sumX / vec.length;
+    const variance = sumX2 / vec.length - mean * mean;
+    const bimodality = Math.max(0, Math.min(1, variance * 4 * (1 - Math.abs(mean - 0.5) * 2)));
+    total += bimodality;
+  }
+  return total / vecs.length;
+}
+
+// Q1960 — tuningFamilySocraticRadarMaxwellBoltzmannProxy
+export function tuningFamilySocraticRadarMaxwellBoltzmannProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let mbSum = 0;
+    for (const x of vec) mbSum += x * Math.exp(-x * x * 2);
+    const mbProxy = Math.max(0, Math.min(1, (mbSum / vec.length) * 2));
+    total += mbProxy;
+  }
+  return total / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -44954,4 +45097,130 @@ export function scaleDFTSpectralFlatness(
   const logSum = mags.reduce((a, m) => a + Math.log(m + eps), 0);
   const geoMean = Math.exp(logSum / 6);
   return Math.min(1, geoMean / arithMean);
+}
+
+/**
+ * TTT1 — Compute the interval vector (count of each interval class 1–6) for a
+ * scale given as an array of cents values.
+ *
+ * For every pair (i, j) the modular interval is reduced to a semitone count
+ * (rounded to the nearest semitone in a 12-semitone grid), then folded into
+ * the six interval classes IC1–IC6 via IC = min(k, 12−k).
+ *
+ * @param scaleCents - Scale degrees in cents (readonly).
+ * @param periodCents - Period in cents (default 1200).
+ * @returns Array of 6 counts [IC1, IC2, IC3, IC4, IC5, IC6].
+ *
+ * @example
+ * const cents = Array.from({length: 12}, (_, i) => i * 100);
+ * const iv = scaleIntervalVectorV2(cents); // 12-TET interval vector
+ */
+export function scaleIntervalVectorV2(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): readonly number[] {
+  const n = scaleCents.length;
+  if (n < 2) return [0, 0, 0, 0, 0, 0];
+  const iv = [0, 0, 0, 0, 0, 0];
+  const semitoneCents = periodCents / 12;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      let interval = Math.abs((scaleCents[j] as number) - (scaleCents[i] as number)) % periodCents;
+      // Fold into [0, periodCents/2]
+      interval = Math.min(interval, periodCents - interval);
+      const semitones = Math.round(interval / semitoneCents) % 12;
+      const ic = Math.min(semitones, 12 - semitones);
+      if (ic === 0) continue;
+      iv[ic - 1]!++;
+    }
+  }
+  return iv;
+}
+
+/**
+ * TTT2 — Shannon entropy of the interval vector, normalized to [0, 1] by
+ * dividing by log2(6) (maximum entropy over 6 interval classes).
+ *
+ * @param scaleCents - Scale degrees in cents (readonly).
+ * @param periodCents - Period in cents (default 1200).
+ * @returns Normalized entropy in [0, 1]; 0 for n < 2 or all-zero vector.
+ *
+ * @example
+ * const cents = Array.from({length: 12}, (_, i) => i * 100);
+ * const h = scaleIntervalVectorEntropyV2(cents); // entropy of 12-TET iv
+ */
+export function scaleIntervalVectorEntropyV2(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const iv = scaleIntervalVectorV2(scaleCents, periodCents);
+  const total = iv.reduce((a, b) => a + b, 0);
+  if (total === 0) return 0;
+  let entropy = 0;
+  for (const count of iv) {
+    if (count > 0) {
+      const p = count / total;
+      entropy -= p * Math.log2(p);
+    }
+  }
+  return entropy / Math.log2(6);
+}
+
+/**
+ * TTT3 — Balance score of the interval vector: how uniformly all 6 interval
+ * classes are represented.  Computed as 1 − CV where CV = std / (mean + ε)
+ * (coefficient of variation), then clamped to [0, 1].
+ *
+ * @param scaleCents - Scale degrees in cents (readonly).
+ * @param periodCents - Period in cents (default 1200).
+ * @returns Balance score in [0, 1]; 0 for n < 2.
+ *
+ * @example
+ * const cents = Array.from({length: 12}, (_, i) => i * 100);
+ * const b = scaleIntervalVectorBalanceV2(cents);
+ */
+export function scaleIntervalVectorBalanceV2(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const iv = scaleIntervalVectorV2(scaleCents, periodCents);
+  const mean = iv.reduce((a, b) => a + b, 0) / 6;
+  const variance = iv.reduce((a, b) => a + (b - mean) ** 2, 0) / 6;
+  const std = Math.sqrt(variance);
+  const cv = std / (mean + 1e-10);
+  return Math.max(0, Math.min(1, 1 - cv));
+}
+
+/**
+ * TTT4 — Dominant interval class: the IC with the highest count, normalized
+ * to (0, 1] by dividing the 1-indexed IC number by 6.
+ *
+ * @param scaleCents - Scale degrees in cents (readonly).
+ * @param periodCents - Period in cents (default 1200).
+ * @returns (argmax IC + 1) / 6 in (0, 1]; 0 for n < 2 or zero vector.
+ *
+ * @example
+ * const cents = Array.from({length: 12}, (_, i) => i * 100);
+ * const m = scaleIntervalVectorMaxICV2(cents);
+ */
+export function scaleIntervalVectorMaxICV2(
+  scaleCents: readonly number[],
+  periodCents = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const iv = scaleIntervalVectorV2(scaleCents, periodCents);
+  const total = iv.reduce((a, b) => a + b, 0);
+  if (total === 0) return 0;
+  let maxVal = -1;
+  let maxIdx = 0;
+  for (let k = 0; k < 6; k++) {
+    if ((iv[k] as number) > maxVal) {
+      maxVal = iv[k] as number;
+      maxIdx = k;
+    }
+  }
+  return (maxIdx + 1) / 6;
 }

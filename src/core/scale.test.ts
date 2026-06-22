@@ -1143,6 +1143,12 @@ import {
   tuningFamilySocraticRadarInhibitionProxy,
   tuningFamilySocraticRadarReceptiveFieldProxy,
   tuningFamilySocraticRadarOscillationProxy,
+  tuningFamilySocraticRadarTemperatureProxy,
+  tuningFamilySocraticRadarEntropyFlowProxy,
+  tuningFamilySocraticRadarFreeEnergyProxy,
+  tuningFamilySocraticRadarHeatCapacityProxyV2,
+  tuningFamilySocraticRadarPhaseTransitionProxy,
+  tuningFamilySocraticRadarMaxwellBoltzmannProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1321,6 +1327,10 @@ import {
   scaleDFTBalanceIndex,
   scaleDFTPeakFrequency,
   scaleDFTSpectralFlatness,
+  scaleIntervalVectorV2,
+  scaleIntervalVectorEntropyV2,
+  scaleIntervalVectorBalanceV2,
+  scaleIntervalVectorMaxICV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -35277,5 +35287,179 @@ describe('Q1948 tuningFamilySocraticRadarOscillationProxy', () => {
     const v = tuningFamilySocraticRadarOscillationProxy([equalTemperament12(440), edo(19, 440)], s);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1950 — tuningFamilySocraticRadarTemperatureProxy
+describe('Q1950 tuningFamilySocraticRadarTemperatureProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarTemperatureProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarTemperatureProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarTemperatureProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1952 — tuningFamilySocraticRadarEntropyFlowProxy
+describe('Q1952 tuningFamilySocraticRadarEntropyFlowProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarEntropyFlowProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarEntropyFlowProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarEntropyFlowProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1954 — tuningFamilySocraticRadarFreeEnergyProxy
+describe('Q1954 tuningFamilySocraticRadarFreeEnergyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarFreeEnergyProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarFreeEnergyProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarFreeEnergyProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1956 — tuningFamilySocraticRadarHeatCapacityProxyV2
+describe('Q1956 tuningFamilySocraticRadarHeatCapacityProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarHeatCapacityProxyV2([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarHeatCapacityProxyV2([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarHeatCapacityProxyV2([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1958 — tuningFamilySocraticRadarPhaseTransitionProxy
+describe('Q1958 tuningFamilySocraticRadarPhaseTransitionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarPhaseTransitionProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarPhaseTransitionProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarPhaseTransitionProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// Q1960 — tuningFamilySocraticRadarMaxwellBoltzmannProxy
+describe('Q1960 tuningFamilySocraticRadarMaxwellBoltzmannProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('empty tunings returns 0', () => {
+    expect(tuningFamilySocraticRadarMaxwellBoltzmannProxy([], s)).toBe(0);
+  });
+  it('single tuning returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarMaxwellBoltzmannProxy([equalTemperament12(440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+  it('two tunings returns finite >= 0', () => {
+    const v = tuningFamilySocraticRadarMaxwellBoltzmannProxy([equalTemperament12(440), edo(19, 440)], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// TTT1 — scaleIntervalVectorV2
+describe('TTT1 scaleIntervalVectorV2', () => {
+  it('empty returns zero vector', () => {
+    expect(scaleIntervalVectorV2([])).toEqual([0, 0, 0, 0, 0, 0]);
+  });
+  it('single note returns zero vector', () => {
+    expect(scaleIntervalVectorV2([0])).toEqual([0, 0, 0, 0, 0, 0]);
+  });
+  it('12-TET → non-zero vector with 6 elements', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const iv = scaleIntervalVectorV2(cents);
+    expect(iv).toHaveLength(6);
+    expect(iv.some((v) => v > 0)).toBe(true);
+  });
+});
+
+// TTT2 — scaleIntervalVectorEntropyV2
+describe('TTT2 scaleIntervalVectorEntropyV2', () => {
+  it('empty returns 0', () => {
+    expect(scaleIntervalVectorEntropyV2([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleIntervalVectorEntropyV2([0])).toBe(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleIntervalVectorEntropyV2(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// TTT3 — scaleIntervalVectorBalanceV2
+describe('TTT3 scaleIntervalVectorBalanceV2', () => {
+  it('empty returns 0', () => {
+    expect(scaleIntervalVectorBalanceV2([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleIntervalVectorBalanceV2([0])).toBe(0);
+  });
+  it('12-TET → finite in [0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleIntervalVectorBalanceV2(cents);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// TTT4 — scaleIntervalVectorMaxICV2
+describe('TTT4 scaleIntervalVectorMaxICV2', () => {
+  it('empty returns 0', () => {
+    expect(scaleIntervalVectorMaxICV2([])).toBe(0);
+  });
+  it('single note returns 0', () => {
+    expect(scaleIntervalVectorMaxICV2([0])).toBe(0);
+  });
+  it('12-TET → value in (0,1]', () => {
+    const cents = Array.from({ length: 12 }, (_, i) => i * 100);
+    const v = scaleIntervalVectorMaxICV2(cents);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });
