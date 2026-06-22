@@ -18470,7 +18470,7 @@ export function tuningFamilySocraticRadarPeakAxis(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { peakAxis: AxisKey; peakScore: number; peakTuningIndex: number } {
+): { peakAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; peakScore: number; peakTuningIndex: number } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18509,7 +18509,7 @@ export function tuningFamilySocraticRadarValleyAxis(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { valleyAxis: AxisKey; valleyScore: number; valleyTuningIndex: number } {
+): { valleyAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; valleyScore: number; valleyTuningIndex: number } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18548,7 +18548,7 @@ export function tuningFamilySocraticRadarValleyAxis(
 export function tuningFamilySocraticRadarResonanceScore(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
-  target: Record<AxisKey, number>,
+  target: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>,
   rootHz?: number,
 ): { resonanceScore: number } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
@@ -18590,7 +18590,7 @@ export function tuningFamilySocraticRadarFlexibilityScore(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { flexibilityScore: number; activeAxes: AxisKey[] } {
+): { flexibilityScore: number; activeAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18622,7 +18622,7 @@ export function tuningFamilySocraticRadarSignificanceTest(
   tuningsB: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { tStatistic: number; significant: boolean; significantAxes: AxisKey[] } {
+): { tStatistic: number; significant: boolean; significantAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profilesA = tuningsA.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -34088,4 +34088,295 @@ export function scaleUniformityScore(
     if (d > maxD) maxD = d;
   }
   return 1 - maxD;
+}
+
+// ---------------------------------------------------------------------------
+// Round 50: Q1494–Q1504 — Harmonic Field / Chord Taxonomy Analysis
+// ---------------------------------------------------------------------------
+
+// Q1494 — tuningFamilySocraticRadarHarmonicFieldSize
+export function tuningFamilySocraticRadarHarmonicFieldSize(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let totalFields = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) continue;
+    const period = t.periodCents;
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    const seen = new Set<string>();
+    for (let i = 0; i < n; i++) {
+      const c0 = cents[i]!;
+      const c1 = cents[(i + 1) % n]!;
+      const c2 = cents[(i + 2) % n]!;
+      const iv1 = ((c1 - c0 + period * 10) % period);
+      const iv2 = ((c2 - c0 + period * 10) % period);
+      const r1 = Math.round(iv1 / 5) * 5;
+      const r2 = Math.round(iv2 / 5) * 5;
+      const sorted = [r1, r2].sort((a, b) => a - b);
+      seen.add(`${sorted[0]!},${sorted[1]!}`);
+    }
+    totalFields += seen.size;
+  }
+  return totalFields / tunings.length;
+}
+
+// Q1496 — tuningFamilySocraticRadarChordDensityMean
+export function tuningFamilySocraticRadarChordDensityMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  if (tunings.length === 0) return 0;
+  const refHz = rootHz ?? 440;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n < 3) continue;
+    const freqs = t.degrees.map((d) => refHz * Math.pow(2, pitchToCents(d) / 1200));
+    // Compute max possible dissonance from all pairs
+    let maxDiss = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const d = chordDissonance([freqs[i]!, freqs[j]!], spectrum);
+        if (d > maxDiss) maxDiss = d;
+      }
+    }
+    const threshold = 0.5 * maxDiss;
+    let count = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        for (let k = j + 1; k < n; k++) {
+          const d01 = chordDissonance([freqs[i]!, freqs[j]!], spectrum);
+          const d02 = chordDissonance([freqs[i]!, freqs[k]!], spectrum);
+          const d12 = chordDissonance([freqs[j]!, freqs[k]!], spectrum);
+          const maxPair = Math.max(d01, d02, d12);
+          if (maxPair < threshold) count++;
+        }
+      }
+    }
+    total += count;
+  }
+  return total / tunings.length;
+}
+
+// Q1498 — tuningFamilySocraticRadarHarmonicRichnessScore
+export function tuningFamilySocraticRadarHarmonicRichnessScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) continue;
+    const period = t.periodCents;
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    const fieldSizes: number[] = [];
+    for (let i = 0; i < n; i++) {
+      const c0 = cents[i]!;
+      const c1 = cents[(i + 1) % n]!;
+      const c2 = cents[(i + 2) % n]!;
+      const iv1 = ((c1 - c0 + period * 10) % period);
+      const iv2 = ((c2 - c0 + period * 10) % period);
+      const fieldIntervals = new Set([
+        Math.round(iv1 / 5) * 5,
+        Math.round(iv2 / 5) * 5,
+      ]);
+      fieldSizes.push(fieldIntervals.size);
+    }
+    const richness = fieldSizes.reduce((s, sz) => s + Math.log(1 + sz), 0) / n;
+    total += richness;
+  }
+  return total / tunings.length;
+}
+
+// Q1500 — tuningFamilySocraticRadarCadentialStrengthMean
+export function tuningFamilySocraticRadarCadentialStrengthMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  const FIFTH = 701.955;
+  const FOURTH = 498.045;
+  const TOLERANCE = 2;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) continue;
+    const period = t.periodCents;
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    let count = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const interval = ((cents[j]! - cents[i]! + period * 10) % period);
+        if (Math.abs(interval - FIFTH) < TOLERANCE || Math.abs(interval - FOURTH) < TOLERANCE) {
+          count++;
+        }
+      }
+    }
+    total += count / n;
+  }
+  return total / tunings.length;
+}
+
+// Q1502 — tuningFamilySocraticRadarHarmonicClosureMean
+export function tuningFamilySocraticRadarHarmonicClosureMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 0;
+  const TARGET = 700;
+  const TOLERANCE = 50;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n < 2) {
+      total += 0;
+      continue;
+    }
+    const period = t.periodCents;
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    let count = 0;
+    const totalPairs = n * (n - 1);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const interval = ((cents[j]! - cents[i]! + period * 10) % period);
+        if (Math.abs(interval - TARGET) <= TOLERANCE) {
+          count++;
+        }
+      }
+    }
+    total += count / totalPairs;
+  }
+  return total / tunings.length;
+}
+
+// Q1504 — tuningFamilySocraticRadarTonicDominantRatio
+export function tuningFamilySocraticRadarTonicDominantRatio(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  void spectrum;
+  void rootHz;
+  if (tunings.length === 0) return 1;
+  let total = 0;
+  for (const t of tunings) {
+    const n = t.degrees.length;
+    if (n === 0) {
+      total += 1;
+      continue;
+    }
+    const period = t.periodCents;
+    const cents = t.degrees.map((d) => pitchToCents(d));
+    let tonicCount = 0;
+    let dominantCount = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const interval = ((cents[j]! - cents[i]! + period * 10) % period);
+        // Tonic: near 0 (unison) or near period (octave)
+        if (interval < 30 || Math.abs(interval - period) < 30) {
+          tonicCount++;
+        }
+        // Dominant: near 700c or near 500c
+        if (Math.abs(interval - 700) <= 30 || Math.abs(interval - 500) <= 30) {
+          dominantCount++;
+        }
+      }
+    }
+    total += (tonicCount + 1) / (dominantCount + 1);
+  }
+  return total / tunings.length;
+}
+
+export function scaleReachabilityMatrix(
+  scaleCents: readonly number[],
+  maxSteps: number = 2,
+  periodCents: number = 1200,
+): number[][] {
+  const n = scaleCents.length;
+  if (n === 0) return [];
+  const R: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    const row: number[] = [];
+    for (let j = 0; j < n; j++) {
+      if (i === j) {
+        row.push(0);
+      } else {
+        const diff = Math.abs(i - j);
+        const dist = Math.min(diff, n - diff);
+        row.push(dist <= maxSteps ? dist : Infinity);
+      }
+    }
+    R.push(row);
+  }
+  return R;
+}
+
+export function scaleReachabilityScore(
+  scaleCents: readonly number[],
+  maxSteps: number = 2,
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const R = scaleReachabilityMatrix(scaleCents, maxSteps, periodCents);
+  let finite = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i !== j && R[i]![j]! < Infinity) finite++;
+    }
+  }
+  return finite / (n * (n - 1));
+}
+
+export function scaleAveragePath(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = j - i;
+      total += Math.min(diff, n - diff);
+    }
+  }
+  const pairs = (n * (n - 1)) / 2;
+  return total / pairs;
+}
+
+export function scaleWienerIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = j - i;
+      total += Math.min(diff, n - diff);
+    }
+  }
+  return total;
 }
