@@ -1071,6 +1071,12 @@ import {
   tuningFamilySocraticRadarExactSequenceProxy,
   tuningFamilySocraticRadarFibrationProxy,
   tuningFamilySocraticRadarSuspensionProxy,
+  tuningFamilySocraticRadarHellingerGeodesicMean,
+  tuningFamilySocraticRadarCurvatureTensorProxy,
+  tuningFamilySocraticRadarParallelTransportProxy,
+  tuningFamilySocraticRadarConnectionFormProxy,
+  tuningFamilySocraticRadarExponentialMapProxy,
+  tuningFamilySocraticRadarRicciCurvatureProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1201,6 +1207,10 @@ import {
   scaleQuarterToneAlignment,
   scaleMicrotonalComplexity,
   scaleEdoApproximationQuality,
+  scaleJustIntonationDeviation,
+  scalePythagoreanDeviation,
+  scaleMeanToneDeviation,
+  scaleEqualTemperamentDeviation,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -32946,6 +32956,113 @@ describe('FFF4 scaleEdoApproximationQuality', () => {
   });
   it('12-TET chromatic → finite, in [0,1]', () => {
     const v = scaleEdoApproximationQuality(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// GGG1 — scaleJustIntonationDeviation
+describe('GGG1 scaleJustIntonationDeviation', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scaleJustIntonationDeviation([])).toBe(0);
+  });
+  it('just-intonation [0,386,702] → finite, in [0,1], low value', () => {
+    const v = scaleJustIntonationDeviation([0, 386, 702]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(v).toBeLessThan(0.5);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleJustIntonationDeviation(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scaleJustIntonationDeviation(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// GGG2 — scalePythagoreanDeviation
+describe('GGG2 scalePythagoreanDeviation', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scalePythagoreanDeviation([])).toBe(0);
+  });
+  it('just-intonation [0,386,702] → finite, in [0,1]', () => {
+    const v = scalePythagoreanDeviation([0, 386, 702]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scalePythagoreanDeviation(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scalePythagoreanDeviation(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// GGG3 — scaleMeanToneDeviation
+describe('GGG3 scaleMeanToneDeviation', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scaleMeanToneDeviation([])).toBe(0);
+  });
+  it('just-intonation [0,386,702] → finite, in [0,1]', () => {
+    const v = scaleMeanToneDeviation([0, 386, 702]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → finite, in [0,1]', () => {
+    const v = scaleMeanToneDeviation(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scaleMeanToneDeviation(quarterTone);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// GGG4 — scaleEqualTemperamentDeviation
+describe('GGG4 scaleEqualTemperamentDeviation', () => {
+  const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
+  const quarterTone = [0, 50, 100, 150, 200];
+  it('empty → 0', () => {
+    expect(scaleEqualTemperamentDeviation([])).toBe(0);
+  });
+  it('just-intonation [0,386,702] → finite, in [0,1]', () => {
+    const v = scaleEqualTemperamentDeviation([0, 386, 702]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('12-TET chromatic → 0', () => {
+    const v = scaleEqualTemperamentDeviation(chromatic);
+    expect(v).toBe(0);
+  });
+  it('quarter-tone scale → finite, in [0,1]', () => {
+    const v = scaleEqualTemperamentDeviation(quarterTone);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);

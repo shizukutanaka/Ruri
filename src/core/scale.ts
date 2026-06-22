@@ -39680,6 +39680,210 @@ export function tuningFamilySocraticRadarSuspensionProxy(
   return Math.max(0, Math.min(1, total / vecs.length));
 }
 
+// Q1806 — tuningFamilySocraticRadarHellingerGeodesicMean
+export function tuningFamilySocraticRadarHellingerGeodesicMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    // single profile: geodesic distance to zero vector
+    const vec = vecs[0]!;
+    const dist = Math.sqrt(vec.reduce((s, v) => s + (Math.sqrt(v) - 0) ** 2, 0));
+    return Math.max(0, Math.min(1, dist));
+  }
+  let total = 0;
+  let count = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const p = vecs[i]!;
+    const q = vecs[i + 1]!;
+    // Hellinger-like geodesic distance: sum(|sqrt(p_i) - sqrt(q_i)|^2)^0.5
+    let sumSq = 0;
+    for (let j = 0; j < axes.length; j++) {
+      sumSq += (Math.sqrt(p[j]!) - Math.sqrt(q[j]!)) ** 2;
+    }
+    total += Math.sqrt(sumSq);
+    count++;
+  }
+  return Math.max(0, Math.min(1, total / count));
+}
+
+// Q1808 — tuningFamilySocraticRadarCurvatureTensorProxy
+export function tuningFamilySocraticRadarCurvatureTensorProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    let sumCurv = 0;
+    for (let i = 0; i < n; i++) {
+      // circular second derivative: p[i-1] - 2*p[i] + p[i+1]
+      const prev = vec[(i - 1 + n) % n]!;
+      const curr = vec[i]!;
+      const next = vec[(i + 1) % n]!;
+      sumCurv += Math.abs(prev - 2 * curr + next);
+    }
+    total += sumCurv / n;
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
+// Q1810 — tuningFamilySocraticRadarParallelTransportProxy
+export function tuningFamilySocraticRadarParallelTransportProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    // compute normalized consecutive differences as tangent vectors
+    const diffs: number[][] = [];
+    for (let i = 0; i < n - 1; i++) {
+      const raw = [vec[i + 1]! - vec[i]!];
+      const norm = Math.sqrt(raw.reduce((s, v) => s + v * v, 0));
+      diffs.push(norm > 0 ? raw.map((v) => v / norm) : [0]);
+    }
+    if (diffs.length < 2) {
+      total += 0;
+      continue;
+    }
+    const first = diffs[0]!;
+    const last = diffs[diffs.length - 1]!;
+    // dot product of first and last tangent vectors
+    let dot = 0;
+    for (let k = 0; k < first.length; k++) {
+      dot += first[k]! * last[k]!;
+    }
+    // parallel transport deviation: |1 - dot|
+    total += Math.abs(1 - dot);
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
+// Q1812 — tuningFamilySocraticRadarConnectionFormProxy
+export function tuningFamilySocraticRadarConnectionFormProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) {
+    const p = vecs[0]!;
+    const n = p.length;
+    const pairs = (n * (n - 1)) / 2;
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        sum += Math.abs(p[i]! * p[j]! - p[j]! * p[i]!);
+      }
+    }
+    return Math.max(0, Math.min(1, sum / (pairs || 1)));
+  }
+  let total = 0;
+  let count = 0;
+  for (let idx = 0; idx < vecs.length - 1; idx++) {
+    const p = vecs[idx]!;
+    const q = vecs[idx + 1]!;
+    const n = p.length;
+    const pairs = (n * (n - 1)) / 2;
+    // skew-symmetric part: |p_i*q_j - p_j*q_i| / C(5,2)
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        sum += Math.abs(p[i]! * q[j]! - p[j]! * q[i]!);
+      }
+    }
+    total += sum / (pairs || 1);
+    count++;
+  }
+  return Math.max(0, Math.min(1, total / count));
+}
+
+// Q1814 — tuningFamilySocraticRadarExponentialMapProxy
+export function tuningFamilySocraticRadarExponentialMapProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) return 0;
+  const sqrtN = Math.sqrt(axes.length);
+  let total = 0;
+  let count = 0;
+  for (let i = 0; i < vecs.length - 1; i++) {
+    const p = vecs[i]!;
+    const q = vecs[i + 1]!;
+    // finite difference dp = p - prev (or p itself for i=0)
+    const dp = i > 0
+      ? p.map((v, k) => v - vecs[i - 1]![k]!)
+      : p.map((v) => v);
+    // predicted next: p + dp
+    const predicted = p.map((v, k) => v + dp[k]!);
+    // distance between q and predicted
+    let sumSq = 0;
+    for (let k = 0; k < axes.length; k++) {
+      sumSq += (q[k]! - predicted[k]!) ** 2;
+    }
+    total += Math.sqrt(sumSq) / sqrtN;
+    count++;
+  }
+  return Math.max(0, Math.min(1, total / count));
+}
+
+// Q1816 — tuningFamilySocraticRadarRicciCurvatureProxy
+export function tuningFamilySocraticRadarRicciCurvatureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const maxVal = Math.max(...vec, 1e-9);
+    let sumCurv = 0;
+    for (let i = 0; i < n; i++) {
+      const prev = vec[(i - 1 + n) % n]!;
+      const curr = vec[i]!;
+      const next = vec[(i + 1) % n]!;
+      sumCurv += Math.abs(prev - 2 * curr + next) / maxVal;
+    }
+    // mean of principal curvatures (Ricci trace)
+    total += sumCurv / n;
+  }
+  return Math.max(0, Math.min(1, total / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -41919,4 +42123,128 @@ export function scaleEdoApproximationQuality(scaleCents: readonly number[], peri
     if (coverage > bestCoverage) bestCoverage = coverage;
   }
   return bestCoverage / n;
+}
+
+/**
+ * GGG1 — scaleJustIntonationDeviation
+ * Mean deviation of scale pitches from nearest just-intonation interval (ratios n/m, n,m ≤ 8).
+ * - For each pitch p in cents, compute ratio r = 2^(p/1200)
+ * - Find nearest just ratio n/m (n,m ≤ 8): min |r - n/m|
+ * - Convert deviation to cents: |log2(r / nearest_ratio)| * 1200
+ * - Return mean_deviation / 100 (normalized, 100 cents = 1 semitone); clamp [0,1]; 0 for n=0
+ */
+export function scaleJustIntonationDeviation(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  // Precompute just ratios n/m with n,m ≤ 8, normalized to [1, 2)
+  const justRatios: number[] = [];
+  for (let num = 1; num <= 8; num++) {
+    for (let den = 1; den <= 8; den++) {
+      let r = num / den;
+      // Normalize to [1, 2)
+      while (r < 1) r *= 2;
+      while (r >= 2) r /= 2;
+      justRatios.push(r);
+    }
+  }
+  let totalDeviation = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    // Normalize pitch to [0, 1200)
+    const pitchNorm = ((pitch % 1200) + 1200) % 1200;
+    const r = Math.pow(2, pitchNorm / 1200);
+    let minDev = Infinity;
+    for (const jr of justRatios) {
+      const devCents = Math.abs(Math.log2(r / jr)) * 1200;
+      if (devCents < minDev) minDev = devCents;
+    }
+    totalDeviation += minDev;
+  }
+  const meanDeviation = totalDeviation / n;
+  return Math.min(1, Math.max(0, meanDeviation / 100));
+}
+
+/**
+ * GGG2 — scalePythagoreanDeviation
+ * Mean deviation from nearest Pythagorean interval (3^k / 2^m form).
+ * - Generate Pythagorean intervals for k = -6..6: ratio = 3^k / 2^floor(k*log2(3))
+ * - For each pitch, find nearest Pythagorean ratio within the octave
+ * - Return mean deviation in cents / 100; clamp [0,1]; 0 for n=0
+ */
+export function scalePythagoreanDeviation(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  // Precompute Pythagorean ratios for k = -6..6, normalized to [1, 2)
+  const pythagoreanRatios: number[] = [];
+  for (let k = -6; k <= 6; k++) {
+    let r = Math.pow(3, k) / Math.pow(2, Math.floor(k * Math.log2(3)));
+    // Normalize to [1, 2)
+    while (r < 1) r *= 2;
+    while (r >= 2) r /= 2;
+    pythagoreanRatios.push(r);
+  }
+  let totalDeviation = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    const pitchNorm = ((pitch % 1200) + 1200) % 1200;
+    const r = Math.pow(2, pitchNorm / 1200);
+    let minDev = Infinity;
+    for (const pr of pythagoreanRatios) {
+      const devCents = Math.abs(Math.log2(r / pr)) * 1200;
+      if (devCents < minDev) minDev = devCents;
+    }
+    totalDeviation += minDev;
+  }
+  const meanDeviation = totalDeviation / n;
+  return Math.min(1, Math.max(0, meanDeviation / 100));
+}
+
+/**
+ * GGG3 — scaleMeanToneDeviation
+ * Mean deviation from 1/4-comma meantone (fifths = 696.578 cents).
+ * - Meantone scale degrees: C=0, D=193.157, E=386.314, F=503.422, G=696.578, A=889.735, B=1082.892 cents
+ * - For each scale pitch, find nearest meantone degree (mod 1200)
+ * - Return mean deviation in cents / 50; clamp [0,1]; 0 for n=0
+ */
+export function scaleMeanToneDeviation(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const meantoneDegrees = [0, 193.157, 386.314, 503.422, 696.578, 889.735, 1082.892];
+  let totalDeviation = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    const pitchNorm = ((pitch % 1200) + 1200) % 1200;
+    let minDev = Infinity;
+    for (const deg of meantoneDegrees) {
+      const d = Math.abs(pitchNorm - deg);
+      const devCents = Math.min(d, 1200 - d);
+      if (devCents < minDev) minDev = devCents;
+    }
+    totalDeviation += minDev;
+  }
+  const meanDeviation = totalDeviation / n;
+  return Math.min(1, Math.max(0, meanDeviation / 50));
+}
+
+/**
+ * GGG4 — scaleEqualTemperamentDeviation
+ * Mean deviation from nearest 12-TET semitone (100-cent multiples).
+ * - For each pitch, compute distance to nearest 100-cent multiple (mod 1200)
+ * - Return mean_deviation / 50; clamp [0,1]; 0 for n=0
+ */
+export function scaleEqualTemperamentDeviation(scaleCents: readonly number[]): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let totalDeviation = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = scaleCents[i]!;
+    const pitchNorm = ((pitch % 1200) + 1200) % 1200;
+    const nearestSemitone = Math.round(pitchNorm / 100) * 100;
+    const d = Math.abs(pitchNorm - nearestSemitone);
+    // Handle wrap-around: distance to nearest 100-cent multiple mod 1200
+    const devCents = Math.min(d, 100 - d);
+    totalDeviation += devCents;
+  }
+  const meanDeviation = totalDeviation / n;
+  return Math.min(1, Math.max(0, meanDeviation / 50));
 }

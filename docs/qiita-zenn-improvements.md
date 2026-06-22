@@ -1008,3 +1008,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | FFF2 | `scaleQuarterToneAlignment` | 四分音グリッド（50セント）への整合度 |
 | FFF3 | `scaleMicrotonalComplexity` | マイクロトーナル固有ステップ比 |
 | FFF4 | `scaleEdoApproximationQuality` | 小整数EDO近似カバレッジ |
+
+## Round 76: 音律偏差・調律誤差 (GGG1–GGG4)
+
+各種参照音律からの偏差を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| GGG1 | `scaleJustIntonationDeviation` | 純正律（n,m≤8）からの平均偏差/100セント |
+| GGG2 | `scalePythagoreanDeviation` | ピタゴラス音律からの平均偏差/100セント |
+| GGG3 | `scaleMeanToneDeviation` | 1/4コンマ・ミーントーンからの平均偏差/50セント |
+| GGG4 | `scaleEqualTemperamentDeviation` | 12平均律からの平均偏差/50セント |
