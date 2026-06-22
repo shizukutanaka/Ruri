@@ -1030,3 +1030,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | HHH2 | `scaleRegisterWidth` | 音域幅（オクターブ単位、正規化） |
 | HHH3 | `scaleOctaveCompleteness` | 12半音クラスのカバレッジ |
 | HHH4 | `scaleSubOctaveDensity` | 1オクターブ以内の音の密度 |
+
+## Round 78: フレーズ構造・モーション分析 (III1–III4)
+
+音階のステップ運動特性（順次・跳躍・間隙補充）を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| III1 | `scaleConjunctMotion` | 順次進行（≤200セント）ステップの割合 |
+| III2 | `scaleDisjunctMotion` | 跳躍進行（>200セント）ステップの割合 |
+| III3 | `scaleStepSizeVariance` | ステップサイズ分散（正規化） |
+| III4 | `scaleGapFill` | 間隙補充傾向（跳躍→順次の割合） |
