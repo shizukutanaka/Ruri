@@ -38744,6 +38744,257 @@ export function tuningFamilySocraticRadarExpansionConstantMean(
   return Math.max(0, Math.min(1, avg));
 }
 
+// Q1746 — tuningFamilySocraticRadarKolmogorovComplexityProxy
+export function tuningFamilySocraticRadarKolmogorovComplexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    // Discretize each axis value to 3 levels: <1/3→0, <2/3→1, ≥2/3→2
+    const discrete = vec.map((v) => (v < 1 / 3 ? 0 : v < 2 / 3 ? 1 : 2));
+    // Run-length encoding length
+    let rleLen = 0;
+    let i = 0;
+    while (i < discrete.length) {
+      rleLen++;
+      const cur = discrete[i]!;
+      while (i < discrete.length && discrete[i]! === cur) i++;
+    }
+    // Normalize by 5 (max RLE length = number of axes) and clamp
+    sum += Math.min(rleLen / 5, 1);
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1748 — tuningFamilySocraticRadarLempelZivComplexityProxy
+export function tuningFamilySocraticRadarLempelZivComplexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let sum = 0;
+  for (const vec of vecs) {
+    // Discretize to 10 levels
+    const discrete = vec.map((v) => Math.min(9, Math.floor(v * 10)));
+    // LZ76 algorithm: parse sequence into distinct phrases
+    const phrases = new Set<string>();
+    let start = 0;
+    let end = 1;
+    while (end <= discrete.length) {
+      const substr = discrete.slice(start, end).join(',');
+      if (!phrases.has(substr)) {
+        phrases.add(substr);
+        start = end;
+      }
+      end++;
+    }
+    const numPhrases = phrases.size;
+    // Normalize by 5 and clamp
+    sum += Math.min(numPhrases / 5, 1);
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1750 — tuningFamilySocraticRadarApproximateEntropyProxy
+export function tuningFamilySocraticRadarApproximateEntropyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-10;
+  let sum = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const r = 0.2; // tolerance
+    // Count template matches for m=2 and m=3
+    const countMatches = (m: number): number => {
+      let count = 0;
+      for (let i = 0; i <= n - m; i++) {
+        for (let j = 0; j <= n - m; j++) {
+          let match = true;
+          for (let k = 0; k < m; k++) {
+            if (Math.abs(vec[i + k]! - vec[j + k]!) > r) {
+              match = false;
+              break;
+            }
+          }
+          if (match) count++;
+        }
+      }
+      return count;
+    };
+    const cm2 = countMatches(2);
+    const cm3 = countMatches(3);
+    const denom2 = n - 1 > 0 ? n - 1 : 1;
+    const denom3 = n - 2 > 0 ? n - 2 : 1;
+    const phi2 = Math.log(Math.max(cm2, eps) / denom2);
+    const phi3 = Math.log(Math.max(cm3, eps) / denom3);
+    const apen = phi2 - phi3;
+    // Normalize by ln(n) and clamp
+    const maxApen = Math.log(n + eps);
+    sum += Math.max(0, Math.min(1, apen / maxApen));
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1752 — tuningFamilySocraticRadarSampleEntropyProxy
+export function tuningFamilySocraticRadarSampleEntropyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-10;
+  let sum = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const r = 0.2;
+    // Count template matches excluding self-matches for m=2 and m+1=3
+    const countMatchesNoSelf = (m: number): number => {
+      let count = 0;
+      for (let i = 0; i <= n - m; i++) {
+        for (let j = 0; j <= n - m; j++) {
+          if (i === j) continue; // exclude self-matches
+          let match = true;
+          for (let k = 0; k < m; k++) {
+            if (Math.abs(vec[i + k]! - vec[j + k]!) > r) {
+              match = false;
+              break;
+            }
+          }
+          if (match) count++;
+        }
+      }
+      return count;
+    };
+    const A = countMatchesNoSelf(3); // m+1=3 matches
+    const B = countMatchesNoSelf(2); // m=2 matches
+    const samp = -Math.log(Math.max(A, eps) / Math.max(B, eps));
+    // Normalize by ln(n) and clamp
+    const maxSamp = Math.log(n + eps);
+    sum += Math.max(0, Math.min(1, samp / maxSamp));
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1754 — tuningFamilySocraticRadarPermutationEntropyProxy
+export function tuningFamilySocraticRadarPermutationEntropyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-10;
+  let sum = 0;
+  for (const vec of vecs) {
+    const n = vec.length;
+    const m = 3; // ordinal pattern length
+    // Enumerate ordinal patterns (permutations of order-3 windows)
+    const patternCounts = new Map<string, number>();
+    let total = 0;
+    for (let i = 0; i <= n - m; i++) {
+      const window = Array.from({ length: m }, (_, k) => vec[i + k]!);
+      // Get ordinal pattern: sort indices by value
+      const indices = Array.from({ length: m }, (_, k) => k);
+      indices.sort((a, b) => window[a]! - window[b]!);
+      const pattern = indices.join(',');
+      patternCounts.set(pattern, (patternCounts.get(pattern) ?? 0) + 1);
+      total++;
+    }
+    // Shannon entropy of pattern distribution
+    let entropy = 0;
+    for (const cnt of patternCounts.values()) {
+      const p = cnt / Math.max(total, 1);
+      entropy -= p * Math.log2(Math.max(p, eps));
+    }
+    // Normalize by log2(m!) = log2(6) for m=3
+    const maxEntropy = Math.log2(6);
+    sum += Math.max(0, Math.min(1, entropy / maxEntropy));
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
+// Q1756 — tuningFamilySocraticRadarMultiscaleEntropyProxy
+export function tuningFamilySocraticRadarMultiscaleEntropyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const eps = 1e-10;
+
+  const sampleEntropyVec = (vec: number[]): number => {
+    const n = vec.length;
+    const r = 0.2;
+    let A = 0;
+    let B = 0;
+    for (let i = 0; i < n - 2; i++) {
+      for (let j = 0; j < n - 2; j++) {
+        if (i === j) continue;
+        const match2 =
+          Math.abs(vec[i]! - vec[j]!) <= r && Math.abs(vec[i + 1]! - vec[j + 1]!) <= r;
+        if (match2) {
+          B++;
+          if (Math.abs(vec[i + 2]! - vec[j + 2]!) <= r) A++;
+        }
+      }
+    }
+    return -Math.log(Math.max(A, eps) / Math.max(B, eps));
+  };
+
+  let sum = 0;
+  for (const vec of vecs) {
+    // Scale 1: original
+    const se1 = sampleEntropyVec(vec);
+    // Scale 2: coarse-grain by averaging pairs
+    const coarse: number[] = [];
+    for (let i = 0; i + 1 < vec.length; i += 2) {
+      coarse.push((vec[i]! + vec[i + 1]!) / 2);
+    }
+    const se2 = coarse.length >= 3 ? sampleEntropyVec(coarse) : se1;
+    const meanSe = (se1 + se2) / 2;
+    // Normalize by ln(n), clamp to [0,1]
+    const maxSe = Math.log(vec.length + eps);
+    sum += Math.max(0, Math.min(1, meanSe / maxSe));
+  }
+  const avg = sum / tunings.length;
+  return Math.max(0, Math.min(1, avg));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -40402,4 +40653,118 @@ export function scaleIntervalEntropy(scaleCents: readonly number[], periodCents:
     if (p > 0) entropy -= p * Math.log2(p);
   }
   return Math.max(0, Math.min(1, entropy / Math.log2(maxBins)));
+}
+
+// ---------------------------------------------------------------------------
+// Round 71: BBB1–BBB4 — ピッチ近接性・声部導音 (Pitch Proximity and Voice Leading)
+// ---------------------------------------------------------------------------
+
+/**
+ * BBB1 — scaleNearestNeighborMean
+ * Mean nearest-neighbor distance in pitch space (in cents), normalized to [0,1]
+ * by dividing by (periodCents/2).
+ * For each pitch, finds the minimum distance to any other pitch (wrapped within period).
+ * Returns mean_of_minimums / (periodCents/2); 0 for n<2.
+ */
+export function scaleNearestNeighborMean(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const half = periodCents / 2;
+  let totalMin = 0;
+  for (let i = 0; i < n; i++) {
+    let minDist = Infinity;
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      let d = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      d = ((d % periodCents) + periodCents) % periodCents;
+      if (d > half) d = periodCents - d;
+      if (d < minDist) minDist = d;
+    }
+    totalMin += minDist;
+  }
+  const meanMin = totalMin / n;
+  return Math.max(0, Math.min(1, meanMin / half));
+}
+
+/**
+ * BBB2 — scaleVoiceLeadingEfficiencyV2
+ * Efficiency of voice leading from scale to itself transposed by one step.
+ * Shifts all pitches up by the smallest step and computes mean displacement / (periodCents/2).
+ * Returns 1 - mean_displacement / (periodCents/2); clamped to [0,1]; 0 for n<2.
+ */
+export function scaleVoiceLeadingEfficiencyV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const half = periodCents / 2;
+  // Find smallest step (min interval between adjacent pitches, wrapped)
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let smallestStep = Infinity;
+  for (let i = 1; i < sorted.length; i++) {
+    const step = sorted[i]! - sorted[i - 1]!;
+    if (step < smallestStep) smallestStep = step;
+  }
+  // Also check wrap-around step
+  const wrapStep = periodCents - sorted[sorted.length - 1]! + sorted[0]!;
+  if (wrapStep < smallestStep) smallestStep = wrapStep;
+  if (!isFinite(smallestStep) || smallestStep <= 0) return 0;
+  // Shift all pitches up by smallestStep, compute mean displacement to nearest original pitch
+  let totalDisplacement = 0;
+  for (let i = 0; i < n; i++) {
+    const shifted = scaleCents[i]! + smallestStep;
+    let minDist = Infinity;
+    for (let j = 0; j < n; j++) {
+      let d = Math.abs(shifted - scaleCents[j]!);
+      d = ((d % periodCents) + periodCents) % periodCents;
+      if (d > half) d = periodCents - d;
+      if (d < minDist) minDist = d;
+    }
+    totalDisplacement += minDist;
+  }
+  const meanDisplacement = totalDisplacement / n;
+  return Math.max(0, Math.min(1, 1 - meanDisplacement / half));
+}
+
+/**
+ * BBB3 — scaleCrowdingIndex
+ * Proportion of pitches that have another pitch within 50 cents (wrapped within period).
+ * Returns count / n; 0 for n<2.
+ */
+export function scaleCrowdingIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const threshold = 50;
+  let crowdedCount = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) continue;
+      let d = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      d = ((d % periodCents) + periodCents) % periodCents;
+      if (d > periodCents / 2) d = periodCents - d;
+      if (d <= threshold) {
+        crowdedCount++;
+        break;
+      }
+    }
+  }
+  return crowdedCount / n;
+}
+
+/**
+ * BBB4 — scaleSpreadIndex
+ * How spread out the scale is across the period.
+ * Computes the range covered: (highest - lowest) / periodCents.
+ * Returns range / periodCents; clamped to [0,1]; 0 for n=0.
+ */
+export function scaleSpreadIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let min = scaleCents[0]!;
+  let max = scaleCents[0]!;
+  for (let i = 1; i < n; i++) {
+    const v = scaleCents[i]!;
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
+  const range = max - min;
+  return Math.max(0, Math.min(1, range / periodCents));
 }

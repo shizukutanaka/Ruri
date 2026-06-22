@@ -1041,6 +1041,12 @@ import {
   tuningFamilySocraticRadarCheegerConstantProxy,
   tuningFamilySocraticRadarSpectralRadiusProxy,
   tuningFamilySocraticRadarExpansionConstantMean,
+  tuningFamilySocraticRadarKolmogorovComplexityProxy,
+  tuningFamilySocraticRadarLempelZivComplexityProxy,
+  tuningFamilySocraticRadarApproximateEntropyProxy,
+  tuningFamilySocraticRadarSampleEntropyProxy,
+  tuningFamilySocraticRadarPermutationEntropyProxy,
+  tuningFamilySocraticRadarMultiscaleEntropyProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1151,6 +1157,10 @@ import {
   scaleIntervalBalance,
   scaleIntervalDominance,
   scaleIntervalEntropy,
+  scaleNearestNeighborMean,
+  scaleVoiceLeadingEfficiencyV2,
+  scaleCrowdingIndex,
+  scaleSpreadIndex,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -31886,6 +31896,94 @@ describe('scaleIntervalEntropy', () => {
   });
   it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
     const v = scaleIntervalEntropy([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Round 71: BBB1–BBB4 — ピッチ近接性・声部導音
+// ---------------------------------------------------------------------------
+
+describe('scaleNearestNeighborMean', () => {
+  it('empty → 0', () => {
+    expect(scaleNearestNeighborMean([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleNearestNeighborMean([0])).toBe(0);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleNearestNeighborMean([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,150] → finite, in [0,1]', () => {
+    const v = scaleNearestNeighborMean([0, 50, 100, 150]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleVoiceLeadingEfficiencyV2', () => {
+  it('empty → 0', () => {
+    expect(scaleVoiceLeadingEfficiencyV2([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleVoiceLeadingEfficiencyV2([0])).toBe(0);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleVoiceLeadingEfficiencyV2([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,150] → finite, in [0,1]', () => {
+    const v = scaleVoiceLeadingEfficiencyV2([0, 50, 100, 150]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleCrowdingIndex', () => {
+  it('empty → 0', () => {
+    expect(scaleCrowdingIndex([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleCrowdingIndex([0])).toBe(0);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleCrowdingIndex([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,150] → finite, in [0,1]', () => {
+    const v = scaleCrowdingIndex([0, 50, 100, 150]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSpreadIndex', () => {
+  it('empty → 0', () => {
+    expect(scaleSpreadIndex([])).toBe(0);
+  });
+  it('n=1 → 0', () => {
+    expect(scaleSpreadIndex([0])).toBe(0);
+  });
+  it('major scale [0,200,400,500,700,900,1100] → finite, in [0,1]', () => {
+    const v = scaleSpreadIndex([0, 200, 400, 500, 700, 900, 1100]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('clustered scale [0,50,100,150] → finite, in [0,1]', () => {
+    const v = scaleSpreadIndex([0, 50, 100, 150]);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);

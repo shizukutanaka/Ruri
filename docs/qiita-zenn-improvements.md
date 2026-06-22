@@ -953,3 +953,14 @@
 | AAA2 | `scaleIntervalBalance` | 音程ヒストグラムの均衡度（1-CV） |
 | AAA3 | `scaleIntervalDominance` | 最頻音程クラスの占有率 |
 | AAA4 | `scaleIntervalEntropy` | 音程クラス分布のShannon entropy |
+
+## Round 71: ピッチ近接性・声部導音 (BBB1–BBB4)
+
+音階内のピッチ間近接性と声部導音効率を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| BBB1 | `scaleNearestNeighborMean` | 最近傍音程の平均距離（正規化） |
+| BBB2 | `scaleVoiceLeadingEfficiencyV2` | 1ステップ上移調時の声部導音効率 |
+| BBB3 | `scaleCrowdingIndex` | 50セント以内の隣接音を持つ音の割合 |
+| BBB4 | `scaleSpreadIndex` | 音域カバー率（最高-最低/周期） |
