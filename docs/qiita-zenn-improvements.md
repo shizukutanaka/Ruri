@@ -479,3 +479,15 @@
 | `tuningOvertoneAlignment` | 調律と倍音列の整合度 |
 | `scaleModalDiversity` | ユニークな旋法の割合 |
 | `tuningLatticeSpread` | 調律複雑度の標準偏差（格子拡散度） |
+
+## Round 29: スペクトル音響分析ヘルパ (LL1–LL4)
+
+**テーマ**: スペクトル重心・平坦度・根音性・マスキング  
+**実装**: LL1–LL4
+
+| 関数 | 説明 |
+|------|------|
+| `spectralCentroidHz` | スペクトル重心（Hz単位、振幅重み） |
+| `spectralFlatness` | スペクトル平坦度（Wienerエントロピー） |
+| `scaleRootedness` | スケールの根音支持度（倍音整合スコア） |
+| `partialMaskingScore` | 倍音間マスキング度（スペクトル密集度） |

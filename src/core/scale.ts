@@ -27241,3 +27241,288 @@ export function tuningFamilySocraticRadarParetoScore(
     return 1 - dominatedCount / n;
   });
 }
+
+// ---------------------------------------------------------------------------
+// Q1254 — tuningFamilySocraticRadarAdjacencyStrength
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarAdjacencyStrength(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[][] {
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const n = profiles.length;
+  const vecs: number[][] = profiles.map((p) => axes.map((ax) => p[ax]));
+  const matrix: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    const row: number[] = [];
+    for (let j = 0; j < n; j++) {
+      if (i === j) {
+        row.push(1);
+      } else {
+        const a = vecs[i]!;
+        const b = vecs[j]!;
+        let dot = 0;
+        let normA = 0;
+        let normB = 0;
+        for (let k = 0; k < 5; k++) {
+          dot += a[k]! * b[k]!;
+          normA += a[k]! * a[k]!;
+          normB += b[k]! * b[k]!;
+        }
+        normA = Math.sqrt(normA);
+        normB = Math.sqrt(normB);
+        row.push(normA === 0 || normB === 0 ? 0 : dot / (normA * normB));
+      }
+    }
+    matrix.push(row);
+  }
+  return matrix;
+}
+
+// ---------------------------------------------------------------------------
+// Q1256 — tuningFamilySocraticRadarClusteringCoefficient
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarClusteringCoefficient(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const THRESHOLD = 0.9;
+  const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
+  const n = tunings.length;
+  const adj: boolean[][] = sim.map((row, i) =>
+    row.map((v, j) => i !== j && v >= THRESHOLD),
+  );
+  return adj.map((neighbors, i) => {
+    const deg = neighbors.filter(Boolean).length;
+    if (deg < 2) return 0;
+    let triangles = 0;
+    for (let j = 0; j < n; j++) {
+      if (!adj[i]![j]) continue;
+      for (let k = j + 1; k < n; k++) {
+        if (!adj[i]![k]) continue;
+        if (adj[j]![k]) triangles++;
+      }
+    }
+    return triangles / (deg * (deg - 1) / 2);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Q1258 — tuningFamilySocraticRadarPageRankScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarPageRankScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const THRESHOLD = 0.9;
+  const D = 0.85;
+  const ITER = 20;
+  const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
+  const n = tunings.length;
+  if (n === 0) return [];
+  const adj: boolean[][] = sim.map((row, i) =>
+    row.map((v, j) => i !== j && v >= THRESHOLD),
+  );
+  const degree = adj.map((row) => row.filter(Boolean).length);
+  const totalEdges = degree.reduce((s, d) => s + d, 0) / 2;
+  if (totalEdges === 0) return Array.from({ length: n }, () => 1 / n);
+  let rank = Array.from({ length: n }, () => 1 / n);
+  for (let iter = 0; iter < ITER; iter++) {
+    const next = Array.from({ length: n }, () => (1 - D) / n);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (adj[j]![i] && degree[j]! > 0) {
+          next[i]! += D * rank[j]! / degree[j]!;
+        }
+      }
+    }
+    rank = next;
+  }
+  return rank;
+}
+
+// ---------------------------------------------------------------------------
+// Q1260 — tuningFamilySocraticRadarBetweennessProxy
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarBetweennessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
+  const n = tunings.length;
+  const counts = new Array<number>(n).fill(0);
+  for (let j = 0; j < n; j++) {
+    for (let k = j + 1; k < n; k++) {
+      let bestM = -1;
+      let bestScore = -Infinity;
+      for (let m = 0; m < n; m++) {
+        if (m === j || m === k) continue;
+        const score = Math.min(sim[j]![m]!, sim[m]![k]!);
+        if (score > bestScore) {
+          bestScore = score;
+          bestM = m;
+        }
+      }
+      if (bestM >= 0) counts[bestM]!++;
+    }
+  }
+  return counts;
+}
+
+// ---------------------------------------------------------------------------
+// Q1262 — tuningFamilySocraticRadarModularityScore
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarModularityScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const THRESHOLD = 0.9;
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
+  const n = tunings.length;
+  if (n < 2) return 0;
+  const adj: boolean[][] = sim.map((row, i) =>
+    row.map((v, j) => i !== j && v >= THRESHOLD),
+  );
+  const degree = adj.map((row) => row.filter(Boolean).length);
+  const totalEdges = degree.reduce((s, d) => s + d, 0) / 2;
+  if (totalEdges === 0) return 0;
+  // Community: sort by first axis score, split into top/bottom half
+  const firstAxisScores = profiles.map((p) => p[axes[0]!]);
+  const sorted = firstAxisScores.slice().sort((a, b) => a - b);
+  const median = sorted[Math.floor(n / 2)]!;
+  const community = firstAxisScores.map((s) => (s >= median ? 1 : 0));
+  let edgesWithin = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (adj[i]![j] && community[i] === community[j]) {
+        edgesWithin++;
+      }
+    }
+  }
+  const twoE = 2 * totalEdges;
+  let degreeSum = 0;
+  for (let c = 0; c <= 1; c++) {
+    let dc = 0;
+    for (let i = 0; i < n; i++) {
+      if (community[i] === c) dc += degree[i]!;
+    }
+    degreeSum += (dc / twoE) * (dc / twoE);
+  }
+  return edgesWithin / totalEdges - degreeSum;
+}
+
+// ---------------------------------------------------------------------------
+// Q1264 — tuningFamilySocraticRadarNetworkDensity
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarNetworkDensity(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const THRESHOLD = 0.9;
+  const n = tunings.length;
+  if (n < 2) return 0;
+  const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
+  let edges = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (sim[i]![j]! >= THRESHOLD) edges++;
+    }
+  }
+  return edges / (n * (n - 1) / 2);
+}
+
+// LL1
+export function spectralCentroidHz(
+  spectrum: Spectrum,
+  referenceHz: number = 440,
+): number {
+  if (spectrum.length === 0) return 0;
+  let weightedSum = 0;
+  let totalAmp = 0;
+  for (const partial of spectrum) {
+    weightedSum += partial.amplitude * partial.ratio * referenceHz;
+    totalAmp += partial.amplitude;
+  }
+  if (totalAmp === 0) return 0;
+  return weightedSum / totalAmp;
+}
+
+// LL2
+export function spectralFlatness(spectrum: Spectrum): number {
+  if (spectrum.length === 0) return 0;
+  let totalAmp = 0;
+  let logSum = 0;
+  for (const partial of spectrum) {
+    totalAmp += partial.amplitude;
+    logSum += Math.log(partial.amplitude + 1e-10);
+  }
+  const arithMean = totalAmp / spectrum.length;
+  if (arithMean === 0) return 0;
+  const geoMean = Math.exp(logSum / spectrum.length);
+  return Math.min(1, Math.max(0, geoMean / arithMean));
+}
+
+// LL3
+export function scaleRootedness(
+  scaleCents: readonly number[],
+  harmonics: number = 6,
+): number {
+  if (scaleCents.length === 0) return 0;
+  let totalScore = 0;
+  for (const p of scaleCents) {
+    let bestK = 1;
+    let minDist = Infinity;
+    for (let k = 1; k <= harmonics; k++) {
+      const harmonicCents = 1200 * Math.log2(k);
+      const dist = Math.abs(p - harmonicCents);
+      if (dist < minDist) {
+        minDist = dist;
+        bestK = k;
+      }
+    }
+    const scorePitch = Math.min(1, Math.max(0, 1 - minDist / 100));
+    totalScore += scorePitch / bestK;
+  }
+  return totalScore / scaleCents.length;
+}
+
+// LL4
+export function partialMaskingScore(
+  spectrum: Spectrum,
+  maskingThresholdCents: number = 200,
+): number {
+  const n = spectrum.length;
+  if (n < 2) return 0;
+  const pairs = (n * (n - 1)) / 2;
+  let totalMasking = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const partialI = spectrum[i]!;
+      const partialJ = spectrum[j]!;
+      const centsDist =
+        1200 * Math.abs(Math.log2(partialI.ratio / partialJ.ratio));
+      if (centsDist < maskingThresholdCents) {
+        totalMasking +=
+          (1 - centsDist / maskingThresholdCents) *
+          partialI.amplitude *
+          partialJ.amplitude;
+      }
+    }
+  }
+  return totalMasking / pairs;
+}
