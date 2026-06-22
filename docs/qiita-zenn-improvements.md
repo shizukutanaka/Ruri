@@ -1107,3 +1107,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | PPP2 | `scaleFusionIndex` | 聴覚融合指数（小ステップによる単一知覚確率） |
 | PPP3 | `scalePitchProximityGrouping` | ゲシュタルト近接性によるグルーピング指数 |
 | PPP4 | `scaleTonalFusion` | 倍音列との整数比近接度による調性融合スコア |
+
+## Round 85: 音階グラフ理論 (QQQ1–QQQ4)
+
+音階をグラフとして解析する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| QQQ1 | `scaleIntervalGraphEdgeCount` | 音程グラフのエッジ密度（閾値内の音程対の割合） |
+| QQQ2 | `scaleChordal` | 弦グラフ性スコア（3連続音程の最大区間が三全音以内） |
+| QQQ3 | `scaleChromatic` | 半音階性スコア（12平均律半音への近接度） |
+| QQQ4 | `scaleSpectralRadius` | スペクトル半径近似（最大次数／(n-1)） |
