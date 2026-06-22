@@ -376,6 +376,12 @@ import {
   presetFamilySocraticRadarMonteCarloVariance,
   presetFamilySocraticRadarDiversityIndex,
   presetFamilySocraticRadarOptimalSubset,
+  presetFamilySocraticRadarSpearmanRank,
+  presetFamilySocraticRadarCumulativeDistribution,
+  presetFamilySocraticRadarRunningMean,
+  presetFamilySocraticRadarExponentialSmoothing,
+  presetFamilySocraticRadarOutlierReport,
+  presetFamilySocraticRadarDendrogramOrder,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -12415,5 +12421,148 @@ describe('presetFamilySocraticRadarOptimalSubset (Q1145)', () => {
     expect(result).toHaveLength(2);
     expect(result[0]).toHaveProperty('id');
     expect(result[0]).toHaveProperty('score');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1147 — presetFamilySocraticRadarSpearmanRank
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarSpearmanRank (Q1147)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined result with rho and n', () => {
+    const result = presetFamilySocraticRadarSpearmanRank(presetIds, spectrum, 'diversity', 'maturity');
+    expect(result).toBeDefined();
+    expect(result).toHaveProperty('rho');
+    expect(result).toHaveProperty('n');
+  });
+  it('rho in [-1,1]', () => {
+    const result = presetFamilySocraticRadarSpearmanRank(presetIds, spectrum, 'diversity', 'maturity');
+    expect(result.rho).toBeGreaterThanOrEqual(-1);
+    expect(result.rho).toBeLessThanOrEqual(1);
+  });
+  it('n equals presetIds.length', () => {
+    const result = presetFamilySocraticRadarSpearmanRank(presetIds, spectrum, 'diversity', 'maturity');
+    expect(result.n).toBe(presetIds.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1149 — presetFamilySocraticRadarCumulativeDistribution
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarCumulativeDistribution (Q1149)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined array', () => {
+    const result = presetFamilySocraticRadarCumulativeDistribution(presetIds, spectrum, 'diversity', 5);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+  });
+  it('has at least 5 entries', () => {
+    const result = presetFamilySocraticRadarCumulativeDistribution(presetIds, spectrum, 'diversity', 5);
+    expect(result.length).toBeGreaterThanOrEqual(5);
+  });
+  it('last cdf is 1', () => {
+    const result = presetFamilySocraticRadarCumulativeDistribution(presetIds, spectrum, 'diversity', 5);
+    expect(result[result.length - 1]!.cdf).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1151 — presetFamilySocraticRadarRunningMean
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarRunningMean (Q1151)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined array', () => {
+    const result = presetFamilySocraticRadarRunningMean(presetIds, spectrum);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+  });
+  it('returns n entries', () => {
+    const result = presetFamilySocraticRadarRunningMean(presetIds, spectrum);
+    expect(result).toHaveLength(presetIds.length);
+  });
+  it('each entry has runningMean with 5 keys', () => {
+    const result = presetFamilySocraticRadarRunningMean(presetIds, spectrum);
+    expect(Object.keys(result[0]!.runningMean)).toHaveLength(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1153 — presetFamilySocraticRadarExponentialSmoothing
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarExponentialSmoothing (Q1153)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined array', () => {
+    const result = presetFamilySocraticRadarExponentialSmoothing(presetIds, spectrum, 0.3);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+  });
+  it('returns n entries', () => {
+    const result = presetFamilySocraticRadarExponentialSmoothing(presetIds, spectrum, 0.3);
+    expect(result).toHaveLength(presetIds.length);
+  });
+  it('smoothed values in [0,1]', () => {
+    const result = presetFamilySocraticRadarExponentialSmoothing(presetIds, spectrum, 0.3);
+    for (const entry of result) {
+      for (const v of Object.values(entry.smoothed)) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1155 — presetFamilySocraticRadarOutlierReport
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarOutlierReport (Q1155)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined array', () => {
+    const result = presetFamilySocraticRadarOutlierReport(presetIds, spectrum, 2.0);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+  });
+  it('returns one entry per preset', () => {
+    const result = presetFamilySocraticRadarOutlierReport(presetIds, spectrum, 2.0);
+    expect(result).toHaveLength(presetIds.length);
+  });
+  it('each entry has id, isOutlier, maxZScore', () => {
+    const result = presetFamilySocraticRadarOutlierReport(presetIds, spectrum, 2.0);
+    for (const e of result) {
+      expect(e).toHaveProperty('id');
+      expect(e).toHaveProperty('isOutlier');
+      expect(e).toHaveProperty('maxZScore');
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Q1157 — presetFamilySocraticRadarDendrogramOrder
+// ---------------------------------------------------------------------------
+
+describe('presetFamilySocraticRadarDendrogramOrder (Q1157)', () => {
+  const presetIds = ['12-tet', 'just-5-limit'];
+  const spectrum = harmonicSpectrum(6);
+  it('returns defined array', () => {
+    const result = presetFamilySocraticRadarDendrogramOrder(presetIds, spectrum);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+  });
+  it('returns n ids', () => {
+    const result = presetFamilySocraticRadarDendrogramOrder(presetIds, spectrum);
+    expect(result).toHaveLength(presetIds.length);
+  });
+  it('returns string array', () => {
+    const result = presetFamilySocraticRadarDendrogramOrder(presetIds, spectrum);
+    expect(result.every((s) => typeof s === 'string')).toBe(true);
   });
 });
