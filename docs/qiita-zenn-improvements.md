@@ -876,3 +876,14 @@
 | TTT4 | `scalePatternRegularity` | ステップパターンの最小周期/n（規則性） |
 
 **参考**: Miller's Law (1956); Scale learnability in cognitive musicology (Krumhansl 1990).
+
+## Round 64: スケールグラフトポロジー (UUU1–UUU4)
+
+音階の音程グラフ構造を分析する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| UUU1 | `scaleGraphDensity` | 50セント以内の音程ペア密度 |
+| UUU2 | `scaleSmallWorldIndex` | スモールワールド係数（クラスタリング/経路効率） |
+| UUU3 | `scaleHubScore` | 最大ハブ度数（150セント隣接グラフ） |
+| UUU4 | `scaleBridgingCoefficient` | ブリッジング係数（Valente-Fujimoto） |
