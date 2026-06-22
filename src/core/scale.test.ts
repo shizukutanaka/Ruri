@@ -1167,6 +1167,12 @@ import {
   tuningFamilySocraticRadarWindSpeedProxy,
   tuningFamilySocraticRadarAtmosphericPressureProxy,
   tuningFamilySocraticRadarCO2ConcentrationProxy,
+  tuningFamilySocraticRadarBiodiversityProxy,
+  tuningFamilySocraticRadarCarryingCapacityProxy,
+  tuningFamilySocraticRadarPredatorPreyProxy,
+  tuningFamilySocraticRadarNicheOverlapProxy,
+  tuningFamilySocraticRadarExtinctionRiskProxy,
+  tuningFamilySocraticRadarMigrationProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1361,6 +1367,10 @@ import {
   scaleTranslationSymmetry,
   scalePalindromeRatio,
   scaleInversionEquivalence,
+  scalePitchDensity,
+  scaleCrowdingIndexV2,
+  scaleSparsityIndex,
+  scaleGapBalance,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -36041,6 +36051,80 @@ describe('Q1996 tuningFamilySocraticRadarCO2ConcentrationProxy', () => {
   });
   it('returns finite [0,1] for two tunings', () => {
     const v = tuningFamilySocraticRadarCO2ConcentrationProxy([equalTemperament12(440), edo(19, 440)], s, 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Round 92 — 音階ピッチ密度分析 (XXX1–XXX4)
+
+// XXX1 — scalePitchDensity
+describe('XXX1 scalePitchDensity', () => {
+  it('returns 0 for empty', () => {
+    expect(scalePitchDensity([])).toBe(0);
+  });
+  it('returns finite and close to 1 for 11-note near-chromatic scale', () => {
+    const chromatic = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    const v = scalePitchDensity(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scalePitchDensity(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// XXX2 — scaleCrowdingIndexV2
+describe('XXX2 scaleCrowdingIndexV2', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleCrowdingIndexV2([])).toBe(0);
+  });
+  it('returns 0 for single note', () => {
+    expect(scaleCrowdingIndexV2([600])).toBe(0);
+  });
+  it('returns 0 for widely-spaced scale', () => {
+    const v = scaleCrowdingIndexV2([400, 800]);
+    expect(v).toBe(0);
+  });
+});
+
+// XXX3 — scaleSparsityIndex
+describe('XXX3 scaleSparsityIndex', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleSparsityIndex([])).toBe(0);
+  });
+  it('returns 0 for single note', () => {
+    expect(scaleSparsityIndex([600])).toBe(0);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleSparsityIndex(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// XXX4 — scaleGapBalance
+describe('XXX4 scaleGapBalance', () => {
+  it('returns 1 for empty', () => {
+    expect(scaleGapBalance([])).toBe(1);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleGapBalance(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two-note scale', () => {
+    const v = scaleGapBalance([100, 600]);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);

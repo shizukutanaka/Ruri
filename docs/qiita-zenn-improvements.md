@@ -1184,3 +1184,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | WWW2 | `scaleTranslationSymmetry` | 自己音程によるシフトで不変な割合 |
 | WWW3 | `scalePalindromeRatio` | ステップ列の回文度 |
 | WWW4 | `scaleInversionEquivalence` | 反転スケールとの類似度（平均絶対差） |
+
+## Round 92: 音階ピッチ密度分析 (XXX1–XXX4)
+
+音階内のピッチ分布密度を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| XXX1 | `scalePitchDensity` | 100セントあたりのピッチ数（正規化） |
+| XXX2 | `scaleCrowdingIndexV2` | 混雑区間（50セント未満）の比率 |
+| XXX3 | `scaleSparsityIndex` | 疎区間（300セント超）の比率 |
+| XXX4 | `scaleGapBalance` | 混雑度と疎密度の均衡指数 |

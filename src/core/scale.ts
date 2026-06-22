@@ -42088,6 +42088,160 @@ export function tuningFamilySocraticRadarCO2ConcentrationProxy(
   return total / vecs.length;
 }
 
+// Q1998 — tuningFamilySocraticRadarBiodiversityProxy
+export function tuningFamilySocraticRadarBiodiversityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    if (sum === 0) {
+      total += 0;
+      continue;
+    }
+    let H = 0;
+    for (const x of vec) {
+      const p = x / sum;
+      if (p > 0) H -= p * Math.log(p);
+    }
+    total += H / Math.log(axes.length);
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2000 — tuningFamilySocraticRadarCarryingCapacityProxy
+export function tuningFamilySocraticRadarCarryingCapacityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    total += sum / vec.length;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2002 — tuningFamilySocraticRadarPredatorPreyProxy
+export function tuningFamilySocraticRadarPredatorPreyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sorted = [...vec].sort((a, b) => a - b);
+    if (sorted.length < 2) {
+      total += 1;
+      continue;
+    }
+    const median = (sorted[Math.floor((sorted.length - 1) / 2)]! + sorted[Math.ceil((sorted.length - 1) / 2)]!) / 2;
+    let alternating = 0;
+    for (let i = 0; i + 1 < vec.length; i++) {
+      const a = vec[i]!;
+      const b = vec[i + 1]!;
+      if ((a >= median && b < median) || (a < median && b >= median)) alternating++;
+    }
+    total += alternating / (vec.length - 1);
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2004 — tuningFamilySocraticRadarNicheOverlapProxy
+export function tuningFamilySocraticRadarNicheOverlapProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sum = 0;
+    for (const x of vec) sum += x;
+    const mean = sum / vec.length;
+    if (mean === 0) {
+      total += 1;
+      continue;
+    }
+    let variance = 0;
+    for (const x of vec) variance += (x - mean) ** 2;
+    variance /= vec.length;
+    const cv = Math.sqrt(variance) / mean;
+    total += Math.min(1, Math.max(0, 1 - cv));
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2006 — tuningFamilySocraticRadarExtinctionRiskProxy
+export function tuningFamilySocraticRadarExtinctionRiskProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let below = 0;
+    for (const x of vec) {
+      if (x < 0.3) below++;
+    }
+    total += below / vec.length;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2008 — tuningFamilySocraticRadarMigrationProxy
+export function tuningFamilySocraticRadarMigrationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let min = vec[0]!;
+    let max = vec[0]!;
+    for (const x of vec) {
+      if (x < min) min = x;
+      if (x > max) max = x;
+    }
+    total += max - min;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -46041,4 +46195,76 @@ export function scaleInversionEquivalence(
   const meanDiff = sumDiff / n;
   const half = periodCents / 2;
   return Math.min(1, Math.max(0, 1 - meanDiff / half));
+}
+
+// ============================================================
+// Round 92 — 音階ピッチ密度分析 (XXX1–XXX4)
+// ============================================================
+
+/**
+ * XXX1 — scalePitchDensity
+ * How many pitches per 100 cents, normalized so that a 12-note scale ≈ 1.
+ * density = n / (periodCents / 100); result = min(1, density / 12)
+ * Empty scale → 0.
+ */
+export function scalePitchDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const density = n / (periodCents / 100);
+  return Math.min(1, Math.max(0, density / 12));
+}
+
+/**
+ * XXX2 — scaleCrowdingIndexV2
+ * Fraction of step intervals (including wrap-around) that are "crowded" (< 50 cents apart).
+ * Steps are computed from sorted pitches with a final wrap-around step.
+ * Empty/single → 0.
+ */
+export function scaleCrowdingIndexV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let crowded = 0;
+  for (let i = 0; i < n; i++) {
+    const step =
+      i < n - 1
+        ? sorted[i + 1]! - sorted[i]!
+        : periodCents - sorted[n - 1]! + sorted[0]!;
+    if (step < 50) crowded++;
+  }
+  return Math.min(1, Math.max(0, crowded / n));
+}
+
+/**
+ * XXX3 — scaleSparsityIndex
+ * Fraction of step intervals (including wrap-around) that are "sparse" (> 300 cents apart).
+ * Empty/single → 0.
+ */
+export function scaleSparsityIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let sparse = 0;
+  for (let i = 0; i < n; i++) {
+    const step =
+      i < n - 1
+        ? sorted[i + 1]! - sorted[i]!
+        : periodCents - sorted[n - 1]! + sorted[0]!;
+    if (step > 300) sparse++;
+  }
+  return Math.min(1, Math.max(0, sparse / n));
+}
+
+/**
+ * XXX4 — scaleGapBalance
+ * How balanced the distribution is between crowded and sparse intervals.
+ * Return: 1 - |crowdingIndex - sparsityIndex|
+ * Perfect balance (equal crowding and sparsity) → 1; Empty → 1.
+ */
+export function scaleGapBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  const crowding = scaleCrowdingIndexV2(scaleCents, periodCents);
+  const sparsity = scaleSparsityIndex(scaleCents, periodCents);
+  return Math.min(1, Math.max(0, 1 - Math.abs(crowding - sparsity)));
 }
