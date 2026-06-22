@@ -502,6 +502,12 @@ import {
   presetFamilySocraticRadarEccentricity,
   presetFamilySocraticRadarGraphDiameter,
   presetFamilySocraticRadarGraphRadius,
+  presetFamilySocraticRadarKMeansClusterV2,
+  presetFamilySocraticRadarSilhouetteScore,
+  presetFamilySocraticRadarAgglomerativeCluster,
+  presetFamilySocraticRadarClusterPurity,
+  presetFamilySocraticRadarDunnIndex,
+  presetFamilySocraticRadarDaviesBouldinIndex,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -14995,5 +15001,104 @@ describe('presetFamilySocraticRadarGraphRadius (Q1397)', () => {
   });
   it('throws for unknown preset', () => {
     expect(() => presetFamilySocraticRadarGraphRadius(['unknown-preset'], spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q1399 — presetFamilySocraticRadarKMeansClusterV2
+describe('Q1399 presetFamilySocraticRadarKMeansClusterV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns result shape', () => {
+    const r = presetFamilySocraticRadarKMeansClusterV2(['12-tet', 'just-5-limit'], s);
+    expect(r).toHaveProperty('clusters');
+    expect(r).toHaveProperty('iterations');
+  });
+  it('cluster values in range', () => {
+    const r = presetFamilySocraticRadarKMeansClusterV2(['12-tet', 'just-5-limit'], s);
+    r.clusters.forEach((c) => expect([0, 1]).toContain(c));
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarKMeansClusterV2(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1401 — presetFamilySocraticRadarSilhouetteScore
+describe('Q1401 presetFamilySocraticRadarSilhouetteScore', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    const r = presetFamilySocraticRadarSilhouetteScore(['12-tet', 'just-5-limit'], s);
+    expect(r).toBe(0);
+  });
+  it('returns number in [-1,1] for single preset', () => {
+    const r = presetFamilySocraticRadarSilhouetteScore(['12-tet'], s);
+    expect(r).toBeGreaterThanOrEqual(-1);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSilhouetteScore(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1403 — presetFamilySocraticRadarAgglomerativeCluster
+describe('Q1403 presetFamilySocraticRadarAgglomerativeCluster', () => {
+  const s = harmonicSpectrum(6);
+  it('returns array of length 2', () => {
+    const r = presetFamilySocraticRadarAgglomerativeCluster(['12-tet', 'just-5-limit'], s);
+    expect(r).toHaveLength(2);
+  });
+  it('cluster values are 0 or 1', () => {
+    const r = presetFamilySocraticRadarAgglomerativeCluster(['12-tet', 'just-5-limit'], s);
+    r.forEach((c) => expect([0, 1]).toContain(c));
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAgglomerativeCluster(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1405 — presetFamilySocraticRadarClusterPurity
+describe('Q1405 presetFamilySocraticRadarClusterPurity', () => {
+  const s = harmonicSpectrum(6);
+  it('returns number in [0,1]', () => {
+    const r = presetFamilySocraticRadarClusterPurity(['12-tet', 'just-5-limit'], s);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(1);
+  });
+  it('returns 1 for single preset', () => {
+    const r = presetFamilySocraticRadarClusterPurity(['12-tet'], s);
+    expect(r).toBe(1);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarClusterPurity(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1407 — presetFamilySocraticRadarDunnIndex
+describe('Q1407 presetFamilySocraticRadarDunnIndex', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    const r = presetFamilySocraticRadarDunnIndex(['12-tet', 'just-5-limit'], s);
+    expect(r).toBe(0);
+  });
+  it('returns 0 for single preset', () => {
+    const r = presetFamilySocraticRadarDunnIndex(['12-tet'], s);
+    expect(r).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDunnIndex(['unknown'], s)).toThrow(RangeError);
+  });
+});
+
+// Q1409 — presetFamilySocraticRadarDaviesBouldinIndex
+describe('Q1409 presetFamilySocraticRadarDaviesBouldinIndex', () => {
+  const s = harmonicSpectrum(6);
+  it('returns 0 for n<=2', () => {
+    const r = presetFamilySocraticRadarDaviesBouldinIndex(['12-tet', 'just-5-limit'], s);
+    expect(r).toBe(0);
+  });
+  it('returns 0 for single preset', () => {
+    const r = presetFamilySocraticRadarDaviesBouldinIndex(['12-tet'], s);
+    expect(r).toBe(0);
+  });
+  it('throws for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDaviesBouldinIndex(['unknown'], s)).toThrow(RangeError);
   });
 });

@@ -30935,3 +30935,498 @@ export function harmonicSeriesMatchCount(
   }
   return count;
 }
+
+// ---------------------------------------------------------------------------
+// Q1398 — tuningFamilySocraticRadarKMeansClusterV2 (Clustering theme)
+/**
+ * K-means clustering of tuning radar profiles (k=2).
+ * Returns { clusters: number[], iterations: number } where clusters[i] is
+ * the cluster index (0 or 1) for tuning i. Uses Euclidean distance on the
+ * 5-axis radar profile vector. Initializes centroids by picking first and
+ * last tuning profiles. Max 100 iterations.
+ * For n<=1 returns all cluster 0 with iterations=0.
+ */
+export function tuningFamilySocraticRadarKMeansClusterV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): { clusters: number[]; iterations: number } {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 1) return { clusters: new Array(n).fill(0), iterations: 0 };
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
+    axes.map((ax) => p[ax]);
+  const l2 = (a: number[], b: number[]) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
+
+  // Initialize centroids: first and last profiles
+  let centroids: number[][] = [toVec(profiles[0]!), toVec(profiles[n - 1]!)];
+  let clusters: number[] = new Array(n).fill(0);
+  let iterations = 0;
+
+  for (let iter = 0; iter < 100; iter++) {
+    // Assign each tuning to nearest centroid
+    const newClusters = profiles.map((p) => {
+      const vec = toVec(p);
+      const d0 = l2(vec, centroids[0]!);
+      const d1 = l2(vec, centroids[1]!);
+      return d0 <= d1 ? 0 : 1;
+    });
+
+    iterations = iter + 1;
+
+    // Check convergence
+    const changed = newClusters.some((c, i) => c !== clusters[i]);
+    clusters = newClusters;
+    if (!changed) break;
+
+    // Recompute centroids
+    for (let c = 0; c < 2; c++) {
+      const members = profiles.filter((_, i) => clusters[i] === c).map(toVec);
+      if (members.length > 0) {
+        centroids[c] = axes.map((_, d) =>
+          members.reduce((s, v) => s + v[d]!, 0) / members.length,
+        );
+      }
+    }
+  }
+
+  return { clusters, iterations };
+}
+
+// ---------------------------------------------------------------------------
+// Q1400 — tuningFamilySocraticRadarSilhouetteScore
+/**
+ * Silhouette coefficient for the k-means result from Q1398.
+ * For each tuning i: a(i)=mean dist to same-cluster members,
+ * b(i)=mean dist to nearest-other-cluster members;
+ * s(i)=(b(i)-a(i))/max(a(i),b(i)). Returns mean s(i).
+ * Returns 0 for n<=2 or single cluster.
+ */
+export function tuningFamilySocraticRadarSilhouetteScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 2) return 0;
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
+    axes.map((ax) => p[ax]);
+  const l2 = (a: number[], b: number[]) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
+
+  const { clusters } = tuningFamilySocraticRadarKMeansClusterV2(tunings, spectrum, rootHz);
+
+  // Check single cluster
+  const uniqueClusters = new Set(clusters);
+  if (uniqueClusters.size <= 1) return 0;
+
+  const vecs = profiles.map(toVec);
+  let totalS = 0;
+
+  for (let i = 0; i < n; i++) {
+    const ci = clusters[i]!;
+    const sameCluster = vecs.filter((_, j) => j !== i && clusters[j] === ci);
+    const otherCluster = vecs.filter((_, j) => clusters[j] !== ci);
+
+    const ai =
+      sameCluster.length > 0
+        ? sameCluster.reduce((s, v) => s + l2(vecs[i]!, v), 0) / sameCluster.length
+        : 0;
+    const bi =
+      otherCluster.length > 0
+        ? otherCluster.reduce((s, v) => s + l2(vecs[i]!, v), 0) / otherCluster.length
+        : 0;
+
+    const maxAB = Math.max(ai, bi);
+    const si = maxAB === 0 ? 0 : (bi - ai) / maxAB;
+    totalS += si;
+  }
+
+  return totalS / n;
+}
+
+// ---------------------------------------------------------------------------
+// Q1402 — tuningFamilySocraticRadarAgglomerativeCluster
+/**
+ * Single-linkage agglomerative clustering into k=2 groups.
+ * Starts with each tuning in its own cluster; merges the pair with minimum
+ * inter-cluster distance (Euclidean on radar profile) until 2 clusters remain.
+ * Returns number[] cluster assignment. For n<=1 returns [0, ...0].
+ */
+export function tuningFamilySocraticRadarAgglomerativeCluster(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number[] {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 1) return new Array(n).fill(0);
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
+    axes.map((ax) => p[ax]);
+  const l2 = (a: number[], b: number[]) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
+
+  const vecs = profiles.map(toVec);
+
+  // Each tuning starts in its own cluster
+  let clusterOf: number[] = Array.from({ length: n }, (_, i) => i);
+  const activeClusters = new Set<number>(Array.from({ length: n }, (_, i) => i));
+
+  while (activeClusters.size > 2) {
+    let minDist = Infinity;
+    let mergeA = -1;
+    let mergeB = -1;
+
+    const activeArr = [...activeClusters];
+    for (let ai = 0; ai < activeArr.length; ai++) {
+      for (let bi = ai + 1; bi < activeArr.length; bi++) {
+        const ca = activeArr[ai]!;
+        const cb = activeArr[bi]!;
+        // Single-linkage: min distance between any two members
+        let minInterDist = Infinity;
+        for (let i = 0; i < n; i++) {
+          if (clusterOf[i] !== ca) continue;
+          for (let j = 0; j < n; j++) {
+            if (clusterOf[j] !== cb) continue;
+            const d = l2(vecs[i]!, vecs[j]!);
+            if (d < minInterDist) minInterDist = d;
+          }
+        }
+        if (minInterDist < minDist) {
+          minDist = minInterDist;
+          mergeA = ca;
+          mergeB = cb;
+        }
+      }
+    }
+
+    // Merge mergeB into mergeA
+    if (mergeA >= 0 && mergeB >= 0) {
+      for (let i = 0; i < n; i++) {
+        if (clusterOf[i] === mergeB) clusterOf[i] = mergeA;
+      }
+      activeClusters.delete(mergeB);
+    }
+  }
+
+  // Remap cluster IDs to 0 and 1
+  const finalClusters = [...activeClusters];
+  const clusterMap = new Map<number, number>();
+  finalClusters.forEach((c, idx) => clusterMap.set(c, idx));
+  return clusterOf.map((c) => clusterMap.get(c) ?? 0);
+}
+
+// ---------------------------------------------------------------------------
+// Q1404 — tuningFamilySocraticRadarClusterPurity
+/**
+ * Cluster purity: find the 2 most-distinct tunings (max Euclidean distance
+ * on radar profile), assign them as cluster references, then measure how
+ * consistently each tuning is closer to its own cluster reference.
+ * Returns a number in [0,1]. Returns 1 for n<=1, 0.5 for n==2 (trivially pure).
+ */
+export function tuningFamilySocraticRadarClusterPurity(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 1) return 1;
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
+    axes.map((ax) => p[ax]);
+  const l2 = (a: number[], b: number[]) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
+
+  const vecs = profiles.map(toVec);
+
+  // Find 2 most-distinct tunings
+  let maxDist = -1;
+  let refA = 0;
+  let refB = n - 1;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const d = l2(vecs[i]!, vecs[j]!);
+      if (d > maxDist) {
+        maxDist = d;
+        refA = i;
+        refB = j;
+      }
+    }
+  }
+
+  if (n === 2) return 1;
+
+  const { clusters } = tuningFamilySocraticRadarKMeansClusterV2(tunings, spectrum, rootHz);
+
+  // For each tuning, check if it's closer to its own reference than the other
+  let consistent = 0;
+  for (let i = 0; i < n; i++) {
+    const dA = l2(vecs[i]!, vecs[refA]!);
+    const dB = l2(vecs[i]!, vecs[refB]!);
+    const assignedToA = clusters[i] === clusters[refA];
+    const closerToA = dA <= dB;
+    if (assignedToA === closerToA) consistent++;
+  }
+
+  return consistent / n;
+}
+
+// ---------------------------------------------------------------------------
+// Q1406 — tuningFamilySocraticRadarDunnIndex
+/**
+ * Dunn index = min(inter-cluster dist) / max(intra-cluster diameter).
+ * Uses clusters from Q1398. Inter-cluster distance = min Euclidean distance
+ * between any two points from different clusters. Intra-cluster diameter =
+ * max pairwise Euclidean within same cluster.
+ * Returns Infinity if any cluster has size<=1 (no intra-cluster distance).
+ * Returns 0 for n<=2.
+ */
+export function tuningFamilySocraticRadarDunnIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 2) return 0;
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
+    axes.map((ax) => p[ax]);
+  const l2 = (a: number[], b: number[]) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
+
+  const vecs = profiles.map(toVec);
+  const { clusters } = tuningFamilySocraticRadarKMeansClusterV2(tunings, spectrum, rootHz);
+
+  const cluster0 = vecs.filter((_, i) => clusters[i] === 0);
+  const cluster1 = vecs.filter((_, i) => clusters[i] === 1);
+
+  if (cluster0.length <= 1 || cluster1.length <= 1) return Infinity;
+
+  // Inter-cluster distance: min distance between points from different clusters
+  let minInter = Infinity;
+  for (const v0 of cluster0) {
+    for (const v1 of cluster1) {
+      const d = l2(v0, v1);
+      if (d < minInter) minInter = d;
+    }
+  }
+
+  // Intra-cluster diameter: max pairwise within each cluster
+  const diameter = (clusterVecs: number[][]) => {
+    let maxD = 0;
+    for (let i = 0; i < clusterVecs.length; i++) {
+      for (let j = i + 1; j < clusterVecs.length; j++) {
+        const d = l2(clusterVecs[i]!, clusterVecs[j]!);
+        if (d > maxD) maxD = d;
+      }
+    }
+    return maxD;
+  };
+
+  const maxIntra = Math.max(diameter(cluster0), diameter(cluster1));
+  if (maxIntra === 0) return Infinity;
+
+  return minInter / maxIntra;
+}
+
+// ---------------------------------------------------------------------------
+// Q1408 — tuningFamilySocraticRadarDaviesBouldinIndex
+/**
+ * Davies-Bouldin index for 2-cluster k-means.
+ * For each cluster c: scatter(c) = mean distance from points to centroid.
+ * DB = mean over c of max_{c'≠c} (scatter(c)+scatter(c'))/(dist between centroids).
+ * Returns 0 for n<=2 or when centroids coincide.
+ */
+export function tuningFamilySocraticRadarDaviesBouldinIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const n = tunings.length;
+  if (n <= 2) return 0;
+
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
+    axes.map((ax) => p[ax]);
+  const l2 = (a: number[], b: number[]) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
+
+  const vecs = profiles.map(toVec);
+  const { clusters } = tuningFamilySocraticRadarKMeansClusterV2(tunings, spectrum, rootHz);
+
+  const clusterVecs = [
+    vecs.filter((_, i) => clusters[i] === 0),
+    vecs.filter((_, i) => clusters[i] === 1),
+  ];
+
+  // Compute centroids
+  const centroids = clusterVecs.map((cvecs) => {
+    if (cvecs.length === 0) return new Array(5).fill(0) as number[];
+    return axes.map((_, d) => cvecs.reduce((s, v) => s + v[d]!, 0) / cvecs.length);
+  });
+
+  // Scatter: mean distance from points to centroid
+  const scatter = clusterVecs.map((cvecs, c) => {
+    if (cvecs.length === 0) return 0;
+    return cvecs.reduce((s, v) => s + l2(v, centroids[c]!), 0) / cvecs.length;
+  });
+
+  const centroidDist = l2(centroids[0]!, centroids[1]!);
+  if (centroidDist === 0) return 0;
+
+  // DB = mean over clusters of max_{other} (scatter_c + scatter_other) / dist_centroids
+  // With k=2, each cluster's max is just the other cluster
+  const db0 = (scatter[0]! + scatter[1]!) / centroidDist;
+  const db1 = (scatter[1]! + scatter[0]!) / centroidDist;
+
+  return (db0 + db1) / 2;
+}
+
+/**
+ * XX1 — Scale interval class vector (cents-based).
+ *
+ * Computes the interval vector (IC vector) of a scale given as an array of
+ * pitch offsets in cents. For each pair (i, j) with i < j, the interval is
+ * computed mod `periodCents`, converted to the nearest semitone index
+ * (multiply by 12/periodCents and round), and tallied in a 12-element array.
+ * Index 0 corresponds to unison (included but conventionally ignored in
+ * traditional IC vectors).
+ *
+ * @param scaleCents - Pitch offsets in cents (e.g. [0, 400, 700])
+ * @param periodCents - Period in cents (default 1200)
+ * @returns Array of 12 counts, one per semitone class (0–11)
+ *
+ * @example
+ * scaleIntervalClassVector([0, 400, 700]);
+ * // intervals: 400c→4st, 700c→7st, 800c (complement of 400 in 1200)→8st
+ */
+export function scaleIntervalClassVector(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number[] {
+  const vector = new Array<number>(12).fill(0);
+  const n = scaleCents.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = ((scaleCents[j]! - scaleCents[i]!) % periodCents + periodCents) % periodCents;
+      const semitone = Math.round(diff * (12 / periodCents)) % 12;
+      vector[semitone] = (vector[semitone]!) + 1;
+    }
+  }
+  return vector;
+}
+
+/**
+ * XX2 — Voice leading distance between two chords.
+ *
+ * Computes the "voice leading distance" between two chords given as lists of
+ * pitch offsets in cents. Pairs voices by sorting both arrays and matching
+ * smallest-to-smallest (greedy minimum-sum assignment). If the arrays have
+ * different lengths, the shorter is padded with zeros. Returns
+ * sqrt(Σ(diff²)).
+ *
+ * @param fromCents - Source chord pitch offsets in cents
+ * @param toCents - Target chord pitch offsets in cents
+ * @returns Euclidean voice-leading distance in cents
+ *
+ * @example
+ * scaleVoiceLeadingDistance([0, 400, 700], [0, 400, 700]); // → 0
+ */
+export function scaleVoiceLeadingDistance(
+  fromCents: readonly number[],
+  toCents: readonly number[],
+): number {
+  const from = [...fromCents].sort((a, b) => a - b);
+  const to = [...toCents].sort((a, b) => a - b);
+  const len = Math.max(from.length, to.length);
+  while (from.length < len) from.push(0);
+  while (to.length < len) to.push(0);
+  let sumSq = 0;
+  for (let i = 0; i < len; i++) {
+    const diff = (from[i]!) - (to[i]!);
+    sumSq += diff * diff;
+  }
+  return Math.sqrt(sumSq);
+}
+
+/**
+ * XX3 — Chromatic saturation of a scale.
+ *
+ * Returns the fraction of chromatic divisions (12 by default) that are
+ * "covered" by the scale. A division at index k is covered if any scale pitch
+ * falls within `periodCents / (2 * divisions)` cents of `k * periodCents /
+ * divisions`. Returns a value in [0, 1].
+ *
+ * @param scaleCents - Pitch offsets in cents
+ * @param periodCents - Period in cents (default 1200)
+ * @param divisions - Number of equal chromatic divisions (default 12)
+ * @returns Fraction of covered divisions in [0, 1]
+ *
+ * @example
+ * scaleChromaticSaturation(Array.from({length:12},(_,i)=>i*100)); // → 1
+ */
+export function scaleChromaticSaturation(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+  divisions: number = 12,
+): number {
+  if (scaleCents.length === 0) return 0;
+  const stepSize = periodCents / divisions;
+  const tolerance = stepSize / 2;
+  let covered = 0;
+  for (let k = 0; k < divisions; k++) {
+    const target = k * stepSize;
+    for (const sc of scaleCents) {
+      if (Math.abs(sc - target) <= tolerance) {
+        covered++;
+        break;
+      }
+    }
+  }
+  return covered / divisions;
+}
+
+/**
+ * XX4 — Maximally even set generator.
+ *
+ * Generates a maximally even set: the k pitches selected from n equal
+ * divisions of `periodCents` (default 1200 cents) that are most evenly
+ * distributed. Uses the Euclidean / Bresenham algorithm:
+ * `floor(i * n / k) * (1200 / n)` for i in 0..k-1.
+ *
+ * @param n - Number of equal divisions
+ * @param k - Number of pitches to select
+ * @returns Array of k cents values
+ * @throws RangeError if k > n, k ≤ 0, or n ≤ 0
+ *
+ * @example
+ * scaleMaximallyEven(12, 7); // → diatonic-like set, starts at 0
+ */
+export function scaleMaximallyEven(n: number, k: number): number[] {
+  if (n <= 0 || k <= 0) throw new RangeError('n and k must be positive');
+  if (k > n) throw new RangeError('k must not exceed n');
+  const result: number[] = [];
+  for (let i = 0; i < k; i++) {
+    result.push(Math.floor((i * n) / k) * (1200 / n));
+  }
+  return result;
+}

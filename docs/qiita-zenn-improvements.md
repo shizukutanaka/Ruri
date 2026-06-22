@@ -623,3 +623,14 @@
 | `tuningRegularityScore` | ステップ幅の変動係数逆数 |
 | `spectralSpread` | 周波数重心周りのRMS拡散（Hz） |
 | `harmonicSeriesMatchCount` | 倍音列ピッチクラスへの一致数 |
+
+## Round 41: インターバルベクトル・声部進行・最大均等集合 (XX1–XX4)
+
+| # | 関数名 | 概要 |
+|---|--------|------|
+| XX1 | `scaleIntervalClassVector` | スケール内の音程クラスベクトル(IC vector)計算 |
+| XX2 | `scaleVoiceLeadingDistance` | 2つの和音間の声部進行距離(最小二乗和の平方根) |
+| XX3 | `scaleChromaticSaturation` | クロマチック分割のカバー率(半音階飽和度) |
+| XX4 | `scaleMaximallyEven` | n等分からk音を選ぶ最大均等集合生成(Bresenham法) |
+
+**参考**: IC vector はAllen Forte「Set Theory」; Maximally Even Sets はClough & Douthett (1991)。
