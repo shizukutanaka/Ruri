@@ -40265,6 +40265,202 @@ export function tuningFamilySocraticRadarCatalanNumberProxy(
   return Math.max(0, Math.min(1, total / profiles.length));
 }
 
+// ---------------------------------------------------------------------------
+// Q1842 — tuningFamilySocraticRadarShannonEntropyMeanV2
+// ---------------------------------------------------------------------------
+
+/**
+ * Q1842 — tuningFamilySocraticRadarShannonEntropyMeanV2
+ * Shannon entropy of axis values per tuning (per-tuning, normalized by log2(5)),
+ * averaged across all tunings. 情報理論: Shannon entropy.
+ */
+export function tuningFamilySocraticRadarShannonEntropyMeanV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const eps = 1e-10;
+  const log2_5 = Math.log2(5);
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let h = 0;
+    for (const v of vec) {
+      h -= v * Math.log2(v + eps);
+    }
+    total += Math.max(0, Math.min(1, h / log2_5));
+  }
+  return total / vecs.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1844 — tuningFamilySocraticRadarRenyiEntropyProxy
+// ---------------------------------------------------------------------------
+
+/**
+ * Q1844 — tuningFamilySocraticRadarRenyiEntropyProxy
+ * Rényi entropy (order α=2) of axis values per tuning, averaged.
+ * 情報理論: Rényi entropy.
+ */
+export function tuningFamilySocraticRadarRenyiEntropyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const eps = 1e-10;
+  const log2_5 = Math.log2(5);
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sumSq = 0;
+    for (const v of vec) {
+      sumSq += v * v + eps;
+    }
+    const h2 = Math.max(0, Math.min(1, -Math.log2(sumSq) / log2_5));
+    total += h2;
+  }
+  return total / vecs.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1846 — tuningFamilySocraticRadarKLDivergenceMean
+// ---------------------------------------------------------------------------
+
+/**
+ * Q1846 — tuningFamilySocraticRadarKLDivergenceMean
+ * KL divergence from uniform distribution [0.2, 0.2, 0.2, 0.2, 0.2],
+ * normalized by log2(5) and clamped to [0,1], averaged across tunings.
+ * 情報理論: Kullback-Leibler divergence.
+ */
+export function tuningFamilySocraticRadarKLDivergenceMean(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const eps = 1e-10;
+  const log2_5 = Math.log2(5);
+  const u = 0.2;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let kl = 0;
+    for (const v of vec) {
+      kl += u * Math.log2(u / (v + eps));
+    }
+    total += Math.max(0, Math.min(1, kl / log2_5));
+  }
+  return total / vecs.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1848 — tuningFamilySocraticRadarMutualInformationProxy
+// ---------------------------------------------------------------------------
+
+/**
+ * Q1848 — tuningFamilySocraticRadarMutualInformationProxy
+ * Mutual information proxy between axis pairs (mean |v[i] - v[j]| over all C(5,2)=10 pairs),
+ * averaged across tunings.
+ * 情報理論: 相互情報量.
+ */
+export function tuningFamilySocraticRadarMutualInformationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let pairSum = 0;
+    let pairCount = 0;
+    for (let i = 0; i < vec.length; i++) {
+      for (let j = i + 1; j < vec.length; j++) {
+        pairSum += Math.abs((vec[i]!) - (vec[j]!));
+        pairCount++;
+      }
+    }
+    total += pairCount > 0 ? pairSum / pairCount : 0;
+  }
+  return total / vecs.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1850 — tuningFamilySocraticRadarFisherInformationProxy
+// ---------------------------------------------------------------------------
+
+/**
+ * Q1850 — tuningFamilySocraticRadarFisherInformationProxy
+ * Fisher information proxy: mean of 4 consecutive absolute differences of axis values,
+ * averaged across tunings.
+ * 情報理論: Fisher情報量.
+ */
+export function tuningFamilySocraticRadarFisherInformationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let diffSum = 0;
+    for (let i = 0; i < vec.length - 1; i++) {
+      diffSum += Math.abs((vec[i + 1]!) - (vec[i]!));
+    }
+    total += diffSum / (vec.length - 1);
+  }
+  return total / vecs.length;
+}
+
+// ---------------------------------------------------------------------------
+// Q1852 — tuningFamilySocraticRadarTsallisEntropyProxy
+// ---------------------------------------------------------------------------
+
+/**
+ * Q1852 — tuningFamilySocraticRadarTsallisEntropyProxy
+ * Tsallis entropy (q=2): (1 - sum(v^2)) normalized by 0.8, clamped to [0,1],
+ * averaged across tunings.
+ * 情報理論: Tsallis entropy.
+ */
+export function tuningFamilySocraticRadarTsallisEntropyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    let sumSq = 0;
+    for (const v of vec) {
+      sumSq += v * v;
+    }
+    total += Math.max(0, Math.min(1, (1 - sumSq) / 0.8));
+  }
+  return total / vecs.length;
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -42819,4 +43015,104 @@ export function scaleGapFill(
     if (steps[i]! > 300 && steps[i + 1]! < 200) count++;
   }
   return count / Math.max(n - 1, 1);
+}
+
+/**
+ * JJJ1 — scaleHarmonicSeriesProximity
+ * How closely scale degrees approximate natural harmonic series intervals
+ * (ratios 2:1, 3:2, 4:3, 5:4, 6:5, 7:6, 8:7 ... up to 16th harmonic) above the root.
+ * - Generate harmonic cents: 1200 * log2(k) for k = 2..16, then mod 1200
+ * - For each degree (skip index 0 = root/0 cents), find min |d.cents - hc_mod|
+ * - proximity per degree = max(0, 1 - minDist / 100)
+ * - Return mean of proximities; 0 if no degrees beyond root
+ */
+export function scaleHarmonicSeriesProximity(scale: TuningSystem): number {
+  const degreeCents = scale.degrees.map((d) => pitchToCents(d));
+  // Skip root (index 0)
+  const nonRoot = degreeCents.slice(1);
+  if (nonRoot.length === 0) return 0;
+  // Build harmonic cents mod 1200 for k = 2..16
+  const harmonicMod: number[] = [];
+  for (let k = 2; k <= 16; k++) {
+    const hc = 1200 * Math.log2(k);
+    harmonicMod.push(((hc % 1200) + 1200) % 1200);
+  }
+  let total = 0;
+  for (let i = 0; i < nonRoot.length; i++) {
+    const dc = nonRoot[i]!;
+    const dcMod = ((dc % 1200) + 1200) % 1200;
+    let minDist = Infinity;
+    for (let j = 0; j < harmonicMod.length; j++) {
+      const dist = Math.abs(dcMod - harmonicMod[j]!);
+      if (dist < minDist) minDist = dist;
+    }
+    total += Math.max(0, 1 - minDist / 100);
+  }
+  return total / nonRoot.length;
+}
+
+/**
+ * JJJ2 — scaleJustIntonationProximity
+ * How closely scale approaches 5-limit just intonation intervals.
+ * - 5-limit JI reference cents within one octave
+ * - For each degree, find nearest JI cents, proximity = max(0, 1 - dist/50)
+ * - Return mean of proximities
+ */
+export function scaleJustIntonationProximity(scale: TuningSystem): number {
+  const jiCents = [
+    0, 111.73, 182.40, 203.91, 315.64, 386.31, 407.82, 498.04,
+    590.22, 609.78, 701.96, 813.69, 884.36, 996.09, 1017.60, 1088.27, 1200,
+  ];
+  const degreeCents = scale.degrees.map((d) => pitchToCents(d));
+  if (degreeCents.length === 0) return 0;
+  let total = 0;
+  for (let i = 0; i < degreeCents.length; i++) {
+    const dc = degreeCents[i]!;
+    const dcMod = ((dc % 1200) + 1200) % 1200;
+    let minDist = Infinity;
+    for (let j = 0; j < jiCents.length; j++) {
+      const dist = Math.abs(dcMod - jiCents[j]!);
+      if (dist < minDist) minDist = dist;
+    }
+    total += Math.max(0, 1 - minDist / 50);
+  }
+  return total / degreeCents.length;
+}
+
+/**
+ * JJJ3 — scaleEqualTemperamentDeviationV2
+ * Mean deviation of scale degrees (as TuningSystem) from nearest 12-TET note.
+ * - For each degree, deviation = |cents - round(cents/100)*100| (mod 1200)
+ * - Normalized: mean(deviation) / 50
+ * - Returns value in [0,1] where 0 = perfectly equal tempered, 1 = maximally detuned
+ */
+export function scaleEqualTemperamentDeviationV2(scale: TuningSystem): number {
+  const degreeCents = scale.degrees.map((d) => pitchToCents(d));
+  const n = degreeCents.length;
+  if (n === 0) return 0;
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    const dc = degreeCents[i]!;
+    const dcMod = ((dc % 1200) + 1200) % 1200;
+    const nearest = Math.round(dcMod / 100) * 100;
+    const d = Math.abs(dcMod - nearest);
+    // Handle wrap-around at 50 cents boundary
+    total += Math.min(d, 100 - d);
+  }
+  return Math.min(1, Math.max(0, total / n / 50));
+}
+
+/**
+ * JJJ4 — scaleMelodyCentroid
+ * Melodic centroid — weighted center of pitch space (normalized).
+ * - centroid = mean(cents of all degrees) / periodCents
+ * - Returns value in [0,1]
+ * - For empty degrees or single degree (root): return 0
+ */
+export function scaleMelodyCentroid(scale: TuningSystem): number {
+  const degreeCents = scale.degrees.map((d) => pitchToCents(d));
+  if (degreeCents.length <= 1) return 0;
+  const sum = degreeCents.reduce((acc, c) => acc + c, 0);
+  const mean = sum / degreeCents.length;
+  return Math.min(1, Math.max(0, mean / scale.periodCents));
 }
