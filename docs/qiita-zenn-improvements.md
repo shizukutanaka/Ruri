@@ -1597,3 +1597,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1322 | `scaleMaskingIndexV2` | マスキング指数: 200セント以内に隣接音を持つ音の割合 |
 | R1323 | `scaleLoudnessBalance` | 音量バランス: 低域（<600c）と高域（≥600c）の音符数の均衡度 |
 | R1324 | `scaleRoughnessEstimate` | 粗さ推定: 150セント未満の音程ペア割合（小音程は粗さを生む） |
+
+## Round 133 — R1331–R1334: 音階和声進行分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1331 | `scaleDominantMotionPotential` | 支配的運動ポテンシャル: 三全音(600c)と導音(1100c)の存在によるV→I解決傾向 |
+| R1332 | `scaleIIVIPotential` | ii-V-Iポテンシャル: 根音・長2度・完全4度・完全5度の存在度 |
+| R1333 | `scaleSecondaryDominantCount` | 副属音数: 5度上に音がある音を副属音ルートとして数えた割合 |
+| R1334 | `scaleModalMixtureScore` | モーダルミクスチャースコア: 長短の両バージョン（M3/m3等）が共存する音度数 |
