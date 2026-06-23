@@ -1507,3 +1507,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1222 | `scalePitchRepetitionRatio` | ピッチ反復率: 10セント以内の重複音程の割合 |
 | R1223 | `scaleSpanRatio` | スパン比: 実際の音域 ÷ 等間隔配置時の期待音域 |
 | R1224 | `scaleAveragePitchHeight` | 平均ピッチ高さ: 音域内での平均ピッチ位置(0=最低, 1=最高) |
+
+## Round 123 — R1231–R1234: 音階モーダル親和性分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1231 | `scaleMajorAffinity` | 長調親和性: 長音階(イオニアン)の7音と50セント以内で一致する音符の割合 |
+| R1232 | `scaleMinorAffinity` | 短調親和性: 自然短音階の7音と50セント以内で一致する音符の割合 |
+| R1233 | `scaleChromaticDegreeCount` | クロマ音度数: 12音クロマチックグリッドで占有されるポジション数÷12 |
+| R1234 | `scaleDiatonicMatchScore` | 全旋法適合スコア: 7つの全音階旋法との最大一致率 |
