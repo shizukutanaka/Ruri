@@ -1489,3 +1489,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | ZZZZ2 | `scaleSubharmonicAlignmentV2` | 下倍音整列度: 音階ピッチとサブハーモニック列(±25セント)の一致率 |
 | ZZZZ3 | `scaleOvertoneRatioProximity` | 倍音比近接度: 音程ペアが純正比(±15セント)に近い割合 |
 | ZZZZ4 | `scaleJustTuningDeviation` | 純正律偏差: 5リミット純正律から最も近い音程への平均偏差の逆数 |
+
+## Round 121 — R1211–R1214: 音階音域バランス分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1211 | `scaleHighRegisterRatio` | 高音域比率: 音域上位1/3に含まれる音符の割合 |
+| R1212 | `scaleLowRegisterRatio` | 低音域比率: 音域下位1/3に含まれる音符の割合 |
+| R1213 | `scaleRegisterSpread` | 音域スプレッド: 最高音と最低音の差をオクターブ(1200セント)で正規化 |
+| R1214 | `scaleRegisterConcentration` | 音域集中度: 音域スプレッドの逆数、狭い音域に集中するほど高スコア |
