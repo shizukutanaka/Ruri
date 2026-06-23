@@ -1283,3 +1283,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | FFFF2 | `scaleIntervalNetworkClustering` | 平均クラスタリング係数（150セント近傍） |
 | FFFF3 | `scaleIntervalHubScore` | ハブノード偏在度（次数の変動係数） |
 | FFFF4 | `scaleIntervalNetworkBalance` | ネットワーク均衡度（ハブスコアの補数） |
+
+## Round 101: 音階スケール自己相似分析 (GGGG1–GGGG4)
+
+音階の自己相似性・再帰的構造を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| GGGG1 | `scaleSubsetSimilarity` | 半周期サブセットとの類似度 |
+| GGGG2 | `scaleStepRecurrence` | 繰り返し出現するステップサイズの比率 |
+| GGGG3 | `scaleOctaveEquivalence` | オクターブ等価性の近似度 |
+| GGGG4 | `scaleHierarchicalBalance` | 複数階層での均衡指数 |
