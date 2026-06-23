@@ -44643,6 +44643,130 @@ export function tuningFamilySocraticRadarCorticalMapProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2238 — tuningFamilySocraticRadarViscosityProxyV2
+export function tuningFamilySocraticRadarViscosityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const range = Math.max(...axisAggregates) - Math.min(...axisAggregates);
+  const result = 1 - range;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2240 — tuningFamilySocraticRadarTurbulenceProxyV2
+export function tuningFamilySocraticRadarTurbulenceProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = std * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2242 — tuningFamilySocraticRadarLaminarFlowProxyV2
+export function tuningFamilySocraticRadarLaminarFlowProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = 1 - std * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2244 — tuningFamilySocraticRadarVorticityProxyV2
+export function tuningFamilySocraticRadarVorticityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const intermediate = axisAggregates.filter((v) => v > 0.3 && v < 0.7);
+  const result = intermediate.length / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2246 — tuningFamilySocraticRadarBuoyancyProxy
+export function tuningFamilySocraticRadarBuoyancyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const sorted = [...axisAggregates].sort((a, b) => b - a);
+  const top3 = sorted.slice(0, Math.min(3, sorted.length));
+  const result = top3.reduce((a, b) => a + b, 0) / top3.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2248 — tuningFamilySocraticRadarSurfaceTensionProxy
+export function tuningFamilySocraticRadarSurfaceTensionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = Math.min(...axisAggregates);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -50315,3 +50439,64 @@ export function scaleHarmonicEntropy(scaleCents: readonly number[], periodCents:
   return Math.min(1, Math.max(0, entropy / Math.log2(10)));
 }
 
+
+// RRRR1 — scaleCenterOfMass
+/**
+ * Weighted center of pitch positions (uniform weights = arithmetic mean of normalized pitches).
+ * Normalizes each pitch to [0,1] within period, then returns mean.
+ * Empty → 0.5 (center).
+ */
+export function scaleCenterOfMass(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0.5;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    sum += (((scaleCents[i]! % periodCents) + periodCents) % periodCents) / periodCents;
+  }
+  return Math.min(1, Math.max(0, sum / n));
+}
+
+// RRRR2 — scaleMomentOfInertia
+/**
+ * Moment of inertia around the center of mass (variance of normalized pitches).
+ * Normalized by max possible variance (0.25 for uniform [0,1]).
+ * Empty/single → 0.
+ */
+export function scaleMomentOfInertia(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const positions: number[] = [];
+  for (let i = 0; i < n; i++) {
+    positions.push((((scaleCents[i]! % periodCents) + periodCents) % periodCents) / periodCents);
+  }
+  const mean = positions.reduce((a, b) => a + b, 0) / n;
+  const variance = positions.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  return Math.min(1, Math.max(0, variance / 0.25));
+}
+
+// RRRR3 — scaleGyrationRadius
+/**
+ * Radius of gyration = sqrt(variance of normalized pitches).
+ * Empty/single → 0; maximum is 0.5 for fully spread pitches, normalized to [0,1].
+ */
+export function scaleGyrationRadius(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const positions: number[] = [];
+  for (let i = 0; i < n; i++) {
+    positions.push((((scaleCents[i]! % periodCents) + periodCents) % periodCents) / periodCents);
+  }
+  const mean = positions.reduce((a, b) => a + b, 0) / n;
+  const variance = positions.reduce((a, b) => a + (b - mean) ** 2, 0) / n;
+  return Math.min(1, Math.max(0, Math.sqrt(variance) / 0.5));
+}
+
+// RRRR4 — scaleAngularMomentum
+/**
+ * Angular momentum proxy: product of center-of-mass and gyration radius.
+ * Measures "spin": high center-of-mass AND high spread = high angular momentum.
+ * Empty → 0.
+ */
+export function scaleAngularMomentum(scaleCents: readonly number[], periodCents: number = 1200): number {
+  return Math.min(1, Math.max(0, scaleCenterOfMass(scaleCents, periodCents) * scaleGyrationRadius(scaleCents, periodCents)));
+}
