@@ -1084,6 +1084,12 @@ import {
   presetFamilySocraticRadarMarketLiquidityProxy,
   presetFamilySocraticRadarGameTheoreticRationalityProxy,
   presetFamilySocraticRadarRiskPremiumProxy,
+  presetFamilySocraticRadarBandwidthProxyV2,
+  presetFamilySocraticRadarLatencyProxy,
+  presetFamilySocraticRadarPacketLossProxy,
+  presetFamilySocraticRadarSignalNoiseRatioProxy,
+  presetFamilySocraticRadarRoutingEfficiencyProxy,
+  presetFamilySocraticRadarNetworkResilienceProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -25187,5 +25193,125 @@ describe('Q2573 presetFamilySocraticRadarRiskPremiumProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarRiskPremiumProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2575 — presetFamilySocraticRadarBandwidthProxyV2
+describe('Q2575 presetFamilySocraticRadarBandwidthProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarBandwidthProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarBandwidthProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBandwidthProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2577 — presetFamilySocraticRadarLatencyProxy
+describe('Q2577 presetFamilySocraticRadarLatencyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarLatencyProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarLatencyProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLatencyProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2579 — presetFamilySocraticRadarPacketLossProxy
+describe('Q2579 presetFamilySocraticRadarPacketLossProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarPacketLossProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarPacketLossProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPacketLossProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2581 — presetFamilySocraticRadarSignalNoiseRatioProxy
+describe('Q2581 presetFamilySocraticRadarSignalNoiseRatioProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarSignalNoiseRatioProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarSignalNoiseRatioProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSignalNoiseRatioProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2583 — presetFamilySocraticRadarRoutingEfficiencyProxy
+describe('Q2583 presetFamilySocraticRadarRoutingEfficiencyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarRoutingEfficiencyProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarRoutingEfficiencyProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarRoutingEfficiencyProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2585 — presetFamilySocraticRadarNetworkResilienceProxy
+describe('Q2585 presetFamilySocraticRadarNetworkResilienceProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarNetworkResilienceProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarNetworkResilienceProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNetworkResilienceProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });

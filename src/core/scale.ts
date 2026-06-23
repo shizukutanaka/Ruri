@@ -48280,6 +48280,128 @@ export function tuningFamilySocraticRadarRiskPremiumProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2574 — tuningFamilySocraticRadarBandwidthProxyV2
+export function tuningFamilySocraticRadarBandwidthProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const max = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const min = axisAggregates.reduce((a, b) => Math.min(a, b), 1);
+  const result = max - min;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2576 — tuningFamilySocraticRadarLatencyProxy
+export function tuningFamilySocraticRadarLatencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = 1 - mean;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2578 — tuningFamilySocraticRadarPacketLossProxy
+export function tuningFamilySocraticRadarPacketLossProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const dropped = axisAggregates.filter((v) => v < 0.3).length;
+  const result = dropped / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2580 — tuningFamilySocraticRadarSignalNoiseRatioProxy
+export function tuningFamilySocraticRadarSignalNoiseRatioProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const meanSq = axisAggregates.reduce((a, b) => a + b * b, 0) / axisAggregates.length;
+  const variance = Math.max(0, meanSq - mean * mean);
+  const result = mean / (mean + Math.sqrt(variance));
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2582 — tuningFamilySocraticRadarRoutingEfficiencyProxy
+export function tuningFamilySocraticRadarRoutingEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const product = axisAggregates.reduce((a, b) => a * b, 1);
+  const result = Math.pow(product, 1 / axisAggregates.length);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2584 — tuningFamilySocraticRadarNetworkResilienceProxy
+export function tuningFamilySocraticRadarNetworkResilienceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.reduce((a, b) => Math.min(a, b), 1);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -55859,4 +55981,70 @@ export function scaleThirdChainScore(pitches: readonly Pitch[]): number {
     })) matches++;
   }
   return Math.min(1, Math.max(0, matches / pitches.length));
+}
+
+// Round 140 — R1401-R1404: 音階旋律輪郭分析
+
+export function scaleMelodicContourVariety(pitches: readonly Pitch[]): number {
+  // Measures variety in melodic contour based on different interval sizes present
+  // More distinct interval sizes = higher variety
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const intervals = new Set<number>();
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.add(Math.round((sorted[i]! - sorted[i - 1]!) / 50) * 50); // round to 50c bins
+  }
+  // Also include the wrap interval
+  intervals.add(Math.round(((sorted[0]! + 1200) - sorted[sorted.length - 1]!) / 50) * 50);
+  // Normalize: max possible distinct intervals = number of pitches
+  return Math.min(1, Math.max(0, intervals.size / pitches.length));
+}
+
+export function scaleAscendingBias(pitches: readonly Pitch[]): number {
+  // Measures whether scale has an "ascending" tendency
+  // More pitches in upper half of octave (>600c) = ascending bias
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const upper = pcs.filter((c) => c > 600).length;
+  return Math.min(1, Math.max(0, upper / pitches.length));
+}
+
+export function scaleStepLeapRatio(pitches: readonly Pitch[]): number {
+  // Ratio of step intervals (<300c) to leap intervals (>=300c) in scale
+  // Steps: intervals smaller than a minor 3rd; Leaps: larger intervals
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  let steps = 0, total = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    const interval = sorted[i]! - sorted[i - 1]!;
+    if (interval < 300) steps++;
+    total++;
+  }
+  // Add wrap interval
+  const wrapInterval = (sorted[0]! + 1200) - sorted[sorted.length - 1]!;
+  if (wrapInterval < 300) steps++;
+  total++;
+  return total > 0 ? Math.min(1, Math.max(0, steps / total)) : 0;
+}
+
+export function scaleContourComplexity(pitches: readonly Pitch[]): number {
+  // Measures complexity of scale contour based on direction changes
+  // More changes of direction (up/down alternation) = more complex
+  if (pitches.length < 3) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  intervals.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  // Count changes where a large interval (>300c) follows a small one (<200c) or vice versa
+  let changes = 0;
+  for (let i = 1; i < intervals.length; i++) {
+    const prev = intervals[i - 1]!;
+    const curr = intervals[i]!;
+    const prevIsLarge = prev >= 300;
+    const currIsLarge = curr >= 300;
+    if (prevIsLarge !== currIsLarge) changes++;
+  }
+  return Math.min(1, Math.max(0, changes / (intervals.length - 1)));
 }
