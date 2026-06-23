@@ -1444,3 +1444,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | UUUU2 | `scaleInversionSimilarity` | 反転類似性: 音程を符号反転したときの類似度 |
 | UUUU3 | `scaleComplementarity` | 補完性: クロマチックスケールに対する補完度(空き位置の割合) |
 | UUUU4 | `scaleMirrorSymmetry` | 鏡像対称性: ピッチ範囲の中点を軸とした鏡像対称スコア |
+
+## Round 116 — VVVV1–VVVV4: 音階音程変動分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| VVVV1 | `scaleStepSizeVarianceV2` | 音程サイズ変動: 連続音程の変動係数2乗(正規化)、均一性の逆指標 |
+| VVVV2 | `scaleLargeSmallStepRatio` | 最大・最小音程比: 最大音程÷最小音程の比(正規化)、音程の多様性指標 |
+| VVVV3 | `scaleStepUniformity` | 音程均一性: 変動係数の逆数、等間隔スケールで1に近づく |
+| VVVV4 | `scaleMaxStepFraction` | 最大音程占有率: 最大音程が総音域に占める割合 |
