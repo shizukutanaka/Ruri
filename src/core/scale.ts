@@ -46335,6 +46335,146 @@ export function tuningFamilySocraticRadarSocialMobilityProxyV2(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2394 — tuningFamilySocraticRadarNeuralOscillationProxy
+export function tuningFamilySocraticRadarNeuralOscillationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: neural oscillation synchronization analog
+  // Compute cosine-like periodicity: average of cos(2π * agg_i) in [0,1]
+  const cosineSum = axisAggregates.reduce((acc, a) => acc + (Math.cos(2 * Math.PI * a) + 1) / 2, 0);
+  const result = cosineSum / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2396 — tuningFamilySocraticRadarCognitivePrimingProxyV2
+export function tuningFamilySocraticRadarCognitivePrimingProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: expectation build-up — high convergence, low diversity = strong priming
+  // agg[4] * (1 - agg[0])
+  const result = axisAggregates[4]! * (1 - axisAggregates[0]!);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2398 — tuningFamilySocraticRadarAttentionalFocusProxy
+export function tuningFamilySocraticRadarAttentionalFocusProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: single dominant axis — max - mean, normalized by 0.8
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const maxVal = Math.max(...axisAggregates);
+  const result = (maxVal - mean) / 0.8;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2400 — tuningFamilySocraticRadarMemoryConsolidationProxy
+export function tuningFamilySocraticRadarMemoryConsolidationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: stability over time — 1 - std (low variance = stable memory)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = 1 - std;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2402 — tuningFamilySocraticRadarPerceptualGroupingProxy
+export function tuningFamilySocraticRadarPerceptualGroupingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: clustering coefficient — mean^2 / (mean^2 + std^2 + 1e-9)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const meanSq = mean ** 2;
+  const result = meanSq / (meanSq + variance + 1e-9);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2404 — tuningFamilySocraticRadarCognitiveParsimonyProxy
+export function tuningFamilySocraticRadarCognitiveParsimonyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: information compression — 1 - entropy/log2(5)
+  // entropy uses axisAggregates as weights (normalize to sum to 1 first)
+  const total = axisAggregates.reduce((a, b) => a + b, 0);
+  let entropy = 0;
+  if (total > 0) {
+    for (const a of axisAggregates) {
+      const p = a / total;
+      if (p > 0) entropy -= p * Math.log2(p);
+    }
+  }
+  const result = 1 - entropy / Math.log2(5);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -52828,4 +52968,66 @@ export function scaleIntervalTension(pitches: readonly Pitch[]): number {
   }
   if (tensions.length === 0) return 0;
   return Math.min(1, Math.max(0, tensions.reduce((a, b) => a + b, 0) / tensions.length));
+}
+
+// Round 125 — R1251-R1254: 音階転調特性分析
+
+export function scaleTranspositionCount(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const rawPcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12);
+  const pcs = new Set(rawPcs);
+  let count = 0;
+  for (let t = 0; t < 12; t++) {
+    const transposed = new Set([...pcs].map((pc) => (pc + t) % 12));
+    const matches = [...transposed].every((pc) => pcs.has(pc)) && [...pcs].every((pc) => transposed.has(pc));
+    if (matches) count++;
+  }
+  return Math.min(1, Math.max(0, count / 12));
+}
+
+export function scaleAxisSymmetryScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12);
+  const pcSet = new Set(pcs);
+  let bestMatch = 0;
+  for (let axis = 0; axis < 12; axis++) {
+    let matches = 0;
+    for (const pc of pcSet) {
+      const reflected = ((axis * 2 - pc) % 12 + 12) % 12;
+      if (pcSet.has(reflected)) matches++;
+    }
+    const score = matches / pcSet.size;
+    if (score > bestMatch) bestMatch = score;
+  }
+  return Math.min(1, Math.max(0, bestMatch));
+}
+
+export function scaleDegreeWeightBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // divide octave into 4 quadrants of 300c each, count pitches in each
+  const quadrants = [0, 0, 0, 0];
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const q = Math.min(3, Math.floor(c / 300));
+    quadrants[q]!++;
+  }
+  const mean = pitches.length / 4;
+  const variance = quadrants.reduce((acc, q) => acc + (q - mean) ** 2, 0) / 4;
+  const cv = Math.sqrt(variance) / (mean + 1e-9);
+  return Math.min(1, Math.max(0, 1 - cv / 2));
+}
+
+export function scaleHemitoniaRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  let hemitoniaCount = 0;
+  let wholeToneCount = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (step <= 100) hemitoniaCount++;
+    else if (step <= 250) wholeToneCount++;
+  }
+  const total = hemitoniaCount + wholeToneCount;
+  if (total === 0) return 0;
+  return Math.min(1, Math.max(0, hemitoniaCount / total));
 }

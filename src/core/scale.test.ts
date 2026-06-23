@@ -1688,6 +1688,10 @@ import {
   scaleAvoidNoteCount,
   scaleColorToneRatio,
   scaleIntervalTension,
+  scaleTranspositionCount,
+  scaleAxisSymmetryScore,
+  scaleDegreeWeightBalance,
+  scaleHemitoniaRatio,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -42425,5 +42429,75 @@ describe('R1244 scaleIntervalTension', () => {
     const pitches = [0, 700].map((c) => pitchFromCents(c));
     const v = scaleIntervalTension(pitches);
     expect(v).toBeLessThan(0.5);
+  });
+});
+
+// Round 125 — R1251-R1254: 音階転調特性分析
+describe('R1251 scaleTranspositionCount', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleTranspositionCount([])).toBe(0);
+  });
+  it('returns positive for major scale', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const v = scaleTranspositionCount(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 1/12 minimum for any scale (at least identity transposition)', () => {
+    const pitches = [0, 200, 400, 700].map((c) => pitchFromCents(c));
+    expect(scaleTranspositionCount(pitches)).toBeGreaterThan(0);
+  });
+});
+
+describe('R1252 scaleAxisSymmetryScore', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleAxisSymmetryScore([])).toBe(0);
+  });
+  it('returns 1 for single note (trivially symmetric)', () => {
+    const pitches = [pitchFromCents(0)];
+    expect(scaleAxisSymmetryScore(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for major scale', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const v = scaleAxisSymmetryScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1253 scaleDegreeWeightBalance', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleDegreeWeightBalance([])).toBe(0);
+  });
+  it('returns high value for evenly distributed scale', () => {
+    const pitches = [0, 300, 600, 900].map((c) => pitchFromCents(c));
+    const v = scaleDegreeWeightBalance(pitches);
+    expect(v).toBeGreaterThan(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const v = scaleDegreeWeightBalance(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1254 scaleHemitoniaRatio', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHemitoniaRatio([])).toBe(0);
+  });
+  it('returns 0 for single note', () => {
+    expect(scaleHemitoniaRatio([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns high value for semitone-heavy scale', () => {
+    const pitches = [0, 100, 200, 500, 700].map((c) => pitchFromCents(c));
+    const v = scaleHemitoniaRatio(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for whole-tone scale', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map((c) => pitchFromCents(c));
+    // all steps are 200c (whole tone), no semitones
+    expect(scaleHemitoniaRatio(pitches)).toBe(0);
   });
 });
