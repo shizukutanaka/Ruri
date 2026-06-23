@@ -1579,3 +1579,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1302 | `scaleModularityScore` | モジュール性スコア: 音程ギャップの変動係数による音群クラスタ化の度合 |
 | R1303 | `scaleTonicStrengthScore` | 主音強度スコア: 完全5度・4度・長3度の存在による主音支持度 |
 | R1304 | `scalePentatonicAffinity` | ペンタトニック親和度: 長短ペンタトニックスケールとの最大一致度 |
+
+## Round 131 — R1311–R1314: 音階対称性反転分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1311 | `scaleInversionSymmetryV2` | 反転対称スコア: 音階を600セント軸で反転した際の自己一致度 |
+| R1312 | `scaleRetrogradeSymmetryV2` | 逆行対称スコア: 音程列の前向きと後ろ向きの一致度（回文的対称性） |
+| R1313 | `scaleTranspositionSymmetryV2` | 移調対称スコア: 移調しても同じ音階クラスを生成する移調数の割合 |
+| R1314 | `scaleRotationalSymmetryV2` | 回転対称スコア: 音程列の回転による自己一致度（限定移調旋法で高い） |

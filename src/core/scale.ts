@@ -47166,6 +47166,134 @@ export function tuningFamilySocraticRadarCoevolutionProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2466 — tuningFamilySocraticRadarAtmosphericPressureProxyV2
+export function tuningFamilySocraticRadarAtmosphericPressureProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2468 — tuningFamilySocraticRadarThermalGradientProxy
+export function tuningFamilySocraticRadarThermalGradientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const maxAgg = Math.max(...axisAggregates);
+  const minAgg = Math.min(...axisAggregates);
+  const result = maxAgg - minAgg;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2470 — tuningFamilySocraticRadarCoriolisEffectProxy
+export function tuningFamilySocraticRadarCoriolisEffectProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const agg0 = axisAggregates[0]!;
+  const agg1 = axisAggregates[1]!;
+  const agg3 = axisAggregates[3]!;
+  const agg4 = axisAggregates[4]!;
+  const result = Math.abs(agg0 - agg4) * (1 - Math.abs(agg1 - agg3));
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2472 — tuningFamilySocraticRadarOceanicCurrentProxy
+export function tuningFamilySocraticRadarOceanicCurrentProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.1;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2474 — tuningFamilySocraticRadarTidalAmplitudeProxy
+export function tuningFamilySocraticRadarTidalAmplitudeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const maxAgg = Math.max(...axisAggregates);
+  const minAgg = Math.min(...axisAggregates);
+  const result = (maxAgg - minAgg) / 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2476 — tuningFamilySocraticRadarHumidityProxyV3
+export function tuningFamilySocraticRadarHumidityProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const saturatedCount = axisAggregates.filter((v) => v > 0.5).length;
+  const result = saturatedCount / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -54128,4 +54256,78 @@ export function scalePentatonicAffinity(pitches: readonly Pitch[]): number {
     return matches / Math.max(pitches.length, refSet.length);
   };
   return Math.min(1, Math.max(0, Math.max(scoreForSet(majorPenta), scoreForSet(minorPenta))));
+}
+
+// Round 131 — R1311-R1314: 音階対称性反転分析
+
+export function scaleInversionSymmetryV2(pitches: readonly Pitch[]): number {
+  // Measures how symmetric the scale is under inversion (reflection around 600c)
+  // Each pitch c maps to (1200 - c) mod 1200; score = fraction of inverted pitches also in scale
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const pcSet = new Set(pcs.map((c) => Math.round(c / 50) * 50));
+  let matches = 0;
+  for (const c of pcs) {
+    const inv = (1200 - c + 1200) % 1200;
+    const invRounded = Math.round(inv / 50) * 50;
+    if (pcSet.has(invRounded)) matches++;
+  }
+  return Math.min(1, Math.max(0, matches / pitches.length));
+}
+
+export function scaleRetrogradeSymmetryV2(pitches: readonly Pitch[]): number {
+  // Measures palindrome-like symmetry of interval sequence
+  // Compares forward and backward interval sequences
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  if (intervals.length === 0) return 0;
+  let matches = 0;
+  for (let i = 0; i < intervals.length; i++) {
+    const fwd = intervals[i]!;
+    const rev = intervals[intervals.length - 1 - i]!;
+    if (Math.abs(fwd - rev) < 25) matches++; // within 25 cents
+  }
+  return matches / intervals.length;
+}
+
+export function scaleTranspositionSymmetryV2(pitches: readonly Pitch[]): number {
+  // Measures how many transpositions of the scale produce the same pitch class set
+  // (i.e., transpositional symmetry / limited transposition like whole tone / diminished)
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50);
+  const pcSet = new Set(pcs);
+  let symmetricTranspositions = 0;
+  for (let t = 50; t < 1200; t += 50) {
+    const transposed = new Set(pcs.map((c) => Math.round(((c + t) % 1200) / 50) * 50));
+    let allMatch = true;
+    for (const pc of pcSet) {
+      if (!transposed.has(pc)) { allMatch = false; break; }
+    }
+    if (allMatch && transposed.size === pcSet.size) symmetricTranspositions++;
+  }
+  // Normalize: more symmetric transpositions = higher score (whole tone scale = 11 transpositions)
+  return Math.min(1, Math.max(0, symmetricTranspositions / 11));
+}
+
+export function scaleRotationalSymmetryV2(pitches: readonly Pitch[]): number {
+  // Measures rotational symmetry: how many rotations of the interval pattern equal the original
+  // (Modes of limited transposition have high rotational symmetry)
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  intervals.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  let symmetricRotations = 0;
+  for (let r = 1; r < intervals.length; r++) {
+    const rotated = [...intervals.slice(r), ...intervals.slice(0, r)];
+    const allMatch = intervals.every((v, i) => Math.abs(v - rotated[i]!) < 25);
+    if (allMatch) symmetricRotations++;
+  }
+  return Math.min(1, Math.max(0, symmetricRotations / (intervals.length - 1)));
 }
