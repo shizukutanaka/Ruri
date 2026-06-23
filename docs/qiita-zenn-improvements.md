@@ -1305,3 +1305,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | HHHH2 | `scaleMidRegisterDensity` | 中音域（1/3〜2/3周期）の音符密度 |
 | HHHH3 | `scaleHighRegisterDensity` | 高音域（2/3〜1周期）の音符密度 |
 | HHHH4 | `scaleRegisterDistributionBalance` | 3音域の均衡指数（標準偏差の補数） |
+
+## Round 103: 音階和声張力分析 (IIII1–IIII4)
+
+音階内の不協和・張力特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| IIII1 | `scaleTritoneRatioV2` | 三全音（半周期±30セント）を含む音の比率 |
+| IIII2 | `scaleDissonantIntervalCountV2` | 不協和ステップ（半音・増4度）の比率 |
+| IIII3 | `scaleTensionResolutionRatioV2` | 解決音程（協和ステップ）の比率 |
+| IIII4 | `scaleHarmonicTensionIndexV2` | 三全音比率と不協和比率の複合張力指数 |

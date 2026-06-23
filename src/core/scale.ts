@@ -43539,6 +43539,128 @@ export function tuningFamilySocraticRadarCataclysmProxy(
   return Math.min(1, Math.max(0, maxVal ** 2 * (1 - minVal) ** 2));
 }
 
+// Q2130 — tuningFamilySocraticRadarPhonemeRichnessProxy
+export function tuningFamilySocraticRadarPhonemeRichnessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const aboveThreshold = axisAggregates.filter((v) => v > 0.3).length;
+  return aboveThreshold / 5;
+}
+
+// Q2132 — tuningFamilySocraticRadarSyntaxComplexityProxy
+export function tuningFamilySocraticRadarSyntaxComplexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, std * 2));
+}
+
+// Q2134 — tuningFamilySocraticRadarSemanticDensityProxy
+export function tuningFamilySocraticRadarSemanticDensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, (mean * (1 + std)) / 2));
+}
+
+// Q2136 — tuningFamilySocraticRadarPragmaticFlexibilityProxy
+export function tuningFamilySocraticRadarPragmaticFlexibilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  return Math.min(1, Math.max(0, maxVal - minVal));
+}
+
+// Q2138 — tuningFamilySocraticRadarLexicalDiversityProxy
+export function tuningFamilySocraticRadarLexicalDiversityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const rounded = axisAggregates.map((v) => Math.round(v * 10) / 10);
+  const uniqueCount = new Set(rounded).size;
+  return uniqueCount / 5;
+}
+
+// Q2140 — tuningFamilySocraticRadarProsodyProxyV2
+export function tuningFamilySocraticRadarProsodyProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const weights = [0.6, 0.8, 1.0, 0.8, 0.6];
+  const sumWeights = weights.reduce((a, b) => a + b, 0);
+  const weightedSum = axisAggregates.reduce((s, v, i) => s + v * weights[i]!, 0);
+  return Math.min(1, Math.max(0, weightedSum / sumWeights));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -48401,4 +48523,73 @@ export function scaleRegisterDistributionBalance(scaleCents: readonly number[], 
   const variance = ((low - mean) ** 2 + (mid - mean) ** 2 + (high - mean) ** 2) / 3;
   const std = Math.sqrt(variance);
   return Math.min(1, Math.max(0, 1 - std * Math.sqrt(3)));
+}
+
+/**
+ * IIII1 — scaleTritoneRatioV2
+ * Fraction of notes close to the tritone (half-period).
+ * Counts notes within 30 cents of periodCents/2 and returns count / n.
+ * Returns 0 for empty scale.
+ */
+export function scaleTritoneRatioV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const halfPeriod = periodCents / 2;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    if (Math.abs(scaleCents[i]! - halfPeriod) <= 30) count++;
+  }
+  return Math.min(1, Math.max(0, count / n));
+}
+
+/**
+ * IIII2 — scaleDissonantIntervalCountV2
+ * Fraction of consecutive steps (including wrap-around) that are dissonant.
+ * Dissonant = step < 120 cents (semitone-like) or step in [550, 650] cents (augmented-like).
+ * Returns 0 for empty or single-note scale.
+ */
+export function scaleDissonantIntervalCountV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
+  let count = 0;
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i]!;
+    if (s < 120 || (s >= 550 && s <= 650)) count++;
+  }
+  return Math.min(1, Math.max(0, count / n));
+}
+
+/**
+ * IIII3 — scaleTensionResolutionRatioV2
+ * Balance between tension (dissonant) and resolution (consonant) intervals.
+ * consonant = n - dissonant_count; returns consonant / n (resolution dominance).
+ * Returns 1 for empty scale.
+ */
+export function scaleTensionResolutionRatioV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  const dissonantFraction = scaleDissonantIntervalCountV2(scaleCents, periodCents);
+  const dissonantCount = dissonantFraction * n;
+  const consonantCount = n - dissonantCount;
+  return Math.min(1, Math.max(0, consonantCount / n));
+}
+
+/**
+ * IIII4 — scaleHarmonicTensionIndexV2
+ * Overall tension score combining tritone presence and dissonance.
+ * Returns (scaleTritoneRatioV2 + scaleDissonantIntervalCountV2) / 2.
+ * Returns 0 for empty scale.
+ */
+export function scaleHarmonicTensionIndexV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const tritone = scaleTritoneRatioV2(scaleCents, periodCents);
+  const dissonant = scaleDissonantIntervalCountV2(scaleCents, periodCents);
+  return Math.min(1, Math.max(0, (tritone + dissonant) / 2));
 }
