@@ -8,7 +8,7 @@ import {
 } from './tuning.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { midiToFreq } from './midi.js';
-import { pitchToCents, centsToFreq } from './cents.js';
+import { type Pitch, pitchToCents, centsToFreq } from './cents.js';
 import { chordDissonance, chordObjectDissonance } from './dissonance.js';
 import {
   rankChords,
@@ -44892,6 +44892,135 @@ export function tuningFamilySocraticRadarZeroPointProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2262 — tuningFamilySocraticRadarThermalEntropyProxy
+export function tuningFamilySocraticRadarThermalEntropyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const sum = axisAggregates.reduce((a, b) => a + b, 0);
+  const normalized = axisAggregates.map((v) => v / (sum + 1e-12));
+  const H = -normalized.reduce((acc, p) => acc + p * Math.log(p + 1e-12), 0);
+  const result = H / Math.log(5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2264 — tuningFamilySocraticRadarThermalTemperatureProxy
+export function tuningFamilySocraticRadarThermalTemperatureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const meanSq = axisAggregates.reduce((a, b) => a + b * b, 0) / 5;
+  const std = Math.sqrt(Math.max(0, meanSq - mean * mean));
+  const result = std / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2266 — tuningFamilySocraticRadarHeatCapacityProxyV3
+export function tuningFamilySocraticRadarHeatCapacityProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) * (b - mean), 0) / 5;
+  const result = variance / (mean + 1e-9);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2268 — tuningFamilySocraticRadarFreeEnergyProxyV2
+export function tuningFamilySocraticRadarFreeEnergyProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const meanSq = axisAggregates.reduce((a, b) => a + b * b, 0) / 5;
+  const std = Math.sqrt(Math.max(0, meanSq - mean * mean));
+  const result = (mean - std + 1) / 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2270 — tuningFamilySocraticRadarMaxwellBoltzmannProxyV2
+export function tuningFamilySocraticRadarMaxwellBoltzmannProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const count = axisAggregates.filter((v) => v >= 0.3 && v <= 0.7).length;
+  const result = count / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2272 — tuningFamilySocraticRadarThermalEquilibriumProxy
+export function tuningFamilySocraticRadarThermalEquilibriumProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const meanSq = axisAggregates.reduce((a, b) => a + b * b, 0) / 5;
+  const std = Math.sqrt(Math.max(0, meanSq - mean * mean));
+  const result = 1 - std * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -50704,4 +50833,81 @@ export function scaleOutlierRatio(scaleCents: readonly number[], periodCents: nu
   const upper = q3 + 1.5 * iqr;
   const outliers = sorted.filter(v => v < lower || v > upper).length;
   return outliers / n;
+}
+
+// Round 114 — TTTT1-TTTT4: 音階フラクタル次元分析
+
+/** TTTT1: ボックスカウンティング次元推定。2スケール(100cent/50cent)でのボックス占有数比からフラクタル次元を推定。[0,1]を返す。 */
+export function scaleBoxCountingDimension(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const range = Math.max(...cents) - Math.min(...cents);
+  if (range === 0) return 0;
+  // Box-counting: count occupied boxes at two scales
+  const n1 = new Set(cents.map((c) => Math.floor(c / 100))).size;
+  const n2 = new Set(cents.map((c) => Math.floor(c / 50))).size;
+  if (n1 <= 1 || n2 <= 1) return 0;
+  const dim = Math.log(n2 / n1) / Math.log(2);
+  return Math.min(1, Math.max(0, dim));
+}
+
+/** TTTT2: ハウスドルフ次元推定。ギャップ分布の平均/最大比をフラクタル指標として使用。[0,1]を返す。 */
+export function scaleHausdorffEstimate(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  // Estimate Hausdorff dimension via gap distribution
+  const gaps: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    gaps.push(cents[i]! - cents[i - 1]!);
+  }
+  const meanGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  const maxGap = Math.max(...gaps);
+  if (maxGap === 0) return 0;
+  // Ratio of mean to max gap as fractal estimate
+  const ratio = meanGap / maxGap;
+  return Math.min(1, Math.max(0, ratio));
+}
+
+/** TTTT3: 自己相似性指数。音程パターンの前半・後半を正規化して比較し相似度を数値化。[0,1]を返す。 */
+export function scaleSelfSimilarityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  // Check if interval patterns repeat at different scales
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    intervals.push(cents[i]! - cents[i - 1]!);
+  }
+  const total = intervals.reduce((a, b) => a + b, 0);
+  if (total === 0) return 0;
+  // Self-similarity: normalized intervals vs doubled-scale normalized intervals
+  const half = Math.floor(intervals.length / 2);
+  if (half === 0) return 0;
+  const firstHalf = intervals.slice(0, half);
+  const secondHalf = intervals.slice(half);
+  const norm1 = firstHalf.map((x) => x / (firstHalf.reduce((a, b) => a + b, 0) + 1e-9));
+  const norm2 = secondHalf.map((x) => x / (secondHalf.reduce((a, b) => a + b, 0) + 1e-9));
+  const minLen = Math.min(norm1.length, norm2.length);
+  let similarity = 0;
+  for (let i = 0; i < minLen; i++) {
+    similarity += 1 - Math.abs(norm1[i]! - norm2[i]!);
+  }
+  return Math.min(1, Math.max(0, similarity / minLen));
+}
+
+/** TTTT4: ラクナリティ。ギャップ分布の変動係数2乗(variance/mean²)を[0,1]に正規化。スケールの疎密パターンを測定。 */
+export function scaleLacunarity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const gaps: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    gaps.push(cents[i]! - cents[i - 1]!);
+  }
+  const n = gaps.length;
+  const mean = gaps.reduce((a, b) => a + b, 0) / n;
+  const variance = gaps.reduce((acc, g) => acc + (g - mean) ** 2, 0) / n;
+  if (mean === 0) return 0;
+  // Lacunarity = variance / mean² (coefficient of variation squared)
+  const lacunarity = variance / (mean * mean);
+  // Normalize: typical range [0, 4], map to [0, 1]
+  return Math.min(1, Math.max(0, lacunarity / 4));
 }

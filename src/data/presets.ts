@@ -921,6 +921,12 @@ import {
   tuningFamilySocraticRadarQuantumTunnelingProxy,
   tuningFamilySocraticRadarDecoherenceProxyV3,
   tuningFamilySocraticRadarZeroPointProxy,
+  tuningFamilySocraticRadarThermalEntropyProxy,
+  tuningFamilySocraticRadarThermalTemperatureProxy,
+  tuningFamilySocraticRadarHeatCapacityProxyV3,
+  tuningFamilySocraticRadarFreeEnergyProxyV2,
+  tuningFamilySocraticRadarMaxwellBoltzmannProxyV2,
+  tuningFamilySocraticRadarThermalEquilibriumProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -19099,4 +19105,88 @@ export function presetFamilySocraticRadarZeroPointProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarZeroPointProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarThermalEntropyProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarThermalEntropyProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarThermalEntropyProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarThermalTemperatureProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarThermalTemperatureProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarThermalTemperatureProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarHeatCapacityProxyV3(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarHeatCapacityProxyV3> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarHeatCapacityProxyV3(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarFreeEnergyProxyV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarFreeEnergyProxyV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarFreeEnergyProxyV2(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarMaxwellBoltzmannProxyV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMaxwellBoltzmannProxyV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMaxwellBoltzmannProxyV2(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarThermalEquilibriumProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarThermalEquilibriumProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarThermalEquilibriumProxy(tunings, spectrum, rootHz);
 }

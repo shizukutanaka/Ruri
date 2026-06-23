@@ -928,6 +928,12 @@ import {
   presetFamilySocraticRadarQuantumTunnelingProxy,
   presetFamilySocraticRadarDecoherenceProxyV3,
   presetFamilySocraticRadarZeroPointProxy,
+  presetFamilySocraticRadarThermalEntropyProxy,
+  presetFamilySocraticRadarThermalTemperatureProxy,
+  presetFamilySocraticRadarHeatCapacityProxyV3,
+  presetFamilySocraticRadarFreeEnergyProxyV2,
+  presetFamilySocraticRadarMaxwellBoltzmannProxyV2,
+  presetFamilySocraticRadarThermalEquilibriumProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -21911,5 +21917,125 @@ describe('Q2261 presetFamilySocraticRadarZeroPointProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarZeroPointProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2263 — presetFamilySocraticRadarThermalEntropyProxy
+describe('Q2263 presetFamilySocraticRadarThermalEntropyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarThermalEntropyProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarThermalEntropyProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThermalEntropyProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2265 — presetFamilySocraticRadarThermalTemperatureProxy
+describe('Q2265 presetFamilySocraticRadarThermalTemperatureProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarThermalTemperatureProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarThermalTemperatureProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThermalTemperatureProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2267 — presetFamilySocraticRadarHeatCapacityProxyV3
+describe('Q2267 presetFamilySocraticRadarHeatCapacityProxyV3', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarHeatCapacityProxyV3(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarHeatCapacityProxyV3(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHeatCapacityProxyV3(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2269 — presetFamilySocraticRadarFreeEnergyProxyV2
+describe('Q2269 presetFamilySocraticRadarFreeEnergyProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarFreeEnergyProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarFreeEnergyProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFreeEnergyProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2271 — presetFamilySocraticRadarMaxwellBoltzmannProxyV2
+describe('Q2271 presetFamilySocraticRadarMaxwellBoltzmannProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarMaxwellBoltzmannProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarMaxwellBoltzmannProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMaxwellBoltzmannProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2273 — presetFamilySocraticRadarThermalEquilibriumProxy
+describe('Q2273 presetFamilySocraticRadarThermalEquilibriumProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarThermalEquilibriumProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarThermalEquilibriumProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThermalEquilibriumProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });
