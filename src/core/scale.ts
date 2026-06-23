@@ -47655,6 +47655,132 @@ export function tuningFamilySocraticRadarCollectiveIntelligenceProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2514 — tuningFamilySocraticRadarButterflyEffectProxy
+export function tuningFamilySocraticRadarButterflyEffectProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  const result = maxVal * (1 - minVal);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2516 — tuningFamilySocraticRadarStrangeAttractorProxy
+export function tuningFamilySocraticRadarStrangeAttractorProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = mean * (1 - Math.abs(mean - 0.5) * 2);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2518 — tuningFamilySocraticRadarFractalDimensionProxyV4
+export function tuningFamilySocraticRadarFractalDimensionProxyV4(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const result = variance / (mean + 0.001);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2520 — tuningFamilySocraticRadarPhaseTransitionProxyV3
+export function tuningFamilySocraticRadarPhaseTransitionProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const crossingCount = axisAggregates.filter((v) => v >= 0.5).length;
+  const result = crossingCount / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2522 — tuningFamilySocraticRadarSelfOrganizationProxyV2
+export function tuningFamilySocraticRadarSelfOrganizationProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const stddev = Math.sqrt(variance);
+  const result = 1 - stddev / (mean + 0.001);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2524 — tuningFamilySocraticRadarEmergentComplexityProxy
+export function tuningFamilySocraticRadarEmergentComplexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const total = axisAggregates.reduce((a, b) => a + b, 0);
+  const pis = axisAggregates.map((v) => (total > 0 ? v / total : 1 / axisAggregates.length));
+  const entropy = -pis.reduce((a, pi) => a + pi * Math.log2(pi + 0.001), 0);
+  const result = entropy / Math.log2(5);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -54899,4 +55025,82 @@ export function scaleSpectralCentroidBias(pitches: readonly Pitch[]): number {
   const centroid = pcs.reduce((a, b) => a + b, 0) / pcs.length;
   const bias = Math.abs(centroid - 600) / 600; // max deviation is 600
   return Math.min(1, Math.max(0, bias));
+}
+
+// Round 135 — R1351-R1354: 音階音程ベクトル分析
+
+export function scaleIntervalVectorEntropy(pitches: readonly Pitch[]): number {
+  // Computes entropy of the interval vector (distribution of interval classes 1-6)
+  // Higher entropy = more evenly distributed interval classes
+  if (pitches.length < 2) return 0;
+  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100));
+  const icCounts = new Array<number>(7).fill(0); // IC 0-6
+  for (let i = 0; i < pcs.length; i++) {
+    for (let j = i + 1; j < pcs.length; j++) {
+      const ic = Math.min(Math.abs(pcs[i]! - pcs[j]!), 12 - Math.abs(pcs[i]! - pcs[j]!));
+      if (ic >= 0 && ic <= 6) icCounts[ic] = (icCounts[ic] ?? 0) + 1;
+    }
+  }
+  const total = icCounts.slice(1).reduce((a, b) => a + b, 0);
+  if (total === 0) return 0;
+  let entropy = 0;
+  for (let i = 1; i <= 6; i++) {
+    const p = (icCounts[i] ?? 0) / total;
+    if (p > 0) entropy -= p * Math.log2(p);
+  }
+  return Math.min(1, Math.max(0, entropy / Math.log2(6)));
+}
+
+export function scaleIntervalClassBalanceV2(pitches: readonly Pitch[]): number {
+  // Measures balance between consonant ICs (1=m2, 5=P4, 6=TT excluded; 3=m3, 4=M3) vs total
+  // Consonant ICs: 3 (m3/M6), 4 (M3/m6), 5 (P4/P5) — these are stable intervals
+  if (pitches.length < 2) return 0;
+  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100));
+  let consonant = 0, total = 0;
+  for (let i = 0; i < pcs.length; i++) {
+    for (let j = i + 1; j < pcs.length; j++) {
+      const ic = Math.min(Math.abs(pcs[i]! - pcs[j]!), 12 - Math.abs(pcs[i]! - pcs[j]!));
+      total++;
+      if (ic === 3 || ic === 4 || ic === 5) consonant++;
+    }
+  }
+  return total > 0 ? Math.min(1, Math.max(0, consonant / total)) : 0;
+}
+
+export function scaleConsistencyIndex(pitches: readonly Pitch[]): number {
+  // Measures interval consistency: how often a stacked interval sum produces scale members
+  // Based on: all pairs of consecutive intervals; if their sum is also in the scale → consistent
+  if (pitches.length < 3) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const pcsSet = new Set(sorted.map((c) => Math.round(c / 50) * 50));
+  let consistent = 0, total = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    for (let j = i + 1; j < sorted.length; j++) {
+      const interval = sorted[j]! - sorted[i]!;
+      // Check if root + interval*2 is in scale (stacking)
+      const stacked = (sorted[i]! + interval * 2) % 1200;
+      const stackedRounded = Math.round(stacked / 50) * 50;
+      if (pcsSet.has(stackedRounded)) consistent++;
+      total++;
+    }
+  }
+  return total > 0 ? Math.min(1, Math.max(0, consistent / total)) : 0;
+}
+
+export function scaleProportionalBalance(pitches: readonly Pitch[]): number {
+  // Measures how evenly interval sizes are proportionally distributed
+  // Compares consecutive interval sizes; low variance in ratios = high proportional balance
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  intervals.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  if (intervals.length === 0) return 0;
+  const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+  if (mean === 0) return 0;
+  const variance = intervals.reduce((a, b) => a + (b - mean) ** 2, 0) / intervals.length;
+  const cv = Math.sqrt(variance) / mean; // coefficient of variation
+  return Math.min(1, Math.max(0, 1 - cv / 2)); // low CV = high balance
 }
