@@ -1462,3 +1462,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | WWWW2 | `scalePitchClusteringV2` | ピッチクラスタリング: 大きなギャップで区切られたクラスタの比率 |
 | WWWW3 | `scaleRangeCoverageV2` | 音域カバレッジ: 隣接音程の200セント制限和÷総音域 |
 | WWWW4 | `scaleOctaveCompletenessV2` | オクターブ完全性: 50セント刻みグリッドでオクターブを占有するビン数÷24 |
+
+## Round 118 — XXXX1–XXXX4: 音階音程特性分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| XXXX1 | `scaleLeapFraction` | 跳躍音程率: 200セント超の跳躍音程が占める割合 |
+| XXXX2 | `scaleStepFraction` | 順次音程率: 200セント以内の順次進行が占める割合 |
+| XXXX3 | `scaleHalfStepCount` | 半音率: 50〜150セントの半音程が占める割合 |
+| XXXX4 | `scaleWholeToneContent` | 全音率: 150〜250セントの全音程が占める割合 |
