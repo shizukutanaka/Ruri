@@ -1624,3 +1624,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1352 | `scaleIntervalClassBalanceV2` | 音程クラスバランス: 協和音程クラス(IC3/4/5)の全ペアに占める割合 |
 | R1353 | `scaleConsistencyIndex` | 一貫性指数: 音程を積み重ねて得られる音が音階内に含まれる割合 |
 | R1354 | `scaleProportionalBalance` | 比例バランス: 隣接音程サイズの変動係数の逆数（等距離に近いほど高い） |
+
+## Round 136 — R1361–R1364: 音階旋律重力分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1361 | `scaleMelodicGravityScore` | 旋律重力スコア: 各音が根音・P4・P5などの安定音に近い度合の平均 |
+| R1362 | `scaleAttractionForceIndex` | 引力指数: 隣接音間の最小音程に基づく音の引力の強さ |
+| R1363 | `scaleTensionResolutionRatio` | 緊張解決比: 安定音度（根音/M3/P4/P5/m6）の全音度に対する割合 |
+| R1364 | `scaleDirectionBias` | 方向バイアス: 中央値より上の音程和と下の音程和の非対称度 |
