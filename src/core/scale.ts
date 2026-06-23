@@ -46882,6 +46882,143 @@ export function tuningFamilySocraticRadarHashCollisionProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2442 — tuningFamilySocraticRadarChaosOrderProxy
+export function tuningFamilySocraticRadarChaosOrderProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // chaos/order balance: agg[0]=diversity(chaos), agg[4]=convergence(order)
+  // harmony when chaos and order are balanced
+  const chaos = axisAggregates[0]!;
+  const order = axisAggregates[4]!;
+  const result = 1 - Math.abs(chaos - order);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2444 — tuningFamilySocraticRadarArchetypeProxy
+export function tuningFamilySocraticRadarArchetypeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // dominant archetype strength — single dominant pattern
+  const result = Math.max(...axisAggregates);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2446 — tuningFamilySocraticRadarDualityProxy
+export function tuningFamilySocraticRadarDualityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // binary opposition — maximum contrast between first and last axes
+  const result = Math.abs(axisAggregates[0]! - axisAggregates[4]!);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2448 — tuningFamilySocraticRadarTranscendenceProxy
+export function tuningFamilySocraticRadarTranscendenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // transcendence of the mean
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const result = Math.max(0, Math.max(...axisAggregates) - mean) / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2450 — tuningFamilySocraticRadarEnantiodromiaProxy
+export function tuningFamilySocraticRadarEnantiodromiaProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // reversal detection — count sign changes in consecutive differences
+  const diffs = [
+    axisAggregates[1]! - axisAggregates[0]!,
+    axisAggregates[2]! - axisAggregates[1]!,
+    axisAggregates[3]! - axisAggregates[2]!,
+    axisAggregates[4]! - axisAggregates[3]!,
+  ];
+  let signChanges = 0;
+  for (let i = 1; i < diffs.length; i++) {
+    if (diffs[i]! * diffs[i - 1]! < 0) signChanges++;
+  }
+  const result = signChanges / 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2452 — tuningFamilySocraticRadarSynchronicityProxy
+export function tuningFamilySocraticRadarSynchronicityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // meaningful coincidence — high cohesion + similar values
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = (1 - std / 0.5) * mean;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -53680,4 +53817,83 @@ export function scaleRootConsonanceScore(pitches: readonly Pitch[]): number {
     totalConsonance += consonance;
   }
   return Math.min(1, Math.max(0, totalConsonance / pitches.length));
+}
+
+// Round 129 — R1291-R1294: 音階倍音整合性分析
+
+export function scaleHarmonicCoherenceIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Harmonic series of root: 0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, ...
+  // In first octave (mod 1200): 0, 702, 386, 884, 498, 969, 0...
+  // Key harmonic positions within octave: unison(0), P5(702), M3(386), m7(969), P4(498), M2(204), M6(884)
+  const harmonicCents = [0, 204, 386, 498, 702, 884, 969, 1088]; // harmonics 1-8 mod 1200
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matches = 0;
+  for (const c of cents) {
+    for (const h of harmonicCents) {
+      if (Math.abs(c - h) < 30 || Math.abs(c - h - 1200) < 30 || Math.abs(c - h + 1200) < 30) {
+        matches++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, matches / pitches.length));
+}
+
+export function scaleSubdominantScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Score based on presence and proximity of P4 (500c) and P5 (700c)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let score = 0;
+  let count = 0;
+  for (const c of cents) {
+    const distTo4th = Math.min(Math.abs(c - 500), Math.abs(c - 500 - 1200), Math.abs(c - 500 + 1200));
+    const distTo5th = Math.min(Math.abs(c - 700), Math.abs(c - 700 - 1200), Math.abs(c - 700 + 1200));
+    const minDist = Math.min(distTo4th, distTo5th);
+    score += Math.max(0, 1 - minDist / 200); // full score within 200c
+    count++;
+  }
+  return Math.min(1, Math.max(0, count > 0 ? score / count : 0));
+}
+
+export function scaleLeadingToneStrengthV3(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  let leadingCount = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    for (let j = 0; j < sorted.length; j++) {
+      if (i === j) continue;
+      const diff = Math.abs(sorted[i]! - sorted[j]!);
+      const wrappedDiff = Math.min(diff, 1200 - diff);
+      if (wrappedDiff > 0 && wrappedDiff <= 100) {
+        leadingCount++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, leadingCount / pitches.length));
+}
+
+export function scaleOctaveEquivalenceScoreV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Group pitches by pitch class (mod 1200, rounded to nearest 50c)
+  const pcGroups = new Map<number, number>();
+  for (const p of pitches) {
+    const rawCents = pitchToCents(p);
+    const octave = Math.floor(rawCents / 1200);
+    const pc = Math.round(((rawCents % 1200) + 1200) % 1200 / 50) * 50;
+    if (!pcGroups.has(pc)) pcGroups.set(pc, 0);
+    pcGroups.set(pc, Math.max(pcGroups.get(pc)!, octave));
+  }
+  // Score = fraction of pitch classes that appear at more than one octave
+  let multiOctaveCount = 0;
+  const allCents = pitches.map((p) => pitchToCents(p));
+  const uniquePCs = [...new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50))];
+  for (const pc of uniquePCs) {
+    const matching = allCents.filter((c) => Math.abs((((c % 1200) + 1200) % 1200) - pc) < 50);
+    const octaves = new Set(matching.map((c) => Math.round(c / 1200)));
+    if (octaves.size > 1) multiOctaveCount++;
+  }
+  if (uniquePCs.length === 0) return 0;
+  return Math.min(1, Math.max(0, multiOctaveCount / uniquePCs.length));
 }

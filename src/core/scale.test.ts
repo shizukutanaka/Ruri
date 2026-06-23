@@ -1631,6 +1631,12 @@ import {
   tuningFamilySocraticRadarCodewordLengthProxy,
   tuningFamilySocraticRadarCryptographicStrengthProxy,
   tuningFamilySocraticRadarHashCollisionProxy,
+  tuningFamilySocraticRadarChaosOrderProxy,
+  tuningFamilySocraticRadarArchetypeProxy,
+  tuningFamilySocraticRadarDualityProxy,
+  tuningFamilySocraticRadarTranscendenceProxy,
+  tuningFamilySocraticRadarEnantiodromiaProxy,
+  tuningFamilySocraticRadarSynchronicityProxy,
   scaleOvertoneAlignment,
   scaleSubharmonicAlignment,
   scaleHarmonicSeriesCompleteness,
@@ -1730,6 +1736,10 @@ import {
   scaleRegisterImbalance,
   scaleTritoneAxisCount,
   scaleRootConsonanceScore,
+  scaleHarmonicCoherenceIndex,
+  scaleSubdominantScore,
+  scaleLeadingToneStrengthV3,
+  scaleOctaveEquivalenceScoreV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -43066,6 +43076,120 @@ describe('Q2440 tuningFamilySocraticRadarHashCollisionProxy', () => {
   });
 });
 
+// Q2442 — tuningFamilySocraticRadarChaosOrderProxy
+describe('Q2442 tuningFamilySocraticRadarChaosOrderProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarChaosOrderProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarChaosOrderProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarChaosOrderProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2444 — tuningFamilySocraticRadarArchetypeProxy
+describe('Q2444 tuningFamilySocraticRadarArchetypeProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarArchetypeProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarArchetypeProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarArchetypeProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2446 — tuningFamilySocraticRadarDualityProxy
+describe('Q2446 tuningFamilySocraticRadarDualityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDualityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarDualityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarDualityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2448 — tuningFamilySocraticRadarTranscendenceProxy
+describe('Q2448 tuningFamilySocraticRadarTranscendenceProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTranscendenceProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarTranscendenceProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarTranscendenceProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2450 — tuningFamilySocraticRadarEnantiodromiaProxy
+describe('Q2450 tuningFamilySocraticRadarEnantiodromiaProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEnantiodromiaProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarEnantiodromiaProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarEnantiodromiaProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2452 — tuningFamilySocraticRadarSynchronicityProxy
+describe('Q2452 tuningFamilySocraticRadarSynchronicityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSynchronicityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarSynchronicityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarSynchronicityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
 // analyzeScale convenience aggregate
 describe('analyzeScale', () => {
   it('returns profile with all expected keys', () => {
@@ -43247,5 +43371,76 @@ describe('R1284 scaleRootConsonanceScore', () => {
     const pitches = [0, 600].map((c) => pitchFromCents(c));
     const v = scaleRootConsonanceScore(pitches);
     expect(v).toBeLessThan(0.6);
+  });
+});
+
+// Round 129 — R1291-R1294: 音階倍音整合性分析
+describe('R1291 scaleHarmonicCoherenceIndex', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHarmonicCoherenceIndex([])).toBe(0);
+  });
+  it('returns high value for harmonic series pitches', () => {
+    const pitches = [0, 204, 386, 498, 702].map((c) => pitchFromCents(c));
+    const v = scaleHarmonicCoherenceIndex(pitches);
+    expect(v).toBeGreaterThan(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map((c) => pitchFromCents(c));
+    const v = scaleHarmonicCoherenceIndex(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1292 scaleSubdominantScore', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleSubdominantScore([])).toBe(0);
+  });
+  it('returns high value for scale with P4 and P5', () => {
+    const pitches = [0, 500, 700].map((c) => pitchFromCents(c));
+    const v = scaleSubdominantScore(pitches);
+    expect(v).toBeGreaterThan(0.5);
+  });
+  it('returns value in [0,1] for major scale', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const v = scaleSubdominantScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1293 scaleLeadingToneStrengthV3', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleLeadingToneStrengthV3([])).toBe(0);
+  });
+  it('returns 0 for single note', () => {
+    expect(scaleLeadingToneStrengthV3([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 1 for scale with all adjacent semitones', () => {
+    const pitches = [0, 100, 200, 300].map((c) => pitchFromCents(c));
+    const v = scaleLeadingToneStrengthV3(pitches);
+    expect(v).toBe(1);
+  });
+  it('returns 0 for widely spaced notes', () => {
+    const pitches = [0, 400, 800].map((c) => pitchFromCents(c));
+    expect(scaleLeadingToneStrengthV3(pitches)).toBe(0);
+  });
+});
+
+describe('R1294 scaleOctaveEquivalenceScoreV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleOctaveEquivalenceScoreV2([])).toBe(0);
+  });
+  it('returns 0 for single note', () => {
+    expect(scaleOctaveEquivalenceScoreV2([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns positive for notes spanning multiple octaves', () => {
+    const pitches = [0, 1200, 2400].map((c) => pitchFromCents(c));
+    const v = scaleOctaveEquivalenceScoreV2(pitches);
+    expect(v).toBeGreaterThan(0);
+  });
+  it('returns 0 for all notes in same octave with no equivalents', () => {
+    const pitches = [0, 200, 400, 700].map((c) => pitchFromCents(c));
+    expect(scaleOctaveEquivalenceScoreV2(pitches)).toBe(0);
   });
 });
