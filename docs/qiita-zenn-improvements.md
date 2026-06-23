@@ -1360,3 +1360,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | MMMM2 | `scaleSpectralSpread` | 重心周りの広がり（スペクトル拡散） |
 | MMMM3 | `scaleSpectralFlux` | 連続ピッチ変化量（スペクトルフラックス） |
 | MMMM4 | `scaleSpectralRolloff` | 下半分累積音高比率（ロールオフ） |
+
+## Round 108: 音階クラスター分析 (NNNN1–NNNN4)
+
+音階の近接音群（クラスター）特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| NNNN1 | `scaleClusterCount` | クラスター数（正規化） |
+| NNNN2 | `scaleClusterDensity` | 平均クラスターサイズ（正規化） |
+| NNNN3 | `scaleIsolatedNoteRatio` | 孤立音（クラスター外）の比率 |
+| NNNN4 | `scaleClusterSpread` | クラスター重心の空間的広がり |
