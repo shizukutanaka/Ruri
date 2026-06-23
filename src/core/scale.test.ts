@@ -1909,6 +1909,10 @@ import {
   scaleIntervalClustering,
   scalePitchClassDiversity,
   scaleAxisSymmetry,
+  scaleHarmonicDistance,
+  scaleEnharmonicEquivalence,
+  scaleDiatonicAlignment,
+  scaleMinorSecondDensity,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -1963,6 +1967,12 @@ import {
   tuningFamilySocraticRadarAirPressureGradientProxy,
   tuningFamilySocraticRadarWindShearProxy,
   tuningFamilySocraticRadarTurbulentVortexProxy,
+  tuningFamilySocraticRadarOceanDepthProxy,
+  tuningFamilySocraticRadarSalinityProxy,
+  tuningFamilySocraticRadarTidalForceProxy,
+  tuningFamilySocraticRadarCurrentVelocityProxy,
+  tuningFamilySocraticRadarWavePeriodProxy,
+  tuningFamilySocraticRadarSeaTemperatureProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -47616,5 +47626,164 @@ describe('R1524 scaleAxisSymmetry', () => {
     const v = scaleAxisSymmetry(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Q2718 tuningFamilySocraticRadarOceanDepthProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarOceanDepthProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarOceanDepthProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarOceanDepthProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2720 tuningFamilySocraticRadarSalinityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSalinityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSalinityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSalinityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2722 tuningFamilySocraticRadarTidalForceProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTidalForceProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarTidalForceProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarTidalForceProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2724 tuningFamilySocraticRadarCurrentVelocityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCurrentVelocityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCurrentVelocityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCurrentVelocityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2726 tuningFamilySocraticRadarWavePeriodProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWavePeriodProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarWavePeriodProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarWavePeriodProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2728 tuningFamilySocraticRadarSeaTemperatureProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSeaTemperatureProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSeaTemperatureProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSeaTemperatureProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// R1531
+describe('R1531 scaleHarmonicDistance', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleHarmonicDistance([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns value in [0,1] for just intervals', () => {
+    const pitches = [0, 204, 386, 498, 702, 884, 1088].map(c => pitchFromCents(c));
+    const v = scaleHarmonicDistance(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map(c => pitchFromCents(c));
+    const v = scaleHarmonicDistance(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1532
+describe('R1532 scaleEnharmonicEquivalence', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleEnharmonicEquivalence([])).toBe(0);
+  });
+  it('returns 1 for 12-TET pitches on grid', () => {
+    const pitches = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100].map(c => pitchFromCents(c));
+    expect(scaleEnharmonicEquivalence(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for arbitrary pitches', () => {
+    const pitches = [0, 150, 350, 550, 750].map(c => pitchFromCents(c));
+    const v = scaleEnharmonicEquivalence(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1533
+describe('R1533 scaleDiatonicAlignment', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleDiatonicAlignment([])).toBe(0);
+  });
+  it('returns 1 for diatonic scale pitches', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map(c => pitchFromCents(c));
+    expect(scaleDiatonicAlignment(pitches)).toBe(1);
+  });
+  it('returns lower value for non-diatonic pitches', () => {
+    const pitches = [50, 150, 350, 450, 650].map(c => pitchFromCents(c));
+    const v = scaleDiatonicAlignment(pitches);
+    expect(v).toBeLessThan(0.5);
+  });
+});
+
+// R1534
+describe('R1534 scaleMinorSecondDensity', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleMinorSecondDensity([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100].map(c => pitchFromCents(c));
+    const v = scaleMinorSecondDensity(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for widely-spaced pitches', () => {
+    const pitches = [0, 400, 800].map(c => pitchFromCents(c));
+    expect(scaleMinorSecondDensity(pitches)).toBe(0);
   });
 });

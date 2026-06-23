@@ -49800,6 +49800,126 @@ export function tuningFamilySocraticRadarTurbulentVortexProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2718 — tuningFamilySocraticRadarOceanDepthProxy
+export function tuningFamilySocraticRadarOceanDepthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const [d = 0, ve = 0, m = 0, b = 0, c = 0] = axisAggregates;
+  const result = 0.15 * d + 0.25 * ve + 0.2 * m + 0.2 * b + 0.2 * c;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2720 — tuningFamilySocraticRadarSalinityProxy
+export function tuningFamilySocraticRadarSalinityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const [d = 0, ve = 0, m = 0, b = 0, c = 0] = axisAggregates;
+  const result = 0.2 * d + 0.2 * ve + 0.25 * m + 0.15 * b + 0.2 * c;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2722 — tuningFamilySocraticRadarTidalForceProxy
+export function tuningFamilySocraticRadarTidalForceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const [d = 0, ve = 0, m = 0, b = 0, c = 0] = axisAggregates;
+  const result = 0.25 * d + 0.15 * ve + 0.2 * m + 0.2 * b + 0.2 * c;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2724 — tuningFamilySocraticRadarCurrentVelocityProxy
+export function tuningFamilySocraticRadarCurrentVelocityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const [d = 0, ve = 0, m = 0, b = 0, c = 0] = axisAggregates;
+  const result = 0.2 * d + 0.15 * ve + 0.15 * m + 0.25 * b + 0.25 * c;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2726 — tuningFamilySocraticRadarWavePeriodProxy
+export function tuningFamilySocraticRadarWavePeriodProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const [d = 0, ve = 0, m = 0, b = 0, c = 0] = axisAggregates;
+  const result = 0.2 * d + 0.2 * ve + 0.2 * m + 0.2 * b + 0.2 * c;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2728 — tuningFamilySocraticRadarSeaTemperatureProxy
+export function tuningFamilySocraticRadarSeaTemperatureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const [d = 0, ve = 0, m = 0, b = 0, c = 0] = axisAggregates;
+  const result = 0.2 * d + 0.2 * ve + 0.15 * m + 0.25 * b + 0.2 * c;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -58132,4 +58252,63 @@ export function scaleAxisSymmetry(pitches: readonly Pitch[]): number {
     maxSymmetry = Math.max(maxSymmetry, symmetric / cents.length);
   }
   return Math.min(1, Math.max(0, maxSymmetry));
+}
+
+export function scaleHarmonicDistance(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  // harmonic distance: sum of |log2(ratio)| for adjacent pairs, normalized
+  let totalDist = 0;
+  for (let i = 1; i < cents.length; i++) {
+    const intervalCents = Math.abs(cents[i]! - cents[i - 1]!);
+    // approximate harmonic distance via interval deviation from just intervals
+    const justIntervals = [0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 1018, 1088, 1200];
+    const nearest = justIntervals.reduce((best, ji) =>
+      Math.abs(intervalCents - ji) < Math.abs(intervalCents - best) ? ji : best, justIntervals[0]!);
+    totalDist += Math.abs(intervalCents - nearest) / 50;
+  }
+  return Math.min(1, Math.max(0, 1 - totalDist / (cents.length - 1)));
+}
+
+export function scaleEnharmonicEquivalence(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // fraction of pitches that are within 10 cents of 12-TET equal-tempered pitch classes
+  const tetGrid = Array.from({ length: 13 }, (_, i) => i * 100);
+  let matches = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const nearest = tetGrid.reduce((best, g) =>
+      Math.abs(c - g) < Math.abs(c - best) ? g : best, tetGrid[0]!);
+    if (Math.abs(c - nearest) <= 10) matches++;
+  }
+  return Math.min(1, Math.max(0, matches / pitches.length));
+}
+
+export function scaleDiatonicAlignment(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // diatonic major scale pitch classes in cents: 0, 200, 400, 500, 700, 900, 1100
+  const diatonic = [0, 200, 400, 500, 700, 900, 1100];
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const nearest = diatonic.reduce((best, d) =>
+      Math.abs(c - d) < Math.abs(c - best) ? d : best, diatonic[0]!);
+    if (Math.abs(c - nearest) <= 25) aligned++;
+  }
+  return Math.min(1, Math.max(0, aligned / pitches.length));
+}
+
+export function scaleMinorSecondDensity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let minorSeconds = 0;
+  const n = cents.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(cents[j]! - cents[i]!);
+      if (diff >= 50 && diff <= 150) minorSeconds++;
+    }
+  }
+  const pairs = (n * (n - 1)) / 2;
+  return Math.min(1, Math.max(0, minorSeconds / Math.max(1, pairs)));
 }
