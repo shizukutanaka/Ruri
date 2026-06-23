@@ -1006,6 +1006,12 @@ import {
   presetFamilySocraticRadarStellarLifecycleProxy,
   presetFamilySocraticRadarBlackHoleProxy,
   presetFamilySocraticRadarQuantumVacuumProxy,
+  presetFamilySocraticRadarPolymerChainProxy,
+  presetFamilySocraticRadarCatalysisProxy,
+  presetFamilySocraticRadarReactionEquilibriumProxy,
+  presetFamilySocraticRadarActivationEnergyProxy,
+  presetFamilySocraticRadarPhaseSeparationProxy,
+  presetFamilySocraticRadarMolecularComplexityProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -23549,5 +23555,125 @@ describe('Q2417 presetFamilySocraticRadarQuantumVacuumProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarQuantumVacuumProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2419 — presetFamilySocraticRadarPolymerChainProxy
+describe('Q2419 presetFamilySocraticRadarPolymerChainProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarPolymerChainProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarPolymerChainProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPolymerChainProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2421 — presetFamilySocraticRadarCatalysisProxy
+describe('Q2421 presetFamilySocraticRadarCatalysisProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCatalysisProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCatalysisProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCatalysisProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2423 — presetFamilySocraticRadarReactionEquilibriumProxy
+describe('Q2423 presetFamilySocraticRadarReactionEquilibriumProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarReactionEquilibriumProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarReactionEquilibriumProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarReactionEquilibriumProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2425 — presetFamilySocraticRadarActivationEnergyProxy
+describe('Q2425 presetFamilySocraticRadarActivationEnergyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarActivationEnergyProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarActivationEnergyProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarActivationEnergyProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2427 — presetFamilySocraticRadarPhaseSeparationProxy
+describe('Q2427 presetFamilySocraticRadarPhaseSeparationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarPhaseSeparationProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarPhaseSeparationProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPhaseSeparationProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2429 — presetFamilySocraticRadarMolecularComplexityProxy
+describe('Q2429 presetFamilySocraticRadarMolecularComplexityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarMolecularComplexityProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarMolecularComplexityProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMolecularComplexityProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });

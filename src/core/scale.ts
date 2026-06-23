@@ -46613,6 +46613,142 @@ export function tuningFamilySocraticRadarQuantumVacuumProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2418 — tuningFamilySocraticRadarPolymerChainProxy
+export function tuningFamilySocraticRadarPolymerChainProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // polymer chain: product of sequential links (multiplicative chaining)
+  const product = axisAggregates.reduce((acc, a) => acc * a, 1);
+  const result = Math.pow(product, 1 / 5); // geometric mean
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2420 — tuningFamilySocraticRadarCatalysisProxy
+export function tuningFamilySocraticRadarCatalysisProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // catalysis: acceleration analog — high peak + low floor = catalytic potential
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  const result = maxVal * (1 - minVal);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2422 — tuningFamilySocraticRadarReactionEquilibriumProxy
+export function tuningFamilySocraticRadarReactionEquilibriumProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // equilibrium: closest to 0.5 = equilibrium
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const result = 1 - Math.abs(mean - 0.5) * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2424 — tuningFamilySocraticRadarActivationEnergyProxy
+export function tuningFamilySocraticRadarActivationEnergyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // activation energy barrier: low range = low barrier = easy reaction
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  const result = 1 - (maxVal - minVal);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2426 — tuningFamilySocraticRadarPhaseSeparationProxy
+export function tuningFamilySocraticRadarPhaseSeparationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // phase separation: high variance = phase separation
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = std * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2428 — tuningFamilySocraticRadarMolecularComplexityProxy
+export function tuningFamilySocraticRadarMolecularComplexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // molecular complexity: Shannon entropy of normalized axisAggregates / log2(5)
+  const sum = axisAggregates.reduce((a, b) => a + b, 0);
+  if (sum === 0) return 0;
+  const normalized = axisAggregates.map((a) => a / sum);
+  const entropy = normalized.reduce((acc, p) => {
+    if (p <= 0) return acc;
+    return acc - p * Math.log2(p);
+  }, 0);
+  const result = entropy / Math.log2(5);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -53261,4 +53397,85 @@ export function analyzeScale(pitches: readonly Pitch[]): ScaleAnalysisProfile {
     axisSymmetryScore: scaleAxisSymmetryScore(pitches),
     hemitoniaRatio: scaleHemitoniaRatio(pitches),
   };
+}
+
+// Round 127 — R1271-R1274: 音階周期性・反復構造分析
+
+export function scaleIntervalPatternEntropy(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  // Compute step intervals, quantized to nearest 50 cents
+  const steps: number[] = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    steps.push(Math.round((sorted[i + 1]! - sorted[i]!) / 50));
+  }
+  // Shannon entropy of step distribution
+  const counts = new Map<number, number>();
+  for (const s of steps) {
+    counts.set(s, (counts.get(s) ?? 0) + 1);
+  }
+  const total = steps.length;
+  let H = 0;
+  for (const count of counts.values()) {
+    const p = count / total;
+    H -= p * Math.log2(p);
+  }
+  // Normalize by log2(unique steps) or log2(n), max entropy
+  const maxH = Math.log2(Math.max(counts.size, 2));
+  return Math.min(1, Math.max(0, maxH > 0 ? H / maxH : 0));
+}
+
+export function scaleGapUniformityV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const gaps: number[] = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    gaps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  if (mean === 0) return 1;
+  const variance = gaps.reduce((acc, g) => acc + (g - mean) ** 2, 0) / gaps.length;
+  const cv = Math.sqrt(variance) / mean;
+  return Math.min(1, Math.max(0, 1 - cv));
+}
+
+export function scaleMaximalEvennessV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  if (pitches.length === 1) return 1;
+  const n = pitches.length;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  // Expected maximally even positions: k * 1200 / n for k=0..n-1
+  let totalDeviation = 0;
+  for (let k = 0; k < n; k++) {
+    const expected = (k * 1200) / n;
+    totalDeviation += Math.abs(sorted[k]! - expected);
+  }
+  const maxDeviation = (1200 / n) * n; // worst case: all at same point
+  return Math.min(1, Math.max(0, 1 - totalDeviation / maxDeviation));
+}
+
+export function scalePeriodicity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200)))]
+    .sort((a, b) => a - b);
+  const n = sorted.length;
+  // Check if scale has a period smaller than the octave (e.g., divides at 600c for tritone period)
+  const divisors = [2, 3, 4, 6];
+  for (const d of divisors) {
+    const period = 1200 / d;
+    let allMatch = true;
+    for (const c of sorted) {
+      const inFirstPeriod = c % period;
+      const matchFound = sorted.some((c2) => Math.abs((c2 % period) - inFirstPeriod) < 25);
+      if (!matchFound) { allMatch = false; break; }
+    }
+    if (allMatch && n > 0) {
+      // Check that the period actually repeats (not just trivially fits)
+      const firstPeriodNotes = sorted.filter((c) => c < period);
+      if (firstPeriodNotes.length > 0 && firstPeriodNotes.length < n) {
+        return Math.min(1, Math.max(0, 1 - 1 / d));
+      }
+    }
+  }
+  return 0;
 }
