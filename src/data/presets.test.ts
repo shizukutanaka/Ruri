@@ -25132,6 +25132,7 @@ describe('Q2567 presetFamilySocraticRadarMarginalUtilityProxy', () => {
 
 // Q2569 — presetFamilySocraticRadarMarketLiquidityProxy
 describe('Q2569 presetFamilySocraticRadarMarketLiquidityProxy', () => {
+  const s = harmonicSpectrum(6);
   it('returns finite for single preset', () => {
     const v = presetFamilySocraticRadarMarketLiquidityProxy(['12-tet'], s);
     expect(Number.isFinite(v)).toBe(true);
@@ -25151,6 +25152,7 @@ describe('Q2569 presetFamilySocraticRadarMarketLiquidityProxy', () => {
 
 // Q2571 — presetFamilySocraticRadarGameTheoreticRationalityProxy
 describe('Q2571 presetFamilySocraticRadarGameTheoreticRationalityProxy', () => {
+  const s = harmonicSpectrum(6);
   it('returns finite for single preset', () => {
     const v = presetFamilySocraticRadarGameTheoreticRationalityProxy(['12-tet'], s);
     expect(Number.isFinite(v)).toBe(true);
@@ -25170,6 +25172,7 @@ describe('Q2571 presetFamilySocraticRadarGameTheoreticRationalityProxy', () => {
 
 // Q2573 — presetFamilySocraticRadarRiskPremiumProxy
 describe('Q2573 presetFamilySocraticRadarRiskPremiumProxy', () => {
+  const s = harmonicSpectrum(6);
   it('returns finite for single preset', () => {
     const v = presetFamilySocraticRadarRiskPremiumProxy(['12-tet'], s);
     expect(Number.isFinite(v)).toBe(true);
