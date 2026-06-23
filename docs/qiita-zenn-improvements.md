@@ -1453,3 +1453,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | VVVV2 | `scaleLargeSmallStepRatio` | 最大・最小音程比: 最大音程÷最小音程の比(正規化)、音程の多様性指標 |
 | VVVV3 | `scaleStepUniformity` | 音程均一性: 変動係数の逆数、等間隔スケールで1に近づく |
 | VVVV4 | `scaleMaxStepFraction` | 最大音程占有率: 最大音程が総音域に占める割合 |
+
+## Round 117 — WWWW1–WWWW4: 音階密度分布分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| WWWW1 | `scaleRegisterBalanceV2` | 音域バランス: 音域の上半部/下半部に対する音符分布の偏り |
+| WWWW2 | `scalePitchClusteringV2` | ピッチクラスタリング: 大きなギャップで区切られたクラスタの比率 |
+| WWWW3 | `scaleRangeCoverageV2` | 音域カバレッジ: 隣接音程の200セント制限和÷総音域 |
+| WWWW4 | `scaleOctaveCompletenessV2` | オクターブ完全性: 50セント刻みグリッドでオクターブを占有するビン数÷24 |
