@@ -1338,3 +1338,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | KKKK2 | `scaleMicrotonalIntervalCount` | 微分音ステップ（80セント未満）の比率 |
 | KKKK3 | `scaleXenharmonicNovelty` | 12-EDO音程クラス外の音符比率 |
 | KKKK4 | `scaleEDOApproximationScore` | 標準EDO（5/7/10/12/17/19/22/31）との最大整合度 |
+
+## Round 106: 音階転調分析 (LLLL1–LLLL4)
+
+音階の転調容易性・移調共有音を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| LLLL1 | `scaleCommonToneCount` | 移調後の最大共有音比率 |
+| LLLL2 | `scalePivotChordPotential` | 3音以上共有できる移調の割合 |
+| LLLL3 | `scaleCircleOfFifthsPosition` | 五度圏上の標準調との整合度 |
+| LLLL4 | `scaleModulationDistanceV2` | 転調距離（最近傍移調との差分） |
