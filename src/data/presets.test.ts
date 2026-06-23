@@ -1102,6 +1102,12 @@ import {
   presetFamilySocraticRadarChromaAberrationProxy,
   presetFamilySocraticRadarDepthOfFieldIndex,
   presetFamilySocraticRadarWaveFrontCoherence,
+  presetFamilySocraticRadarAntibodyTiterProxy,
+  presetFamilySocraticRadarPathogenLoadProxy,
+  presetFamilySocraticRadarInflammationIndex,
+  presetFamilySocraticRadarImmuneToleranceScore,
+  presetFamilySocraticRadarVaccineEfficacyProxy,
+  presetFamilySocraticRadarAutoimmuneRiskProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -25499,5 +25505,89 @@ describe('Q2609 presetFamilySocraticRadarWaveFrontCoherence', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarWaveFrontCoherence(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2611 presetFamilySocraticRadarAntibodyTiterProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarAntibodyTiterProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarAntibodyTiterProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAntibodyTiterProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2613 presetFamilySocraticRadarPathogenLoadProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarPathogenLoadProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarPathogenLoadProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPathogenLoadProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2615 presetFamilySocraticRadarInflammationIndex', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarInflammationIndex(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarInflammationIndex(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarInflammationIndex(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2617 presetFamilySocraticRadarImmuneToleranceScore', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarImmuneToleranceScore(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarImmuneToleranceScore(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarImmuneToleranceScore(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2619 presetFamilySocraticRadarVaccineEfficacyProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarVaccineEfficacyProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarVaccineEfficacyProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarVaccineEfficacyProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2621 presetFamilySocraticRadarAutoimmuneRiskProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarAutoimmuneRiskProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarAutoimmuneRiskProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAutoimmuneRiskProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });

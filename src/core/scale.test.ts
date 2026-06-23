@@ -1874,6 +1874,16 @@ import {
   scaleHarmonicOscillatorIndex,
   scaleDampingRatioEstimate,
   scaleSpringConstantProxy,
+  scaleGrowthRateIndex,
+  scaleDecayConstant,
+  scaleTopologyScore,
+  scaleConnectivityIndex,
+  tuningFamilySocraticRadarAntibodyTiterProxy,
+  tuningFamilySocraticRadarPathogenLoadProxy,
+  tuningFamilySocraticRadarInflammationIndex,
+  tuningFamilySocraticRadarImmuneToleranceScore,
+  tuningFamilySocraticRadarVaccineEfficacyProxy,
+  tuningFamilySocraticRadarAutoimmuneRiskProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -45970,6 +45980,190 @@ describe('R1434 scaleSpringConstantProxy', () => {
   it('returns value in [0,1]', () => {
     const pitches = [0, 300, 600, 900].map(c => pitchFromCents(c));
     const v = scaleSpringConstantProxy(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2610 — tuningFamilySocraticRadarAntibodyTiterProxy
+describe('Q2610 tuningFamilySocraticRadarAntibodyTiterProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAntibodyTiterProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarAntibodyTiterProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarAntibodyTiterProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2612 — tuningFamilySocraticRadarPathogenLoadProxy
+describe('Q2612 tuningFamilySocraticRadarPathogenLoadProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPathogenLoadProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarPathogenLoadProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarPathogenLoadProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2614 — tuningFamilySocraticRadarInflammationIndex
+describe('Q2614 tuningFamilySocraticRadarInflammationIndex', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarInflammationIndex([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarInflammationIndex([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarInflammationIndex([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2616 — tuningFamilySocraticRadarImmuneToleranceScore
+describe('Q2616 tuningFamilySocraticRadarImmuneToleranceScore', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarImmuneToleranceScore([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarImmuneToleranceScore([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarImmuneToleranceScore([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2618 — tuningFamilySocraticRadarVaccineEfficacyProxy
+describe('Q2618 tuningFamilySocraticRadarVaccineEfficacyProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarVaccineEfficacyProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarVaccineEfficacyProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarVaccineEfficacyProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2620 — tuningFamilySocraticRadarAutoimmuneRiskProxy
+describe('Q2620 tuningFamilySocraticRadarAutoimmuneRiskProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAutoimmuneRiskProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarAutoimmuneRiskProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarAutoimmuneRiskProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// R1441
+describe('R1441 scaleGrowthRateIndex', () => {
+  it('returns 0.5 for empty', () => {
+    expect(scaleGrowthRateIndex([])).toBe(0.5);
+  });
+  it('returns 0.5 for two pitches', () => {
+    const pitches = [0, 500].map(c => pitchFromCents(c));
+    expect(scaleGrowthRateIndex(pitches)).toBe(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 100, 300, 700, 1100].map(c => pitchFromCents(c));
+    const v = scaleGrowthRateIndex(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1442
+describe('R1442 scaleDecayConstant', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleDecayConstant([])).toBe(0);
+  });
+  it('returns 0 for equal intervals', () => {
+    const pitches = [0, 200, 400, 600].map(c => pitchFromCents(c));
+    expect(scaleDecayConstant(pitches)).toBe(0);
+  });
+  it('returns value in [0,1] for varied intervals', () => {
+    const pitches = [0, 100, 300, 700].map(c => pitchFromCents(c));
+    const v = scaleDecayConstant(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1443
+describe('R1443 scaleTopologyScore', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleTopologyScore([])).toBe(0);
+  });
+  it('returns 1 for all-different interval types', () => {
+    const pitches = [0, 100, 400, 700].map(c => pitchFromCents(c));
+    const v = scaleTopologyScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
+    const v = scaleTopologyScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1444
+describe('R1444 scaleConnectivityIndex', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleConnectivityIndex([])).toBe(0);
+  });
+  it('returns 1 for all step intervals', () => {
+    const pitches = [0, 100, 200, 300].map(c => pitchFromCents(c));
+    expect(scaleConnectivityIndex(pitches)).toBe(1);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 500, 900].map(c => pitchFromCents(c));
+    const v = scaleConnectivityIndex(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

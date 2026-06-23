@@ -1702,3 +1702,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1434 | `scaleSpringConstantProxy` | 隣接音程の平均を600cで正規化したバネ定数プロキシ |
 
 **設計根拠**: 物理振動系の視点でスケール構造を解釈する。共鳴整合→高いResonance、調和振動子近似→高いHarmonicOscillator、音程ばらつき→高いDamping、音程密度→高いSpringConstant。
+
+## Round 144 — R1441–R1444 音階成長・減衰パターン分析
+
+| ID | 関数名 | 概要 |
+|----|--------|------|
+| R1441 | `scaleGrowthRateIndex` | 最初と最後の音程差の方向を[0,1]正規化した成長率指標 |
+| R1442 | `scaleDecayConstant` | ソート済み音程の指数的減衰定数（大から小への変化速度） |
+| R1443 | `scaleTopologyScore` | 150cent刻み音程タイプの多様性÷音程数（位相空間の多様度） |
+| R1444 | `scaleConnectivityIndex` | 300c以内の隣接音程（ラップ含む）の割合（連結性指標） |
+
+**設計根拠**: 成長・減衰の視点でスケールのダイナミクスを解析する。音程が大きくなるほど高いGrowth、急激な変化ほど高いDecay、位相多様性が高いほど高いTopology、短音程が多いほど高いConnectivity。

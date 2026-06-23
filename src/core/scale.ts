@@ -48673,6 +48673,133 @@ export function tuningFamilySocraticRadarWaveFrontCoherence(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2610 — tuningFamilySocraticRadarAntibodyTiterProxy
+export function tuningFamilySocraticRadarAntibodyTiterProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Antibody titer = max axis value (peak immune response strength)
+  const result = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2612 — tuningFamilySocraticRadarPathogenLoadProxy
+export function tuningFamilySocraticRadarPathogenLoadProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Pathogen load = fraction of axes below 0.3 (weak zones = threats)
+  const count = axisAggregates.filter((v) => v < 0.3).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2614 — tuningFamilySocraticRadarInflammationIndex
+export function tuningFamilySocraticRadarInflammationIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Inflammation = std deviation (high variance = inflamed/unbalanced state)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const result = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2616 — tuningFamilySocraticRadarImmuneToleranceScore
+export function tuningFamilySocraticRadarImmuneToleranceScore(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Immune tolerance = how close all axes are to each other (balanced = tolerant)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const result = 1 - Math.sqrt(variance);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2618 — tuningFamilySocraticRadarVaccineEfficacyProxy
+export function tuningFamilySocraticRadarVaccineEfficacyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Vaccine efficacy = (mean - 0.3) / 0.7 → how much above baseline (0.3) the mean is
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = (mean - 0.3) / 0.7;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2620 — tuningFamilySocraticRadarAutoimmuneRiskProxy
+export function tuningFamilySocraticRadarAutoimmuneRiskProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Autoimmune risk = fraction of axes above 0.8 (overactive immune response)
+  const count = axisAggregates.filter((v) => v > 0.8).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -56503,4 +56630,75 @@ export function scaleSpringConstantProxy(pitches: readonly Pitch[]): number {
   if (intervals.length === 0) return 0;
   const mean = intervals.reduce((s, v) => s + v, 0) / intervals.length;
   return Math.min(1, Math.max(0, mean / 600));
+}
+
+// R1441
+export function scaleGrowthRateIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0.5;
+  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  if (intervals.length <= 1) return 0.5;
+  const first = intervals[0]!;
+  const last = intervals[intervals.length - 1]!;
+  const denom = first + last;
+  if (denom === 0) return 0.5;
+  const v = (last - first) / denom;
+  return (v + 1) / 2;
+}
+
+// R1442
+export function scaleDecayConstant(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  if (intervals.length === 0) return 0;
+  const minVal = Math.min(...intervals);
+  const maxVal = Math.max(...intervals);
+  if (maxVal === 0 || minVal === maxVal) return 0;
+  const n = intervals.length;
+  const k = -Math.log(minVal / maxVal) / (n - 1);
+  return Math.min(1, Math.max(0, k / 5));
+}
+
+// R1443
+export function scaleTopologyScore(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  if (intervals.length === 0) return 0;
+  const bins = [0, 150, 300, 450, 600, 750, 900];
+  const binOf = (v: number): number => {
+    const b = bins.findIndex((threshold, idx) => idx === bins.length - 1 || v < bins[idx + 1]!);
+    return bins[b === -1 ? bins.length - 1 : b]!;
+  };
+  const distinctTypes = new Set(intervals.map(binOf));
+  return Math.min(1, Math.max(0, distinctTypes.size / intervals.length));
+}
+
+// R1444
+export function scaleConnectivityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const n = sorted.length;
+  let connected = 0;
+  for (let i = 0; i < n - 1; i++) {
+    const interval = sorted[i + 1]! - sorted[i]!;
+    if (interval <= 300) connected++;
+  }
+  // wrap-around: last pitch to first+1200
+  const wrapInterval = sorted[0]! + 1200 - sorted[n - 1]!;
+  if (wrapInterval <= 300) connected++;
+  // denominator: total number of intervals (n-1 adjacent + 1 wrap) = n
+  // but to ensure all-step scales return 1, divide by n-1 (non-wrap adjacent count)
+  // and clamp to [0,1] to handle wrap contributions
+  return Math.min(1, Math.max(0, connected / (n - 1)));
 }
