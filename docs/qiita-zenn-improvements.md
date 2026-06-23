@@ -1480,3 +1480,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | YYYY2 | `scaleUniformityIndex` | 均一性指数: 4区間チゥ二乗検定による一様分布適合度 |
 | YYYY3 | `scaleBimodalityIndex` | 双峰性指数: 歪度と尖度から双峰分布係数を推定 |
 | YYYY4 | `scaleDistributionSkewIndex` | 分布歪度指数: 歪度を[0,1]にマッピング(0.5=対称) |
+
+## Round 120 — ZZZZ1–ZZZZ4: 音階倍音列関係分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| ZZZZ1 | `scaleHarmonicSeriesAlignmentV2` | 倍音列整列度: 音階ピッチと倍音列(±25セント)の一致率 |
+| ZZZZ2 | `scaleSubharmonicAlignmentV2` | 下倍音整列度: 音階ピッチとサブハーモニック列(±25セント)の一致率 |
+| ZZZZ3 | `scaleOvertoneRatioProximity` | 倍音比近接度: 音程ペアが純正比(±15セント)に近い割合 |
+| ZZZZ4 | `scaleJustTuningDeviation` | 純正律偏差: 5リミット純正律から最も近い音程への平均偏差の逆数 |
