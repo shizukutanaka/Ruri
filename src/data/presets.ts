@@ -1083,6 +1083,12 @@ import {
   tuningFamilySocraticRadarSignalNoiseRatioProxy,
   tuningFamilySocraticRadarRoutingEfficiencyProxy,
   tuningFamilySocraticRadarNetworkResilienceProxy,
+  tuningFamilySocraticRadarHydraulicPressureProxy,
+  tuningFamilySocraticRadarFluidViscosityProxy,
+  tuningFamilySocraticRadarTurbulenceIntensity,
+  tuningFamilySocraticRadarVortexStrengthProxy,
+  tuningFamilySocraticRadarCavitationRiskProxy,
+  tuningFamilySocraticRadarBernoulliEffect,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -21667,4 +21673,94 @@ export function presetFamilySocraticRadarNetworkResilienceProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarNetworkResilienceProxy(tunings, spectrum, rootHz);
+}
+
+// Q2587 — presetFamilySocraticRadarHydraulicPressureProxy
+export function presetFamilySocraticRadarHydraulicPressureProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarHydraulicPressureProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarHydraulicPressureProxy(tunings, spectrum, rootHz);
+}
+
+// Q2589 — presetFamilySocraticRadarFluidViscosityProxy
+export function presetFamilySocraticRadarFluidViscosityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarFluidViscosityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarFluidViscosityProxy(tunings, spectrum, rootHz);
+}
+
+// Q2591 — presetFamilySocraticRadarTurbulenceIntensity
+export function presetFamilySocraticRadarTurbulenceIntensity(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTurbulenceIntensity> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTurbulenceIntensity(tunings, spectrum, rootHz);
+}
+
+// Q2593 — presetFamilySocraticRadarVortexStrengthProxy
+export function presetFamilySocraticRadarVortexStrengthProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarVortexStrengthProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarVortexStrengthProxy(tunings, spectrum, rootHz);
+}
+
+// Q2595 — presetFamilySocraticRadarCavitationRiskProxy
+export function presetFamilySocraticRadarCavitationRiskProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCavitationRiskProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCavitationRiskProxy(tunings, spectrum, rootHz);
+}
+
+// Q2597 — presetFamilySocraticRadarBernoulliEffect
+export function presetFamilySocraticRadarBernoulliEffect(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarBernoulliEffect> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarBernoulliEffect(tunings, spectrum, rootHz);
 }
