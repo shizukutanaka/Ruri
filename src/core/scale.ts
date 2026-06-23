@@ -48532,6 +48532,147 @@ export function tuningFamilySocraticRadarBernoulliEffect(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2598 — tuningFamilySocraticRadarDiffractionIndex
+export function tuningFamilySocraticRadarDiffractionIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Diffraction = peak-to-mean ratio (how much the dominant axis stands out)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const result = mean > 0 ? Math.min(1, (maxVal - mean) / mean) : 0;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2600 — tuningFamilySocraticRadarFocalStrengthProxy
+export function tuningFamilySocraticRadarFocalStrengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Focal strength = 1 - coefficient of variation (low spread = strong focus)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  if (mean === 0) return 0;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const cv = Math.sqrt(variance) / mean;
+  const result = 1 - Math.min(1, cv);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2602 — tuningFamilySocraticRadarApertureProxy
+export function tuningFamilySocraticRadarApertureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Aperture = max - min (how wide the opening is)
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const minVal = axisAggregates.reduce((a, b) => Math.min(a, b), 1);
+  const result = maxVal - minVal;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2604 — tuningFamilySocraticRadarChromaAberrationProxy
+export function tuningFamilySocraticRadarChromaAberrationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Chromatic aberration = variance across axes (color channels misaligned)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const result = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2606 — tuningFamilySocraticRadarDepthOfFieldIndex
+export function tuningFamilySocraticRadarDepthOfFieldIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Depth of field = fraction of axes in the "focused zone" [0.4, 0.6]
+  const count = axisAggregates.filter((v) => v >= 0.4 && v <= 0.6).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2608 — tuningFamilySocraticRadarWaveFrontCoherence
+export function tuningFamilySocraticRadarWaveFrontCoherence(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Wave front coherence = how close all axes are to each other (max mutual correlation)
+  // Use 1 - normalized pairwise distance
+  let totalDist = 0;
+  let count = 0;
+  for (let i = 0; i < axisAggregates.length; i++) {
+    for (let j = i + 1; j < axisAggregates.length; j++) {
+      totalDist += Math.abs((axisAggregates[i] ?? 0) - (axisAggregates[j] ?? 0));
+      count++;
+    }
+  }
+  const avgDist = count > 0 ? totalDist / count : 0;
+  const result = 1 - avgDist;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -56298,4 +56439,68 @@ export function scaleIntervalSpread(pitches: readonly Pitch[]): number {
   const variance = intervals.reduce((s, v) => s + (v - mean) ** 2, 0) / intervals.length;
   const stddev = Math.sqrt(variance);
   return Math.min(1, Math.max(0, stddev / 600));
+}
+
+// R1431
+export function scaleResonanceFrequencyScore(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const resonanceMultiples = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+  let nearCount = 0;
+  let total = 0;
+  for (let i = 1; i < centsArr.length; i++) {
+    const interval = Math.abs(centsArr[i]! - centsArr[i - 1]!);
+    total++;
+    const isNear = resonanceMultiples.some((r) => Math.abs(interval - r) <= 20);
+    if (isNear) nearCount++;
+  }
+  if (total === 0) return 0;
+  return Math.min(1, Math.max(0, nearCount / total));
+}
+
+// R1432
+export function scaleHarmonicOscillatorIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const targets = [2 / 1, 3 / 2, 4 / 3, 5 / 4, 6 / 5, 5 / 3, 8 / 5];
+  let matchCount = 0;
+  let total = 0;
+  for (let i = 1; i < centsArr.length; i++) {
+    const interval = centsArr[i]! - centsArr[i - 1]!;
+    const ratio = Math.pow(2, interval / 1200);
+    total++;
+    const isMatch = targets.some((t) => Math.abs(ratio - t) < 0.04);
+    if (isMatch) matchCount++;
+  }
+  if (total === 0) return 0;
+  return Math.min(1, Math.max(0, matchCount / total));
+}
+
+// R1433
+export function scaleDampingRatioEstimate(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < centsArr.length; i++) {
+    intervals.push(Math.abs(centsArr[i]! - centsArr[i - 1]!));
+  }
+  if (intervals.length === 0) return 0;
+  const sorted = intervals.slice().sort((a, b) => a - b);
+  const minVal = sorted[0]!;
+  const maxVal = sorted[sorted.length - 1]!;
+  if (maxVal === 0) return 0;
+  return Math.min(1, Math.max(0, 1 - minVal / maxVal));
+}
+
+// R1434
+export function scaleSpringConstantProxy(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < centsArr.length; i++) {
+    intervals.push(Math.abs(centsArr[i]! - centsArr[i - 1]!));
+  }
+  if (intervals.length === 0) return 0;
+  const mean = intervals.reduce((s, v) => s + v, 0) / intervals.length;
+  return Math.min(1, Math.max(0, mean / 600));
 }

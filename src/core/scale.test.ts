@@ -1709,6 +1709,12 @@ import {
   tuningFamilySocraticRadarVortexStrengthProxy,
   tuningFamilySocraticRadarCavitationRiskProxy,
   tuningFamilySocraticRadarBernoulliEffect,
+  tuningFamilySocraticRadarDiffractionIndex,
+  tuningFamilySocraticRadarFocalStrengthProxy,
+  tuningFamilySocraticRadarApertureProxy,
+  tuningFamilySocraticRadarChromaAberrationProxy,
+  tuningFamilySocraticRadarDepthOfFieldIndex,
+  tuningFamilySocraticRadarWaveFrontCoherence,
   scaleOvertoneAlignment,
   scaleSubharmonicAlignment,
   scaleHarmonicSeriesCompleteness,
@@ -1864,6 +1870,10 @@ import {
   scaleModalInterchangeScore,
   scaleChromaticTendencyScore,
   scaleIntervalSpread,
+  scaleResonanceFrequencyScore,
+  scaleHarmonicOscillatorIndex,
+  scaleDampingRatioEstimate,
+  scaleSpringConstantProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -45777,6 +45787,189 @@ describe('R1424 scaleIntervalSpread', () => {
   it('returns value in [0,1] for unequal intervals', () => {
     const pitches = [0, 100, 350, 700, 1100].map(c => pitchFromCents(c));
     const v = scaleIntervalSpread(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2598 — tuningFamilySocraticRadarDiffractionIndex
+describe('Q2598 tuningFamilySocraticRadarDiffractionIndex', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDiffractionIndex([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarDiffractionIndex([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarDiffractionIndex([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2600 — tuningFamilySocraticRadarFocalStrengthProxy
+describe('Q2600 tuningFamilySocraticRadarFocalStrengthProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarFocalStrengthProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarFocalStrengthProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarFocalStrengthProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2602 — tuningFamilySocraticRadarApertureProxy
+describe('Q2602 tuningFamilySocraticRadarApertureProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarApertureProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarApertureProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarApertureProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2604 — tuningFamilySocraticRadarChromaAberrationProxy
+describe('Q2604 tuningFamilySocraticRadarChromaAberrationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarChromaAberrationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarChromaAberrationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarChromaAberrationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2606 — tuningFamilySocraticRadarDepthOfFieldIndex
+describe('Q2606 tuningFamilySocraticRadarDepthOfFieldIndex', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDepthOfFieldIndex([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarDepthOfFieldIndex([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarDepthOfFieldIndex([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2608 — tuningFamilySocraticRadarWaveFrontCoherence
+describe('Q2608 tuningFamilySocraticRadarWaveFrontCoherence', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWaveFrontCoherence([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarWaveFrontCoherence([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarWaveFrontCoherence([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// R1431
+describe('R1431 scaleResonanceFrequencyScore', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleResonanceFrequencyScore([])).toBe(0);
+  });
+  it('returns 1 for exactly 100-cent intervals', () => {
+    const pitches = [0, 100, 200, 300, 400, 500].map(c => pitchFromCents(c));
+    expect(scaleResonanceFrequencyScore(pitches)).toBe(1);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 150, 350, 650].map(c => pitchFromCents(c));
+    const v = scaleResonanceFrequencyScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1432
+describe('R1432 scaleHarmonicOscillatorIndex', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleHarmonicOscillatorIndex([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 702, 1200].map(c => pitchFromCents(c));
+    const v = scaleHarmonicOscillatorIndex(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('detects 3/2 ratio (702 cents) as harmonic', () => {
+    const pitches = [0, 702].map(c => pitchFromCents(c));
+    const v = scaleHarmonicOscillatorIndex(pitches);
+    expect(v).toBeGreaterThan(0);
+  });
+});
+
+// R1433
+describe('R1433 scaleDampingRatioEstimate', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleDampingRatioEstimate([])).toBe(0);
+  });
+  it('returns 0 for equal intervals', () => {
+    const pitches = [0, 200, 400, 600].map(c => pitchFromCents(c));
+    expect(scaleDampingRatioEstimate(pitches)).toBe(0);
+  });
+  it('returns value in [0,1] for varied intervals', () => {
+    const pitches = [0, 100, 300, 700].map(c => pitchFromCents(c));
+    const v = scaleDampingRatioEstimate(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1434
+describe('R1434 scaleSpringConstantProxy', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleSpringConstantProxy([])).toBe(0);
+  });
+  it('returns ~0.333 for 200-cent intervals', () => {
+    const pitches = [0, 200, 400, 600].map(c => pitchFromCents(c));
+    expect(scaleSpringConstantProxy(pitches)).toBeCloseTo(200/600, 3);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 300, 600, 900].map(c => pitchFromCents(c));
+    const v = scaleSpringConstantProxy(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
