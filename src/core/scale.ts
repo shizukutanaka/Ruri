@@ -45538,6 +45538,137 @@ export function tuningFamilySocraticRadarPrototypeMatchingProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2322 — tuningFamilySocraticRadarConvexityProxy
+export function tuningFamilySocraticRadarConvexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  let convexCount = 0;
+  for (let i = 1; i <= 3; i++) {
+    if (axisAggregates[i]! <= (axisAggregates[i - 1]! + axisAggregates[i + 1]!) / 2) {
+      convexCount++;
+    }
+  }
+  const result = convexCount / 3;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2324 — tuningFamilySocraticRadarCentroidProxy
+export function tuningFamilySocraticRadarCentroidProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const weightedSum = axisAggregates.reduce((acc, val, i) => acc + i * val, 0);
+  const totalSum = axisAggregates.reduce((a, b) => a + b, 0);
+  const centroid = weightedSum / (totalSum + 1e-9);
+  const result = centroid / 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2326 — tuningFamilySocraticRadarCompactnessProxy
+export function tuningFamilySocraticRadarCompactnessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const spread = Math.max(...axisAggregates) - Math.min(...axisAggregates);
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const result = 1 - spread / (mean + 1e-9);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2328 — tuningFamilySocraticRadarAspectRatioProxy
+export function tuningFamilySocraticRadarAspectRatioProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const sorted = [...axisAggregates].sort((a, b) => a - b);
+  const bot2 = (sorted[0]! + sorted[1]!) / 2;
+  const top2 = (sorted[3]! + sorted[4]!) / 2;
+  const result = bot2 / (top2 + 1e-9);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2330 — tuningFamilySocraticRadarCircularityProxy
+export function tuningFamilySocraticRadarCircularityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, val) => acc + (val - mean) ** 2, 0) / 5;
+  const result = 1 / (1 + variance * 10);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2332 — tuningFamilySocraticRadarSymmetryEnergyProxy
+export function tuningFamilySocraticRadarSymmetryEnergyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const energy = (Math.abs(axisAggregates[0]! - axisAggregates[4]!) + Math.abs(axisAggregates[1]! - axisAggregates[3]!)) / 2;
+  const result = 1 - energy;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -51661,4 +51792,63 @@ export function scaleWholeToneContent(pitches: readonly Pitch[]): number {
     if (interval >= 150 && interval <= 250) wholeTones++;
   }
   return wholeTones / (cents.length - 1);
+}
+
+export function scaleNormalityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 4) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const n = cents.length;
+  const mean = cents.reduce((a, b) => a + b, 0) / n;
+  const std = Math.sqrt(cents.reduce((acc, c) => acc + (c - mean) ** 2, 0) / n);
+  if (std === 0) return 0;
+  const q1 = cents[Math.floor(n * 0.25)]!;
+  const q3 = cents[Math.floor(n * 0.75)]!;
+  const iqr = q3 - q1;
+  // Normal distribution: IQR/std ≈ 1.35; normalize difference from this ratio
+  const ratio = iqr / std;
+  const normalRatio = 1.35;
+  return Math.min(1, Math.max(0, 1 - Math.abs(ratio - normalRatio) / normalRatio));
+}
+
+export function scaleUniformityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const lo = cents[0]!;
+  const range = cents[cents.length - 1]! - lo;
+  if (range === 0) return 0;
+  const bins = [0, 0, 0, 0];
+  for (const c of cents) {
+    const bin = Math.min(3, Math.floor(((c - lo) / range) * 4));
+    bins[bin]!++;
+  }
+  const expected = cents.length / 4;
+  const chiSq = bins.reduce((acc, b) => acc + (b - expected) ** 2 / expected, 0);
+  // chi-square for 3 df: critical at 7.81 (p=0.05); normalize
+  return Math.min(1, Math.max(0, 1 - chiSq / 12));
+}
+
+export function scaleBimodalityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 4) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const n = cents.length;
+  const mean = cents.reduce((a, b) => a + b, 0) / n;
+  const std = Math.sqrt(cents.reduce((acc, c) => acc + (c - mean) ** 2, 0) / n);
+  if (std === 0) return 0;
+  const skewness = cents.reduce((acc, c) => acc + ((c - mean) / std) ** 3, 0) / n;
+  const kurtosis = cents.reduce((acc, c) => acc + ((c - mean) / std) ** 4, 0) / n - 3;
+  const bc = (skewness ** 2 + 1) / (kurtosis + 3);
+  // BC = 5/9 threshold for bimodality; map [0, 1] range from [0, 5/9+]
+  return Math.min(1, Math.max(0, bc / 1.0));
+}
+
+export function scaleDistributionSkewIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0.5;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const n = cents.length;
+  const mean = cents.reduce((a, b) => a + b, 0) / n;
+  const std = Math.sqrt(cents.reduce((acc, c) => acc + (c - mean) ** 2, 0) / n);
+  if (std === 0) return 0.5;
+  const skewness = cents.reduce((acc, c) => acc + ((c - mean) / std) ** 3, 0) / n;
+  // Map skewness [-3, 3] to [0, 1]
+  return Math.min(1, Math.max(0, (skewness + 3) / 6));
 }
