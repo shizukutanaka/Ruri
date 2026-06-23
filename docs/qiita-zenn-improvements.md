@@ -1570,3 +1570,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1292 | `scaleSubdominantScore` | 完全4・5度スコア: 各音符の完全4度(500c)または5度(700c)への近接度の平均 |
 | R1293 | `scaleLeadingToneStrengthV3` | 導音強度: 隣接する音符と100セント以内の半音関係にある音符の割合 |
 | R1294 | `scaleOctaveEquivalenceScoreV2` | オクターブ等価スコア: 複数オクターブにわたって現れるピッチクラスの割合 |
+
+## Round 130 — R1301–R1304: 音階モード分類分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1301 | `scaleModeAffinityScore` | モード親和スコア: 7つの教会旋法との最大一致度 |
+| R1302 | `scaleModularityScore` | モジュール性スコア: 音程ギャップの変動係数による音群クラスタ化の度合 |
+| R1303 | `scaleTonicStrengthScore` | 主音強度スコア: 完全5度・4度・長3度の存在による主音支持度 |
+| R1304 | `scalePentatonicAffinity` | ペンタトニック親和度: 長短ペンタトニックスケールとの最大一致度 |
