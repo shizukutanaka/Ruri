@@ -49676,6 +49676,130 @@ export function tuningFamilySocraticRadarResistorNoiseProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2706 — tuningFamilySocraticRadarAerodynamicLiftProxy
+export function tuningFamilySocraticRadarAerodynamicLiftProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // aerodynamic lift: upward force from harmonic structure → benchmark + versatility
+  const result = axisAggregates[3]! * 0.4 + axisAggregates[1]! * 0.4 + axisAggregates[4]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2708 — tuningFamilySocraticRadarDragCoefficientProxy
+export function tuningFamilySocraticRadarDragCoefficientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // drag coefficient: resistance to harmonic flow → low convergence + high diversity
+  const result = (1 - axisAggregates[4]!) * 0.4 + axisAggregates[0]! * 0.4 + (1 - axisAggregates[1]!) * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2710 — tuningFamilySocraticRadarBoundaryLayerProxy
+export function tuningFamilySocraticRadarBoundaryLayerProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // boundary layer: interface between ordered/disordered → maturity contrast with diversity
+  const boundaryEffect = Math.abs(axisAggregates[2]! - axisAggregates[0]!);
+  const result = boundaryEffect * 0.5 + axisAggregates[1]! * 0.3 + axisAggregates[3]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2712 — tuningFamilySocraticRadarAirPressureGradientProxy
+export function tuningFamilySocraticRadarAirPressureGradientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // pressure gradient: directional harmonic force → max-min axis difference
+  const maxAxis = Math.max(...axisAggregates);
+  const minAxis = Math.min(...axisAggregates);
+  const result = (maxAxis - minAxis) * 0.6 + axisAggregates[3]! * 0.4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2714 — tuningFamilySocraticRadarWindShearProxy
+export function tuningFamilySocraticRadarWindShearProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // wind shear: velocity differential between layers → diversity span
+  const sorted = [...axisAggregates].sort((a, b) => a - b);
+  const shear = (sorted[4]! - sorted[0]!) * 0.5 + (sorted[3]! - sorted[1]!) * 0.5;
+  return Math.min(1, Math.max(0, shear));
+}
+
+// Q2716 — tuningFamilySocraticRadarTurbulentVortexProxy
+export function tuningFamilySocraticRadarTurbulentVortexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // turbulent vortex: chaotic rotation → high diversity + low convergence + low maturity
+  const result = axisAggregates[0]! * 0.4 + (1 - axisAggregates[4]!) * 0.3 + (1 - axisAggregates[2]!) * 0.3;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -57952,4 +58076,60 @@ export function scaleModalColor(pitches: readonly Pitch[]): number {
     }
   }
   return Math.min(1, Math.max(0, modalCount / pitches.length));
+}
+
+export function scaleRhythmicComplexity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    intervals.push(Math.abs(cents[i]! - cents[i - 1]!));
+  }
+  // unique interval count / total as complexity measure
+  const uniqueIntervals = new Set(intervals.map((iv) => Math.round(iv / 25) * 25)).size;
+  return Math.min(1, Math.max(0, uniqueIntervals / Math.max(1, intervals.length)));
+}
+
+export function scaleIntervalClustering(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    intervals.push(Math.abs(cents[i]! - cents[i - 1]!));
+  }
+  if (intervals.length === 0) return 0;
+  const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+  // clustering: low variance relative to mean → tightly clustered intervals
+  const variance = intervals.reduce((acc, iv) => acc + (iv - mean) ** 2, 0) / intervals.length;
+  const cv = mean > 0 ? Math.sqrt(variance) / mean : 0;
+  return Math.min(1, Math.max(0, 1 - Math.min(1, cv)));
+}
+
+export function scalePitchClassDiversity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // pitch classes in 25c bins across 1200c
+  const bins = new Set<number>();
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    bins.add(Math.floor(c / 25));
+  }
+  return Math.min(1, Math.max(0, bins.size / 48));
+}
+
+export function scaleAxisSymmetry(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  // test symmetry around multiple axes (0, 100, 200, ... 1100 cents)
+  let maxSymmetry = 0;
+  for (let axis = 0; axis < 12; axis++) {
+    const axisCents = axis * 100;
+    let symmetric = 0;
+    for (const c of cents) {
+      const mirror = ((2 * axisCents - c) % 1200 + 1200) % 1200;
+      const found = cents.some((other) => Math.abs(other - mirror) <= 20);
+      if (found) symmetric++;
+    }
+    maxSymmetry = Math.max(maxSymmetry, symmetric / cents.length);
+  }
+  return Math.min(1, Math.max(0, maxSymmetry));
 }
