@@ -43913,6 +43913,133 @@ export function tuningFamilySocraticRadarCausalDensityProxy(
   return Math.min(1, Math.max(0, (mean * (1 + range)) / 2));
 }
 
+// Q2166 — tuningFamilySocraticRadarStructuralIntegrityProxy
+export function tuningFamilySocraticRadarStructuralIntegrityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const minVal = Math.min(...axisAggregates);
+  return Math.min(1, Math.max(0, minVal));
+}
+
+// Q2168 — tuningFamilySocraticRadarLoadBearingProxy
+export function tuningFamilySocraticRadarLoadBearingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const sorted = [...axisAggregates].sort((a, b) => b - a);
+  const top3 = sorted.slice(0, 3);
+  const result = top3.reduce((a, b) => a + b, 0) / 3;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2170 — tuningFamilySocraticRadarSpanLengthProxy
+export function tuningFamilySocraticRadarSpanLengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const maxVal = Math.max(...axisAggregates);
+  const result = maxVal - mean;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2172 — tuningFamilySocraticRadarFoundationStrengthProxy
+export function tuningFamilySocraticRadarFoundationStrengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const minVal = Math.min(...axisAggregates);
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = minVal * mean;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2174 — tuningFamilySocraticRadarArchedSupportProxy
+export function tuningFamilySocraticRadarArchedSupportProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = 1 - std;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2176 — tuningFamilySocraticRadarSeismicResistanceProxy
+export function tuningFamilySocraticRadarSeismicResistanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  const range = maxVal - minVal;
+  const result = (1 - range) * mean;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -49035,4 +49162,126 @@ export function scaleEDOApproximationScore(scaleCents: readonly number[], period
     if (score > maxScore) maxScore = score;
   }
   return Math.min(1, Math.max(0, maxScore));
+}
+
+/**
+ * LLLL1 — scaleCommonToneCount
+ * Average fraction of notes shared with transpositions of itself.
+ * For each transposition t in [100, 200, ..., 1100] cents:
+ *   - Count notes in original that appear (within 10 cents) in transposed scale
+ *   - transposed = scaleCents.map(c => (c + t) % periodCents)
+ * Returns: max(commonTones/n over all transpositions), clamped to [0, 1].
+ * Empty → 0.
+ */
+export function scaleCommonToneCount(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let maxFraction = 0;
+  for (let t = 100; t <= 1100; t += 100) {
+    let common = 0;
+    for (let i = 0; i < n; i++) {
+      const orig = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+      for (let j = 0; j < n; j++) {
+        const transposed = ((scaleCents[j]! + t) % periodCents + periodCents) % periodCents;
+        if (Math.abs(orig - transposed) <= 10) {
+          common++;
+          break;
+        }
+      }
+    }
+    const fraction = common / n;
+    if (fraction > maxFraction) maxFraction = fraction;
+  }
+  return Math.min(1, Math.max(0, maxFraction));
+}
+
+/**
+ * LLLL2 — scalePivotChordPotential
+ * How many transpositions share at least 3 common tones.
+ * For each of 11 transpositions (100..1100 by 100):
+ *   - Count common tones (within 10 cents)
+ *   - If count ≥ 3, increment counter
+ * Returns: counter / 11, clamped to [0, 1].
+ * Empty or n < 3 → 0.
+ */
+export function scalePivotChordPotential(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0 || n < 3) return 0;
+  let pivotCount = 0;
+  for (let t = 100; t <= 1100; t += 100) {
+    let common = 0;
+    for (let i = 0; i < n; i++) {
+      const orig = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+      for (let j = 0; j < n; j++) {
+        const transposed = ((scaleCents[j]! + t) % periodCents + periodCents) % periodCents;
+        if (Math.abs(orig - transposed) <= 10) {
+          common++;
+          break;
+        }
+      }
+    }
+    if (common >= 3) pivotCount++;
+  }
+  return Math.min(1, Math.max(0, pivotCount / 11));
+}
+
+/**
+ * LLLL3 — scaleCircleOfFifthsPosition
+ * How close the scale's pitch set is to a position on the circle of fifths.
+ * Generates 12 circle-of-fifths positions (700-cent transpositions of [0,200,400,500,700,900,1100])
+ * For each position, counts common tones with scaleCents (within 10 cents).
+ * Returns: max over 12 positions of (commonTones / max(n, 7)), clamped to [0, 1].
+ * Empty → 0.
+ */
+export function scaleCircleOfFifthsPosition(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const template = [0, 200, 400, 500, 700, 900, 1100];
+  let maxScore = 0;
+  for (let pos = 0; pos < 12; pos++) {
+    const offset = (pos * 700) % periodCents;
+    let common = 0;
+    for (let i = 0; i < n; i++) {
+      const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+      for (let k = 0; k < template.length; k++) {
+        const templatePitch = ((template[k]! + offset) % periodCents + periodCents) % periodCents;
+        if (Math.abs(pitch - templatePitch) <= 10) {
+          common++;
+          break;
+        }
+      }
+    }
+    const score = common / Math.max(n, 7);
+    if (score > maxScore) maxScore = score;
+  }
+  return Math.min(1, Math.max(0, maxScore));
+}
+
+/**
+ * LLLL4 — scaleModulationDistanceV2
+ * Average "distance" to nearest related scale (minimum transpositions needed).
+ * Finds the transposition (100..1100) that maximizes common tones.
+ * bestCommon = max common tones over all transpositions.
+ * Returns: 1 - (bestCommon / n)  [close modulation = many shared notes].
+ * Empty → 0.
+ */
+export function scaleModulationDistanceV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  let bestCommon = 0;
+  for (let t = 100; t <= 1100; t += 100) {
+    let common = 0;
+    for (let i = 0; i < n; i++) {
+      const orig = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+      for (let j = 0; j < n; j++) {
+        const transposed = ((scaleCents[j]! + t) % periodCents + periodCents) % periodCents;
+        if (Math.abs(orig - transposed) <= 10) {
+          common++;
+          break;
+        }
+      }
+    }
+    if (common > bestCommon) bestCommon = common;
+  }
+  return Math.min(1, Math.max(0, 1 - bestCommon / n));
 }
