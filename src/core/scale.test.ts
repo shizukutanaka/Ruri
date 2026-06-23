@@ -1850,6 +1850,10 @@ import {
   scaleAscendingBias,
   scaleStepLeapRatio,
   scaleContourComplexity,
+  scalePulseRegularity,
+  scaleAccentPotential,
+  scalePolyrhythmicIndex,
+  scalePhaseCoherence,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -45510,6 +45514,74 @@ describe('R1404 scaleContourComplexity', () => {
   it('returns value in [0,1]', () => {
     const pitches = [0, 100, 700, 800].map((c) => pitchFromCents(c));
     const v = scaleContourComplexity(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1411
+describe('R1411 scalePulseRegularity', () => {
+  it('returns 0 for empty', () => {
+    expect(scalePulseRegularity([])).toBe(0);
+  });
+  it('returns 1 for equal intervals', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
+    expect(scalePulseRegularity(pitches)).toBeCloseTo(1, 5);
+  });
+  it('returns value in [0,1] for unequal intervals', () => {
+    const pitches = [0, 100, 350, 700].map(c => pitchFromCents(c));
+    const v = scalePulseRegularity(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1412
+describe('R1412 scaleAccentPotential', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleAccentPotential([])).toBe(0);
+  });
+  it('returns 1 when all on beat positions', () => {
+    const pitches = [0, 300, 600, 900].map(c => pitchFromCents(c));
+    expect(scaleAccentPotential(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for mixed', () => {
+    const pitches = [0, 150, 300, 500].map(c => pitchFromCents(c));
+    const v = scaleAccentPotential(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1413
+describe('R1413 scalePolyrhythmicIndex', () => {
+  it('returns 0 for empty', () => {
+    expect(scalePolyrhythmicIndex([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
+    const v = scalePolyrhythmicIndex(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns higher value for varied repeated intervals', () => {
+    const pitches = [0, 200, 400, 500, 700, 900].map(c => pitchFromCents(c));
+    const v = scalePolyrhythmicIndex(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// R1414
+describe('R1414 scalePhaseCoherence', () => {
+  it('returns 0.5 for empty', () => {
+    expect(scalePhaseCoherence([])).toBe(0.5);
+  });
+  it('returns 0.5 for single pitch', () => {
+    expect(scalePhaseCoherence([pitchFromCents(0)])).toBe(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 700, 900].map(c => pitchFromCents(c));
+    const v = scalePhaseCoherence(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

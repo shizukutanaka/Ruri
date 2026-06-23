@@ -56048,3 +56048,68 @@ export function scaleContourComplexity(pitches: readonly Pitch[]): number {
   }
   return Math.min(1, Math.max(0, changes / (intervals.length - 1)));
 }
+
+// R1411
+export function scalePulseRegularity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < centsArr.length; i++) {
+    intervals.push(centsArr[i]! - centsArr[i - 1]!);
+  }
+  const mean = intervals.reduce((s, v) => s + v, 0) / intervals.length;
+  if (mean === 0) return 0;
+  const variance = intervals.reduce((s, v) => s + (v - mean) ** 2, 0) / intervals.length;
+  const stddev = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, 1 - stddev / mean));
+}
+
+// R1412
+export function scaleAccentPotential(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const beatPositions = [0, 300, 600, 900];
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (beatPositions.some((b) => Math.abs(c - b) <= 25)) count++;
+  }
+  return Math.min(1, Math.max(0, count / pitches.length));
+}
+
+// R1413
+export function scalePolyrhythmicIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const binCounts = new Map<number, number>();
+  for (let i = 1; i < centsArr.length; i++) {
+    const interval = centsArr[i]! - centsArr[i - 1]!;
+    const bin = Math.round(interval / 50) * 50;
+    binCounts.set(bin, (binCounts.get(bin) ?? 0) + 1);
+  }
+  let repeated = 0;
+  for (const count of binCounts.values()) {
+    if (count > 1) repeated++;
+  }
+  return Math.min(1, Math.max(0, repeated / pitches.length));
+}
+
+// R1414
+export function scalePhaseCoherence(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0.5;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < centsArr.length; i++) {
+    intervals.push(centsArr[i]! - centsArr[i - 1]!);
+  }
+  if (intervals.length < 2) return 0.5;
+  let cosSum = 0;
+  let count = 0;
+  for (let i = 0; i < intervals.length - 1; i++) {
+    const a = intervals[i]!;
+    const b = intervals[i + 1]!;
+    cosSum += Math.cos((2 * Math.PI * (a - b)) / 1200);
+    count++;
+  }
+  const mean = cosSum / count;
+  return Math.min(1, Math.max(0, (mean + 1) / 2));
+}
