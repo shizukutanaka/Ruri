@@ -49187,6 +49187,135 @@ export function tuningFamilySocraticRadarUrbanSprawlProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2658 — tuningFamilySocraticRadarLearningRateProxy
+export function tuningFamilySocraticRadarLearningRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Learning rate = mean * (1 - mean) (sigmoid-like peak at 0.5 = optimal learning zone)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = 4 * mean * (1 - mean); // peak at mean=0.5, 0 at extremes
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2660 — tuningFamilySocraticRadarForgettingCurveProxy
+export function tuningFamilySocraticRadarForgettingCurveProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Forgetting curve = 1 - mean (high retention = low forgetting)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = 1 - mean;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2662 — tuningFamilySocraticRadarCognitiveFlexibilityProxy
+export function tuningFamilySocraticRadarCognitiveFlexibilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Cognitive flexibility = std deviation (high variance = flexible switching between states)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const result = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2664 — tuningFamilySocraticRadarAttentionSpanProxy
+export function tuningFamilySocraticRadarAttentionSpanProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Attention span = sustained focus = 1 - coefficient of variation
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  if (mean === 0) return 0;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const cv = Math.sqrt(variance) / mean;
+  const result = 1 - Math.min(1, cv);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2666 — tuningFamilySocraticRadarMemoryCapacityProxy
+export function tuningFamilySocraticRadarMemoryCapacityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Memory capacity = fraction of axes above 0.4 (all slots utilized)
+  const count = axisAggregates.filter((v) => v > 0.4).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2668 — tuningFamilySocraticRadarTransferLearningProxy
+export function tuningFamilySocraticRadarTransferLearningProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Transfer learning = min axis value (weakest link determines transferability)
+  const result = axisAggregates.reduce((a, b) => Math.min(a, b), 1);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
