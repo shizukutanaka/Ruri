@@ -43117,6 +43117,152 @@ export function tuningFamilySocraticRadarEnzymeKineticsProxy(
   return Math.min(1, Math.max(0, totalScore / vecs.length));
 }
 
+// Q2094 — tuningFamilySocraticRadarChannelCapacityProxy
+export function tuningFamilySocraticRadarChannelCapacityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    // channel capacity analog: log2(1 + mean) / log2(2) == log2(1 + mean)
+    total += Math.log2(1 + mean);
+  }
+  // log2(1 + mean) is in [0, 1] when mean is in [0, 1]
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2096 — tuningFamilySocraticRadarSignalToNoiseProxyV2
+export function tuningFamilySocraticRadarSignalToNoiseProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    const variance = vec.reduce((acc, x) => acc + (x - mean) ** 2, 0) / vec.length;
+    const std = Math.sqrt(variance);
+    // SNR analog: signal=mean, noise=std; normalize to [0,1] by dividing by 10
+    const snr = mean / (std + 1e-10);
+    total += Math.min(1, snr / 10);
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2098 — tuningFamilySocraticRadarRedundancyProxy
+export function tuningFamilySocraticRadarRedundancyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const sum = vec.reduce((acc, x) => acc + x, 0);
+    if (sum < 1e-10) {
+      total += 1; // all zero → max redundancy
+      continue;
+    }
+    // entropy: -sum(p * log2(p)), p_i = x_i / sum(x)
+    let entropy = 0;
+    for (const x of vec) {
+      const p = x / sum;
+      if (p > 1e-10) entropy -= p * Math.log2(p);
+    }
+    // max entropy = log2(5) for 5 uniform axes; redundancy = 1 - entropy/log2(5)
+    total += 1 - entropy / Math.log2(5);
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2100 — tuningFamilySocraticRadarBandwidthProxy
+export function tuningFamilySocraticRadarBandwidthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const maxVal = Math.max(...vec);
+    const minVal = Math.min(...vec);
+    // bandwidth analog: range of axis values (max - min frequency spread)
+    total += maxVal - minVal;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2102 — tuningFamilySocraticRadarCompressionRatioProxy
+export function tuningFamilySocraticRadarCompressionRatioProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    // round to 1 decimal place and count unique values
+    const rounded = vec.map((x) => Math.round(x * 10) / 10);
+    const uniqueCount = new Set(rounded).size;
+    // compressible = few unique values; 1 - (unique / 5)
+    total += 1 - uniqueCount / 5;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2104 — tuningFamilySocraticRadarMutualInformationProxyV2
+export function tuningFamilySocraticRadarMutualInformationProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility' , 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    // pairwise |x_i - x_j| analog for mutual information (divergence between axis pairs)
+    let pairSum = 0;
+    let pairCount = 0;
+    for (let i = 0; i < vec.length; i++) {
+      for (let j = i + 1; j < vec.length; j++) {
+        pairSum += Math.abs(vec[i]! - vec[j]!);
+        pairCount++;
+      }
+    }
+    // normalize: mean pairwise diff is in [0,1]; invert so high similarity = high MI
+    const meanDiff = pairCount > 0 ? pairSum / pairCount : 0;
+    total += 1 - meanDiff;
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -47722,4 +47868,94 @@ export function scaleCoverageEfficiency(scaleCents: readonly number[], periodCen
   const fillRatio = scaleFillRatio(scaleCents, periodCents);
   const efficiency = fillRatio / (n / 12);
   return Math.min(1, Math.max(0, efficiency));
+}
+
+// FFFF1 — scaleIntervalNetworkDensity
+// Fraction of all possible interval pairs that are "close" (within 50 cents of each other, using shortest arc).
+export function scaleIntervalNetworkDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  if (periodCents <= 0) return 0;
+  const totalPairs = (n * (n - 1)) / 2;
+  let closePairs = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const arc = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+      if (arc < 50) closePairs++;
+    }
+  }
+  return Math.min(1, Math.max(0, closePairs / totalPairs));
+}
+
+// FFFF2 — scaleIntervalNetworkClustering
+// Average clustering coefficient: how clustered pitches are (fraction of neighbors that are also mutual neighbors).
+export function scaleIntervalNetworkClustering(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  if (periodCents <= 0) return 0;
+  const threshold = 150;
+  let totalClustering = 0;
+  let countWithNeighbors = 0;
+  for (let i = 0; i < n; i++) {
+    // Find neighbors of i (within 150 cents, using shortest arc)
+    const neighbors: number[] = [];
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const arc = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+      if (arc < threshold) neighbors.push(j);
+    }
+    const k = neighbors.length;
+    if (k < 2) continue;
+    // Count edges among neighbors
+    let edges = 0;
+    for (let a = 0; a < neighbors.length; a++) {
+      for (let b = a + 1; b < neighbors.length; b++) {
+        const na = neighbors[a]!;
+        const nb = neighbors[b]!;
+        const diff = Math.abs(scaleCents[na]! - scaleCents[nb]!);
+        const arc = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+        if (arc < threshold) edges++;
+      }
+    }
+    totalClustering += edges / ((k * (k - 1)) / 2);
+    countWithNeighbors++;
+  }
+  if (countWithNeighbors === 0) return 0;
+  return Math.min(1, Math.max(0, totalClustering / countWithNeighbors));
+}
+
+// FFFF3 — scaleIntervalHubScore
+// Identifies whether the scale has "hub" notes (notes with many connections within 200 cents).
+export function scaleIntervalHubScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  if (periodCents <= 0) return 0;
+  const threshold = 200;
+  const degrees: number[] = [];
+  for (let i = 0; i < n; i++) {
+    let deg = 0;
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const arc = Math.min(diff % periodCents, periodCents - (diff % periodCents));
+      if (arc < threshold) deg++;
+    }
+    degrees.push(deg);
+  }
+  const mean = degrees.reduce((s, d) => s + d, 0) / degrees.length;
+  if (mean === 0) return 0;
+  const variance = degrees.reduce((s, d) => s + (d - mean) ** 2, 0) / degrees.length;
+  const std = Math.sqrt(variance);
+  const hubScore = std / mean;
+  return Math.min(1, Math.max(0, hubScore));
+}
+
+// FFFF4 — scaleIntervalNetworkBalance
+// How balanced the network connectivity is (1 = no dominant hubs, 0 = maximally hub-dominated).
+export function scaleIntervalNetworkBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 1;
+  return Math.min(1, Math.max(0, 1 - scaleIntervalHubScore(scaleCents, periodCents)));
 }
