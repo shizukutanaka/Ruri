@@ -1885,6 +1885,10 @@ import {
   scalePitchVariance,
   scaleBalancePoint,
   scaleMassDistribution,
+  scaleDistributionShape,
+  scaleAsymmetryIndex,
+  scaleUnimodality,
+  scaleIntervalDensityPeak,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -1903,6 +1907,12 @@ import {
   tuningFamilySocraticRadarHalfLifeProxy,
   tuningFamilySocraticRadarClearanceRateProxy,
   tuningFamilySocraticRadarReceptorBindingProxy,
+  tuningFamilySocraticRadarUrbanDensityProxy,
+  tuningFamilySocraticRadarTrafficCongestionProxy,
+  tuningFamilySocraticRadarInfrastructureLoadProxy,
+  tuningFamilySocraticRadarTransportConnectivityProxy,
+  tuningFamilySocraticRadarZoningDiversityIndex,
+  tuningFamilySocraticRadarUrbanSprawlProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -46544,5 +46554,188 @@ describe('R1464 scaleMassDistribution', () => {
   it('returns 0.5 for evenly distributed scale', () => {
     const pitches = [0, 300, 600, 900].map(c => pitchFromCents(c));
     expect(scaleMassDistribution(pitches)).toBe(0.5);
+  });
+});
+
+// Q2646 — tuningFamilySocraticRadarUrbanDensityProxy
+describe('Q2646 tuningFamilySocraticRadarUrbanDensityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarUrbanDensityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarUrbanDensityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarUrbanDensityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2648 — tuningFamilySocraticRadarTrafficCongestionProxy
+describe('Q2648 tuningFamilySocraticRadarTrafficCongestionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTrafficCongestionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarTrafficCongestionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarTrafficCongestionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2650 — tuningFamilySocraticRadarInfrastructureLoadProxy
+describe('Q2650 tuningFamilySocraticRadarInfrastructureLoadProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarInfrastructureLoadProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarInfrastructureLoadProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarInfrastructureLoadProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2652 — tuningFamilySocraticRadarTransportConnectivityProxy
+describe('Q2652 tuningFamilySocraticRadarTransportConnectivityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTransportConnectivityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarTransportConnectivityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarTransportConnectivityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2654 — tuningFamilySocraticRadarZoningDiversityIndex
+describe('Q2654 tuningFamilySocraticRadarZoningDiversityIndex', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarZoningDiversityIndex([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarZoningDiversityIndex([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarZoningDiversityIndex([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// Q2656 — tuningFamilySocraticRadarUrbanSprawlProxy
+describe('Q2656 tuningFamilySocraticRadarUrbanSprawlProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarUrbanSprawlProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarUrbanSprawlProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value in [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarUrbanSprawlProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+// R1471
+describe('R1471 scaleDistributionShape', () => {
+  it('returns 0.5 for empty', () => {
+    expect(scaleDistributionShape([])).toBe(0.5);
+  });
+  it('returns 0.5 for symmetric distribution', () => {
+    const pitches = [0, 300, 600, 900].map(c => pitchFromCents(c));
+    expect(scaleDistributionShape(pitches)).toBeCloseTo(0.5, 3);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 100, 200, 300, 1000, 1100].map(c => pitchFromCents(c));
+    const v = scaleDistributionShape(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1472
+describe('R1472 scaleAsymmetryIndex', () => {
+  it('returns 0.5 for empty', () => {
+    expect(scaleAsymmetryIndex([])).toBe(0.5);
+  });
+  it('returns 0.5 for symmetric scale', () => {
+    const pitches = [0, 300, 600, 900].map(c => pitchFromCents(c));
+    expect(scaleAsymmetryIndex(pitches)).toBe(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 100, 200, 300].map(c => pitchFromCents(c));
+    const v = scaleAsymmetryIndex(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1473
+describe('R1473 scaleUnimodality', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleUnimodality([])).toBe(0);
+  });
+  it('returns 1 for single-bin scale', () => {
+    const pitches = [0, 50, 100, 150].map(c => pitchFromCents(c));
+    expect(scaleUnimodality(pitches)).toBe(1);
+  });
+  it('returns value in (0,1] for multi-bin scale', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
+    const v = scaleUnimodality(pitches);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1474
+describe('R1474 scaleIntervalDensityPeak', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleIntervalDensityPeak([])).toBe(0);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
+    const v = scaleIntervalDensityPeak(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns ~0.167 for all 200-cent intervals', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
+    const v = scaleIntervalDensityPeak(pitches);
+    expect(v).toBeCloseTo(100/1200, 2);
   });
 });

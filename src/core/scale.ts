@@ -49059,6 +49059,134 @@ export function tuningFamilySocraticRadarReceptorBindingProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2646 — tuningFamilySocraticRadarUrbanDensityProxy
+export function tuningFamilySocraticRadarUrbanDensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Urban density = mean axis value (overall activity level)
+  const result = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2648 — tuningFamilySocraticRadarTrafficCongestionProxy
+export function tuningFamilySocraticRadarTrafficCongestionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Traffic congestion = bottleneck: how much the peak load exceeds the average
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const result = mean > 0 ? (maxVal - mean) / mean : 0;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2650 — tuningFamilySocraticRadarInfrastructureLoadProxy
+export function tuningFamilySocraticRadarInfrastructureLoadProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Infrastructure load = fraction of axes above 0.6 (overloaded capacity)
+  const count = axisAggregates.filter((v) => v > 0.6).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2652 — tuningFamilySocraticRadarTransportConnectivityProxy
+export function tuningFamilySocraticRadarTransportConnectivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Transport connectivity = harmonic mean (all routes must be passable)
+  const reciprocalSum = axisAggregates.reduce((s, v) => s + 1 / Math.max(v, 1e-9), 0);
+  const result = axisAggregates.length / reciprocalSum;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2654 — tuningFamilySocraticRadarZoningDiversityIndex
+export function tuningFamilySocraticRadarZoningDiversityIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Zoning diversity = std deviation (variety of land uses)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const result = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2656 — tuningFamilySocraticRadarUrbanSprawlProxy
+export function tuningFamilySocraticRadarUrbanSprawlProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Urban sprawl = max - min (how spread out the development is)
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const minVal = axisAggregates.reduce((a, b) => Math.min(a, b), 1);
+  const result = maxVal - minVal;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -57036,4 +57164,69 @@ export function scaleMassDistribution(pitches: readonly Pitch[]): number {
   const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
   const upper = centsArr.filter((c) => c >= 600).length;
   return upper / centsArr.length;
+}
+
+// R1471
+export function scaleDistributionShape(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0.5;
+  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
+  const n = centsArr.length;
+  const mean = centsArr.reduce((sum, c) => sum + c, 0) / n;
+  const sorted = [...centsArr].sort((a, b) => a - b);
+  const mid = Math.floor(n / 2);
+  const median = n % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
+  const variance = centsArr.reduce((sum, c) => sum + (c - mean) ** 2, 0) / n;
+  const stddev = Math.sqrt(variance);
+  if (stddev === 0) return 0.5;
+  const v = (mean - median) / stddev;
+  return Math.min(1, Math.max(0, (v + 1) / 2));
+}
+
+// R1472
+export function scaleAsymmetryIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0.5;
+  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
+  const total = centsArr.length;
+  const upper = centsArr.filter((c) => c >= 600).length;
+  const lower = total - upper;
+  const v = (upper - lower) / total;
+  return Math.min(1, Math.max(0, (v + 1) / 2));
+}
+
+// R1473
+export function scaleUnimodality(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
+  const bins = new Set<number>();
+  for (const c of centsArr) {
+    const bin = Math.min(5, Math.floor(c / 200));
+    bins.add(bin);
+  }
+  const occupiedBins = bins.size;
+  return 1 / Math.max(1, occupiedBins - 1);
+}
+
+// R1474
+export function scaleIntervalDensityPeak(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const centsArr = [...pitches.map((p) => pitchToCents(p) % 1200)].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < centsArr.length; i++) {
+    intervals.push(centsArr[i]! - centsArr[i - 1]!);
+  }
+  const binCounts = new Array<number>(6).fill(0);
+  for (const interval of intervals) {
+    const bin = Math.min(5, Math.floor(interval / 200));
+    binCounts[bin]!++;
+  }
+  let peakBin = 0;
+  let peakCount = -1;
+  for (let i = 0; i < binCounts.length; i++) {
+    if (binCounts[i]! > peakCount) {
+      peakCount = binCounts[i]!;
+      peakBin = i;
+    }
+  }
+  const binCenter = peakBin * 200 + 100;
+  return Math.min(1, Math.max(0, binCenter / 1200));
 }

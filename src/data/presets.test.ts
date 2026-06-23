@@ -1120,6 +1120,12 @@ import {
   presetFamilySocraticRadarHalfLifeProxy,
   presetFamilySocraticRadarClearanceRateProxy,
   presetFamilySocraticRadarReceptorBindingProxy,
+  presetFamilySocraticRadarUrbanDensityProxy,
+  presetFamilySocraticRadarTrafficCongestionProxy,
+  presetFamilySocraticRadarInfrastructureLoadProxy,
+  presetFamilySocraticRadarTransportConnectivityProxy,
+  presetFamilySocraticRadarZoningDiversityIndex,
+  presetFamilySocraticRadarUrbanSprawlProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -25769,5 +25775,89 @@ describe('Q2645 presetFamilySocraticRadarReceptorBindingProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarReceptorBindingProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2647 presetFamilySocraticRadarUrbanDensityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarUrbanDensityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarUrbanDensityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarUrbanDensityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2649 presetFamilySocraticRadarTrafficCongestionProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarTrafficCongestionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarTrafficCongestionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTrafficCongestionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2651 presetFamilySocraticRadarInfrastructureLoadProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarInfrastructureLoadProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarInfrastructureLoadProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarInfrastructureLoadProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2653 presetFamilySocraticRadarTransportConnectivityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarTransportConnectivityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarTransportConnectivityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTransportConnectivityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2655 presetFamilySocraticRadarZoningDiversityIndex', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarZoningDiversityIndex(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarZoningDiversityIndex(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarZoningDiversityIndex(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2657 presetFamilySocraticRadarUrbanSprawlProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarUrbanSprawlProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarUrbanSprawlProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarUrbanSprawlProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
