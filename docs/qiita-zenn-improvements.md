@@ -1561,3 +1561,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1282 | `scaleRegisterImbalance` | 音域不均衡: 上半オクターブ（600c以上）と下半オクターブの音符数の差÷総数 |
 | R1283 | `scaleTritoneAxisCount` | 三全音軸数: 三全音関係（±60セント）にある音程ペアの割合 |
 | R1284 | `scaleRootConsonanceScore` | 根音協和スコア: 全音符の根音（0セント）に対する平均協和度 |
+
+## Round 129 — R1291–R1294: 音階倍音整合性分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1291 | `scaleHarmonicCoherenceIndex` | 倍音整合指数: 音階ピッチが根音倍音列（±30セント）と一致する割合 |
+| R1292 | `scaleSubdominantScore` | 完全4・5度スコア: 各音符の完全4度(500c)または5度(700c)への近接度の平均 |
+| R1293 | `scaleLeadingToneStrengthV3` | 導音強度: 隣接する音符と100セント以内の半音関係にある音符の割合 |
+| R1294 | `scaleOctaveEquivalenceScoreV2` | オクターブ等価スコア: 複数オクターブにわたって現れるピッチクラスの割合 |
