@@ -1680,3 +1680,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1414 | `scalePhaseCoherence` | 隣接音程差のcos平均を[0,1]正規化したリズム位相一致度 |
 
 **設計根拠**: リズム解析の視点でスケール構造を捉える。均等分割→高いPulseRegularity、拍子整合→高いAccentPotential、反復音程→高いPolyrhythmicIndex、音程変化の滑らかさ→高いPhaseCoherence。
+
+## Round 142 — R1421–R1424 音階音域・展開分析
+
+| ID | 関数名 | 概要 |
+|----|--------|------|
+| R1421 | `scaleAmbitoRange` | 最低音から最高音までのセント幅を1200で正規化した音域指標 |
+| R1422 | `scaleModalInterchangeScore` | 100セント差のペアを持つ音の割合（旋法混交・半音変容指標） |
+| R1423 | `scaleChromaticTendencyScore` | 全音階的位置（30c以内）にない音の割合（半音導音傾向） |
+| R1424 | `scaleIntervalSpread` | 隣接音程の標準偏差を600cで正規化した音程分散指標 |
+
+**設計根拠**: 音域の広さ（Ambito）、旋法混交（ModalInterchange）、半音傾向音（ChromaticTendency）、音程分散（IntervalSpread）の4軸でスケールの展開特性を多角的に評価する。
