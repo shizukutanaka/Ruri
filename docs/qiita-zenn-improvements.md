@@ -1393,3 +1393,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | PPPP2 | `scaleTranslationSymmetry` | 等間隔（平行移動）対称性 |
 | PPPP3 | `scaleRotationSymmetry` | 回転（巡回転置）対称性 |
 | PPPP4 | `scaleInversionSymmetry` | インターバル逆読み対称性 |
+
+## Round 111: 音階エントロピー分析 (QQQQ1–QQQQ4)
+
+音階の情報エントロピーを多角的に測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| QQQQ1 | `scalePitchEntropy` | ピッチ位置のシャノンエントロピー |
+| QQQQ2 | `scaleIntervalEntropyV2` | インターバルサイズのシャノンエントロピー |
+| QQQQ3 | `scaleRhythmicEntropy` | インターバル比率のエントロピー（リズム的複雑性） |
+| QQQQ4 | `scaleHarmonicEntropy` | 和声エントロピー代理（音程複雑性の不確実性） |
