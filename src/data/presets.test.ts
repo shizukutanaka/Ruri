@@ -898,6 +898,12 @@ import {
   presetFamilySocraticRadarSymptomsProxy,
   presetFamilySocraticRadarTherapeuticWindowProxy,
   presetFamilySocraticRadarRecoveryRateProxy,
+  presetFamilySocraticRadarTrophicLevelProxy,
+  presetFamilySocraticRadarBiodiversityIndexProxy,
+  presetFamilySocraticRadarCarryingCapacityProxyV2,
+  presetFamilySocraticRadarInvasiveSpeciesProxy,
+  presetFamilySocraticRadarHabitatFragmentationProxy,
+  presetFamilySocraticRadarPopulationDynamicsProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -21305,5 +21311,101 @@ describe('Q2201 presetFamilySocraticRadarRecoveryRateProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarRecoveryRateProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2203 — presetFamilySocraticRadarTrophicLevelProxy
+describe('Q2203 presetFamilySocraticRadarTrophicLevelProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarTrophicLevelProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarTrophicLevelProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTrophicLevelProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2205 — presetFamilySocraticRadarBiodiversityIndexProxy
+describe('Q2205 presetFamilySocraticRadarBiodiversityIndexProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarBiodiversityIndexProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarBiodiversityIndexProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBiodiversityIndexProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2207 — presetFamilySocraticRadarCarryingCapacityProxyV2
+describe('Q2207 presetFamilySocraticRadarCarryingCapacityProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCarryingCapacityProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCarryingCapacityProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCarryingCapacityProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2209 — presetFamilySocraticRadarInvasiveSpeciesProxy
+describe('Q2209 presetFamilySocraticRadarInvasiveSpeciesProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarInvasiveSpeciesProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarInvasiveSpeciesProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarInvasiveSpeciesProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2211 — presetFamilySocraticRadarHabitatFragmentationProxy
+describe('Q2211 presetFamilySocraticRadarHabitatFragmentationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarHabitatFragmentationProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarHabitatFragmentationProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHabitatFragmentationProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2213 — presetFamilySocraticRadarPopulationDynamicsProxy
+describe('Q2213 presetFamilySocraticRadarPopulationDynamicsProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarPopulationDynamicsProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarPopulationDynamicsProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPopulationDynamicsProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });

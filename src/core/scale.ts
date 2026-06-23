@@ -44287,6 +44287,125 @@ export function tuningFamilySocraticRadarRecoveryRateProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2202 — tuningFamilySocraticRadarTrophicLevelProxy
+export function tuningFamilySocraticRadarTrophicLevelProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2204 — tuningFamilySocraticRadarBiodiversityIndexProxy
+export function tuningFamilySocraticRadarBiodiversityIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = 1 - std / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2206 — tuningFamilySocraticRadarCarryingCapacityProxyV2
+export function tuningFamilySocraticRadarCarryingCapacityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = Math.max(...axisAggregates);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2208 — tuningFamilySocraticRadarInvasiveSpeciesProxy
+export function tuningFamilySocraticRadarInvasiveSpeciesProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const count = axisAggregates.filter((v) => v > 0.8).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2210 — tuningFamilySocraticRadarHabitatFragmentationProxy
+export function tuningFamilySocraticRadarHabitatFragmentationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const count = axisAggregates.filter((v) => v < 0.2).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2212 — tuningFamilySocraticRadarPopulationDynamicsProxy
+export function tuningFamilySocraticRadarPopulationDynamicsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = Math.max(...axisAggregates) - Math.min(...axisAggregates);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -49726,4 +49845,89 @@ export function scaleClusterSpread(scaleCents: readonly number[], periodCents: n
   const variance = centroids.reduce((acc, c) => acc + (c - mean) ** 2, 0) / centroids.length;
   const std = Math.sqrt(variance);
   return Math.min(1, Math.max(0, std / (periodCents / 2)));
+}
+
+/**
+ * OOOO1 — scaleAscendingTendency
+ * Fraction of consecutive interval pairs (sorted) that are strictly increasing in size.
+ * Sort scaleCents, compute intervals between consecutive pitches (including wrap-around).
+ * Count pairs where interval[i] < interval[i+1].
+ * Return count / max(n-1, 1); empty → 0, single → 0.
+ */
+export function scaleAscendingTendency(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) intervals.push(sorted[i + 1]! - sorted[i]!);
+    else intervals.push(periodCents - sorted[i]! + sorted[0]!);
+  }
+  let count = 0;
+  for (let i = 0; i < intervals.length - 1; i++) {
+    if (intervals[i]! < intervals[i + 1]!) count++;
+  }
+  return Math.min(1, Math.max(0, count / (intervals.length - 1)));
+}
+
+/**
+ * OOOO2 — scaleDescendingTendency
+ * Fraction of consecutive interval pairs (sorted) that are strictly decreasing in size.
+ * Sort scaleCents, compute intervals between consecutive pitches (including wrap-around).
+ * Count pairs where interval[i] > interval[i+1].
+ * Return count / max(n-1, 1); empty → 0, single → 0.
+ */
+export function scaleDescendingTendency(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) intervals.push(sorted[i + 1]! - sorted[i]!);
+    else intervals.push(periodCents - sorted[i]! + sorted[0]!);
+  }
+  let count = 0;
+  for (let i = 0; i < intervals.length - 1; i++) {
+    if (intervals[i]! > intervals[i + 1]!) count++;
+  }
+  return Math.min(1, Math.max(0, count / (intervals.length - 1)));
+}
+
+/**
+ * OOOO3 — scaleDirectionBalance
+ * Balance between ascending and descending tendencies.
+ * 1 - |ascending - descending| where ascending = scaleAscendingTendency(...),
+ * descending = scaleDescendingTendency(...).
+ * Empty/single → 0.
+ */
+export function scaleDirectionBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const ascending = scaleAscendingTendency(scaleCents, periodCents);
+  const descending = scaleDescendingTendency(scaleCents, periodCents);
+  return Math.min(1, Math.max(0, 1 - Math.abs(ascending - descending)));
+}
+
+/**
+ * OOOO4 — scaleIntervalSymmetry
+ * How symmetric the interval sequence is (palindrome-like).
+ * Sort intervals, compare interval[i] to interval[n-1-i], mean of
+ * 1 - |diff|/periodCents across all pairs.
+ * Empty/single → 1.
+ */
+export function scaleIntervalSymmetry(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) intervals.push(sorted[i + 1]! - sorted[i]!);
+    else intervals.push(periodCents - sorted[i]! + sorted[0]!);
+  }
+  let sum = 0;
+  for (let i = 0; i < intervals.length; i++) {
+    const mirror = intervals[intervals.length - 1 - i]!;
+    sum += 1 - Math.abs(intervals[i]! - mirror) / periodCents;
+  }
+  return Math.min(1, Math.max(0, sum / intervals.length));
 }
