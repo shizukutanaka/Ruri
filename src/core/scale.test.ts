@@ -1431,6 +1431,10 @@ import {
   scaleModalDarknessV2,
   scaleModalBrightnessBiasV2,
   scaleModalComplexityV2,
+  scaleFillRatio,
+  scaleMaxGap,
+  scaleGapUniformity,
+  scaleCoverageEfficiency,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -37303,5 +37307,196 @@ describe('DDDD4 scaleModalComplexityV2', () => {
     const all10 = [100, 200, 300, 400, 600, 700, 800, 900, 1000, 1100];
     const v = scaleModalComplexityV2(all10);
     expect(v).toBe(1);
+  });
+});
+
+// Q2070 — tuningFamilySocraticRadarCognitiveLoadProxy
+describe('Q2070 tuningFamilySocraticRadarCognitiveLoadProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCognitiveLoadProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCognitiveLoadProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarCognitiveLoadProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2072 — tuningFamilySocraticRadarWorkingMemoryProxy
+describe('Q2072 tuningFamilySocraticRadarWorkingMemoryProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWorkingMemoryProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarWorkingMemoryProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarWorkingMemoryProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2074 — tuningFamilySocraticRadarAttentionProxy
+describe('Q2074 tuningFamilySocraticRadarAttentionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAttentionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarAttentionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarAttentionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2076 — tuningFamilySocraticRadarPatternRecognitionProxy
+describe('Q2076 tuningFamilySocraticRadarPatternRecognitionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPatternRecognitionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarPatternRecognitionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarPatternRecognitionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2078 — tuningFamilySocraticRadarEmotionalValenceProxy
+describe('Q2078 tuningFamilySocraticRadarEmotionalValenceProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEmotionalValenceProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarEmotionalValenceProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarEmotionalValenceProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2080 — tuningFamilySocraticRadarHabitStrengthProxy
+describe('Q2080 tuningFamilySocraticRadarHabitStrengthProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarHabitStrengthProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarHabitStrengthProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarHabitStrengthProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// EEEE1 — scaleFillRatio
+describe('EEEE1 scaleFillRatio', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleFillRatio([])).toBe(0);
+  });
+  it('returns finite [0,1] for chromatic scale', () => {
+    const chromatic = [100,200,300,400,500,600,700,800,900,1000,1100];
+    const v = scaleFillRatio(chromatic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns >0 for single pitch', () => {
+    const v = scaleFillRatio([600]);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// EEEE2 — scaleMaxGap
+describe('EEEE2 scaleMaxGap', () => {
+  it('returns 1 for empty', () => {
+    expect(scaleMaxGap([])).toBe(1);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleMaxGap(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns low value for chromatic scale', () => {
+    const chromatic = [100,200,300,400,500,600,700,800,900,1000,1100];
+    const v = scaleMaxGap(chromatic);
+    expect(v).toBeLessThanOrEqual(0.1); // max gap = 100/1200 ≈ 0.083
+  });
+});
+
+// EEEE3 — scaleGapUniformity
+describe('EEEE3 scaleGapUniformity', () => {
+  it('returns 1 for empty', () => {
+    expect(scaleGapUniformity([])).toBe(1);
+  });
+  it('returns 1 for equal-step scale', () => {
+    const wholeTone = [200, 400, 600, 800, 1000];
+    const v = scaleGapUniformity(wholeTone);
+    expect(v).toBeCloseTo(1, 3);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleGapUniformity(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// EEEE4 — scaleCoverageEfficiency
+describe('EEEE4 scaleCoverageEfficiency', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleCoverageEfficiency([])).toBe(0);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleCoverageEfficiency(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns <=1 for chromatic scale', () => {
+    const chromatic = [100,200,300,400,500,600,700,800,900,1000,1100];
+    const v = scaleCoverageEfficiency(chromatic);
+    expect(v).toBeLessThanOrEqual(1);
+    expect(v).toBeGreaterThan(0);
   });
 });
