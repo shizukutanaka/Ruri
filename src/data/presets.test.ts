@@ -1066,6 +1066,12 @@ import {
   presetFamilySocraticRadarPragmaticFlexibilityProxyV2,
   presetFamilySocraticRadarMorphologicalRichnessProxy,
   presetFamilySocraticRadarDiscourseCoherenceProxy,
+  presetFamilySocraticRadarTopologicalConnectivityProxy,
+  presetFamilySocraticRadarEuclideanDistanceProxy,
+  presetFamilySocraticRadarHarmonicMeanProxy,
+  presetFamilySocraticRadarGoldenRatioProxy,
+  presetFamilySocraticRadarCurvatureProxy,
+  presetFamilySocraticRadarSymmetryBreakingProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
