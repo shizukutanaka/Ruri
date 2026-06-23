@@ -47019,6 +47019,153 @@ export function tuningFamilySocraticRadarSynchronicityProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2454 — tuningFamilySocraticRadarBiodiversityProxyV3
+export function tuningFamilySocraticRadarBiodiversityProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ecological biodiversity: Simpson's index sum(pi*(1-pi))
+  const total = axisAggregates.reduce((a, b) => a + b, 0);
+  if (total === 0) return 0;
+  const pis = axisAggregates.map((v) => v / total);
+  const result = pis.reduce((acc, pi) => acc + pi * (1 - pi), 0);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2456 — tuningFamilySocraticRadarFoodWebComplexityProxyV2
+export function tuningFamilySocraticRadarFoodWebComplexityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // food web complexity: variance of axisAggregates * 4 (clamped [0,1])
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((acc, v) => acc + (v - mean) ** 2, 0) / axisAggregates.length;
+  const result = variance * 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2458 — tuningFamilySocraticRadarNicheSpecializationProxy
+export function tuningFamilySocraticRadarNicheSpecializationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // niche specialization: 1 - (stddev / 0.5) — how narrow/focused
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((acc, v) => acc + (v - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = 1 - std / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2460 — tuningFamilySocraticRadarEvolutionaryFitnessProxy
+export function tuningFamilySocraticRadarEvolutionaryFitnessProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // evolutionary fitness: max(axisAggregates)^2 normalized (already [0,1] since max<=1)
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const result = maxVal * maxVal;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2462 — tuningFamilySocraticRadarAdaptationRateProxy
+export function tuningFamilySocraticRadarAdaptationRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // adaptation rate: range(axisAggregates) = max - min
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const minVal = axisAggregates.reduce((a, b) => Math.min(a, b), 1);
+  const result = maxVal - minVal;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2464 — tuningFamilySocraticRadarCoevolutionProxy
+export function tuningFamilySocraticRadarCoevolutionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // coevolution: correlation between first and last axis across tunings
+  const firstVals = vecs.map((v) => v[0]!);
+  const lastVals = vecs.map((v) => v[axes.length - 1]!);
+  const n = firstVals.length;
+  if (n < 2) {
+    // single tuning: use average of first and last axis as proxy
+    const axisAggregates = axes.map((_, ai) => {
+      const vals = vecs.map((v) => v[ai]!);
+      return vals.reduce((a, b) => a + b, 0) / vals.length;
+    });
+    const result = (axisAggregates[0]! + axisAggregates[axes.length - 1]!) / 2;
+    return Math.min(1, Math.max(0, result));
+  }
+  const meanFirst = firstVals.reduce((a, b) => a + b, 0) / n;
+  const meanLast = lastVals.reduce((a, b) => a + b, 0) / n;
+  const covNum = firstVals.reduce((acc, v, i) => acc + (v - meanFirst) * (lastVals[i]! - meanLast), 0);
+  const stdFirst = Math.sqrt(firstVals.reduce((acc, v) => acc + (v - meanFirst) ** 2, 0) / n);
+  const stdLast = Math.sqrt(lastVals.reduce((acc, v) => acc + (v - meanLast) ** 2, 0) / n);
+  if (stdFirst === 0 || stdLast === 0) return 0.5;
+  const corr = covNum / (n * stdFirst * stdLast);
+  // map correlation [-1,1] to [0,1]
+  const result = (corr + 1) / 2;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -53896,4 +54043,89 @@ export function scaleOctaveEquivalenceScoreV2(pitches: readonly Pitch[]): number
   }
   if (uniquePCs.length === 0) return 0;
   return Math.min(1, Math.max(0, multiOctaveCount / uniquePCs.length));
+}
+
+// Round 130 — R1301-R1304: 音階モード分類分析
+
+export function scaleModeAffinityScore(pitches: readonly Pitch[]): number {
+  // Returns highest affinity score across all 7 church modes (0=Ionian, 1=Dorian...6=Locrian)
+  // Each mode is compared against the input pitch classes (mod 1200)
+  // Perfect match = 1.0, partial matches proportional
+  if (pitches.length === 0) return 0;
+  const modes = [
+    [0, 200, 400, 500, 700, 900, 1100], // Ionian (major)
+    [0, 200, 300, 500, 700, 900, 1000], // Dorian
+    [0, 100, 300, 500, 700, 800, 1000], // Phrygian
+    [0, 200, 400, 600, 700, 900, 1100], // Lydian
+    [0, 200, 400, 500, 700, 900, 1000], // Mixolydian
+    [0, 200, 300, 500, 700, 800, 1000], // Aeolian
+    [0, 100, 300, 500, 600, 800, 1000], // Locrian
+  ];
+  const inputPCs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100);
+  let best = 0;
+  for (const mode of modes) {
+    let matches = 0;
+    for (const ic of inputPCs) {
+      if (mode.some((m) => Math.abs(m - ic) < 50 || Math.abs(m - ic - 1200) < 50 || Math.abs(m - ic + 1200) < 50)) {
+        matches++;
+      }
+    }
+    const score = matches / Math.max(pitches.length, mode.length);
+    if (score > best) best = score;
+  }
+  return Math.min(1, Math.max(0, best));
+}
+
+export function scaleModularityScore(pitches: readonly Pitch[]): number {
+  // Measures how well pitches cluster into distinct groups (musical "modules")
+  // Uses gap analysis: large gaps between adjacent pitches indicate modular structure
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const gaps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    gaps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  gaps.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  const variance = gaps.reduce((a, b) => a + (b - mean) ** 2, 0) / gaps.length;
+  const cv = mean > 0 ? Math.sqrt(variance) / mean : 0; // coefficient of variation
+  return Math.min(1, Math.max(0, cv / 2)); // higher CV = more modular
+}
+
+export function scaleTonicStrengthScore(pitches: readonly Pitch[]): number {
+  // Measures how strongly the first pitch acts as a tonic
+  // Based on: P5 (700c), P4 (500c), M3 (400c) from root present = strong tonic
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const tonicSupports = [700, 500, 400, 900, 200]; // P5, P4, M3, M6, M2 — ranked by importance
+  const weights = [0.35, 0.25, 0.2, 0.15, 0.05];
+  let score = 0;
+  for (let i = 0; i < tonicSupports.length; i++) {
+    const target = tonicSupports[i]!;
+    const w = weights[i]!;
+    if (pcs.some((c) => Math.abs(c - target) < 60)) {
+      score += w;
+    }
+  }
+  return Math.min(1, Math.max(0, score));
+}
+
+export function scalePentatonicAffinity(pitches: readonly Pitch[]): number {
+  // Measures similarity to pentatonic scales (major and minor)
+  // Major pentatonic: 0, 200, 400, 700, 900
+  // Minor pentatonic: 0, 300, 500, 700, 1000
+  if (pitches.length === 0) return 0;
+  const majorPenta = [0, 200, 400, 700, 900];
+  const minorPenta = [0, 300, 500, 700, 1000];
+  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50);
+  const scoreForSet = (refSet: number[]) => {
+    let matches = 0;
+    for (const pc of pcs) {
+      if (refSet.some((r) => Math.abs(r - pc) < 75 || Math.abs(r - pc - 1200) < 75 || Math.abs(r - pc + 1200) < 75)) {
+        matches++;
+      }
+    }
+    return matches / Math.max(pitches.length, refSet.length);
+  };
+  return Math.min(1, Math.max(0, Math.max(scoreForSet(majorPenta), scoreForSet(minorPenta))));
 }

@@ -1024,6 +1024,12 @@ import {
   presetFamilySocraticRadarTranscendenceProxy,
   presetFamilySocraticRadarEnantiodromiaProxy,
   presetFamilySocraticRadarSynchronicityProxy,
+  presetFamilySocraticRadarBiodiversityProxyV3,
+  presetFamilySocraticRadarFoodWebComplexityProxyV2,
+  presetFamilySocraticRadarNicheSpecializationProxy,
+  presetFamilySocraticRadarEvolutionaryFitnessProxy,
+  presetFamilySocraticRadarAdaptationRateProxy,
+  presetFamilySocraticRadarCoevolutionProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
