@@ -1030,6 +1030,12 @@ import {
   presetFamilySocraticRadarEvolutionaryFitnessProxy,
   presetFamilySocraticRadarAdaptationRateProxy,
   presetFamilySocraticRadarCoevolutionProxy,
+  presetFamilySocraticRadarAtmosphericPressureProxyV2,
+  presetFamilySocraticRadarThermalGradientProxy,
+  presetFamilySocraticRadarCoriolisEffectProxy,
+  presetFamilySocraticRadarOceanicCurrentProxy,
+  presetFamilySocraticRadarTidalAmplitudeProxy,
+  presetFamilySocraticRadarHumidityProxyV3,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -24053,5 +24059,125 @@ describe('Q2465 presetFamilySocraticRadarCoevolutionProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarCoevolutionProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2467 — presetFamilySocraticRadarAtmosphericPressureProxyV2
+describe('Q2467 presetFamilySocraticRadarAtmosphericPressureProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarAtmosphericPressureProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarAtmosphericPressureProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAtmosphericPressureProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2469 — presetFamilySocraticRadarThermalGradientProxy
+describe('Q2469 presetFamilySocraticRadarThermalGradientProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarThermalGradientProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarThermalGradientProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThermalGradientProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2471 — presetFamilySocraticRadarCoriolisEffectProxy
+describe('Q2471 presetFamilySocraticRadarCoriolisEffectProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCoriolisEffectProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCoriolisEffectProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCoriolisEffectProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2473 — presetFamilySocraticRadarOceanicCurrentProxy
+describe('Q2473 presetFamilySocraticRadarOceanicCurrentProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarOceanicCurrentProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarOceanicCurrentProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarOceanicCurrentProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2475 — presetFamilySocraticRadarTidalAmplitudeProxy
+describe('Q2475 presetFamilySocraticRadarTidalAmplitudeProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarTidalAmplitudeProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarTidalAmplitudeProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTidalAmplitudeProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2477 — presetFamilySocraticRadarHumidityProxyV3
+describe('Q2477 presetFamilySocraticRadarHumidityProxyV3', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarHumidityProxyV3(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarHumidityProxyV3(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHumidityProxyV3(['unknown-preset'], s)).toThrow(RangeError);
   });
 });
