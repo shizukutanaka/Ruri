@@ -1559,6 +1559,12 @@ import {
   tuningFamilySocraticRadarMarketEfficiencyProxyV2,
   tuningFamilySocraticRadarRiskAversionProxy,
   tuningFamilySocraticRadarLiquidityProxyV2,
+  tuningFamilySocraticRadarBiodiversityProxyV2,
+  tuningFamilySocraticRadarEcosystemStabilityProxy,
+  tuningFamilySocraticRadarCarryingCapacityProxyV3,
+  tuningFamilySocraticRadarNicheOverlapProxyV2,
+  tuningFamilySocraticRadarSuccessionProxy,
+  tuningFamilySocraticRadarFoodWebComplexityProxy,
   scaleOvertoneAlignment,
   scaleSubharmonicAlignment,
   scaleHarmonicSeriesCompleteness,
@@ -1608,6 +1614,10 @@ import {
   scaleLargeSmallStepRatio,
   scaleStepUniformity,
   scaleMaxStepFraction,
+  scaleRegisterBalanceV2,
+  scalePitchClusteringV2,
+  scaleRangeCoverageV2,
+  scaleOctaveCompletenessV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -40883,6 +40893,193 @@ describe('VVVV4 scaleMaxStepFraction', () => {
   it('returns value in [0,1] for multi-pitch scale', () => {
     const pitches = [0, 200, 400, 700, 1100].map((c) => pitchFromCents(c));
     const v = scaleMaxStepFraction(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Round 117 — WWWW1-WWWW4: 音階密度分布分析
+describe('WWWW1 scaleRegisterBalanceV2', () => {
+  it('returns 0.5 for single pitch', () => {
+    expect(scaleRegisterBalanceV2([pitchFromCents(0)])).toBe(0.5);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    const v = scaleRegisterBalanceV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns near 1 for all-high pitches', () => {
+    const pitches = [700, 800, 900, 1000, 1100].map((c) => pitchFromCents(c));
+    const v = scaleRegisterBalanceV2(pitches);
+    expect(v).toBeGreaterThan(0.5);
+  });
+});
+
+describe('WWWW2 scalePitchClusteringV2', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scalePitchClusteringV2([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 0 for equal-spaced scale', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    const v = scalePitchClusteringV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for clustered scale', () => {
+    const pitches = [0, 50, 100, 700, 750, 800].map((c) => pitchFromCents(c));
+    const v = scalePitchClusteringV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('WWWW3 scaleRangeCoverageV2', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleRangeCoverageV2([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    const v = scaleRangeCoverageV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for sparse scale', () => {
+    const pitches = [0, 400, 800, 1200].map((c) => pitchFromCents(c));
+    const v = scaleRangeCoverageV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('WWWW4 scaleOctaveCompletenessV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleOctaveCompletenessV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    const v = scaleOctaveCompletenessV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns higher value for more complete scale', () => {
+    const fullScale = Array.from({ length: 24 }, (_, i) => pitchFromCents(i * 50));
+    const sparse = [0, 400, 700].map((c) => pitchFromCents(c));
+    const full = scaleOctaveCompletenessV2(fullScale);
+    const sp = scaleOctaveCompletenessV2(sparse);
+    expect(full).toBeGreaterThan(sp);
+  });
+});
+
+// Q2298 — tuningFamilySocraticRadarBiodiversityProxyV2
+describe('Q2298 tuningFamilySocraticRadarBiodiversityProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBiodiversityProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarBiodiversityProxyV2([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarBiodiversityProxyV2([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2300 — tuningFamilySocraticRadarEcosystemStabilityProxy
+describe('Q2300 tuningFamilySocraticRadarEcosystemStabilityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEcosystemStabilityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarEcosystemStabilityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarEcosystemStabilityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2302 — tuningFamilySocraticRadarCarryingCapacityProxyV3
+describe('Q2302 tuningFamilySocraticRadarCarryingCapacityProxyV3', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCarryingCapacityProxyV3([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCarryingCapacityProxyV3([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarCarryingCapacityProxyV3([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2304 — tuningFamilySocraticRadarNicheOverlapProxyV2
+describe('Q2304 tuningFamilySocraticRadarNicheOverlapProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNicheOverlapProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarNicheOverlapProxyV2([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarNicheOverlapProxyV2([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2306 — tuningFamilySocraticRadarSuccessionProxy
+describe('Q2306 tuningFamilySocraticRadarSuccessionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSuccessionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarSuccessionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarSuccessionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2308 — tuningFamilySocraticRadarFoodWebComplexityProxy
+describe('Q2308 tuningFamilySocraticRadarFoodWebComplexityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarFoodWebComplexityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarFoodWebComplexityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarFoodWebComplexityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

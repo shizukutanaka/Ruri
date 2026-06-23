@@ -45279,6 +45279,147 @@ export function tuningFamilySocraticRadarLiquidityProxyV2(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2298 — tuningFamilySocraticRadarBiodiversityProxyV2
+export function tuningFamilySocraticRadarBiodiversityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const total = axisAggregates.reduce((a, b) => a + b, 0) + 1e-9;
+  const H = axisAggregates.reduce((acc, agg) => {
+    const p = agg / total;
+    return acc - p * Math.log(p + 1e-12);
+  }, 0);
+  const result = H / Math.log(5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2300 — tuningFamilySocraticRadarEcosystemStabilityProxy
+export function tuningFamilySocraticRadarEcosystemStabilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, agg) => acc + (agg - mean) ** 2, 0) / 5;
+  const result = 1 - variance * 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2302 — tuningFamilySocraticRadarCarryingCapacityProxyV3
+export function tuningFamilySocraticRadarCarryingCapacityProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = Math.max(...axisAggregates);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2304 — tuningFamilySocraticRadarNicheOverlapProxyV2
+export function tuningFamilySocraticRadarNicheOverlapProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  if (vecs.length < 2) return 0.5;
+  let totalSim = 0;
+  let pairs = 0;
+  for (let i = 0; i < vecs.length; i++) {
+    for (let j = i + 1; j < vecs.length; j++) {
+      const vi = vecs[i]!;
+      const vj = vecs[j]!;
+      const dot = vi.reduce((acc, v, k) => acc + v * vj[k]!, 0);
+      const normI = Math.sqrt(vi.reduce((acc, v) => acc + v * v, 0));
+      const normJ = Math.sqrt(vj.reduce((acc, v) => acc + v * v, 0));
+      totalSim += dot / (normI * normJ + 1e-9);
+      pairs++;
+    }
+  }
+  const result = pairs > 0 ? totalSim / pairs : 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2306 — tuningFamilySocraticRadarSuccessionProxy
+export function tuningFamilySocraticRadarSuccessionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const max = Math.max(...axisAggregates);
+  const result = mean / (max + 1e-9);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2308 — tuningFamilySocraticRadarFoodWebComplexityProxy
+export function tuningFamilySocraticRadarFoodWebComplexityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  let connectedPairs = 0;
+  for (let i = 0; i < axisAggregates.length; i++) {
+    for (let j = i + 1; j < axisAggregates.length; j++) {
+      if (Math.abs(axisAggregates[i]! - axisAggregates[j]!) < 0.2) {
+        connectedPairs++;
+      }
+    }
+  }
+  const result = connectedPairs / 10;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -51301,4 +51442,61 @@ export function scaleMaxStepFraction(pitches: readonly Pitch[]): number {
     if (step > maxStep) maxStep = step;
   }
   return Math.min(1, Math.max(0, maxStep / total));
+}
+
+// Round 117 — WWWW1-WWWW4: 音階密度分布分析
+
+export function scaleRegisterBalanceV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0.5;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const lo = cents[0]!;
+  const hi = cents[cents.length - 1]!;
+  const mid = (lo + hi) / 2;
+  const lower = cents.filter((c) => c < mid).length;
+  const upper = cents.filter((c) => c > mid).length;
+  const total = lower + upper;
+  if (total === 0) return 0.5;
+  // Perfect balance = 0.5, all low = 0, all high = 1
+  return Math.min(1, Math.max(0, upper / total));
+}
+
+export function scalePitchClusteringV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const total = cents[cents.length - 1]! - cents[0]!;
+  if (total === 0) return 1;
+  // Count "gaps" larger than mean step — separating clusters
+  const steps: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    steps.push(cents[i]! - cents[i - 1]!);
+  }
+  const meanStep = total / (cents.length - 1);
+  const clusterGaps = steps.filter((s) => s > meanStep * 2).length;
+  // More cluster gaps = higher clustering
+  return Math.min(1, Math.max(0, clusterGaps / (cents.length - 1)));
+}
+
+export function scaleRangeCoverageV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const total = cents[cents.length - 1]! - cents[0]!;
+  if (total === 0) return 0;
+  // Covered area: sum of step sizes <= 200 cents (within one step of 200c tolerance)
+  let coveredSum = 0;
+  for (let i = 1; i < cents.length; i++) {
+    coveredSum += Math.min(cents[i]! - cents[i - 1]!, 200);
+  }
+  return Math.min(1, Math.max(0, coveredSum / total));
+}
+
+export function scaleOctaveCompletenessV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  // Map to octave [0, 1200) with 50-cent resolution (24 bins)
+  const bins = new Set<number>();
+  for (const c of cents) {
+    const normalized = ((c % 1200) + 1200) % 1200;
+    bins.add(Math.floor(normalized / 50));
+  }
+  return Math.min(1, Math.max(0, bins.size / 24));
 }

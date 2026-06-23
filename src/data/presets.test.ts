@@ -946,6 +946,12 @@ import {
   presetFamilySocraticRadarMarketEfficiencyProxyV2,
   presetFamilySocraticRadarRiskAversionProxy,
   presetFamilySocraticRadarLiquidityProxyV2,
+  presetFamilySocraticRadarBiodiversityProxyV2,
+  presetFamilySocraticRadarEcosystemStabilityProxy,
+  presetFamilySocraticRadarCarryingCapacityProxyV3,
+  presetFamilySocraticRadarNicheOverlapProxyV2,
+  presetFamilySocraticRadarSuccessionProxy,
+  presetFamilySocraticRadarFoodWebComplexityProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -22289,5 +22295,125 @@ describe('Q2297 presetFamilySocraticRadarLiquidityProxyV2', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarLiquidityProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2299 — presetFamilySocraticRadarBiodiversityProxyV2
+describe('Q2299 presetFamilySocraticRadarBiodiversityProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarBiodiversityProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarBiodiversityProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBiodiversityProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2301 — presetFamilySocraticRadarEcosystemStabilityProxy
+describe('Q2301 presetFamilySocraticRadarEcosystemStabilityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarEcosystemStabilityProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarEcosystemStabilityProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEcosystemStabilityProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2303 — presetFamilySocraticRadarCarryingCapacityProxyV3
+describe('Q2303 presetFamilySocraticRadarCarryingCapacityProxyV3', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCarryingCapacityProxyV3(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCarryingCapacityProxyV3(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCarryingCapacityProxyV3(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2305 — presetFamilySocraticRadarNicheOverlapProxyV2
+describe('Q2305 presetFamilySocraticRadarNicheOverlapProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarNicheOverlapProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarNicheOverlapProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNicheOverlapProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2307 — presetFamilySocraticRadarSuccessionProxy
+describe('Q2307 presetFamilySocraticRadarSuccessionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarSuccessionProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarSuccessionProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSuccessionProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2309 — presetFamilySocraticRadarFoodWebComplexityProxy
+describe('Q2309 presetFamilySocraticRadarFoodWebComplexityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarFoodWebComplexityProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarFoodWebComplexityProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarFoodWebComplexityProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });

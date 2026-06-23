@@ -939,6 +939,12 @@ import {
   tuningFamilySocraticRadarMarketEfficiencyProxyV2,
   tuningFamilySocraticRadarRiskAversionProxy,
   tuningFamilySocraticRadarLiquidityProxyV2,
+  tuningFamilySocraticRadarBiodiversityProxyV2,
+  tuningFamilySocraticRadarEcosystemStabilityProxy,
+  tuningFamilySocraticRadarCarryingCapacityProxyV3,
+  tuningFamilySocraticRadarNicheOverlapProxyV2,
+  tuningFamilySocraticRadarSuccessionProxy,
+  tuningFamilySocraticRadarFoodWebComplexityProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -19369,4 +19375,88 @@ export function presetFamilySocraticRadarLiquidityProxyV2(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarLiquidityProxyV2(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarBiodiversityProxyV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarBiodiversityProxyV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarBiodiversityProxyV2(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarEcosystemStabilityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarEcosystemStabilityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarEcosystemStabilityProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarCarryingCapacityProxyV3(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCarryingCapacityProxyV3> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCarryingCapacityProxyV3(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarNicheOverlapProxyV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarNicheOverlapProxyV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarNicheOverlapProxyV2(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarSuccessionProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSuccessionProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSuccessionProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarFoodWebComplexityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarFoodWebComplexityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarFoodWebComplexityProxy(tunings, spectrum, rootHz);
 }
