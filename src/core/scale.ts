@@ -44526,6 +44526,123 @@ export function tuningFamilySocraticRadarStormIntensityProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2226 — tuningFamilySocraticRadarNeuralFiringProxy
+export function tuningFamilySocraticRadarNeuralFiringProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.filter((v) => v > 0.5).length / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2228 — tuningFamilySocraticRadarSynapticWeightProxyV2
+export function tuningFamilySocraticRadarSynapticWeightProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2230 — tuningFamilySocraticRadarPlasticityProxy
+export function tuningFamilySocraticRadarPlasticityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = Math.max(...axisAggregates) - Math.min(...axisAggregates);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2232 — tuningFamilySocraticRadarLateralInhibitionProxy
+export function tuningFamilySocraticRadarLateralInhibitionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.filter((v) => v < 0.3).length / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2234 — tuningFamilySocraticRadarFrequencyEntrainmentProxy
+export function tuningFamilySocraticRadarFrequencyEntrainmentProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = 1 - std / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2236 — tuningFamilySocraticRadarCorticalMapProxy
+export function tuningFamilySocraticRadarCorticalMapProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = Math.max(...axisAggregates);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -50073,5 +50190,128 @@ export function scaleRotationSymmetry(scaleCents: readonly number[], periodCents
     if (Math.abs(intervals[i]! - intervals[i + 1]!) < 1) equal++;
   }
   return Math.min(1, Math.max(0, equal / (intervals.length - 1)));
+}
+
+/**
+ * QQQQ1 — scalePitchEntropy
+ * Shannon entropy of normalized pitch positions.
+ * Normalize pitches to [0,1] by dividing by periodCents, bin into 12 bins,
+ * compute -sum(p * log2(p)) for non-zero p, normalized by log2(12).
+ * Empty → 0; all in same bin → 0.
+ */
+export function scalePitchEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const bins = new Array<number>(12).fill(0);
+  for (let i = 0; i < n; i++) {
+    const normalized = (((scaleCents[i]! % periodCents) + periodCents) % periodCents) / periodCents;
+    const bin = Math.min(11, Math.floor(normalized * 12));
+    bins[bin]!++;
+  }
+  let entropy = 0;
+  for (let i = 0; i < 12; i++) {
+    const p = bins[i]! / n;
+    if (p > 0) entropy -= p * Math.log2(p);
+  }
+  return Math.min(1, Math.max(0, entropy / Math.log2(12)));
+}
+
+/**
+ * QQQQ2 — scaleIntervalEntropyV2
+ * Shannon entropy of interval sizes.
+ * Sort pitches, compute n intervals (including wrap-around),
+ * bin into 12 bins of width periodCents/12 each.
+ * Same entropy formula as QQQQ1.
+ * Empty/single → 0.
+ */
+export function scaleIntervalEntropyV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) intervals.push(sorted[i + 1]! - sorted[i]!);
+    else intervals.push(periodCents - sorted[i]! + sorted[0]!);
+  }
+  const binWidth = periodCents / 12;
+  const bins = new Array<number>(12).fill(0);
+  for (let i = 0; i < intervals.length; i++) {
+    const bin = Math.min(11, Math.floor(intervals[i]! / binWidth));
+    bins[bin]!++;
+  }
+  let entropy = 0;
+  for (let i = 0; i < 12; i++) {
+    const p = bins[i]! / intervals.length;
+    if (p > 0) entropy -= p * Math.log2(p);
+  }
+  return Math.min(1, Math.max(0, entropy / Math.log2(12)));
+}
+
+/**
+ * QQQQ3 — scaleRhythmicEntropy
+ * Entropy of interval ratios (consecutive interval / next interval).
+ * Compute ratios ratio[i] = interval[i] / interval[i+1] (skip div-by-zero).
+ * Bin ratios clamped to [0,2] into 10 bins.
+ * Same Shannon entropy formula, normalized by log2(10).
+ * Empty/single/two notes → 0.
+ */
+export function scaleRhythmicEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 2) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 0; i < n; i++) {
+    if (i < n - 1) intervals.push(sorted[i + 1]! - sorted[i]!);
+    else intervals.push(periodCents - sorted[i]! + sorted[0]!);
+  }
+  const bins = new Array<number>(10).fill(0);
+  let count = 0;
+  for (let i = 0; i < intervals.length - 1; i++) {
+    if (intervals[i + 1]! === 0) continue;
+    const ratio = intervals[i]! / intervals[i + 1]!;
+    const clamped = Math.min(2, Math.max(0, ratio));
+    const bin = Math.min(9, Math.floor(clamped * 5));
+    bins[bin]!++;
+    count++;
+  }
+  if (count === 0) return 0;
+  let entropy = 0;
+  for (let i = 0; i < 10; i++) {
+    const p = bins[i]! / count;
+    if (p > 0) entropy -= p * Math.log2(p);
+  }
+  return Math.min(1, Math.max(0, entropy / Math.log2(10)));
+}
+
+/**
+ * QQQQ4 — scaleHarmonicEntropy
+ * Harmonic entropy proxy: how uncertain is the "implied root" of the scale.
+ * For each pair of pitches (i,j), compute interval ratio ≈ 2^(|ci-cj|/1200).
+ * Bin pairwise interval "complexity" into 10 bins over [1,2].
+ * Empty/single → 0.
+ */
+export function scaleHarmonicEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+  void periodCents;
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const bins = new Array<number>(10).fill(0);
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      const ratio = Math.pow(2, diff / 1200);
+      const clamped = Math.min(2, Math.max(1, ratio));
+      const bin = Math.min(9, Math.floor((clamped - 1) * 10));
+      bins[bin]!++;
+      count++;
+    }
+  }
+  if (count === 0) return 0;
+  let entropy = 0;
+  for (let i = 0; i < 10; i++) {
+    const p = bins[i]! / count;
+    if (p > 0) entropy -= p * Math.log2(p);
+  }
+  return Math.min(1, Math.max(0, entropy / Math.log2(10)));
 }
 
