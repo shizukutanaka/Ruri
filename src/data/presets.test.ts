@@ -1072,6 +1072,12 @@ import {
   presetFamilySocraticRadarGoldenRatioProxy,
   presetFamilySocraticRadarCurvatureProxy,
   presetFamilySocraticRadarSymmetryBreakingProxy,
+  presetFamilySocraticRadarCrystallineOrderProxyV3,
+  presetFamilySocraticRadarThermalExpansionProxy,
+  presetFamilySocraticRadarViscosityProxyV3,
+  presetFamilySocraticRadarElasticModulusProxy,
+  presetFamilySocraticRadarConductivityProxyV4,
+  presetFamilySocraticRadarEntropyDensityProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -24935,5 +24941,125 @@ describe('Q2549 presetFamilySocraticRadarSymmetryBreakingProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarSymmetryBreakingProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2551 — presetFamilySocraticRadarCrystallineOrderProxyV3
+describe('Q2551 presetFamilySocraticRadarCrystallineOrderProxyV3', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCrystallineOrderProxyV3(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCrystallineOrderProxyV3(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCrystallineOrderProxyV3(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2553 — presetFamilySocraticRadarThermalExpansionProxy
+describe('Q2553 presetFamilySocraticRadarThermalExpansionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarThermalExpansionProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarThermalExpansionProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThermalExpansionProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2555 — presetFamilySocraticRadarViscosityProxyV3
+describe('Q2555 presetFamilySocraticRadarViscosityProxyV3', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarViscosityProxyV3(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarViscosityProxyV3(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarViscosityProxyV3(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2557 — presetFamilySocraticRadarElasticModulusProxy
+describe('Q2557 presetFamilySocraticRadarElasticModulusProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarElasticModulusProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarElasticModulusProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarElasticModulusProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2559 — presetFamilySocraticRadarConductivityProxyV4
+describe('Q2559 presetFamilySocraticRadarConductivityProxyV4', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarConductivityProxyV4(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarConductivityProxyV4(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarConductivityProxyV4(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2561 — presetFamilySocraticRadarEntropyDensityProxy
+describe('Q2561 presetFamilySocraticRadarEntropyDensityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarEntropyDensityProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarEntropyDensityProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEntropyDensityProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });
