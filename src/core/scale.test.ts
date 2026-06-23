@@ -1889,6 +1889,10 @@ import {
   scaleAsymmetryIndex,
   scaleUnimodality,
   scaleIntervalDensityPeak,
+  scaleHexatonicAffinity,
+  scaleOctatonicAffinity,
+  scaleOctaveBalance,
+  scaleFifthCircleScore,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -46857,5 +46861,74 @@ describe('R1474 scaleIntervalDensityPeak', () => {
     const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
     const v = scaleIntervalDensityPeak(pitches);
     expect(v).toBeCloseTo(100/1200, 2);
+  });
+});
+
+// R1481
+describe('R1481 scaleHexatonicAffinity', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleHexatonicAffinity([])).toBe(0);
+  });
+  it('returns 1 for 6-note scale', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map(c => pitchFromCents(c));
+    expect(scaleHexatonicAffinity(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for other sizes', () => {
+    const pitches = [0, 200, 400, 700, 900].map(c => pitchFromCents(c));
+    const v = scaleHexatonicAffinity(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1482
+describe('R1482 scaleOctatonicAffinity', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleOctatonicAffinity([])).toBe(0);
+  });
+  it('returns 1 for 8-note scale', () => {
+    const pitches = [0, 150, 300, 450, 600, 750, 900, 1050].map(c => pitchFromCents(c));
+    expect(scaleOctatonicAffinity(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for other sizes', () => {
+    const pitches = [0, 200, 400, 700].map(c => pitchFromCents(c));
+    const v = scaleOctatonicAffinity(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1483
+describe('R1483 scaleOctaveBalance', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleOctaveBalance([])).toBe(0);
+  });
+  it('returns 1 for perfectly balanced scale', () => {
+    const pitches = [0, 300, 600, 900].map(c => pitchFromCents(c));
+    expect(scaleOctaveBalance(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for unbalanced scale', () => {
+    const pitches = [0, 100, 200, 300].map(c => pitchFromCents(c));
+    const v = scaleOctaveBalance(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// R1484
+describe('R1484 scaleFifthCircleScore', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleFifthCircleScore([])).toBe(0);
+  });
+  it('returns 1 for all chromatic positions', () => {
+    const positions = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    const pitches = positions.map(c => pitchFromCents(c));
+    expect(scaleFifthCircleScore(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for diatonic scale', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map(c => pitchFromCents(c));
+    const v = scaleFifthCircleScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

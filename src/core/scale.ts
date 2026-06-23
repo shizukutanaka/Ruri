@@ -57359,3 +57359,46 @@ export function scaleIntervalDensityPeak(pitches: readonly Pitch[]): number {
   const binCenter = peakBin * 200 + 100;
   return Math.min(1, Math.max(0, binCenter / 1200));
 }
+
+export function scaleHexatonicAffinity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const n = Math.min(pitches.length, 12);
+  return Math.min(1, Math.max(0, 1 - Math.abs(n - 6) / 6));
+}
+
+export function scaleOctatonicAffinity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const n = Math.min(pitches.length, 16);
+  return Math.min(1, Math.max(0, 1 - Math.abs(n - 8) / 8));
+}
+
+export function scaleOctaveBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const counts = [0, 0, 0, 0];
+  for (const p of pitches) {
+    const c = pitchToCents(p) % 1200;
+    const q = Math.min(3, Math.floor(c / 300));
+    counts[q]!++;
+  }
+  const maxCount = Math.max(...counts);
+  const minCount = Math.min(...counts);
+  return Math.min(1, Math.max(0, 1 - (maxCount - minCount) / Math.max(1, pitches.length)));
+}
+
+export function scaleFifthCircleScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const positions = [0, 700, 200, 900, 400, 1100, 600, 100, 800, 300, 1000, 500];
+  let matched = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    for (const pos of positions) {
+      const diff = Math.abs(c - pos);
+      const wrapped = Math.min(diff, 1200 - diff);
+      if (wrapped <= 20) {
+        matched++;
+        break;
+      }
+    }
+  }
+  return matched / pitches.length;
+}
