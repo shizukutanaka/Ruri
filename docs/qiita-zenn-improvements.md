@@ -1471,3 +1471,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | XXXX2 | `scaleStepFraction` | 順次音程率: 200セント以内の順次進行が占める割合 |
 | XXXX3 | `scaleHalfStepCount` | 半音率: 50〜150セントの半音程が占める割合 |
 | XXXX4 | `scaleWholeToneContent` | 全音率: 150〜250セントの全音程が占める割合 |
+
+## Round 119 — YYYY1–YYYY4: 音階ピッチ分布統計検定
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| YYYY1 | `scaleNormalityIndex` | 正規性指数: IQR/標準偏差比が正規分布の1.35に近いほど高スコア |
+| YYYY2 | `scaleUniformityIndex` | 均一性指数: 4区間チゥ二乗検定による一様分布適合度 |
+| YYYY3 | `scaleBimodalityIndex` | 双峰性指数: 歪度と尖度から双峰分布係数を推定 |
+| YYYY4 | `scaleDistributionSkewIndex` | 分布歪度指数: 歪度を[0,1]にマッピング(0.5=対称) |
