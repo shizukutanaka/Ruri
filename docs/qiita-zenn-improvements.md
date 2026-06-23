@@ -1415,3 +1415,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | RRRR2 | `scaleMomentOfInertia` | 重心周りの慣性モーメント（分散） |
 | RRRR3 | `scaleGyrationRadius` | 回転半径（分散の平方根） |
 | RRRR4 | `scaleAngularMomentum` | 角運動量代理（重心×回転半径） |
+
+## Round 113: 音階ピッチ分布統計分析 (SSSS1–SSSS4)
+
+音階の正規化ピッチ位置分布を統計的に測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| SSSS1 | `scaleSkewness` | ピッチ分布の歪度（左右非対称性） |
+| SSSS2 | `scaleKurtosis` | ピッチ分布の尖度（裾の重さ） |
+| SSSS3 | `scaleQuartileSpread` | 四分位範囲（中間50%の広がり） |
+| SSSS4 | `scaleOutlierRatio` | 外れ値ピッチの比率（IQR法） |
