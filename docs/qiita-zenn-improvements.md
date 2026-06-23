@@ -1691,3 +1691,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1424 | `scaleIntervalSpread` | 隣接音程の標準偏差を600cで正規化した音程分散指標 |
 
 **設計根拠**: 音域の広さ（Ambito）、旋法混交（ModalInterchange）、半音傾向音（ChromaticTendency）、音程分散（IntervalSpread）の4軸でスケールの展開特性を多角的に評価する。
+
+## Round 143 — R1431–R1434 音階物理振動分析
+
+| ID | 関数名 | 概要 |
+|----|--------|------|
+| R1431 | `scaleResonanceFrequencyScore` | 隣接音程が100cent倍数±20c内に入る割合（共鳴周波数整合度） |
+| R1432 | `scaleHarmonicOscillatorIndex` | 隣接音程比が小整数比（3/2等）に近い割合（調和振動子整合） |
+| R1433 | `scaleDampingRatioEstimate` | 音程の最大・最小比から推定する減衰比（1−min/max） |
+| R1434 | `scaleSpringConstantProxy` | 隣接音程の平均を600cで正規化したバネ定数プロキシ |
+
+**設計根拠**: 物理振動系の視点でスケール構造を解釈する。共鳴整合→高いResonance、調和振動子近似→高いHarmonicOscillator、音程ばらつき→高いDamping、音程密度→高いSpringConstant。
