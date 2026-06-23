@@ -1426,3 +1426,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | SSSS2 | `scaleKurtosis` | ピッチ分布の尖度（裾の重さ） |
 | SSSS3 | `scaleQuartileSpread` | 四分位範囲（中間50%の広がり） |
 | SSSS4 | `scaleOutlierRatio` | 外れ値ピッチの比率（IQR法） |
+
+## Round 114 — TTTT1–TTTT4: 音階フラクタル次元分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| TTTT1 | `scaleBoxCountingDimension` | ボックスカウンティング次元: 2スケールでのボックス占有数比からフラクタル次元を推定 |
+| TTTT2 | `scaleHausdorffEstimate` | ハウスドルフ次元推定: ギャップ分布の平均/最大比をフラクタル指標として使用 |
+| TTTT3 | `scaleSelfSimilarityIndex` | 自己相似性指数: 音程パターンの前半・後半を比較し相似度を数値化 |
+| TTTT4 | `scaleLacunarity` | ラクナリティ: ギャップ分布の変動係数2乗、スケールの疎密パターンを測定 |
