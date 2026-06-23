@@ -1349,3 +1349,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | LLLL2 | `scalePivotChordPotential` | 3音以上共有できる移調の割合 |
 | LLLL3 | `scaleCircleOfFifthsPosition` | 五度圏上の標準調との整合度 |
 | LLLL4 | `scaleModulationDistanceV2` | 転調距離（最近傍移調との差分） |
+
+## Round 107: 音階音色類似分析 (MMMM1–MMMM4)
+
+音階のピッチ分布をスペクトル音色特性として測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| MMMM1 | `scaleSpectralCentroidV2` | ピッチ重心（スペクトル重心の類似） |
+| MMMM2 | `scaleSpectralSpread` | 重心周りの広がり（スペクトル拡散） |
+| MMMM3 | `scaleSpectralFlux` | 連続ピッチ変化量（スペクトルフラックス） |
+| MMMM4 | `scaleSpectralRolloff` | 下半分累積音高比率（ロールオフ） |
