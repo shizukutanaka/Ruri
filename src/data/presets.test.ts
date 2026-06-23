@@ -25072,6 +25072,7 @@ describe('Q2561 presetFamilySocraticRadarEntropyDensityProxy', () => {
 
 // Q2563 — presetFamilySocraticRadarNashEquilibriumProxyV5
 describe('Q2563 presetFamilySocraticRadarNashEquilibriumProxyV5', () => {
+  const s = harmonicSpectrum(6);
   it('returns finite for single preset', () => {
     const v = presetFamilySocraticRadarNashEquilibriumProxyV5(['12-tet'], s);
     expect(Number.isFinite(v)).toBe(true);
@@ -25091,6 +25092,7 @@ describe('Q2563 presetFamilySocraticRadarNashEquilibriumProxyV5', () => {
 
 // Q2565 — presetFamilySocraticRadarParetoEfficiencyProxy
 describe('Q2565 presetFamilySocraticRadarParetoEfficiencyProxy', () => {
+  const s = harmonicSpectrum(6);
   it('returns finite for single preset', () => {
     const v = presetFamilySocraticRadarParetoEfficiencyProxy(['12-tet'], s);
     expect(Number.isFinite(v)).toBe(true);
@@ -25110,6 +25112,7 @@ describe('Q2565 presetFamilySocraticRadarParetoEfficiencyProxy', () => {
 
 // Q2567 — presetFamilySocraticRadarMarginalUtilityProxy
 describe('Q2567 presetFamilySocraticRadarMarginalUtilityProxy', () => {
+  const s = harmonicSpectrum(6);
   it('returns finite for single preset', () => {
     const v = presetFamilySocraticRadarMarginalUtilityProxy(['12-tet'], s);
     expect(Number.isFinite(v)).toBe(true);
