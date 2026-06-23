@@ -1615,3 +1615,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1342 | `scalePartialAlignmentDensity` | 倍音整合密度: 倍音1-16のいずれか（±50c）に一致する音の割合 |
 | R1343 | `scaleInharmonicityIndex` | 不協和指数: 各音程ペアの最近傍純正律音程からの平均偏差（50c正規化） |
 | R1344 | `scaleSpectralCentroidBias` | スペクトル重心バイアス: 音度分布の重心が600cからどれだけ偏っているか |
+
+## Round 135 — R1351–R1354: 音階音程ベクトル分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1351 | `scaleIntervalVectorEntropy` | 音程ベクトルエントロピー: 音程クラス1-6の分布のシャノンエントロピー |
+| R1352 | `scaleIntervalClassBalanceV2` | 音程クラスバランス: 協和音程クラス(IC3/4/5)の全ペアに占める割合 |
+| R1353 | `scaleConsistencyIndex` | 一貫性指数: 音程を積み重ねて得られる音が音階内に含まれる割合 |
+| R1354 | `scaleProportionalBalance` | 比例バランス: 隣接音程サイズの変動係数の逆数（等距離に近いほど高い） |
