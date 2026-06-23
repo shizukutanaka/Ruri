@@ -1382,3 +1382,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | OOOO2 | `scaleDescendingTendency` | インターバルが減少傾向にある連続対の比率 |
 | OOOO3 | `scaleDirectionBalance` | 上昇・下降傾向のバランス度 |
 | OOOO4 | `scaleIntervalSymmetry` | インターバル列の回文的対称性 |
+
+## Round 110: 音階対称性分析 (PPPP1–PPPP4)
+
+音階の幾何学的対称性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| PPPP1 | `scaleReflectionSymmetry` | ピッチ反転（鏡映）対称性 |
+| PPPP2 | `scaleTranslationSymmetry` | 等間隔（平行移動）対称性 |
+| PPPP3 | `scaleRotationSymmetry` | 回転（巡回転置）対称性 |
+| PPPP4 | `scaleInversionSymmetry` | インターバル逆読み対称性 |
