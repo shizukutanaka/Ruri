@@ -1553,6 +1553,12 @@ import {
   tuningFamilySocraticRadarChannelCapacityProxyV2,
   tuningFamilySocraticRadarFisherInformationProxyV2,
   tuningFamilySocraticRadarKolmogorovComplexityProxyV2,
+  tuningFamilySocraticRadarNashEquilibriumProxyV4,
+  tuningFamilySocraticRadarParetoOptimalityProxy,
+  tuningFamilySocraticRadarUtilityMaximizationProxy,
+  tuningFamilySocraticRadarMarketEfficiencyProxyV2,
+  tuningFamilySocraticRadarRiskAversionProxy,
+  tuningFamilySocraticRadarLiquidityProxyV2,
   scaleOvertoneAlignment,
   scaleSubharmonicAlignment,
   scaleHarmonicSeriesCompleteness,
@@ -1598,6 +1604,10 @@ import {
   scaleInversionSimilarity,
   scaleComplementarity,
   scaleMirrorSymmetry,
+  scaleStepSizeVarianceV2,
+  scaleLargeSmallStepRatio,
+  scaleStepUniformity,
+  scaleMaxStepFraction,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -40633,6 +40643,120 @@ describe('Q2284 tuningFamilySocraticRadarKolmogorovComplexityProxyV2', () => {
   });
 });
 
+// Q2286 — tuningFamilySocraticRadarNashEquilibriumProxyV4
+describe('Q2286 tuningFamilySocraticRadarNashEquilibriumProxyV4', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNashEquilibriumProxyV4([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarNashEquilibriumProxyV4([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarNashEquilibriumProxyV4([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2288 — tuningFamilySocraticRadarParetoOptimalityProxy
+describe('Q2288 tuningFamilySocraticRadarParetoOptimalityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarParetoOptimalityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarParetoOptimalityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarParetoOptimalityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2290 — tuningFamilySocraticRadarUtilityMaximizationProxy
+describe('Q2290 tuningFamilySocraticRadarUtilityMaximizationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarUtilityMaximizationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarUtilityMaximizationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarUtilityMaximizationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2292 — tuningFamilySocraticRadarMarketEfficiencyProxyV2
+describe('Q2292 tuningFamilySocraticRadarMarketEfficiencyProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarMarketEfficiencyProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarMarketEfficiencyProxyV2([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarMarketEfficiencyProxyV2([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2294 — tuningFamilySocraticRadarRiskAversionProxy
+describe('Q2294 tuningFamilySocraticRadarRiskAversionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarRiskAversionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarRiskAversionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarRiskAversionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2296 — tuningFamilySocraticRadarLiquidityProxyV2
+describe('Q2296 tuningFamilySocraticRadarLiquidityProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarLiquidityProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarLiquidityProxyV2([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarLiquidityProxyV2([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
 // Round 115 — UUUU1-UUUU4: 音階対称変換分析
 describe('UUUU1 scaleRetrogradeSimilarity', () => {
   it('returns 1 for empty scale', () => {
@@ -40691,6 +40815,74 @@ describe('UUUU4 scaleMirrorSymmetry', () => {
   it('returns value in [0,1] for chromatic scale', () => {
     const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
     const v = scaleMirrorSymmetry(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Round 116 — VVVV1-VVVV4: 音階音程変動分析
+describe('VVVV1 scaleStepSizeVarianceV2', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleStepSizeVarianceV2([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 0 for equal-spaced scale', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    const v = scaleStepSizeVarianceV2(pitches);
+    expect(v).toBeCloseTo(0, 5);
+  });
+  it('returns value in [0,1] for irregular scale', () => {
+    const pitches = [0, 100, 300, 500, 700, 1100].map((c) => pitchFromCents(c));
+    const v = scaleStepSizeVarianceV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('VVVV2 scaleLargeSmallStepRatio', () => {
+  it('returns 0 for two pitches', () => {
+    expect(scaleLargeSmallStepRatio([pitchFromCents(0), pitchFromCents(100)])).toBe(0);
+  });
+  it('returns 0 for equal-spaced scale', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    const v = scaleLargeSmallStepRatio(pitches);
+    expect(v).toBeCloseTo(0, 5);
+  });
+  it('returns value in [0,1] for irregular scale', () => {
+    const pitches = [0, 100, 300, 700, 1100].map((c) => pitchFromCents(c));
+    const v = scaleLargeSmallStepRatio(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('VVVV3 scaleStepUniformity', () => {
+  it('returns 1 for single pitch', () => {
+    expect(scaleStepUniformity([pitchFromCents(0)])).toBe(1);
+  });
+  it('returns 1 for equal-spaced scale', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    const v = scaleStepUniformity(pitches);
+    expect(v).toBeCloseTo(1, 5);
+  });
+  it('returns value in [0,1] for irregular scale', () => {
+    const pitches = [0, 100, 300, 500, 700, 1100].map((c) => pitchFromCents(c));
+    const v = scaleStepUniformity(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('VVVV4 scaleMaxStepFraction', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleMaxStepFraction([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 1 for two pitches', () => {
+    const v = scaleMaxStepFraction([pitchFromCents(0), pitchFromCents(100)]);
+    expect(v).toBe(1);
+  });
+  it('returns value in [0,1] for multi-pitch scale', () => {
+    const pitches = [0, 200, 400, 700, 1100].map((c) => pitchFromCents(c));
+    const v = scaleMaxStepFraction(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

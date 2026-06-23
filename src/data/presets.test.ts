@@ -940,6 +940,12 @@ import {
   presetFamilySocraticRadarChannelCapacityProxyV2,
   presetFamilySocraticRadarFisherInformationProxyV2,
   presetFamilySocraticRadarKolmogorovComplexityProxyV2,
+  presetFamilySocraticRadarNashEquilibriumProxyV4,
+  presetFamilySocraticRadarParetoOptimalityProxy,
+  presetFamilySocraticRadarUtilityMaximizationProxy,
+  presetFamilySocraticRadarMarketEfficiencyProxyV2,
+  presetFamilySocraticRadarRiskAversionProxy,
+  presetFamilySocraticRadarLiquidityProxyV2,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -22163,5 +22169,125 @@ describe('Q2285 presetFamilySocraticRadarKolmogorovComplexityProxyV2', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarKolmogorovComplexityProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2287 — presetFamilySocraticRadarNashEquilibriumProxyV4
+describe('Q2287 presetFamilySocraticRadarNashEquilibriumProxyV4', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarNashEquilibriumProxyV4(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarNashEquilibriumProxyV4(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNashEquilibriumProxyV4(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2289 — presetFamilySocraticRadarParetoOptimalityProxy
+describe('Q2289 presetFamilySocraticRadarParetoOptimalityProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarParetoOptimalityProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarParetoOptimalityProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarParetoOptimalityProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2291 — presetFamilySocraticRadarUtilityMaximizationProxy
+describe('Q2291 presetFamilySocraticRadarUtilityMaximizationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarUtilityMaximizationProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarUtilityMaximizationProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarUtilityMaximizationProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2293 — presetFamilySocraticRadarMarketEfficiencyProxyV2
+describe('Q2293 presetFamilySocraticRadarMarketEfficiencyProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarMarketEfficiencyProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarMarketEfficiencyProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMarketEfficiencyProxyV2(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2295 — presetFamilySocraticRadarRiskAversionProxy
+describe('Q2295 presetFamilySocraticRadarRiskAversionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarRiskAversionProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarRiskAversionProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarRiskAversionProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2297 — presetFamilySocraticRadarLiquidityProxyV2
+describe('Q2297 presetFamilySocraticRadarLiquidityProxyV2', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarLiquidityProxyV2(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarLiquidityProxyV2(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLiquidityProxyV2(['unknown-preset'], s)).toThrow(RangeError);
   });
 });

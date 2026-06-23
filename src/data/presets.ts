@@ -933,6 +933,12 @@ import {
   tuningFamilySocraticRadarChannelCapacityProxyV2,
   tuningFamilySocraticRadarFisherInformationProxyV2,
   tuningFamilySocraticRadarKolmogorovComplexityProxyV2,
+  tuningFamilySocraticRadarNashEquilibriumProxyV4,
+  tuningFamilySocraticRadarParetoOptimalityProxy,
+  tuningFamilySocraticRadarUtilityMaximizationProxy,
+  tuningFamilySocraticRadarMarketEfficiencyProxyV2,
+  tuningFamilySocraticRadarRiskAversionProxy,
+  tuningFamilySocraticRadarLiquidityProxyV2,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -19279,4 +19285,88 @@ export function presetFamilySocraticRadarKolmogorovComplexityProxyV2(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarKolmogorovComplexityProxyV2(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarNashEquilibriumProxyV4(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarNashEquilibriumProxyV4> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarNashEquilibriumProxyV4(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarParetoOptimalityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarParetoOptimalityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarParetoOptimalityProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarUtilityMaximizationProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarUtilityMaximizationProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarUtilityMaximizationProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarMarketEfficiencyProxyV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMarketEfficiencyProxyV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMarketEfficiencyProxyV2(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarRiskAversionProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarRiskAversionProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarRiskAversionProxy(tunings, spectrum, rootHz);
+}
+
+export function presetFamilySocraticRadarLiquidityProxyV2(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarLiquidityProxyV2> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarLiquidityProxyV2(tunings, spectrum, rootHz);
 }
