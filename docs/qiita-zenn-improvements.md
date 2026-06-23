@@ -1660,3 +1660,23 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1392 | `scaleUndertoneMatchRatio` | 下倍音一致率: 音度が根音の下倍音列に±30c以内で一致する割合 |
 | R1393 | `scaleJustFifthChain` | 純正5度連鎖スコア: 702cの積み重ねで生成される12音に一致する割合 |
 | R1394 | `scaleThirdChainScore` | 長3度連鎖スコア: 386cの積み重ねで生成される12音に一致する割合 |
+
+## Round 140 — R1401–R1404: 音階旋律輪郭分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1401 | `scaleMelodicContourVariety` | 旋律輪郭多様性: 隣接音程の異なるサイズ数を音度数で正規化 |
+| R1402 | `scaleAscendingBias` | 上昇バイアス: 600セント超の音度の割合（上向き傾向の測定） |
+| R1403 | `scaleStepLeapRatio` | 順次跳躍比: 300セント未満の順次進行が全音程に占める割合 |
+| R1404 | `scaleContourComplexity` | 輪郭複雑度: 大小音程の交互出現（方向転換）の頻度 |
+
+## Round 141 — R1411–R1414 音階リズム・パターン分析
+
+| ID | 関数名 | 概要 |
+|----|--------|------|
+| R1411 | `scalePulseRegularity` | スケール音間隔の均等性（1−変動係数） |
+| R1412 | `scaleAccentPotential` | 拍子位置（300cents倍数±25c）に落ちる音の割合 |
+| R1413 | `scalePolyrhythmicIndex` | 50cent刻みで2回以上出現する音程数÷音数 |
+| R1414 | `scalePhaseCoherence` | 隣接音程差のcos平均を[0,1]正規化したリズム位相一致度 |
+
+**設計根拠**: リズム解析の視点でスケール構造を捉える。均等分割→高いPulseRegularity、拍子整合→高いAccentPotential、反復音程→高いPolyrhythmicIndex、音程変化の滑らかさ→高いPhaseCoherence。
