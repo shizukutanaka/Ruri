@@ -49435,6 +49435,126 @@ export function tuningFamilySocraticRadarCorrosionProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2682 — tuningFamilySocraticRadarTectonicActivityProxy
+export function tuningFamilySocraticRadarTectonicActivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // tectonic activity: dynamic movement → diversity + versatility (change and range)
+  const result = axisAggregates[0]! * 0.4 + axisAggregates[1]! * 0.4 + (1 - axisAggregates[2]!) * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2684 — tuningFamilySocraticRadarSeismicIntensityProxy
+export function tuningFamilySocraticRadarSeismicIntensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // seismic intensity: sudden dissonance peaks → high benchmark deviation + low convergence
+  const result = axisAggregates[3]! * 0.5 + (1 - axisAggregates[4]!) * 0.3 + axisAggregates[0]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2686 — tuningFamilySocraticRadarVolcanicIndexProxy
+export function tuningFamilySocraticRadarVolcanicIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // volcanic index: explosive energy release → high diversity + high maturity contrast
+  const result = axisAggregates[0]! * 0.4 + axisAggregates[2]! * 0.3 + axisAggregates[1]! * 0.3;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2688 — tuningFamilySocraticRadarErosionRateProxy
+export function tuningFamilySocraticRadarErosionRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // erosion rate: gradual degradation of structure → low maturity + low benchmark
+  const result = (1 - axisAggregates[2]!) * 0.45 + (1 - axisAggregates[3]!) * 0.35 + axisAggregates[1]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2690 — tuningFamilySocraticRadarStrataFormationProxy
+export function tuningFamilySocraticRadarStrataFormationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // strata formation: layered structure → high convergence + high maturity (ordered accumulation)
+  const result = axisAggregates[4]! * 0.4 + axisAggregates[2]! * 0.4 + axisAggregates[3]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2692 — tuningFamilySocraticRadarMagmaViscosityProxy
+export function tuningFamilySocraticRadarMagmaViscosityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // magma viscosity: resistance to flow → high convergence + high maturity, low versatility
+  const result = axisAggregates[4]! * 0.35 + axisAggregates[2]! * 0.35 + (1 - axisAggregates[1]!) * 0.3;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -57586,4 +57706,66 @@ export function scaleSyncopation(pitches: readonly Pitch[]): number {
     if (prevStrong && nextStrong && !currStrong) offbeat++;
   }
   return Math.min(1, Math.max(0, offbeat / Math.max(1, pitches.length - 2)));
+}
+
+export function scaleSmallIntegerRatioScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  let score = 0;
+  for (let i = 1; i < cents.length; i++) {
+    const intervalCents = Math.abs(cents[i]! - cents[i - 1]!);
+    // small integer ratios: unison(0), octave(1200), fifth(702), fourth(498), major third(386), minor third(316)
+    const justIntervals = [0, 316, 386, 498, 702, 884, 1200];
+    const closest = justIntervals.reduce((best, ji) => Math.abs(intervalCents - ji) < Math.abs(intervalCents - best) ? ji : best, justIntervals[0]!);
+    if (Math.abs(intervalCents - closest) <= 15) score++;
+  }
+  return Math.min(1, Math.max(0, score / (cents.length - 1)));
+}
+
+export function scaleJustIntonationAffinity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => pitchToCents(p) % 1200);
+  // just intonation scale degrees (5-limit): 0, 112, 182, 316, 386, 498, 590, 702, 814, 884, 1018, 1088
+  const justDegrees = [0, 112, 182, 316, 386, 498, 590, 702, 814, 884, 1018, 1088];
+  let matched = 0;
+  for (const c of cents) {
+    for (const jd of justDegrees) {
+      if (Math.abs(c - jd) <= 12) {
+        matched++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, matched / pitches.length));
+}
+
+export function scaleRatioComplexity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  let complexitySum = 0;
+  for (let i = 1; i < cents.length; i++) {
+    const intervalCents = Math.abs(cents[i]! - cents[i - 1]!);
+    // complexity: how far from nearest simple ratio — normalize to [0,1] where 50c = max complexity
+    const justIntervals = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
+    const closestDist = justIntervals.reduce((best, ji) => Math.min(best, Math.abs(intervalCents - ji)), Infinity);
+    complexitySum += Math.min(1, closestDist / 50);
+  }
+  return Math.min(1, Math.max(0, complexitySum / (cents.length - 1)));
+}
+
+export function scalePrimeLimitScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => pitchToCents(p) % 1200);
+  // 3-limit (Pythagorean) positions: 0, 90, 204, 294, 408, 498, 612, 702, 792, 906, 996, 1110
+  const threeLimitDegrees = [0, 90, 204, 294, 408, 498, 612, 702, 792, 906, 996, 1110];
+  let matched = 0;
+  for (const c of cents) {
+    for (const tl of threeLimitDegrees) {
+      if (Math.abs(c - tl) <= 15) {
+        matched++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, matched / pitches.length));
 }

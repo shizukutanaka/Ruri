@@ -1131,6 +1131,12 @@ import {
   tuningFamilySocraticRadarPlasticDeformationProxy,
   tuningFamilySocraticRadarFractureResistanceProxy,
   tuningFamilySocraticRadarCorrosionProxy,
+  tuningFamilySocraticRadarTectonicActivityProxy,
+  tuningFamilySocraticRadarSeismicIntensityProxy,
+  tuningFamilySocraticRadarVolcanicIndexProxy,
+  tuningFamilySocraticRadarErosionRateProxy,
+  tuningFamilySocraticRadarStrataFormationProxy,
+  tuningFamilySocraticRadarMagmaViscosityProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -22435,4 +22441,94 @@ export function presetFamilySocraticRadarCorrosionProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarCorrosionProxy(tunings, spectrum, rootHz);
+}
+
+// Q2683 — presetFamilySocraticRadarTectonicActivityProxy
+export function presetFamilySocraticRadarTectonicActivityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTectonicActivityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTectonicActivityProxy(tunings, spectrum, rootHz);
+}
+
+// Q2685 — presetFamilySocraticRadarSeismicIntensityProxy
+export function presetFamilySocraticRadarSeismicIntensityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSeismicIntensityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSeismicIntensityProxy(tunings, spectrum, rootHz);
+}
+
+// Q2687 — presetFamilySocraticRadarVolcanicIndexProxy
+export function presetFamilySocraticRadarVolcanicIndexProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarVolcanicIndexProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarVolcanicIndexProxy(tunings, spectrum, rootHz);
+}
+
+// Q2689 — presetFamilySocraticRadarErosionRateProxy
+export function presetFamilySocraticRadarErosionRateProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarErosionRateProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarErosionRateProxy(tunings, spectrum, rootHz);
+}
+
+// Q2691 — presetFamilySocraticRadarStrataFormationProxy
+export function presetFamilySocraticRadarStrataFormationProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarStrataFormationProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarStrataFormationProxy(tunings, spectrum, rootHz);
+}
+
+// Q2693 — presetFamilySocraticRadarMagmaViscosityProxy
+export function presetFamilySocraticRadarMagmaViscosityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMagmaViscosityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMagmaViscosityProxy(tunings, spectrum, rootHz);
 }
