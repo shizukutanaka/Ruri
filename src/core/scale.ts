@@ -48930,6 +48930,135 @@ export function tuningFamilySocraticRadarFloodRiskProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2634 — tuningFamilySocraticRadarDoseResponseProxy
+export function tuningFamilySocraticRadarDoseResponseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Dose-response = sigmoid-like transform of mean: 1/(1+e^(-10*(mean-0.5)))
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = 1 / (1 + Math.exp(-10 * (mean - 0.5)));
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2636 — tuningFamilySocraticRadarBioavailabilityProxy
+export function tuningFamilySocraticRadarBioavailabilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Bioavailability = fraction of axes above 0.5 (how much actually reaches systemic circulation)
+  const count = axisAggregates.filter((v) => v >= 0.5).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2638 — tuningFamilySocraticRadarToxicityIndexProxy
+export function tuningFamilySocraticRadarToxicityIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Toxicity = fraction of axes above 0.85 (overdose threshold)
+  const count = axisAggregates.filter((v) => v > 0.85).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2640 — tuningFamilySocraticRadarHalfLifeProxy
+export function tuningFamilySocraticRadarHalfLifeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Half-life = median of axis values (persistence in the middle)
+  const sorted = [...axisAggregates].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const result = sorted.length % 2 === 0
+    ? ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2
+    : (sorted[mid] ?? 0);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2642 — tuningFamilySocraticRadarClearanceRateProxy
+export function tuningFamilySocraticRadarClearanceRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Clearance rate = 1 - max (how quickly the drug is eliminated)
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const result = 1 - maxVal;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2644 — tuningFamilySocraticRadarReceptorBindingProxy
+export function tuningFamilySocraticRadarReceptorBindingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Receptor binding = geometric mean (all axes must be present to bind)
+  const logSum = axisAggregates.reduce((s, v) => s + Math.log(Math.max(v, 1e-9)), 0);
+  const result = Math.exp(logSum / axisAggregates.length);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -56873,4 +57002,38 @@ export function scaleMinorThirdContent(pitches: readonly Pitch[]): number {
     if (Math.abs(interval - 300) <= 20) count++;
   }
   return Math.min(1, Math.max(0, count / (centsArr.length - 1)));
+}
+
+// R1461
+export function scaleGravitationalCenter(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0.5;
+  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
+  const mean = centsArr.reduce((sum, c) => sum + c, 0) / centsArr.length;
+  return mean / 1200;
+}
+
+// R1462
+export function scalePitchVariance(pitches: readonly Pitch[]): number {
+  if (pitches.length <= 1) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
+  const mean = centsArr.reduce((sum, c) => sum + c, 0) / centsArr.length;
+  const variance = centsArr.reduce((sum, c) => sum + (c - mean) ** 2, 0) / centsArr.length;
+  const stdDev = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, stdDev / 600));
+}
+
+// R1463
+export function scaleBalancePoint(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
+  const mean = centsArr.reduce((sum, c) => sum + c, 0) / centsArr.length;
+  return 1 - Math.abs(mean - 600) / 600;
+}
+
+// R1464
+export function scaleMassDistribution(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
+  const upper = centsArr.filter((c) => c >= 600).length;
+  return upper / centsArr.length;
 }
