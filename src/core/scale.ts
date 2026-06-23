@@ -48800,6 +48800,136 @@ export function tuningFamilySocraticRadarAutoimmuneRiskProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2622 — tuningFamilySocraticRadarCycloneIntensityProxy
+export function tuningFamilySocraticRadarCycloneIntensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Cyclone intensity = max - mean (how much the peak exceeds the average)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const maxVal = axisAggregates.reduce((a, b) => Math.max(a, b), 0);
+  const result = maxVal - mean;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2624 — tuningFamilySocraticRadarJetStreamProxy
+export function tuningFamilySocraticRadarJetStreamProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Jet stream = mean of top-2 axes (fast high-altitude current = dominant channels)
+  const sorted = [...axisAggregates].sort((a, b) => b - a);
+  const top2 = sorted.slice(0, 2);
+  const result = top2.reduce((a, b) => a + b, 0) / top2.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2626 — tuningFamilySocraticRadarClimateVariabilityIndex
+export function tuningFamilySocraticRadarClimateVariabilityIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Climate variability = std deviation of axis aggregates
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((s, v) => s + (v - mean) ** 2, 0) / axisAggregates.length;
+  const result = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2628 — tuningFamilySocraticRadarHeatWaveIndex
+export function tuningFamilySocraticRadarHeatWaveIndex(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Heat wave = fraction of axes above 0.7 (sustained high temperature)
+  const count = axisAggregates.filter((v) => v > 0.7).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2630 — tuningFamilySocraticRadarDroughtIndexProxy
+export function tuningFamilySocraticRadarDroughtIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Drought = fraction of axes below 0.25 (sustained low moisture)
+  const count = axisAggregates.filter((v) => v < 0.25).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2632 — tuningFamilySocraticRadarFloodRiskProxy
+export function tuningFamilySocraticRadarFloodRiskProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Flood risk = (mean - min) / (1 - min) normalized excess above the lowest point
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const minVal = axisAggregates.reduce((a, b) => Math.min(a, b), 1);
+  const result = minVal < 1 ? (mean - minVal) / (1 - minVal) : 0;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -56701,4 +56831,46 @@ export function scaleConnectivityIndex(pitches: readonly Pitch[]): number {
   // but to ensure all-step scales return 1, divide by n-1 (non-wrap adjacent count)
   // and clamp to [0,1] to handle wrap contributions
   return Math.min(1, Math.max(0, connected / (n - 1)));
+}
+
+// R1451
+export function scaleSemitoneContent(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  let count = 0;
+  for (let i = 1; i < centsArr.length; i++) {
+    const interval = Math.abs(centsArr[i]! - centsArr[i - 1]!);
+    if (Math.abs(interval - 100) <= 20) count++;
+  }
+  return Math.min(1, Math.max(0, count / (centsArr.length - 1)));
+}
+
+// R1453
+export function scaleTritoneContent(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  const n = centsArr.length;
+  const totalPairs = (n * (n - 1)) / 2;
+  if (totalPairs === 0) return 0;
+  let count = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const raw = Math.abs(centsArr[i]! - centsArr[j]!) % 1200;
+      const interval = Math.min(raw, 1200 - raw);
+      if (Math.abs(interval - 600) <= 30) count++;
+    }
+  }
+  return Math.min(1, Math.max(0, count / totalPairs));
+}
+
+// R1454
+export function scaleMinorThirdContent(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const centsArr = pitches.map((p) => pitchToCents(p));
+  let count = 0;
+  for (let i = 1; i < centsArr.length; i++) {
+    const interval = Math.abs(centsArr[i]! - centsArr[i - 1]!);
+    if (Math.abs(interval - 300) <= 20) count++;
+  }
+  return Math.min(1, Math.max(0, count / (centsArr.length - 1)));
 }
