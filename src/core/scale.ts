@@ -45021,6 +45021,139 @@ export function tuningFamilySocraticRadarThermalEquilibriumProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2274 — tuningFamilySocraticRadarShannonInformationProxy
+export function tuningFamilySocraticRadarShannonInformationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const sum = axisAggregates.reduce((a, b) => a + b, 0) + 1e-9;
+  const probs = axisAggregates.map((v) => v / sum);
+  const H = -probs.reduce((acc, p) => acc + p * Math.log2(p + 1e-12), 0);
+  const result = H / Math.log2(5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2276 — tuningFamilySocraticRadarKullbackLeiblerProxy
+export function tuningFamilySocraticRadarKullbackLeiblerProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const KL = axisAggregates.reduce((acc, agg) => acc + 0.2 * Math.log2(0.2 / (agg + 1e-12)), 0);
+  const result = 1 - KL / Math.log2(5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2278 — tuningFamilySocraticRadarMutualInformationProxyV3
+export function tuningFamilySocraticRadarMutualInformationProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  let totalDiff = 0;
+  for (let i = 0; i < 5; i++) {
+    for (let j = i + 1; j < 5; j++) {
+      totalDiff += Math.abs(axisAggregates[i]! - axisAggregates[j]!);
+    }
+  }
+  const result = 1 - totalDiff / (10 * 1.0);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2280 — tuningFamilySocraticRadarChannelCapacityProxyV2
+export function tuningFamilySocraticRadarChannelCapacityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const meanSq = axisAggregates.reduce((a, b) => a + b * b, 0) / 5;
+  const std = Math.sqrt(Math.max(0, meanSq - mean * mean));
+  const SNR = mean / (std + 1e-9);
+  const result = SNR / (SNR + 1);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2282 — tuningFamilySocraticRadarFisherInformationProxyV2
+export function tuningFamilySocraticRadarFisherInformationProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const meanSq = axisAggregates.reduce((a, b) => a + b * b, 0) / 5;
+  const std = Math.sqrt(Math.max(0, meanSq - mean * mean));
+  const variance = std * std;
+  const result = 1 / (1 + variance * 4);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2284 — tuningFamilySocraticRadarKolmogorovComplexityProxyV2
+export function tuningFamilySocraticRadarKolmogorovComplexityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const distinct = new Set(axisAggregates.map((x) => Math.round(x * 10))).size;
+  const result = 1 - (distinct - 1) / 4;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -50910,4 +51043,80 @@ export function scaleLacunarity(pitches: readonly Pitch[]): number {
   const lacunarity = variance / (mean * mean);
   // Normalize: typical range [0, 4], map to [0, 1]
   return Math.min(1, Math.max(0, lacunarity / 4));
+}
+
+// Round 115 — UUUU1-UUUU4: 音階対称変換分析
+
+export function scaleRetrogradeSimilarity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 1;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    intervals.push(cents[i]! - cents[i - 1]!);
+  }
+  const reversed = [...intervals].reverse();
+  const n = intervals.length;
+  let similarity = 0;
+  for (let i = 0; i < n; i++) {
+    const a = intervals[i]!;
+    const b = reversed[i]!;
+    const diff = Math.abs(a - b);
+    const maxVal = Math.max(a, b, 1);
+    similarity += 1 - diff / maxVal;
+  }
+  return Math.min(1, Math.max(0, similarity / n));
+}
+
+export function scaleInversionSimilarity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 1;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const root = cents[0]!;
+  const offsets = cents.map((c) => c - root);
+  const period = cents[cents.length - 1]! - root || 1200;
+  // Inversion: negate offsets mod period
+  const inverted = offsets.map((o) => period - o).sort((a, b) => a - b);
+  const n = offsets.length;
+  let similarity = 0;
+  for (let i = 0; i < n; i++) {
+    const diff = Math.abs(offsets[i]! - inverted[i]!);
+    similarity += 1 - diff / period;
+  }
+  return Math.min(1, Math.max(0, similarity / n));
+}
+
+export function scaleComplementarity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 1;
+  const cents = pitches.map((p) => pitchToCents(p));
+  // Snap to nearest 100-cent grid (within 25 cents tolerance)
+  const occupied = new Set<number>();
+  for (const c of cents) {
+    const gridPos = Math.round(c / 100);
+    if (Math.abs(c - gridPos * 100) <= 25) {
+      occupied.add(((gridPos % 12) + 12) % 12);
+    }
+  }
+  const complement = 12 - occupied.size;
+  return Math.min(1, Math.max(0, complement / 12));
+}
+
+export function scaleMirrorSymmetry(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 1;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const lo = cents[0]!;
+  const hi = cents[cents.length - 1]!;
+  const mid = (lo + hi) / 2;
+  const range = hi - lo || 1;
+  let symmetryScore = 0;
+  for (let i = 0; i < cents.length; i++) {
+    const c = cents[i]!;
+    const mirror = 2 * mid - c;
+    // Find closest pitch to mirror position
+    let minDist = Infinity;
+    for (let j = 0; j < cents.length; j++) {
+      const dist = Math.abs(cents[j]! - mirror);
+      if (dist < minDist) minDist = dist;
+    }
+    symmetryScore += 1 - Math.min(1, minDist / (range / 2 + 1));
+  }
+  return Math.min(1, Math.max(0, symmetryScore / cents.length));
 }
