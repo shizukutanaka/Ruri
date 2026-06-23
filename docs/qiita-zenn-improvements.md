@@ -1272,3 +1272,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | EEEE2 | `scaleMaxGap` | 最大ギャップ（正規化） |
 | EEEE3 | `scaleGapUniformity` | ギャップ均一性（変動係数の補数） |
 | EEEE4 | `scaleCoverageEfficiency` | カバレッジ効率（12音基準） |
+
+## Round 100: 音階音程ネットワーク分析 (FFFF1–FFFF4)
+
+音階をネットワークとしてモデル化し、音程間の接続特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| FFFF1 | `scaleIntervalNetworkDensity` | 近接ノード対の密度（50セント以内） |
+| FFFF2 | `scaleIntervalNetworkClustering` | 平均クラスタリング係数（150セント近傍） |
+| FFFF3 | `scaleIntervalHubScore` | ハブノード偏在度（次数の変動係数） |
+| FFFF4 | `scaleIntervalNetworkBalance` | ネットワーク均衡度（ハブスコアの補数） |
