@@ -1371,3 +1371,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | NNNN2 | `scaleClusterDensity` | 平均クラスターサイズ（正規化） |
 | NNNN3 | `scaleIsolatedNoteRatio` | 孤立音（クラスター外）の比率 |
 | NNNN4 | `scaleClusterSpread` | クラスター重心の空間的広がり |
+
+## Round 109: 音階方向性分析 (OOOO1–OOOO4)
+
+音階インターバル列の方向性・対称性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| OOOO1 | `scaleAscendingTendency` | インターバルが増加傾向にある連続対の比率 |
+| OOOO2 | `scaleDescendingTendency` | インターバルが減少傾向にある連続対の比率 |
+| OOOO3 | `scaleDirectionBalance` | 上昇・下降傾向のバランス度 |
+| OOOO4 | `scaleIntervalSymmetry` | インターバル列の回文的対称性 |
