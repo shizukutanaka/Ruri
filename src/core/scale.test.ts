@@ -1810,6 +1810,10 @@ import {
   scaleAttractionForceIndex,
   scaleTensionResolutionRatio,
   scaleDirectionBias,
+  scaleTonicClarityScore,
+  scaleDominantPresence,
+  scaleSubdominantPresence,
+  scaleTonalCenterStrength,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -44757,6 +44761,73 @@ describe('R1364 scaleDirectionBias', () => {
   it('returns value in [0,1]', () => {
     const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
     const v = scaleDirectionBias(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Round 137 — R1371-R1374: 音階調性中心分析
+describe('R1371 scaleTonicClarityScore', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleTonicClarityScore([])).toBe(0);
+  });
+  it('returns high value for major triad', () => {
+    const pitches = [0, 400, 700].map((c) => pitchFromCents(c));
+    const v = scaleTonicClarityScore(pitches);
+    expect(v).toBeGreaterThan(0.7);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const v = scaleTonicClarityScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1372 scaleDominantPresence', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleDominantPresence([])).toBe(0);
+  });
+  it('returns high value for scale with G, B, D', () => {
+    const pitches = [700, 1100, 200].map((c) => pitchFromCents(c));
+    const v = scaleDominantPresence(pitches);
+    expect(v).toBeGreaterThan(0.7);
+  });
+  it('returns 0 for scale without dominant tones', () => {
+    const pitches = [0, 500].map((c) => pitchFromCents(c));
+    expect(scaleDominantPresence(pitches)).toBe(0);
+  });
+});
+
+describe('R1373 scaleSubdominantPresence', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleSubdominantPresence([])).toBe(0);
+  });
+  it('returns high value for F, A, C triad', () => {
+    const pitches = [0, 500, 900].map((c) => pitchFromCents(c));
+    const v = scaleSubdominantPresence(pitches);
+    expect(v).toBeGreaterThan(0.9);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const v = scaleSubdominantPresence(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1374 scaleTonalCenterStrength', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleTonalCenterStrength([])).toBe(0);
+  });
+  it('returns high value for major scale', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const v = scaleTonalCenterStrength(pitches);
+    expect(v).toBeGreaterThan(0.5);
+  });
+  it('returns value in [0,1]', () => {
+    const pitches = [0, 150, 350, 550, 750].map((c) => pitchFromCents(c));
+    const v = scaleTonalCenterStrength(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

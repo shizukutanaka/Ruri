@@ -1633,3 +1633,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1362 | `scaleAttractionForceIndex` | 引力指数: 隣接音間の最小音程に基づく音の引力の強さ |
 | R1363 | `scaleTensionResolutionRatio` | 緊張解決比: 安定音度（根音/M3/P4/P5/m6）の全音度に対する割合 |
 | R1364 | `scaleDirectionBias` | 方向バイアス: 中央値より上の音程和と下の音程和の非対称度 |
+
+## Round 137 — R1371–R1374: 音階調性中心分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1371 | `scaleTonicClarityScore` | 主音明瞭度スコア: 根音・P5・M3の存在と三全音の欠如による主調明確性 |
+| R1372 | `scaleDominantPresence` | 属音存在度: V和音の構成音(G/B/D/F)の存在による属和音機能の強さ |
+| R1373 | `scaleSubdominantPresence` | 下属音存在度: IV和音の構成音(F/A/C)の存在による下属和音機能の強さ |
+| R1374 | `scaleTonalCenterStrength` | 調性中心強度: 主音明瞭度・属音・下属音存在度の平均 |

@@ -47905,6 +47905,131 @@ export function tuningFamilySocraticRadarDiscourseCoherenceProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2538 — tuningFamilySocraticRadarTopologicalConnectivityProxy
+export function tuningFamilySocraticRadarTopologicalConnectivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const result = 1 - variance * 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2540 — tuningFamilySocraticRadarEuclideanDistanceProxy
+export function tuningFamilySocraticRadarEuclideanDistanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const sumSq = axisAggregates.reduce((a, b) => a + b * b, 0);
+  const result = Math.sqrt(sumSq / 5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2542 — tuningFamilySocraticRadarHarmonicMeanProxy
+export function tuningFamilySocraticRadarHarmonicMeanProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const sumRecip = axisAggregates.reduce((a, b) => a + 1 / (b + 0.001), 0);
+  const result = 5 / sumRecip;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2544 — tuningFamilySocraticRadarGoldenRatioProxy
+export function tuningFamilySocraticRadarGoldenRatioProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const max = Math.max(...axisAggregates);
+  if (max <= 0) return 0;
+  const result = 1 - Math.abs(mean / max - 0.618);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2546 — tuningFamilySocraticRadarCurvatureProxy
+export function tuningFamilySocraticRadarCurvatureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  let sumDiff = 0;
+  for (let i = 1; i < axisAggregates.length; i++) {
+    sumDiff += Math.abs(axisAggregates[i]! - axisAggregates[i - 1]!);
+  }
+  const result = sumDiff / 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2548 — tuningFamilySocraticRadarSymmetryBreakingProxy
+export function tuningFamilySocraticRadarSymmetryBreakingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = Math.abs(axisAggregates[0]! - axisAggregates[4]!) + Math.abs(axisAggregates[1]! - axisAggregates[3]!) / 2;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -55299,4 +55424,57 @@ export function scaleDirectionBias(pitches: readonly Pitch[]): number {
   // 0.5 = balanced, >0.5 = upward bias, <0.5 = downward bias
   // Return distance from 0.5 (normalized asymmetry)
   return Math.min(1, Math.max(0, Math.abs(above - below) / total));
+}
+
+// Round 137 — R1371-R1374: 音階調性中心分析
+
+export function scaleTonicClarityScore(pitches: readonly Pitch[]): number {
+  // Measures how clearly the scale defines a tonic (0c = root)
+  // Scores based on: presence of root (0c), P5 (700c), M3 (400c), and absence of tritone (600c)
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasNote = (t: number) => pcs.some((c) => Math.abs(c - t) < 60 || Math.abs(c - t - 1200) < 60 || Math.abs(c - t + 1200) < 60);
+  let score = 0;
+  if (hasNote(0)) score += 0.35;    // root present
+  if (hasNote(700)) score += 0.30;  // P5 strongly defines key
+  if (hasNote(400)) score += 0.20;  // M3 clarifies major quality
+  if (!hasNote(600)) score += 0.15; // absence of tritone = less ambiguity
+  return Math.min(1, Math.max(0, score));
+}
+
+export function scaleDominantPresence(pitches: readonly Pitch[]): number {
+  // Measures strength of dominant function by checking for V chord tones
+  // V chord in C: G (700c), B (1100c), D (200c), F (500c as 7th)
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasNote = (t: number) => pcs.some((c) => Math.abs(c - t) < 60);
+  let score = 0;
+  if (hasNote(700)) score += 0.40;  // G (V root)
+  if (hasNote(1100)) score += 0.30; // B (V third / leading tone)
+  if (hasNote(200)) score += 0.20;  // D (V fifth)
+  if (hasNote(500)) score += 0.10;  // F (V seventh)
+  return Math.min(1, Math.max(0, score));
+}
+
+export function scaleSubdominantPresence(pitches: readonly Pitch[]): number {
+  // Measures strength of subdominant function by checking for IV chord tones
+  // IV chord in C: F (500c), A (900c), C (0c)
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasNote = (t: number) => pcs.some((c) => Math.abs(c - t) < 60);
+  let score = 0;
+  if (hasNote(500)) score += 0.40;  // F (IV root)
+  if (hasNote(900)) score += 0.35;  // A (IV third)
+  if (hasNote(0)) score += 0.25;    // C (IV fifth = tonic)
+  return Math.min(1, Math.max(0, score));
+}
+
+export function scaleTonalCenterStrength(pitches: readonly Pitch[]): number {
+  // Combined measure of tonal center strength
+  // Averages tonic clarity, dominant presence, and subdominant presence
+  if (pitches.length === 0) return 0;
+  const tc = scaleTonicClarityScore(pitches);
+  const dom = scaleDominantPresence(pitches);
+  const sub = scaleSubdominantPresence(pitches);
+  return Math.min(1, Math.max(0, (tc + dom + sub) / 3));
 }
