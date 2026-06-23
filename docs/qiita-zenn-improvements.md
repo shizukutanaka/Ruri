@@ -1588,3 +1588,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1312 | `scaleRetrogradeSymmetryV2` | 逆行対称スコア: 音程列の前向きと後ろ向きの一致度（回文的対称性） |
 | R1313 | `scaleTranspositionSymmetryV2` | 移調対称スコア: 移調しても同じ音階クラスを生成する移調数の割合 |
 | R1314 | `scaleRotationalSymmetryV2` | 回転対称スコア: 音程列の回転による自己一致度（限定移調旋法で高い） |
+
+## Round 132 — R1321–R1324: 音階音響心理学分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1321 | `scaleCriticalBandDensityV2` | 臨界帯域密度: 100セント以内に収まる音程ペアの割合（マスキング傾向） |
+| R1322 | `scaleMaskingIndexV2` | マスキング指数: 200セント以内に隣接音を持つ音の割合 |
+| R1323 | `scaleLoudnessBalance` | 音量バランス: 低域（<600c）と高域（≥600c）の音符数の均衡度 |
+| R1324 | `scaleRoughnessEstimate` | 粗さ推定: 150セント未満の音程ペア割合（小音程は粗さを生む） |

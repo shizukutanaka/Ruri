@@ -47294,6 +47294,123 @@ export function tuningFamilySocraticRadarHumidityProxyV3(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2478 — tuningFamilySocraticRadarGravitationalPullProxyV2
+export function tuningFamilySocraticRadarGravitationalPullProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const n = axisAggregates.length;
+  const reciprocalSum = axisAggregates.reduce((a, b) => a + 1 / (b + 0.0001), 0);
+  const result = n / reciprocalSum;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2480 — tuningFamilySocraticRadarStellarLuminosityProxy
+export function tuningFamilySocraticRadarStellarLuminosityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.reduce((a, b) => a + b * b, 0) / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2482 — tuningFamilySocraticRadarOrbitalPeriodProxy
+export function tuningFamilySocraticRadarOrbitalPeriodProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = 1 - 1 / (mean * 10 + 1);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2484 — tuningFamilySocraticRadarRedshiftProxyV2
+export function tuningFamilySocraticRadarRedshiftProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = (axisAggregates[4]! - axisAggregates[0]! + 1) / 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2486 — tuningFamilySocraticRadarDarkMatterProxy
+export function tuningFamilySocraticRadarDarkMatterProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = 1 - axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2488 — tuningFamilySocraticRadarEventHorizonProxyV2
+export function tuningFamilySocraticRadarEventHorizonProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.filter((v) => v > 0.8).length / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -54330,4 +54447,76 @@ export function scaleRotationalSymmetryV2(pitches: readonly Pitch[]): number {
     if (allMatch) symmetricRotations++;
   }
   return Math.min(1, Math.max(0, symmetricRotations / (intervals.length - 1)));
+}
+
+// Round 132 — R1321-R1324: 音階音響心理学分析
+
+export function scaleCriticalBandDensityV2(pitches: readonly Pitch[]): number {
+  // Critical band width is ~100 cents in midrange; measures how many pitch pairs fall within one critical band
+  // Higher density = more notes within critical band proximity
+  if (pitches.length < 2) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let pairsWithinCB = 0;
+  let totalPairs = 0;
+  for (let i = 0; i < pcs.length; i++) {
+    for (let j = i + 1; j < pcs.length; j++) {
+      const diff = Math.abs(pcs[i]! - pcs[j]!);
+      const wrappedDiff = Math.min(diff, 1200 - diff);
+      if (wrappedDiff < 100) pairsWithinCB++;
+      totalPairs++;
+    }
+  }
+  if (totalPairs === 0) return 0;
+  return Math.min(1, Math.max(0, pairsWithinCB / totalPairs));
+}
+
+export function scaleMaskingIndexV2(pitches: readonly Pitch[]): number {
+  // Measures potential for spectral masking: notes close in frequency mask each other
+  // Score = fraction of pitches that have a neighbor within 200 cents
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let maskedCount = 0;
+  for (let i = 0; i < pcs.length; i++) {
+    for (let j = 0; j < pcs.length; j++) {
+      if (i === j) continue;
+      const diff = Math.abs(pcs[i]! - pcs[j]!);
+      const wrappedDiff = Math.min(diff, 1200 - diff);
+      if (wrappedDiff > 0 && wrappedDiff < 200) {
+        maskedCount++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, maskedCount / pitches.length));
+}
+
+export function scaleLoudnessBalance(pitches: readonly Pitch[]): number {
+  // Simulates loudness balance across octave: pitches evenly distributed across high/low register
+  // Low register (<600c) vs high register (>=600c); balance = 1 - |low-high|/(low+high)
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const low = pcs.filter((c) => c < 600).length;
+  const high = pcs.filter((c) => c >= 600).length;
+  const total = low + high;
+  if (total === 0) return 0;
+  return Math.min(1, Math.max(0, 1 - Math.abs(low - high) / total));
+}
+
+export function scaleRoughnessEstimate(pitches: readonly Pitch[]): number {
+  // Roughness estimate based on small interval count (minor 2nds create roughness)
+  // Intervals < 150 cents are considered rough; returns fraction of rough pairs
+  if (pitches.length < 2) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let roughPairs = 0;
+  let totalPairs = 0;
+  for (let i = 0; i < pcs.length; i++) {
+    for (let j = i + 1; j < pcs.length; j++) {
+      const diff = Math.abs(pcs[i]! - pcs[j]!);
+      const wrappedDiff = Math.min(diff, 1200 - diff);
+      if (wrappedDiff > 0 && wrappedDiff < 150) roughPairs++;
+      totalPairs++;
+    }
+  }
+  if (totalPairs === 0) return 0;
+  return Math.min(1, Math.max(0, roughPairs / totalPairs));
 }
