@@ -1261,3 +1261,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | DDDD2 | `scaleModalDarknessV2` | 暗い音程（m2/m3/TT/m6/m7）の含有率 |
 | DDDD3 | `scaleModalBrightnessBiasV2` | 明暗バイアス（0=暗、0.5=中立、1=明） |
 | DDDD4 | `scaleModalComplexityV2` | 全モーダル音程クラスの充足率 |
+
+## Round 99: 音階ピッチ空間充填分析 (EEEE1–EEEE4)
+
+音階が音高空間（周期）をどれだけ効率的に充填するかを測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| EEEE1 | `scaleFillRatio` | ±50セント近傍の合計カバレッジ比率 |
+| EEEE2 | `scaleMaxGap` | 最大ギャップ（正規化） |
+| EEEE3 | `scaleGapUniformity` | ギャップ均一性（変動係数の補数） |
+| EEEE4 | `scaleCoverageEfficiency` | カバレッジ効率（12音基準） |
