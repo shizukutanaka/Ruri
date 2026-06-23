@@ -44165,6 +44165,128 @@ export function tuningFamilySocraticRadarPhaseTransitionProxyV2(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2190 — tuningFamilySocraticRadarVitalSignsProxy
+export function tuningFamilySocraticRadarVitalSignsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  return Math.min(1, Math.max(0, mean));
+}
+
+// Q2192 — tuningFamilySocraticRadarHomeostasisProxy
+export function tuningFamilySocraticRadarHomeostasisProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = 1 - std / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2194 — tuningFamilySocraticRadarImmuneResponseProxy
+export function tuningFamilySocraticRadarImmuneResponseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const count = axisAggregates.filter((v) => v > 0.6).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2196 — tuningFamilySocraticRadarSymptomsProxy
+export function tuningFamilySocraticRadarSymptomsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const count = axisAggregates.filter((v) => v < 0.3).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2198 — tuningFamilySocraticRadarTherapeuticWindowProxy
+export function tuningFamilySocraticRadarTherapeuticWindowProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const count = axisAggregates.filter((v) => v >= 0.4 && v <= 0.7).length;
+  const result = count / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2200 — tuningFamilySocraticRadarRecoveryRateProxy
+export function tuningFamilySocraticRadarRecoveryRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const maxVal = Math.max(...axisAggregates);
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const result = maxVal * mean;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -49497,4 +49619,111 @@ export function scaleSpectralRolloff(scaleCents: readonly number[], periodCents:
     if (p < 0.5) count++;
   }
   return Math.min(1, Math.max(0, count / n));
+}
+
+/**
+ * NNNN1 — scaleClusterCount
+ * Number of clusters of closely-spaced notes, normalized by n.
+ * A cluster is a maximal group of consecutive notes (sorted) where each
+ * consecutive pair is < 150 cents apart.
+ * Returns: clusterCount / n (or 1/n if n=1); empty → 0
+ */
+export function scaleClusterCount(scaleCents: readonly number[], periodCents: number = 1200): number {
+  void periodCents;
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (n === 1) return 1 / 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let clusters = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i]! - sorted[i - 1]! >= 150) {
+      clusters++;
+    }
+  }
+  return Math.min(1, Math.max(0, clusters / n));
+}
+
+/**
+ * NNNN2 — scaleClusterDensity
+ * Average cluster size normalized by total note count.
+ * clusterSizes = sizes of each maximal cluster (gap < 150 cents).
+ * Returns: mean(clusterSizes) / n; empty → 0
+ */
+export function scaleClusterDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  void periodCents;
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  const sizes: number[] = [];
+  let current = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i]! - sorted[i - 1]! < 150) {
+      current++;
+    } else {
+      sizes.push(current);
+      current = 1;
+    }
+  }
+  sizes.push(current);
+  const mean = sizes.reduce((acc, s) => acc + s, 0) / sizes.length;
+  return Math.min(1, Math.max(0, mean / n));
+}
+
+/**
+ * NNNN3 — scaleIsolatedNoteRatio
+ * Fraction of notes that are isolated (not in a cluster with any neighbor).
+ * A note is isolated if it is >= 150 cents from both its left and right
+ * neighbors (wrap-around: last-to-first gap = periodCents - lastNote + firstNote).
+ * Returns: isolatedCount / n; empty/single → 1
+ */
+export function scaleIsolatedNoteRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  if (n === 1) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  let isolated = 0;
+  for (let i = 0; i < n; i++) {
+    const prev = i === 0 ? sorted[n - 1]! : sorted[i - 1]!;
+    const next = i === n - 1 ? sorted[0]! : sorted[i + 1]!;
+    const curr = sorted[i]!;
+    const leftGap = i === 0 ? periodCents - sorted[n - 1]! + curr : curr - prev;
+    const rightGap = i === n - 1 ? periodCents - curr + sorted[0]! : next - curr;
+    if (leftGap >= 150 && rightGap >= 150) {
+      isolated++;
+    }
+  }
+  return Math.min(1, Math.max(0, isolated / n));
+}
+
+/**
+ * NNNN4 — scaleClusterSpread
+ * How spread out the clusters are across the period.
+ * Cluster centroids = mean pitch of each cluster.
+ * If 0 or 1 cluster: return 0; else return std(centroids) / (periodCents/2), clamped [0,1].
+ * Empty → 0
+ */
+export function scaleClusterSpread(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Build clusters
+  const centroids: number[] = [];
+  let clusterStart = 0;
+  for (let i = 1; i <= sorted.length; i++) {
+    const atEnd = i === sorted.length;
+    const split = atEnd || sorted[i]! - sorted[i - 1]! >= 150;
+    if (split) {
+      let sum = 0;
+      for (let j = clusterStart; j < i; j++) {
+        sum += sorted[j]!;
+      }
+      centroids.push(sum / (i - clusterStart));
+      clusterStart = i;
+    }
+  }
+  if (centroids.length <= 1) return 0;
+  const mean = centroids.reduce((acc, c) => acc + c, 0) / centroids.length;
+  const variance = centroids.reduce((acc, c) => acc + (c - mean) ** 2, 0) / centroids.length;
+  const std = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, std / (periodCents / 2)));
 }
