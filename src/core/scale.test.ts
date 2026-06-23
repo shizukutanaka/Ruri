@@ -1565,6 +1565,12 @@ import {
   tuningFamilySocraticRadarNicheOverlapProxyV2,
   tuningFamilySocraticRadarSuccessionProxy,
   tuningFamilySocraticRadarFoodWebComplexityProxy,
+  tuningFamilySocraticRadarAttentionProxyV2,
+  tuningFamilySocraticRadarWorkingMemoryProxyV2,
+  tuningFamilySocraticRadarCognitivePrimingProxy,
+  tuningFamilySocraticRadarGestaltProxy,
+  tuningFamilySocraticRadarExpectationProxy,
+  tuningFamilySocraticRadarPrototypeMatchingProxy,
   scaleOvertoneAlignment,
   scaleSubharmonicAlignment,
   scaleHarmonicSeriesCompleteness,
@@ -1618,6 +1624,10 @@ import {
   scalePitchClusteringV2,
   scaleRangeCoverageV2,
   scaleOctaveCompletenessV2,
+  scaleLeapFraction,
+  scaleStepFraction,
+  scaleHalfStepCount,
+  scaleWholeToneContent,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -41082,5 +41092,178 @@ describe('Q2308 tuningFamilySocraticRadarFoodWebComplexityProxy', () => {
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2310 — tuningFamilySocraticRadarAttentionProxyV2
+describe('Q2310 tuningFamilySocraticRadarAttentionProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAttentionProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarAttentionProxyV2([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarAttentionProxyV2([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2312 — tuningFamilySocraticRadarWorkingMemoryProxyV2
+describe('Q2312 tuningFamilySocraticRadarWorkingMemoryProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWorkingMemoryProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarWorkingMemoryProxyV2([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarWorkingMemoryProxyV2([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2314 — tuningFamilySocraticRadarCognitivePrimingProxy
+describe('Q2314 tuningFamilySocraticRadarCognitivePrimingProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCognitivePrimingProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCognitivePrimingProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarCognitivePrimingProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2316 — tuningFamilySocraticRadarGestaltProxy
+describe('Q2316 tuningFamilySocraticRadarGestaltProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarGestaltProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarGestaltProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarGestaltProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2318 — tuningFamilySocraticRadarExpectationProxy
+describe('Q2318 tuningFamilySocraticRadarExpectationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarExpectationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarExpectationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarExpectationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2320 — tuningFamilySocraticRadarPrototypeMatchingProxy
+describe('Q2320 tuningFamilySocraticRadarPrototypeMatchingProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPrototypeMatchingProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarPrototypeMatchingProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarPrototypeMatchingProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Round 118 — XXXX1-XXXX4: 音階音程特性分析
+describe('XXXX1 scaleLeapFraction', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleLeapFraction([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 0 for chromatic scale (all half-steps)', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    expect(scaleLeapFraction(pitches)).toBe(0);
+  });
+  it('returns 1 when all intervals are leaps', () => {
+    const pitches = [0, 300, 600, 900].map((c) => pitchFromCents(c));
+    expect(scaleLeapFraction(pitches)).toBe(1);
+  });
+});
+
+describe('XXXX2 scaleStepFraction', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleStepFraction([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 1 for chromatic scale (all steps)', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    expect(scaleStepFraction(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for mixed scale', () => {
+    const pitches = [0, 100, 300, 500, 700].map((c) => pitchFromCents(c));
+    const v = scaleStepFraction(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('XXXX3 scaleHalfStepCount', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleHalfStepCount([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 1 for chromatic scale (all ~100 cent intervals)', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    expect(scaleHalfStepCount(pitches)).toBe(1);
+  });
+  it('returns 0 for whole-tone scale', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map((c) => pitchFromCents(c));
+    expect(scaleHalfStepCount(pitches)).toBe(0);
+  });
+});
+
+describe('XXXX4 scaleWholeToneContent', () => {
+  it('returns 0 for single pitch', () => {
+    expect(scaleWholeToneContent([pitchFromCents(0)])).toBe(0);
+  });
+  it('returns 1 for whole-tone scale (all ~200 cent intervals)', () => {
+    const pitches = [0, 200, 400, 600, 800, 1000].map((c) => pitchFromCents(c));
+    expect(scaleWholeToneContent(pitches)).toBe(1);
+  });
+  it('returns 0 for chromatic scale (all ~100 cent intervals)', () => {
+    const pitches = Array.from({ length: 12 }, (_, i) => pitchFromCents(i * 100));
+    expect(scaleWholeToneContent(pitches)).toBe(0);
   });
 });
