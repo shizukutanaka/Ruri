@@ -43263,6 +43263,160 @@ export function tuningFamilySocraticRadarMutualInformationProxyV2(
   return Math.min(1, Math.max(0, total / vecs.length));
 }
 
+// Q2106 — tuningFamilySocraticRadarAttractorStrengthProxy
+export function tuningFamilySocraticRadarAttractorStrengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // average vector across all tunings
+  const mean = axes.map((_, i) => {
+    const col = vecs.map((v) => v[i]!);
+    return col.reduce((a, b) => a + b, 0) / col.length;
+  });
+  // std of axes in the mean vector
+  const avgMean = mean.reduce((a, b) => a + b, 0) / mean.length;
+  const variance = mean.reduce((a, v) => a + (v - avgMean) ** 2, 0) / mean.length;
+  const std = Math.sqrt(variance);
+  // convergence to attractor: 1 - std/0.5, clamped to [0,1]
+  const result = Math.min(1, Math.max(0, 1 - std / 0.5));
+  return result;
+}
+
+// Q2108 — tuningFamilySocraticRadarBifurcationProxy
+export function tuningFamilySocraticRadarBifurcationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // average vector across all tunings
+  const mean = axes.map((_, i) => {
+    const col = vecs.map((v) => v[i]!);
+    return col.reduce((a, b) => a + b, 0) / col.length;
+  });
+  // number of axes crossing 0.5 threshold / 5 (bifurcation = balanced split near threshold)
+  const crossingCount = mean.filter((v) => Math.abs(v - 0.5) < 0.25).length;
+  const result = crossingCount / axes.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2110 — tuningFamilySocraticRadarLyapunovProxy
+export function tuningFamilySocraticRadarLyapunovProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // average vector across all tunings
+  const mean = axes.map((_, i) => {
+    const col = vecs.map((v) => v[i]!);
+    return col.reduce((a, b) => a + b, 0) / col.length;
+  });
+  // sensitivity: std of first-differences of sorted axes, normalized
+  const sorted = [...mean].sort((a, b) => a - b);
+  const diffs: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    diffs.push(sorted[i]! - sorted[i - 1]!);
+  }
+  if (diffs.length === 0) return 0;
+  const diffMean = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+  const diffVariance = diffs.reduce((a, v) => a + (v - diffMean) ** 2, 0) / diffs.length;
+  const diffStd = Math.sqrt(diffVariance);
+  // normalize: max std of uniform diffs is ~0.289 (for 4 equal diffs summing to 1)
+  const result = Math.min(1, diffStd / 0.3);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2112 — tuningFamilySocraticRadarFractalDimensionProxyV3
+export function tuningFamilySocraticRadarFractalDimensionProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // average vector across all tunings
+  const mean = axes.map((_, i) => {
+    const col = vecs.map((v) => v[i]!);
+    return col.reduce((a, b) => a + b, 0) / col.length;
+  });
+  // box-counting analog: how many distinct "scales" visible at 4 threshold levels
+  const thresholds = [0.25, 0.5, 0.75, 1.0];
+  let distinctScales = 0;
+  for (const threshold of thresholds) {
+    const count = mean.filter((v) => v <= threshold).length;
+    if (count > 0 && count < axes.length) distinctScales++;
+  }
+  // normalize: max is 4 distinct scale levels
+  const result = distinctScales / 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2114 — tuningFamilySocraticRadarSelfOrganizationProxy
+export function tuningFamilySocraticRadarSelfOrganizationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // average vector across all tunings
+  const mean = axes.map((_, i) => {
+    const col = vecs.map((v) => v[i]!);
+    return col.reduce((a, b) => a + b, 0) / col.length;
+  });
+  // order from disorder: mean / (std + 1e-10) normalized min(1, ratio/5)
+  const avgMean = mean.reduce((a, b) => a + b, 0) / mean.length;
+  const variance = mean.reduce((a, v) => a + (v - avgMean) ** 2, 0) / mean.length;
+  const std = Math.sqrt(variance);
+  const ratio = avgMean / (std + 1e-10);
+  const result = Math.min(1, ratio / 5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2116 — tuningFamilySocraticRadarEmergenceProxy
+export function tuningFamilySocraticRadarEmergenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  if (tunings.length === 1) return 0.5;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  // per-tuning mean across axes
+  const perTuningMeans = vecs.map((v) => v.reduce((a, b) => a + b, 0) / v.length);
+  // overall mean of all tunings combined
+  const overallMean = perTuningMeans.reduce((a, b) => a + b, 0) / perTuningMeans.length;
+  const minMean = Math.min(...perTuningMeans);
+  const maxMean = Math.max(...perTuningMeans);
+  // how much the multi-tuning mean exceeds single-tuning means
+  const result = (overallMean - minMean) / (maxMean - minMean + 1e-10);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -47958,4 +48112,115 @@ export function scaleIntervalNetworkBalance(scaleCents: readonly number[], perio
   const n = scaleCents.length;
   if (n < 2) return 1;
   return Math.min(1, Math.max(0, 1 - scaleIntervalHubScore(scaleCents, periodCents)));
+}
+
+// GGGG1 — scaleSubsetSimilarity
+// How similar is the scale to its own half-period subset?
+// Take notes in [0, period/2), normalize to period: double each pitch,
+// compare to original scale (nearest-neighbor matching within 10 cents).
+export function scaleSubsetSimilarity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (periodCents <= 0) return 0;
+  const half = periodCents / 2;
+  const subsetDoubled: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const c = scaleCents[i]!;
+    if (c >= 0 && c < half) {
+      subsetDoubled.push(c * 2);
+    }
+  }
+  if (subsetDoubled.length === 0) return 0;
+  let matchCount = 0;
+  for (let i = 0; i < subsetDoubled.length; i++) {
+    const doubled = subsetDoubled[i]!;
+    let found = false;
+    for (let j = 0; j < n; j++) {
+      if (Math.abs(scaleCents[j]! - doubled) < 10) {
+        found = true;
+        break;
+      }
+    }
+    if (found) matchCount++;
+  }
+  return Math.min(1, Math.max(0, matchCount / n));
+}
+
+// GGGG2 — scaleStepRecurrence
+// Fraction of step sizes that recur (appear more than once, within 10 cents tolerance).
+export function scaleStepRecurrence(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  if (periodCents <= 0) return 0;
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const curr = scaleCents[i]!;
+    const next = i + 1 < n ? scaleCents[i + 1]! : scaleCents[0]! + periodCents;
+    steps.push(next - curr);
+  }
+  let recurringCount = 0;
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i]!;
+    let count = 0;
+    for (let j = 0; j < steps.length; j++) {
+      if (Math.abs(steps[j]! - s) < 10) count++;
+    }
+    if (count >= 2) recurringCount++;
+  }
+  return Math.min(1, Math.max(0, recurringCount / n));
+}
+
+// GGGG3 — scaleOctaveEquivalence
+// How well the scale approximates octave equivalence (pitch class repetition).
+// For each pair (i,j): check if |cents[i] - cents[j]| is within 10 cents of any multiple of 1200.
+export function scaleOctaveEquivalence(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 2) return 0;
+  const totalPairs = (n * (n - 1)) / 2;
+  if (totalPairs === 0) return 0;
+  let matchCount = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const diff = Math.abs(scaleCents[i]! - scaleCents[j]!);
+      // Check if diff is close to any multiple of 1200 (including 0)
+      const nearest = Math.round(diff / 1200) * 1200;
+      if (Math.abs(diff - nearest) < 10) matchCount++;
+    }
+  }
+  return Math.min(1, Math.max(0, matchCount / totalPairs));
+}
+
+// GGGG4 — scaleHierarchicalBalance
+// Balance at multiple levels of resolution.
+// Level 1: split period into 2 halves; Level 2: split into 4 quarters.
+export function scaleHierarchicalBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  if (periodCents <= 0) return 1;
+
+  // Level 1: 2 halves
+  let n1 = 0;
+  let n2 = 0;
+  const half = periodCents / 2;
+  for (let i = 0; i < n; i++) {
+    const c = scaleCents[i]!;
+    if (c < half) n1++;
+    else n2++;
+  }
+  const level1 = 1 - Math.abs(n1 - n2) / n;
+
+  // Level 2: 4 quarters
+  const quarter = periodCents / 4;
+  const counts = [0, 0, 0, 0];
+  for (let i = 0; i < n; i++) {
+    const c = scaleCents[i]!;
+    const idx = Math.min(3, Math.floor(c / quarter));
+    counts[idx]!++;
+  }
+  const mean4 = n / 4;
+  const variance4 = counts.reduce((s, v) => s + (v - mean4) ** 2, 0) / 4;
+  const std4 = Math.sqrt(variance4);
+  const level2 = 1 - (std4 * 2) / n;
+
+  return Math.min(1, Math.max(0, (level1 + level2) / 2));
 }
