@@ -1294,3 +1294,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | GGGG2 | `scaleStepRecurrence` | 繰り返し出現するステップサイズの比率 |
 | GGGG3 | `scaleOctaveEquivalence` | オクターブ等価性の近似度 |
 | GGGG4 | `scaleHierarchicalBalance` | 複数階層での均衡指数 |
+
+## Round 102: 音階スペクトル密度分析 (HHHH1–HHHH4)
+
+音高が周期内の低・中・高音域にどう分布するかを測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| HHHH1 | `scaleLowRegisterDensity` | 低音域（0〜1/3周期）の音符密度 |
+| HHHH2 | `scaleMidRegisterDensity` | 中音域（1/3〜2/3周期）の音符密度 |
+| HHHH3 | `scaleHighRegisterDensity` | 高音域（2/3〜1周期）の音符密度 |
+| HHHH4 | `scaleRegisterDistributionBalance` | 3音域の均衡指数（標準偏差の補数） |
