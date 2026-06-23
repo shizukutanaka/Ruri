@@ -46188,6 +46188,153 @@ export function tuningFamilySocraticRadarProsodyCurveProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2382 — tuningFamilySocraticRadarSocialNetworkProxy
+export function tuningFamilySocraticRadarSocialNetworkProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: social network clustering analog
+  // "connectivity" = mean × (1 - std) — high mean + low variance = dense connected network
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = mean * (1 - std);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2384 — tuningFamilySocraticRadarCriticalityProxyV2
+export function tuningFamilySocraticRadarCriticalityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: near-critical point analog
+  // closest to 0.5 = most critical (phase transition boundary)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const result = 1 - Math.abs(mean - 0.5) * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2386 — tuningFamilySocraticRadarEmergenceProxyV2
+export function tuningFamilySocraticRadarEmergenceProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: emergent structure analog
+  // range = max - min (high range = strong emergent differentiation)
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  const result = maxVal - minVal;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2388 — tuningFamilySocraticRadarCollectiveBehaviorProxy
+export function tuningFamilySocraticRadarCollectiveBehaviorProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: synchronization analog
+  // low variation = synchronized collective behavior
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = 1 - std / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2390 — tuningFamilySocraticRadarCulturalDiversityProxyV2
+export function tuningFamilySocraticRadarCulturalDiversityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: cultural spread — Shannon entropy of axis aggregates as probability distribution
+  const sum = axisAggregates.reduce((a, b) => a + b, 0);
+  if (sum === 0) return 0;
+  const probs = axisAggregates.map((v) => v / sum);
+  const entropy = probs.reduce((acc, p) => {
+    if (p <= 0) return acc;
+    return acc - p * Math.log2(p);
+  }, 0);
+  const result = entropy / Math.log2(5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2392 — tuningFamilySocraticRadarSocialMobilityProxyV2
+export function tuningFamilySocraticRadarSocialMobilityProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: transition rate analog
+  // count of adjacent pairs where |agg[i+1] - agg[i]| > 0.2, divided by 4
+  let transitions = 0;
+  for (let i = 0; i < 4; i++) {
+    if (Math.abs(axisAggregates[i + 1]! - axisAggregates[i]!) > 0.2) {
+      transitions++;
+    }
+  }
+  const result = transitions / 4;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -52615,4 +52762,70 @@ export function scaleDiatonicMatchScore(pitches: readonly Pitch[]): number {
     if (score > bestMatch) bestMatch = score;
   }
   return Math.min(1, Math.max(0, bestMatch));
+}
+
+// Round 124 — R1241-R1244: 音階テンション特性分析
+
+export function scaleSemitoneClusterDensity(pitches: readonly Pitch[]): number {
+  // fraction of adjacent pairs (when sorted by cents) within 100 cents of each other
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  let clusters = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i + 1]! - sorted[i]! < 100) clusters++;
+  }
+  return Math.min(1, Math.max(0, clusters / (pitches.length - 1)));
+}
+
+export function scaleAvoidNoteCount(pitches: readonly Pitch[]): number {
+  // fraction of notes within 50 cents of a tritone (600c) above any note in the scale
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let avoidCount = 0;
+  for (const c of cents) {
+    const tritone = (c + 600) % 1200;
+    const hasResolution = cents.some((c2) => {
+      const diff = Math.abs(c2 - tritone);
+      return diff < 50 || diff > 1150;
+    });
+    if (hasResolution) avoidCount++;
+  }
+  return Math.min(1, Math.max(0, avoidCount / pitches.length));
+}
+
+export function scaleColorToneRatio(pitches: readonly Pitch[]): number {
+  // fraction of notes NOT in the major scale (chromatic / color tones)
+  if (pitches.length === 0) return 0;
+  const majorCents = [0, 200, 400, 500, 700, 900, 1100];
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let colorCount = 0;
+  for (const c of cents) {
+    const isDiatonic = majorCents.some((m) => Math.abs(c - m) < 50 || Math.abs(c - m - 1200) < 50 || Math.abs(c - m + 1200) < 50);
+    if (!isDiatonic) colorCount++;
+  }
+  return Math.min(1, Math.max(0, colorCount / pitches.length));
+}
+
+export function scaleIntervalTension(pitches: readonly Pitch[]): number {
+  // average tension of all intervals: tritone=1, minor2=0.9, major7=0.8, minor7=0.5, major2=0.4, other=0.1
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const tensions: number[] = [];
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const interval = Math.abs(cents[i]! - cents[j]!);
+      const ic = Math.min(interval, 1200 - interval); // interval class (0-600)
+      let tension = 0.1;
+      if (ic < 50) tension = 0.05;        // unison
+      else if (ic < 150) tension = 0.9;   // minor 2nd
+      else if (ic < 250) tension = 0.4;   // major 2nd
+      else if (ic < 350) tension = 0.2;   // minor 3rd
+      else if (ic < 450) tension = 0.15;  // major 3rd
+      else if (ic < 550) tension = 0.1;   // perfect 4th/5th
+      else tension = 1.0;                 // tritone
+      tensions.push(tension);
+    }
+  }
+  if (tensions.length === 0) return 0;
+  return Math.min(1, Math.max(0, tensions.reduce((a, b) => a + b, 0) / tensions.length));
 }
