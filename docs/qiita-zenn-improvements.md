@@ -1498,3 +1498,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1212 | `scaleLowRegisterRatio` | 低音域比率: 音域下位1/3に含まれる音符の割合 |
 | R1213 | `scaleRegisterSpread` | 音域スプレッド: 最高音と最低音の差をオクターブ(1200セント)で正規化 |
 | R1214 | `scaleRegisterConcentration` | 音域集中度: 音域スプレッドの逆数、狭い音域に集中するほど高スコア |
+
+## Round 122 — R1221–R1224: 音階ピッチ多様性・集中分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1221 | `scalePitchVariety` | ピッチ多様性: 25セント解像度での個別ピッチクラス数 ÷ 総ピッチ数 |
+| R1222 | `scalePitchRepetitionRatio` | ピッチ反復率: 10セント以内の重複音程の割合 |
+| R1223 | `scaleSpanRatio` | スパン比: 実際の音域 ÷ 等間隔配置時の期待音域 |
+| R1224 | `scaleAveragePitchHeight` | 平均ピッチ高さ: 音域内での平均ピッチ位置(0=最低, 1=最高) |
