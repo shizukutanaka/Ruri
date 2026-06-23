@@ -838,6 +838,12 @@ import {
   presetFamilySocraticRadarPatternRecognitionProxy,
   presetFamilySocraticRadarEmotionalValenceProxy,
   presetFamilySocraticRadarHabitStrengthProxy,
+  presetFamilySocraticRadarMembranePotentialProxy,
+  presetFamilySocraticRadarOsmoticPressureProxy,
+  presetFamilySocraticRadarProteinFoldingProxy,
+  presetFamilySocraticRadarCellularRespirationProxy,
+  presetFamilySocraticRadarDNAReplicationProxy,
+  presetFamilySocraticRadarEnzymeKineticsProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -20285,5 +20291,101 @@ describe('Q2081 presetFamilySocraticRadarHabitStrengthProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarHabitStrengthProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2083 — presetFamilySocraticRadarMembranePotentialProxy
+describe('Q2083 presetFamilySocraticRadarMembranePotentialProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarMembranePotentialProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarMembranePotentialProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMembranePotentialProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2085 — presetFamilySocraticRadarOsmoticPressureProxy
+describe('Q2085 presetFamilySocraticRadarOsmoticPressureProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarOsmoticPressureProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarOsmoticPressureProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarOsmoticPressureProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2087 — presetFamilySocraticRadarProteinFoldingProxy
+describe('Q2087 presetFamilySocraticRadarProteinFoldingProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarProteinFoldingProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarProteinFoldingProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProteinFoldingProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2089 — presetFamilySocraticRadarCellularRespirationProxy
+describe('Q2089 presetFamilySocraticRadarCellularRespirationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCellularRespirationProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCellularRespirationProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCellularRespirationProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2091 — presetFamilySocraticRadarDNAReplicationProxy
+describe('Q2091 presetFamilySocraticRadarDNAReplicationProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarDNAReplicationProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarDNAReplicationProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDNAReplicationProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2093 — presetFamilySocraticRadarEnzymeKineticsProxy
+describe('Q2093 presetFamilySocraticRadarEnzymeKineticsProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarEnzymeKineticsProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarEnzymeKineticsProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEnzymeKineticsProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });

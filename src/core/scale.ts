@@ -42997,6 +42997,126 @@ export function tuningFamilySocraticRadarHabitStrengthProxy(
   return Math.min(1, Math.max(0, totalGeoMean / vecs.length));
 }
 
+// Q2082 — tuningFamilySocraticRadarMembranePotentialProxy
+export function tuningFamilySocraticRadarMembranePotentialProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalMean = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    totalMean += mean;
+  }
+  return Math.min(1, Math.max(0, totalMean / vecs.length));
+}
+
+// Q2084 — tuningFamilySocraticRadarOsmoticPressureProxy
+export function tuningFamilySocraticRadarOsmoticPressureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalGradient = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    const max = vec.reduce((acc, x) => Math.max(acc, x), 0);
+    totalGradient += max - mean;
+  }
+  return Math.min(1, Math.max(0, totalGradient / vecs.length));
+}
+
+// Q2086 — tuningFamilySocraticRadarProteinFoldingProxy
+export function tuningFamilySocraticRadarProteinFoldingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalStability = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    const variance = vec.reduce((acc, x) => acc + (x - mean) ** 2, 0) / vec.length;
+    const std = Math.sqrt(variance);
+    totalStability += 1 - Math.min(1, std);
+  }
+  return Math.min(1, Math.max(0, totalStability / vecs.length));
+}
+
+// Q2088 — tuningFamilySocraticRadarCellularRespirationProxy
+export function tuningFamilySocraticRadarCellularRespirationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalFraction = 0;
+  for (const vec of vecs) {
+    const aboveThreshold = vec.filter((x) => x > 0.4).length;
+    totalFraction += aboveThreshold / vec.length;
+  }
+  return Math.min(1, Math.max(0, totalFraction / vecs.length));
+}
+
+// Q2090 — tuningFamilySocraticRadarDNAReplicationProxy
+export function tuningFamilySocraticRadarDNAReplicationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalProduct = 0;
+  for (const vec of vecs) {
+    const max = vec.reduce((acc, x) => Math.max(acc, x), 0);
+    const min = vec.reduce((acc, x) => Math.min(acc, x), 1);
+    totalProduct += max * min;
+  }
+  return Math.min(1, Math.max(0, totalProduct / vecs.length));
+}
+
+// Q2092 — tuningFamilySocraticRadarEnzymeKineticsProxy
+export function tuningFamilySocraticRadarEnzymeKineticsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalScore = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    const variance = vec.reduce((acc, x) => acc + (x - mean) ** 2, 0) / vec.length;
+    const std = Math.sqrt(variance);
+    totalScore += mean * (1 - Math.min(1, std));
+  }
+  return Math.min(1, Math.max(0, totalScore / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -47519,4 +47639,87 @@ export function scaleModalComplexityV2(scaleCents: readonly number[], periodCent
     }
   }
   return Math.min(1, Math.max(0, (brightCount + darkCount) / n));
+}
+
+// EEEE1 — scaleFillRatio
+// Measures what fraction of the period is "covered" by ±50-cent pitch neighborhoods.
+export function scaleFillRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  if (periodCents <= 0) return 0;
+  const halfWidth = 50;
+  // Build list of intervals [lo, hi] clamped to [0, periodCents]
+  const intervals: Array<[number, number]> = scaleCents.map((c) => [
+    Math.max(0, c - halfWidth),
+    Math.min(periodCents, c + halfWidth),
+  ]);
+  // Sort by lo
+  intervals.sort((a, b) => a[0]! - b[0]!);
+  // Merge overlapping intervals and sum coverage
+  let coverage = 0;
+  let curLo = intervals[0]![0];
+  let curHi = intervals[0]![1];
+  for (let i = 1; i < intervals.length; i++) {
+    const [lo, hi] = intervals[i]!;
+    if (lo <= curHi) {
+      // Overlapping or adjacent — extend
+      if (hi > curHi) curHi = hi;
+    } else {
+      coverage += curHi - curLo;
+      curLo = lo;
+      curHi = hi;
+    }
+  }
+  coverage += curHi - curLo;
+  return Math.min(1, Math.max(0, coverage / periodCents));
+}
+
+// EEEE2 — scaleMaxGap
+// Largest uncovered gap in pitch space, normalized to [0,1].
+export function scaleMaxGap(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 1;
+  if (periodCents <= 0) return 0;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // Gaps: from 0 to first, between consecutive, from last to period
+  let maxGap = sorted[0]!; // 0 to first pitch
+  for (let i = 1; i < sorted.length; i++) {
+    const gap = sorted[i]! - sorted[i - 1]!;
+    if (gap > maxGap) maxGap = gap;
+  }
+  const lastGap = periodCents - sorted[sorted.length - 1]!;
+  if (lastGap > maxGap) maxGap = lastGap;
+  return Math.min(1, Math.max(0, maxGap / periodCents));
+}
+
+// EEEE3 — scaleGapUniformity
+// How uniform the gaps between pitches are (1 = perfectly uniform, 0 = maximally uneven).
+export function scaleGapUniformity(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 1;
+  if (periodCents <= 0) return 1;
+  const sorted = [...scaleCents].sort((a, b) => a - b);
+  // n gaps: consecutive steps + wrap-around
+  const gaps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    gaps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  gaps.push(periodCents - sorted[sorted.length - 1]! + sorted[0]!);
+  const mean = gaps.reduce((s, g) => s + g, 0) / gaps.length;
+  if (mean === 0) return 1;
+  const variance = gaps.reduce((s, g) => s + (g - mean) ** 2, 0) / gaps.length;
+  const std = Math.sqrt(variance);
+  const cv = std / mean;
+  const uniformity = 1 - cv / Math.sqrt(n);
+  return Math.min(1, Math.max(0, uniformity));
+}
+
+// EEEE4 — scaleCoverageEfficiency
+// Coverage relative to note count — how efficiently each note covers space (12-note scale as reference).
+export function scaleCoverageEfficiency(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const fillRatio = scaleFillRatio(scaleCents, periodCents);
+  const efficiency = fillRatio / (n / 12);
+  return Math.min(1, Math.max(0, efficiency));
 }
