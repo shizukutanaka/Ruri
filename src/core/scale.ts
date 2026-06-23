@@ -46475,6 +46475,144 @@ export function tuningFamilySocraticRadarCognitiveParsimonyProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2406 — tuningFamilySocraticRadarCelestialHarmonyProxy
+export function tuningFamilySocraticRadarCelestialHarmonyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: orbital resonance analog
+  // axes at harmonic ratio positions (1:1, 1:2, 1:3, 2:3, 3:4) create resonance
+  const harmonicPositions = [1 / 5, 2 / 5, 3 / 5, 4 / 5, 5 / 5];
+  let resonanceScore = 0;
+  for (let i = 0; i < 5; i++) {
+    resonanceScore += 1 - Math.abs(axisAggregates[i]! - harmonicPositions[i]!);
+  }
+  const result = resonanceScore / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2408 — tuningFamilySocraticRadarGravitationalWaveProxy
+export function tuningFamilySocraticRadarGravitationalWaveProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: wave amplitude analog — std * 2 (high variance = strong oscillation, clamped)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance =
+    axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = std * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2410 — tuningFamilySocraticRadarCosmicExpansionProxy
+export function tuningFamilySocraticRadarCosmicExpansionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: Hubble-like expansion — mean of axisAggregates (uniform growth proxy)
+  const result = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2412 — tuningFamilySocraticRadarStellarLifecycleProxy
+export function tuningFamilySocraticRadarStellarLifecycleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: star lifecycle stage — 5 axes as 5 stages
+  // dominant stage fraction: max(axisAggregates) / (sum + 1e-9)
+  const sum = axisAggregates.reduce((a, b) => a + b, 0);
+  const maxVal = Math.max(...axisAggregates);
+  const result = maxVal / (sum + 1e-9);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2414 — tuningFamilySocraticRadarBlackHoleProxy
+export function tuningFamilySocraticRadarBlackHoleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: event horizon analog — agg[4]^2 (convergence squared — strong convergence = singularity)
+  const convergence = axisAggregates[4]!;
+  const result = convergence ** 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2416 — tuningFamilySocraticRadarQuantumVacuumProxy
+export function tuningFamilySocraticRadarQuantumVacuumProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: vacuum fluctuation — (1 - mean) * std * 4 (low mean + high variance = vacuum-like)
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance =
+    axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  const result = (1 - mean) * std * 4;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -53030,4 +53168,60 @@ export function scaleHemitoniaRatio(pitches: readonly Pitch[]): number {
   const total = hemitoniaCount + wholeToneCount;
   if (total === 0) return 0;
   return Math.min(1, Math.max(0, hemitoniaCount / total));
+}
+
+// Round 126 — R1261-R1264: 音階クラスタ特性分析
+
+export function scaleNoteGroupingScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  // Count how many adjacent pairs form "within-group" connections (gap < 200c)
+  let withinGroupPairs = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i + 1]! - sorted[i]! < 200) withinGroupPairs++;
+  }
+  return Math.min(1, Math.max(0, withinGroupPairs / (sorted.length - 1)));
+}
+
+export function scaleInterclusterGap(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const gaps: number[] = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const gap = sorted[i + 1]! - sorted[i]!;
+    if (gap >= 200) gaps.push(gap);
+  }
+  if (gaps.length === 0) return 0;
+  const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  return Math.min(1, Math.max(0, avgGap / 600)); // normalize: 600c = tritone gap
+}
+
+export function scaleGroupCount(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  if (pitches.length === 1) return 1 / 6;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  let groups = 1;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i + 1]! - sorted[i]! >= 200) groups++;
+  }
+  return Math.min(1, Math.max(0, groups / 6)); // normalize by 6 (max reasonable groups)
+}
+
+export function scaleClusterDensityVariation(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  // Find clusters (groups of notes with gaps < 200c between them)
+  const clusters: number[] = [1];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i + 1]! - sorted[i]! < 200) {
+      clusters[clusters.length - 1]!++;
+    } else {
+      clusters.push(1);
+    }
+  }
+  if (clusters.length === 1) return 0; // single cluster, no variation
+  const mean = clusters.reduce((a, b) => a + b, 0) / clusters.length;
+  const variance = clusters.reduce((acc, c) => acc + (c - mean) ** 2, 0) / clusters.length;
+  const cv = Math.sqrt(variance) / (mean + 1e-9);
+  return Math.min(1, Math.max(0, cv / 2)); // normalize CV: 2 = very high variation
 }

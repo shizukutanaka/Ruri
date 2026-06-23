@@ -1534,3 +1534,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1252 | `scaleAxisSymmetryScore` | 反転対称スコア: 最適対称軸での反転一致率（最大値） |
 | R1253 | `scaleDegreeWeightBalance` | 音度重みバランス: オクターブを4分割した各領域への音符分布の均等性 |
 | R1254 | `scaleHemitoniaRatio` | 半音比率: 全音・半音ステップのうち半音ステップが占める割合 |
+
+## Round 126 — R1261–R1264: 音階クラスタ特性分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1261 | `scaleNoteGroupingScore` | 音符グループ化スコア: 隣接音符が200セント未満でまとまるペアの割合 |
+| R1262 | `scaleInterclusterGap` | クラスタ間隔: クラスタ間の平均ギャップ（600セント=三全音で正規化） |
+| R1263 | `scaleGroupCount` | グループ数: 200セント以上の間隔で区切られた自然クラスタ数÷6 |
+| R1264 | `scaleClusterDensityVariation` | クラスタ密度変動: クラスタサイズの変動係数（÷2で正規化） |

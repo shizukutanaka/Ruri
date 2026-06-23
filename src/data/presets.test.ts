@@ -1000,6 +1000,12 @@ import {
   presetFamilySocraticRadarMemoryConsolidationProxy,
   presetFamilySocraticRadarPerceptualGroupingProxy,
   presetFamilySocraticRadarCognitiveParsimonyProxy,
+  presetFamilySocraticRadarCelestialHarmonyProxy,
+  presetFamilySocraticRadarGravitationalWaveProxy,
+  presetFamilySocraticRadarCosmicExpansionProxy,
+  presetFamilySocraticRadarStellarLifecycleProxy,
+  presetFamilySocraticRadarBlackHoleProxy,
+  presetFamilySocraticRadarQuantumVacuumProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -23423,5 +23429,125 @@ describe('Q2405 presetFamilySocraticRadarCognitiveParsimonyProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarCognitiveParsimonyProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2407 — presetFamilySocraticRadarCelestialHarmonyProxy
+describe('Q2407 presetFamilySocraticRadarCelestialHarmonyProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCelestialHarmonyProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCelestialHarmonyProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCelestialHarmonyProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2409 — presetFamilySocraticRadarGravitationalWaveProxy
+describe('Q2409 presetFamilySocraticRadarGravitationalWaveProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarGravitationalWaveProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarGravitationalWaveProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGravitationalWaveProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2411 — presetFamilySocraticRadarCosmicExpansionProxy
+describe('Q2411 presetFamilySocraticRadarCosmicExpansionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCosmicExpansionProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCosmicExpansionProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCosmicExpansionProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2413 — presetFamilySocraticRadarStellarLifecycleProxy
+describe('Q2413 presetFamilySocraticRadarStellarLifecycleProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarStellarLifecycleProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarStellarLifecycleProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarStellarLifecycleProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2415 — presetFamilySocraticRadarBlackHoleProxy
+describe('Q2415 presetFamilySocraticRadarBlackHoleProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarBlackHoleProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarBlackHoleProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBlackHoleProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2417 — presetFamilySocraticRadarQuantumVacuumProxy
+describe('Q2417 presetFamilySocraticRadarQuantumVacuumProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarQuantumVacuumProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarQuantumVacuumProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarQuantumVacuumProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });
