@@ -1735,3 +1735,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1464 | `scaleMassDistribution` | 600c以上の音度の割合（上半オクターブ集中度） |
 
 **設計根拠**: 物理系の重心概念をスケールに適用する。均等分布→高いVariance、中央重心→高いBalance、上方集中→高いMassDistribution、各軸の数値を空間的に解釈する。
+
+## Round 147 — R1471–R1474 音階音度分布形状分析
+
+| ID | 関数名 | 概要 |
+|----|--------|------|
+| R1471 | `scaleDistributionShape` | (平均−中央値)/標準偏差を[0,1]変換した分布歪度 |
+| R1472 | `scaleAsymmetryIndex` | 600c以上の音度数と未満の差÷全音数を[0,1]変換した非対称指標 |
+| R1473 | `scaleUnimodality` | 200cent刻みビンの占有数の逆数（少ビン=高一峰性） |
+| R1474 | `scaleIntervalDensityPeak` | 最頻200centビンの中心を1200で正規化した音程密度ピーク位置 |
+
+**設計根拠**: 確率分布の形状指標（歪度・非対称・一峰性・モード）をスケールに適用。低音集中→低いAsymmetry、均等分布→低いUnimodality、特定音程が多い→特定IntervalDensityPeak。
