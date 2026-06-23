@@ -1606,3 +1606,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1332 | `scaleIIVIPotential` | ii-V-Iポテンシャル: 根音・長2度・完全4度・完全5度の存在度 |
 | R1333 | `scaleSecondaryDominantCount` | 副属音数: 5度上に音がある音を副属音ルートとして数えた割合 |
 | R1334 | `scaleModalMixtureScore` | モーダルミクスチャースコア: 長短の両バージョン（M3/m3等）が共存する音度数 |
+
+## Round 134 — R1341–R1344: 音階スペクトル整合性分析
+
+| ID | 関数名 | 説明 |
+|----|--------|------|
+| R1341 | `scaleSpectrumMatchScore` | スペクトル一致スコア: 音度が自然倍音列の主要ポジション（±25c）に一致する割合 |
+| R1342 | `scalePartialAlignmentDensity` | 倍音整合密度: 倍音1-16のいずれか（±50c）に一致する音の割合 |
+| R1343 | `scaleInharmonicityIndex` | 不協和指数: 各音程ペアの最近傍純正律音程からの平均偏差（50c正規化） |
+| R1344 | `scaleSpectralCentroidBias` | スペクトル重心バイアス: 音度分布の重心が600cからどれだけ偏っているか |
