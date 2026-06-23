@@ -1316,3 +1316,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | IIII2 | `scaleDissonantIntervalCountV2` | 不協和ステップ（半音・増4度）の比率 |
 | IIII3 | `scaleTensionResolutionRatioV2` | 解決音程（協和ステップ）の比率 |
 | IIII4 | `scaleHarmonicTensionIndexV2` | 三全音比率と不協和比率の複合張力指数 |
+
+## Round 104: 音階倍音列分析 (JJJJ1–JJJJ4)
+
+音階が自然倍音列・純正律にどれだけ整合するかを測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| JJJJ1 | `scaleOvertoneAlignment` | 第1–16倍音列との整合率（20セント許容） |
+| JJJJ2 | `scaleSubharmonicAlignment` | 第2–8倍音の逆数（倍音下列）との整合率 |
+| JJJJ3 | `scaleHarmonicSeriesCompleteness` | 第2–8倍音の充足率 |
+| JJJJ4 | `scaleJustIntonationProximityV2` | 5リミット純正律音程との近傍率 |
