@@ -1708,6 +1708,8 @@ import {
   scaleInterclusterGap,
   scaleGroupCount,
   scaleClusterDensityVariation,
+  analyzeScale,
+  type ScaleAnalysisProfile,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -42813,5 +42815,39 @@ describe('Q2416 tuningFamilySocraticRadarQuantumVacuumProxy', () => {
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// analyzeScale convenience aggregate
+describe('analyzeScale', () => {
+  it('returns profile with all expected keys', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const profile: ScaleAnalysisProfile = analyzeScale(pitches);
+    expect(typeof profile.majorAffinity).toBe('number');
+    expect(typeof profile.intervalTension).toBe('number');
+    expect(typeof profile.diatonicMatchScore).toBe('number');
+    expect(typeof profile.groupCount).toBe('number');
+    expect(Object.keys(profile)).toHaveLength(14);
+  });
+  it('all values are in [0,1]', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const profile = analyzeScale(pitches);
+    for (const val of Object.values(profile)) {
+      expect(val).toBeGreaterThanOrEqual(0);
+      expect(val).toBeLessThanOrEqual(1);
+    }
+  });
+  it('returns 0 for all numeric values on empty input', () => {
+    const profile = analyzeScale([]);
+    expect(profile.majorAffinity).toBe(0);
+    expect(profile.diatonicMatchScore).toBe(0);
+    expect(profile.intervalTension).toBe(0);
+  });
+  it('major scale has majorAffinity=1 and colorToneRatio=0', () => {
+    const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));
+    const profile = analyzeScale(pitches);
+    expect(profile.majorAffinity).toBe(1);
+    expect(profile.colorToneRatio).toBe(0);
+    expect(profile.diatonicMatchScore).toBe(1);
   });
 });

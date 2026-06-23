@@ -53021,7 +53021,7 @@ export function scaleDiatonicMatchScore(pitches: readonly Pitch[]): number {
     [0, 100, 300, 500, 700, 800, 1000], // phrygian
     [0, 200, 400, 600, 700, 900, 1100], // lydian
     [0, 200, 400, 500, 700, 900, 1000], // mixolydian
-    [0, 200, 300, 500, 700, 800, 1000], // aeolian (= dorian)
+    [0, 200, 300, 500, 700, 800, 1000], // aeolian/natural minor
     [0, 100, 300, 500, 600, 800, 1000], // locrian
   ];
   const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
@@ -53224,4 +53224,41 @@ export function scaleClusterDensityVariation(pitches: readonly Pitch[]): number 
   const variance = clusters.reduce((acc, c) => acc + (c - mean) ** 2, 0) / clusters.length;
   const cv = Math.sqrt(variance) / (mean + 1e-9);
   return Math.min(1, Math.max(0, cv / 2)); // normalize CV: 2 = very high variation
+}
+
+// Convenience aggregate: compute a compact multi-dimensional scale analysis profile.
+export interface ScaleAnalysisProfile {
+  readonly majorAffinity: number;
+  readonly minorAffinity: number;
+  readonly chromaticDegreeCount: number;
+  readonly diatonicMatchScore: number;
+  readonly semitoneClusterDensity: number;
+  readonly colorToneRatio: number;
+  readonly intervalTension: number;
+  readonly noteGroupingScore: number;
+  readonly groupCount: number;
+  readonly leapFraction: number;
+  readonly stepFraction: number;
+  readonly halfStepCount: number;
+  readonly axisSymmetryScore: number;
+  readonly hemitoniaRatio: number;
+}
+
+export function analyzeScale(pitches: readonly Pitch[]): ScaleAnalysisProfile {
+  return {
+    majorAffinity: scaleMajorAffinity(pitches),
+    minorAffinity: scaleMinorAffinity(pitches),
+    chromaticDegreeCount: scaleChromaticDegreeCount(pitches),
+    diatonicMatchScore: scaleDiatonicMatchScore(pitches),
+    semitoneClusterDensity: scaleSemitoneClusterDensity(pitches),
+    colorToneRatio: scaleColorToneRatio(pitches),
+    intervalTension: scaleIntervalTension(pitches),
+    noteGroupingScore: scaleNoteGroupingScore(pitches),
+    groupCount: scaleGroupCount(pitches),
+    leapFraction: scaleLeapFraction(pitches),
+    stepFraction: scaleStepFraction(pitches),
+    halfStepCount: scaleHalfStepCount(pitches),
+    axisSymmetryScore: scaleAxisSymmetryScore(pitches),
+    hemitoniaRatio: scaleHemitoniaRatio(pitches),
+  };
 }
