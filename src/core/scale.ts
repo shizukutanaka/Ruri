@@ -43790,6 +43790,129 @@ export function tuningFamilySocraticRadarCoastlineComplexityProxy(
   return Math.min(1, Math.max(0, alternations / 4));
 }
 
+// Q2154 — tuningFamilySocraticRadarOntologicalWeightProxy
+export function tuningFamilySocraticRadarOntologicalWeightProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  return Math.min(1, Math.max(0, mean));
+}
+
+// Q2156 — tuningFamilySocraticRadarEpistemicCertaintyProxy
+export function tuningFamilySocraticRadarEpistemicCertaintyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const variance =
+    axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const std = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, 1 - std / 0.5));
+}
+
+// Q2158 — tuningFamilySocraticRadarDialecticalTensionProxy
+export function tuningFamilySocraticRadarDialecticalTensionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  return Math.min(1, Math.max(0, maxVal - minVal));
+}
+
+// Q2160 — tuningFamilySocraticRadarParadigmShiftProxy
+export function tuningFamilySocraticRadarParadigmShiftProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const aboveThreshold = axisAggregates.filter((v) => v > 0.8).length;
+  return Math.min(1, Math.max(0, aboveThreshold / axisAggregates.length));
+}
+
+// Q2162 — tuningFamilySocraticRadarHermeneuticCircleProxy
+export function tuningFamilySocraticRadarHermeneuticCircleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const n = axisAggregates.length;
+  const logSum = axisAggregates.reduce((a, b) => a + Math.log(Math.max(b, 1e-10)), 0);
+  const geometricMean = Math.exp(logSum / n);
+  return Math.min(1, Math.max(0, geometricMean));
+}
+
+// Q2164 — tuningFamilySocraticRadarCausalDensityProxy
+export function tuningFamilySocraticRadarCausalDensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
+  const maxVal = Math.max(...axisAggregates);
+  const minVal = Math.min(...axisAggregates);
+  const range = maxVal - minVal;
+  return Math.min(1, Math.max(0, (mean * (1 + range)) / 2));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -48820,4 +48943,96 @@ export function scaleJustIntonationProximityV2(scaleCents: readonly number[], pe
     if (minDist <= 10) matchCount++;
   }
   return Math.min(1, Math.max(0, matchCount / n));
+}
+
+/**
+ * KKKK1 — scaleMicrotonalDeviation
+ * Average deviation of scale pitches from the nearest 12-EDO pitch class,
+ * normalized by 50 cents (the maximum possible deviation from any 12-EDO class).
+ * 12-EDO pitch classes: 0, 100, 200, ..., 1100 cents.
+ * Returns mean(deviations) / 50, clamped to [0, 1]. Empty → 0.
+ */
+export function scaleMicrotonalDeviation(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const edo12Step = 100; // cents per 12-EDO step
+  let totalDev = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+    // Nearest 12-EDO class within the period
+    const nearest = Math.round(pitch / edo12Step) * edo12Step;
+    const dev = Math.abs(pitch - nearest);
+    // dev can be at most 50 cents (midpoint between adjacent 12-EDO classes)
+    totalDev += dev;
+  }
+  const meanDev = totalDev / n;
+  return Math.min(1, Math.max(0, meanDev / 50));
+}
+
+/**
+ * KKKK2 — scaleMicrotonalIntervalCount
+ * Fraction of consecutive step sizes (including wrap-around) that are "microtonal"
+ * (i.e., less than 80 cents).
+ * Returns count / n steps. Empty or single note → 0.
+ */
+export function scaleMicrotonalIntervalCount(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n <= 1) return 0;
+  const sorted = Array.from(scaleCents).sort((a, b) => a - b);
+  let microtonalCount = 0;
+  for (let i = 0; i < n; i++) {
+    const curr = sorted[i]!;
+    const next = i + 1 < n ? sorted[i + 1]! : sorted[0]! + periodCents;
+    const step = next - curr;
+    if (step < 80) microtonalCount++;
+  }
+  return Math.min(1, Math.max(0, microtonalCount / n));
+}
+
+/**
+ * KKKK3 — scaleXenharmonicNovelty
+ * Fraction of pitches that fall outside all standard 12-EDO pitch classes
+ * (more than 30 cents from any 12-EDO class).
+ * Returns count / n. Empty → 0.
+ */
+export function scaleXenharmonicNovelty(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const edo12Step = 100;
+  let xenCount = 0;
+  for (let i = 0; i < n; i++) {
+    const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+    const nearest = Math.round(pitch / edo12Step) * edo12Step;
+    const dev = Math.abs(pitch - nearest);
+    if (dev > 30) xenCount++;
+  }
+  return Math.min(1, Math.max(0, xenCount / n));
+}
+
+/**
+ * KKKK4 — scaleEDOApproximationScore
+ * How well the scale approximates any common EDO (5, 7, 10, 12, 17, 19, 22, 31).
+ * For each EDO n: step = periodCents / n; count pitches that land within 10 cents
+ * of the nearest EDO grid point. Score = matchCount / scale_n.
+ * Returns the maximum score over all EDOs, clamped to [0, 1]. Empty → 0.
+ */
+export function scaleEDOApproximationScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const COMMON_EDOS = [5, 7, 10, 12, 17, 19, 22, 31];
+  let maxScore = 0;
+  for (let e = 0; e < COMMON_EDOS.length; e++) {
+    const edoN = COMMON_EDOS[e]!;
+    const step = periodCents / edoN;
+    let matchCount = 0;
+    for (let i = 0; i < n; i++) {
+      const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
+      const nearestDegree = Math.round(pitch / step);
+      const nearestPitch = nearestDegree * step;
+      if (Math.abs(pitch - nearestPitch) <= 10) matchCount++;
+    }
+    const score = matchCount / n;
+    if (score > maxScore) maxScore = score;
+  }
+  return Math.min(1, Math.max(0, maxScore));
 }

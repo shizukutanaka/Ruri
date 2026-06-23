@@ -1327,3 +1327,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | JJJJ2 | `scaleSubharmonicAlignment` | 第2–8倍音の逆数（倍音下列）との整合率 |
 | JJJJ3 | `scaleHarmonicSeriesCompleteness` | 第2–8倍音の充足率 |
 | JJJJ4 | `scaleJustIntonationProximityV2` | 5リミット純正律音程との近傍率 |
+
+## Round 105: 音階微分音分析 (KKKK1–KKKK4)
+
+音階の微分音・異音律的特性を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| KKKK1 | `scaleMicrotonalDeviation` | 12-EDO最近傍からの平均偏差（正規化） |
+| KKKK2 | `scaleMicrotonalIntervalCount` | 微分音ステップ（80セント未満）の比率 |
+| KKKK3 | `scaleXenharmonicNovelty` | 12-EDO音程クラス外の音符比率 |
+| KKKK4 | `scaleEDOApproximationScore` | 標準EDO（5/7/10/12/17/19/22/31）との最大整合度 |

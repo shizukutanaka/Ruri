@@ -1487,10 +1487,20 @@ import {
   tuningFamilySocraticRadarBasinDepthProxy,
   tuningFamilySocraticRadarWatershedProxy,
   tuningFamilySocraticRadarCoastlineComplexityProxy,
+  tuningFamilySocraticRadarOntologicalWeightProxy,
+  tuningFamilySocraticRadarEpistemicCertaintyProxy,
+  tuningFamilySocraticRadarDialecticalTensionProxy,
+  tuningFamilySocraticRadarParadigmShiftProxy,
+  tuningFamilySocraticRadarHermeneuticCircleProxy,
+  tuningFamilySocraticRadarCausalDensityProxy,
   scaleOvertoneAlignment,
   scaleSubharmonicAlignment,
   scaleHarmonicSeriesCompleteness,
   scaleJustIntonationProximityV2,
+  scaleMicrotonalDeviation,
+  scaleMicrotonalIntervalCount,
+  scaleXenharmonicNovelty,
+  scaleEDOApproximationScore,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -38604,6 +38614,190 @@ describe('JJJJ4 scaleJustIntonationProximityV2', () => {
   it('returns finite [0,1] for diatonic scale', () => {
     const diatonic = [200, 400, 500, 700, 900, 1100];
     const v = scaleJustIntonationProximityV2(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// KKKK1 — scaleMicrotonalDeviation
+describe('KKKK1 scaleMicrotonalDeviation', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleMicrotonalDeviation([])).toBe(0);
+  });
+  it('returns 0 for perfect 12-EDO pitches', () => {
+    // Notes exactly on 12-EDO grid
+    const v = scaleMicrotonalDeviation([200, 400, 700]);
+    expect(v).toBe(0);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleMicrotonalDeviation(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// KKKK2 — scaleMicrotonalIntervalCount
+describe('KKKK2 scaleMicrotonalIntervalCount', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleMicrotonalIntervalCount([])).toBe(0);
+  });
+  it('returns 0 for single note', () => {
+    expect(scaleMicrotonalIntervalCount([600])).toBe(0);
+  });
+  it('returns >0 for microtonal scale', () => {
+    // Step of 50 cents is microtonal
+    const v = scaleMicrotonalIntervalCount([50, 100, 150, 700]);
+    expect(v).toBeGreaterThan(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// KKKK3 — scaleXenharmonicNovelty
+describe('KKKK3 scaleXenharmonicNovelty', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleXenharmonicNovelty([])).toBe(0);
+  });
+  it('returns 0 for 12-EDO pitches', () => {
+    const v = scaleXenharmonicNovelty([200, 400, 700]);
+    expect(v).toBe(0);
+  });
+  it('returns >0 for xenharmonic pitches', () => {
+    // 350 cents is >30 from any 12-EDO class
+    const v = scaleXenharmonicNovelty([350]);
+    expect(v).toBeGreaterThan(0);
+  });
+});
+
+// KKKK4 — scaleEDOApproximationScore
+describe('KKKK4 scaleEDOApproximationScore', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleEDOApproximationScore([])).toBe(0);
+  });
+  it('returns high score for 12-EDO diatonic', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleEDOApproximationScore(diatonic);
+    expect(v).toBeGreaterThan(0.5);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for arbitrary scale', () => {
+    const v = scaleEDOApproximationScore([150, 350, 650, 950]);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2154 — tuningFamilySocraticRadarOntologicalWeightProxy
+describe('Q2154 tuningFamilySocraticRadarOntologicalWeightProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarOntologicalWeightProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarOntologicalWeightProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarOntologicalWeightProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2156 — tuningFamilySocraticRadarEpistemicCertaintyProxy
+describe('Q2156 tuningFamilySocraticRadarEpistemicCertaintyProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEpistemicCertaintyProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarEpistemicCertaintyProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarEpistemicCertaintyProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2158 — tuningFamilySocraticRadarDialecticalTensionProxy
+describe('Q2158 tuningFamilySocraticRadarDialecticalTensionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDialecticalTensionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarDialecticalTensionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarDialecticalTensionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2160 — tuningFamilySocraticRadarParadigmShiftProxy
+describe('Q2160 tuningFamilySocraticRadarParadigmShiftProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarParadigmShiftProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarParadigmShiftProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarParadigmShiftProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2162 — tuningFamilySocraticRadarHermeneuticCircleProxy
+describe('Q2162 tuningFamilySocraticRadarHermeneuticCircleProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarHermeneuticCircleProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarHermeneuticCircleProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarHermeneuticCircleProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// Q2164 — tuningFamilySocraticRadarCausalDensityProxy
+describe('Q2164 tuningFamilySocraticRadarCausalDensityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCausalDensityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns finite [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCausalDensityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite [0,1] for two tunings', () => {
+    const v = tuningFamilySocraticRadarCausalDensityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
