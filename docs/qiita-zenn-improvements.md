@@ -1404,3 +1404,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | QQQQ2 | `scaleIntervalEntropyV2` | インターバルサイズのシャノンエントロピー |
 | QQQQ3 | `scaleRhythmicEntropy` | インターバル比率のエントロピー（リズム的複雑性） |
 | QQQQ4 | `scaleHarmonicEntropy` | 和声エントロピー代理（音程複雑性の不確実性） |
+
+## Round 112: 音階重心・慣性分析 (RRRR1–RRRR4)
+
+音階のピッチ分布を物理的な質量分布として測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| RRRR1 | `scaleCenterOfMass` | 正規化ピッチ位置の重心（平均） |
+| RRRR2 | `scaleMomentOfInertia` | 重心周りの慣性モーメント（分散） |
+| RRRR3 | `scaleGyrationRadius` | 回転半径（分散の平方根） |
+| RRRR4 | `scaleAngularMomentum` | 角運動量代理（重心×回転半径） |
