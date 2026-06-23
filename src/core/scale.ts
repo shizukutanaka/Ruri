@@ -45791,6 +45791,133 @@ export function tuningFamilySocraticRadarAnisotropyProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2346 — tuningFamilySocraticRadarRefractionProxy
+export function tuningFamilySocraticRadarRefractionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = 1 - axisAggregates.reduce((acc, a, i) => acc + Math.abs(a - i / 4), 0) / 5 * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2348 — tuningFamilySocraticRadarReflectanceProxy
+export function tuningFamilySocraticRadarReflectanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.filter(a => a > 0.6).length / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2350 — tuningFamilySocraticRadarAbsorbanceProxy
+export function tuningFamilySocraticRadarAbsorbanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.filter(a => a < 0.4).length / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2352 — tuningFamilySocraticRadarTransmittanceProxy
+export function tuningFamilySocraticRadarTransmittanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates.filter(a => a >= 0.35 && a <= 0.65).length / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2354 — tuningFamilySocraticRadarDispersionProxy
+export function tuningFamilySocraticRadarDispersionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = std * 4;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2356 — tuningFamilySocraticRadarInterferenceProxy
+export function tuningFamilySocraticRadarInterferenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  let constructivePairs = 0;
+  for (let i = 0; i < axisAggregates.length; i++) {
+    for (let j = i + 1; j < axisAggregates.length; j++) {
+      const ai = axisAggregates[i]!;
+      const aj = axisAggregates[j]!;
+      if ((ai > 0.5 && aj > 0.5) || (ai < 0.5 && aj < 0.5)) {
+        constructivePairs++;
+      }
+    }
+  }
+  const result = constructivePairs / 10;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -52055,4 +52182,47 @@ export function scaleJustTuningDeviation(pitches: readonly Pitch[]): number {
   const meanDev = totalDev / cents.length;
   // Normalize: 0 deviation = 1, 50 cents deviation = 0
   return Math.min(1, Math.max(0, 1 - meanDev / 50));
+}
+
+// Round 121 — R1211-R1214: 音階音域バランス分析
+
+/** R1211: Fraction of pitches in the upper third of the scale's range. */
+export function scaleHighRegisterRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const lo = cents[0]!;
+  const range = cents[cents.length - 1]! - lo;
+  if (range === 0) return 0;
+  const threshold = lo + range * 2 / 3;
+  const high = cents.filter((c) => c >= threshold).length;
+  return high / cents.length;
+}
+
+/** R1212: Fraction of pitches in the lower third of the scale's range. */
+export function scaleLowRegisterRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const lo = cents[0]!;
+  const range = cents[cents.length - 1]! - lo;
+  if (range === 0) return 1;
+  const threshold = lo + range / 3;
+  const low = cents.filter((c) => c <= threshold).length;
+  return low / cents.length;
+}
+
+/** R1213: Difference between highest and lowest pitch normalized to octave (1200 cents). */
+export function scaleRegisterSpread(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const range = Math.max(...cents) - Math.min(...cents);
+  return Math.min(1, Math.max(0, range / 1200));
+}
+
+/** R1214: Inverse of register spread — how concentrated pitches are in a narrow range. */
+export function scaleRegisterConcentration(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 1;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const range = Math.max(...cents) - Math.min(...cents);
+  // Full octave = 0 concentration, 0 range = 1 concentration
+  return Math.min(1, Math.max(0, 1 - range / 1200));
 }

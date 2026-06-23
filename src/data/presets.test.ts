@@ -970,6 +970,12 @@ import {
   presetFamilySocraticRadarConductivityProxyV3,
   presetFamilySocraticRadarCrystallineOrderProxyV2,
   presetFamilySocraticRadarAnisotropyProxy,
+  presetFamilySocraticRadarRefractionProxy,
+  presetFamilySocraticRadarReflectanceProxy,
+  presetFamilySocraticRadarAbsorbanceProxy,
+  presetFamilySocraticRadarTransmittanceProxy,
+  presetFamilySocraticRadarDispersionProxy,
+  presetFamilySocraticRadarInterferenceProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -22793,5 +22799,125 @@ describe('Q2345 presetFamilySocraticRadarAnisotropyProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarAnisotropyProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2347 — presetFamilySocraticRadarRefractionProxy
+describe('Q2347 presetFamilySocraticRadarRefractionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarRefractionProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarRefractionProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarRefractionProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2349 — presetFamilySocraticRadarReflectanceProxy
+describe('Q2349 presetFamilySocraticRadarReflectanceProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarReflectanceProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarReflectanceProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarReflectanceProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2351 — presetFamilySocraticRadarAbsorbanceProxy
+describe('Q2351 presetFamilySocraticRadarAbsorbanceProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarAbsorbanceProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarAbsorbanceProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAbsorbanceProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2353 — presetFamilySocraticRadarTransmittanceProxy
+describe('Q2353 presetFamilySocraticRadarTransmittanceProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarTransmittanceProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarTransmittanceProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTransmittanceProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2355 — presetFamilySocraticRadarDispersionProxy
+describe('Q2355 presetFamilySocraticRadarDispersionProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarDispersionProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarDispersionProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDispersionProxy(['unknown-preset'], s)).toThrow(RangeError);
+  });
+});
+
+// Q2357 — presetFamilySocraticRadarInterferenceProxy
+describe('Q2357 presetFamilySocraticRadarInterferenceProxy', () => {
+  const s = harmonicSpectrum(6);
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarInterferenceProxy(['12-tet'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarInterferenceProxy(['12-tet', 'just-5-limit'], s);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarInterferenceProxy(['unknown-preset'], s)).toThrow(RangeError);
   });
 });
