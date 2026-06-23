@@ -46749,6 +46749,139 @@ export function tuningFamilySocraticRadarMolecularComplexityProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2430 — tuningFamilySocraticRadarCompressionRatioProxyV2
+export function tuningFamilySocraticRadarCompressionRatioProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: compression ratio — entropy of distribution (low entropy = high compression)
+  const total = axisAggregates.reduce((a, b) => a + b, 0) + 1e-9;
+  const probs = axisAggregates.map((a) => a / total);
+  const H = -probs.reduce((acc, p) => acc + p * Math.log2(p + 1e-12), 0);
+  const result = 1 - H / Math.log2(5);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2432 — tuningFamilySocraticRadarRedundancyProxyV2
+export function tuningFamilySocraticRadarRedundancyProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: redundancy — few distinct values = high redundancy
+  const rounded = axisAggregates.map((a) => Math.round(a * 100) / 100);
+  const distinct = new Set(rounded).size;
+  const result = 1 - distinct / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2434 — tuningFamilySocraticRadarChannelNoiseProxy
+export function tuningFamilySocraticRadarChannelNoiseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: channel noise — high variance = noisy channel
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = std * 2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2436 — tuningFamilySocraticRadarCodewordLengthProxy
+export function tuningFamilySocraticRadarCodewordLengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: codeword length — low mean → short codewords → efficient encoding
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const result = 1 - mean;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2438 — tuningFamilySocraticRadarCryptographicStrengthProxy
+export function tuningFamilySocraticRadarCryptographicStrengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: cryptographic strength — high variance = hard to predict = strong crypto
+  const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
+  const variance = axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5;
+  const std = Math.sqrt(variance);
+  const result = std / 0.5;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2440 — tuningFamilySocraticRadarHashCollisionProxy
+export function tuningFamilySocraticRadarHashCollisionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IMPLEMENTATION: hash collision probability analog
+  const collisions = axisAggregates.filter((a) => a > 0.7).length;
+  const result = collisions / 5;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -53478,4 +53611,73 @@ export function scalePeriodicity(pitches: readonly Pitch[]): number {
     }
   }
   return 0;
+}
+
+// Round 128 — R1281-R1284: 音階根音協和性・密度分析
+
+export function scalePitchDensityGini(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Split octave into 12 semitone bins, count notes per bin, compute Gini coefficient
+  const bins = new Array<number>(12).fill(0);
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const bin = Math.min(11, Math.floor(c / 100));
+    bins[bin]!++;
+  }
+  const sorted = [...bins].sort((a, b) => a - b);
+  const n = 12;
+  const total = sorted.reduce((a, b) => a + b, 0);
+  if (total === 0) return 0;
+  let gini = 0;
+  for (let i = 0; i < n; i++) {
+    gini += (2 * (i + 1) - n - 1) * sorted[i]!;
+  }
+  gini = gini / (n * total);
+  return Math.min(1, Math.max(0, gini));
+}
+
+export function scaleRegisterImbalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const lower = cents.filter((c) => c < 600).length;
+  const upper = cents.filter((c) => c >= 600).length;
+  const total = lower + upper;
+  if (total === 0) return 0;
+  return Math.abs(lower - upper) / total;
+}
+
+export function scaleTritoneAxisCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let tritoneCount = 0;
+  let totalPairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      totalPairs++;
+      const diff = Math.abs(cents[i]! - cents[j]!);
+      const ic = Math.min(diff, 1200 - diff);
+      if (Math.abs(ic - 600) < 60) tritoneCount++; // within 60 cents of tritone
+    }
+  }
+  return totalPairs > 0 ? Math.min(1, Math.max(0, tritoneCount / totalPairs)) : 0;
+}
+
+export function scaleRootConsonanceScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Consonance table: map interval class (0-600) to consonance score
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let totalConsonance = 0;
+  for (const c of cents) {
+    const ic = Math.min(c, 1200 - c);
+    let consonance = 0.1;
+    if (ic < 25) consonance = 1.0;        // unison
+    else if (ic < 150) consonance = 0.1;  // minor 2nd (dissonant)
+    else if (ic < 250) consonance = 0.3;  // major 2nd
+    else if (ic < 350) consonance = 0.7;  // minor 3rd
+    else if (ic < 450) consonance = 0.8;  // major 3rd
+    else if (ic < 550) consonance = 0.9;  // perfect 4th/5th
+    else consonance = 0.05;               // tritone (most dissonant)
+    totalConsonance += consonance;
+  }
+  return Math.min(1, Math.max(0, totalConsonance / pitches.length));
 }
