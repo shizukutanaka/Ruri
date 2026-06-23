@@ -1125,6 +1125,12 @@ import {
   tuningFamilySocraticRadarAttentionSpanProxy,
   tuningFamilySocraticRadarMemoryCapacityProxy,
   tuningFamilySocraticRadarTransferLearningProxy,
+  tuningFamilySocraticRadarMaterialStrengthProxy,
+  tuningFamilySocraticRadarPorosityProxy,
+  tuningFamilySocraticRadarThermalConductivityProxy,
+  tuningFamilySocraticRadarPlasticDeformationProxy,
+  tuningFamilySocraticRadarFractureResistanceProxy,
+  tuningFamilySocraticRadarCorrosionProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -22339,4 +22345,94 @@ export function presetFamilySocraticRadarTransferLearningProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarTransferLearningProxy(tunings, spectrum, rootHz);
+}
+
+// Q2671 — presetFamilySocraticRadarMaterialStrengthProxy
+export function presetFamilySocraticRadarMaterialStrengthProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMaterialStrengthProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMaterialStrengthProxy(tunings, spectrum, rootHz);
+}
+
+// Q2673 — presetFamilySocraticRadarPorosityProxy
+export function presetFamilySocraticRadarPorosityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPorosityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPorosityProxy(tunings, spectrum, rootHz);
+}
+
+// Q2675 — presetFamilySocraticRadarThermalConductivityProxy
+export function presetFamilySocraticRadarThermalConductivityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarThermalConductivityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarThermalConductivityProxy(tunings, spectrum, rootHz);
+}
+
+// Q2677 — presetFamilySocraticRadarPlasticDeformationProxy
+export function presetFamilySocraticRadarPlasticDeformationProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPlasticDeformationProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPlasticDeformationProxy(tunings, spectrum, rootHz);
+}
+
+// Q2679 — presetFamilySocraticRadarFractureResistanceProxy
+export function presetFamilySocraticRadarFractureResistanceProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarFractureResistanceProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarFractureResistanceProxy(tunings, spectrum, rootHz);
+}
+
+// Q2681 — presetFamilySocraticRadarCorrosionProxy
+export function presetFamilySocraticRadarCorrosionProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCorrosionProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCorrosionProxy(tunings, spectrum, rootHz);
 }

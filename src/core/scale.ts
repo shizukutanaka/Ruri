@@ -49316,6 +49316,125 @@ export function tuningFamilySocraticRadarTransferLearningProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2670 — tuningFamilySocraticRadarMaterialStrengthProxy
+export function tuningFamilySocraticRadarMaterialStrengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // material strength: weighted sum emphasizing maturity and benchmark (structural integrity)
+  const result = axisAggregates[2]! * 0.4 + axisAggregates[3]! * 0.4 + axisAggregates[0]! * 0.1 + axisAggregates[1]! * 0.05 + axisAggregates[4]! * 0.05;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2672 — tuningFamilySocraticRadarPorosityProxy
+export function tuningFamilySocraticRadarPorosityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // porosity: gaps/spaces in tuning → low maturity + high diversity = many gaps
+  const result = (1 - axisAggregates[2]!) * 0.5 + axisAggregates[0]! * 0.3 + (1 - axisAggregates[4]!) * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2674 — tuningFamilySocraticRadarThermalConductivityProxy
+export function tuningFamilySocraticRadarThermalConductivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // thermal conductivity: propagation of harmonic energy → convergence + versatility
+  const result = axisAggregates[4]! * 0.4 + axisAggregates[1]! * 0.4 + axisAggregates[3]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2676 — tuningFamilySocraticRadarPlasticDeformationProxy
+export function tuningFamilySocraticRadarPlasticDeformationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // plastic deformation: tuning flexibility without return to original state → versatility high, convergence low
+  const result = axisAggregates[1]! * 0.5 + (1 - axisAggregates[4]!) * 0.3 + axisAggregates[0]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2678 — tuningFamilySocraticRadarFractureResistanceProxy
+export function tuningFamilySocraticRadarFractureResistanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  const result = axisAggregates[2]! * 0.35 + axisAggregates[1]! * 0.35 + axisAggregates[3]! * 0.2 + axisAggregates[4]! * 0.1;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2680 — tuningFamilySocraticRadarCorrosionProxy
+export function tuningFamilySocraticRadarCorrosionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // corrosion: harmonic degradation over time → low benchmark + low maturity
+  const result = (1 - axisAggregates[3]!) * 0.4 + (1 - axisAggregates[2]!) * 0.4 + axisAggregates[0]! * 0.2;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -57401,4 +57520,70 @@ export function scaleFifthCircleScore(pitches: readonly Pitch[]): number {
     }
   }
   return matched / pitches.length;
+}
+
+export function scalePatternRepetition(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    intervals.push(Math.round((cents[i]! - cents[i - 1]!) * 10) / 10);
+  }
+  if (intervals.length < 2) return 0;
+  let repeats = 0;
+  for (let i = 1; i < intervals.length; i++) {
+    if (Math.abs(intervals[i]! - intervals[i - 1]!) < 5) repeats++;
+  }
+  return Math.min(1, Math.max(0, repeats / (intervals.length - 1)));
+}
+
+export function scaleMotifDensity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => pitchToCents(p) % 1200);
+  const binSize = 100;
+  const bins = new Array<number>(12).fill(0);
+  for (const c of cents) {
+    const b = Math.min(11, Math.floor(c / binSize));
+    bins[b]!++;
+  }
+  const nonEmpty = bins.filter((b) => b > 0).length;
+  return Math.min(1, Math.max(0, nonEmpty / 12));
+}
+
+export function scaleRhythmicAffinity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) {
+    intervals.push(Math.abs(cents[i]! - cents[i - 1]!));
+  }
+  const rhythmicSteps = [100, 200, 300, 400, 500, 600, 700];
+  let affine = 0;
+  for (const iv of intervals) {
+    for (const rs of rhythmicSteps) {
+      if (Math.abs(iv - rs) <= 25) {
+        affine++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, affine / intervals.length));
+}
+
+export function scaleSyncopation(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0;
+  const cents = pitches.map((p) => pitchToCents(p) % 1200);
+  let offbeat = 0;
+  for (let i = 1; i < cents.length - 1; i++) {
+    const prev = cents[i - 1]!;
+    const curr = cents[i]!;
+    const next = cents[i + 1]!;
+    // syncopation: pitch that doesn't align with surrounding strong beats (triads / octave positions)
+    const strongPositions = [0, 400, 700, 1200];
+    const prevStrong = strongPositions.some((sp) => Math.abs(prev - sp) <= 30);
+    const nextStrong = strongPositions.some((sp) => Math.abs(next - sp) <= 30);
+    const currStrong = strongPositions.some((sp) => Math.abs(curr - sp) <= 30);
+    if (prevStrong && nextStrong && !currStrong) offbeat++;
+  }
+  return Math.min(1, Math.max(0, offbeat / Math.max(1, pitches.length - 2)));
 }
