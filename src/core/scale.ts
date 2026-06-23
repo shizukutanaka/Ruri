@@ -42877,6 +42877,126 @@ export function tuningFamilySocraticRadarCulturalDiversityProxy(
   return Math.min(1, Math.max(0, totalEntropy / vecs.length));
 }
 
+// Q2070 — tuningFamilySocraticRadarCognitiveLoadProxy
+export function tuningFamilySocraticRadarCognitiveLoadProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalStdDev = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    const variance = vec.reduce((acc, x) => acc + (x - mean) ** 2, 0) / vec.length;
+    totalStdDev += Math.sqrt(variance);
+  }
+  // max possible std dev when values are 0/1 split = 0.5, normalise to [0,1]
+  return Math.min(1, Math.max(0, (totalStdDev / vecs.length) * 2));
+}
+
+// Q2072 — tuningFamilySocraticRadarWorkingMemoryProxy
+export function tuningFamilySocraticRadarWorkingMemoryProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalFraction = 0;
+  for (const vec of vecs) {
+    const inRange = vec.filter((x) => x >= 0.3 && x <= 0.7).length;
+    totalFraction += inRange / vec.length;
+  }
+  return Math.min(1, Math.max(0, totalFraction / vecs.length));
+}
+
+// Q2074 — tuningFamilySocraticRadarAttentionProxy
+export function tuningFamilySocraticRadarAttentionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalMax = 0;
+  for (const vec of vecs) {
+    totalMax += Math.max(...vec);
+  }
+  return Math.min(1, Math.max(0, totalMax / vecs.length));
+}
+
+// Q2076 — tuningFamilySocraticRadarPatternRecognitionProxy
+export function tuningFamilySocraticRadarPatternRecognitionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let total = 0;
+  for (const vec of vecs) {
+    const mean = vec.reduce((acc, x) => acc + x, 0) / vec.length;
+    if (mean < 1e-10) {
+      total += 1;
+      continue;
+    }
+    const stdDev = Math.sqrt(vec.reduce((acc, x) => acc + (x - mean) ** 2, 0) / vec.length);
+    const cv = stdDev / mean;
+    total += Math.min(1, Math.max(0, 1 - cv));
+  }
+  return Math.min(1, Math.max(0, total / vecs.length));
+}
+
+// Q2078 — tuningFamilySocraticRadarEmotionalValenceProxy
+export function tuningFamilySocraticRadarEmotionalValenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalMean = 0;
+  for (const vec of vecs) {
+    totalMean += vec.reduce((acc, x) => acc + x, 0) / vec.length;
+  }
+  return Math.min(1, Math.max(0, totalMean / vecs.length));
+}
+
+// Q2080 — tuningFamilySocraticRadarHabitStrengthProxy
+export function tuningFamilySocraticRadarHabitStrengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  let totalGeoMean = 0;
+  for (const vec of vecs) {
+    const product = vec.reduce((acc, x) => acc * Math.max(x, 1e-10), 1);
+    totalGeoMean += Math.pow(product, 1 / vec.length);
+  }
+  return Math.min(1, Math.max(0, totalGeoMean / vecs.length));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -47304,4 +47424,99 @@ export function scaleTonalCentripetal(scaleCents: readonly number[], periodCents
   const n = scaleCents.length;
   if (n === 0) return 1;
   return Math.min(1, Math.max(0, 1 - scaleTonalPolarization(scaleCents, periodCents)));
+}
+
+/**
+ * DDDD1 — scaleModalBrightnessV2
+ * Overall brightness score based on typical "bright" intervals.
+ * Count intervals within 10 cents of: 200 (M2), 400 (M3), 700 (P5), 900 (M6), 1100 (M7)
+ * Return: brightCount / n (fraction of notes matching bright intervals)
+ * Empty/single (n<1) → 0
+ */
+export function scaleModalBrightnessV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 1) return 0;
+  const brightTargets = [200, 400, 700, 900, 1100];
+  let brightCount = 0;
+  for (let i = 0; i < n; i++) {
+    const c = scaleCents[i]!;
+    for (const t of brightTargets) {
+      if (Math.abs(c - t) <= 10) {
+        brightCount++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, brightCount / n));
+}
+
+/**
+ * DDDD2 — scaleModalDarknessV2
+ * Overall darkness score based on typical "dark" intervals.
+ * Count intervals within 10 cents of: 100 (m2), 300 (m3), 600 (TT), 800 (m6), 1000 (m7)
+ * Return: darkCount / n
+ * Empty/single (n<1) → 0
+ */
+export function scaleModalDarknessV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n < 1) return 0;
+  const darkTargets = [100, 300, 600, 800, 1000];
+  let darkCount = 0;
+  for (let i = 0; i < n; i++) {
+    const c = scaleCents[i]!;
+    for (const t of darkTargets) {
+      if (Math.abs(c - t) <= 10) {
+        darkCount++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, darkCount / n));
+}
+
+/**
+ * DDDD3 — scaleModalBrightnessBiasV2
+ * Relative bias toward brightness vs darkness.
+ * bright = scaleModalBrightnessV2 result
+ * dark = scaleModalDarknessV2 result
+ * Return: (bright - dark + 1) / 2 — maps [-1,1] to [0,1]; 0.5 = neutral
+ * Empty → 0.5
+ */
+export function scaleModalBrightnessBiasV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0.5;
+  const bright = scaleModalBrightnessV2(scaleCents, periodCents);
+  const dark = scaleModalDarknessV2(scaleCents, periodCents);
+  return Math.min(1, Math.max(0, (bright - dark + 1) / 2));
+}
+
+/**
+ * DDDD4 — scaleModalComplexityV2
+ * How many modal classes (bright + dark) are represented.
+ * Return: (brightCount + darkCount) / n, clamped to [0,1]
+ * Empty → 0
+ */
+export function scaleModalComplexityV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+  const n = scaleCents.length;
+  if (n === 0) return 0;
+  const brightTargets = [200, 400, 700, 900, 1100];
+  const darkTargets = [100, 300, 600, 800, 1000];
+  let brightCount = 0;
+  let darkCount = 0;
+  for (let i = 0; i < n; i++) {
+    const c = scaleCents[i]!;
+    for (const t of brightTargets) {
+      if (Math.abs(c - t) <= 10) {
+        brightCount++;
+        break;
+      }
+    }
+    for (const t of darkTargets) {
+      if (Math.abs(c - t) <= 10) {
+        darkCount++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, Math.max(0, (brightCount + darkCount) / n));
 }

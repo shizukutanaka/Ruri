@@ -1250,3 +1250,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | CCCC2 | `scaleTonalGravityBalance` | 重心の中点（0.5）からの対称性 |
 | CCCC3 | `scaleTonalPolarization` | 極端値への偏向度（中心からの距離の平均） |
 | CCCC4 | `scaleTonalCentripetal` | 向心性（分極度の補数） |
+
+## Round 98: 音階モーダル特性分析 (DDDD1–DDDD4)
+
+音階の明暗モーダル特性（長調/短調的音程の含有率）を測定する4つのヘルパー関数を追加。
+
+| 関数ID | 関数名 | 説明 |
+|--------|--------|------|
+| DDDD1 | `scaleModalBrightnessV2` | 明るい音程（M2/M3/P5/M6/M7）の含有率 |
+| DDDD2 | `scaleModalDarknessV2` | 暗い音程（m2/m3/TT/m6/m7）の含有率 |
+| DDDD3 | `scaleModalBrightnessBiasV2` | 明暗バイアス（0=暗、0.5=中立、1=明） |
+| DDDD4 | `scaleModalComplexityV2` | 全モーダル音程クラスの充足率 |

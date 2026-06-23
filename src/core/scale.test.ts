@@ -1203,6 +1203,12 @@ import {
   tuningFamilySocraticRadarInnovationProxy,
   tuningFamilySocraticRadarSocialMobilityProxy,
   tuningFamilySocraticRadarCulturalDiversityProxy,
+  tuningFamilySocraticRadarCognitiveLoadProxy,
+  tuningFamilySocraticRadarWorkingMemoryProxy,
+  tuningFamilySocraticRadarAttentionProxy,
+  tuningFamilySocraticRadarPatternRecognitionProxy,
+  tuningFamilySocraticRadarEmotionalValenceProxy,
+  tuningFamilySocraticRadarHabitStrengthProxy,
   scaleComplexityRatio,
   scaleExpressivenessIndex,
   scaleHarmonicComplexity,
@@ -1421,6 +1427,10 @@ import {
   scaleTonalGravityBalance,
   scaleTonalPolarization,
   scaleTonalCentripetal,
+  scaleModalBrightnessV2,
+  scaleModalDarknessV2,
+  scaleModalBrightnessBiasV2,
+  scaleModalComplexityV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -37218,5 +37228,80 @@ describe('CCCC4 scaleTonalCentripetal', () => {
     expect(Number.isFinite(v)).toBe(true);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// DDDD1 — scaleModalBrightnessV2
+describe('DDDD1 scaleModalBrightnessV2', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleModalBrightnessV2([])).toBe(0);
+  });
+  it('returns 1 for pure bright scale (M2/M3/P5/M6/M7)', () => {
+    const bright = [200, 400, 700, 900, 1100];
+    const v = scaleModalBrightnessV2(bright);
+    expect(v).toBe(1);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleModalBrightnessV2(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// DDDD2 — scaleModalDarknessV2
+describe('DDDD2 scaleModalDarknessV2', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleModalDarknessV2([])).toBe(0);
+  });
+  it('returns 1 for pure dark scale (m2/m3/TT/m6/m7)', () => {
+    const dark = [100, 300, 600, 800, 1000];
+    const v = scaleModalDarknessV2(dark);
+    expect(v).toBe(1);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleModalDarknessV2(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+// DDDD3 — scaleModalBrightnessBiasV2
+describe('DDDD3 scaleModalBrightnessBiasV2', () => {
+  it('returns 0.5 for empty (neutral)', () => {
+    expect(scaleModalBrightnessBiasV2([])).toBe(0.5);
+  });
+  it('returns 1 for pure bright scale', () => {
+    const bright = [200, 400, 700, 900, 1100];
+    const v = scaleModalBrightnessBiasV2(bright);
+    expect(v).toBeCloseTo(1, 5);
+  });
+  it('returns 0 for pure dark scale', () => {
+    const dark = [100, 300, 600, 800, 1000];
+    const v = scaleModalBrightnessBiasV2(dark);
+    expect(v).toBeCloseTo(0, 5);
+  });
+});
+
+// DDDD4 — scaleModalComplexityV2
+describe('DDDD4 scaleModalComplexityV2', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleModalComplexityV2([])).toBe(0);
+  });
+  it('returns finite [0,1] for diatonic scale', () => {
+    const diatonic = [200, 400, 500, 700, 900, 1100];
+    const v = scaleModalComplexityV2(diatonic);
+    expect(Number.isFinite(v)).toBe(true);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 1 for scale covering all 10 modal intervals', () => {
+    // All 10 modal intervals in one scale (10 notes)
+    const all10 = [100, 200, 300, 400, 600, 700, 800, 900, 1000, 1100];
+    const v = scaleModalComplexityV2(all10);
+    expect(v).toBe(1);
   });
 });
