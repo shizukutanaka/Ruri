@@ -2225,3 +2225,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scalePhrygianContentV2` — フリジア旋法の特徴音程（100/300/500/700/800/1000セント±20）の充足率を返す（`scalePhrygianContent` が既存のため V2 サフィックス付与）
 - `scaleLydianContentV2` — リディア旋法の特徴音程（200/400/600/700/900/1100セント±20）の充足率を返す（`scaleLydianContent` が既存のため V2 サフィックス付与）
 - `scaleMixolydianContentV2` — ミクソリディア旋法の特徴音程（200/400/500/700/900/1000セント±20）の充足率を返す（`scaleMixolydianContent` が既存のため V2 サフィックス付与）
+
+## Round 204: 教会旋法分析ヘルパII（ロクリア/エオリア/イオニア/スーパーロクリア）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleLocrianContentV2` — ロクリア旋法の特徴音程（100/300/500/600/800/1000セント±20）の充足率を返す（`scaleLocrianContent` が既存のため V2 サフィックス付与）
+- `scaleAeolianContentV2` — エオリア旋法（自然短音階）の特徴音程（200/300/500/700/800/1000セント±20）の充足率を返す（`scaleAeolianContent` が既存のため V2 サフィックス付与）
+- `scaleIonianContentV2` — イオニア旋法（長音階）の特徴音程（200/400/500/700/900/1100セント±20）の充足率を返す（`scaleIonianContent` が既存のため V2 サフィックス付与）
+- `scaleSuperlocrianContent` — スーパーロクリア（オルタード）旋法の特徴音程（100/200/300/600/800/1000セント±20）の充足率を返す
