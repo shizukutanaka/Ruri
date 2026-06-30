@@ -2401,3 +2401,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleInSenContent`: 日本・陰旋法（[0,90,498,702,1008]¢）との一致率
 - `scaleHirajoshiContent`: 日本・平調子（[0,204,294,702,792]¢）との一致率
 - `scaleYoNaContent`: 日本・四七抜き（[0,204,498,702,996]¢）との一致率
+
+## Round 226: 東南・東アジア音階コンテンツヘルパ II
+
+- `scaleKoreanMinyoContent`: 韓国民謡ペンタトニック（[0,300,500,700,1000]¢）との一致率
+- `scaleKoreanGungnakContent`: 韓国宮廷音楽ペンタトニック（[0,204,498,702,906]¢）との一致率
+- `scaleThaiDiatonicContent`: タイ7音等分音律（[0,171,343,514,686,857,1029]¢）との一致率
+- `scaleVietnamNguLinh`: ベトナム・ングーリン五音音階（[0,204,408,702,906]¢）との一致率
