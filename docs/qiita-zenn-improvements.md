@@ -1913,3 +1913,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Detects jazz-specific chromatic alterations beyond basic modal content. Sharp 11 (#11/Lydian note) is fundamental to Lydian Dominant and acoustic scale harmony. Flat 9, sharp 9, and flat 13 are the characteristic "altered" extensions in dominant seventh chords (the altered scale). These are essential markers of bebop and post-bop jazz vocabulary.
 
 **Implementation**: Each function checks what fraction of pitches fall within ±25 cents of the target degree (mod 1200). Returns ratio in [0,1].
+
+## Round 164: 旋法密度分析 (R1617–R1620)
+
+**Functions**: `scaleLeadingToneContent`, `scaleModalColorContent`, `scaleEnneatonicContent`, `scaleHeptatonicDensity`
+
+**Motivation**: Measures structural properties of scales beyond mode matching. Leading tone detection identifies classical vs. modal orientation. Modal color content captures the minor/modal "flavor" via b3/b6/b7. Enneatonic and heptatonic density measure how many distinct pitch-class slots a scale fills against 9-tone and 7-tone templates respectively.
+
+**Implementation**: Leading tone and modal color use ±25c tolerance matching. Enneatonic and heptatonic density quantize to 100c slots and compare set sizes.

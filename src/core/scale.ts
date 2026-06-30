@@ -51420,6 +51420,156 @@ export function tuningFamilySocraticRadarNozzleExhaustVelocityProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2850 — tuningFamilySocraticRadarBeamDivergenceProxy
+export function tuningFamilySocraticRadarBeamDivergenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // beam divergence: angular spread of laser/light beam → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2852 — tuningFamilySocraticRadarCoherenceLengthProxy
+export function tuningFamilySocraticRadarCoherenceLengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // coherence length: path length over which light remains coherent → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2854 — tuningFamilySocraticRadarPolarizationDegreeProxy
+export function tuningFamilySocraticRadarPolarizationDegreeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // polarization degree: fraction of polarized light in beam → maturity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2856 — tuningFamilySocraticRadarQuantumEfficiencyProxy
+export function tuningFamilySocraticRadarQuantumEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // quantum efficiency: photon-to-electron conversion rate → benchmark+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2858 — tuningFamilySocraticRadarNumericalApertureProxy
+export function tuningFamilySocraticRadarNumericalApertureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // numerical aperture: light-gathering power of optical system → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2860 — tuningFamilySocraticRadarSpectralResolutionProxy
+export function tuningFamilySocraticRadarSpectralResolutionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // spectral resolution: ability to distinguish adjacent wavelengths → convergence+versatility
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -60308,4 +60458,49 @@ export function scaleFlatThirteenContent(pitches: readonly Pitch[]): number {
     return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
   }).length;
   return Math.min(1, matched / pitches.length);
+}
+
+export function scaleLeadingToneContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Leading tone: semitone below octave = ~1100 cents (±25c)
+  const tol = 25;
+  const target = 1100;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleModalColorContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Modal color notes: b3 (300c), b6 (800c), b7 (1000c) — characteristic of minor/modal
+  const targets = [300, 800, 1000];
+  const tol = 25;
+  const matchedTargets = targets.filter((t) =>
+    pitches.some((p) => {
+      const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+      return Math.min(Math.abs(c - t), 1200 - Math.abs(c - t)) <= tol;
+    }),
+  ).length;
+  return matchedTargets / targets.length;
+}
+
+export function scaleEnneatonicContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Enneatonic (9-note): count distinct pitch classes mod 1200 with 100c resolution
+  const classes = new Set(
+    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100),
+  );
+  // Ratio of 9-note coverage: 9 distinct semitone slots expected
+  return Math.min(1, classes.size / 9);
+}
+
+export function scaleHeptatonicDensity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Heptatonic density: ratio of distinct semitone pitch classes to 7
+  const classes = new Set(
+    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100),
+  );
+  return Math.min(1, classes.size / 7);
 }
