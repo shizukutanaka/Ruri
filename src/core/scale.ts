@@ -55320,6 +55320,156 @@ export function tuningFamilySocraticRadarQuantumNoiseProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3162 — tuningFamilySocraticRadarJetStreamV2Proxy
+export function tuningFamilySocraticRadarJetStreamV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // jet stream: fast upper-atmosphere flow → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3164 — tuningFamilySocraticRadarThermalGradientV2Proxy
+export function tuningFamilySocraticRadarThermalGradientV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // thermal gradient: temperature lapse rate and inversion layers → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3166 — tuningFamilySocraticRadarConvectivePlumeProxy
+export function tuningFamilySocraticRadarConvectivePlumeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // convective plume: buoyant updraft and entrainment → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3168 — tuningFamilySocraticRadarWindShearV2Proxy
+export function tuningFamilySocraticRadarWindShearV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // wind shear: velocity gradient with altitude → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3170 — tuningFamilySocraticRadarAtmosphericWaveProxy
+export function tuningFamilySocraticRadarAtmosphericWaveProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // atmospheric wave: Rossby/gravity waves and oscillation → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3172 — tuningFamilySocraticRadarHumidityFieldProxy
+export function tuningFamilySocraticRadarHumidityFieldProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // humidity field: moisture transport and saturation — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -65655,4 +65805,55 @@ export function scaleAugmentedTriadContentV2(pitches: readonly Pitch[]): number 
     if (Math.abs(c - 400) < 30 || Math.abs(c - 800) < 30) count++;
   }
   return Math.min(1, count / pitches.length);
+}
+
+export function scaleRegisterBalanceV3(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Register balance: how evenly pitches are distributed across the octave
+  // Split into lower half (0-599 cents) and upper half (600-1199 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const lower = cents.filter((c) => c < 600).length;
+  const upper = cents.filter((c) => c >= 600).length;
+  if (lower === 0 || upper === 0) return 0;
+  // Balance score: 1 when equal, approaches 0 when all in one half
+  const ratio = Math.min(lower, upper) / Math.max(lower, upper);
+  return ratio;
+}
+
+export function scaleHarmonicSpreadV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Harmonic spread: standard deviation of pitch class positions (normalized)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const mean = cents.reduce((a, b) => a + b, 0) / cents.length;
+  const variance = cents.reduce((a, c) => a + (c - mean) ** 2, 0) / cents.length;
+  // Max possible std dev for uniform distribution across [0,1200) is ~346 cents
+  return Math.min(1, Math.sqrt(variance) / 346);
+}
+
+export function scaleMicrotonalDensityV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Microtonal density: fraction of pitches that fall outside 12-TET slots (±25 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let microtonal = 0;
+  for (const c of cents) {
+    const nearestSemitone = Math.round(c / 100) * 100;
+    if (Math.abs(c - nearestSemitone) > 25) microtonal++;
+  }
+  return microtonal / pitches.length;
+}
+
+export function scaleModalAmbiguityV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Modal ambiguity: presence of pitches that fit multiple modes simultaneously
+  // Measured as ratio of pitches within 30 cents of both major and minor scale slots
+  const majorSlots = [0, 200, 400, 500, 700, 900, 1100];
+  const minorSlots = [0, 200, 300, 500, 700, 800, 1000];
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let ambiguous = 0;
+  for (const c of cents) {
+    const inMajor = majorSlots.some((s) => Math.abs(c - s) < 30);
+    const inMinor = minorSlots.some((s) => Math.abs(c - s) < 30);
+    if (inMajor && inMinor) ambiguous++;
+  }
+  return ambiguous / pitches.length;
 }

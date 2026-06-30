@@ -2105,3 +2105,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleWholeToneContentV2(pitches)` — 全音音階グリッド（200 cent格子）への適合音高割合
 - `scaleDiminishedChordContentV2(pitches)` — 減三和音構成音（300/600/900 cent）の音高割合
 - `scaleAugmentedTriadContentV2(pitches)` — 増三和音構成音（400/800 cent）の音高割合
+
+### Round 190: 音階構造多様性分析
+
+- `scaleRegisterBalanceV3(pitches)` — 音域バランス（オクターブ前半0-599 centと後半600-1199 centへの均等分布度）
+- `scaleHarmonicSpreadV2(pitches)` — 音高クラスの標準偏差による和声的広がり（0-1正規化）
+- `scaleMicrotonalDensityV2(pitches)` — 12平均律スロット±25 cent外の音高（微分音）の割合
+- `scaleModalAmbiguityV2(pitches)` — 長調・短調両スケールに30 cent以内で合致する音高の割合（調性曖昧度）
