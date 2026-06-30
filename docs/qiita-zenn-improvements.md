@@ -2140,3 +2140,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleAddedSixthContent(pitches)` — 長6度（900 cent付近）の音高割合（add6和音特性）
 - `scaleMajorNinthContent(pitches)` — 長9度（200 cent付近）の音高割合（メジャーナインス）
 - `scaleSharpNinthContent(pitches)` — シャープ9度（300 cent付近）の音高割合（短3度/♯9音程）
+
+## Round 195: 音階テンション音程分析ヘルパ（増五度/短七度/長七度/短九度）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleAugmentedFifthContent` — 増五度（800セント±30）の存在比率を返す
+- `scaleMinorSeventhContent` — 短七度（1000セント±30）の存在比率を返す
+- `scaleMajorSeventhContent` — 長七度（1100セント±30）の存在比率を返す
+- `scaleMinorNinthContentV2` — 短九度/短二度（100セント±30）の存在比率を返す（`scaleMinorNinthContent` が既存のため V2 サフィックス付与）
+
+すべて `pitchToCents(p)` で値を取得し、`% 1200` で正規化後に目標値との距離を判定する。

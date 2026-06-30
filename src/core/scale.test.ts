@@ -1993,6 +1993,10 @@ import {
   scaleCardinalityScore,
   scaleSaturation,
   scaleDegreeSpread,
+  scaleAugmentedFifthContent,
+  scaleMinorSeventhContent,
+  scaleMajorSeventhContent,
+  scaleMinorNinthContentV2,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -52888,6 +52892,67 @@ describe('scaleDegreeSpread', () => {
   });
   it('returns value in [0,1] for 12-TET degrees', () => {
     const v = scaleDegreeSpread(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleAugmentedFifthContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleAugmentedFifthContent([])).toBe(0);
+  });
+  it('returns > 0 for a scale containing augmented fifth (~800 cents)', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleAugmentedFifthContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1]', () => {
+    const v = scaleAugmentedFifthContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleMinorSeventhContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleMinorSeventhContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMinorSeventhContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMinorSeventhContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleMajorSeventhContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleMajorSeventhContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMajorSeventhContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMajorSeventhContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleMinorNinthContentV2', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleMinorNinthContentV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMinorNinthContentV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMinorNinthContentV2(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
