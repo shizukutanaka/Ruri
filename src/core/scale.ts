@@ -73074,3 +73074,55 @@ export function scaleMaqamHijazContent(pitches: readonly Pitch[]): number {
   }
   return matched / hijaz.length;
 }
+
+export function scaleMakamUssakContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Turkish Makam Ussak: [0, 150, 294, 498, 702, 882, 996] (Hicaz tetrachord on D)
+  const ussak = [0, 150, 294, 498, 702, 882, 996];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of ussak) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / ussak.length;
+}
+
+export function scaleMakamHicazContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Turkish Makam Hicaz: [0, 90, 390, 498, 702, 792, 1092]
+  const hicaz = [0, 90, 390, 498, 702, 792, 1092];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of hicaz) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / hicaz.length;
+}
+
+export function scaleMakamKurdContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Turkish Makam Kürd: [0, 90, 294, 498, 702, 792, 996]
+  const kurd = [0, 90, 294, 498, 702, 792, 996];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of kurd) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / kurd.length;
+}
+
+export function scaleMakamNihavandContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Turkish Makam Nihavand: [0, 204, 294, 498, 702, 792, 1088]
+  const nihavand = [0, 204, 294, 498, 702, 792, 1088];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of nihavand) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / nihavand.length;
+}
