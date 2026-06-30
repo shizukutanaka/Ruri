@@ -1981,6 +1981,10 @@ import {
   scaleMicrotoneCount,
   scaleSubsemitoneContent,
   scaleFifthOfSemitone,
+  scaleEnergyBalance,
+  scalePitchMoment,
+  scaleHarmonicWeight,
+  scaleSpectralWeight,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2143,6 +2147,12 @@ import {
   tuningFamilySocraticRadarMarineBioluminescenceProxy,
   tuningFamilySocraticRadarCoralReefDiversityProxy,
   tuningFamilySocraticRadarTidalZonationProxy,
+  tuningFamilySocraticRadarAirQualityIndexProxy,
+  tuningFamilySocraticRadarWaterPurificationRateProxy,
+  tuningFamilySocraticRadarSoilRemediationEfficiencyProxy,
+  tuningFamilySocraticRadarCarbonSequestrationProxy,
+  tuningFamilySocraticRadarWasteRecyclingRateProxy,
+  tuningFamilySocraticRadarNoisePollutionIndexProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -50061,6 +50071,90 @@ describe('tuningFamilySocraticRadarTidalZonationProxy', () => {
     expect(Number.isFinite(v)).toBe(true);
   });
 });
+describe('tuningFamilySocraticRadarAirQualityIndexProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAirQualityIndexProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarAirQualityIndexProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarAirQualityIndexProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarWaterPurificationRateProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWaterPurificationRateProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarWaterPurificationRateProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarWaterPurificationRateProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarSoilRemediationEfficiencyProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSoilRemediationEfficiencyProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSoilRemediationEfficiencyProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSoilRemediationEfficiencyProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarCarbonSequestrationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCarbonSequestrationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCarbonSequestrationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCarbonSequestrationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarWasteRecyclingRateProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWasteRecyclingRateProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarWasteRecyclingRateProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarWasteRecyclingRateProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarNoisePollutionIndexProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNoisePollutionIndexProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarNoisePollutionIndexProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNoisePollutionIndexProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
 describe('scaleLeadingToneContent', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLeadingToneContent([])).toBe(0);
@@ -50451,5 +50545,66 @@ describe('scaleFifthOfSemitone', () => {
     const v = scaleFifthOfSemitone(equalTemperament12(440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleEnergyBalance', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleEnergyBalance([])).toBe(0);
+  });
+  it('returns 1 for perfectly balanced pitch set', () => {
+    const pitches = [0, 300, 700, 1000].map((c) => pitchFromCents(c));
+    const v = scaleEnergyBalance(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleEnergyBalance(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scalePitchMoment', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scalePitchMoment([])).toBe(0);
+  });
+  it('returns ~0.5 for balanced pitch set', () => {
+    const pitches = [0, 600].map((c) => pitchFromCents(c));
+    const v = scalePitchMoment(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scalePitchMoment(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleHarmonicWeight', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleHarmonicWeight([])).toBe(0);
+  });
+  it('returns >0 for harmonic-series pitches', () => {
+    const pitches = [0, 702, 386].map((c) => pitchFromCents(c));
+    expect(scaleHarmonicWeight(pitches)).toBeGreaterThan(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleHarmonicWeight(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleSpectralWeight', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleSpectralWeight([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleSpectralWeight(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns lower value for low-pitched set', () => {
+    const lo = [0, 100, 200].map((c) => pitchFromCents(c));
+    const hi = [800, 900, 1000].map((c) => pitchFromCents(c));
+    expect(scaleSpectralWeight(lo)).toBeLessThan(scaleSpectralWeight(hi));
   });
 });

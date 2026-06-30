@@ -1969,3 +1969,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Implementation**: Sorts pitch classes, computes adjacent intervals, and counts matches by cent-range criteria. Sub-semitone content uses modular rounding to nearest 100c. Returns ratio in [0,1].
 
 **Implementation**: Uses ±25c tolerance matching and sorted pitch-class intervals. Returns ratio in [0,1].
+
+## Round 171: 音響重心分析 (R1645–R1648)
+
+**Functions**: `scaleEnergyBalance`, `scalePitchMoment`, `scaleHarmonicWeight`, `scaleSpectralWeight`
+
+**Motivation**: Provides spectral-domain analysis of pitch-class distributions. Energy balance measures the symmetry of pitches above vs below the tritone midpoint (600c). Pitch moment computes the mean cent position as a centroid. Harmonic weight scores alignment with reduced harmonic-series partials. Spectral weight applies a 1/f rolloff weighting to emphasize lower pitch positions.
+
+**Implementation**: Energy balance uses a symmetry ratio. Pitch moment normalizes mean cents by 1200. Harmonic/spectral weight use tolerance matching and weighted sums respectively. All return [0,1].

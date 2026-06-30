@@ -52470,6 +52470,156 @@ export function tuningFamilySocraticRadarTidalZonationProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2934 — tuningFamilySocraticRadarAirQualityIndexProxy
+export function tuningFamilySocraticRadarAirQualityIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // air quality index: composite measure of atmospheric pollutant concentrations → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2936 — tuningFamilySocraticRadarWaterPurificationRateProxy
+export function tuningFamilySocraticRadarWaterPurificationRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // water purification rate: removal efficiency of contaminants in treatment → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2938 — tuningFamilySocraticRadarSoilRemediationEfficiencyProxy
+export function tuningFamilySocraticRadarSoilRemediationEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // soil remediation efficiency: contaminant degradation rate in contaminated soil → maturity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2940 — tuningFamilySocraticRadarCarbonSequestrationProxy
+export function tuningFamilySocraticRadarCarbonSequestrationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // carbon sequestration: long-term storage of CO2 in natural or artificial sinks → diversity+convergence
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2942 — tuningFamilySocraticRadarWasteRecyclingRateProxy
+export function tuningFamilySocraticRadarWasteRecyclingRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // waste recycling rate: fraction of waste material diverted from landfill → versatility+benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2944 — tuningFamilySocraticRadarNoisePollutionIndexProxy
+export function tuningFamilySocraticRadarNoisePollutionIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // noise pollution index: community noise exposure weighted by frequency and time → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -61771,4 +61921,57 @@ export function scaleFifthOfSemitone(pitches: readonly Pitch[]): number {
     if (step >= 10 && step <= 30) count++;
   }
   return Math.min(1, count / (sorted.length - 1));
+}
+
+export function scaleEnergyBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Energy balance: ratio of pitch mass above vs below 600c (tritone midpoint)
+  const above = pitches.filter((p) => ((pitchToCents(p) % 1200) + 1200) % 1200 > 600).length;
+  const below = pitches.filter((p) => ((pitchToCents(p) % 1200) + 1200) % 1200 <= 600).length;
+  const total = above + below;
+  if (total === 0) return 0;
+  // 1.0 = perfect balance (0.5 above, 0.5 below), 0 = all on one side
+  const ratio = Math.min(above, below) / Math.max(above, below);
+  return Math.min(1, ratio);
+}
+
+export function scalePitchMoment(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Pitch moment: mean of pitch cents mod 1200, normalized to [0,1]
+  const sum = pitches.reduce((acc, p) => acc + ((pitchToCents(p) % 1200) + 1200) % 1200, 0);
+  return Math.min(1, (sum / pitches.length) / 1200);
+}
+
+export function scaleHarmonicWeight(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Harmonic weight: weight pitches by proximity to harmonic series partials
+  // Partials 1-8 in cents above fundamental: 0, 1902, 2786, 3369, 3814, 4151, ...
+  // Reduced to one octave (mod 1200): 0, 702, 386, 969, 814, 151, 969, 204 (approximate)
+  const harmonics = [0, 702, 386, 969, 814, 151, 969, 204].map((h) => ((h % 1200) + 1200) % 1200);
+  const tol = 30;
+  let weight = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const closest = harmonics.reduce((best, h) => {
+      const d = Math.min(Math.abs(c - h), 1200 - Math.abs(c - h));
+      return d < best ? d : best;
+    }, Infinity);
+    if (closest <= tol) weight++;
+  }
+  return Math.min(1, weight / pitches.length);
+}
+
+export function scaleSpectralWeight(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Spectral weight: weighted centroid using cent position as frequency proxy
+  // Weight = 1 / (position + 1) simulates 1/f rolloff
+  let weightedSum = 0;
+  let weightTotal = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const w = 1 / (c + 1);
+    weightedSum += c * w;
+    weightTotal += w;
+  }
+  return weightTotal === 0 ? 0 : Math.min(1, weightedSum / weightTotal / 1200);
 }
