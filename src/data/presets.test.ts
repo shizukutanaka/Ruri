@@ -1330,6 +1330,12 @@ import {
   presetFamilySocraticRadarTranscriptomeProfileProxy,
   presetFamilySocraticRadarProteinDockingProxy,
   presetFamilySocraticRadarPhylogeneticDistanceProxy,
+  presetFamilySocraticRadarDrugBioavailabilityProxy,
+  presetFamilySocraticRadarReceptorOccupancyProxy,
+  presetFamilySocraticRadarPharmacokineticsProxy,
+  presetFamilySocraticRadarDrugBindingProxy,
+  presetFamilySocraticRadarPlasmaHalfLifeProxy,
+  presetFamilySocraticRadarDrugMetabolismProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -28661,5 +28667,83 @@ describe('presetFamilySocraticRadarPhylogeneticDistanceProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarPhylogeneticDistanceProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarDrugBioavailabilityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarDrugBioavailabilityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarDrugBioavailabilityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDrugBioavailabilityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarReceptorOccupancyProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarReceptorOccupancyProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarReceptorOccupancyProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarReceptorOccupancyProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarPharmacokineticsProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarPharmacokineticsProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarPharmacokineticsProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPharmacokineticsProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarDrugBindingProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarDrugBindingProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarDrugBindingProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDrugBindingProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarPlasmaHalfLifeProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarPlasmaHalfLifeProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarPlasmaHalfLifeProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPlasmaHalfLifeProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarDrugMetabolismProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarDrugMetabolismProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarDrugMetabolismProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDrugMetabolismProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
