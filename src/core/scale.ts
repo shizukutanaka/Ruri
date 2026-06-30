@@ -60001,6 +60001,126 @@ export function tuningFamilySocraticRadarSmartGridProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3510 — tuningFamilySocraticRadarObjectDetectionProxy
+export function tuningFamilySocraticRadarObjectDetectionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ObjectDetection: precision diversity and recall benchmark
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3512 — tuningFamilySocraticRadarSemanticSegmentationProxy
+export function tuningFamilySocraticRadarSemanticSegmentationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // SemanticSegmentation: balanced versatility and pixel-level benchmark
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3514 — tuningFamilySocraticRadarImageClassificationProxy
+export function tuningFamilySocraticRadarImageClassificationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ImageClassification: maturity-driven taxonomy with versatile feature space
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3516 — tuningFamilySocraticRadarPointCloudProxy
+export function tuningFamilySocraticRadarPointCloudProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // PointCloud: spatial diversity and geometric convergence
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3518 — tuningFamilySocraticRadarVideoAnalysisProxy
+export function tuningFamilySocraticRadarVideoAnalysisProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // VideoAnalysis: temporal maturity with benchmark-driven tracking
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3520 — tuningFamilySocraticRadarSpeechRecognitionProxy
+export function tuningFamilySocraticRadarSpeechRecognitionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // SpeechRecognition: versatile acoustic modeling with convergent language integration
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -72432,4 +72552,57 @@ export function scaleEnharmonicEquivalenceV2(pitches: readonly Pitch[]): number 
   }
   if (pairs === 0) return 0;
   return Math.min(1, enharmonic / pairs * 10);
+}
+
+export function scaleChordToneRatioV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Basic triad tones: unison(0), major/minor third(300/400), perfect fifth(700), octave(1200→0)
+  const chordTones = [0, 300, 400, 700];
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const c of cs) {
+    if (chordTones.some((t) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / pitches.length;
+}
+
+export function scaleTensionRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Tension tones: minor 2nd(100), tritone(600), major 7th(1100)
+  const tensionTones = [100, 600, 1100];
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let tension = 0;
+  for (const c of cs) {
+    if (tensionTones.some((t) => Math.abs(c - t) <= tolerance)) tension++;
+  }
+  return tension / pitches.length;
+}
+
+export function scaleExtendedHarmonyScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Extensions: 9th(200), 11th(500), 13th(900) and their alterations
+  const extensions = [200, 500, 900, 150, 550, 850];
+  const tolerance = 25;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of extensions) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / extensions.length;
+}
+
+export function scaleAlterationDensity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Altered tones: notes that deviate from standard diatonic (≠ 0,200,400,500,700,900,1100) by >40¢
+  const diatonic = [0, 200, 400, 500, 700, 900, 1100];
+  const threshold = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let altered = 0;
+  for (const c of cs) {
+    const minDist = Math.min(...diatonic.map((d) => Math.abs(c - d)));
+    if (minDist > threshold) altered++;
+  }
+  return altered / pitches.length;
 }

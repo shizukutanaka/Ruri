@@ -2533,6 +2533,10 @@ import {
   scaleBluesTonePresence,
   scaleTritoneSubstitution,
   scaleEnharmonicEquivalenceV2,
+  scaleChordToneRatioV2,
+  scaleTensionRatio,
+  scaleExtendedHarmonyScore,
+  scaleAlterationDensity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -63816,6 +63820,70 @@ describe('scaleEnharmonicEquivalenceV2', () => {
   });
   it('returns value in [0,1] for 19-EDO', () => {
     const v = scaleEnharmonicEquivalenceV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleChordToneRatioV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleChordToneRatioV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleChordToneRatioV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleChordToneRatioV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleTensionRatio', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleTensionRatio([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleTensionRatio(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleTensionRatio(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleExtendedHarmonyScore', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleExtendedHarmonyScore([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleExtendedHarmonyScore(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleExtendedHarmonyScore(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleAlterationDensity', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleAlterationDensity([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleAlterationDensity(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleAlterationDensity(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

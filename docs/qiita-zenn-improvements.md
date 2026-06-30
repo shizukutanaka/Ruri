@@ -2352,3 +2352,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleBluesTonePresence`: ブルーストーン（♭3・♭5・♭7）のカバー率
 - `scaleTritoneSubstitution`: 三全音代理コンテキスト（完全5度＋三全音の共存率）
 - `scaleEnharmonicEquivalenceV2`: 異名同音等価ペア密度（10¢以内の近接音程比）
+
+## Round 219: 和声機能分析ヘルパ
+
+- `scaleChordToneRatioV2`: 三和音構成音（ユニゾン/3度/5度）のカバー率
+- `scaleTensionRatio`: テンション音（短2度/三全音/長7度）の密度
+- `scaleExtendedHarmonyScore`: 拡張和声（9・11・13度とその変形）のカバー率
+- `scaleAlterationDensity`: 全音階からの逸脱音（±40¢超）の割合
