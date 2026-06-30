@@ -1933,6 +1933,10 @@ import {
   scaleRestDensity,
   scaleRhythmicRegularity,
   scaleTemporalPatternScore,
+  scaleLydianContent,
+  scaleDoianContent,
+  scalePhrygianContent,
+  scaleMixolydianContent,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2023,6 +2027,12 @@ import {
   tuningFamilySocraticRadarCatalystActivityProxy,
   tuningFamilySocraticRadarSolutionConcentrationProxy,
   tuningFamilySocraticRadarReactionYieldProxy,
+  tuningFamilySocraticRadarPolymerChainLengthProxy,
+  tuningFamilySocraticRadarCrossLinkDensityProxy,
+  tuningFamilySocraticRadarGlassTransitionTempProxy,
+  tuningFamilySocraticRadarMolecularWeightProxy,
+  tuningFamilySocraticRadarPolymerCrystallinityProxy,
+  tuningFamilySocraticRadarViscoelasticModulusProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -48219,6 +48229,96 @@ describe('Q2788 tuningFamilySocraticRadarReactionYieldProxy', () => {
   });
 });
 
+describe('Q2790 tuningFamilySocraticRadarPolymerChainLengthProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPolymerChainLengthProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPolymerChainLengthProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPolymerChainLengthProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2792 tuningFamilySocraticRadarCrossLinkDensityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCrossLinkDensityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCrossLinkDensityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCrossLinkDensityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2794 tuningFamilySocraticRadarGlassTransitionTempProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarGlassTransitionTempProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarGlassTransitionTempProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarGlassTransitionTempProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2796 tuningFamilySocraticRadarMolecularWeightProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarMolecularWeightProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarMolecularWeightProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarMolecularWeightProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2798 tuningFamilySocraticRadarPolymerCrystallinityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPolymerCrystallinityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPolymerCrystallinityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPolymerCrystallinityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2800 tuningFamilySocraticRadarViscoelasticModulusProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarViscoelasticModulusProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarViscoelasticModulusProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarViscoelasticModulusProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
 // R1531
 describe('R1531 scaleHarmonicDistance', () => {
   it('returns 0 for single pitch', () => {
@@ -48614,5 +48714,57 @@ describe('R1584 scaleTemporalPatternScore', () => {
     const v = scaleTemporalPatternScore(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1591 scaleLydianContent', () => {
+  it('returns 0 for empty', () => { expect(scaleLydianContent([])).toBe(0); });
+  it('returns 1 for pure Lydian scale', () => {
+    const pitches = [0,200,400,600,700,900,1100].map((c) => pitchFromCents(c));
+    expect(scaleLydianContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scaleLydianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1592 scaleDoianContent', () => {
+  it('returns 0 for empty', () => { expect(scaleDoianContent([])).toBe(0); });
+  it('returns 1 for pure Dorian scale', () => {
+    const pitches = [0,200,300,500,700,900,1000].map((c) => pitchFromCents(c));
+    expect(scaleDoianContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scaleDoianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1593 scalePhrygianContent', () => {
+  it('returns 0 for empty', () => { expect(scalePhrygianContent([])).toBe(0); });
+  it('returns 1 for pure Phrygian scale', () => {
+    const pitches = [0,100,300,500,700,800,1000].map((c) => pitchFromCents(c));
+    expect(scalePhrygianContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scalePhrygianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1594 scaleMixolydianContent', () => {
+  it('returns 0 for empty', () => { expect(scaleMixolydianContent([])).toBe(0); });
+  it('returns 1 for pure Mixolydian scale', () => {
+    const pitches = [0,200,400,500,700,900,1000].map((c) => pitchFromCents(c));
+    expect(scaleMixolydianContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scaleMixolydianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
   });
 });
