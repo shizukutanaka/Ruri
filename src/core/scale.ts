@@ -53220,6 +53220,156 @@ export function tuningFamilySocraticRadarResonanceStructureProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2994 — tuningFamilySocraticRadarBeamDeflectionProxy
+export function tuningFamilySocraticRadarBeamDeflectionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // beam deflection: load-induced displacement → maturity emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2996 — tuningFamilySocraticRadarFoundationBearingProxy
+export function tuningFamilySocraticRadarFoundationBearingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // foundation bearing: soil load capacity → benchmark emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2998 — tuningFamilySocraticRadarSeismicResponseProxy
+export function tuningFamilySocraticRadarSeismicResponseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // seismic response: ground motion amplification → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3000 — tuningFamilySocraticRadarConcreteStrengthProxy
+export function tuningFamilySocraticRadarConcreteStrengthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // concrete strength: compressive capacity → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3002 — tuningFamilySocraticRadarSteelYieldProxy
+export function tuningFamilySocraticRadarSteelYieldProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // steel yield: plastic deformation threshold → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3004 — tuningFamilySocraticRadarStructuralDampingProxy
+export function tuningFamilySocraticRadarStructuralDampingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // structural damping: energy dissipation → convergence emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -62791,4 +62941,65 @@ export function scaleEnharmonicPotential(pitches: readonly Pitch[]): number {
     }
   }
   return Math.min(1, nearBoundary / pitches.length);
+}
+
+export function scaleHarmonicTensionProfile(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Tension: tritones and minor 2nds add maximum tension; perfect intervals reduce it
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let tension = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      // high tension: tritone (600), minor 2nd (100), major 7th (1100)
+      if (Math.abs(iv - 600) < 30 || Math.abs(iv - 100) < 30 || Math.abs(iv - 1100) < 30) tension += 1.0;
+      // low tension: unison (0), P5 (700), P4 (500), octave (1200)
+      else if (iv < 20 || Math.abs(iv - 700) < 20 || Math.abs(iv - 500) < 20 || Math.abs(iv - 1200) < 20) tension += 0.0;
+      else tension += 0.5;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, tension / pairs);
+}
+
+export function scalePentatonicAlignment(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Major pentatonic degrees: 0, 200, 400, 700, 900 cents
+  const pentatonicDegrees = [0, 200, 400, 700, 900];
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let aligned = 0;
+  for (const c of cents) {
+    if (pentatonicDegrees.some((d) => Math.abs(c - d) < 30 || Math.abs(c - d - 1200) < 30 || Math.abs(c - d + 1200) < 30)) {
+      aligned++;
+    }
+  }
+  return Math.min(1, aligned / cents.length);
+}
+
+export function scaleRootDoubling(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Root doubling: count pitches near 0 cents (root) or 1200 (octave)
+  let rootCount = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (c < 30 || c > 1170) rootCount++;
+  }
+  // Normalize: 0 = no root, 1 = all pitches are root/octave
+  return Math.min(1, rootCount / pitches.length);
+}
+
+export function scaleDominantDriveScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Dominant drive: presence of leading tone (1100 cents) and tritone (600 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasLeadingTone = cents.some((c) => Math.abs(c - 1100) < 30);
+  const hasTritone = cents.some((c) => Math.abs(c - 600) < 30);
+  const hasFifth = cents.some((c) => Math.abs(c - 700) < 20);
+  // Score based on V7 chord characteristics
+  let score = 0;
+  if (hasLeadingTone) score += 0.4;
+  if (hasTritone) score += 0.4;
+  if (hasFifth) score += 0.2;
+  return Math.min(1, score);
 }

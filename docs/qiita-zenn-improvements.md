@@ -2007,3 +2007,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleChromaticDensityIndex(pitches)` — 隣接音程のうち半音以下の割合（半音彩度密度）
 - `scaleVoiceLeadingSmoothnessScore(pitches)` — 隣接音程が全音以下の割合（声部進行の滑らかさ）
 - `scaleEnharmonicPotential(pitches)` — 平均律境界（100centの倍数）に近い音高の割合（異名同音ポテンシャル）
+
+### Round 176: 和声理論分析
+
+- `scaleHarmonicTensionProfile(pitches)` — 音程ペアのトライトーン/短2度/長7度比率から導出した和声的緊張プロファイル
+- `scalePentatonicAlignment(pitches)` — 長音階ペンタトニック度数（0/200/400/700/900 cent）への整合度
+- `scaleRootDoubling(pitches)` — 根音・オクターブ（0/1200 cent付近）を重複させる音高の割合
+- `scaleDominantDriveScore(pitches)` — 導音・トライトーン・完全5度の存在による属和音的推進力スコア
