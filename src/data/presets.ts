@@ -1587,6 +1587,12 @@ import {
   tuningFamilySocraticRadarTroposphereProxy,
   tuningFamilySocraticRadarStratosphereProxy,
   tuningFamilySocraticRadarAirQualityProxy,
+  tuningFamilySocraticRadarDevelopmentalPsychologyProxy,
+  tuningFamilySocraticRadarSocialPsychologyProxy,
+  tuningFamilySocraticRadarNeuropsychologyIndexProxy,
+  tuningFamilySocraticRadarHealthPsychologyProxy,
+  tuningFamilySocraticRadarPersonalityModelProxy,
+  tuningFamilySocraticRadarEmotionRegulationProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -29762,4 +29768,94 @@ export function presetFamilySocraticRadarAirQualityProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarAirQualityProxy(tunings, spectrum, rootHz);
+}
+
+// Q3607
+export function presetFamilySocraticRadarDevelopmentalPsychologyProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarDevelopmentalPsychologyProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarDevelopmentalPsychologyProxy(tunings, spectrum, rootHz);
+}
+
+// Q3609
+export function presetFamilySocraticRadarSocialPsychologyProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSocialPsychologyProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSocialPsychologyProxy(tunings, spectrum, rootHz);
+}
+
+// Q3611
+export function presetFamilySocraticRadarNeuropsychologyIndexProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarNeuropsychologyIndexProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarNeuropsychologyIndexProxy(tunings, spectrum, rootHz);
+}
+
+// Q3613
+export function presetFamilySocraticRadarHealthPsychologyProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarHealthPsychologyProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarHealthPsychologyProxy(tunings, spectrum, rootHz);
+}
+
+// Q3615
+export function presetFamilySocraticRadarPersonalityModelProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPersonalityModelProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPersonalityModelProxy(tunings, spectrum, rootHz);
+}
+
+// Q3617
+export function presetFamilySocraticRadarEmotionRegulationProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarEmotionRegulationProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarEmotionRegulationProxy(tunings, spectrum, rootHz);
 }

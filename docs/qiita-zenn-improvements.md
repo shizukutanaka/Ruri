@@ -2408,3 +2408,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleKoreanGungnakContent`: 韓国宮廷音楽ペンタトニック（[0,204,498,702,906]¢）との一致率
 - `scaleThaiDiatonicContent`: タイ7音等分音律（[0,171,343,514,686,857,1029]¢）との一致率
 - `scaleVietnamNguLinh`: ベトナム・ングーリン五音音階（[0,204,408,702,906]¢）との一致率
+
+## Round 227: 音域レジスター分析ヘルパ
+
+- `scaleIntervalSpectralBalance`: 低・中・高音域への均等分布スコア（偏差最小=1）
+- `scaleLowRegisterDensityV2`: 低音域（0〜400¢）の音符密度
+- `scaleMidRegisterDensityV2`: 中音域（400〜800¢）の音符密度
+- `scaleHighRegisterDensityV2`: 高音域（800〜1200¢）の音符密度

@@ -2565,6 +2565,12 @@ import {
   tuningFamilySocraticRadarDigitalTwinProxy,
   tuningFamilySocraticRadarInternetOfThingsProxy,
   tuningFamilySocraticRadarEdgeComputingProxy,
+  tuningFamilySocraticRadarDevelopmentalPsychologyProxy,
+  tuningFamilySocraticRadarSocialPsychologyProxy,
+  tuningFamilySocraticRadarNeuropsychologyIndexProxy,
+  tuningFamilySocraticRadarHealthPsychologyProxy,
+  tuningFamilySocraticRadarPersonalityModelProxy,
+  tuningFamilySocraticRadarEmotionRegulationProxy,
   scaleAverageStepCents,
   scaleDiatonicSaturation,
   scaleStepSizeVarianceV3,
@@ -2609,6 +2615,10 @@ import {
   scaleInSenContent,
   scaleHirajoshiContent,
   scaleYoNaContent,
+  scaleIntervalSpectralBalance,
+  scaleLowRegisterDensityV2,
+  scaleMidRegisterDensityV2,
+  scaleHighRegisterDensityV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -65062,5 +65072,69 @@ describe('tuningFamilySocraticRadarEdgeComputingProxy', () => {
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarEdgeComputingProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('scaleIntervalSpectralBalance', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleIntervalSpectralBalance([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleIntervalSpectralBalance(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleIntervalSpectralBalance(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleLowRegisterDensityV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleLowRegisterDensityV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleLowRegisterDensityV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleLowRegisterDensityV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMidRegisterDensityV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleMidRegisterDensityV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMidRegisterDensityV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMidRegisterDensityV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleHighRegisterDensityV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHighRegisterDensityV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleHighRegisterDensityV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleHighRegisterDensityV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });
