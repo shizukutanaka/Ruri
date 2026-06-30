@@ -2380,3 +2380,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleMakamHicazContent`: マカーム・ヒジャーズ（[0,90,390,498,702,792,1092]¢）との一致率
 - `scaleMakamKurdContent`: マカーム・キュルド（[0,90,294,498,702,792,996]¢）との一致率
 - `scaleMakamNihavandContent`: マカーム・ニハーヴァンド（[0,204,294,498,702,792,1088]¢）との一致率
+
+## Round 223: ガムランと倍音系列ヘルパ
+
+- `scaleSlendroContent`: ジャワスレンドロ音階（[0,240,480,720,960]¢ ±45¢）との一致率
+- `scalePelogContent`: ジャワペロッグ音階（[0,120,270,540,675,785,1070]¢ ±40¢）との一致率
+- `scaleHarmonicSeriesContentV2`: 倍音列（第1〜8倍音を1オクターブに縮約）との一致率
+- `scaleJustIntonationFidelity`: 5リミット純正律音程（±8¢以内）への適合率

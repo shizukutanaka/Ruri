@@ -2573,6 +2573,10 @@ import {
   scaleMakamHicazContent,
   scaleMakamKurdContent,
   scaleMakamNihavandContent,
+  scaleSlendroContent,
+  scalePelogContent,
+  scaleHarmonicSeriesContentV2,
+  scaleJustIntonationFidelity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -64472,6 +64476,70 @@ describe('scaleMakamNihavandContent', () => {
   });
   it('returns value in [0,1] for 19-EDO', () => {
     const v = scaleMakamNihavandContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSlendroContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleSlendroContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleSlendroContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleSlendroContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scalePelogContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scalePelogContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scalePelogContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scalePelogContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleHarmonicSeriesContentV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHarmonicSeriesContentV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleHarmonicSeriesContentV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleHarmonicSeriesContentV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleJustIntonationFidelity', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleJustIntonationFidelity([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleJustIntonationFidelity(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleJustIntonationFidelity(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
