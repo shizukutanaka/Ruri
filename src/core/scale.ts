@@ -64653,3 +64653,60 @@ export function scaleMinorSeventhCount(pitches: readonly Pitch[]): number {
   }
   return pairs === 0 ? 0 : Math.min(1, count / pairs);
 }
+
+export function scaleNoteCountComplexity(pitches: readonly Pitch[]): number {
+  // Note count complexity: more notes → more complex, normalized by 24 (max for dense chromatic)
+  return Math.min(1, pitches.length / 24);
+}
+
+export function scaleIntervalComplexityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Interval complexity: count of distinct interval classes (rounded to nearest 50 cents) normalized by 12
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervalClasses = new Set<number>();
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      const folded = iv > 600 ? 1200 - iv : iv;
+      intervalClasses.add(Math.round(folded / 50) * 50);
+    }
+  }
+  return Math.min(1, intervalClasses.size / 12);
+}
+
+export function scaleHarmonicComplexityRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Harmonic complexity: ratio of dissonant intervals (non-perfect consonances) among all pairs
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  // Perfect consonances: unison(0), P4(500), P5(700), octave(1200) ± 20 cents
+  const perfectConsonances = [0, 500, 700, 1200];
+  let dissonant = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      const isConsonant = perfectConsonances.some((c) => Math.abs(iv - c) < 20);
+      if (!isConsonant) dissonant++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, dissonant / pairs);
+}
+
+export function scaleComplexityBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Complexity balance: geometric mean of note count complexity and interval complexity
+  const noteComp = Math.min(1, pitches.length / 24);
+  if (pitches.length < 2) return noteComp;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervalClasses = new Set<number>();
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      const folded = iv > 600 ? 1200 - iv : iv;
+      intervalClasses.add(Math.round(folded / 50) * 50);
+    }
+  }
+  const intComp = Math.min(1, intervalClasses.size / 12);
+  return Math.min(1, Math.sqrt(noteComp * intComp));
+}

@@ -2070,3 +2070,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleMajorSixthCount(pitches)` — 全音程ペアのうち長6度（850〜950 cent）の割合
 - `scaleMinorSeventhCount(pitches)` — 全音程ペアのうち短7度（950〜1050 cent）の割合
 - `scalePerfectOctaveRatio(pitches)` — 全音程ペアのうちオクターブ（1150〜1250 cent）の割合
+
+### Round 185: 音階複雑度分析
+
+- `scaleNoteCountComplexity(pitches)` — 音高数を24で正規化した音階の音符数複雑度
+- `scaleIntervalComplexityIndex(pitches)` — 全音程ペアの50 cent単位音程クラス多様度（12種で正規化）
+- `scaleHarmonicComplexityRatio(pitches)` — 全音程ペアのうち完全協和音（ユニゾン/P4/P5/オクターブ以外）の割合
+- `scaleComplexityBalance(pitches)` — 音符数複雑度と音程複雑度の幾何平均による総合複雑度指数
