@@ -56070,6 +56070,156 @@ export function tuningFamilySocraticRadarEcosystemResilienceProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3222 — tuningFamilySocraticRadarNuclearBindingProxy
+export function tuningFamilySocraticRadarNuclearBindingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // nuclear binding: strong force cohesion and mass defect → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3224 — tuningFamilySocraticRadarRadioactiveDecayProxyV2
+export function tuningFamilySocraticRadarRadioactiveDecayProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // radioactive decay: half-life and decay chain → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3226 — tuningFamilySocraticRadarFissionBarrierProxy
+export function tuningFamilySocraticRadarFissionBarrierProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // fission barrier: potential energy barrier and critical deformation → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3228 — tuningFamilySocraticRadarNeutronCaptureProxy
+export function tuningFamilySocraticRadarNeutronCaptureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // neutron capture: cross-section resonance and s/r-process nucleosynthesis → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3230 — tuningFamilySocraticRadarSpinParityProxy
+export function tuningFamilySocraticRadarSpinParityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // spin-parity: angular momentum quantization and symmetry conservation → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3232 — tuningFamilySocraticRadarIsotopeRatioProxyV2
+export function tuningFamilySocraticRadarIsotopeRatioProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // isotope ratio: abundance fractionation and mass spectrometric signature — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -66653,6 +66803,54 @@ export function scaleSharpNinthContent(pitches: readonly Pitch[]): number {
   let count = 0;
   for (const c of cents) {
     if (Math.abs(c - 300) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleAugmentedFifthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 800;
+  const tolerance = 30;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleMinorSeventhContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 1000;
+  const tolerance = 30;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleMajorSeventhContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 1100;
+  const tolerance = 30;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleMinorNinthContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 100;
+  const tolerance = 30;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
   }
   return Math.min(1, count / pitches.length);
 }
