@@ -63623,3 +63623,57 @@ export function scaleDegreeDensityProfile(pitches: readonly Pitch[]): number {
   }
   return Math.min(1, occupied.size / 12);
 }
+
+export function scaleAlteredDegreeCount(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Altered degrees: pitches that don't fit major scale (0,200,400,500,700,900,1100 cents) within 25 cents
+  const majorScale = [0, 200, 400, 500, 700, 900, 1100];
+  let altered = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const fits = majorScale.some((d) => Math.abs(c - d) < 25 || Math.abs(c - d - 1200) < 25 || Math.abs(c - d + 1200) < 25);
+    if (!fits) altered++;
+  }
+  return Math.min(1, altered / pitches.length);
+}
+
+export function scaleTonicReturnRate(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Tonic return: fraction of pitches within 25 cents of 0 or 1200 cents (the tonic)
+  let tonicCount = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (c < 25 || c > 1175) tonicCount++;
+  }
+  return Math.min(1, tonicCount / pitches.length);
+}
+
+export function scaleParallelModeContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Parallel mode: check both major (0,200,400,500,700,900,1100) and minor (0,200,300,500,700,800,1000) scale degrees
+  const major = [0, 200, 400, 500, 700, 900, 1100];
+  const minor = [0, 200, 300, 500, 700, 800, 1000];
+  let majorFit = 0;
+  let minorFit = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (major.some((d) => Math.abs(c - d) < 25)) majorFit++;
+    if (minor.some((d) => Math.abs(c - d) < 25)) minorFit++;
+  }
+  // Parallel mode content: how much the scale spans BOTH major and minor
+  const majorRatio = majorFit / pitches.length;
+  const minorRatio = minorFit / pitches.length;
+  return Math.min(1, (majorRatio + minorRatio) / 2);
+}
+
+export function scaleBlueNoteContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Blue notes: b3 (300), b5 (600), b7 (1000) cents — blues scale additions
+  const blueNotes = [300, 600, 1000];
+  let blueCount = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (blueNotes.some((b) => Math.abs(c - b) < 30)) blueCount++;
+  }
+  return Math.min(1, blueCount / pitches.length);
+}

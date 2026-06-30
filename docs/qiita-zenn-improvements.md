@@ -2035,3 +2035,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleIntervalStacking(pitches)` — 隣接音程の最大偏差から導出した均一スタッキングスコア（EDO的均等さ）
 - `scalePitchClassEntropy(pitches)` — 半音バケットのシャノン情報エントロピー（12平均律クラス上での分布均等度）
 - `scaleDegreeDensityProfile(pitches)` — 12半音スロットのうち占有された半音クラスの割合
+
+### Round 180: モーダル混合・ブルーノート分析
+
+- `scaleAlteredDegreeCount(pitches)` — 長音階（0/200/400/500/700/900/1100 cent）から外れた音高の割合（変化音指数）
+- `scaleTonicReturnRate(pitches)` — 主音（0 cent付近）に近い音高の割合（主音回帰率）
+- `scaleParallelModeContent(pitches)` — 長調・短調の両方の音階に属する音高の平均割合（平行調混合指数）
+- `scaleBlueNoteContent(pitches)` — ブルーノート（b3/b5/b7: 300/600/1000 cent）を含む音高の割合
