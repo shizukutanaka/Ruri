@@ -2042,3 +2042,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleTonicReturnRate(pitches)` — 主音（0 cent付近）に近い音高の割合（主音回帰率）
 - `scaleParallelModeContent(pitches)` — 長調・短調の両方の音階に属する音高の平均割合（平行調混合指数）
 - `scaleBlueNoteContent(pitches)` — ブルーノート（b3/b5/b7: 300/600/1000 cent）を含む音高の割合
+
+### Round 181: 世界音楽・音階系統分析
+
+- `scaleOrientalModeContent(pitches)` — ダブルハーモニックモード（オリエンタル音階: 0/100/400/500/700/800/1100 cent）への整合度
+- `scaleMaqamContent(pitches)` — マカームラスト近似（クォーターノーン3度・7度: 0/200/350/500/700/900/1050 cent）への整合度
+- `scaleRagaAlignment(pitches)` — ラーガ・ヤマン近似（リディアン＃4: 0/200/400/600/700/900/1100 cent）への整合度
+- `scaleGamutCompleteness(pitches)` — 7音全音階の音域網羅度（7クロマスロット中の占有率）

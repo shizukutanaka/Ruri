@@ -63827,3 +63827,53 @@ export function scaleBlueNoteContent(pitches: readonly Pitch[]): number {
   }
   return Math.min(1, blueCount / pitches.length);
 }
+
+export function scaleOrientalModeContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Oriental/double harmonic mode: 0, 100, 400, 500, 700, 800, 1100 cents (augmented 2nds characteristic)
+  const orientalDegrees = [0, 100, 400, 500, 700, 800, 1100];
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (orientalDegrees.some((d) => Math.abs(c - d) < 30)) aligned++;
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleMaqamContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Rast approximation: 0, 200, 350, 500, 700, 900, 1050 cents (quartertone 3rd and 7th)
+  const maqamDegrees = [0, 200, 350, 500, 700, 900, 1050];
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (maqamDegrees.some((d) => Math.abs(c - d) < 40)) aligned++;
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleRagaAlignment(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Raga Yaman approximation: 0, 200, 400, 600, 700, 900, 1100 (Lydian with sharp 4th)
+  const yaman = [0, 200, 400, 600, 700, 900, 1100];
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (yaman.some((d) => Math.abs(c - d) < 30)) aligned++;
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleGamutCompleteness(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Gamut completeness: how many of the 7 diatonic pitch classes are represented (regardless of mode)
+  // All diatonic possible degrees: 0,100,200,300,400,500,600,700,800,900,1000,1100 — check at least one pitch per diatonic step
+  // Simplified: 7-note diatonic has gaps at tritone; count how many 100-cent slots have at least one pitch
+  const slots = new Set<number>();
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    slots.add(Math.round(c / 100) % 12);
+  }
+  // A complete heptatonic gamut covers 7 of 12 chromatic slots
+  return Math.min(1, slots.size / 7);
+}
