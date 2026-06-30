@@ -51570,6 +51570,156 @@ export function tuningFamilySocraticRadarSpectralResolutionProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2862 — tuningFamilySocraticRadarAtmosphericPressureGradientProxy
+export function tuningFamilySocraticRadarAtmosphericPressureGradientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // atmospheric pressure gradient: spatial rate of pressure change → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2864 — tuningFamilySocraticRadarCloudFormationProxy
+export function tuningFamilySocraticRadarCloudFormationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // cloud formation: condensation nuclei and droplet aggregation → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2866 — tuningFamilySocraticRadarPrecipitationRateProxy
+export function tuningFamilySocraticRadarPrecipitationRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // precipitation rate: water droplet fall intensity per unit time → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2868 — tuningFamilySocraticRadarThunderstormIndexProxy
+export function tuningFamilySocraticRadarThunderstormIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // thunderstorm index: convective instability and lightning frequency → diversity+convergence
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2870 — tuningFamilySocraticRadarHumidityGradientProxy
+export function tuningFamilySocraticRadarHumidityGradientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // humidity gradient: spatial variation of water vapor content → versatility+benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2872 — tuningFamilySocraticRadarWeatherFrontScoreProxy
+export function tuningFamilySocraticRadarWeatherFrontScoreProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // weather front score: boundary between air masses of different temperatures → convergence+benchmark
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -60503,4 +60653,69 @@ export function scaleHeptatonicDensity(pitches: readonly Pitch[]): number {
     pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100),
   );
   return Math.min(1, classes.size / 7);
+}
+
+export function scaleFifthQualityScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Perfect fifth quality: fraction of pitch pairs forming ~700c intervals (±15c)
+  const tol = 15;
+  const target = 700;
+  let count = 0;
+  for (let i = 0; i < pitches.length; i++) {
+    for (let j = i + 1; j < pitches.length; j++) {
+      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const interval = Math.min(d, 1200 - d);
+      if (Math.abs(interval - target) <= tol) count++;
+    }
+  }
+  const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
+  return maxPairs === 0 ? 0 : Math.min(1, count / maxPairs);
+}
+
+export function scaleThirdQualityScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Major or minor third quality: pairs at ~300c (minor) or ~400c (major) ±20c
+  const tols = [{ target: 300, tol: 20 }, { target: 400, tol: 20 }];
+  let count = 0;
+  for (let i = 0; i < pitches.length; i++) {
+    for (let j = i + 1; j < pitches.length; j++) {
+      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const interval = Math.min(d, 1200 - d);
+      if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
+    }
+  }
+  const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
+  return maxPairs === 0 ? 0 : Math.min(1, count / maxPairs);
+}
+
+export function scaleSixthQualityScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Major or minor sixth: ~800c (minor) or ~900c (major) ±20c
+  const tols = [{ target: 800, tol: 20 }, { target: 900, tol: 20 }];
+  let count = 0;
+  for (let i = 0; i < pitches.length; i++) {
+    for (let j = i + 1; j < pitches.length; j++) {
+      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const interval = Math.min(d, 1200 - d);
+      if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
+    }
+  }
+  const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
+  return maxPairs === 0 ? 0 : Math.min(1, count / maxPairs);
+}
+
+export function scaleSeventhQualityScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Major or minor seventh: ~1000c (minor) or ~1100c (major) ±20c
+  const tols = [{ target: 1000, tol: 20 }, { target: 1100, tol: 20 }];
+  let count = 0;
+  for (let i = 0; i < pitches.length; i++) {
+    for (let j = i + 1; j < pitches.length; j++) {
+      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const interval = Math.min(d, 1200 - d);
+      if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
+    }
+  }
+  const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
+  return maxPairs === 0 ? 0 : Math.min(1, count / maxPairs);
 }

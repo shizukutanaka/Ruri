@@ -1921,3 +1921,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Measures structural properties of scales beyond mode matching. Leading tone detection identifies classical vs. modal orientation. Modal color content captures the minor/modal "flavor" via b3/b6/b7. Enneatonic and heptatonic density measure how many distinct pitch-class slots a scale fills against 9-tone and 7-tone templates respectively.
 
 **Implementation**: Leading tone and modal color use ±25c tolerance matching. Enneatonic and heptatonic density quantize to 100c slots and compare set sizes.
+
+## Round 165: 音程質量分析 (R1621–R1624)
+
+**Functions**: `scaleFifthQualityScore`, `scaleThirdQualityScore`, `scaleSixthQualityScore`, `scaleSeventhQualityScore`
+
+**Motivation**: Measures the prevalence of consonant interval classes within a scale. Fifth quality captures perfect-fifth richness (important for tonal stability). Third, sixth, and seventh quality scores reflect harmonic richness across the most common chord tones. Together these provide a harmonic profile complementary to the modal content scores.
+
+**Implementation**: Each function counts all pitch pairs forming the target interval (within tolerance), normalized by total pairs. Returns ratio in [0,1].
