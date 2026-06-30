@@ -54870,6 +54870,156 @@ export function tuningFamilySocraticRadarDataIntegrityProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3126 — tuningFamilySocraticRadarBrainMachineInterfaceProxy
+export function tuningFamilySocraticRadarBrainMachineInterfaceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // brain-machine interface: neural signal decoding accuracy → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3128 — tuningFamilySocraticRadarNeuralDecodingProxy
+export function tuningFamilySocraticRadarNeuralDecodingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // neural decoding: population code reconstruction → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3130 — tuningFamilySocraticRadarCorticalMappingProxy
+export function tuningFamilySocraticRadarCorticalMappingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // cortical mapping: somatosensory area topology → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3132 — tuningFamilySocraticRadarSpikeSortProxy
+export function tuningFamilySocraticRadarSpikeSortProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // spike sorting: action potential classification → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3134 — tuningFamilySocraticRadarEEGCoherenceProxy
+export function tuningFamilySocraticRadarEEGCoherenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // EEG coherence: oscillatory synchrony → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3136 — tuningFamilySocraticRadarDeepBrainStimulationProxy
+export function tuningFamilySocraticRadarDeepBrainStimulationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // deep brain stimulation: therapeutic modulation → balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -65058,4 +65208,58 @@ export function scaleSupertoneContent(pitches: readonly Pitch[]): number {
     if (Math.abs(c - 100) < 30 || Math.abs(c - 200) < 30) count++;
   }
   return Math.min(1, count / pitches.length);
+}
+
+export function scaleMinorNinthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Minor ninth: 100 cents above an octave; as pitch class, minor 9th = 100 cents
+  // Count pitches near 100 cents (enharmonic to minor 2nd / flat 9th in tonal context)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 100) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleDiminishedFifthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Diminished fifth (tritone): 600 cents — enharmonic to augmented fourth
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 600) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleAugmentedFourthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Augmented fourth (tritone from root perspective): 600 cents
+  // Same pitch class as dim5, but measuring from the subdominant
+  // Also count pitches near 600 from 500 (= at ~1100) representing ♯4 above 5th degree
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    // ♯4 = 600 cents; ♭5 = 600 cents — same class
+    if (Math.abs(c - 600) < 30 || Math.abs(c - 550) < 25 || Math.abs(c - 650) < 25) count++;
+  }
+  return Math.min(1, count / Math.max(1, pitches.length));
+}
+
+export function scaleFlatFifthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Flat fifth: diminished fifth degree near 600 cents (same as tritone/dim5)
+  // Distinguishes from perfect fifth (700 cents); measures "altered" 5th presence
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  // Flat 5th: 600-660 cents; Perfect 5th: 700 cents; measure ABSENCE of 700 and PRESENCE of ~630
+  const hasPerfectFifth = cents.some((c) => Math.abs(c - 700) < 20);
+  let flatFifthCount = 0;
+  for (const c of cents) {
+    if (c >= 570 && c <= 660) flatFifthCount++;
+  }
+  if (flatFifthCount === 0) return 0;
+  const base = Math.min(1, flatFifthCount / pitches.length);
+  // Reduce score if perfect fifth is also present (reduces "flatness")
+  return hasPerfectFifth ? base * 0.5 : base;
 }
