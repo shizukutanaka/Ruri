@@ -2216,3 +2216,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleHarmonicSeriesContent` — 倍音列の特徴音程（702/498/386/316セントなど11点±20）の充足率を返す
 - `scaleMeantoneContent` — クォーターコンマミーントーンの特徴音程（696.6/386.3/310.3/1082.9セント±8）の充足率を返す
 - `scaleBluesScaleContent` — ブルース音階の特徴音程（300/600/700セント±25）の充足率を返す
+
+## Round 203: 教会旋法分析ヘルパ（ドリア/フリジア/リディア/ミクソリディア）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleDorianContent` — ドリア旋法の特徴音程（200/300/500/700/900/1000セント±20）の充足率を返す
+- `scalePhrygianContentV2` — フリジア旋法の特徴音程（100/300/500/700/800/1000セント±20）の充足率を返す（`scalePhrygianContent` が既存のため V2 サフィックス付与）
+- `scaleLydianContentV2` — リディア旋法の特徴音程（200/400/600/700/900/1100セント±20）の充足率を返す（`scaleLydianContent` が既存のため V2 サフィックス付与）
+- `scaleMixolydianContentV2` — ミクソリディア旋法の特徴音程（200/400/500/700/900/1000セント±20）の充足率を返す（`scaleMixolydianContent` が既存のため V2 サフィックス付与）
