@@ -1546,6 +1546,12 @@ import {
   presetFamilySocraticRadarWindEnergyProxy,
   presetFamilySocraticRadarThermalStorageProxy,
   presetFamilySocraticRadarSmartGridProxy,
+  presetFamilySocraticRadarObjectDetectionProxy,
+  presetFamilySocraticRadarSemanticSegmentationProxy,
+  presetFamilySocraticRadarImageClassificationProxy,
+  presetFamilySocraticRadarPointCloudProxy,
+  presetFamilySocraticRadarVideoAnalysisProxy,
+  presetFamilySocraticRadarSpeechRecognitionProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -37882,5 +37888,89 @@ describe('presetFamilySocraticRadarEpigenomicsAnalysisProxy', () => {
     expect(() =>
       presetFamilySocraticRadarEpigenomicsAnalysisProxy(['unknown-preset'], harmonicSpectrum(6), 440),
     ).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarObjectDetectionProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarObjectDetectionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarObjectDetectionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarObjectDetectionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarSemanticSegmentationProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarSemanticSegmentationProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarSemanticSegmentationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSemanticSegmentationProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarImageClassificationProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarImageClassificationProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarImageClassificationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarImageClassificationProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarPointCloudProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarPointCloudProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarPointCloudProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPointCloudProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarVideoAnalysisProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarVideoAnalysisProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarVideoAnalysisProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarVideoAnalysisProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarSpeechRecognitionProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarSpeechRecognitionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarSpeechRecognitionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSpeechRecognitionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });

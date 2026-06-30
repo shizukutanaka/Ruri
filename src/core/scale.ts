@@ -70533,7 +70533,7 @@ export function scalePitchClassEntropy(pitches: readonly Pitch[]): number {
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
     const bucket = Math.min(11, Math.floor(c / 100));
-    buckets[bucket]++;
+    buckets[bucket]! ++;
   }
   const total = pitches.length;
   let entropy = 0;
