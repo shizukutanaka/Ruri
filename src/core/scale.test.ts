@@ -2013,6 +2013,10 @@ import {
   scaleMidBandDensity,
   scaleHighBandDensity,
   scaleBandBalance,
+  scaleQuarterToneContent,
+  scaleGoldenRatioContentV2,
+  scaleJustMajorThirdContent,
+  scaleJustFifthContent,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2349,6 +2353,12 @@ import {
   tuningFamilySocraticRadarLaserThresholdProxy,
   tuningFamilySocraticRadarPhotonStatisticsProxy,
   tuningFamilySocraticRadarCavityQEDProxy,
+  tuningFamilySocraticRadarShannonEntropyProxy,
+  tuningFamilySocraticRadarMutualInformationProxyV4,
+  tuningFamilySocraticRadarKolmogorovComplexityProxyV3,
+  tuningFamilySocraticRadarChannelCapacityProxyV3,
+  tuningFamilySocraticRadarDataCompressionProxy,
+  tuningFamilySocraticRadarErrorCorrectionProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -53569,6 +53579,66 @@ describe('scaleSparsityRatio', () => {
     });
     it('returns value in [0,1] for 19-EDO', () => {
       const v = scaleBandBalance(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleQuarterToneContent', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleQuarterToneContent([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleQuarterToneContent(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleQuarterToneContent(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleGoldenRatioContentV2', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleGoldenRatioContentV2([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleGoldenRatioContentV2(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleGoldenRatioContentV2(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleJustMajorThirdContent', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleJustMajorThirdContent([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleJustMajorThirdContent(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleJustMajorThirdContent(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleJustFifthContent', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleJustFifthContent([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleJustFifthContent(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleJustFifthContent(edo(19, 440).degrees);
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     });

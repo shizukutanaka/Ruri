@@ -2189,3 +2189,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleMidBandDensity` — 400〜800セント（中音帯）の音度比率を返す
 - `scaleHighBandDensity` — 800〜1200セント（高音帯）の音度比率を返す
 - `scaleBandBalance` — 3つの帯域への均等分布度（1=完全均等、0=全て1帯域）を返す
+
+## Round 200: 微分音程・純正律音程分析ヘルパ（クォータートーン/黄金比/純正長三度/純正完全五度）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleQuarterToneContent` — クォータートーン（50セント±20、または1150セント±20）の存在比率を返す
+- `scaleGoldenRatioContentV2` — 黄金比に基づく音程（833セント±25、φ比率）の存在比率を返す（`scaleGoldenRatioContent` が既存のため V2 サフィックス付与）
+- `scaleJustMajorThirdContent` — 純正長三度（386セント±15、5/4比率）の存在比率を返す
+- `scaleJustFifthContent` — 純正完全五度（702セント±10、3/2比率）の存在比率を返す
