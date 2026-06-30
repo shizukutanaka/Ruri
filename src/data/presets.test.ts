@@ -1378,6 +1378,12 @@ import {
   presetFamilySocraticRadarQuantumGateProxy,
   presetFamilySocraticRadarQuantumTeleportationProxy,
   presetFamilySocraticRadarQuantumNoiseProxy,
+  presetFamilySocraticRadarJetStreamV2Proxy,
+  presetFamilySocraticRadarThermalGradientV2Proxy,
+  presetFamilySocraticRadarConvectivePlumeProxy,
+  presetFamilySocraticRadarWindShearV2Proxy,
+  presetFamilySocraticRadarAtmosphericWaveProxy,
+  presetFamilySocraticRadarHumidityFieldProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -29333,5 +29339,83 @@ describe('presetFamilySocraticRadarQuantumNoiseProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarQuantumNoiseProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarJetStreamV2Proxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarJetStreamV2Proxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarJetStreamV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarJetStreamV2Proxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarThermalGradientV2Proxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarThermalGradientV2Proxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarThermalGradientV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThermalGradientV2Proxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarConvectivePlumeProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarConvectivePlumeProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarConvectivePlumeProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarConvectivePlumeProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarWindShearV2Proxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarWindShearV2Proxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarWindShearV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarWindShearV2Proxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarAtmosphericWaveProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarAtmosphericWaveProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarAtmosphericWaveProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAtmosphericWaveProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarHumidityFieldProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarHumidityFieldProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarHumidityFieldProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHumidityFieldProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
