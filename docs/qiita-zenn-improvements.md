@@ -1897,3 +1897,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Extends modal analysis to exotic scales used in jazz, Byzantine, and Eastern European music. Lydian Dominant (acoustic scale) is fundamental to jazz composition. Double Harmonic (Byzantine) and Hungarian Minor provide augmented second intervals characteristic of Middle Eastern music. Neapolitan Major enables analysis of Baroque-era harmonic practices.
 
 **Implementation**: Each function matches pitches within ±25 cents of the target modal degrees using modular arithmetic. Returns ratio of matched pitches in [0,1].
+
+## Round 162: 拡張和声分析 (R1609–R1612)
+
+**Functions**: `scaleAugmentedSecondContent`, `scaleTritoneSubstitutionContent`, `scaleNeapolitanChordContent`, `scaleGermanSixthContent`
+
+**Motivation**: Extends harmonic analysis to chromatic and augmented sixth chord vocabulary. Augmented seconds are characteristic of harmonic minor and Hungarian scales. Tritone substitution is central to jazz harmony. Neapolitan and German sixth chords are hallmarks of Late Classical and Romantic harmonic language.
+
+**Implementation**: Each function uses interval-based detection with cent-tolerance windows. Returns ratio in [0,1] using pitch-to-cents conversion via `pitchToCents()`.
