@@ -60361,6 +60361,126 @@ export function tuningFamilySocraticRadarFogProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3534 — tuningFamilySocraticRadarSoilErosionProxy
+export function tuningFamilySocraticRadarSoilErosionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // SoilErosion: topsoil diversity loss and benchmark degradation
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3536 — tuningFamilySocraticRadarLandDegradationProxy
+export function tuningFamilySocraticRadarLandDegradationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // LandDegradation: balanced degradation across versatility and benchmark
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3538 — tuningFamilySocraticRadarDesertificationProxy
+export function tuningFamilySocraticRadarDesertificationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Desertification: maturity and benchmark convergence under arid conditions
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3540 — tuningFamilySocraticRadarWetlandProxy
+export function tuningFamilySocraticRadarWetlandProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Wetland: high diversity and balanced convergence in hydric ecosystems
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3542 — tuningFamilySocraticRadarMangroveProxy
+export function tuningFamilySocraticRadarMangroveProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Mangrove: maturity-focused coastal ecosystem resilience
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3544 — tuningFamilySocraticRadarDeforestationProxy
+export function tuningFamilySocraticRadarDeforestationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Deforestation: versatility loss and convergence shift in forest systems
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -72901,4 +73021,56 @@ export function scalePentatonicMajorDensity(pitches: readonly Pitch[]): number {
     if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
   return matched / pentatonicMajor.length;
+}
+
+export function scaleMaqamRastContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Rast (Arabic): [0, 204, 342, 498, 702, 906, 1044] (quarter-tone intervals)
+  const rast = [0, 204, 342, 498, 702, 906, 1044];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of rast) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / rast.length;
+}
+
+export function scaleMaqamBayatiContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Bayati: [0, 150, 300, 498, 702, 852, 1002]
+  const bayati = [0, 150, 300, 498, 702, 852, 1002];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of bayati) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / bayati.length;
+}
+
+export function scaleMaqamSabaContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Saba: [0, 150, 300, 396, 600, 702, 852]
+  const saba = [0, 150, 300, 396, 600, 702, 852];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of saba) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / saba.length;
+}
+
+export function scaleMaqamHijazContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Hijaz: [0, 96, 396, 498, 702, 792, 1092]
+  const hijaz = [0, 96, 396, 498, 702, 792, 1092];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of hijaz) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / hijaz.length;
 }

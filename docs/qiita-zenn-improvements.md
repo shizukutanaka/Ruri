@@ -2366,3 +2366,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleHexatonicDensity`: ヘキサトニック（増和音）スケールとの一致率
 - `scalePentatonicMinorDensity`: マイナーペンタトニックスケールとの一致率
 - `scalePentatonicMajorDensity`: メジャーペンタトニックスケールとの一致率
+
+## Round 221: アラビア・マカームコンテンツヘルパ
+
+- `scaleMaqamRastContent`: マカーム・ラスト（[0,204,342,498,702,906,1044]¢）との一致率
+- `scaleMaqamBayatiContent`: マカーム・バヤティ（[0,150,300,498,702,852,1002]¢）との一致率
+- `scaleMaqamSabaContent`: マカーム・サバ（[0,150,300,396,600,702,852]¢）との一致率
+- `scaleMaqamHijazContent`: マカーム・ヒジャーズ（[0,96,396,498,702,792,1092]¢）との一致率

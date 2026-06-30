@@ -2553,6 +2553,10 @@ import {
   scaleHexatonicDensity,
   scalePentatonicMinorDensity,
   scalePentatonicMajorDensity,
+  scaleMaqamRastContent,
+  scaleMaqamBayatiContent,
+  scaleMaqamSabaContent,
+  scaleMaqamHijazContent,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -64144,6 +64148,70 @@ describe('scalePentatonicMajorDensity', () => {
   });
   it('returns value in [0,1] for 19-EDO', () => {
     const v = scalePentatonicMajorDensity(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMaqamRastContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleMaqamRastContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMaqamRastContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMaqamRastContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMaqamBayatiContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleMaqamBayatiContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMaqamBayatiContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMaqamBayatiContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMaqamSabaContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleMaqamSabaContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMaqamSabaContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMaqamSabaContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMaqamHijazContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleMaqamHijazContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleMaqamHijazContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleMaqamHijazContent(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
