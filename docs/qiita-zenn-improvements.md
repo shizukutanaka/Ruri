@@ -2077,3 +2077,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleIntervalComplexityIndex(pitches)` — 全音程ペアの50 cent単位音程クラス多様度（12種で正規化）
 - `scaleHarmonicComplexityRatio(pitches)` — 全音程ペアのうち完全協和音（ユニゾン/P4/P5/オクターブ以外）の割合
 - `scaleComplexityBalance(pitches)` — 音符数複雑度と音程複雑度の幾何平均による総合複雑度指数
+
+### Round 186: 音階機能度分析
+
+- `scaleQuintCircleStep(pitches)` — 五度圏（700 cent刻み）の各位置への整合音高割合
+- `scaleSubdominantDrive(pitches)` — 完全4度・短7度・長6度の存在による下属和音的推進力スコア
+- `scaleMediantContent(pitches)` — 中音（長3度400・短3度300 cent）を含む音高の割合
+- `scaleSupertoneContent(pitches)` — 上主音（長2度200・短2度100 cent）を含む音高の割合

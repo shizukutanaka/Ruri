@@ -64860,3 +64860,52 @@ export function scaleComplexityBalance(pitches: readonly Pitch[]): number {
   const intComp = Math.min(1, intervalClasses.size / 12);
   return Math.min(1, Math.sqrt(noteComp * intComp));
 }
+
+export function scaleQuintCircleStep(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Quint circle step: how many pitches align with the circle of fifths (0, 700, 200, 900, 400, 1100, 600, 100, 800, 300, 1000, 500 cents)
+  // Each step in the circle moves by 700 cents; measure how many consecutive 5th steps are covered
+  const quintCircle = Array.from({ length: 12 }, (_, i) => (i * 700) % 1200);
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (quintCircle.some((q) => Math.abs(c - q) < 25)) aligned++;
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleSubdominantDrive(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Subdominant drive: presence of P4 (500 cents) and m7 (1000 cents) → subdominant tendency
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasFourth = cents.some((c) => Math.abs(c - 500) < 25);
+  const hasMinorSeventh = cents.some((c) => Math.abs(c - 1000) < 30);
+  const hasSixth = cents.some((c) => Math.abs(c - 900) < 25);
+  let score = 0;
+  if (hasFourth) score += 0.45;
+  if (hasMinorSeventh) score += 0.35;
+  if (hasSixth) score += 0.20;
+  return Math.min(1, score);
+}
+
+export function scaleMediantContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Mediant: third scale degree — both major 3rd (400) and minor 3rd (300)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 300) < 30 || Math.abs(c - 400) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleSupertoneContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Supertone (2nd degree): major 2nd (200) and minor 2nd (100)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 100) < 30 || Math.abs(c - 200) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
