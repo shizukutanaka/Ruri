@@ -1473,6 +1473,12 @@ import {
   tuningFamilySocraticRadarFractureProxy,
   tuningFamilySocraticRadarCorrosionMaterialProxy,
   tuningFamilySocraticRadarNanotubeProxy,
+  tuningFamilySocraticRadarTectonicsProxy,
+  tuningFamilySocraticRadarSeismicProxy,
+  tuningFamilySocraticRadarVolcanicProxy,
+  tuningFamilySocraticRadarOceanCurrentProxy,
+  tuningFamilySocraticRadarAtmosphericProxy,
+  tuningFamilySocraticRadarGeomagneticProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -27895,4 +27901,94 @@ export function presetFamilySocraticRadarNanotubeProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarNanotubeProxy(tunings, spectrum, rootHz);
+}
+
+// Q3367
+export function presetFamilySocraticRadarTectonicsProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTectonicsProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTectonicsProxy(tunings, spectrum, rootHz);
+}
+
+// Q3369
+export function presetFamilySocraticRadarSeismicProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSeismicProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSeismicProxy(tunings, spectrum, rootHz);
+}
+
+// Q3371
+export function presetFamilySocraticRadarVolcanicProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarVolcanicProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarVolcanicProxy(tunings, spectrum, rootHz);
+}
+
+// Q3373
+export function presetFamilySocraticRadarOceanCurrentProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarOceanCurrentProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarOceanCurrentProxy(tunings, spectrum, rootHz);
+}
+
+// Q3375
+export function presetFamilySocraticRadarAtmosphericProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarAtmosphericProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarAtmosphericProxy(tunings, spectrum, rootHz);
+}
+
+// Q3377
+export function presetFamilySocraticRadarGeomagneticProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarGeomagneticProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarGeomagneticProxy(tunings, spectrum, rootHz);
 }
