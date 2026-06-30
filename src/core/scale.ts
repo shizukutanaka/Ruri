@@ -58920,6 +58920,126 @@ export function tuningFamilySocraticRadarMedicalImagingProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3486 — tuningFamilySocraticRadarSemiconductorJunctionProxy
+export function tuningFamilySocraticRadarSemiconductorJunctionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // SemiconductorJunction: band-gap diversity and carrier benchmark
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3488 — tuningFamilySocraticRadarPhotovoltaicEffectProxy
+export function tuningFamilySocraticRadarPhotovoltaicEffectProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // PhotovoltaicEffect: versatile light-to-energy conversion with convergence efficiency
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3490 — tuningFamilySocraticRadarBatteryStorageProxy
+export function tuningFamilySocraticRadarBatteryStorageProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // BatteryStorage: mature technology with high benchmark capacity retention
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3492 — tuningFamilySocraticRadarWindEnergyProxy
+export function tuningFamilySocraticRadarWindEnergyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // WindEnergy: diverse turbine placement with convergent grid integration
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3494 — tuningFamilySocraticRadarThermalStorageProxy
+export function tuningFamilySocraticRadarThermalStorageProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ThermalStorage: mature heat retention with versatile discharge benchmarking
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3496 — tuningFamilySocraticRadarSmartGridProxy
+export function tuningFamilySocraticRadarSmartGridProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // SmartGrid: versatile demand-response with balanced convergence and diversity
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -70626,4 +70746,59 @@ export function scaleAugmentedContentV2(pitches: readonly Pitch[]): number {
     if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
   return matched / augmented.length;
+}
+
+export function scaleLeadingToneStrengthV5(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Leading tone = pitch ~100 cents below tonic (semitone below octave = ~1100 cents)
+  const target = 1100;
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasLeading = cs.some((c) => Math.abs(c - target) <= tolerance);
+  // Also check ~50 cents below (quarter-tone leading tones)
+  const hasQuarter = cs.some((c) => Math.abs(c - 1150) <= 25);
+  if (hasLeading) return 1.0;
+  if (hasQuarter) return 0.5;
+  return 0;
+}
+
+export function scaleSubdominantPresenceV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Subdominant = perfect 4th (500 cents) ± tolerance
+  const target = 500;
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasSub = cs.some((c) => Math.abs(c - target) <= tolerance);
+  // Tritone sub at 600 cents
+  const hasTritone = cs.some((c) => Math.abs(c - 600) <= 20);
+  if (hasSub && hasTritone) return 1.0;
+  if (hasSub) return 0.7;
+  if (hasTritone) return 0.4;
+  return 0;
+}
+
+export function scaleMediantBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Mediant = major 3rd (400¢) or minor 3rd (300¢)
+  const majorThird = 400;
+  const minorThird = 300;
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasMajor = cs.some((c) => Math.abs(c - majorThird) <= tolerance) ? 1 : 0;
+  const hasMinor = cs.some((c) => Math.abs(c - minorThird) <= tolerance) ? 1 : 0;
+  return (hasMajor + hasMinor) / 2;
+}
+
+export function scaleDominantSeventh(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Dominant 7th chord tones relative to tonic: 700¢ (P5), 1100¢ (m7 of dominant = M3 of dom)
+  // Check for presence of 5th (700), major 7th (1100), and major 3rd (400)
+  const targets = [400, 700, 1100];
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of targets) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
 }

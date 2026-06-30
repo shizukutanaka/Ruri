@@ -2338,3 +2338,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleWholeToneContentV4`: 全音音階6ポジションのカバー率
 - `scaleDiminishedContentV2`: 減和音オクタトニック8ポジションのカバー率
 - `scaleAugmentedContentV2`: 増三和音3ポジションのカバー率
+
+## Round 217: 機能和声ヘルパ
+
+- `scaleLeadingToneStrengthV5`: 導音の存在強度（1100¢前後±35¢）
+- `scaleSubdominantPresenceV2`: 下属音の存在（完全4度500¢±30¢ + 増4度代理）
+- `scaleMediantBalance`: 中音バランス（長3度400¢・短3度300¢の双方カバー率）
+- `scaleDominantSeventh`: 属七和音構成音カバー率（長3度/完全5度/短7度）
