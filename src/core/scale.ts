@@ -68725,3 +68725,55 @@ export function scaleDoubleHarmonicContentV2(pitches: readonly Pitch[]): number 
   }
   return matched / targets.length;
 }
+
+export function scaleAugmentedContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Augmented scale: minor 3rd(300), major 3rd(400), augmented 5th(800), major 6th(900)
+  const targets = [300, 400, 700, 800];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleDiminishedContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Diminished scale (whole-half): alternating 200/100 cent steps
+  const targets = [200, 300, 500, 600, 800, 900, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleHarmonicMajorContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Harmonic major: major scale with lowered 6th(800)
+  const targets = [200, 400, 500, 700, 800, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleMelodicMinorContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Melodic minor (ascending): minor 3rd(300), major 6th(900), major 7th(1100)
+  const targets = [200, 300, 500, 700, 900, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
