@@ -2013,6 +2013,12 @@ import {
   tuningFamilySocraticRadarFlowRateCoefficientProxy,
   tuningFamilySocraticRadarShearStressIndexProxy,
   tuningFamilySocraticRadarBuoyancyForceProxy,
+  tuningFamilySocraticRadarChemicalReactionRateProxy,
+  tuningFamilySocraticRadarOxidationReductionPotentialProxy,
+  tuningFamilySocraticRadarEquilibriumConstantProxy,
+  tuningFamilySocraticRadarCatalystActivityProxy,
+  tuningFamilySocraticRadarSolutionConcentrationProxy,
+  tuningFamilySocraticRadarReactionYieldProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
