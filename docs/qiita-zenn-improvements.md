@@ -2119,3 +2119,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scalePitchDensityV2(pitches)` — 100 cent区間ごとの音高クラス充填率（0〜12スロット正規化）
 - `scaleGapIndex(pitches)` — 最大音高間隔/オクターブ比（折返しギャップ含む）
 - `scaleOctaveSpan(pitches)` — 音高の全音域をオクターブ単位で計測（4オクターブ上限正規化）
+
+### Round 192: 音階半音論的特性分析
+
+- `scaleHemitonia(pitches)` — 隣接音クラス間の半音（<110 cent）数/音高数（ヘミトニア率）
+- `scaleImperfectionRatio(pitches)` — 完全5度（700 cent）パートナーを持たない音高の割合
+- `scaleCardinalityRatio(pitches)` — 異なる音高クラス数/12（音高多様性）
+- `scaleSemitoneCountV2(pitches)` — 12平均律半音スロット±25 cent以内の音高割合（12TET整合率）

@@ -55620,6 +55620,156 @@ export function tuningFamilySocraticRadarSubstrateTurnoverProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3186 — tuningFamilySocraticRadarSeismicWaveProxy
+export function tuningFamilySocraticRadarSeismicWaveProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // seismic wave: P/S wave propagation and attenuation → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3188 — tuningFamilySocraticRadarMantleConvectionProxy
+export function tuningFamilySocraticRadarMantleConvectionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // mantle convection: thermal plumes and plate driving → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3190 — tuningFamilySocraticRadarGeomagneticFieldProxy
+export function tuningFamilySocraticRadarGeomagneticFieldProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // geomagnetic field: dipole orientation and secular variation → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3192 — tuningFamilySocraticRadarTectonicStressProxyV2
+export function tuningFamilySocraticRadarTectonicStressProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // tectonic stress: strain accumulation and fault mechanics → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3194 — tuningFamilySocraticRadarCrustDensityProxy
+export function tuningFamilySocraticRadarCrustDensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // crust density: compositional layering and isostasy → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3196 — tuningFamilySocraticRadarHeatFlowProxy
+export function tuningFamilySocraticRadarHeatFlowProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // heat flow: geothermal gradient and radiogenic production — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -66061,4 +66211,54 @@ export function scaleOctaveSpan(pitches: readonly Pitch[]): number {
   const spanOctaves = (maxC - minC) / 1200;
   // Normalize to [0,1] with 4 octaves as reference maximum
   return Math.min(1, spanOctaves / 4);
+}
+
+export function scaleHemitonia(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Hemitonia: count of semitone (100 cent) intervals between adjacent pitch classes
+  const sorted = [...new Set(pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200))].sort(
+    (a, b) => a - b,
+  );
+  let hemitones = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i]! - sorted[i - 1]! < 110) hemitones++;
+  }
+  // Wrap-around check
+  if (sorted.length > 1 && 1200 - sorted[sorted.length - 1]! + sorted[0]! < 110) hemitones++;
+  // Normalize: max hemitones = number of distinct pitches (fully chromatic)
+  return Math.min(1, hemitones / Math.max(1, sorted.length));
+}
+
+export function scaleImperfectionRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Imperfection: ratio of pitches that have NO perfect fifth (700 cents) partner
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let imperfect = 0;
+  for (const c of cents) {
+    const target = (c + 700) % 1200;
+    if (!cents.some((other) => Math.abs(other - target) < 20)) imperfect++;
+  }
+  return imperfect / pitches.length;
+}
+
+export function scaleCardinalityRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Cardinality ratio: distinct pitch classes / total pitches
+  // High ratio = few duplicates; low ratio = many repeated pitch classes
+  const distinct = new Set(
+    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100)),
+  ).size;
+  return Math.min(1, distinct / 12);
+}
+
+export function scaleSemitoneCountV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Semitone count: total number of pitches falling within 25 cents of 12-TET semitone slots
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let onSemitone = 0;
+  for (const c of cents) {
+    const nearestSemitone = Math.round(c / 100) * 100;
+    if (Math.abs(c - nearestSemitone) <= 25) onSemitone++;
+  }
+  return onSemitone / pitches.length;
 }
