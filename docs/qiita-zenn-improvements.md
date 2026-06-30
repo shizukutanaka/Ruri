@@ -2261,3 +2261,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleNaturalMinorContent` — 自然短調の特徴音程（200/300/500/700/800/1000セント±20）の充足率を返す
 - `scalePhrygianDominantContentV2` — フリジア・ドミナント（スパニッシュジプシー）の特徴音程（100/400/500/700/800/1000セント±20）の充足率を返す（`scalePhrygianDominantContent` が既存のため V2 サフィックス付与）
 - `scaleArabicContent` — アラビア音階の特徴音程（100/400/600/700/800/1000セント±20）の充足率を返す
+
+## Round 208: 世界のペンタトニック音階分析ヘルパ（日本/中国/インド/アフリカ）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleJapanesePentatonicContent` — 日本音階（陰音階: 100/500/700/800セント±25）の充足率を返す
+- `scaleChinesePentatonicContent` — 中国五声音階（宮調: 200/400/700/900セント±25）の充足率を返す
+- `scaleIndiaPentatonicContent` — インド五音音階（ブープリ・ラーガ: 200/400/700/900セント±30）の充足率を返す
+- `scaleAfricanPentatonicContent` — アフリカ五音音階（200/500/700/1000セント±25）の充足率を返す
