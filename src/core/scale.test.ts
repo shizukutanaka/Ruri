@@ -2057,6 +2057,10 @@ import {
   scaleFlamencoContent,
   scaleByzantineContent,
   scaleUkrainianContent,
+  scaleSpanishGitanoContent,
+  scaleRagaYamanContent,
+  scaleRagaBhairavi,
+  scaleRagaBhairav,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2459,6 +2463,12 @@ import {
   tuningFamilySocraticRadarArcticAmplificationProxy,
   tuningFamilySocraticRadarHadleyCellProxy,
   tuningFamilySocraticRadarMonsoonProxy,
+  tuningFamilySocraticRadarCrowdDynamicsProxy,
+  tuningFamilySocraticRadarOpinionFormationProxy,
+  tuningFamilySocraticRadarSocialContagionProxy,
+  tuningFamilySocraticRadarNetworkEffectProxy,
+  tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy,
+  tuningFamilySocraticRadarSocialNormProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -53737,6 +53747,90 @@ describe('tuningFamilySocraticRadarMonsoonProxy', () => {
     expect(Number.isFinite(v)).toBe(true);
   });
 });
+describe('tuningFamilySocraticRadarCrowdDynamicsProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCrowdDynamicsProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCrowdDynamicsProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCrowdDynamicsProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarOpinionFormationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarOpinionFormationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarOpinionFormationProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarOpinionFormationProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarSocialContagionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSocialContagionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSocialContagionProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSocialContagionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarNetworkEffectProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNetworkEffectProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarNetworkEffectProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNetworkEffectProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarSocialNormProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSocialNormProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSocialNormProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSocialNormProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
 describe('scaleLeadingToneContent', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLeadingToneContent([])).toBe(0);
@@ -55264,6 +55358,66 @@ describe('scaleBluesScaleContent', () => {
     });
     it('returns value in [0,1] for 19-EDO', () => {
       const v = scaleUkrainianContent(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleSpanishGitanoContent', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleSpanishGitanoContent([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleSpanishGitanoContent(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleSpanishGitanoContent(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleRagaYamanContent', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleRagaYamanContent([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleRagaYamanContent(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleRagaYamanContent(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleRagaBhairavi', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleRagaBhairavi([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleRagaBhairavi(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleRagaBhairavi(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleRagaBhairav', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleRagaBhairav([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleRagaBhairav(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleRagaBhairav(edo(19, 440).degrees);
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     });
