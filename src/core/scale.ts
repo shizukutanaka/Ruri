@@ -50370,6 +50370,156 @@ export function tuningFamilySocraticRadarBraggAngleProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2766 — tuningFamilySocraticRadarViscosityIndexProxy
+export function tuningFamilySocraticRadarViscosityIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // viscosity: resistance to flow → convergence+maturity weighted
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2768 — tuningFamilySocraticRadarPressureDropProxy
+export function tuningFamilySocraticRadarPressureDropProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // pressure drop: energy loss along flow path → benchmark weighted
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2770 — tuningFamilySocraticRadarVelocityGradientProxy
+export function tuningFamilySocraticRadarVelocityGradientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // velocity gradient: rate of velocity change → diversity+versatility weighted
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2772 — tuningFamilySocraticRadarFlowRateCoefficientProxy
+export function tuningFamilySocraticRadarFlowRateCoefficientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // flow rate coefficient: volumetric flow efficiency → benchmark+diversity weighted
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2774 — tuningFamilySocraticRadarShearStressIndexProxy
+export function tuningFamilySocraticRadarShearStressIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // shear stress: tangential force per area → diversity+benchmark weighted
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2776 — tuningFamilySocraticRadarBuoyancyForceProxy
+export function tuningFamilySocraticRadarBuoyancyForceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // buoyancy force: upward fluid pressure → versatility+convergence weighted
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -58897,4 +59047,50 @@ export function scalePentatonicBalance(pitches: readonly Pitch[]): number {
     if (minor.some((d) => Math.abs(c - d) <= 25)) min++;
   }
   return (maj / pitches.length + min / pitches.length) / 2;
+}
+
+// R1571
+export function scaleAmbitusScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const mn = Math.min(...cents);
+  const mx = Math.max(...cents);
+  return Math.min(1, Math.max(0, (mx - mn) / 1200));
+}
+
+// R1572
+export function scaleIntervalVariance(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+  if (mean === 0) return 0;
+  const variance = intervals.reduce((acc, iv) => acc + (iv - mean) ** 2, 0) / intervals.length;
+  const cv = Math.sqrt(variance) / mean;
+  return Math.min(1, Math.max(0, cv / 2));
+}
+
+// R1573
+export function scalePitchCentroid(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const mean = pcs.reduce((a, b) => a + b, 0) / pcs.length;
+  return Math.min(1, Math.max(0, mean / 1200));
+}
+
+// R1574
+export function scaleDistributionBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const bins = new Array<number>(12).fill(0);
+  for (const p of pitches) {
+    const bin = Math.floor(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12;
+    bins[bin]! += 1;
+  }
+  const expected = pitches.length / 12;
+  const totalDev = bins.reduce((acc, b) => acc + Math.abs(b - expected), 0);
+  const maxDev = expected * 12 * (1 - 1 / 12); // worst case: all in one bin
+  return Math.min(1, Math.max(0, 1 - totalDev / (maxDev + 1e-9)));
 }
