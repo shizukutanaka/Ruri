@@ -2387,3 +2387,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scalePelogContent`: ジャワペロッグ音階（[0,120,270,540,675,785,1070]¢ ±40¢）との一致率
 - `scaleHarmonicSeriesContentV2`: 倍音列（第1〜8倍音を1オクターブに縮約）との一致率
 - `scaleJustIntonationFidelity`: 5リミット純正律音程（±8¢以内）への適合率
+
+## Round 224: エチオピア音階と歴史的音律ヘルパ
+
+- `scaleEthiopianKignitContent`: エチオピア・キグニット（アンチ・ホイエ）音階との一致率
+- `scaleEthiopianBatiContent`: エチオピア・バティ（短調）音階との一致率
+- `scaleMeantoneAffinity`: 1/4コンマ中全音律長音階との親和度（±15¢）
+- `scaleWellTemperamentAffinity`: ヴェルクマイスターIII音律C長調との親和度（±12¢）
