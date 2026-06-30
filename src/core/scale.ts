@@ -58440,6 +58440,126 @@ export function tuningFamilySocraticRadarMeanReversionProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3438 — tuningFamilySocraticRadarMagneticConfinementProxy
+export function tuningFamilySocraticRadarMagneticConfinementProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 磁気閉じ込め: 安定した制御 → convergence重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3440 — tuningFamilySocraticRadarDebyeShieldingProxy
+export function tuningFamilySocraticRadarDebyeShieldingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // デバイ遮蔽: 成熟した遮蔽効果 → maturity重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3442 — tuningFamilySocraticRadarPlasmaOscillationProxy
+export function tuningFamilySocraticRadarPlasmaOscillationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // プラズマ振動: 多様な振動モード → diversity重視
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3444 — tuningFamilySocraticRadarAlfvenWaveProxy
+export function tuningFamilySocraticRadarAlfvenWaveProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // アルヴェーン波: 多目的な波動伝播 → versatility重視
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3446 — tuningFamilySocraticRadarMagnetohydrodynamicsProxy
+export function tuningFamilySocraticRadarMagnetohydrodynamicsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 磁気流体力学: 基準性能の最大化 → benchmark重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3448 — tuningFamilySocraticRadarFusionProxy
+export function tuningFamilySocraticRadarFusionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 核融合: 均衡した総合力 → balanced
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -69921,6 +70041,58 @@ export function scaleRagaDarbari(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Raga Darbari Kanada: minor 3rd(300), komal gandhar, minor 6th(800), minor 7th(1000)
   const targets = [200, 300, 500, 700, 800, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleRagaTodi(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Raga Todi: komal re(100), komal ga(300), shuddha ma(500), pa(700), komal dha(800)
+  const targets = [100, 300, 500, 600, 700, 800];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleRagaBageshri(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Raga Bageshri (Kafi thaat): komal ga(300), komal ni(1000), no pa
+  const targets = [200, 300, 500, 800, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleRagaPurvi(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Raga Purvi: komal re(100), shuddha ga(400), teevra ma(600), komal dha(800), shuddha ni(1100)
+  const targets = [100, 400, 600, 700, 800, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleRagaMarwa(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Raga Marwa: komal re(100), shuddha ga(400), teevra ma(600), shuddha dha(900), shuddha ni(1100) — no pa
+  const targets = [100, 400, 600, 900, 1100];
   const tolerance = 20;
   let matched = 0;
   for (const t of targets) {

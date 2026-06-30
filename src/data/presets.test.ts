@@ -1516,6 +1516,12 @@ import {
   presetFamilySocraticRadarHerdBehaviorProxy,
   presetFamilySocraticRadarLiquidityCrisisProxy,
   presetFamilySocraticRadarMeanReversionProxy,
+  presetFamilySocraticRadarMagneticConfinementProxy,
+  presetFamilySocraticRadarDebyeShieldingProxy,
+  presetFamilySocraticRadarPlasmaOscillationProxy,
+  presetFamilySocraticRadarAlfvenWaveProxy,
+  presetFamilySocraticRadarMagnetohydrodynamicsProxy,
+  presetFamilySocraticRadarFusionProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';

@@ -2065,6 +2065,10 @@ import {
   scaleRagaBhimpalasi,
   scaleRagaMalkauns,
   scaleRagaDarbari,
+  scaleRagaTodi,
+  scaleRagaBageshri,
+  scaleRagaPurvi,
+  scaleRagaMarwa,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2479,6 +2483,12 @@ import {
   tuningFamilySocraticRadarHerdBehaviorProxy,
   tuningFamilySocraticRadarLiquidityCrisisProxy,
   tuningFamilySocraticRadarMeanReversionProxy,
+  tuningFamilySocraticRadarMagneticConfinementProxy,
+  tuningFamilySocraticRadarDebyeShieldingProxy,
+  tuningFamilySocraticRadarPlasmaOscillationProxy,
+  tuningFamilySocraticRadarAlfvenWaveProxy,
+  tuningFamilySocraticRadarMagnetohydrodynamicsProxy,
+  tuningFamilySocraticRadarFusionProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -53925,6 +53935,90 @@ describe('tuningFamilySocraticRadarMeanReversionProxy', () => {
     expect(Number.isFinite(v)).toBe(true);
   });
 });
+describe('tuningFamilySocraticRadarMagneticConfinementProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarMagneticConfinementProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarMagneticConfinementProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarMagneticConfinementProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarDebyeShieldingProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDebyeShieldingProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarDebyeShieldingProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarDebyeShieldingProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarPlasmaOscillationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPlasmaOscillationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPlasmaOscillationProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPlasmaOscillationProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarAlfvenWaveProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAlfvenWaveProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarAlfvenWaveProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarAlfvenWaveProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarMagnetohydrodynamicsProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarMagnetohydrodynamicsProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarMagnetohydrodynamicsProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarMagnetohydrodynamicsProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarFusionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarFusionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarFusionProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarFusionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
 describe('scaleLeadingToneContent', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLeadingToneContent([])).toBe(0);
@@ -55572,6 +55666,66 @@ describe('scaleBluesScaleContent', () => {
     });
     it('returns value in [0,1] for 19-EDO', () => {
       const v = scaleRagaDarbari(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleRagaTodi', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleRagaTodi([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleRagaTodi(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleRagaTodi(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleRagaBageshri', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleRagaBageshri([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleRagaBageshri(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleRagaBageshri(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleRagaPurvi', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleRagaPurvi([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleRagaPurvi(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleRagaPurvi(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleRagaMarwa', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleRagaMarwa([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleRagaMarwa(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleRagaMarwa(edo(19, 440).degrees);
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     });
