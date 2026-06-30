@@ -1960,4 +1960,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 
 **Motivation**: Analyses chord voicing and inversion content within a scale. Root position strength measures whether a complete root-position triad (root + third + fifth) is present. First and second inversion content detect characteristic pitches for each inversion. Open voicing ratio captures the spacing density — high values indicate widely-spaced intervals typical of open (orchestral) voicing.
 
+## Round 170: 微分音程分析 (R1641–R1644)
+
+**Functions**: `scaleQuarterToneRatio`, `scaleMicrotoneCount`, `scaleSubsemitoneContent`, `scaleFifthOfSemitone`
+
+**Motivation**: Detects microtonal interval content beyond 12-TET chromaticism. Quarter-tone ratio identifies Arabic maqam and 24-EDO scale characteristics. Microtone count captures sub-semitone step density. Sub-semitone content measures how many pitches deviate from 12-TET grid by more than 15c. Fifth-of-semitone detects extreme microtonality (~20c steps, characteristic of very high EDO systems).
+
+**Implementation**: Sorts pitch classes, computes adjacent intervals, and counts matches by cent-range criteria. Sub-semitone content uses modular rounding to nearest 100c. Returns ratio in [0,1].
+
 **Implementation**: Uses ±25c tolerance matching and sorted pitch-class intervals. Returns ratio in [0,1].

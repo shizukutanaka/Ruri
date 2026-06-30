@@ -52320,6 +52320,156 @@ export function tuningFamilySocraticRadarMaillardReactionScoreProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2922 — tuningFamilySocraticRadarCoralBleachingProxy
+export function tuningFamilySocraticRadarCoralBleachingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // coral bleaching: thermal stress-induced expulsion of symbiotic algae → diversity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2924 — tuningFamilySocraticRadarPlanktonDensityProxy
+export function tuningFamilySocraticRadarPlanktonDensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // plankton density: concentration of microscopic marine organisms → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2926 — tuningFamilySocraticRadarOceanChemosynthesisProxy
+export function tuningFamilySocraticRadarOceanChemosynthesisProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ocean chemosynthesis: energy production from chemical reactions at vents → maturity+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2928 — tuningFamilySocraticRadarMarineBioluminescenceProxy
+export function tuningFamilySocraticRadarMarineBioluminescenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // marine bioluminescence: light emission by deep-sea organisms → convergence+versatility
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2930 — tuningFamilySocraticRadarCoralReefDiversityProxy
+export function tuningFamilySocraticRadarCoralReefDiversityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // coral reef diversity: species richness in reef ecosystems → diversity+maturity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2932 — tuningFamilySocraticRadarTidalZonationProxy
+export function tuningFamilySocraticRadarTidalZonationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // tidal zonation: species distribution across intertidal gradient → benchmark+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -61569,4 +61719,56 @@ export function scaleOpenVoicingRatio(pitches: readonly Pitch[]): number {
     if (sorted[i + 1]! - sorted[i]! > 300) openIntervals++;
   }
   return Math.min(1, openIntervals / (sorted.length - 1));
+}
+
+export function scaleQuarterToneRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Quarter tone steps (~50c ±25c) fraction among adjacent sorted pitch-class intervals
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let qtCount = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (step >= 25 && step <= 75) qtCount++;
+  }
+  return Math.min(1, qtCount / (sorted.length - 1));
+}
+
+export function scaleMicrotoneCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Microtone count: adjacent steps < 80c (smaller than a semitone)
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let micro = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i + 1]! - sorted[i]! < 80) micro++;
+  }
+  return Math.min(1, micro / (sorted.length - 1));
+}
+
+export function scaleSubsemitoneContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Sub-semitone content: pitches that deviate from nearest 100c semitone by >15c
+  const subsemitone = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const nearest = Math.round(c / 100) * 100;
+    return Math.abs(c - nearest) > 15;
+  }).length;
+  return Math.min(1, subsemitone / pitches.length);
+}
+
+export function scaleFifthOfSemitone(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Fifth-of-semitone steps (~20c ±10c) — extreme microtonal steps
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let count = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (step >= 10 && step <= 30) count++;
+  }
+  return Math.min(1, count / (sorted.length - 1));
 }
