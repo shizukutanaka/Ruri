@@ -2529,6 +2529,10 @@ import {
   scaleSubdominantPresenceV2,
   scaleMediantBalance,
   scaleDominantSeventh,
+  scaleNeapolitanContent,
+  scaleBluesTonePresence,
+  scaleTritoneSubstitution,
+  scaleEnharmonicEquivalenceV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -63750,5 +63754,69 @@ describe('tuningFamilySocraticRadarSmartGridProxy', () => {
       440,
     );
     expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('scaleNeapolitanContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleNeapolitanContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleNeapolitanContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleNeapolitanContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleBluesTonePresence', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleBluesTonePresence([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleBluesTonePresence(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleBluesTonePresence(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleTritoneSubstitution', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleTritoneSubstitution([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleTritoneSubstitution(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleTritoneSubstitution(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleEnharmonicEquivalenceV2', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleEnharmonicEquivalenceV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleEnharmonicEquivalenceV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleEnharmonicEquivalenceV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

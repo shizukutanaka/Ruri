@@ -2345,3 +2345,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleSubdominantPresenceV2`: 下属音の存在（完全4度500¢±30¢ + 増4度代理）
 - `scaleMediantBalance`: 中音バランス（長3度400¢・短3度300¢の双方カバー率）
 - `scaleDominantSeventh`: 属七和音構成音カバー率（長3度/完全5度/短7度）
+
+## Round 218: ジャズ・クロマティックハーモニーヘルパ
+
+- `scaleNeapolitanContent`: ナポリ音（♭Ⅱ、100¢前後）の存在検出
+- `scaleBluesTonePresence`: ブルーストーン（♭3・♭5・♭7）のカバー率
+- `scaleTritoneSubstitution`: 三全音代理コンテキスト（完全5度＋三全音の共存率）
+- `scaleEnharmonicEquivalenceV2`: 異名同音等価ペア密度（10¢以内の近接音程比）

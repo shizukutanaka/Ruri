@@ -72384,3 +72384,52 @@ export function scaleDominantSeventh(pitches: readonly Pitch[]): number {
   }
   return matched / targets.length;
 }
+
+export function scaleNeapolitanContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Neapolitan = flat 2nd (100 cents) ± tolerance
+  const target = 100;
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  return cs.some((c) => Math.abs(c - target) <= tolerance) ? 1 : 0;
+}
+
+export function scaleBluesTonePresence(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Blues notes: flat 3rd (300), flat 5th (600), flat 7th (1000)
+  const blues = [300, 600, 1000];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of blues) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / blues.length;
+}
+
+export function scaleTritoneSubstitution(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Check both perfect 5th (700) and tritone (600) are present — tritone substitution context
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const hasFifth = cs.some((c) => Math.abs(c - 700) <= tolerance) ? 1 : 0;
+  const hasTritone = cs.some((c) => Math.abs(c - 600) <= tolerance) ? 1 : 0;
+  return (hasFifth + hasTritone) / 2;
+}
+
+export function scaleEnharmonicEquivalenceV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Fraction of pitch pairs that are enharmonically close (within 10 cents but not the same pitch)
+  const centsArr = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let pairs = 0;
+  let enharmonic = 0;
+  for (let i = 0; i < centsArr.length; i++) {
+    for (let j = i + 1; j < centsArr.length; j++) {
+      pairs++;
+      const diff = Math.abs(centsArr[i]! - centsArr[j]!);
+      if (diff > 0 && diff <= 10) enharmonic++;
+    }
+  }
+  if (pairs === 0) return 0;
+  return Math.min(1, enharmonic / pairs * 10);
+}
