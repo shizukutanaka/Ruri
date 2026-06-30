@@ -2017,6 +2017,10 @@ import {
   scaleGoldenRatioContentV2,
   scaleJustMajorThirdContent,
   scaleJustFifthContent,
+  scaleEqualDivisionScore,
+  scalePentatonicContent,
+  scaleOctatonicContentV2,
+  scaleWholeToneContentV3,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -53813,6 +53817,66 @@ describe('scaleSparsityRatio', () => {
     });
     it('returns value in [0,1] for 19-EDO', () => {
       const v = scaleJustFifthContent(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleEqualDivisionScore', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleEqualDivisionScore([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleEqualDivisionScore(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleEqualDivisionScore(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scalePentatonicContent', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scalePentatonicContent([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scalePentatonicContent(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scalePentatonicContent(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleOctatonicContentV2', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleOctatonicContentV2([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleOctatonicContentV2(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleOctatonicContentV2(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleWholeToneContentV3', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleWholeToneContentV3([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleWholeToneContentV3(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleWholeToneContentV3(edo(19, 440).degrees);
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     });

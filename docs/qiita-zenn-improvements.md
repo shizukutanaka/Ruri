@@ -2198,3 +2198,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleGoldenRatioContentV2` — 黄金比に基づく音程（833セント±25、φ比率）の存在比率を返す（`scaleGoldenRatioContent` が既存のため V2 サフィックス付与）
 - `scaleJustMajorThirdContent` — 純正長三度（386セント±15、5/4比率）の存在比率を返す
 - `scaleJustFifthContent` — 純正完全五度（702セント±10、3/2比率）の存在比率を返す
+
+## Round 201: 音階型類似度分析ヘルパ（等分音律/ペンタトニック/オクタトニック/全音音階）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleEqualDivisionScore` — 等分音律への近似度（ステップサイズの均等性、1=完全等分）を返す
+- `scalePentatonicContent` — ペンタトニックの特徴音程（240/480/720/960セント±40）の充足率を返す
+- `scaleOctatonicContentV2` — オクタトニック（減音階）の特徴音程（150セント刻み7点±25）の充足率を返す（`scaleOctatonicContent` が既存のため V2 サフィックス付与）
+- `scaleWholeToneContentV3` — 全音音階の特徴音程（200セント刻み5点±25）の充足率を返す（`scaleWholeToneContent`/`V2` が既存のため V3 サフィックス付与）
