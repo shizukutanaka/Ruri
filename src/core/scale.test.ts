@@ -2239,6 +2239,12 @@ import {
   tuningFamilySocraticRadarChordRecognitionProxy,
   tuningFamilySocraticRadarTimbreDescriptorProxy,
   tuningFamilySocraticRadarSourceSeparationProxy,
+  tuningFamilySocraticRadarMarketEquilibriumProxy,
+  tuningFamilySocraticRadarPriceElasticityProxy,
+  tuningFamilySocraticRadarGameTheoryNashProxy,
+  tuningFamilySocraticRadarOptimalControlProxy,
+  tuningFamilySocraticRadarStochasticGrowthProxy,
+  tuningFamilySocraticRadarCapitalFormationProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -51330,6 +51336,90 @@ describe('tuningFamilySocraticRadarSourceSeparationProxy', () => {
   });
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarSourceSeparationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarMarketEquilibriumProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarMarketEquilibriumProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarMarketEquilibriumProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarMarketEquilibriumProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarPriceElasticityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPriceElasticityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPriceElasticityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPriceElasticityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarGameTheoryNashProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarGameTheoryNashProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarGameTheoryNashProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarGameTheoryNashProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarOptimalControlProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarOptimalControlProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarOptimalControlProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarOptimalControlProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarStochasticGrowthProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarStochasticGrowthProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarStochasticGrowthProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarStochasticGrowthProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarCapitalFormationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCapitalFormationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCapitalFormationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCapitalFormationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(Number.isFinite(v)).toBe(true);
   });
 });

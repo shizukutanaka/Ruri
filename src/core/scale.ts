@@ -54570,6 +54570,156 @@ export function tuningFamilySocraticRadarSourceSeparationProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3102 — tuningFamilySocraticRadarMarketEquilibriumProxy
+export function tuningFamilySocraticRadarMarketEquilibriumProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // market equilibrium: supply-demand price clearing → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3104 — tuningFamilySocraticRadarPriceElasticityProxy
+export function tuningFamilySocraticRadarPriceElasticityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // price elasticity: demand sensitivity to price → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3106 — tuningFamilySocraticRadarGameTheoryNashProxy
+export function tuningFamilySocraticRadarGameTheoryNashProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Nash equilibrium: strategic non-cooperative balance → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3108 — tuningFamilySocraticRadarOptimalControlProxy
+export function tuningFamilySocraticRadarOptimalControlProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // optimal control: Pontryagin maximum principle → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3110 — tuningFamilySocraticRadarStochasticGrowthProxy
+export function tuningFamilySocraticRadarStochasticGrowthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // stochastic growth: random walk capital accumulation → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3112 — tuningFamilySocraticRadarCapitalFormationProxy
+export function tuningFamilySocraticRadarCapitalFormationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // capital formation: investment-savings balance → balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
