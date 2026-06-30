@@ -2180,3 +2180,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleCentroidDeviation` — 音度の重心（平均セント値）の600セントからの偏差を正規化して返す
 - `scaleClusterDensityV2` — 150セント以内の音度ペアの比率（全ペア中）を返す（`scaleClusterDensity` が既存のため V2 サフィックス付与）
 - `scaleSparsityRatio` — 最大ギャップ / 平均ギャップ を正規化した疎密比を返す
+
+## Round 199: 音階帯域別密度分析ヘルパ（低音帯/中音帯/高音帯/帯域バランス）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleLowBandDensity` — 0〜400セント（低音帯）の音度比率を返す
+- `scaleMidBandDensity` — 400〜800セント（中音帯）の音度比率を返す
+- `scaleHighBandDensity` — 800〜1200セント（高音帯）の音度比率を返す
+- `scaleBandBalance` — 3つの帯域への均等分布度（1=完全均等、0=全て1帯域）を返す
