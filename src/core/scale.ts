@@ -53070,6 +53070,156 @@ export function tuningFamilySocraticRadarTranslationEfficiencyProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2982 — tuningFamilySocraticRadarMolecularOrbitalProxy
+export function tuningFamilySocraticRadarMolecularOrbitalProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // molecular orbital: LCAO basis → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2984 — tuningFamilySocraticRadarElectronDensityProxy
+export function tuningFamilySocraticRadarElectronDensityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // electron density: charge distribution → maturity emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2986 — tuningFamilySocraticRadarHOMOLUMOGapProxy
+export function tuningFamilySocraticRadarHOMOLUMOGapProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // HOMO-LUMO gap: frontier orbital energy gap → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2988 — tuningFamilySocraticRadarDipoleMomentProxy
+export function tuningFamilySocraticRadarDipoleMomentProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // dipole moment: charge asymmetry → convergence
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2990 — tuningFamilySocraticRadarBondOrderProxy
+export function tuningFamilySocraticRadarBondOrderProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // bond order: covalent bond strength → versatility
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2992 — tuningFamilySocraticRadarResonanceStructureProxy
+export function tuningFamilySocraticRadarResonanceStructureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // resonance structure: delocalization → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -62581,4 +62731,64 @@ export function scaleSymmetryScore(pitches: readonly Pitch[]): number {
   }
   const halfLen = Math.floor(n / 2);
   return halfLen === 0 ? 0 : Math.min(1, matchCount / halfLen);
+}
+
+export function scaleModalAmbiguityScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0;
+  // Modal ambiguity: count intervals that appear in multiple modal contexts (100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  // Count how many different modal intervals (minor2nd=100, major2nd=200, minor3rd=300, major3rd=400, P4=500, tritone=600) are present
+  const modalIntervals = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+  const foundIntervals = new Set<number>();
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      for (const mi of modalIntervals) {
+        if (Math.abs(iv - mi) < 20) { foundIntervals.add(mi); break; }
+      }
+    }
+  }
+  // Ambiguity is high when many different interval classes are present
+  return Math.min(1, foundIntervals.size / modalIntervals.length);
+}
+
+export function scaleChromaticDensityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Chromatic density: ratio of semitone and minor 2nd intervals among all adjacent intervals
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  if (cents.length < 2) return 0;
+  let chromaticCount = 0;
+  for (let i = 1; i < cents.length; i++) {
+    const iv = cents[i]! - cents[i - 1]!;
+    if (iv < 120) chromaticCount++; // semitone or smaller
+  }
+  // Also consider wrap-around interval
+  const wrapIv = 1200 - cents[cents.length - 1]! + cents[0]!;
+  if (wrapIv < 120) chromaticCount++;
+  return Math.min(1, chromaticCount / cents.length);
+}
+
+export function scaleVoiceLeadingSmoothnessScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Voice leading smoothness: how many adjacent intervals are small (≤200 cents = whole step or smaller)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let smooth = 0;
+  for (let i = 1; i < cents.length; i++) {
+    if (cents[i]! - cents[i - 1]! <= 200) smooth++;
+  }
+  return Math.min(1, smooth / (cents.length - 1));
+}
+
+export function scaleEnharmonicPotential(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Enharmonic potential: pitches near equal-temperament note boundaries (within 25 cents of any 100-cent multiple)
+  const etBoundaries = Array.from({ length: 12 }, (_, i) => i * 100);
+  let nearBoundary = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (etBoundaries.some((b) => Math.abs(c - b) < 25 || Math.abs(c - b - 1200) < 25 || Math.abs(c - b + 1200) < 25)) {
+      nearBoundary++;
+    }
+  }
+  return Math.min(1, nearBoundary / pitches.length);
 }

@@ -2179,6 +2179,12 @@ import {
   tuningFamilySocraticRadarChromatinAccessibilityProxy,
   tuningFamilySocraticRadarRNAStabilityProxy,
   tuningFamilySocraticRadarTranslationEfficiencyProxy,
+  tuningFamilySocraticRadarMolecularOrbitalProxy,
+  tuningFamilySocraticRadarElectronDensityProxy,
+  tuningFamilySocraticRadarHOMOLUMOGapProxy,
+  tuningFamilySocraticRadarDipoleMomentProxy,
+  tuningFamilySocraticRadarBondOrderProxy,
+  tuningFamilySocraticRadarResonanceStructureProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';

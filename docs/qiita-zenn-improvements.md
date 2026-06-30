@@ -2000,3 +2000,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleFibonacciPattern(pitches)` — 隣接音程がフィボナッチ数列（半音×100 cent）に一致する割合
 - `scaleBeautyIndex(pitches)` — 回文対称性と協和音程比率の複合美指数
 - `scaleSymmetryScore(pitches)` — 音程列の回文対称スコア
+
+### Round 175: モーダル・調性分析
+
+- `scaleModalAmbiguityScore(pitches)` — 異なる旋法的音程クラスの数を正規化したモーダル曖昧度スコア
+- `scaleChromaticDensityIndex(pitches)` — 隣接音程のうち半音以下の割合（半音彩度密度）
+- `scaleVoiceLeadingSmoothnessScore(pitches)` — 隣接音程が全音以下の割合（声部進行の滑らかさ）
+- `scaleEnharmonicPotential(pitches)` — 平均律境界（100centの倍数）に近い音高の割合（異名同音ポテンシャル）
