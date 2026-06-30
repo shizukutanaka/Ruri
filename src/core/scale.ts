@@ -70573,3 +70573,57 @@ export function scaleMaxMinStepRatio(pitches: readonly Pitch[]): number {
   if (minS === 0) return 1;
   return Math.min(1, (maxS / minS - 1) / 10);
 }
+
+export function scalePitchClassEntropyV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const counts = new Array<number>(12).fill(0);
+  for (const p of pitches) {
+    const pc = Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12;
+    counts[pc]! += 1;
+  }
+  const total = pitches.length;
+  let entropy = 0;
+  for (const c of counts) {
+    if (c > 0) {
+      const prob = c / total;
+      entropy -= prob * Math.log2(prob);
+    }
+  }
+  return Math.min(1, entropy / Math.log2(12));
+}
+
+export function scaleWholeToneContentV4(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const wholeTone = [0, 200, 400, 600, 800, 1000];
+  const tolerance = 25;
+  let matched = 0;
+  for (const t of wholeTone) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / wholeTone.length;
+}
+
+export function scaleDiminishedContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const dimOctatonic = [0, 150, 300, 450, 600, 750, 900, 1050];
+  const tolerance = 30;
+  let matched = 0;
+  for (const t of dimOctatonic) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / dimOctatonic.length;
+}
+
+export function scaleAugmentedContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const augmented = [0, 400, 800];
+  const tolerance = 30;
+  let matched = 0;
+  for (const t of augmented) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / augmented.length;
+}

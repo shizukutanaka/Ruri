@@ -2331,3 +2331,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleDiatonicSaturation`: 12半音クラスのうちカバー率（全音域充填度）
 - `scaleStepSizeVarianceV3`: ステップサイズの分散（均質性の逆指標）
 - `scaleMaxMinStepRatio`: 最大/最小ステップ比（音程の不均一度）
+
+## Round 216: 音程クラスエントロピーと音階コンテンツヘルパ
+
+- `scalePitchClassEntropyV2`: ピッチクラス分布のシャノンエントロピー（log2(12)で正規化）
+- `scaleWholeToneContentV4`: 全音音階6ポジションのカバー率
+- `scaleDiminishedContentV2`: 減和音オクタトニック8ポジションのカバー率
+- `scaleAugmentedContentV2`: 増三和音3ポジションのカバー率
