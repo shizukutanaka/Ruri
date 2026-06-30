@@ -2293,6 +2293,12 @@ import {
   tuningFamilySocraticRadarSkinDepthProxy,
   tuningFamilySocraticRadarPoyntingVectorProxy,
   tuningFamilySocraticRadarMaxwellEquationProxy,
+  tuningFamilySocraticRadarFoodWebProxy,
+  tuningFamilySocraticRadarTrophicLevelProxyV2,
+  tuningFamilySocraticRadarBiodiversityIndexProxyV2,
+  tuningFamilySocraticRadarNicheOverlapProxyV3,
+  tuningFamilySocraticRadarPopulationDynamicsProxyV2,
+  tuningFamilySocraticRadarEcosystemResilienceProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -52140,6 +52146,90 @@ describe('tuningFamilySocraticRadarMaxwellEquationProxy', () => {
   });
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarMaxwellEquationProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarFoodWebProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarFoodWebProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarFoodWebProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarFoodWebProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarTrophicLevelProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTrophicLevelProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarTrophicLevelProxyV2([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarTrophicLevelProxyV2([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarBiodiversityIndexProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBiodiversityIndexProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarBiodiversityIndexProxyV2([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarBiodiversityIndexProxyV2([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarNicheOverlapProxyV3', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNicheOverlapProxyV3([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarNicheOverlapProxyV3([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNicheOverlapProxyV3([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarPopulationDynamicsProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPopulationDynamicsProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPopulationDynamicsProxyV2([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPopulationDynamicsProxyV2([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarEcosystemResilienceProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEcosystemResilienceProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarEcosystemResilienceProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarEcosystemResilienceProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(Number.isFinite(v)).toBe(true);
   });
 });

@@ -2133,3 +2133,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleMinorTriadContent(pitches)` — 短三和音構成音（0/300/700 cent）の音高割合
 - `scaleDominantSeventhContent(pitches)` — 属七和音構成音（0/400/700/1000 cent）の音高割合
 - `scaleHalfDiminishedContent(pitches)` — 半減七和音構成音（0/300/600/1000 cent）の音高割合
+
+### Round 194: 音階テンション音程分析
+
+- `scaleSuspendedFourthContent(pitches)` — 完全4度（500 cent付近）の音高割合（サスフォー特性）
+- `scaleAddedSixthContent(pitches)` — 長6度（900 cent付近）の音高割合（add6和音特性）
+- `scaleMajorNinthContent(pitches)` — 長9度（200 cent付近）の音高割合（メジャーナインス）
+- `scaleSharpNinthContent(pitches)` — シャープ9度（300 cent付近）の音高割合（短3度/♯9音程）

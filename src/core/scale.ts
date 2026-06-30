@@ -55920,6 +55920,156 @@ export function tuningFamilySocraticRadarMaxwellEquationProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3210 — tuningFamilySocraticRadarFoodWebProxy
+export function tuningFamilySocraticRadarFoodWebProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // food web: trophic interactions and energy flow → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3212 — tuningFamilySocraticRadarTrophicLevelProxyV2
+export function tuningFamilySocraticRadarTrophicLevelProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // trophic level: energy transfer efficiency and hierarchy → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3214 — tuningFamilySocraticRadarBiodiversityIndexProxyV2
+export function tuningFamilySocraticRadarBiodiversityIndexProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // biodiversity index: species richness and evenness → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3216 — tuningFamilySocraticRadarNicheOverlapProxyV3
+export function tuningFamilySocraticRadarNicheOverlapProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // niche overlap: competitive exclusion and resource partitioning → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3218 — tuningFamilySocraticRadarPopulationDynamicsProxyV2
+export function tuningFamilySocraticRadarPopulationDynamicsProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // population dynamics: Lotka-Volterra cycles and carrying capacity → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3220 — tuningFamilySocraticRadarEcosystemResilienceProxy
+export function tuningFamilySocraticRadarEcosystemResilienceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ecosystem resilience: disturbance recovery and stability — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -66457,6 +66607,52 @@ export function scaleHalfDiminishedContent(pitches: readonly Pitch[]): number {
   let count = 0;
   for (const c of cents) {
     if (chordSlots.some((s) => Math.abs(c - s) < 30)) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleSuspendedFourthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Suspended fourth: perfect fourth at 500 cents (replaces 3rd in sus4 chord)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 500) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleAddedSixthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Added sixth: major sixth at 900 cents (common in add6 and 6/9 chords)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 900) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleMajorNinthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Major ninth: as a pitch class, major 9th = major 2nd = 200 cents
+  // Distinguishes from sharp ninth (minor 3rd / 300 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    // 200 cents ± 30, excluding range overlap with semitone (100) and minor third (300)
+    if (Math.abs(c - 200) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleSharpNinthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Sharp ninth: enharmonic to minor third at 300 cents (used in dominant #9 chords)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 300) < 30) count++;
   }
   return Math.min(1, count / pitches.length);
 }
