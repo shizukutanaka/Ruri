@@ -2234,3 +2234,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleAeolianContentV2` — エオリア旋法（自然短音階）の特徴音程（200/300/500/700/800/1000セント±20）の充足率を返す（`scaleAeolianContent` が既存のため V2 サフィックス付与）
 - `scaleIonianContentV2` — イオニア旋法（長音階）の特徴音程（200/400/500/700/900/1100セント±20）の充足率を返す（`scaleIonianContent` が既存のため V2 サフィックス付与）
 - `scaleSuperlocrianContent` — スーパーロクリア（オルタード）旋法の特徴音程（100/200/300/600/800/1000セント±20）の充足率を返す
+
+## Round 205: 特殊音階分析ヘルパ（ハンガリー短調/ナポリ長調/エニグマティック/二重調和音階）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleHungarianMinorContentV2` — ハンガリー短調の特徴音程（200/300/600/700/800/1100セント±20）の充足率を返す（`scaleHungarianMinorContent` が既存のため V2 サフィックス付与）
+- `scaleNapolitanMajorContent` — ナポリ長調の特徴音程（100/400/500/700/900/1100セント±20）の充足率を返す
+- `scaleEnigmaticContent` — エニグマティック音階の特徴音程（100/300/600/800/1000/1100セント±20）の充足率を返す
+- `scaleDoubleHarmonicContentV2` — 二重調和音階（ビザンチン）の特徴音程（100/400/500/700/800/1100セント±20）の充足率を返す（`scaleDoubleHarmonicContent` が既存のため V2 サフィックス付与）
