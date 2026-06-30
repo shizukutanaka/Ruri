@@ -1953,3 +1953,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Extends harmonic analysis to functional categories. Chord tone ratio measures how "triadic" a scale is relative to the major triad template. Non-chord tone ratio is its complement, capturing scale notes that require melodic resolution. Appoggiatura content detects notes in the 50–150c neighbourhood of chord tones — the typical range for ornamental dissonances. Ornamentation index estimates passing/neighbor tone density between structural tones.
 
 **Implementation**: All functions use ±25–30c cent-tolerance matching against [0, 400, 700] (major triad). Returns ratio in [0,1].
+
+## Round 169: 和音配置分析 (R1637–R1640)
+
+**Functions**: `scaleRootPositionStrength`, `scaleFirstInversionContent`, `scaleSecondInversionContent`, `scaleOpenVoicingRatio`
+
+**Motivation**: Analyses chord voicing and inversion content within a scale. Root position strength measures whether a complete root-position triad (root + third + fifth) is present. First and second inversion content detect characteristic pitches for each inversion. Open voicing ratio captures the spacing density — high values indicate widely-spaced intervals typical of open (orchestral) voicing.
+
+**Implementation**: Uses ±25c tolerance matching and sorted pitch-class intervals. Returns ratio in [0,1].

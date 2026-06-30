@@ -1973,6 +1973,10 @@ import {
   scaleChordToneRatio,
   scaleNonChordToneRatio,
   scaleOrnamentationIndex,
+  scaleRootPositionStrength,
+  scaleFirstInversionContent,
+  scaleSecondInversionContent,
+  scaleOpenVoicingRatio,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2123,6 +2127,12 @@ import {
   tuningFamilySocraticRadarSoundInsulationIndexProxy,
   tuningFamilySocraticRadarDiffusionFactorProxy,
   tuningFamilySocraticRadarNoiseCriterionProxy,
+  tuningFamilySocraticRadarWaterActivityProxy,
+  tuningFamilySocraticRadarEmulsificationStabilityProxy,
+  tuningFamilySocraticRadarGelationTemperatureProxy,
+  tuningFamilySocraticRadarFermentationRateProxy,
+  tuningFamilySocraticRadarOsmoticPressureIndexProxy,
+  tuningFamilySocraticRadarMaillardReactionScoreProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -50152,5 +50162,61 @@ describe('scaleOrnamentationIndex', () => {
   it('returns >0 for pitch set with passing tones', () => {
     const pitches = [0, 200, 400, 550, 700].map((c) => pitchFromCents(c));
     expect(scaleOrnamentationIndex(pitches)).toBeGreaterThanOrEqual(0);
+  });
+});
+describe('scaleRootPositionStrength', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleRootPositionStrength([])).toBe(0);
+  });
+  it('returns 1 for complete major triad', () => {
+    const pitches = [0, 400, 700].map((c) => pitchFromCents(c));
+    expect(scaleRootPositionStrength(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleRootPositionStrength(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleFirstInversionContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleFirstInversionContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleFirstInversionContent(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns >0 for pitch set with third and fifth', () => {
+    const pitches = [0, 400, 700].map((c) => pitchFromCents(c));
+    expect(scaleFirstInversionContent(pitches)).toBeGreaterThan(0);
+  });
+});
+describe('scaleSecondInversionContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleSecondInversionContent([])).toBe(0);
+  });
+  it('detects perfect fourth at 500 cents', () => {
+    const pitches = [0, 500, 700].map((c) => pitchFromCents(c));
+    expect(scaleSecondInversionContent(pitches)).toBeGreaterThan(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleSecondInversionContent(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleOpenVoicingRatio', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleOpenVoicingRatio([])).toBe(0);
+  });
+  it('returns 1 for widely spaced pitches', () => {
+    const pitches = [0, 400, 900].map((c) => pitchFromCents(c));
+    expect(scaleOpenVoicingRatio(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleOpenVoicingRatio(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

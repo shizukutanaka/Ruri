@@ -52170,6 +52170,156 @@ export function tuningFamilySocraticRadarNoiseCriterionProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2910 — tuningFamilySocraticRadarWaterActivityProxy
+export function tuningFamilySocraticRadarWaterActivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // water activity: availability of water for microbial growth in food → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2912 — tuningFamilySocraticRadarEmulsificationStabilityProxy
+export function tuningFamilySocraticRadarEmulsificationStabilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // emulsification stability: droplet size distribution in oil-water emulsion → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2914 — tuningFamilySocraticRadarGelationTemperatureProxy
+export function tuningFamilySocraticRadarGelationTemperatureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // gelation temperature: sol-gel transition point for biopolymers → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2916 — tuningFamilySocraticRadarFermentationRateProxy
+export function tuningFamilySocraticRadarFermentationRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // fermentation rate: microbial metabolic conversion speed → versatility+benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2918 — tuningFamilySocraticRadarOsmoticPressureIndexProxy
+export function tuningFamilySocraticRadarOsmoticPressureIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // osmotic pressure index: solute concentration driving water transport → maturity+convergence
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2920 — tuningFamilySocraticRadarMaillardReactionScoreProxy
+export function tuningFamilySocraticRadarMaillardReactionScoreProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Maillard reaction score: non-enzymatic browning intensity in heated foods → diversity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -61357,4 +61507,66 @@ export function scaleOrnamentationIndex(pitches: readonly Pitch[]): number {
     return false;
   }).length;
   return Math.min(1, ornament / pitches.length);
+}
+
+export function scaleRootPositionStrength(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Root position strength: presence of root (0c) relative to third (400c) and fifth (700c)
+  // Returns high value when root, third, and fifth all present
+  const tol = 25;
+  const hasRoot = pitches.some((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - 0), 1200 - Math.abs(c - 0)) <= tol;
+  });
+  const hasThird = pitches.some((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - 400), 1200 - Math.abs(c - 400)) <= tol;
+  });
+  const hasFifth = pitches.some((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - 700), 1200 - Math.abs(c - 700)) <= tol;
+  });
+  return ((hasRoot ? 1 : 0) + (hasThird ? 1 : 0) + (hasFifth ? 1 : 0)) / 3;
+}
+
+export function scaleFirstInversionContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // First inversion: third in bass (lowest note near 400c relative to root)
+  // Detect if a pitch near 400c is present while root (0c) is absent or higher
+  const tol = 25;
+  const hasFlatThird = pitches.some((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.abs(c - 400) <= tol || Math.abs(c - 300) <= tol;
+  });
+  const hasFifth = pitches.some((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.abs(c - 700) <= tol;
+  });
+  return ((hasFlatThird ? 1 : 0) + (hasFifth ? 1 : 0)) / 2;
+}
+
+export function scaleSecondInversionContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Second inversion: fifth in bass — detect presence of perfect fourth (500c) above bass
+  // Approximate: count pitches near 500c (P4 = 500c ±25c)
+  const tol = 25;
+  const target = 500;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleOpenVoicingRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Open voicing: intervals > 300c (a third) between consecutive pitches in the set
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let openIntervals = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i + 1]! - sorted[i]! > 300) openIntervals++;
+  }
+  return Math.min(1, openIntervals / (sorted.length - 1));
 }
