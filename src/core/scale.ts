@@ -56220,6 +56220,156 @@ export function tuningFamilySocraticRadarIsotopeRatioProxyV2(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3234 — tuningFamilySocraticRadarDendriticIntegrationProxy
+export function tuningFamilySocraticRadarDendriticIntegrationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // dendritic integration: spatial summation of synaptic inputs → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3236 — tuningFamilySocraticRadarSynapticPlasticityProxy
+export function tuningFamilySocraticRadarSynapticPlasticityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // synaptic plasticity: LTP/LTD and Hebbian learning → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3238 — tuningFamilySocraticRadarOscillatoryCouplingProxy
+export function tuningFamilySocraticRadarOscillatoryCouplingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // oscillatory coupling: gamma-theta cross-frequency coupling → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3240 — tuningFamilySocraticRadarNeuralSynchronyProxy
+export function tuningFamilySocraticRadarNeuralSynchronyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // neural synchrony: phase-locking and coherence → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3242 — tuningFamilySocraticRadarInhibitoryBalanceProxyV2
+export function tuningFamilySocraticRadarInhibitoryBalanceProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // inhibitory balance: E/I ratio and GABAergic control → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3244 — tuningFamilySocraticRadarReceptiveFieldProxyV2
+export function tuningFamilySocraticRadarReceptiveFieldProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // receptive field: center-surround selectivity and tuning curves — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -66846,6 +66996,54 @@ export function scaleMajorSeventhContent(pitches: readonly Pitch[]): number {
 export function scaleMinorNinthContentV2(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const target = 100;
+  const tolerance = 30;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleMajorThirdContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 400;
+  const tolerance = 25;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleTritoneContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 600;
+  const tolerance = 25;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scalePerfectFifthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 700;
+  const tolerance = 20;
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (Math.abs(c - target) <= tolerance) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleNeutralSeventhContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const target = 950;
   const tolerance = 30;
   let count = 0;
   for (const p of pitches) {

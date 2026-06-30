@@ -2151,3 +2151,14 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleMinorNinthContentV2` — 短九度/短二度（100セント±30）の存在比率を返す（`scaleMinorNinthContent` が既存のため V2 サフィックス付与）
 
 すべて `pitchToCents(p)` で値を取得し、`% 1200` で正規化後に目標値との距離を判定する。
+
+## Round 196: 音階調和音程分析ヘルパ（長三度/三全音/完全五度/中立七度）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleMajorThirdContent` — 長三度（400セント±25）の存在比率を返す
+- `scaleTritoneContentV2` — 三全音（600セント±25）の存在比率を返す（`scaleTritoneContent` が既存のため V2 サフィックス付与）
+- `scalePerfectFifthContent` — 完全五度（700セント±20）の存在比率を返す
+- `scaleNeutralSeventhContent` — 中立七度（950セント±30、マカームなど微分音楽に特有）の存在比率を返す
+
+すべて `pitchToCents(p)` で値を取得し、`% 1200` で正規化後に目標値との距離を判定する。
