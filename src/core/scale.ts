@@ -53370,6 +53370,156 @@ export function tuningFamilySocraticRadarStructuralDampingProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3006 — tuningFamilySocraticRadarCropYieldProxy
+export function tuningFamilySocraticRadarCropYieldProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // crop yield: biomass productivity → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3008 — tuningFamilySocraticRadarSoilFertilityProxy
+export function tuningFamilySocraticRadarSoilFertilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // soil fertility: nutrient availability → diversity emphasis
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3010 — tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy
+export function tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // photosynthesis efficiency: light-energy conversion → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3012 — tuningFamilySocraticRadarWaterUseEfficiencyProxy
+export function tuningFamilySocraticRadarWaterUseEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // water use efficiency: transpiration ratio → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3014 — tuningFamilySocraticRadarNitrogenFixationProxy
+export function tuningFamilySocraticRadarNitrogenFixationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // nitrogen fixation: biological N2 → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3016 — tuningFamilySocraticRadarHarvestIndexProxy
+export function tuningFamilySocraticRadarHarvestIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // harvest index: partitioning to grain → maturity emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -63002,4 +63152,47 @@ export function scaleDominantDriveScore(pitches: readonly Pitch[]): number {
   if (hasTritone) score += 0.4;
   if (hasFifth) score += 0.2;
   return Math.min(1, score);
+}
+
+export function scaleLeapContentRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Leap: any interval larger than a major 2nd (>200 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let leaps = 0;
+  for (let i = 1; i < cents.length; i++) {
+    if (cents[i]! - cents[i - 1]! > 200) leaps++;
+  }
+  return Math.min(1, leaps / (cents.length - 1));
+}
+
+export function scaleStepwiseMotionRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Stepwise: half step (≤100 cents) or whole step (≤200 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let steps = 0;
+  for (let i = 1; i < cents.length; i++) {
+    if (cents[i]! - cents[i - 1]! <= 200) steps++;
+  }
+  return Math.min(1, steps / (cents.length - 1));
+}
+
+export function scaleIntervalRegularity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0;
+  // Regularity: low variance in adjacent intervals → high regularity
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) intervals.push(cents[i]! - cents[i - 1]!);
+  const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+  const variance = intervals.reduce((a, b) => a + (b - mean) ** 2, 0) / intervals.length;
+  // Normalize: stddev of 0 → regularity 1; stddev of 600 → regularity 0
+  const stddev = Math.sqrt(variance);
+  return Math.min(1, Math.max(0, 1 - stddev / 600));
+}
+
+export function scaleRegistralSpread(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Registral spread: range of pitch cents (not folded into octave) normalized by 4800 cents (4 octaves)
+  const allCents = pitches.map((p) => pitchToCents(p));
+  const range = Math.max(...allCents) - Math.min(...allCents);
+  return Math.min(1, range / 4800);
 }

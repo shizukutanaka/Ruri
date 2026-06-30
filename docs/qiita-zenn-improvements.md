@@ -2014,3 +2014,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scalePentatonicAlignment(pitches)` — 長音階ペンタトニック度数（0/200/400/700/900 cent）への整合度
 - `scaleRootDoubling(pitches)` — 根音・オクターブ（0/1200 cent付近）を重複させる音高の割合
 - `scaleDominantDriveScore(pitches)` — 導音・トライトーン・完全5度の存在による属和音的推進力スコア
+
+### Round 177: 音程モーション・跳躍分析
+
+- `scaleLeapContentRatio(pitches)` — 隣接音程のうち長2度超（跳躍）の割合
+- `scaleStepwiseMotionRatio(pitches)` — 隣接音程のうち全音以下（順次進行）の割合
+- `scaleIntervalRegularity(pitches)` — 隣接音程の分散の低さから導出した規則性スコア（均等分割ほど高い）
+- `scaleRegistralSpread(pitches)` — 音域の広がり（cent単位レンジ / 4800 centで正規化）
