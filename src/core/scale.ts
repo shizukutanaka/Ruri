@@ -64027,3 +64027,55 @@ export function scaleGamutCompleteness(pitches: readonly Pitch[]): number {
   // A complete heptatonic gamut covers 7 of 12 chromatic slots
   return Math.min(1, slots.size / 7);
 }
+
+export function scaleWholeToneScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Whole-tone scale alignment: 0, 200, 400, 600, 800, 1000 cents
+  const wholeTone = [0, 200, 400, 600, 800, 1000];
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (wholeTone.some((d) => Math.abs(c - d) < 30)) aligned++;
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleOctatonicContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Octatonic (diminished) scale: alternating whole and half steps
+  // Two forms: (W-H): 0,200,300,500,600,800,900,1100 and (H-W): 0,100,300,400,600,700,900,1000
+  const oct1 = [0, 200, 300, 500, 600, 800, 900, 1100];
+  const oct2 = [0, 100, 300, 400, 600, 700, 900, 1000];
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const fits1 = oct1.some((d) => Math.abs(c - d) < 25);
+    const fits2 = oct2.some((d) => Math.abs(c - d) < 25);
+    if (fits1 || fits2) aligned++;
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleHexatonicContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Hexatonic augmented scale: 0, 300, 400, 700, 800, 1100 cents
+  const hexatonic = [0, 300, 400, 700, 800, 1100];
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (hexatonic.some((d) => Math.abs(c - d) < 30)) aligned++;
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleHexatonicDiversity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Hexatonic diversity: how many distinct 200-cent segments (mod 1200) contain pitches
+  // 6 segments: [0-200), [200-400), [400-600), [600-800), [800-1000), [1000-1200)
+  const segments = new Set<number>();
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    segments.add(Math.floor(c / 200));
+  }
+  return Math.min(1, segments.size / 6);
+}

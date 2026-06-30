@@ -2049,3 +2049,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleMaqamContent(pitches)` — マカームラスト近似（クォーターノーン3度・7度: 0/200/350/500/700/900/1050 cent）への整合度
 - `scaleRagaAlignment(pitches)` — ラーガ・ヤマン近似（リディアン＃4: 0/200/400/600/700/900/1100 cent）への整合度
 - `scaleGamutCompleteness(pitches)` — 7音全音階の音域網羅度（7クロマスロット中の占有率）
+
+### Round 182: 特殊音階タイプ分析
+
+- `scaleWholeToneScale(pitches)` — 全音音階（0/200/400/600/800/1000 cent）への整合度
+- `scaleOctatonicContent(pitches)` — 8音減音階（全半または半全交互: 2種類のパターン）への整合度
+- `scaleHexatonicContent(pitches)` — 6音増音階（0/300/400/700/800/1100 cent）への整合度
+- `scaleHexatonicDiversity(pitches)` — 200 cent単位の6セグメントのうち占有セグメント数の割合
