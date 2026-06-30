@@ -1198,6 +1198,12 @@ import {
   presetFamilySocraticRadarMolecularWeightProxy,
   presetFamilySocraticRadarPolymerCrystallinityProxy,
   presetFamilySocraticRadarViscoelasticModulusProxy,
+  presetFamilySocraticRadarMorphogenGradientProxy,
+  presetFamilySocraticRadarCellDifferentiationRateProxy,
+  presetFamilySocraticRadarTissueInductionIndexProxy,
+  presetFamilySocraticRadarDevelopmentalStageScoreProxy,
+  presetFamilySocraticRadarEmbryonicGrowthProxy,
+  presetFamilySocraticRadarOrganogenesisRateProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -26939,5 +26945,89 @@ describe('Q2801 presetFamilySocraticRadarViscoelasticModulusProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarViscoelasticModulusProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2803 presetFamilySocraticRadarMorphogenGradientProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarMorphogenGradientProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarMorphogenGradientProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMorphogenGradientProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2805 presetFamilySocraticRadarCellDifferentiationRateProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarCellDifferentiationRateProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarCellDifferentiationRateProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCellDifferentiationRateProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2807 presetFamilySocraticRadarTissueInductionIndexProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarTissueInductionIndexProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarTissueInductionIndexProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarTissueInductionIndexProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2809 presetFamilySocraticRadarDevelopmentalStageScoreProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarDevelopmentalStageScoreProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarDevelopmentalStageScoreProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDevelopmentalStageScoreProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2811 presetFamilySocraticRadarEmbryonicGrowthProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarEmbryonicGrowthProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarEmbryonicGrowthProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEmbryonicGrowthProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('Q2813 presetFamilySocraticRadarOrganogenesisRateProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarOrganogenesisRateProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarOrganogenesisRateProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarOrganogenesisRateProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });

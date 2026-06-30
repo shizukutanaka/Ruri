@@ -1191,6 +1191,12 @@ import {
   tuningFamilySocraticRadarMolecularWeightProxy,
   tuningFamilySocraticRadarPolymerCrystallinityProxy,
   tuningFamilySocraticRadarViscoelasticModulusProxy,
+  tuningFamilySocraticRadarMorphogenGradientProxy,
+  tuningFamilySocraticRadarCellDifferentiationRateProxy,
+  tuningFamilySocraticRadarTissueInductionIndexProxy,
+  tuningFamilySocraticRadarDevelopmentalStageScoreProxy,
+  tuningFamilySocraticRadarEmbryonicGrowthProxy,
+  tuningFamilySocraticRadarOrganogenesisRateProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -23395,4 +23401,94 @@ export function presetFamilySocraticRadarViscoelasticModulusProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarViscoelasticModulusProxy(tunings, spectrum, rootHz);
+}
+
+// Q2803 — presetFamilySocraticRadarMorphogenGradientProxy
+export function presetFamilySocraticRadarMorphogenGradientProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMorphogenGradientProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMorphogenGradientProxy(tunings, spectrum, rootHz);
+}
+
+// Q2805 — presetFamilySocraticRadarCellDifferentiationRateProxy
+export function presetFamilySocraticRadarCellDifferentiationRateProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCellDifferentiationRateProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCellDifferentiationRateProxy(tunings, spectrum, rootHz);
+}
+
+// Q2807 — presetFamilySocraticRadarTissueInductionIndexProxy
+export function presetFamilySocraticRadarTissueInductionIndexProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarTissueInductionIndexProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarTissueInductionIndexProxy(tunings, spectrum, rootHz);
+}
+
+// Q2809 — presetFamilySocraticRadarDevelopmentalStageScoreProxy
+export function presetFamilySocraticRadarDevelopmentalStageScoreProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarDevelopmentalStageScoreProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarDevelopmentalStageScoreProxy(tunings, spectrum, rootHz);
+}
+
+// Q2811 — presetFamilySocraticRadarEmbryonicGrowthProxy
+export function presetFamilySocraticRadarEmbryonicGrowthProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarEmbryonicGrowthProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarEmbryonicGrowthProxy(tunings, spectrum, rootHz);
+}
+
+// Q2813 — presetFamilySocraticRadarOrganogenesisRateProxy
+export function presetFamilySocraticRadarOrganogenesisRateProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarOrganogenesisRateProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarOrganogenesisRateProxy(tunings, spectrum, rootHz);
 }

@@ -1937,6 +1937,10 @@ import {
   scaleDoianContent,
   scalePhrygianContent,
   scaleMixolydianContent,
+  scaleLocrianContent,
+  scaleAeolianContent,
+  scaleIonianContent,
+  scalePhrygianDominantContent,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2033,6 +2037,12 @@ import {
   tuningFamilySocraticRadarMolecularWeightProxy,
   tuningFamilySocraticRadarPolymerCrystallinityProxy,
   tuningFamilySocraticRadarViscoelasticModulusProxy,
+  tuningFamilySocraticRadarMorphogenGradientProxy,
+  tuningFamilySocraticRadarCellDifferentiationRateProxy,
+  tuningFamilySocraticRadarTissueInductionIndexProxy,
+  tuningFamilySocraticRadarDevelopmentalStageScoreProxy,
+  tuningFamilySocraticRadarEmbryonicGrowthProxy,
+  tuningFamilySocraticRadarOrganogenesisRateProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -48319,6 +48329,96 @@ describe('Q2800 tuningFamilySocraticRadarViscoelasticModulusProxy', () => {
   });
 });
 
+describe('Q2802 tuningFamilySocraticRadarMorphogenGradientProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarMorphogenGradientProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarMorphogenGradientProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarMorphogenGradientProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2804 tuningFamilySocraticRadarCellDifferentiationRateProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCellDifferentiationRateProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCellDifferentiationRateProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCellDifferentiationRateProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2806 tuningFamilySocraticRadarTissueInductionIndexProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTissueInductionIndexProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarTissueInductionIndexProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarTissueInductionIndexProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2808 tuningFamilySocraticRadarDevelopmentalStageScoreProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDevelopmentalStageScoreProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarDevelopmentalStageScoreProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarDevelopmentalStageScoreProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2810 tuningFamilySocraticRadarEmbryonicGrowthProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEmbryonicGrowthProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarEmbryonicGrowthProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarEmbryonicGrowthProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2812 tuningFamilySocraticRadarOrganogenesisRateProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarOrganogenesisRateProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarOrganogenesisRateProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarOrganogenesisRateProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
 // R1531
 describe('R1531 scaleHarmonicDistance', () => {
   it('returns 0 for single pitch', () => {
@@ -48765,6 +48865,58 @@ describe('R1594 scaleMixolydianContent', () => {
   it('returns value in [0,1] for chromatic scale', () => {
     const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
     const v = scaleMixolydianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1601 scaleLocrianContent', () => {
+  it('returns 0 for empty', () => { expect(scaleLocrianContent([])).toBe(0); });
+  it('returns 1 for pure Locrian scale', () => {
+    const pitches = [0,100,300,500,600,800,1000].map((c) => pitchFromCents(c));
+    expect(scaleLocrianContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scaleLocrianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1602 scaleAeolianContent', () => {
+  it('returns 0 for empty', () => { expect(scaleAeolianContent([])).toBe(0); });
+  it('returns 1 for natural minor scale', () => {
+    const pitches = [0,200,300,500,700,800,1000].map((c) => pitchFromCents(c));
+    expect(scaleAeolianContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scaleAeolianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1603 scaleIonianContent', () => {
+  it('returns 0 for empty', () => { expect(scaleIonianContent([])).toBe(0); });
+  it('returns 1 for major scale', () => {
+    const pitches = [0,200,400,500,700,900,1100].map((c) => pitchFromCents(c));
+    expect(scaleIonianContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scaleIonianContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1604 scalePhrygianDominantContent', () => {
+  it('returns 0 for empty', () => { expect(scalePhrygianDominantContent([])).toBe(0); });
+  it('returns 1 for Phrygian dominant scale', () => {
+    const pitches = [0,100,400,500,700,800,1000].map((c) => pitchFromCents(c));
+    expect(scalePhrygianDominantContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map((c) => pitchFromCents(c));
+    const v = scalePhrygianDominantContent(pitches);
     expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1);
   });
 });
