@@ -68553,3 +68553,55 @@ export function scaleSuperlocrianContent(pitches: readonly Pitch[]): number {
   }
   return matched / targets.length;
 }
+
+export function scaleHungarianMinorContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Hungarian minor: augmented 2nd(300), augmented 4th(600), major 7th(1100)
+  const targets = [200, 300, 600, 700, 800, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleNapolitanMajorContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Neapolitan major: minor 2nd(100), major 3rd(400), major 6th(900)
+  const targets = [100, 400, 500, 700, 900, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleEnigmaticContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Enigmatic scale: minor 2nd(100), augmented 2nd(300), tritone(600), augmented 5th(800)
+  const targets = [100, 300, 600, 800, 1000, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleDoubleHarmonicContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Double harmonic (Byzantine): minor 2nd(100), major 3rd(400), minor 6th(800), major 7th(1100)
+  const targets = [100, 400, 500, 700, 800, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
