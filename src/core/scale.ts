@@ -55770,6 +55770,156 @@ export function tuningFamilySocraticRadarHeatFlowProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3198 — tuningFamilySocraticRadarElectricDipoleProxy
+export function tuningFamilySocraticRadarElectricDipoleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // electric dipole: charge separation and field polarization → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3200 — tuningFamilySocraticRadarMagneticFluxProxy
+export function tuningFamilySocraticRadarMagneticFluxProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // magnetic flux: field linkage and induction → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3202 — tuningFamilySocraticRadarPlasmaFrequencyProxy
+export function tuningFamilySocraticRadarPlasmaFrequencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // plasma frequency: collective oscillation cutoff → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3204 — tuningFamilySocraticRadarSkinDepthProxy
+export function tuningFamilySocraticRadarSkinDepthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // skin depth: electromagnetic penetration into conductors → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3206 — tuningFamilySocraticRadarPoyntingVectorProxy
+export function tuningFamilySocraticRadarPoyntingVectorProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Poynting vector: electromagnetic energy flux density → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3208 — tuningFamilySocraticRadarMaxwellEquationProxy
+export function tuningFamilySocraticRadarMaxwellEquationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Maxwell equations: unified electromagnetism — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -66261,4 +66411,52 @@ export function scaleSemitoneCountV2(pitches: readonly Pitch[]): number {
     if (Math.abs(c - nearestSemitone) <= 25) onSemitone++;
   }
   return onSemitone / pitches.length;
+}
+
+export function scaleMajorTriadContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Major triad tones: root(0), major third(400), perfect fifth(700)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const triadSlots = [0, 400, 700];
+  let count = 0;
+  for (const c of cents) {
+    if (triadSlots.some((s) => Math.abs(c - s) < 30 || Math.abs(c - s - 1200) < 30)) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleMinorTriadContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Minor triad tones: root(0), minor third(300), perfect fifth(700)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const triadSlots = [0, 300, 700];
+  let count = 0;
+  for (const c of cents) {
+    if (triadSlots.some((s) => Math.abs(c - s) < 30)) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleDominantSeventhContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Dominant seventh chord tones: root(0), major third(400), fifth(700), minor seventh(1000)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const chordSlots = [0, 400, 700, 1000];
+  let count = 0;
+  for (const c of cents) {
+    if (chordSlots.some((s) => Math.abs(c - s) < 30)) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleHalfDiminishedContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Half-diminished (minor 7 flat 5) chord tones: root(0), minor third(300), dim fifth(600), minor seventh(1000)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const chordSlots = [0, 300, 600, 1000];
+  let count = 0;
+  for (const c of cents) {
+    if (chordSlots.some((s) => Math.abs(c - s) < 30)) count++;
+  }
+  return Math.min(1, count / pitches.length);
 }

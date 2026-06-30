@@ -2126,3 +2126,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleImperfectionRatio(pitches)` — 完全5度（700 cent）パートナーを持たない音高の割合
 - `scaleCardinalityRatio(pitches)` — 異なる音高クラス数/12（音高多様性）
 - `scaleSemitoneCountV2(pitches)` — 12平均律半音スロット±25 cent以内の音高割合（12TET整合率）
+
+### Round 193: 音階和音内容分析
+
+- `scaleMajorTriadContent(pitches)` — 長三和音構成音（0/400/700 cent）の音高割合
+- `scaleMinorTriadContent(pitches)` — 短三和音構成音（0/300/700 cent）の音高割合
+- `scaleDominantSeventhContent(pitches)` — 属七和音構成音（0/400/700/1000 cent）の音高割合
+- `scaleHalfDiminishedContent(pitches)` — 半減七和音構成音（0/300/600/1000 cent）の音高割合
