@@ -60017,7 +60017,12 @@ export function tuningFamilySocraticRadarGenomeSequencingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // GenomeSequencing: high benchmark read depth with diverse coverage
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60037,7 +60042,12 @@ export function tuningFamilySocraticRadarProteinStructurePredictionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ProteinStructurePrediction: convergent folding with versatile secondary structures
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60057,7 +60067,12 @@ export function tuningFamilySocraticRadarRNAFoldingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // RNAFolding: mature structural motifs with benchmark thermodynamic stability
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60077,7 +60092,12 @@ export function tuningFamilySocraticRadarMetagenomicAnalysisProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // MetagenomicAnalysis: diverse microbial communities with convergent taxonomic classification
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60097,7 +60117,12 @@ export function tuningFamilySocraticRadarPhylogeneticTreeProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PhylogeneticTree: convergent evolutionary lineages with diverse branching patterns
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60117,7 +60142,12 @@ export function tuningFamilySocraticRadarEpigenomicsAnalysisProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // EpigenomicsAnalysis: mature methylation patterns with versatile histone modification benchmarks
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60137,7 +60167,12 @@ export function tuningFamilySocraticRadarObjectDetectionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ObjectDetection: precision diversity and recall benchmark
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60157,7 +60192,12 @@ export function tuningFamilySocraticRadarSemanticSegmentationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SemanticSegmentation: balanced versatility and pixel-level benchmark
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60177,7 +60217,12 @@ export function tuningFamilySocraticRadarImageClassificationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ImageClassification: maturity-driven taxonomy with versatile feature space
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60197,7 +60242,12 @@ export function tuningFamilySocraticRadarPointCloudProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PointCloud: spatial diversity and geometric convergence
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60217,7 +60267,12 @@ export function tuningFamilySocraticRadarVideoAnalysisProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // VideoAnalysis: temporal maturity with benchmark-driven tracking
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60237,7 +60292,12 @@ export function tuningFamilySocraticRadarSpeechRecognitionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SpeechRecognition: versatile acoustic modeling with convergent language integration
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60257,7 +60317,12 @@ export function tuningFamilySocraticRadarCycloneProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Cyclone: rotating energy diversity and pressure benchmark
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60277,7 +60342,12 @@ export function tuningFamilySocraticRadarAnticycloneProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Anticyclone: stable high-pressure versatility and maturity balance
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60297,7 +60367,12 @@ export function tuningFamilySocraticRadarThunderstormProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Thunderstorm: intense convective maturity and benchmark energy
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60317,7 +60392,12 @@ export function tuningFamilySocraticRadarHeatWaveProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // HeatWave: sustained high-diversity thermal pressure convergence
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60337,7 +60417,12 @@ export function tuningFamilySocraticRadarBlizzardProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Blizzard: low-visibility maturity convergence with dynamic diversity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60357,7 +60442,12 @@ export function tuningFamilySocraticRadarFogProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Fog: diffuse versatility and convergence with low benchmark contrast
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60377,7 +60467,12 @@ export function tuningFamilySocraticRadarSoilErosionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SoilErosion: topsoil diversity loss and benchmark degradation
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60397,7 +60492,12 @@ export function tuningFamilySocraticRadarLandDegradationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // LandDegradation: balanced degradation across versatility and benchmark
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60417,7 +60517,12 @@ export function tuningFamilySocraticRadarDesertificationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Desertification: maturity and benchmark convergence under arid conditions
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60437,7 +60542,12 @@ export function tuningFamilySocraticRadarWetlandProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Wetland: high diversity and balanced convergence in hydric ecosystems
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60457,7 +60567,12 @@ export function tuningFamilySocraticRadarMangroveProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Mangrove: maturity-focused coastal ecosystem resilience
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60477,7 +60592,12 @@ export function tuningFamilySocraticRadarDeforestationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Deforestation: versatility loss and convergence shift in forest systems
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60497,7 +60617,12 @@ export function tuningFamilySocraticRadarKinematicsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Kinematics: joint diversity and end-effector benchmark precision
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60517,7 +60642,12 @@ export function tuningFamilySocraticRadarManipulatorArmProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ManipulatorArm: versatility and maturity in multi-joint reach
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60537,7 +60667,12 @@ export function tuningFamilySocraticRadarGraspPlanningProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // GraspPlanning: maturity and benchmark balance for contact stability
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60557,7 +60692,12 @@ export function tuningFamilySocraticRadarHapticFeedbackProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // HapticFeedback: diversity and convergence for tactile fidelity
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60577,7 +60717,12 @@ export function tuningFamilySocraticRadarSwarmRoboticsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SwarmRobotics: maturity of emergent coordination and convergence
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60597,7 +60742,12 @@ export function tuningFamilySocraticRadarSoftRoboticsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SoftRobotics: versatility and deformable structure convergence
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60617,7 +60767,12 @@ export function tuningFamilySocraticRadarNanomaterialProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Nanomaterial: size-dependent property diversity and surface benchmark
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60637,7 +60792,12 @@ export function tuningFamilySocraticRadarGrapheneProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Graphene: high versatility and two-dimensional material benchmark
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60657,7 +60817,12 @@ export function tuningFamilySocraticRadarQuantumDotProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // QuantumDot: quantum confinement maturity and benchmark tuning
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60677,7 +60842,12 @@ export function tuningFamilySocraticRadarNanoparticleProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Nanoparticle: diversity and surface-to-volume ratio convergence
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60697,7 +60867,12 @@ export function tuningFamilySocraticRadarSelfAssemblyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SelfAssembly: maturity of spontaneous ordering and convergence
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60717,7 +60892,12 @@ export function tuningFamilySocraticRadarSpintronicsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Spintronics: versatility and spin-orbit coupling benchmark
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60737,7 +60917,12 @@ export function tuningFamilySocraticRadarLaserCavityProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // LaserCavity: resonance benchmark and coherence convergence
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60757,7 +60942,12 @@ export function tuningFamilySocraticRadarOpticalFiberProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // OpticalFiber: diversity propagation and benchmark transmission
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60777,7 +60967,12 @@ export function tuningFamilySocraticRadarHolographyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Holography: diversity wavefront and versatility interference
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60797,7 +60992,12 @@ export function tuningFamilySocraticRadarNonlinearOpticsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // NonlinearOptics: versatility harmonic generation and diversity phase matching
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60817,7 +61017,12 @@ export function tuningFamilySocraticRadarPlasmonicProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Plasmonic: maturity surface resonance and benchmark field enhancement
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60837,7 +61042,12 @@ export function tuningFamilySocraticRadarMetamaterialProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Metamaterial: uniform negative index and engineered response
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60857,7 +61067,12 @@ export function tuningFamilySocraticRadarOzoneDepletionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // OzoneDepletion: UV diversity exposure and stratospheric benchmark
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60877,7 +61092,12 @@ export function tuningFamilySocraticRadarAerosolProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Aerosol: particle versatility and optical diversity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60897,7 +61117,12 @@ export function tuningFamilySocraticRadarPhotochemistryProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Photochemistry: high diversity from photon-driven reaction pathways
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60917,7 +61142,12 @@ export function tuningFamilySocraticRadarTroposphereProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Troposphere: turbulent maturity and weather-driven convergence
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60937,7 +61167,12 @@ export function tuningFamilySocraticRadarStratosphereProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // Stratosphere: stable benchmark layer with ozone benchmark dominance
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60957,7 +61192,12 @@ export function tuningFamilySocraticRadarAirQualityProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // AirQuality: maturity-convergence balance for pollutant index
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60977,7 +61217,12 @@ export function tuningFamilySocraticRadarInformationDiffusionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // InformationDiffusion: spread diversity and convergence rate
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -60997,7 +61242,12 @@ export function tuningFamilySocraticRadarEchoChamberProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // EchoChamber: benchmark and maturity reinforce uniformity
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61017,7 +61267,12 @@ export function tuningFamilySocraticRadarViralSpreadProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ViralSpread: diversity and versatility drive rapid adoption
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61037,7 +61292,12 @@ export function tuningFamilySocraticRadarDigitalTwinProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // DigitalTwin: maturity and benchmark fidelity for model accuracy
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61057,7 +61317,12 @@ export function tuningFamilySocraticRadarInternetOfThingsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // InternetOfThings: versatility and diversity for device heterogeneity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61077,7 +61342,12 @@ export function tuningFamilySocraticRadarEdgeComputingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // EdgeComputing: benchmark and convergence for low-latency processing
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61097,7 +61367,12 @@ export function tuningFamilySocraticRadarDevelopmentalPsychologyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // DevelopmentalPsychology: maturity-weighted developmental stage progression
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.35 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.35 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61117,7 +61392,12 @@ export function tuningFamilySocraticRadarSocialPsychologyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SocialPsychology: diversity-driven social influence and group dynamics
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61137,7 +61417,12 @@ export function tuningFamilySocraticRadarNeuropsychologyIndexProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // NeuropsychologyIndex: benchmark-weighted neural processing index
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61157,7 +61442,12 @@ export function tuningFamilySocraticRadarHealthPsychologyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // HealthPsychology: versatility-weighted biopsychosocial health model
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61177,7 +61467,12 @@ export function tuningFamilySocraticRadarPersonalityModelProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PersonalityModel: diversity-maturity balance for trait dimensionality
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -61197,7 +61492,12 @@ export function tuningFamilySocraticRadarEmotionRegulationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // EmotionRegulation: maturity-convergence balance for regulatory capacity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -71613,7 +71913,7 @@ export function scalePitchClassEntropy(pitches: readonly Pitch[]): number {
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
     const bucket = Math.min(11, Math.floor(c / 100));
-    buckets[bucket]! ++;
+    buckets[bucket]!++;
   }
   const total = pitches.length;
   let entropy = 0;
@@ -73631,7 +73931,7 @@ export function scaleEnharmonicEquivalenceV2(pitches: readonly Pitch[]): number 
     }
   }
   if (pairs === 0) return 0;
-  return Math.min(1, enharmonic / pairs * 10);
+  return Math.min(1, (enharmonic / pairs) * 10);
 }
 
 export function scaleChordToneRatioV2(pitches: readonly Pitch[]): number {
@@ -74011,7 +74311,8 @@ export function scaleIntervalSpectralBalance(pitches: readonly Pitch[]): number 
   const total = pitches.length;
   // Balance score: how evenly distributed (max = 1 when all thirds equal)
   const expected = total / 3;
-  const deviation = (Math.abs(low - expected) + Math.abs(mid - expected) + Math.abs(high - expected)) / (2 * total);
+  const deviation =
+    (Math.abs(low - expected) + Math.abs(mid - expected) + Math.abs(high - expected)) / (2 * total);
   return Math.max(0, 1 - deviation);
 }
 
