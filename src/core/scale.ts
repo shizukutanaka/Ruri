@@ -68209,3 +68209,55 @@ export function scaleBluesScaleContent(pitches: readonly Pitch[]): number {
   }
   return matched / targets.length;
 }
+
+export function scaleDorianContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Dorian mode characteristic: minor 3rd(300), major 6th(900)
+  const targets = [200, 300, 500, 700, 900, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scalePhrygianContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Phrygian mode characteristic: minor 2nd(100), minor 3rd(300)
+  const targets = [100, 300, 500, 700, 800, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleLydianContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Lydian mode characteristic: augmented 4th(600), major 7th(1100)
+  const targets = [200, 400, 600, 700, 900, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleMixolydianContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Mixolydian mode characteristic: minor 7th(1000), perfect 5th(700)
+  const targets = [200, 400, 500, 700, 900, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
