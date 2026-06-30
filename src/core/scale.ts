@@ -51270,6 +51270,156 @@ export function tuningFamilySocraticRadarComplementCascadeProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2838 — tuningFamilySocraticRadarLiftDragRatioProxy
+export function tuningFamilySocraticRadarLiftDragRatioProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // lift-drag ratio: aerodynamic efficiency metric for wing performance → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2840 — tuningFamilySocraticRadarThrustVectorAngleProxy
+export function tuningFamilySocraticRadarThrustVectorAngleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // thrust vector angle: direction control of rocket propulsion → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2842 — tuningFamilySocraticRadarOrbitalInclinationProxy
+export function tuningFamilySocraticRadarOrbitalInclinationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // orbital inclination: angle of orbit relative to equatorial plane → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2844 — tuningFamilySocraticRadarReentryHeatFluxProxy
+export function tuningFamilySocraticRadarReentryHeatFluxProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // reentry heat flux: thermal load during atmospheric reentry → benchmark+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2846 — tuningFamilySocraticRadarPropellantMassRatioProxy
+export function tuningFamilySocraticRadarPropellantMassRatioProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // propellant mass ratio: Tsiolkovsky rocket equation efficiency → maturity+convergence
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2848 — tuningFamilySocraticRadarNozzleExhaustVelocityProxy
+export function tuningFamilySocraticRadarNozzleExhaustVelocityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // nozzle exhaust velocity: effective jet speed from engine → convergence+benchmark
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -60110,4 +60260,52 @@ export function scaleGermanSixthContent(pitches: readonly Pitch[]): number {
     }),
   ).length;
   return matched / targets.length;
+}
+
+export function scaleSharpElevenContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Sharp 11 (#11) = tritone above root = ~600 cents (±25c)
+  const tol = 25;
+  const target = 600;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleFlatNineContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Flat 9 (b9) = minor 9th above root = ~100 cents (±25c) above octave, i.e., 100c mod 1200
+  const tol = 25;
+  const target = 100;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleSharpNineContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Sharp 9 (#9) = augmented 9th = ~300 cents (±25c)
+  const tol = 25;
+  const target = 300;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleFlatThirteenContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Flat 13 (b13) = minor 13th = ~800 cents (±25c)
+  const tol = 25;
+  const target = 800;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
 }

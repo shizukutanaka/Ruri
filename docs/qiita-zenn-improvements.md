@@ -1905,3 +1905,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Extends harmonic analysis to chromatic and augmented sixth chord vocabulary. Augmented seconds are characteristic of harmonic minor and Hungarian scales. Tritone substitution is central to jazz harmony. Neapolitan and German sixth chords are hallmarks of Late Classical and Romantic harmonic language.
 
 **Implementation**: Each function uses interval-based detection with cent-tolerance windows. Returns ratio in [0,1] using pitch-to-cents conversion via `pitchToCents()`.
+
+## Round 163: ジャズ拡張和声分析 (R1613–R1616)
+
+**Functions**: `scaleSharpElevenContent`, `scaleFlatNineContent`, `scaleSharpNineContent`, `scaleFlatThirteenContent`
+
+**Motivation**: Detects jazz-specific chromatic alterations beyond basic modal content. Sharp 11 (#11/Lydian note) is fundamental to Lydian Dominant and acoustic scale harmony. Flat 9, sharp 9, and flat 13 are the characteristic "altered" extensions in dominant seventh chords (the altered scale). These are essential markers of bebop and post-bop jazz vocabulary.
+
+**Implementation**: Each function checks what fraction of pitches fall within ±25 cents of the target degree (mod 1200). Returns ratio in [0,1].
