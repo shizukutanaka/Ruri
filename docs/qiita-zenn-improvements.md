@@ -2324,3 +2324,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleDissonanceDensity` — 不協和音程（短2度/tritone/長7度系±30）の音程ペア比率を返す
 - `scaleConsonanceBias` — 協和音程（完全系/3度系±25）の音程ペア比率を返す
 - `scaleTonicClarityScoreV2` — 主音支持音程（完全5度/長短3度±20）の充足率を返す
+
+## Round 215: ステップサイズ解析ヘルパ
+
+- `scaleAverageStepCents`: 音程ステップの平均セント値（600セント基準で正規化）
+- `scaleDiatonicSaturation`: 12半音クラスのうちカバー率（全音域充填度）
+- `scaleStepSizeVarianceV3`: ステップサイズの分散（均質性の逆指標）
+- `scaleMaxMinStepRatio`: 最大/最小ステップ比（音程の不均一度）

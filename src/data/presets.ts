@@ -1521,6 +1521,12 @@ import {
   tuningFamilySocraticRadarStrangeAttractorProxyV2,
   tuningFamilySocraticRadarPhaseSpaceProxy,
   tuningFamilySocraticRadarSynchronizationProxy,
+  tuningFamilySocraticRadarIsotopeProxy,
+  tuningFamilySocraticRadarRadioactiveDecayProxyV3,
+  tuningFamilySocraticRadarRockCycleProxy,
+  tuningFamilySocraticRadarMineralFormationProxy,
+  tuningFamilySocraticRadarChemicalWeatheringProxy,
+  tuningFamilySocraticRadarSedimentLayerProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -28663,4 +28669,94 @@ export function presetFamilySocraticRadarSynchronizationProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarSynchronizationProxy(tunings, spectrum, rootHz);
+}
+
+// Q3463
+export function presetFamilySocraticRadarIsotopeProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarIsotopeProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarIsotopeProxy(tunings, spectrum, rootHz);
+}
+
+// Q3465
+export function presetFamilySocraticRadarRadioactiveDecayProxyV3(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarRadioactiveDecayProxyV3> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarRadioactiveDecayProxyV3(tunings, spectrum, rootHz);
+}
+
+// Q3467
+export function presetFamilySocraticRadarRockCycleProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarRockCycleProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarRockCycleProxy(tunings, spectrum, rootHz);
+}
+
+// Q3469
+export function presetFamilySocraticRadarMineralFormationProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarMineralFormationProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarMineralFormationProxy(tunings, spectrum, rootHz);
+}
+
+// Q3471
+export function presetFamilySocraticRadarChemicalWeatheringProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarChemicalWeatheringProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarChemicalWeatheringProxy(tunings, spectrum, rootHz);
+}
+
+// Q3473
+export function presetFamilySocraticRadarSedimentLayerProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSedimentLayerProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSedimentLayerProxy(tunings, spectrum, rootHz);
 }

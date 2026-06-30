@@ -58680,6 +58680,126 @@ export function tuningFamilySocraticRadarSynchronizationProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3462 — tuningFamilySocraticRadarIsotopeProxy
+export function tuningFamilySocraticRadarIsotopeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 同位体: 核安定性の多様性 (benchmark) と元素範囲 (diversity) を重視
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3464 — tuningFamilySocraticRadarRadioactiveDecayProxyV3
+export function tuningFamilySocraticRadarRadioactiveDecayProxyV3(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 放射性崩壊: 崩壊系列/エネルギー → maturity重視
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3466 — tuningFamilySocraticRadarRockCycleProxy
+export function tuningFamilySocraticRadarRockCycleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 岩石循環: 火成岩/変成岩/堆積岩 → diversity重視
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3468 — tuningFamilySocraticRadarMineralFormationProxy
+export function tuningFamilySocraticRadarMineralFormationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 鉱物形成: 結晶化/格子構造 → versatility重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3470 — tuningFamilySocraticRadarChemicalWeatheringProxy
+export function tuningFamilySocraticRadarChemicalWeatheringProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 化学的風化: 風化/変質プロセス → maturity重視
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3472 — tuningFamilySocraticRadarSedimentLayerProxy
+export function tuningFamilySocraticRadarSedimentLayerProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 堆積層: 地層学/堆積プロセス → benchmark重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -70282,4 +70402,54 @@ export function scaleTonicClarityScoreV2(pitches: readonly Pitch[]): number {
     if (cents.some((c) => Math.abs(c - t) <= 20)) score++;
   }
   return score / tonicSupport.length;
+}
+
+export function scaleAverageStepCents(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = pitches
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let total = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    total += sorted[i]! - sorted[i - 1]!;
+  }
+  const avg = total / (sorted.length - 1);
+  return Math.min(1, avg / 600);
+}
+
+export function scaleDiatonicSaturation(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const semitones = new Set(
+    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12),
+  );
+  return semitones.size / 12;
+}
+
+export function scaleStepSizeVarianceV3(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0;
+  const sorted = pitches
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    steps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  const mean = steps.reduce((a, b) => a + b, 0) / steps.length;
+  const variance = steps.reduce((acc, s) => acc + (s - mean) ** 2, 0) / steps.length;
+  return Math.min(1, variance / 360000);
+}
+
+export function scaleMaxMinStepRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = pitches
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    steps.push(sorted[i]! - sorted[i - 1]!);
+  }
+  const maxS = Math.max(...steps);
+  const minS = Math.min(...steps);
+  if (minS === 0) return 1;
+  return Math.min(1, (maxS / minS - 1) / 10);
 }
