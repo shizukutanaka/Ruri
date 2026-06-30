@@ -1973,6 +1973,12 @@ import {
   tuningFamilySocraticRadarCurrentVelocityProxy,
   tuningFamilySocraticRadarWavePeriodProxy,
   tuningFamilySocraticRadarSeaTemperatureProxy,
+  tuningFamilySocraticRadarNuclearFissionProxy,
+  tuningFamilySocraticRadarNeutronFluxProxy,
+  tuningFamilySocraticRadarRadioactiveDecayProxy,
+  tuningFamilySocraticRadarIsotopeStabilityProxy,
+  tuningFamilySocraticRadarBindingEnergyProxy,
+  tuningFamilySocraticRadarNuclearFusionProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -47715,6 +47721,96 @@ describe('Q2728 tuningFamilySocraticRadarSeaTemperatureProxy', () => {
   });
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarSeaTemperatureProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2730 tuningFamilySocraticRadarNuclearFissionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNuclearFissionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarNuclearFissionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNuclearFissionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2732 tuningFamilySocraticRadarNeutronFluxProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNeutronFluxProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarNeutronFluxProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNeutronFluxProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2734 tuningFamilySocraticRadarRadioactiveDecayProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarRadioactiveDecayProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarRadioactiveDecayProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarRadioactiveDecayProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2736 tuningFamilySocraticRadarIsotopeStabilityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarIsotopeStabilityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarIsotopeStabilityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarIsotopeStabilityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2738 tuningFamilySocraticRadarBindingEnergyProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBindingEnergyProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarBindingEnergyProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarBindingEnergyProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('Q2740 tuningFamilySocraticRadarNuclearFusionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNuclearFusionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarNuclearFusionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNuclearFusionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(Number.isFinite(v)).toBe(true);
   });
 });
