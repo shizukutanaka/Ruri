@@ -58080,6 +58080,126 @@ export function tuningFamilySocraticRadarLanguageProcessingProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3402 — tuningFamilySocraticRadarCarbonCycleProxy
+export function tuningFamilySocraticRadarCarbonCycleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 炭素循環: 地球規模の循環 → versatility重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3404 — tuningFamilySocraticRadarGreenhouseEffectProxy
+export function tuningFamilySocraticRadarGreenhouseEffectProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 温室効果: 熱の閉じ込め → convergence重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3406 — tuningFamilySocraticRadarOceanAcidificationProxy
+export function tuningFamilySocraticRadarOceanAcidificationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 海洋酸性化: pH変化の蓄積 → maturity重視
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3408 — tuningFamilySocraticRadarArcticAmplificationProxy
+export function tuningFamilySocraticRadarArcticAmplificationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 北極増幅: 極域の温度増幅 → diversity重視
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3410 — tuningFamilySocraticRadarHadleyCellProxy
+export function tuningFamilySocraticRadarHadleyCellProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ハドレー循環: 大気循環の基準 → benchmark重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3412 — tuningFamilySocraticRadarMonsoonProxy
+export function tuningFamilySocraticRadarMonsoonProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // モンスーン: 季節変動の均衡 → balanced
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -69406,6 +69526,58 @@ export function scaleBaliPelogContent(pitches: readonly Pitch[]): number {
   // Balinese pelog (approx): steps ~120/270/120/270/120/150/150 cents
   const targets = [120, 390, 510, 675, 825];
   const tolerance = 35;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleEthiopianContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Ethiopian (tizita minor): minor 3rd(300), minor 6th(800), minor 7th(1000)
+  const targets = [200, 300, 700, 800, 1000];
+  const tolerance = 25;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleFlamencoContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Flamenco (phrygian dominant variant): minor 2nd(100), major 3rd(400), minor 7th(1000)
+  const targets = [100, 400, 500, 700, 800, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleByzantineContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Byzantine (double harmonic): minor 2nd(100), major 3rd(400), minor 6th(800), major 7th(1100)
+  const targets = [100, 400, 500, 700, 800, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleUkrainianContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Ukrainian Dorian: minor 3rd(300), augmented 4th(600), minor 7th(1000)
+  const targets = [200, 300, 600, 700, 900, 1000];
+  const tolerance = 20;
   let matched = 0;
   for (const t of targets) {
     const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
