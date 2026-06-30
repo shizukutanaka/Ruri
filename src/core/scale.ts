@@ -59244,3 +59244,60 @@ export function scaleDistributionBalance(pitches: readonly Pitch[]): number {
   const maxDev = expected * 12 * (1 - 1 / 12); // worst case: all in one bin
   return Math.min(1, Math.max(0, 1 - totalDev / (maxDev + 1e-9)));
 }
+
+// R1581
+export function scaleNoteOnsetDensity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => pitchToCents(p));
+  const range = Math.max(...cents) - Math.min(...cents);
+  const slots = Math.max(1, range / 100 + 1);
+  return Math.min(1, pitches.length / slots);
+}
+
+// R1582
+export function scaleRestDensity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 1;
+  const slots = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+  let empty = 0;
+  for (const slot of slots) {
+    const filled = pitches.some((p) => {
+      const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+      return Math.abs(c - slot) <= 30;
+    });
+    if (!filled) empty++;
+  }
+  return empty / slots.length;
+}
+
+// R1583
+export function scaleRhythmicRegularity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const sorted = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    intervals.push(sorted[i]! - sorted[i - 1]!);
+  }
+  const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+  if (mean === 0) return 1;
+  const variance = intervals.reduce((acc, iv) => acc + (iv - mean) ** 2, 0) / intervals.length;
+  const cv = Math.sqrt(variance) / mean;
+  return Math.min(1, Math.max(0, 1 - Math.min(1, cv)));
+}
+
+// R1584
+export function scaleTemporalPatternScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0;
+  const sorted = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
+  let consistent = 0;
+  let total = 0;
+  for (let i = 2; i < sorted.length; i++) {
+    const iv1 = sorted[i - 1]! - sorted[i - 2]!;
+    const iv2 = sorted[i]! - sorted[i - 1]!;
+    if (iv1 > 0 && iv2 > 0) {
+      const ratio = Math.max(iv1, iv2) / Math.min(iv1, iv2);
+      if (ratio <= 2) consistent++;
+      total++;
+    }
+  }
+  return total === 0 ? 0 : consistent / total;
+}
