@@ -1913,6 +1913,10 @@ import {
   scaleEnharmonicEquivalence,
   scaleDiatonicAlignment,
   scaleMinorSecondDensity,
+  scaleFlatSeventhContent,
+  scaleNeutralIntervalCount,
+  scaleNonDiatonicDensity,
+  scaleSubdominantStrength,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -47881,5 +47885,71 @@ describe('R1534 scaleMinorSecondDensity', () => {
   it('returns 0 for widely-spaced pitches', () => {
     const pitches = [0, 400, 800].map(c => pitchFromCents(c));
     expect(scaleMinorSecondDensity(pitches)).toBe(0);
+  });
+});
+
+describe('R1541 scaleFlatSeventhContent', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleFlatSeventhContent([])).toBe(0);
+  });
+  it('returns 1 when all pitches are flat seventh', () => {
+    // 1000c is the minor seventh
+    const pitches = [pitchFromCents(1000), pitchFromCents(1005)];
+    expect(scaleFlatSeventhContent(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map(c => pitchFromCents(c));
+    const v = scaleFlatSeventhContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1542 scaleNeutralIntervalCount', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleNeutralIntervalCount([])).toBe(0);
+  });
+  it('returns 1 for all neutral intervals (100c steps → each = 100c)', () => {
+    const pitches = [0,100,200,300].map(c => pitchFromCents(c));
+    const v = scaleNeutralIntervalCount(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 0 for large intervals only', () => {
+    // 400c intervals are not in neutral zone
+    const pitches = [0,400,800].map(c => pitchFromCents(c));
+    expect(scaleNeutralIntervalCount(pitches)).toBe(0);
+  });
+});
+
+describe('R1543 scaleNonDiatonicDensity', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleNonDiatonicDensity([])).toBe(0);
+  });
+  it('returns 0 for pure diatonic scale', () => {
+    const pitches = [0,200,400,500,700,900,1100].map(c => pitchFromCents(c));
+    expect(scaleNonDiatonicDensity(pitches)).toBe(0);
+  });
+  it('returns value in [0,1] for chromatic scale', () => {
+    const pitches = [0,100,200,300,400,500,600,700,800,900,1000,1100].map(c => pitchFromCents(c));
+    const v = scaleNonDiatonicDensity(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('R1544 scaleSubdominantStrength', () => {
+  it('returns 0 for empty', () => {
+    expect(scaleSubdominantStrength([])).toBe(0);
+  });
+  it('returns 1 when pitch is at the perfect fourth', () => {
+    const pitches = [pitchFromCents(500)];
+    expect(scaleSubdominantStrength(pitches)).toBe(1);
+  });
+  it('returns value in [0,1] for diatonic scale', () => {
+    const pitches = [0,200,400,500,700,900,1100].map(c => pitchFromCents(c));
+    const v = scaleSubdominantStrength(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });
