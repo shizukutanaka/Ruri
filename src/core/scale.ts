@@ -52920,6 +52920,156 @@ export function tuningFamilySocraticRadarInhibitoryBalanceProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2970 — tuningFamilySocraticRadarGeneExpressionLevelProxy
+export function tuningFamilySocraticRadarGeneExpressionLevelProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // gene expression level: transcript abundance → versatility+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2972 — tuningFamilySocraticRadarProteinSynthesisRateProxy
+export function tuningFamilySocraticRadarProteinSynthesisRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // protein synthesis rate: ribosome throughput → versatility+benchmark
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2974 — tuningFamilySocraticRadarDNAMethylationProxy
+export function tuningFamilySocraticRadarDNAMethylationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // DNA methylation: epigenetic silencing → maturity emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2976 — tuningFamilySocraticRadarChromatinAccessibilityProxy
+export function tuningFamilySocraticRadarChromatinAccessibilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // chromatin accessibility: open chromatin → diversity emphasis
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2978 — tuningFamilySocraticRadarRNAStabilityProxy
+export function tuningFamilySocraticRadarRNAStabilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // RNA stability: half-life → benchmark emphasis
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2980 — tuningFamilySocraticRadarTranslationEfficiencyProxy
+export function tuningFamilySocraticRadarTranslationEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // translation efficiency: codon usage → convergence emphasis
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -62362,4 +62512,73 @@ export function scaleDegreeSpread(pitches: readonly Pitch[]): number {
   const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   const range = Math.max(...cents) - Math.min(...cents);
   return Math.min(1, range / 1200);
+}
+
+export function scaleGoldenRatioContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const phi = (1 + Math.sqrt(5)) / 2;
+  // Golden-ratio-derived degrees (in cents): phi*100, phi^2*100, phi^3*100 ... mod 1200
+  const goldenDegrees = [1, 2, 3, 4, 5].map((k) => ((Math.pow(phi, k) * 100) % 1200));
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    for (const gd of goldenDegrees) {
+      if (Math.abs(c - gd) < 30 || Math.abs(c - gd + 1200) < 30 || Math.abs(c - gd - 1200) < 30) {
+        count++;
+        break;
+      }
+    }
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleFibonacciPattern(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Fibonacci: 1,1,2,3,5,8,13,21 as interval sizes in semitones (× 100 cents)
+  const fibIntervals = new Set([100, 200, 300, 500, 800]);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let fibCount = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    const interval = sorted[i]! - sorted[i - 1]!;
+    if ([...fibIntervals].some((fi) => Math.abs(interval - fi) < 25)) fibCount++;
+  }
+  return Math.min(1, fibCount / (sorted.length - 1));
+}
+
+export function scaleBeautyIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Combined metric: symmetry + consonant intervals + step regularity
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  // Palindrome symmetry of intervals
+  const intervals = cents.slice(1).map((c, i) => c - cents[i]!);
+  let symScore = 0;
+  if (intervals.length > 0) {
+    let matching = 0;
+    for (let i = 0; i < Math.floor(intervals.length / 2); i++) {
+      if (Math.abs(intervals[i]! - intervals[intervals.length - 1 - i]!) < 20) matching++;
+    }
+    symScore = matching / Math.max(1, Math.floor(intervals.length / 2));
+  }
+  // Consonant interval ratio (unison, octave, fifth, fourth, major/minor third/sixth)
+  const consonant = new Set([0, 700, 500, 400, 300, 900, 800, 1200]);
+  const consCount = intervals.filter((iv) =>
+    [...consonant].some((c) => Math.abs(iv - c) < 15)
+  ).length;
+  const consScore = intervals.length > 0 ? consCount / intervals.length : 0;
+  return Math.min(1, (symScore + consScore) / 2);
+}
+
+export function scaleSymmetryScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) intervals.push(cents[i]! - cents[i - 1]!);
+  // Check palindrome property of interval sequence
+  let matchCount = 0;
+  const n = intervals.length;
+  for (let i = 0; i < Math.floor(n / 2); i++) {
+    if (Math.abs(intervals[i]! - intervals[n - 1 - i]!) < 15) matchCount++;
+  }
+  const halfLen = Math.floor(n / 2);
+  return halfLen === 0 ? 0 : Math.min(1, matchCount / halfLen);
 }

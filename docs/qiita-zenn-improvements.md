@@ -1993,3 +1993,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Quantifies the size and coverage of a scale. Tone count measures how many notes appear relative to the chromatic scale (12). Cardinality score counts distinct pitch classes (10c resolution). Saturation measures octave coverage in 50c slots (24 possible). Degree spread captures the interval range from lowest to highest pitch class.
 
 **Implementation**: Tone count is a simple length normalization. Cardinality uses Set deduplication with 10c rounding. Saturation uses 50c floor bins. Degree spread uses min/max of cents values. All return ratio in [0,1].
+
+### Round 174: 黄金比・フィボナッチ音階分析
+
+- `scaleGoldenRatioContent(pitches)` — 音高が黄金比由来の度数（φ^k × 100 cent mod 1200）に近い割合
+- `scaleFibonacciPattern(pitches)` — 隣接音程がフィボナッチ数列（半音×100 cent）に一致する割合
+- `scaleBeautyIndex(pitches)` — 回文対称性と協和音程比率の複合美指数
+- `scaleSymmetryScore(pitches)` — 音程列の回文対称スコア

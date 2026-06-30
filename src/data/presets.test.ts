@@ -1282,6 +1282,12 @@ import {
   presetFamilySocraticRadarReceptorSensitivityProxy,
   presetFamilySocraticRadarDepolarizationRateProxy,
   presetFamilySocraticRadarInhibitoryBalanceProxy,
+  presetFamilySocraticRadarGeneExpressionLevelProxy,
+  presetFamilySocraticRadarProteinSynthesisRateProxy,
+  presetFamilySocraticRadarDNAMethylationProxy,
+  presetFamilySocraticRadarChromatinAccessibilityProxy,
+  presetFamilySocraticRadarRNAStabilityProxy,
+  presetFamilySocraticRadarTranslationEfficiencyProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
