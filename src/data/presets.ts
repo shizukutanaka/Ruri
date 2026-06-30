@@ -10139,7 +10139,9 @@ export function presetFamilySocraticRadarVersatilityQuotient(
 export function presetFamilySocraticRadarWeightedScore(
   presetIds: string[],
   spectrum: Spectrum,
-  weights: Partial<Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>>,
+  weights: Partial<
+    Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>
+  >,
   rootHz?: number,
   presets: readonly TuningPreset[] = ALL_PRESETS,
 ): ReturnType<typeof tuningFamilySocraticRadarWeightedScore> {
@@ -10248,7 +10250,10 @@ export function presetFamilySocraticRadarRobustMedian(
 export function presetFamilySocraticRadarPercentileRank(
   presetIds: string[],
   spectrum: Spectrum,
-  queryProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>,
+  queryProfile: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >,
   rootHz?: number,
   presets: readonly TuningPreset[] = ALL_PRESETS,
 ): ReturnType<typeof tuningFamilySocraticRadarPercentileRank> {
@@ -10525,7 +10530,10 @@ export function presetFamilySocraticRadarAxisPercentile(
 export function presetFamilySocraticRadarPareto(
   presetIds: string[],
   spectrum: Spectrum,
-  candidates: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>[],
+  candidates: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >[],
   rootHz?: number,
   presets: readonly TuningPreset[] = ALL_PRESETS,
 ): ReturnType<typeof tuningFamilySocraticRadarPareto> {
@@ -10592,7 +10600,6 @@ export function presetFamilySocraticRadarExponentialMovingAverage(
   });
   return tuningFamilySocraticRadarExponentialMovingAverage(tunings, spectrum, alpha, rootHz);
 }
-
 
 // ---------------------------------------------------------------------------
 // Q1087 — presetFamilySocraticRadarKullbackLeiblerDivergence
@@ -10928,7 +10935,14 @@ export function presetFamilySocraticRadarBootstrapCI(
     if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
     return loadTuningPreset(preset);
   });
-  return tuningFamilySocraticRadarBootstrapCI(tunings, spectrum, axis, samples, confidenceLevel, rootHz);
+  return tuningFamilySocraticRadarBootstrapCI(
+    tunings,
+    spectrum,
+    axis,
+    samples,
+    confidenceLevel,
+    rootHz,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -10976,7 +10990,12 @@ export function presetFamilySocraticRadarFuzzyMembership(
 export function presetFamilySocraticRadarMultiObjectiveRank(
   presetIds: string[],
   spectrum: Spectrum,
-  objectives: Partial<Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', 'maximize' | 'minimize'>>,
+  objectives: Partial<
+    Record<
+      'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+      'maximize' | 'minimize'
+    >
+  >,
   rootHz?: number,
   presets: readonly TuningPreset[] = ALL_PRESETS,
 ): ReturnType<typeof tuningFamilySocraticRadarMultiObjectiveRank> {
@@ -11089,7 +11108,9 @@ export function presetFamilySocraticRadarRollingWindowStats(
 export function presetFamilySocraticRadarEnsembleScore(
   presetIds: string[],
   spectrum: Spectrum,
-  weights?: Partial<Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>>,
+  weights?: Partial<
+    Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>
+  >,
   rootHz?: number,
   presets: readonly TuningPreset[] = ALL_PRESETS,
 ): ReturnType<typeof tuningFamilySocraticRadarEnsembleScore> {
@@ -11439,7 +11460,13 @@ export function presetFamilySocraticRadarPhaseSpaceEmbedding(
     if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
     return loadTuningPreset(preset);
   });
-  return tuningFamilySocraticRadarPhaseSpaceEmbedding(tunings, spectrum, axis, embeddingDim, rootHz);
+  return tuningFamilySocraticRadarPhaseSpaceEmbedding(
+    tunings,
+    spectrum,
+    axis,
+    embeddingDim,
+    rootHz,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -11602,7 +11629,15 @@ export function presetFamilySocraticRadarTransferEntropy(
     if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
     return loadTuningPreset(preset);
   });
-  return tuningFamilySocraticRadarTransferEntropy(tunings, spectrum, fromAxis, toAxis, lag, bins, rootHz);
+  return tuningFamilySocraticRadarTransferEntropy(
+    tunings,
+    spectrum,
+    fromAxis,
+    toAxis,
+    lag,
+    bins,
+    rootHz,
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -11741,7 +11776,15 @@ export function presetFamilySocraticRadarMultiScaleEntropy(
     if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
     return loadTuningPreset(preset);
   });
-  return tuningFamilySocraticRadarMultiScaleEntropy(tunings, spectrum, axis, maxScale, m, r, rootHz);
+  return tuningFamilySocraticRadarMultiScaleEntropy(
+    tunings,
+    spectrum,
+    axis,
+    maxScale,
+    m,
+    r,
+    rootHz,
+  );
 }
 
 // ---------------------------------------------------------------------------

@@ -16825,7 +16825,9 @@ export function tuningFamilySocraticRadarPolarizationIndex(
   for (const ax of axes) {
     meanProfile[ax] = profiles.reduce((s, p) => s + p[ax], 0) / profiles.length;
   }
-  const extremeAxes: AxisKey[] = axes.filter((ax) => meanProfile[ax] < 0.2 || meanProfile[ax] > 0.8);
+  const extremeAxes: AxisKey[] = axes.filter(
+    (ax) => meanProfile[ax] < 0.2 || meanProfile[ax] > 0.8,
+  );
   const polarizationIndex = extremeAxes.length / 5;
   const polarizationLabel: 'neutral' | 'moderate' | 'polarized' =
     polarizationIndex < 0.4 ? 'neutral' : polarizationIndex < 0.7 ? 'moderate' : 'polarized';
@@ -16964,8 +16966,14 @@ export function tuningFamilySocraticRadarRegimeProbability(
       const spec = regime[ax];
       if (!spec) continue;
       const score = p[ax];
-      if (spec.min !== undefined && score < spec.min) { passes = false; break; }
-      if (spec.max !== undefined && score > spec.max) { passes = false; break; }
+      if (spec.min !== undefined && score < spec.min) {
+        passes = false;
+        break;
+      }
+      if (spec.max !== undefined && score > spec.max) {
+        passes = false;
+        break;
+      }
     }
     if (passes) passingIndices.push(i);
   }
@@ -17053,7 +17061,9 @@ export function tuningFamilySocraticRadarOutlierDetection(
       outlierAxes[i] = outlierAxList;
     }
   }
-  const outlierIndices = Object.keys(outlierAxes).map(Number).sort((a, b) => a - b);
+  const outlierIndices = Object.keys(outlierAxes)
+    .map(Number)
+    .sort((a, b) => a - b);
   return { outlierIndices, outlierAxes };
 }
 
@@ -17412,7 +17422,11 @@ export function tuningFamilySocraticRadarMomentumScore(
   if (tunings.length <= 1) return { momentumScore: 0, momentumLabel: 'neutral' };
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const firstProfile = tuningFamilySocraticRadarProfile([tunings[0]!], spectrum, rootHz);
-  const lastProfile = tuningFamilySocraticRadarProfile([tunings[tunings.length - 1]!], spectrum, rootHz);
+  const lastProfile = tuningFamilySocraticRadarProfile(
+    [tunings[tunings.length - 1]!],
+    spectrum,
+    rootHz,
+  );
   const momentumScore = axes.reduce((s, ax) => s + (lastProfile[ax] - firstProfile[ax]), 0) / 5;
   const momentumLabel: 'positive' | 'negative' | 'neutral' =
     momentumScore > 0.02 ? 'positive' : momentumScore < -0.02 ? 'negative' : 'neutral';
@@ -17853,10 +17867,7 @@ export function tuningFamilySocraticRadarIntersectionProfile(
     if (profiles.length === 0) {
       intersectionProfile[ax] = 0;
     } else {
-      intersectionProfile[ax] = profiles.reduce(
-        (mn, p) => Math.min(mn, p[ax]),
-        profiles[0]![ax],
-      );
+      intersectionProfile[ax] = profiles.reduce((mn, p) => Math.min(mn, p[ax]), profiles[0]![ax]);
     }
   }
   return { intersectionProfile };
@@ -17887,10 +17898,7 @@ export function tuningFamilySocraticRadarUnionProfile(
     if (profiles.length === 0) {
       unionProfile[ax] = 0;
     } else {
-      unionProfile[ax] = profiles.reduce(
-        (mx, p) => Math.max(mx, p[ax]),
-        profiles[0]![ax],
-      );
+      unionProfile[ax] = profiles.reduce((mx, p) => Math.max(mx, p[ax]), profiles[0]![ax]);
     }
   }
   return { unionProfile };
@@ -18114,8 +18122,7 @@ export function tuningFamilySocraticRadarStrengthMap(
   const strengthMap = {} as Record<AxisKey, number>;
   const n = profiles.length;
   for (const ax of axes) {
-    strengthMap[ax] =
-      n === 0 ? 0 : profiles.filter((p) => p[ax] >= 0.6).length / n;
+    strengthMap[ax] = n === 0 ? 0 : profiles.filter((p) => p[ax] >= 0.6).length / n;
   }
   return { strengthMap };
 }
@@ -18159,7 +18166,13 @@ export function tuningFamilySocraticRadarSummaryReport(
   // Health index
   const { healthIndex } = tuningFamilySocraticRadarHealthIndex(tunings, spectrum, rootHz);
   const healthLabel =
-    healthIndex >= 0.8 ? 'excellent' : healthIndex >= 0.6 ? 'good' : healthIndex >= 0.4 ? 'fair' : 'poor';
+    healthIndex >= 0.8
+      ? 'excellent'
+      : healthIndex >= 0.6
+        ? 'good'
+        : healthIndex >= 0.4
+          ? 'fair'
+          : 'poor';
   // Overall trend
   const { overallTrend } = tuningFamilySocraticRadarTrend(tunings, spectrum, rootHz);
   const summaryReport = [
@@ -18470,7 +18483,11 @@ export function tuningFamilySocraticRadarPeakAxis(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { peakAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; peakScore: number; peakTuningIndex: number } {
+): {
+  peakAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  peakScore: number;
+  peakTuningIndex: number;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18509,7 +18526,11 @@ export function tuningFamilySocraticRadarValleyAxis(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { valleyAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; valleyScore: number; valleyTuningIndex: number } {
+): {
+  valleyAxis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  valleyScore: number;
+  valleyTuningIndex: number;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18590,7 +18611,10 @@ export function tuningFamilySocraticRadarFlexibilityScore(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { flexibilityScore: number; activeAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] } {
+): {
+  flexibilityScore: number;
+  activeAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18622,7 +18646,11 @@ export function tuningFamilySocraticRadarSignificanceTest(
   tuningsB: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { tStatistic: number; significant: boolean; significantAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] } {
+): {
+  tStatistic: number;
+  significant: boolean;
+  significantAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profilesA = tuningsA.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18640,10 +18668,8 @@ export function tuningFamilySocraticRadarSignificanceTest(
     if (nA <= 1 && nB <= 1) {
       t = meanA - meanB;
     } else {
-      const varA =
-        nA <= 1 ? 0 : valsA.reduce((s, v) => s + (v - meanA) ** 2, 0) / (nA - 1);
-      const varB =
-        nB <= 1 ? 0 : valsB.reduce((s, v) => s + (v - meanB) ** 2, 0) / (nB - 1);
+      const varA = nA <= 1 ? 0 : valsA.reduce((s, v) => s + (v - meanA) ** 2, 0) / (nA - 1);
+      const varB = nB <= 1 ? 0 : valsB.reduce((s, v) => s + (v - meanB) ** 2, 0) / (nB - 1);
       const se = Math.sqrt((nA > 0 ? varA / nA : 0) + (nB > 0 ? varB / nB : 0));
       t = se === 0 ? meanA - meanB : (meanA - meanB) / se;
     }
@@ -18843,7 +18869,9 @@ export function tuningFamilySocraticRadarVersatilityQuotient(
 export function tuningFamilySocraticRadarWeightedScore(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
-  weights: Partial<Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>>,
+  weights: Partial<
+    Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>
+  >,
   rootHz?: number,
 ): { weightedScore: number } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
@@ -18881,7 +18909,12 @@ export function tuningFamilySocraticRadarNormalizedProfile(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { normalizedProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  normalizedProfile: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18916,7 +18949,12 @@ export function tuningFamilySocraticRadarGeometricMean(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { geometricMean: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  geometricMean: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18954,7 +18992,12 @@ export function tuningFamilySocraticRadarHarmonicMean(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { harmonicMean: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  harmonicMean: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -18992,7 +19035,12 @@ export function tuningFamilySocraticRadarTrimmedMean(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { trimmedMean: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  trimmedMean: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -19048,7 +19096,10 @@ export function tuningFamilySocraticRadarRobustMedian(
   };
 
   if (profiles.length === 0) {
-    for (const ax of axes) { median[ax] = 0; mad[ax] = 0; }
+    for (const ax of axes) {
+      median[ax] = 0;
+      mad[ax] = 0;
+    }
     return { median, mad };
   }
 
@@ -19078,7 +19129,10 @@ export function tuningFamilySocraticRadarRobustMedian(
 export function tuningFamilySocraticRadarPercentileRank(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
-  queryProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>,
+  queryProfile: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >,
   rootHz?: number,
 ): {
   percentileRank: number;
@@ -19160,7 +19214,12 @@ export function tuningFamilySocraticRadarRankingVector(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { rankingVector: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  rankingVector: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -19205,7 +19264,12 @@ export function tuningFamilySocraticRadarMinMaxNormalized(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { normalizedProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  normalizedProfile: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -19248,7 +19312,10 @@ export function tuningFamilySocraticRadarAboveThresholdCount(
   spectrum: Spectrum,
   threshold: number,
   rootHz?: number,
-): { count: number; aboveAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] } {
+): {
+  count: number;
+  aboveAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -19343,7 +19410,12 @@ export function tuningFamilySocraticRadarZScore(
   populationMean: number,
   populationStd: number,
   rootHz?: number,
-): { zScoreProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  zScoreProfile: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -19354,7 +19426,8 @@ export function tuningFamilySocraticRadarZScore(
   }
   const zScoreProfile = {} as Record<AxisKey, number>;
   for (const ax of axes) {
-    zScoreProfile[ax] = populationStd === 0 ? 0 : (meanProfile[ax] - populationMean) / populationStd;
+    zScoreProfile[ax] =
+      populationStd === 0 ? 0 : (meanProfile[ax] - populationMean) / populationStd;
   }
   return { zScoreProfile };
 }
@@ -19379,7 +19452,10 @@ export function tuningFamilySocraticRadarRelativeStrength(
   spectrum: Spectrum,
   rootHz?: number,
 ): {
-  relativeStrength: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>;
+  relativeStrength: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
   strongerAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
   weakerAxes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
 } {
@@ -19420,7 +19496,10 @@ export function tuningFamilySocraticRadarImbalanceIndex(
   rootHz?: number,
 ): {
   imbalanceIndex: number;
-  mostImbalancedPair: ['diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'];
+  mostImbalancedPair: [
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  ];
 } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
@@ -19437,8 +19516,7 @@ export function tuningFamilySocraticRadarImbalanceIndex(
       const diff = Math.abs(meanProfile[axes[i]!]! - meanProfile[axes[j]!]!);
       if (
         diff > imbalanceIndex ||
-        (diff === imbalanceIndex &&
-          [axes[i]!, axes[j]!].join(',') < mostImbalancedPair.join(','))
+        (diff === imbalanceIndex && [axes[i]!, axes[j]!].join(',') < mostImbalancedPair.join(','))
       ) {
         imbalanceIndex = diff;
         mostImbalancedPair = [axes[i]!, axes[j]!];
@@ -19667,7 +19745,10 @@ export function tuningFamilySocraticRadarAxisPercentile(
 export function tuningFamilySocraticRadarPareto(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
-  candidates: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>[],
+  candidates: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >[],
   rootHz?: number,
 ): { isParetoOptimal: boolean; dominatedByCount: number } {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
@@ -19676,8 +19757,7 @@ export function tuningFamilySocraticRadarPareto(
   const n = profiles.length;
   const familyMean = {} as Record<AxisKey, number>;
   for (const ax of axes) {
-    familyMean[ax] =
-      n === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / n;
+    familyMean[ax] = n === 0 ? 0 : profiles.reduce((s, p) => s + p[ax], 0) / n;
   }
   let dominatedByCount = 0;
   for (const candidate of candidates) {
@@ -19709,7 +19789,12 @@ export function tuningFamilySocraticRadarAxisCorrelationWith(
   spectrum: Spectrum,
   axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
   rootHz?: number,
-): { correlations: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
+): {
+  correlations: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -19761,7 +19846,13 @@ export function tuningFamilySocraticRadarSignalToNoise(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { snrProfile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>; meanSNR: number } {
+): {
+  snrProfile: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+  meanSNR: number;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const SNR_CAP = 10.0;
@@ -19808,7 +19899,9 @@ export function tuningFamilySocraticRadarExponentialMovingAverage(
   rootHz?: number,
 ): { ema: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> } {
   if (alpha <= 0 || alpha > 1) {
-    throw new RangeError(`tuningFamilySocraticRadarExponentialMovingAverage: alpha must be in (0,1], got ${alpha}`);
+    throw new RangeError(
+      `tuningFamilySocraticRadarExponentialMovingAverage: alpha must be in (0,1], got ${alpha}`,
+    );
   }
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
@@ -19860,7 +19953,7 @@ export function melodicContour(pitchClasses: readonly number[]): string {
       result += 'R';
     } else {
       // Shortest-path interval: ascending direction (mod 12)
-      const up = ((b - a) + 12) % 12; // 1..11
+      const up = (b - a + 12) % 12; // 1..11
       // up < 6 → ascending, up > 6 → descending, up === 6 → tritone → treat as U
       result += up <= 6 ? 'U' : 'D';
     }
@@ -19957,7 +20050,7 @@ export function scaleRotations(degrees: readonly number[]): number[][] {
   const result: number[][] = [];
   for (let i = 0; i < degrees.length; i++) {
     const root = degrees[i]!;
-    const rotation = degrees.map((d) => ((d - root) % 12 + 12) % 12).sort((a, b) => a - b);
+    const rotation = degrees.map((d) => (((d - root) % 12) + 12) % 12).sort((a, b) => a - b);
     result.push(rotation);
   }
   return result;
@@ -20056,7 +20149,7 @@ export function scaleSubsets(degrees: readonly number[], size: number): number[]
   function combine(start: number, current: number[]): void {
     if (current.length === size) {
       const minVal = current[0]!;
-      const normalized = current.map((d) => ((d - minVal) % 12 + 12) % 12).sort((a, b) => a - b);
+      const normalized = current.map((d) => (((d - minVal) % 12) + 12) % 12).sort((a, b) => a - b);
       const key = normalized.join(',');
       if (!seen.has(key)) {
         seen.add(key);
@@ -20113,7 +20206,7 @@ export function fundamentalBassNote(
   if (chord.length === 1) return ((chord[0]! % 12) + 12) % 12;
 
   const uniquePcs = [...new Set(chord.map((pc) => ((pc % 12) + 12) % 12))];
-  const chordFreqs = chord.map((pc) => rootHz * Math.pow(2, ((pc % 12 + 12) % 12) / 12));
+  const chordFreqs = chord.map((pc) => rootHz * Math.pow(2, (((pc % 12) + 12) % 12) / 12));
 
   let bestPc = uniquePcs[0]!;
   let bestDissonance = Infinity;
@@ -20154,10 +20247,7 @@ export function fundamentalBassNote(
  * voiceLeadingDistance([0, 4, 7], [0, 4, 7]); // 0
  * voiceLeadingDistance([0, 4, 7], [0, 3, 9]); // small number (parsimony)
  */
-export function voiceLeadingDistance(
-  chordA: readonly number[],
-  chordB: readonly number[],
-): number {
+export function voiceLeadingDistance(chordA: readonly number[], chordB: readonly number[]): number {
   if (chordA.length === 0 || chordB.length === 0) return 0;
 
   const voices = Math.min(chordA.length, chordB.length);
@@ -20254,10 +20344,10 @@ export function modalInterchange(
   mode2Degrees: readonly number[],
 ): number[] {
   const root = ((rootPc % 12) + 12) % 12;
-  const set1 = new Set(mode1Degrees.map((d) => (root + ((d % 12 + 12) % 12)) % 12));
+  const set1 = new Set(mode1Degrees.map((d) => (root + (((d % 12) + 12) % 12)) % 12));
   const borrowed: number[] = [];
   for (const d of mode2Degrees) {
-    const pc = (root + ((d % 12 + 12) % 12)) % 12;
+    const pc = (root + (((d % 12) + 12) % 12)) % 12;
     if (!set1.has(pc)) {
       borrowed.push(pc);
     }
@@ -20303,7 +20393,7 @@ export function harmonicField(
   return scaleDegrees.map((_, i) => {
     const chord = stepsNeeded.map((step) => {
       const degree = scaleDegrees[(i + step) % n]!;
-      return (root + ((degree % 12 + 12) % 12)) % 12;
+      return (root + (((degree % 12) + 12) % 12)) % 12;
     });
     return chord.sort((a, b) => a - b);
   });
@@ -20341,7 +20431,7 @@ export function chordInversion(chord: readonly number[], inversion: number): num
   const rotated = [...sorted.slice(rot), ...sorted.slice(0, rot)];
   // Re-normalise: subtract minimum so lowest PC = 0
   const min = rotated[0]!;
-  return rotated.map((pc) => ((pc - min) % 12 + 12) % 12);
+  return rotated.map((pc) => (((pc - min) % 12) + 12) % 12);
 }
 
 // ---------------------------------------------------------------------------
@@ -20385,7 +20475,7 @@ export function diatonicTransposition(
         bestIdx = i;
       }
     }
-    const newIdx = ((bestIdx + steps) % n + n) % n;
+    const newIdx = (((bestIdx + steps) % n) + n) % n;
     return ((scaleDegrees[newIdx]! % 12) + 12) % 12;
   });
 }
@@ -20458,7 +20548,7 @@ export function chordComplexity(
   const structural = uniquePCs.size / 12;
 
   // Spectral: dissonance normalised by the chromatic reference
-  const toFreq = (pc: number) => rootHz * Math.pow(2, ((pc % 12 + 12) % 12) / 12);
+  const toFreq = (pc: number) => rootHz * Math.pow(2, (((pc % 12) + 12) % 12) / 12);
   const chordFreqs = [...uniquePCs].map(toFreq);
   const chromaticPCs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
   const refFreqs = chromaticPCs.map(toFreq);
@@ -20503,7 +20593,13 @@ export function noteNameToMidi(name: string): number {
 
   // Base pitch class for each letter (C=0)
   const letterPc: Record<string, number> = {
-    C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11,
+    C: 0,
+    D: 2,
+    E: 4,
+    F: 5,
+    G: 7,
+    A: 9,
+    B: 11,
   };
   const basePc = letterPc[letter];
   if (basePc === undefined) {
@@ -20529,7 +20625,20 @@ export function noteNameToMidi(name: string): number {
 
 const SOLFEGE_7 = ['Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Si'] as const;
 const SOLFEGE_5 = ['Do', 'Re', 'Mi', 'Sol', 'La'] as const;
-const SOLFEGE_12 = ['Do', 'Di', 'Re', 'Ri', 'Mi', 'Fa', 'Fi', 'Sol', 'Si', 'La', 'Li', 'Ti'] as const;
+const SOLFEGE_12 = [
+  'Do',
+  'Di',
+  'Re',
+  'Ri',
+  'Mi',
+  'Fa',
+  'Fi',
+  'Sol',
+  'Si',
+  'La',
+  'Li',
+  'Ti',
+] as const;
 
 /**
  * Convert a scale degree index to its solfege syllable.
@@ -20586,7 +20695,8 @@ export function scaleDegreeToSolfege(
   // For other scale sizes: map by proportional index into 7-degree table
   const mapped = Math.round((degree / totalDegrees) * 7) % 7;
   const syllable = SOLFEGE_7[mapped];
-  if (syllable === undefined) throw new RangeError(`No solfege mapping for degree ${degree} of ${totalDegrees}`);
+  if (syllable === undefined)
+    throw new RangeError(`No solfege mapping for degree ${degree} of ${totalDegrees}`);
   return syllable;
 }
 
@@ -20670,10 +20780,7 @@ export function chordName(chord: readonly number[]): string {
       .sort((a, b) => a - b);
 
     for (const [sig, name] of CHORD_SIGNATURES) {
-      if (
-        sig.length === intervals.length &&
-        sig.every((iv, idx) => iv === intervals[idx])
-      ) {
+      if (sig.length === intervals.length && sig.every((iv, idx) => iv === intervals[idx])) {
         return name;
       }
     }
@@ -20701,10 +20808,7 @@ export function chordName(chord: readonly number[]): string {
  * ambitus([0, 2, 4, 5, 7, 9, 11]); // 11
  * ambitus([]);                       // 0
  */
-export function ambitus(
-  pitchClasses: readonly number[],
-  anchorPc?: number,
-): number {
+export function ambitus(pitchClasses: readonly number[], anchorPc?: number): number {
   if (pitchClasses.length === 0) return 0;
 
   const first = pitchClasses[0]!;
@@ -20717,7 +20821,7 @@ export function ambitus(
   for (const pc of pitchClasses) {
     const normalized = ((pc % 12) + 12) % 12;
     // Candidate: pick the nearest octave of normalized relative to prev
-    let diff = (normalized - ((prev % 12) + 12) % 12 + 12) % 12;
+    let diff = (normalized - (((prev % 12) + 12) % 12) + 12) % 12;
     if (diff > 6) diff -= 12;
     const current = prev + diff;
     unfolded.push(current);
@@ -20760,8 +20864,7 @@ export function melodicLeaps(pitchClasses: readonly number[]): {
     }
   }
 
-  const avgLeap =
-    leaps.length > 0 ? leaps.reduce((s, v) => s + v, 0) / leaps.length : 0;
+  const avgLeap = leaps.length > 0 ? leaps.reduce((s, v) => s + v, 0) / leaps.length : 0;
   const maxLeap = leaps.length > 0 ? Math.max(...leaps) : 0;
 
   return { leaps, avgLeap, maxLeap };
@@ -20784,10 +20887,7 @@ export function melodicLeaps(pitchClasses: readonly number[]): {
  * generateChordProgression([0, 5, 7], 3);
  * // [[0,4,7], [0,5,9], [2,7,11]]
  */
-export function generateChordProgression(
-  rootPcs: readonly number[],
-  chordSize: 3 | 4,
-): number[][] {
+export function generateChordProgression(rootPcs: readonly number[], chordSize: 3 | 4): number[][] {
   return rootPcs.map((root) => {
     const r = ((root % 12) + 12) % 12;
     const pcs =
@@ -20816,7 +20916,7 @@ export function transposePitchClasses(
   pitchClasses: readonly number[],
   semitones: number,
 ): number[] {
-  return pitchClasses.map((pc) => ((pc + semitones) % 12 + 12) % 12);
+  return pitchClasses.map((pc) => (((pc + semitones) % 12) + 12) % 12);
 }
 
 /**
@@ -20937,10 +21037,7 @@ export function computeDissonanceCurve(
  * isSubsetOf([0, 4, 7], [0, 2, 4, 5, 7, 9, 11]); // true — C-major triad in C-major scale
  * isSubsetOf([0, 1], [0, 2, 4]); // false
  */
-export function isSubsetOf(
-  subset: readonly number[],
-  superset: readonly number[],
-): boolean {
+export function isSubsetOf(subset: readonly number[], superset: readonly number[]): boolean {
   const superSet = new Set(superset.map((x) => ((x % 12) + 12) % 12));
   for (const pc of subset) {
     if (!superSet.has(((pc % 12) + 12) % 12)) return false;
@@ -20961,10 +21058,7 @@ export function isSubsetOf(
  * @example
  * pcSetIntersection([0, 4, 7], [0, 3, 7]); // [0, 7]
  */
-export function pcSetIntersection(
-  a: readonly number[],
-  b: readonly number[],
-): number[] {
+export function pcSetIntersection(a: readonly number[], b: readonly number[]): number[] {
   const setA = new Set(a.map((x) => ((x % 12) + 12) % 12));
   const setB = new Set(b.map((x) => ((x % 12) + 12) % 12));
   const result: number[] = [];
@@ -20987,10 +21081,7 @@ export function pcSetIntersection(
  * @example
  * pcSetUnion([0, 4], [7, 11]); // [0, 4, 7, 11]
  */
-export function pcSetUnion(
-  a: readonly number[],
-  b: readonly number[],
-): number[] {
+export function pcSetUnion(a: readonly number[], b: readonly number[]): number[] {
   const combined = new Set([
     ...a.map((x) => ((x % 12) + 12) % 12),
     ...b.map((x) => ((x % 12) + 12) % 12),
@@ -21013,10 +21104,7 @@ export function pcSetUnion(
  * scaleDistance([0, 4, 7], [0, 4, 7]); // 0 — identical
  * scaleDistance([0, 4, 7], [1, 5, 8]); // 1 — completely different
  */
-export function scaleDistance(
-  degreesA: readonly number[],
-  degreesB: readonly number[],
-): number {
+export function scaleDistance(degreesA: readonly number[], degreesB: readonly number[]): number {
   const setA = new Set(degreesA.map((x) => ((x % 12) + 12) % 12));
   const setB = new Set(degreesB.map((x) => ((x % 12) + 12) % 12));
   if (setA.size === 0 && setB.size === 0) return 0;
@@ -21072,10 +21160,7 @@ export function zetaFunction(pitchClasses: readonly number[]): number {
  * @example
  * roughnessProfile([261.63, 329.63, 392.00], harmonicSpectrum());
  */
-export function roughnessProfile(
-  freqs: readonly number[],
-  spectrum: Spectrum,
-): number[] {
+export function roughnessProfile(freqs: readonly number[], spectrum: Spectrum): number[] {
   const result: number[] = [];
   for (let i = 0; i < freqs.length; i++) {
     for (let j = i + 1; j < freqs.length; j++) {
@@ -21194,7 +21279,7 @@ export function modeOf(degrees: readonly number[], modeIndex: number): number[] 
   if (degrees.length === 0) return [];
   const i = ((modeIndex % degrees.length) + degrees.length) % degrees.length;
   const root = degrees[i]!;
-  return degrees.map((d) => ((d - root) % 12 + 12) % 12).sort((a, b) => a - b);
+  return degrees.map((d) => (((d - root) % 12) + 12) % 12).sort((a, b) => a - b);
 }
 
 // ---------------------------------------------------------------------------
@@ -21292,7 +21377,10 @@ export function tuningFamilySocraticRadarKullbackLeiblerDivergence(
   spectrum: Spectrum,
   epsilon = 1e-10,
   rootHz?: number,
-): { axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; klFromMean: number }[] {
+): {
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  klFromMean: number;
+}[] {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -21359,7 +21447,10 @@ export function tuningFamilySocraticRadarShannonEntropy(
   spectrum: Spectrum,
   bins = 5,
   rootHz?: number,
-): { axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; entropy: number }[] {
+): {
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  entropy: number;
+}[] {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -21437,7 +21528,10 @@ export function tuningFamilySocraticRadarGiniCoefficient(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; gini: number }[] {
+): {
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  gini: number;
+}[] {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -21552,16 +21646,20 @@ export function edoEnharmonicEquivalents(
   toleranceCents: number = 10,
 ): number[] {
   if (edoDivisions < 1) {
-    throw new RangeError(`edoEnharmonicEquivalents: edoDivisions must be >= 1, got ${edoDivisions}`);
+    throw new RangeError(
+      `edoEnharmonicEquivalents: edoDivisions must be >= 1, got ${edoDivisions}`,
+    );
   }
   if (toleranceCents < 0) {
-    throw new RangeError(`edoEnharmonicEquivalents: toleranceCents must be >= 0, got ${toleranceCents}`);
+    throw new RangeError(
+      `edoEnharmonicEquivalents: toleranceCents must be >= 0, got ${toleranceCents}`,
+    );
   }
   const stepSize = 1200 / edoDivisions;
   const targetMod = ((targetCents % 1200) + 1200) % 1200;
   const matches: number[] = [];
   for (let degree = 0; degree < edoDivisions; degree++) {
-    const degreeCents = ((degree * stepSize) % 1200 + 1200) % 1200;
+    const degreeCents = (((degree * stepSize) % 1200) + 1200) % 1200;
     let diff = Math.abs(degreeCents - targetMod);
     // Wrap-around distance (e.g., 0 and 1190 are 10 cents apart)
     if (diff > 600) diff = 1200 - diff;
@@ -21652,7 +21750,7 @@ export function scaleToIntervalHistogram(
       const pi = scaleCents[i]!;
       const pj = scaleCents[j]!;
       // Ascending interval (wrap at 1200)
-      const interval = ((pj - pi) % 1200 + 1200) % 1200;
+      const interval = (((pj - pi) % 1200) + 1200) % 1200;
       if (interval === 0) continue; // same pitch class
       const bin = Math.floor(interval / binSizeCents) * binSizeCents;
       hist.set(bin, (hist.get(bin) ?? 0) + 1);
@@ -21670,10 +21768,15 @@ export function tuningFamilySocraticRadarTopK(
   spectrum: Spectrum,
   k: number = 3,
   rootHz?: number,
-): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', Array<{ id: string; score: number }>> {
+): Record<
+  'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  Array<{ id: string; score: number }>
+> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
-  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
   const result = {} as Record<AxisKey, Array<{ id: string; score: number }>>;
   const limit = Math.min(k, tunings.length);
   for (const ax of axes) {
@@ -21693,10 +21796,15 @@ export function tuningFamilySocraticRadarBottomK(
   spectrum: Spectrum,
   k: number = 3,
   rootHz?: number,
-): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', Array<{ id: string; score: number }>> {
+): Record<
+  'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+  Array<{ id: string; score: number }>
+> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
-  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
   const result = {} as Record<AxisKey, Array<{ id: string; score: number }>>;
   const limit = Math.min(k, tunings.length);
   for (const ax of axes) {
@@ -21715,7 +21823,11 @@ export function tuningFamilySocraticRadarDominantAxisPerTuning(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): Array<{ id: string; axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; score: number }> {
+): Array<{
+  id: string;
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  score: number;
+}> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const result = tunings.map((t) => {
@@ -21737,10 +21849,17 @@ export function tuningFamilySocraticRadarAxisQuartiles(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): Array<{ axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; q1: number; q2: number; q3: number }> {
+): Array<{
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  q1: number;
+  q2: number;
+  q3: number;
+}> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
-  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
 
   function interpolate(sorted: number[], p: number): number {
     const n = sorted.length;
@@ -21774,13 +21893,18 @@ export function tuningFamilySocraticRadarAnomalyScore(
   rootHz?: number,
 ): Array<{ id: string; anomalyScore: number }> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
-  const axes: AxisKey[] = ['diversity', 'versatility' , 'maturity', 'benchmark', 'convergence'];
-  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
   const n = profiles.length;
   if (n === 0) return [];
 
   // Compute mean and population std per axis
-  const stats: Record<AxisKey, { mean: number; std: number }> = {} as Record<AxisKey, { mean: number; std: number }>;
+  const stats: Record<AxisKey, { mean: number; std: number }> = {} as Record<
+    AxisKey,
+    { mean: number; std: number }
+  >;
   for (const ax of axes) {
     const vals = profiles.map((p) => p[ax]);
     const mean = vals.reduce((s, v) => s + v, 0) / n;
@@ -21848,7 +21972,7 @@ export function pitchSetComplement(
     throw new RangeError(`pitchSetComplement: edoDivisions must be ≥ 1, got ${edoDivisions}`);
   }
   const step = 1200 / edoDivisions;
-  const pcs = pitchClassesCents.map(c => ((c % 1200) + 1200) % 1200);
+  const pcs = pitchClassesCents.map((c) => ((c % 1200) + 1200) % 1200);
   const complement: number[] = [];
   for (let i = 0; i < edoDivisions; i++) {
     const degree = i * step;
@@ -21882,12 +22006,9 @@ export function pitchSetComplement(
  * @example
  * scaleMirror([0, 200, 400, 500, 700, 900, 1100]); // major → phrygian-like mirror
  */
-export function scaleMirror(
-  scaleCents: readonly number[],
-  axis: number = 0,
-): number[] {
+export function scaleMirror(scaleCents: readonly number[], axis: number = 0): number[] {
   if (scaleCents.length === 0) return [];
-  const mirrored = scaleCents.map(c => ((2 * axis - c) % 1200 + 1200) % 1200);
+  const mirrored = scaleCents.map((c) => (((2 * axis - c) % 1200) + 1200) % 1200);
   mirrored.sort((a, b) => a - b);
   // Deduplicate within 0.001 cents
   const result: number[] = [mirrored[0]!];
@@ -21922,10 +22043,7 @@ export function scaleMirror(
  * modalTranspose([0, 200, 400, 500, 700, 900, 1100], 1);
  * // → [0, 200, 300, 500, 700, 900, 1000]  (Dorian from major)
  */
-export function modalTranspose(
-  scaleCents: readonly number[],
-  steps: number,
-): number[] {
+export function modalTranspose(scaleCents: readonly number[], steps: number): number[] {
   if (scaleCents.length === 0) {
     if (steps !== 0) {
       throw new RangeError('modalTranspose: cannot rotate empty scale with nonzero steps');
@@ -21938,9 +22056,7 @@ export function modalTranspose(
   if (rotation === 0) return sorted;
   const rotated = [...sorted.slice(rotation), ...sorted.slice(0, rotation)];
   const offset = rotated[0]!;
-  return rotated
-    .map(c => ((c - offset) % 1200 + 1200) % 1200)
-    .sort((a, b) => a - b);
+  return rotated.map((c) => (((c - offset) % 1200) + 1200) % 1200).sort((a, b) => a - b);
 }
 
 // ---------------------------------------------------------------------------
@@ -21970,7 +22086,7 @@ export function scaleSymmetryAxes(
   toleranceCents: number = 5,
 ): number[] {
   if (scaleCents.length === 0) return [];
-  const pcs = scaleCents.map(c => ((c % 1200) + 1200) % 1200);
+  const pcs = scaleCents.map((c) => ((c % 1200) + 1200) % 1200);
 
   // Generate candidate axes from all pairs (p1+p2)/2 mod 1200,
   // including each pitch paired with its octave-shifted self (gives axis = p + 600).
@@ -21978,11 +22094,11 @@ export function scaleSymmetryAxes(
   for (let i = 0; i < pcs.length; i++) {
     const pi = pcs[i]!;
     // Pair pitch with its octave-shifted self → axis = p + 600
-    candidateSet.add(((pi + 600) % 1200 + 1200) % 1200);
+    candidateSet.add((((pi + 600) % 1200) + 1200) % 1200);
     for (let j = i; j < pcs.length; j++) {
       const pj = pcs[j]!;
       // (pi + pj) / 2 mod 1200 and the "other half" (shifted by 600)
-      const a1 = ((pi + pj) / 2 % 1200 + 1200) % 1200;
+      const a1 = ((((pi + pj) / 2) % 1200) + 1200) % 1200;
       const a2 = ((pi + pj) / 2 + 600) % 1200;
       candidateSet.add(Math.round(a1 * 1000) / 1000);
       candidateSet.add(Math.round(a2 * 1000) / 1000);
@@ -21994,7 +22110,7 @@ export function scaleSymmetryAxes(
   for (const axis of candidateSet) {
     let symmetric = true;
     for (const p of pcs) {
-      const reflected = ((2 * axis - p) % 1200 + 1200) % 1200;
+      const reflected = (((2 * axis - p) % 1200) + 1200) % 1200;
       let found = false;
       for (const q of pcs) {
         let diff = Math.abs(reflected - q);
@@ -22149,15 +22265,12 @@ export function tuningFamilySocraticRadarKMeansCluster(
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   if (k < 1 || k > tunings.length) {
-    throw new RangeError(
-      `k must be between 1 and tunings.length (${tunings.length}), got ${k}`,
-    );
+    throw new RangeError(`k must be between 1 and tunings.length (${tunings.length}), got ${k}`);
   }
   const profiles = tunings.map((t) =>
     tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
   );
-  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
-    axes.map((ax) => p[ax]);
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) => axes.map((ax) => p[ax]);
 
   const l2 = (a: number[], b: number[]) =>
     Math.sqrt(a.reduce((s, v, i) => s + (v - (b[i] ?? 0)) ** 2, 0));
@@ -22208,7 +22321,10 @@ export function tuningFamilySocraticRadarPrincipalAxis(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): Array<{ axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; variance: number }> {
+): Array<{
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  variance: number;
+}> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) =>
@@ -22320,7 +22436,9 @@ export function justIntonationError(
 
   return scaleCents.map((degreeCents, idx) => {
     const pc = ((degreeCents % 1200) + 1200) % 1200;
-    let bestN = 1, bestD = 1, bestErr = Infinity;
+    let bestN = 1,
+      bestD = 1,
+      bestErr = Infinity;
     for (const { n, d, cents } of candidates) {
       const err = cents - pc;
       if (Math.abs(err) < Math.abs(bestErr)) {
@@ -22352,10 +22470,7 @@ export function justIntonationError(
  * @example
  * edoToContinuedFraction(700, 5); // → [0, 1, 1, 2, 2] (approx. 7/12)
  */
-export function edoToContinuedFraction(
-  cents: number,
-  maxTerms: number = 8,
-): number[] {
+export function edoToContinuedFraction(cents: number, maxTerms: number = 8): number[] {
   if (maxTerms < 1) throw new RangeError('maxTerms must be >= 1');
 
   const result: number[] = [];
@@ -22382,18 +22497,18 @@ export function edoToContinuedFraction(
  * Ratios: [1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8]
  */
 const _SEMITONE_HD: readonly number[] = [
-  Math.log2(1 * 1),        // 0: 1/1
-  Math.log2(16 * 15),      // 1: 16/15
-  Math.log2(9 * 8),        // 2: 9/8
-  Math.log2(6 * 5),        // 3: 6/5
-  Math.log2(5 * 4),        // 4: 5/4
-  Math.log2(4 * 3),        // 5: 4/3
-  Math.log2(45 * 32),      // 6: 45/32
-  Math.log2(3 * 2),        // 7: 3/2
-  Math.log2(8 * 5),        // 8: 8/5
-  Math.log2(5 * 3),        // 9: 5/3
-  Math.log2(16 * 9),       // 10: 16/9
-  Math.log2(15 * 8),       // 11: 15/8
+  Math.log2(1 * 1), // 0: 1/1
+  Math.log2(16 * 15), // 1: 16/15
+  Math.log2(9 * 8), // 2: 9/8
+  Math.log2(6 * 5), // 3: 6/5
+  Math.log2(5 * 4), // 4: 5/4
+  Math.log2(4 * 3), // 5: 4/3
+  Math.log2(45 * 32), // 6: 45/32
+  Math.log2(3 * 2), // 7: 3/2
+  Math.log2(8 * 5), // 8: 8/5
+  Math.log2(5 * 3), // 9: 5/3
+  Math.log2(16 * 9), // 10: 16/9
+  Math.log2(15 * 8), // 11: 15/8
 ];
 
 /**
@@ -22407,9 +22522,7 @@ const _SEMITONE_HD: readonly number[] = [
  * @example
  * harmonicDistanceMatrix([0, 4, 7]); // C-E-G triad harmonic distances
  */
-export function harmonicDistanceMatrix(
-  pitchClasses: readonly number[],
-): number[][] {
+export function harmonicDistanceMatrix(pitchClasses: readonly number[]): number[][] {
   if (pitchClasses.length === 0) throw new RangeError('pitchClasses must not be empty');
 
   const n = pitchClasses.length;
@@ -22421,7 +22534,7 @@ export function harmonicDistanceMatrix(
         matrix[i]![j] = 0;
         continue;
       }
-      const interval = ((pitchClasses[j]! - pitchClasses[i]!) % 12 + 12) % 12;
+      const interval = (((pitchClasses[j]! - pitchClasses[i]!) % 12) + 12) % 12;
       const hdUp = _SEMITONE_HD[interval]!;
       const hdDown = _SEMITONE_HD[(12 - interval) % 12]!;
       matrix[i]![j] = Math.min(hdUp, hdDown);
@@ -22467,7 +22580,7 @@ export function scaleRoughnessProfile(
         const fj = degHz * pj.ratio;
         const avg = (fi + fj) / 2;
         if (avg === 0) continue;
-        roughness += pi.amplitude * pj.amplitude * Math.exp(-3.5 * Math.abs(fi - fj) / avg);
+        roughness += pi.amplitude * pj.amplitude * Math.exp((-3.5 * Math.abs(fi - fj)) / avg);
       }
     }
 
@@ -22547,7 +22660,7 @@ export function scaleConnectedness(
   let intersection = 0;
   for (const c1 of scale1Cents) {
     const n1 = normalize(c1);
-    const matches = norm2.some(n2 => {
+    const matches = norm2.some((n2) => {
       const diff = Math.abs(n1 - n2);
       return Math.min(diff, 1200 - diff) <= toleranceCents;
     });
@@ -22719,10 +22832,15 @@ export function tuningFamilySocraticRadarNormalizeProfiles(
   spectrum: Spectrum,
   method: 'minmax' | 'zscore' = 'minmax',
   rootHz?: number,
-): Array<{ id: string; profile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> }> {
+): Array<{
+  id: string;
+  profile: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number>;
+}> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
-  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
   const n = profiles.length;
   if (n === 0) return [];
 
@@ -22774,7 +22892,13 @@ export function tuningFamilySocraticRadarFuzzyMembership(
   spectrum: Spectrum,
   threshold: number = 0.5,
   rootHz?: number,
-): Array<{ id: string; membership: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> }> {
+): Array<{
+  id: string;
+  membership: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  >;
+}> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   return tunings.map((t) => {
@@ -22805,7 +22929,12 @@ export function tuningFamilySocraticRadarFuzzyMembership(
 export function tuningFamilySocraticRadarMultiObjectiveRank(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
-  objectives: Partial<Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', 'maximize' | 'minimize'>>,
+  objectives: Partial<
+    Record<
+      'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+      'maximize' | 'minimize'
+    >
+  >,
   rootHz?: number,
 ): Array<{ id: string; rank: number; score: number }> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
@@ -22847,10 +22976,16 @@ export function tuningFamilySocraticRadarAdaptiveThreshold(
   spectrum: Spectrum,
   multiplier: number = 1.0,
   rootHz?: number,
-): Array<{ axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'; threshold: number; aboveCount: number }> {
+): Array<{
+  axis: 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  threshold: number;
+  aboveCount: number;
+}> {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
-  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz));
+  const profiles = tunings.map((t) =>
+    tuningFamilySocraticRadarProfile([t as TuningSystem], spectrum, rootHz),
+  );
   const n = profiles.length;
 
   return axes.map((ax) => {
@@ -22957,7 +23092,7 @@ export function scaleModulationDistance(
   if (totalLen === 0) return 0;
 
   const isClose = (a: number, b: number): boolean => {
-    const diff = Math.abs(((a - b) % 1200 + 1200) % 1200);
+    const diff = Math.abs((((a - b) % 1200) + 1200) % 1200);
     return Math.min(diff, 1200 - diff) <= toleranceCents;
   };
 
@@ -23156,7 +23291,11 @@ export function tuningFamilySocraticRadarRollingWindowStats(
   }
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const results: Array<{ windowEnd: number; mean: Record<AxisKey, number>; std: Record<AxisKey, number> }> = [];
+  const results: Array<{
+    windowEnd: number;
+    mean: Record<AxisKey, number>;
+    std: Record<AxisKey, number>;
+  }> = [];
   for (let i = windowSize - 1; i < profiles.length; i++) {
     const window = profiles.slice(i - windowSize + 1, i + 1);
     const mean = {} as Record<AxisKey, number>;
@@ -23206,7 +23345,8 @@ export function tuningFamilySocraticRadarEnsembleScore(
   const totalWeight = axes.reduce((s, ax) => s + effectiveWeights[ax], 0);
   const result = tunings.map((t) => {
     const profile = tuningFamilySocraticRadarProfile([t], spectrum, rootHz);
-    const ensembleScore = axes.reduce((s, ax) => s + effectiveWeights[ax] * profile[ax], 0) / totalWeight;
+    const ensembleScore =
+      axes.reduce((s, ax) => s + effectiveWeights[ax] * profile[ax], 0) / totalWeight;
     return { id: t.id, ensembleScore };
   });
   return result.sort((a, b) => b.ensembleScore - a.ensembleScore);
@@ -23248,8 +23388,8 @@ export function tuningFamilySocraticRadarMonteCarloVariance(
   for (let trial = 0; trial < trials; trial++) {
     const subset: typeof profiles = [];
     for (let j = 0; j < subsetSize; j++) {
-      seed = (seed * 1664525 + 1013904223) & 0xFFFFFFFF;
-      const idx = ((seed >>> 0) % n + n) % n;
+      seed = (seed * 1664525 + 1013904223) & 0xffffffff;
+      const idx = (((seed >>> 0) % n) + n) % n;
       subset.push(profiles[idx]!);
     }
     const trialMean = {} as Record<AxisKey, number>;
@@ -23295,7 +23435,9 @@ export function tuningFamilySocraticRadarDiversityIndex(
   let pairCount = 0;
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      const l2 = Math.sqrt(axes.reduce((s, ax) => s + (profiles[i]![ax] - profiles[j]![ax]) ** 2, 0));
+      const l2 = Math.sqrt(
+        axes.reduce((s, ax) => s + (profiles[i]![ax] - profiles[j]![ax]) ** 2, 0),
+      );
       totalDistance += l2;
       pairCount++;
     }
@@ -23353,7 +23495,7 @@ export function tuningFamilySocraticRadarOptimalSubset(
     if (kk === 0 || kk === nn) return 1;
     let result = 1;
     for (let i = 0; i < kk; i++) {
-      result = result * (nn - i) / (i + 1);
+      result = (result * (nn - i)) / (i + 1);
       if (result > 200) return 201; // Early exit to avoid overflow
     }
     return result;
@@ -23423,10 +23565,7 @@ export function tuningFamilySocraticRadarOptimalSubset(
  * Normalize by dividing by max count (if max > 0).
  * Returns array of length `edo` with values in [0,1].
  */
-export function scaleChromaVector(
-  scaleCents: readonly number[],
-  edo: number = 12,
-): number[] {
+export function scaleChromaVector(scaleCents: readonly number[], edo: number = 12): number[] {
   if (edo < 1) throw new RangeError(`edo must be >= 1, got ${edo}`);
   const bins = new Array<number>(edo).fill(0);
   const binWidth = 1200 / edo;
@@ -24014,9 +24153,15 @@ export function tuningFamilySocraticRadarStabilityScore(
   for (const ax of axes) {
     const vals = profiles.map((p) => p[ax]);
     const n = vals.length;
-    if (n === 0) { result[ax] = 1; continue; }
+    if (n === 0) {
+      result[ax] = 1;
+      continue;
+    }
     const mean = vals.reduce((s, v) => s + v, 0) / n;
-    if (mean <= 0) { result[ax] = 1; continue; }
+    if (mean <= 0) {
+      result[ax] = 1;
+      continue;
+    }
     const variance = vals.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
     const std = Math.sqrt(variance);
     const cv = Math.min(1, std / mean);
@@ -24240,10 +24385,7 @@ export function tuningFamilySocraticRadarRegimeDetection(
  * @example
  * perceptualTuningDistance(equalTemperament12(440), equalTemperament12(432));
  */
-export function perceptualTuningDistance(
-  tuning1: TuningSystem,
-  tuning2: TuningSystem,
-): number {
+export function perceptualTuningDistance(tuning1: TuningSystem, tuning2: TuningSystem): number {
   const n1 = tuning1.degrees.length;
   const n2 = tuning2.degrees.length;
   const n = Math.min(n1, n2);
@@ -24376,10 +24518,7 @@ export function harmonicEntropyApproximation(
  * @example
  * tuningComplexityRatio(equalTemperament12(440));
  */
-export function tuningComplexityRatio(
-  tuning: TuningSystem,
-  maxNumerator: number = 32,
-): number {
+export function tuningComplexityRatio(tuning: TuningSystem, maxNumerator: number = 32): number {
   if (maxNumerator < 2) throw new RangeError('maxNumerator must be >= 2');
 
   const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
@@ -24711,9 +24850,8 @@ export function intervalConsistency(
 
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      const raw = ((scaleCents[j]! - scaleCents[i]!) % 1200 + 1200) % 1200;
-      const bin =
-        toleranceCents > 0 ? Math.round(raw / toleranceCents) * toleranceCents : raw;
+      const raw = (((scaleCents[j]! - scaleCents[i]!) % 1200) + 1200) % 1200;
+      const bin = toleranceCents > 0 ? Math.round(raw / toleranceCents) * toleranceCents : raw;
       classCounts.set(bin, (classCounts.get(bin) ?? 0) + 1);
     }
   }
@@ -24753,7 +24891,7 @@ export function tuningIsomorphismScore(
     const result: number[] = [];
     for (let i = 0; i < cents.length; i++) {
       for (let j = i + 1; j < cents.length; j++) {
-        const diff = ((cents[j]! - cents[i]!) % 1200 + 1200) % 1200;
+        const diff = (((cents[j]! - cents[i]!) % 1200) + 1200) % 1200;
         result.push(diff);
       }
     }
@@ -24809,7 +24947,7 @@ export function scaleGraphDensity(
 
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      const diff = ((scaleCents[j]! - scaleCents[i]!) % 1200 + 1200) % 1200;
+      const diff = (((scaleCents[j]! - scaleCents[i]!) % 1200) + 1200) % 1200;
       const circDist = Math.min(diff, 1200 - diff);
       if (circDist <= connectThresholdCents) edges++;
     }
@@ -24913,7 +25051,8 @@ export function harmonicLatticePosition(
       const isBetter =
         error < bestError - 1e-9 ||
         (Math.abs(error - bestError) < 1e-9 && isOctaveReduced && !bestIsOctaveReduced) ||
-        (Math.abs(error - bestError) < 1e-9 && isOctaveReduced === bestIsOctaveReduced &&
+        (Math.abs(error - bestError) < 1e-9 &&
+          isOctaveReduced === bestIsOctaveReduced &&
           num + den < bestNum + bestDen);
       if (isBetter) {
         bestError = error;
@@ -24923,9 +25062,7 @@ export function harmonicLatticePosition(
     }
   }
 
-  const coords = primes.map(
-    (p) => _ff4PrimeExponent(bestNum, p) - _ff4PrimeExponent(bestDen, p),
-  );
+  const coords = primes.map((p) => _ff4PrimeExponent(bestNum, p) - _ff4PrimeExponent(bestDen, p));
 
   return {
     coords,
@@ -24962,8 +25099,12 @@ export function tuningFamilySocraticRadarMutualInformation(
   const n = tunings.length;
   if (n < 1 || bins < 2) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const binnedAxis1 = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[axis1] * bins))));
-  const binnedAxis2 = profiles.map((p) => Math.min(bins - 1, Math.max(0, Math.floor(p[axis2] * bins))));
+  const binnedAxis1 = profiles.map((p) =>
+    Math.min(bins - 1, Math.max(0, Math.floor(p[axis1] * bins))),
+  );
+  const binnedAxis2 = profiles.map((p) =>
+    Math.min(bins - 1, Math.max(0, Math.floor(p[axis2] * bins))),
+  );
 
   // Joint distribution
   const joint: number[][] = Array.from({ length: bins }, () => new Array(bins).fill(0) as number[]);
@@ -25093,7 +25234,7 @@ export function tuningFamilySocraticRadarFractalDimension(
       for (let i = 1; i <= count; i++) {
         sum += Math.abs(x[m + i * k - 1]! - x[m + (i - 1) * k - 1]!);
       }
-      Lk += sum * (n - 1) / (k * k * count);
+      Lk += (sum * (n - 1)) / (k * k * count);
     }
     Lk /= k;
     if (Lk > 0) {
@@ -25700,10 +25841,7 @@ export function tuningFamilySocraticRadarMultiScaleEntropy(
  * @returns Normalised entropy in [0, 1]; 0 for empty scale.
  * @throws {RangeError} if edo < 1.
  */
-export function pitchClassEntropy(
-  scaleCents: readonly number[],
-  edo: number = 12,
-): number {
+export function pitchClassEntropy(scaleCents: readonly number[], edo: number = 12): number {
   if (edo < 1) throw new RangeError(`edo must be >= 1, got ${edo}`);
   if (scaleCents.length === 0) return 0;
   const centsPerBin = 1200 / edo;
@@ -25790,10 +25928,7 @@ export function intervalAmbiguity(
  * @param toleranceCents - Half-width of the fifth window (default 5 cents).
  * @returns Centrality value in [0, 1]; 0 for tunings with fewer than 2 degrees.
  */
-export function tuningNetworkCentrality(
-  tuning: TuningSystem,
-  toleranceCents: number = 5,
-): number {
+export function tuningNetworkCentrality(tuning: TuningSystem, toleranceCents: number = 5): number {
   const degrees = tuning.degrees;
   const n = degrees.length;
   if (n < 2) return 0;
@@ -25812,8 +25947,7 @@ export function tuningNetworkCentrality(
       }
     }
   }
-  const meanConnections =
-    connectionCounts.reduce((a, b) => a + b, 0) / n;
+  const meanConnections = connectionCounts.reduce((a, b) => a + b, 0) / n;
   return meanConnections / (n - 1);
 }
 
@@ -25847,11 +25981,8 @@ export function scaleModalNetwork(
   for (let k = 1; k < n; k++) {
     // Rotate: take scaleCents[k..n-1, 0..k-1], normalise to start at 0
     const root = scaleCents[k]!;
-    const modeCents = [
-      ...scaleCents.slice(k),
-      ...scaleCents.slice(0, k),
-    ].map((c) => {
-      const shifted = ((c - root) % 1200 + 1200) % 1200;
+    const modeCents = [...scaleCents.slice(k), ...scaleCents.slice(0, k)].map((c) => {
+      const shifted = (((c - root) % 1200) + 1200) % 1200;
       return shifted;
     });
     // Count tones in modeCents that appear in originalSet (within 1 cent)
@@ -25939,11 +26070,7 @@ export function roughnessCurvePoints(
   const n = spectrum.length;
   const norm = n * n;
   const result: Array<{ intervalCents: number; roughness: number }> = [];
-  for (
-    let intervalCents = 0;
-    intervalCents <= 1200 + 1e-9;
-    intervalCents += intervalStepCents
-  ) {
+  for (let intervalCents = 0; intervalCents <= 1200 + 1e-9; intervalCents += intervalStepCents) {
     const ic = Math.round(intervalCents * 1e6) / 1e6; // avoid float drift
     let roughness = 0;
     if (n > 0) {
@@ -25954,10 +26081,7 @@ export function roughnessCurvePoints(
           const fj = secondHz * pj.ratio;
           const avg = (fi + fj) / 2;
           if (avg === 0) continue;
-          roughness +=
-            pi.amplitude *
-            pj.amplitude *
-            Math.exp((-3.5 * Math.abs(fi - fj)) / avg);
+          roughness += pi.amplitude * pj.amplitude * Math.exp((-3.5 * Math.abs(fi - fj)) / avg);
         }
       }
       roughness /= norm;
@@ -26073,7 +26197,7 @@ export function tuningFamilySocraticRadarPairwiseDifference(
   for (let i = 0; i < n; i++) {
     const row: number[] = [];
     for (let j = 0; j < n; j++) {
-      row.push(i === j ? 0 : (profiles[i]![axis] - profiles[j]![axis]));
+      row.push(i === j ? 0 : profiles[i]![axis] - profiles[j]![axis]);
     }
     matrix.push(row);
   }
@@ -26322,7 +26446,9 @@ export function tuningFamilySocraticRadarWeightedMedian(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   if (weights.length !== tunings.length) {
-    throw new RangeError(`weights.length (${weights.length}) must equal tunings.length (${tunings.length})`);
+    throw new RangeError(
+      `weights.length (${weights.length}) must equal tunings.length (${tunings.length})`,
+    );
   }
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
@@ -26334,7 +26460,8 @@ export function tuningFamilySocraticRadarWeightedMedian(
     return result;
   }
   const weightSum = weights.reduce((s, w) => s + w, 0);
-  const normWeights = weightSum === 0 ? weights.map(() => 1 / n) : weights.map((w) => w / weightSum);
+  const normWeights =
+    weightSum === 0 ? weights.map(() => 1 / n) : weights.map((w) => w / weightSum);
   for (const ax of axes) {
     const pairs = profiles.map((p, i) => ({ score: p[ax], weight: normWeights[i]! }));
     pairs.sort((a, b) => a.score - b.score);
@@ -26655,13 +26782,12 @@ export function tuningFamilySocraticRadarEntropyWeightedComposite(
   });
 
   const totalEntropy = axisEntropies.reduce((s, e) => s + e, 0);
-  const weights = totalEntropy === 0
-    ? axes.map(() => 1 / axes.length)
-    : axisEntropies.map((e) => e / totalEntropy);
+  const weights =
+    totalEntropy === 0
+      ? axes.map(() => 1 / axes.length)
+      : axisEntropies.map((e) => e / totalEntropy);
 
-  return profiles.map((p) =>
-    axes.reduce((sum, ax, ai) => sum + (weights[ai]! * p[ax]), 0),
-  );
+  return profiles.map((p) => axes.reduce((sum, ax, ai) => sum + weights[ai]! * p[ax], 0));
 }
 
 // ---------------------------------------------------------------------------
@@ -26757,7 +26883,7 @@ export function tuningFamilySocraticRadarVIKOR(
       const worst = fWorst[ai]!;
       const range = best - worst;
       if (range === 0) continue;
-      s += w * (best - p[ax]) / range;
+      s += (w * (best - p[ax])) / range;
     }
     return s;
   });
@@ -26770,7 +26896,7 @@ export function tuningFamilySocraticRadarVIKOR(
       const worst = fWorst[ai]!;
       const range = best - worst;
       if (range === 0) continue;
-      const val = w * (best - p[ax]) / range;
+      const val = (w * (best - p[ax])) / range;
       if (val > r) r = val;
     }
     return r === -Infinity ? 0 : r;
@@ -26830,16 +26956,20 @@ export function frequencyRatioComplexity(ratio: number): number {
 
   // Continued-fraction rational approximation with max denominator 1000.
   // We want p/q ≈ ratio in lowest terms.
-  let h0 = 1, k0 = 0;
-  let h1 = 0, k1 = 1;
+  let h0 = 1,
+    k0 = 0;
+  let h1 = 0,
+    k1 = 1;
   let x = ratio;
   for (let iter = 0; iter < 50; iter++) {
     const a = Math.floor(x);
     const h2 = a * h1 + h0;
     const k2 = a * k1 + k0;
     if (k2 > 1000) break;
-    h0 = h1; k0 = k1;
-    h1 = h2; k1 = k2;
+    h0 = h1;
+    k0 = k1;
+    h1 = h2;
+    k1 = k2;
     const frac = x - a;
     if (frac < 1e-8) break;
     x = 1 / frac;
@@ -26858,10 +26988,7 @@ export function frequencyRatioComplexity(ratio: number): number {
  * Steps are binned into `bins` equal bins over [0, 1200). Returns 0 for
  * scales with fewer than 2 notes. Throws `RangeError` if `bins <= 0`.
  */
-export function melodicEntropy(
-  scaleCents: readonly number[],
-  bins: number = 12,
-): number {
+export function melodicEntropy(scaleCents: readonly number[], bins: number = 12): number {
   if (bins <= 0) throw new RangeError('bins must be > 0');
   if (scaleCents.length < 2) return 0;
 
@@ -26893,19 +27020,13 @@ export function melodicEntropy(
  * the ratio of that degree's frequency to `tuning.referenceHz` and applies
  * `frequencyRatioComplexity`. Returns one complexity value per degree.
  */
-export function harmonicComplexityProfile(
-  tuning: TuningSystem,
-  maxDegree?: number,
-): number[] {
+export function harmonicComplexityProfile(tuning: TuningSystem, maxDegree?: number): number[] {
   const limit =
-    maxDegree !== undefined
-      ? Math.min(maxDegree, tuning.degrees.length)
-      : tuning.degrees.length;
+    maxDegree !== undefined ? Math.min(maxDegree, tuning.degrees.length) : tuning.degrees.length;
   const result: number[] = [];
   for (let i = 0; i < limit; i++) {
     const degree = tuning.degrees[i]!;
-    const ratio =
-      centsToFreq(pitchToCents(degree), tuning.referenceHz) / tuning.referenceHz;
+    const ratio = centsToFreq(pitchToCents(degree), tuning.referenceHz) / tuning.referenceHz;
     result.push(frequencyRatioComplexity(ratio));
   }
   return result;
@@ -26916,10 +27037,7 @@ export function harmonicComplexityProfile(
  * For each pitch p, weight = 1 / (1 + |p - rootCents| / 100).
  * Returns the mean weight across all pitches (0 for empty, 1 if only root).
  */
-export function scaleHarmonicGravity(
-  scaleCents: readonly number[],
-  rootCents: number = 0,
-): number {
+export function scaleHarmonicGravity(scaleCents: readonly number[], rootCents: number = 0): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let sum = 0;
@@ -26936,10 +27054,7 @@ export function scaleHarmonicGravity(
  * then alignment = 1 - minDist/100 clamped to [0,1].
  * Returns the mean alignment across all degrees (0 for no degrees).
  */
-export function tuningOvertoneAlignment(
-  tuning: TuningSystem,
-  harmonics: number = 8,
-): number {
+export function tuningOvertoneAlignment(tuning: TuningSystem, harmonics: number = 8): number {
   const n = tuning.degrees.length;
   if (n === 0) return 0;
   const harmonicCents: number[] = [];
@@ -27002,8 +27117,7 @@ export function tuningLatticeSpread(tuning: TuningSystem): number {
     complexities.push(frequencyRatioComplexity(ratio));
   }
   const mean = complexities.reduce((s, v) => s + v, 0) / n;
-  const variance =
-    complexities.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
+  const variance = complexities.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
   return Math.sqrt(variance);
 }
 
@@ -27072,10 +27186,16 @@ export function tuningFamilySocraticRadarGiniCoefficientV2(
   const n = profiles.length;
   const result = {} as Record<AxisKey, number>;
   for (const ax of axes) {
-    if (n <= 1) { result[ax] = 0; continue; }
+    if (n <= 1) {
+      result[ax] = 0;
+      continue;
+    }
     const vals = profiles.map((p) => p[ax]);
     const mean = vals.reduce((s, v) => s + v, 0) / n;
-    if (mean === 0) { result[ax] = 0; continue; }
+    if (mean === 0) {
+      result[ax] = 0;
+      continue;
+    }
     let sumDiff = 0;
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
@@ -27114,10 +27234,16 @@ export function tuningFamilySocraticRadarTheilIndex(
   const n = profiles.length;
   const result = {} as Record<AxisKey, number>;
   for (const ax of axes) {
-    if (n === 0) { result[ax] = 0; continue; }
+    if (n === 0) {
+      result[ax] = 0;
+      continue;
+    }
     const vals = profiles.map((p) => p[ax]);
     const mean = vals.reduce((s, v) => s + v, 0) / n;
-    if (mean === 0) { result[ax] = 0; continue; }
+    if (mean === 0) {
+      result[ax] = 0;
+      continue;
+    }
     let theil = 0;
     for (const x of vals) {
       if (x > 0) {
@@ -27157,10 +27283,16 @@ export function tuningFamilySocraticRadarAtkinsonIndex(
   const n = profiles.length;
   const result = {} as Record<AxisKey, number>;
   for (const ax of axes) {
-    if (n === 0) { result[ax] = 0; continue; }
+    if (n === 0) {
+      result[ax] = 0;
+      continue;
+    }
     const vals = profiles.map((p) => p[ax]);
     const arithmeticMean = vals.reduce((s, v) => s + v, 0) / n;
-    if (arithmeticMean === 0) { result[ax] = 0; continue; }
+    if (arithmeticMean === 0) {
+      result[ax] = 0;
+      continue;
+    }
     const logSum = vals.reduce((s, v) => s + Math.log(v + 1e-10), 0);
     const geometricMean = Math.exp(logSum / n);
     result[ax] = Math.max(0, Math.min(1, 1 - geometricMean / arithmeticMean));
@@ -27194,10 +27326,16 @@ export function tuningFamilySocraticRadarHooverIndex(
   const n = profiles.length;
   const result = {} as Record<AxisKey, number>;
   for (const ax of axes) {
-    if (n === 0) { result[ax] = 0; continue; }
+    if (n === 0) {
+      result[ax] = 0;
+      continue;
+    }
     const vals = profiles.map((p) => p[ax]);
     const sumX = vals.reduce((s, v) => s + v, 0);
-    if (sumX === 0) { result[ax] = 0; continue; }
+    if (sumX === 0) {
+      result[ax] = 0;
+      continue;
+    }
     const mean = sumX / n;
     const sumAbsDiff = vals.reduce((s, v) => s + Math.abs(v - mean), 0);
     result[ax] = sumAbsDiff / (2 * sumX);
@@ -27227,7 +27365,7 @@ export function tuningFamilySocraticRadarParetoScore(
   rootHz?: number,
 ): number[] {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
-  const axes: AxisKey[] = ['diversity', 'versatility' , 'maturity', 'benchmark', 'convergence'];
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const n = profiles.length;
   if (n === 0) return [];
@@ -27252,7 +27390,13 @@ export function tuningFamilySocraticRadarAdjacencyStrength(
   spectrum: Spectrum,
   rootHz?: number,
 ): number[][] {
-  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
+  ];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const n = profiles.length;
   const vecs: number[][] = profiles.map((p) => axes.map((ax) => p[ax]));
@@ -27295,9 +27439,7 @@ export function tuningFamilySocraticRadarClusteringCoefficient(
   const THRESHOLD = 0.9;
   const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
   const n = tunings.length;
-  const adj: boolean[][] = sim.map((row, i) =>
-    row.map((v, j) => i !== j && v >= THRESHOLD),
-  );
+  const adj: boolean[][] = sim.map((row, i) => row.map((v, j) => i !== j && v >= THRESHOLD));
   return adj.map((neighbors, i) => {
     const deg = neighbors.filter(Boolean).length;
     if (deg < 2) return 0;
@@ -27309,7 +27451,7 @@ export function tuningFamilySocraticRadarClusteringCoefficient(
         if (adj[j]![k]) triangles++;
       }
     }
-    return triangles / (deg * (deg - 1) / 2);
+    return triangles / ((deg * (deg - 1)) / 2);
   });
 }
 
@@ -27328,9 +27470,7 @@ export function tuningFamilySocraticRadarPageRankScore(
   const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
   const n = tunings.length;
   if (n === 0) return [];
-  const adj: boolean[][] = sim.map((row, i) =>
-    row.map((v, j) => i !== j && v >= THRESHOLD),
-  );
+  const adj: boolean[][] = sim.map((row, i) => row.map((v, j) => i !== j && v >= THRESHOLD));
   const degree = adj.map((row) => row.filter(Boolean).length);
   const totalEdges = degree.reduce((s, d) => s + d, 0) / 2;
   if (totalEdges === 0) return Array.from({ length: n }, () => 1 / n);
@@ -27340,7 +27480,7 @@ export function tuningFamilySocraticRadarPageRankScore(
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (adj[j]![i] && degree[j]! > 0) {
-          next[i]! += D * rank[j]! / degree[j]!;
+          next[i]! += (D * rank[j]!) / degree[j]!;
         }
       }
     }
@@ -27389,14 +27529,18 @@ export function tuningFamilySocraticRadarModularityScore(
   rootHz?: number,
 ): number {
   const THRESHOLD = 0.9;
-  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
+  ];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const sim = tuningFamilySocraticRadarAdjacencyStrength(tunings, spectrum, rootHz);
   const n = tunings.length;
   if (n < 2) return 0;
-  const adj: boolean[][] = sim.map((row, i) =>
-    row.map((v, j) => i !== j && v >= THRESHOLD),
-  );
+  const adj: boolean[][] = sim.map((row, i) => row.map((v, j) => i !== j && v >= THRESHOLD));
   const degree = adj.map((row) => row.filter(Boolean).length);
   const totalEdges = degree.reduce((s, d) => s + d, 0) / 2;
   if (totalEdges === 0) return 0;
@@ -27444,14 +27588,11 @@ export function tuningFamilySocraticRadarNetworkDensity(
       if (sim[i]![j]! >= THRESHOLD) edges++;
     }
   }
-  return edges / (n * (n - 1) / 2);
+  return edges / ((n * (n - 1)) / 2);
 }
 
 // LL1
-export function spectralCentroidHz(
-  spectrum: Spectrum,
-  referenceHz: number = 440,
-): number {
+export function spectralCentroidHz(spectrum: Spectrum, referenceHz: number = 440): number {
   if (spectrum.length === 0) return 0;
   let weightedSum = 0;
   let totalAmp = 0;
@@ -27479,10 +27620,7 @@ export function spectralFlatness(spectrum: Spectrum): number {
 }
 
 // LL3
-export function scaleRootedness(
-  scaleCents: readonly number[],
-  harmonics: number = 6,
-): number {
+export function scaleRootedness(scaleCents: readonly number[], harmonics: number = 6): number {
   if (scaleCents.length === 0) return 0;
   let totalScore = 0;
   for (const p of scaleCents) {
@@ -27515,13 +27653,10 @@ export function partialMaskingScore(
     for (let j = i + 1; j < n; j++) {
       const partialI = spectrum[i]!;
       const partialJ = spectrum[j]!;
-      const centsDist =
-        1200 * Math.abs(Math.log2(partialI.ratio / partialJ.ratio));
+      const centsDist = 1200 * Math.abs(Math.log2(partialI.ratio / partialJ.ratio));
       if (centsDist < maskingThresholdCents) {
         totalMasking +=
-          (1 - centsDist / maskingThresholdCents) *
-          partialI.amplitude *
-          partialJ.amplitude;
+          (1 - centsDist / maskingThresholdCents) * partialI.amplitude * partialJ.amplitude;
       }
     }
   }
@@ -27541,13 +27676,23 @@ export function tuningFamilySocraticRadarJensenShannonDivergence(
   if (n === 0) return matrix;
 
   const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
 
   // Normalize a profile to a PMF
-  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+  function toPMF(profile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  }): number[] {
     const vals = axes.map((k) => profile[k]);
     const sum = vals.reduce((a, b) => a + b, 0);
     if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
@@ -27592,12 +27737,22 @@ export function tuningFamilySocraticRadarEarthMoverDistance(
   if (n === 0) return matrix;
 
   const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
 
-  function toSortedScores(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+  function toSortedScores(profile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  }): number[] {
     return axes.map((k) => profile[k]).sort((a, b) => a - b);
   }
 
@@ -27642,12 +27797,22 @@ export function tuningFamilySocraticRadarTotalVariationDistance(
   if (n === 0) return matrix;
 
   const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
 
-  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+  function toPMF(profile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  }): number[] {
     const vals = axes.map((k) => profile[k]);
     const sum = vals.reduce((a, b) => a + b, 0);
     if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
@@ -27685,12 +27850,22 @@ export function tuningFamilySocraticRadarHellingerDistance(
   if (n === 0) return matrix;
 
   const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
 
-  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+  function toPMF(profile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  }): number[] {
     const vals = axes.map((k) => profile[k]);
     const sum = vals.reduce((a, b) => a + b, 0);
     if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
@@ -27729,12 +27904,22 @@ export function tuningFamilySocraticRadarBhattacharyyaCoefficient(
   if (n === 0) return matrix;
 
   const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
 
-  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+  function toPMF(profile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  }): number[] {
     const vals = axes.map((k) => profile[k]);
     const sum = vals.reduce((a, b) => a + b, 0);
     if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
@@ -27773,12 +27958,22 @@ export function tuningFamilySocraticRadarKLDivergenceAsymmetric(
   if (n === 0) return matrix;
 
   const axes: Array<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence'> = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
 
-  function toPMF(profile: { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number }): number[] {
+  function toPMF(profile: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  }): number[] {
     const vals = axes.map((k) => profile[k]);
     const sum = vals.reduce((a, b) => a + b, 0);
     if (sum === 0) return [0.2, 0.2, 0.2, 0.2, 0.2];
@@ -27836,17 +28031,14 @@ export function scaleDensityProfile(
 export function tuningStepsVariance(tuning: TuningSystem): number {
   const degrees = tuning.degrees;
   if (degrees.length <= 1) return 0;
-  const sorted = [...degrees].sort(
-    (a, b) => pitchToCents(a) - pitchToCents(b),
-  );
+  const sorted = [...degrees].sort((a, b) => pitchToCents(a) - pitchToCents(b));
   const steps: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     steps.push(pitchToCents(sorted[i]!) - pitchToCents(sorted[i - 1]!));
   }
   if (steps.length === 0) return 0;
   const mean = steps.reduce((s, v) => s + v, 0) / steps.length;
-  const variance =
-    steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
+  const variance = steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
   return variance;
 }
 
@@ -27869,19 +28061,14 @@ export function scaleChordCoverage(
   const tolerance = 25;
   let covered = 0;
   for (const ci of chordIntervals) {
-    const isCovered = scaleIntervals.some(
-      (si) => Math.abs(si - ci) <= tolerance,
-    );
+    const isCovered = scaleIntervals.some((si) => Math.abs(si - ci) <= tolerance);
     if (isCovered) covered++;
   }
   return covered / chordIntervals.length;
 }
 
 // MM4
-export function harmonicSeriesDeviation(
-  tuning: TuningSystem,
-  harmonics: number = 8,
-): number {
+export function harmonicSeriesDeviation(tuning: TuningSystem, harmonics: number = 8): number {
   const degrees = tuning.degrees;
   if (degrees.length === 0 || harmonics === 0) return 0;
   const degreeCents = degrees.map((d) => pitchToCents(d));
@@ -27963,14 +28150,14 @@ export function intervalDirectionalityBias(scaleCents: readonly number[]): numbe
 export function chordRootAmbiguity(chordCents: readonly number[]): number {
   if (chordCents.length <= 1) return 1;
   // Just interval reference points in cents
-  const justIntervals = [0, 701.955, 386.314, 968.826, 203.910, 1088.269];
+  const justIntervals = [0, 701.955, 386.314, 968.826, 203.91, 1088.269];
   const rootScores: number[] = [];
   for (let i = 0; i < chordCents.length; i++) {
     const root = chordCents[i]!;
     let matches = 0;
     for (let j = 0; j < chordCents.length; j++) {
       if (i === j) continue;
-      const interval = ((chordCents[j]! - root) % 1200 + 1200) % 1200;
+      const interval = (((chordCents[j]! - root) % 1200) + 1200) % 1200;
       const fits = justIntervals.some((ji) => Math.abs(interval - ji) <= 15);
       if (fits) matches++;
     }
@@ -27987,7 +28174,10 @@ export function chordRootAmbiguity(chordCents: readonly number[]): number {
  * Deviation per pitch = |scale_pitch - nearest_ref_pitch| / (halfStep / 2).
  * Average deviation clamped to [0, 1]. Returns 0 for empty scale.
  */
-export function scaleColorfulness(scaleCents: readonly number[], referenceEdo: number = 12): number {
+export function scaleColorfulness(
+  scaleCents: readonly number[],
+  referenceEdo: number = 12,
+): number {
   if (scaleCents.length === 0) return 0;
   const stepCents = 1200 / referenceEdo;
   const halfStep = stepCents / 2;
@@ -28106,12 +28296,17 @@ export function tuningFamilySocraticRadarCrossAxisCorrelationMatrix(
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
-      if (i === j) { matrix[i]![j] = 1; continue; }
+      if (i === j) {
+        matrix[i]![j] = 1;
+        continue;
+      }
       const xs = profiles.map((p) => p[axes[i]!]);
       const ys = profiles.map((p) => p[axes[j]!]);
       const meanX = xs.reduce((s, v) => s + v, 0) / m;
       const meanY = ys.reduce((s, v) => s + v, 0) / m;
-      let num = 0; let denomX = 0; let denomY = 0;
+      let num = 0;
+      let denomX = 0;
+      let denomY = 0;
       for (let k = 0; k < m; k++) {
         const dx = xs[k]! - meanX;
         const dy = ys[k]! - meanY;
@@ -28315,7 +28510,8 @@ export function tuningFamilySocraticRadarMannWhitneyU(
 ): number {
   const n = tunings.length;
   for (const idx of [...groupA, ...groupB]) {
-    if (idx < 0 || idx >= n) throw new RangeError(`Index ${idx} out of range for tunings array of length ${n}`);
+    if (idx < 0 || idx >= n)
+      throw new RangeError(`Index ${idx} out of range for tunings array of length ${n}`);
   }
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   let U = 0;
@@ -28432,7 +28628,11 @@ export function tuningFamilySocraticRadarAxisBinarize(
 ): number[][] {
   if (tunings.length === 0) return [];
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   // Compute median for each axis
@@ -28442,9 +28642,7 @@ export function tuningFamilySocraticRadarAxisBinarize(
     if (n % 2 === 1) return vals[Math.floor(n / 2)]!;
     return (vals[Math.floor(n / 2) - 1]! + vals[Math.floor(n / 2)]!) / 2;
   });
-  return profiles.map((p) =>
-    axes.map((axis, ai) => (p[axis] >= medians[ai]! ? 1 : 0)),
-  );
+  return profiles.map((p) => axes.map((axis, ai) => (p[axis] >= medians[ai]! ? 1 : 0)));
 }
 
 // ---------------------------------------------------------------------------
@@ -28481,7 +28679,11 @@ export function tuningFamilySocraticRadarMahalanobisDistance(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28523,7 +28725,11 @@ export function tuningFamilySocraticRadarOutlierScore(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28561,7 +28767,11 @@ export function tuningFamilySocraticRadarCentroidDistance(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28590,7 +28800,11 @@ export function tuningFamilySocraticRadarDensityEstimate(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28630,7 +28844,11 @@ export function tuningFamilySocraticRadarFuzzyUnion(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const zero = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
   if (tunings.length === 0) return zero;
@@ -28655,7 +28873,11 @@ export function tuningFamilySocraticRadarFuzzyIntersection(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const zero = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
   if (tunings.length === 0) return zero;
@@ -28680,7 +28902,11 @@ export function tuningFamilySocraticRadarFuzzyComplement(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28696,7 +28922,11 @@ export function tuningFamilySocraticRadarSugenoIntegral(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28722,7 +28952,11 @@ export function tuningFamilySocraticRadarChoquetIntegral(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28750,7 +28984,11 @@ export function tuningFamilySocraticRadarLukasiewiczNorm(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28774,10 +29012,21 @@ export function tuningFamilySocraticRadarSimulatedAnnealingProxy(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
-  const zero: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> = {
-    diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0,
+  const zero: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  > = {
+    diversity: 0,
+    versatility: 0,
+    maturity: 0,
+    benchmark: 0,
+    convergence: 0,
   };
   if (tunings.length === 0) return zero;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28809,14 +29058,18 @@ export function tuningFamilySocraticRadarGeneticFitness(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const fitnesses = profiles.map((p) => {
     let product = 1;
     for (const axis of axes) {
-      product *= (p[axis] + 0.01);
+      product *= p[axis] + 0.01;
     }
     return product;
   });
@@ -28833,10 +29086,21 @@ export function tuningFamilySocraticRadarParticleBest(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
-  const zero: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> = {
-    diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0,
+  const zero: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  > = {
+    diversity: 0,
+    versatility: 0,
+    maturity: 0,
+    benchmark: 0,
+    convergence: 0,
   };
   if (tunings.length === 0) return zero;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28860,7 +29124,11 @@ export function tuningFamilySocraticRadarPheromoneWeight(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28882,7 +29150,11 @@ export function tuningFamilySocraticRadarGradientApproximation(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
@@ -28902,14 +29174,28 @@ export function tuningFamilySocraticRadarNelderMeadCentroid(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
-  const zero: Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> = {
-    diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0,
+  const zero: Record<
+    'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence',
+    number
+  > = {
+    diversity: 0,
+    versatility: 0,
+    maturity: 0,
+    benchmark: 0,
+    convergence: 0,
   };
   if (tunings.length === 0) return zero;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const composites = profiles.map((p, i) => ({ composite: axes.reduce((s, axis) => s + p[axis], 0) / 5, i }));
+  const composites = profiles.map((p, i) => ({
+    composite: axes.reduce((s, axis) => s + p[axis], 0) / 5,
+    i,
+  }));
   composites.sort((a, b) => b.composite - a.composite);
   const topCount = Math.ceil(tunings.length / 2);
   const topProfiles = composites.slice(0, topCount).map((entry) => profiles[entry.i]!);
@@ -29065,7 +29351,9 @@ export function tuningTranspositionInvariance(
   const original: number[] = tuning.degrees.map((p) => pitchToCents(p));
   original.sort((a, b) => a - b);
 
-  const transposed: number[] = original.map((c) => ((c + transpositionCents) % 1200 + 1200) % 1200);
+  const transposed: number[] = original.map(
+    (c) => (((c + transpositionCents) % 1200) + 1200) % 1200,
+  );
   transposed.sort((a, b) => a - b);
 
   let matched = 0;
@@ -29096,23 +29384,20 @@ export function tuningTranspositionInvariance(
  * Balance = (covered groups) / 4.
  * Returns 0 for an empty chord.
  */
-export function chordFactorBalance(
-  chordCents: readonly number[],
-  rootCents: number = 0,
-): number {
+export function chordFactorBalance(chordCents: readonly number[], rootCents: number = 0): number {
   const n = chordCents.length;
   if (n === 0) return 0;
 
   const factorGroups: number[][] = [
-    [0],         // root
-    [386, 400],  // third
-    [702],       // fifth
+    [0], // root
+    [386, 400], // third
+    [702], // fifth
     [969, 1000], // seventh
   ];
 
   const intervals: number[] = [];
   for (let i = 0; i < n; i++) {
-    intervals.push(((chordCents[i]! - rootCents) % 1200 + 1200) % 1200);
+    intervals.push((((chordCents[i]! - rootCents) % 1200) + 1200) % 1200);
   }
 
   let covered = 0;
@@ -29144,10 +29429,7 @@ export function chordFactorBalance(
  * Returns 0.5 for an empty spectrum (neutral balance).
  * Throws RangeError if cutoffRatio <= 1.
  */
-export function spectralOvertoneBalance(
-  spectrum: Spectrum,
-  cutoffRatio: number = 4,
-): number {
+export function spectralOvertoneBalance(spectrum: Spectrum, cutoffRatio: number = 4): number {
   if (cutoffRatio <= 1) {
     throw new RangeError(`cutoffRatio must be > 1, got ${cutoffRatio}`);
   }
@@ -29210,7 +29492,7 @@ export function tuningPitchClassBalance(
   const classWidth = 1200 / octaveDivisions;
   for (let i = 0; i < tuning.degrees.length; i++) {
     const cents = pitchToCents(tuning.degrees[i]!);
-    const cls = Math.floor(((cents % 1200) + 1200) % 1200 / classWidth);
+    const cls = Math.floor((((cents % 1200) + 1200) % 1200) / classWidth);
     occupied.add(cls);
   }
   return occupied.size / octaveDivisions;
@@ -29222,10 +29504,7 @@ export function tuningPitchClassBalance(
  * the mean deviation. Returns 1 / (1 + mean_deviation).
  * Returns 0 for empty tuning.
  */
-export function harmonicSeriesConvergence(
-  tuning: TuningSystem,
-  harmonics: number = 16,
-): number {
+export function harmonicSeriesConvergence(tuning: TuningSystem, harmonics: number = 16): number {
   if (tuning.degrees.length === 0) return 0;
   const tuningCents: number[] = [];
   for (let i = 0; i < tuning.degrees.length; i++) {
@@ -29362,7 +29641,11 @@ export function tuningFamilySocraticRadarELECTRE(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -29400,7 +29683,11 @@ export function tuningFamilySocraticRadarPROMETHEE(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -29445,7 +29732,11 @@ export function tuningFamilySocraticRadarCOPRAS(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -29478,7 +29769,11 @@ export function tuningFamilySocraticRadarARAS(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -29493,7 +29788,8 @@ export function tuningFamilySocraticRadarARAS(
     return sum;
   });
   // Normalized: each row[k] / augColSum[k]
-  const normalizeRow = (row: number[]) => row.map((v, k) => augmentedColSums[k]! === 0 ? 0 : v / augmentedColSums[k]!);
+  const normalizeRow = (row: number[]) =>
+    row.map((v, k) => (augmentedColSums[k]! === 0 ? 0 : v / augmentedColSums[k]!));
   const normA0 = normalizeRow(a0);
   const normScores = scores.map((row) => normalizeRow(row));
   const sA0 = normA0.reduce((s, v) => s + v, 0);
@@ -29511,7 +29807,11 @@ export function tuningFamilySocraticRadarWASPAS(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -29534,7 +29834,11 @@ export function tuningFamilySocraticRadarEDAS(
   rootHz?: number,
 ): number[] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -29544,18 +29848,18 @@ export function tuningFamilySocraticRadarEDAS(
   const av = axes.map((_, k) => scores.reduce((s, row) => s + row[k]!, 0) / n);
   // PDA and NDA
   const pda = scores.map((row) =>
-    row.map((v, k) => av[k]! > 0 ? Math.max(0, v - av[k]!) / av[k]! : 0),
+    row.map((v, k) => (av[k]! > 0 ? Math.max(0, v - av[k]!) / av[k]! : 0)),
   );
   const nda = scores.map((row) =>
-    row.map((v, k) => av[k]! > 0 ? Math.max(0, av[k]! - v) / av[k]! : 0),
+    row.map((v, k) => (av[k]! > 0 ? Math.max(0, av[k]! - v) / av[k]! : 0)),
   );
   // SP, SN
   const sp = pda.map((row) => row.reduce((s, v) => s + v, 0) / 5);
   const sn = nda.map((row) => row.reduce((s, v) => s + v, 0) / 5);
   const maxSP = Math.max(...sp);
   const maxSN = Math.max(...sn);
-  const nsp = sp.map((v) => maxSP === 0 ? 0 : v / maxSP);
-  const nsn = sn.map((v) => maxSN === 0 ? 1 : 1 - v / maxSN);
+  const nsp = sp.map((v) => (maxSP === 0 ? 0 : v / maxSP));
+  const nsn = sn.map((v) => (maxSN === 0 ? 1 : 1 - v / maxSN));
   return nsp.map((v, i) => 0.5 * (v + nsn[i]!));
 }
 
@@ -29633,16 +29937,20 @@ export function primeFactorComplexity(ratio: number): number {
   if (ratio === 1) return 0;
 
   // Continued-fraction rational approximation, max denominator 1000.
-  let h0 = 1, k0 = 0;
-  let h1 = 0, k1 = 1;
+  let h0 = 1,
+    k0 = 0;
+  let h1 = 0,
+    k1 = 1;
   let x = ratio;
   for (let iter = 0; iter < 50; iter++) {
     const a = Math.floor(x);
     const h2 = a * h1 + h0;
     const k2 = a * k1 + k0;
     if (k2 > 1000) break;
-    h0 = h1; k0 = k1;
-    h1 = h2; k1 = k2;
+    h0 = h1;
+    k0 = k1;
+    h1 = h2;
+    k1 = k2;
     const frac = x - a;
     if (frac < 1e-8) break;
     x = 1 / frac;
@@ -29686,7 +29994,7 @@ export function scaleIntervalicRichness(scaleCents: readonly number[]): number {
   const bins = new Set<number>();
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      const raw = ((scaleCents[j]! - scaleCents[i]!) % 1200 + 1200) % 1200;
+      const raw = (((scaleCents[j]! - scaleCents[i]!) % 1200) + 1200) % 1200;
       const folded = Math.min(raw, 1200 - raw);
       const bin = Math.round(folded / 50) * 50;
       bins.add(bin);
@@ -29722,7 +30030,7 @@ export function scaleOctaveStretchFactor(tuning: TuningSystem): number {
     }
   }
   if (minDist > 200) return 0;
-  return (closestCents - 1200) / 1200 * 100;
+  return ((closestCents - 1200) / 1200) * 100;
 }
 
 /**
@@ -29813,7 +30121,11 @@ export function tuningFamilySocraticRadarBoundingBoxVolume(
   rootHz?: number,
 ): number {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return 0;
@@ -29848,7 +30160,11 @@ export function tuningFamilySocraticRadarBoundingBoxDiagonal(
   rootHz?: number,
 ): number {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return 0;
@@ -29883,7 +30199,11 @@ export function tuningFamilySocraticRadarRadiusOfGyration(
   rootHz?: number,
 ): number {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n <= 1) return 0;
@@ -29892,10 +30212,11 @@ export function tuningFamilySocraticRadarRadiusOfGyration(
   // Centroid per axis
   const centroid = axes.map((_, k) => scores.reduce((s, row) => s + row[k]!, 0) / n);
   // Mean of squared L2 distances
-  const meanSqDist = scores.reduce((acc, row) => {
-    const sq = row.reduce((s, v, k) => s + (v - centroid[k]!) ** 2, 0);
-    return acc + sq;
-  }, 0) / n;
+  const meanSqDist =
+    scores.reduce((acc, row) => {
+      const sq = row.reduce((s, v, k) => s + (v - centroid[k]!) ** 2, 0);
+      return acc + sq;
+    }, 0) / n;
   return Math.sqrt(meanSqDist);
 }
 
@@ -29913,7 +30234,11 @@ export function tuningFamilySocraticRadarAspectRatio(
   rootHz?: number,
 ): number {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return 0;
@@ -29953,7 +30278,11 @@ export function tuningFamilySocraticRadarProfilePolygonArea(
   rootHz?: number,
 ): number {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return 0;
@@ -29987,7 +30316,11 @@ export function tuningFamilySocraticRadarLeaveOneCentroid(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n <= 1) return tunings.map(() => [0, 0, 0, 0, 0]);
@@ -29995,9 +30328,7 @@ export function tuningFamilySocraticRadarLeaveOneCentroid(
   const scores = profiles.map((p) => axes.map((axis) => p[axis]));
   // Precompute full sum per axis
   const fullSum = axes.map((_, k) => scores.reduce((s, row) => s + row[k]!, 0));
-  return scores.map((row) =>
-    axes.map((_, k) => (fullSum[k]! - row[k]!) / (n - 1)),
-  );
+  return scores.map((row) => axes.map((_, k) => (fullSum[k]! - row[k]!) / (n - 1)));
 }
 
 // ---------------------------------------------------------------------------
@@ -30013,7 +30344,11 @@ export function tuningFamilySocraticRadarCumulativeAverage(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -30043,7 +30378,11 @@ export function tuningFamilySocraticRadarCumulativeMax(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -30074,7 +30413,11 @@ export function tuningFamilySocraticRadarCumulativeVariance(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -30110,7 +30453,11 @@ export function tuningFamilySocraticRadarChangePointIndex(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   const defaultResult = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
@@ -30147,7 +30494,11 @@ export function tuningFamilySocraticRadarLocalExtremaCount(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   const defaultResult = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
@@ -30183,7 +30534,11 @@ export function tuningFamilySocraticRadarSignChanges(
   rootHz?: number,
 ): Record<'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence', number> {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   const defaultResult = { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
@@ -30226,7 +30581,11 @@ export function tuningFamilySocraticRadarSimilarityWalkMatrix(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -30395,7 +30754,11 @@ export function tuningFamilySocraticRadarClusterCount(
   rootHz?: number,
 ): number {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return 0;
@@ -30424,7 +30787,11 @@ export function tuningFamilySocraticRadarGraphConnectivity(
   rootHz?: number,
 ): { components: number; isConnected: boolean } {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return { components: 0, isConnected: true };
@@ -30484,7 +30851,11 @@ export function tuningFamilySocraticRadarShortestPathMatrix(
   rootHz?: number,
 ): number[][] {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n === 0) return [];
@@ -30542,7 +30913,11 @@ export function tuningFamilySocraticRadarSpanningTreeWeight(
   rootHz?: number,
 ): number {
   const axes: ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] = [
-    'diversity', 'versatility', 'maturity', 'benchmark', 'convergence',
+    'diversity',
+    'versatility',
+    'maturity',
+    'benchmark',
+    'convergence',
   ];
   const n = tunings.length;
   if (n <= 1) return 0;
@@ -30753,7 +31128,18 @@ export function scaleToChromaticNames(
 ): string[] {
   if (scaleCents.length === 0) return [];
   const chromaticNames: readonly string[] = [
-    'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+    'C',
+    'C#',
+    'D',
+    'D#',
+    'E',
+    'F',
+    'F#',
+    'G',
+    'G#',
+    'A',
+    'A#',
+    'B',
   ];
   const result: string[] = [];
   for (const pitch of scaleCents) {
@@ -30779,7 +31165,7 @@ export function tuningMeantoneDeviation(tuning: TuningSystem): number {
   const meantoneFifth = 696.578;
   const meantoneDegrees: number[] = [];
   for (let k = 0; k < 12; k++) {
-    meantoneDegrees.push(((k * meantoneFifth) % 1200 + 1200) % 1200);
+    meantoneDegrees.push((((k * meantoneFifth) % 1200) + 1200) % 1200);
   }
   meantoneDegrees.sort((a, b) => a - b);
   let totalMinDist = 0;
@@ -30875,8 +31261,7 @@ export function tuningRegularityScore(tuning: TuningSystem): number {
   if (steps.length === 0) return 1;
   const mean = steps.reduce((s, v) => s + v, 0) / steps.length;
   if (mean === 0) return 1;
-  const variance =
-    steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
+  const variance = steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
   const cv = Math.sqrt(variance) / mean;
   return Math.max(0, Math.min(1, 1 - cv));
 }
@@ -30886,21 +31271,15 @@ export function tuningRegularityScore(tuning: TuningSystem): number {
  * spread = sqrt(sum(amp * (ratio * refHz - centroid_hz)^2) / sum(amp))
  * Returns 0 for empty or single-partial spectrum.
  */
-export function spectralSpread(
-  spectrum: Spectrum,
-  referenceHz: number = 440,
-): number {
+export function spectralSpread(spectrum: Spectrum, referenceHz: number = 440): number {
   if (spectrum.length === 0) return 0;
   const totalAmp = spectrum.reduce((s, p) => s + p.amplitude, 0);
   if (totalAmp === 0) return 0;
   const centroidHz =
-    spectrum.reduce((s, p) => s + p.amplitude * p.ratio * referenceHz, 0) /
-    totalAmp;
+    spectrum.reduce((s, p) => s + p.amplitude * p.ratio * referenceHz, 0) / totalAmp;
   const spread = Math.sqrt(
-    spectrum.reduce(
-      (s, p) => s + p.amplitude * (p.ratio * referenceHz - centroidHz) ** 2,
-      0,
-    ) / totalAmp,
+    spectrum.reduce((s, p) => s + p.amplitude * (p.ratio * referenceHz - centroidHz) ** 2, 0) /
+      totalAmp,
   );
   return spread;
 }
@@ -30958,8 +31337,7 @@ export function tuningFamilySocraticRadarKMeansClusterV2(
   if (n <= 1) return { clusters: new Array(n).fill(0), iterations: 0 };
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
-    axes.map((ax) => p[ax]);
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) => axes.map((ax) => p[ax]);
   const l2 = (a: number[], b: number[]) =>
     Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
 
@@ -30988,9 +31366,7 @@ export function tuningFamilySocraticRadarKMeansClusterV2(
     for (let c = 0; c < 2; c++) {
       const members = profiles.filter((_, i) => clusters[i] === c).map(toVec);
       if (members.length > 0) {
-        centroids[c] = axes.map((_, d) =>
-          members.reduce((s, v) => s + v[d]!, 0) / members.length,
-        );
+        centroids[c] = axes.map((_, d) => members.reduce((s, v) => s + v[d]!, 0) / members.length);
       }
     }
   }
@@ -31018,8 +31394,7 @@ export function tuningFamilySocraticRadarSilhouetteScore(
   if (n <= 2) return 0;
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
-    axes.map((ax) => p[ax]);
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) => axes.map((ax) => p[ax]);
   const l2 = (a: number[], b: number[]) =>
     Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
 
@@ -31073,8 +31448,7 @@ export function tuningFamilySocraticRadarAgglomerativeCluster(
   if (n <= 1) return new Array(n).fill(0);
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
-    axes.map((ax) => p[ax]);
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) => axes.map((ax) => p[ax]);
   const l2 = (a: number[], b: number[]) =>
     Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
 
@@ -31147,8 +31521,7 @@ export function tuningFamilySocraticRadarClusterPurity(
   if (n <= 1) return 1;
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
-    axes.map((ax) => p[ax]);
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) => axes.map((ax) => p[ax]);
   const l2 = (a: number[], b: number[]) =>
     Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
 
@@ -31207,8 +31580,7 @@ export function tuningFamilySocraticRadarDunnIndex(
   if (n <= 2) return 0;
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
-    axes.map((ax) => p[ax]);
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) => axes.map((ax) => p[ax]);
   const l2 = (a: number[], b: number[]) =>
     Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
 
@@ -31266,8 +31638,7 @@ export function tuningFamilySocraticRadarDaviesBouldinIndex(
   if (n <= 2) return 0;
 
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) =>
-    axes.map((ax) => p[ax]);
+  const toVec = (p: ReturnType<typeof tuningFamilySocraticRadarProfile>) => axes.map((ax) => p[ax]);
   const l2 = (a: number[], b: number[]) =>
     Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
 
@@ -31328,9 +31699,9 @@ export function scaleIntervalClassVector(
   const n = scaleCents.length;
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      const diff = ((scaleCents[j]! - scaleCents[i]!) % periodCents + periodCents) % periodCents;
+      const diff = (((scaleCents[j]! - scaleCents[i]!) % periodCents) + periodCents) % periodCents;
       const semitone = Math.round(diff * (12 / periodCents)) % 12;
-      vector[semitone] = (vector[semitone]!) + 1;
+      vector[semitone] = vector[semitone]! + 1;
     }
   }
   return vector;
@@ -31363,7 +31734,7 @@ export function scaleChordVLDistance(
   while (to.length < len) to.push(0);
   let sumSq = 0;
   for (let i = 0; i < len; i++) {
-    const diff = (from[i]!) - (to[i]!);
+    const diff = from[i]! - to[i]!;
     sumSq += diff * diff;
   }
   return Math.sqrt(sumSq);
@@ -31467,7 +31838,7 @@ export function scaleReflectionSymmetry(
   for (const axis of axes) {
     let matched = 0;
     for (let i = 0; i < n; i++) {
-      const mirror = ((2 * axis - scaleCents[i]!) % periodCents + periodCents) % periodCents;
+      const mirror = (((2 * axis - scaleCents[i]!) % periodCents) + periodCents) % periodCents;
       // Check if mirror is within 10 cents of any pitch in the scale
       let found = false;
       for (let j = 0; j < n; j++) {
@@ -31529,7 +31900,7 @@ export function scaleRotationalSymmetry(
   for (let k = 1; k < n; k++) {
     const s = (k * periodCents) / n;
     // Shift all pitches by s and wrap into [0, periodCents)
-    const shifted = sorted.map(p => ((p + s) % periodCents + periodCents) % periodCents);
+    const shifted = sorted.map((p) => (((p + s) % periodCents) + periodCents) % periodCents);
     shifted.sort((a, b) => a - b);
     const shiftedIntervals = getIntervals(shifted);
 
@@ -31591,11 +31962,14 @@ export function scaleFractalDimension(
 
   // Check if all counts are the same (undefined slope)
   const firstY = ys[0]!;
-  const allSame = ys.every(y => Math.abs(y - firstY) < 1e-10);
+  const allSame = ys.every((y) => Math.abs(y - firstY) < 1e-10);
   if (allSame) return 0;
 
   // Least-squares linear fit: slope = (Σxy - n*x̄*ȳ) / (Σx² - n*x̄²)
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  let sumX = 0,
+    sumY = 0,
+    sumXY = 0,
+    sumX2 = 0;
   for (let i = 0; i < m; i++) {
     sumX += xs[i]!;
     sumY += ys[i]!;
@@ -31647,7 +32021,11 @@ export function scaleZoomSelfSimilarity(
   function pearson(a: number[], b: number[]): number {
     const len = Math.min(a.length, b.length);
     if (len < 2) return 0;
-    let sumA = 0, sumB = 0, sumAB = 0, sumA2 = 0, sumB2 = 0;
+    let sumA = 0,
+      sumB = 0,
+      sumAB = 0,
+      sumA2 = 0,
+      sumB2 = 0;
     for (let i = 0; i < len; i++) {
       sumA += a[i]!;
       sumB += b[i]!;
@@ -32009,7 +32387,10 @@ export function tuningFamilySocraticRadarTransferEntropyMean(
 }
 
 // ZZ1: scaleComplexityRatio
-export function scaleComplexityRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleComplexityRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   if (scaleCents.length <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   const intervals: number[] = [];
@@ -32026,7 +32407,10 @@ export function scaleComplexityRatio(scaleCents: readonly number[], periodCents:
 }
 
 // ZZ2: scaleExpressivenessIndex
-export function scaleExpressivenessIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleExpressivenessIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   if (scaleCents.length <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   const intervals: number[] = [];
@@ -32036,7 +32420,7 @@ export function scaleExpressivenessIndex(scaleCents: readonly number[], periodCe
   const tolerance = 10;
   const distinct: number[] = [];
   for (const iv of intervals) {
-    if (!distinct.some(d => Math.abs(d - iv) <= tolerance)) {
+    if (!distinct.some((d) => Math.abs(d - iv) <= tolerance)) {
       distinct.push(iv);
     }
   }
@@ -32052,7 +32436,7 @@ export function scaleHarmonicComplexity(scaleCents: readonly number[], limit: nu
   for (let i = 0; i < scaleCents.length; i++) {
     for (let j = 0; j < scaleCents.length; j++) {
       if (i !== j) {
-        const diff = ((scaleCents[j]! - scaleCents[i]!) % 1200 + 1200) % 1200;
+        const diff = (((scaleCents[j]! - scaleCents[i]!) % 1200) + 1200) % 1200;
         if (diff > 0) intervals.push(diff);
       }
     }
@@ -32064,7 +32448,7 @@ export function scaleHarmonicComplexity(scaleCents: readonly number[], limit: nu
     let bestPQ = 2; // p+q for 1/1 = 2
     for (let p = 1; p <= limit; p++) {
       for (let q = 1; q <= limit; q++) {
-        const ratioCents = ((1200 * Math.log2(p / q)) % 1200 + 1200) % 1200;
+        const ratioCents = (((1200 * Math.log2(p / q)) % 1200) + 1200) % 1200;
         const dist = Math.abs(iv - ratioCents);
         if (dist < bestDist) {
           bestDist = dist;
@@ -32083,8 +32467,8 @@ export function scaleTonalGravity(scaleCents: readonly number[], tonicCents: num
   let gravitySum = 0;
   let nonTonicCount = 0;
   for (const pitch of scaleCents) {
-    const dist1 = ((pitch - tonicCents) % 1200 + 1200) % 1200;
-    const dist2 = ((tonicCents - pitch) % 1200 + 1200) % 1200;
+    const dist1 = (((pitch - tonicCents) % 1200) + 1200) % 1200;
+    const dist2 = (((tonicCents - pitch) % 1200) + 1200) % 1200;
     const minDist = Math.min(dist1, dist2);
     if (minDist < 0.001) continue; // skip tonic itself
     gravitySum += 1 / (1 + minDist);
@@ -32423,13 +32807,19 @@ export function tuningFamilySocraticRadarLoudnessWeightedProfile(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
-): { diversity: number; versatility: number; maturity: number; benchmark: number; convergence: number } {
+): {
+  diversity: number;
+  versatility: number;
+  maturity: number;
+  benchmark: number;
+  convergence: number;
+} {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   if (tunings.length === 0) {
     return { diversity: 0, versatility: 0, maturity: 0, benchmark: 0, convergence: 0 };
   }
-  const refHz = rootHz ?? (tunings[0]?.referenceHz ?? 440);
+  const refHz = rootHz ?? tunings[0]?.referenceHz ?? 440;
   const aWeighted = spectrum.map((component) => {
     const f = refHz * component.ratio;
     const f2 = f * f;
@@ -32442,9 +32832,10 @@ export function tuningFamilySocraticRadarLoudnessWeightedProfile(
     return { ratio: component.ratio, amplitude: Math.max(0, component.amplitude) * aVal };
   });
   const maxAmp = aWeighted.reduce((m, c) => Math.max(m, c.amplitude), 0);
-  const normSpectrum: Spectrum = maxAmp > 0
-    ? aWeighted.map((c) => ({ ratio: c.ratio, amplitude: c.amplitude / maxAmp }))
-    : aWeighted;
+  const normSpectrum: Spectrum =
+    maxAmp > 0
+      ? aWeighted.map((c) => ({ ratio: c.ratio, amplitude: c.amplitude / maxAmp }))
+      : aWeighted;
   const profiles = (tunings as TuningSystem[]).map((t) =>
     tuningFamilySocraticRadarProfile([t], normSpectrum, rootHz),
   );
@@ -32525,10 +32916,12 @@ export function tuningFamilySocraticRadarMaskingThresholdMean(
     const refHz = rootHz ?? t.referenceHz ?? 440;
     const degrees = t.degrees;
     if (degrees.length === 0 || spectrum.length === 0) continue;
-    const components = degrees.map((d) => {
-      const f = refHz * Math.pow(2, pitchToCents(d) / 1200);
-      return spectrum.map((sc) => ({ freq: f * sc.ratio, amp: Math.max(0, sc.amplitude) }));
-    }).flat();
+    const components = degrees
+      .map((d) => {
+        const f = refHz * Math.pow(2, pitchToCents(d) / 1200);
+        return spectrum.map((sc) => ({ freq: f * sc.ratio, amp: Math.max(0, sc.amplitude) }));
+      })
+      .flat();
     let masking = 0;
     for (let i = 0; i < components.length; i++) {
       for (let j = 0; j < components.length; j++) {
@@ -32654,7 +33047,8 @@ export function scaleTranspositionDistance(
   if (scaleCents.length === 0) return 0;
   let total = 0;
   for (let i = 0; i < scaleCents.length; i++) {
-    const transposed = ((scaleCents[i]! + transpositionCents) % periodCents + periodCents) % periodCents;
+    const transposed =
+      (((scaleCents[i]! + transpositionCents) % periodCents) + periodCents) % periodCents;
     let minDist = Infinity;
     for (let j = 0; j < scaleCents.length; j++) {
       const orig = ((scaleCents[j]! % periodCents) + periodCents) % periodCents;
@@ -32740,10 +33134,7 @@ export function scaleSubsetCount(
   return Math.round(result);
 }
 
-export function scaleModeCount(
-  scaleCents: readonly number[],
-  periodCents: number = 1200,
-): number {
+export function scaleModeCount(scaleCents: readonly number[], periodCents: number = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (n === 1) return 1;
@@ -32989,7 +33380,8 @@ export function tuningFamilySocraticRadarParetoFrontSize(
       if (
         objectives[j]!.mean >= objectives[i]!.mean &&
         objectives[j]!.variance >= objectives[i]!.variance &&
-        (objectives[j]!.mean > objectives[i]!.mean || objectives[j]!.variance > objectives[i]!.variance)
+        (objectives[j]!.mean > objectives[i]!.mean ||
+          objectives[j]!.variance > objectives[i]!.variance)
       ) {
         dominated = true;
         break;
@@ -33179,7 +33571,7 @@ export function tuningFamilySocraticRadarClusteringCoefficientV2(
         if (adj[neighbors[a]!]![neighbors[b]!]) edgesAmongNeighbors++;
       }
     }
-    totalCC += edgesAmongNeighbors / (k * (k - 1) / 2);
+    totalCC += edgesAmongNeighbors / ((k * (k - 1)) / 2);
   }
   return totalCC / n;
 }
@@ -33411,11 +33803,13 @@ export function scalePrimeForm(
 
   function normalize(rotation: number[]): number[] {
     const first = rotation[0]!;
-    return rotation.map((x) => ((x - first) % divisions + divisions) % divisions);
+    return rotation.map((x) => (((x - first) % divisions) + divisions) % divisions);
   }
 
   function invert(pcsArr: number[]): number[] {
-    return pcsArr.map((x) => ((divisions - x) % divisions + divisions) % divisions).sort((a, b) => a - b);
+    return pcsArr
+      .map((x) => (((divisions - x) % divisions) + divisions) % divisions)
+      .sort((a, b) => a - b);
   }
 
   function allRotations(arr: number[]): number[][] {
@@ -33435,10 +33829,7 @@ export function scalePrimeForm(
     return 0;
   }
 
-  const candidates: number[][] = [
-    ...allRotations([...pcs]),
-    ...allRotations(invert([...pcs])),
-  ];
+  const candidates: number[][] = [...allRotations([...pcs]), ...allRotations(invert([...pcs]))];
 
   let best = candidates[0]!;
   for (const c of candidates) {
@@ -33514,7 +33905,7 @@ export function scaleMeantoneDeviation(
   const meaFifth = 696.578;
   const meaonePitches: number[] = [];
   for (let k = -6; k <= 6; k++) {
-    let p = ((k * meaFifth) % periodCents + periodCents) % periodCents;
+    let p = (((k * meaFifth) % periodCents) + periodCents) % periodCents;
     meaonePitches.push(p);
   }
   let totalDev = 0;
@@ -33567,7 +33958,7 @@ export function scaleJustIntonationRatioScore(
   function isSmoothNumber(n: number, limit: number): boolean {
     if (n <= 0) return false;
     let x = n;
-    const primes = [2, 3, 5, 7, 11, 13].filter(p => p <= limit);
+    const primes = [2, 3, 5, 7, 11, 13].filter((p) => p <= limit);
     for (const p of primes) {
       while (x % p === 0) x = Math.floor(x / p);
     }
@@ -33717,7 +34108,7 @@ export function tuningFamilySocraticRadarProfileVolatility(
   const n = profiles.length;
   if (n <= 1) return 0;
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
-  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity' , 'benchmark', 'convergence'];
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   const meanVals = profiles.map((p) => axes.reduce((s, a) => s + p[a], 0) / axes.length);
   const mean = meanVals.reduce((a, b) => a + b, 0) / n;
   const variance = meanVals.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
@@ -34114,8 +34505,8 @@ export function tuningFamilySocraticRadarHarmonicFieldSize(
       const c0 = cents[i]!;
       const c1 = cents[(i + 1) % n]!;
       const c2 = cents[(i + 2) % n]!;
-      const iv1 = ((c1 - c0 + period * 10) % period);
-      const iv2 = ((c2 - c0 + period * 10) % period);
+      const iv1 = (c1 - c0 + period * 10) % period;
+      const iv2 = (c2 - c0 + period * 10) % period;
       const r1 = Math.round(iv1 / 5) * 5;
       const r2 = Math.round(iv2 / 5) * 5;
       const sorted = [r1, r2].sort((a, b) => a - b);
@@ -34185,12 +34576,9 @@ export function tuningFamilySocraticRadarHarmonicRichnessScore(
       const c0 = cents[i]!;
       const c1 = cents[(i + 1) % n]!;
       const c2 = cents[(i + 2) % n]!;
-      const iv1 = ((c1 - c0 + period * 10) % period);
-      const iv2 = ((c2 - c0 + period * 10) % period);
-      const fieldIntervals = new Set([
-        Math.round(iv1 / 5) * 5,
-        Math.round(iv2 / 5) * 5,
-      ]);
+      const iv1 = (c1 - c0 + period * 10) % period;
+      const iv2 = (c2 - c0 + period * 10) % period;
+      const fieldIntervals = new Set([Math.round(iv1 / 5) * 5, Math.round(iv2 / 5) * 5]);
       fieldSizes.push(fieldIntervals.size);
     }
     const richness = fieldSizes.reduce((s, sz) => s + Math.log(1 + sz), 0) / n;
@@ -34221,7 +34609,7 @@ export function tuningFamilySocraticRadarCadentialStrengthMean(
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (i === j) continue;
-        const interval = ((cents[j]! - cents[i]! + period * 10) % period);
+        const interval = (cents[j]! - cents[i]! + period * 10) % period;
         if (Math.abs(interval - FIFTH) < TOLERANCE || Math.abs(interval - FOURTH) < TOLERANCE) {
           count++;
         }
@@ -34257,7 +34645,7 @@ export function tuningFamilySocraticRadarHarmonicClosureMean(
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (i === j) continue;
-        const interval = ((cents[j]! - cents[i]! + period * 10) % period);
+        const interval = (cents[j]! - cents[i]! + period * 10) % period;
         if (Math.abs(interval - TARGET) <= TOLERANCE) {
           count++;
         }
@@ -34291,7 +34679,7 @@ export function tuningFamilySocraticRadarTonicDominantRatio(
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (i === j) continue;
-        const interval = ((cents[j]! - cents[i]! + period * 10) % period);
+        const interval = (cents[j]! - cents[i]! + period * 10) % period;
         // Tonic: near 0 (unison) or near period (octave)
         if (interval < 30 || Math.abs(interval - period) < 30) {
           tonicCount++;
@@ -34493,7 +34881,7 @@ export function tuningFamilySocraticRadarKolmogorovProxy(
   let total = 0;
   for (const t of tunings) {
     const cents = t.degrees.map((d) => pitchToCents(d));
-    const tokens = cents.map((c) => String(Math.round(((c % 1200) + 1200) % 1200 / 10) * 10));
+    const tokens = cents.map((c) => String(Math.round((((c % 1200) + 1200) % 1200) / 10) * 10));
     const original = tokens.join(',');
     const len = original.length;
     if (len === 0) {
@@ -34654,7 +35042,7 @@ export function tuningFamilySocraticRadarSelfSimilarityScore(
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         if (i === j) continue;
-        const iv = ((cents[j]! - cents[i]! + period * 10) % period);
+        const iv = (cents[j]! - cents[i]! + period * 10) % period;
         fullIntervals.add(Math.round(iv / 50) * 50);
       }
     }
@@ -34668,7 +35056,7 @@ export function tuningFamilySocraticRadarSelfSimilarityScore(
         for (let a = 0; a < subSize; a++) {
           for (let b = 0; b < subSize; b++) {
             if (a === b) continue;
-            const iv = ((cents[chosen[b]!]! - cents[chosen[a]!]! + period * 10) % period);
+            const iv = (cents[chosen[b]!]! - cents[chosen[a]!]! + period * 10) % period;
             subIntervals.add(Math.round(iv / 50) * 50);
           }
         }
@@ -35173,7 +35561,9 @@ export function tuningFamilySocraticRadarTOPSISRanking(
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const ideal = axes.map((ax) => profiles.reduce((best, p) => Math.max(best, p[ax]), -Infinity));
-  const antiIdeal = axes.map((ax) => profiles.reduce((worst, p) => Math.min(worst, p[ax]), Infinity));
+  const antiIdeal = axes.map((ax) =>
+    profiles.reduce((worst, p) => Math.min(worst, p[ax]), Infinity),
+  );
   return profiles.map((p) => {
     let dPlus = 0;
     let dMinus = 0;
@@ -35262,7 +35652,7 @@ export function tuningFamilySocraticRadarVIKORCompromise(
       const worst = fWorst[ai]!;
       const range = best - worst;
       if (range === 0) continue;
-      s += w * (best - p[ax]) / range;
+      s += (w * (best - p[ax])) / range;
     }
     return s;
   });
@@ -35274,7 +35664,7 @@ export function tuningFamilySocraticRadarVIKORCompromise(
       const worst = fWorst[ai]!;
       const range = best - worst;
       if (range === 0) continue;
-      const val = w * (best - p[ax]) / range;
+      const val = (w * (best - p[ax])) / range;
       if (val > r) r = val;
     }
     return r === -Infinity ? 0 : r;
@@ -35400,7 +35790,7 @@ export function tuningFamilySocraticRadarCOPRASRatio(
   if (tunings.length === 0) return [];
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const sPlus = profiles.map((p) => p.diversity + p.versatility);
-  const sMinus = profiles.map((p) => (1 - p.maturity) + (1 - p.benchmark) + (1 - p.convergence));
+  const sMinus = profiles.map((p) => 1 - p.maturity + (1 - p.benchmark) + (1 - p.convergence));
   const maxSPlus = sPlus.reduce((m, v) => Math.max(m, v), 0);
   const minSMinus = sMinus.reduce((m, v) => Math.min(m, v), Infinity);
   return profiles.map((_p, i) => {
@@ -36004,7 +36394,10 @@ export function tuningFamilySocraticRadarCurvatureMean(
     const dists = vecs
       .map((v, j) => ({ j, d: j !== i ? euclidean(vecs[i]!, v) : Infinity }))
       .sort((a, b) => a.d - b.d);
-    if (dists.length < 2) { totalCurvature += 0; continue; }
+    if (dists.length < 2) {
+      totalCurvature += 0;
+      continue;
+    }
     const j = dists[0]!.j;
     const k = dists[1]!.j;
     const vi = vecs[i]!;
@@ -36012,7 +36405,10 @@ export function tuningFamilySocraticRadarCurvatureMean(
     const vk = vecs[k]!;
     const dij = euclidean(vi, vj);
     const dik = euclidean(vi, vk);
-    if (dij === 0 || dik === 0) { totalCurvature += 0; continue; }
+    if (dij === 0 || dik === 0) {
+      totalCurvature += 0;
+      continue;
+    }
     // Vector from i to j and i to k
     const dot = vi.reduce((s, v, d) => s + (vj[d]! - v) * (vk[d]! - vi[d]!), 0);
     const cosAngle = dot / (dij * dik);
@@ -36093,7 +36489,10 @@ export function tuningFamilySocraticRadarFisherInformationMean(
     const sum = vec.reduce((s, v) => s + v, 0);
     const ps = sum > 0 ? vec.map((v) => v / sum) : vec.map(() => 1 / axes.length);
     const meanP = ps.reduce((s, v) => s + v, 0) / ps.length;
-    const fisher = ps.reduce((s, p) => s + (meanP > 0 ? (p - meanP) * (p - meanP) / meanP : 0), 0);
+    const fisher = ps.reduce(
+      (s, p) => s + (meanP > 0 ? ((p - meanP) * (p - meanP)) / meanP : 0),
+      0,
+    );
     totalFisher += fisher;
   }
   return totalFisher / tunings.length;
@@ -36234,14 +36633,18 @@ export function tuningFamilySocraticRadarProfileMutualInfoMean(
   if (tunings.length === 0) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  const bin = (v: number): number => v < 0.33 ? 0 : v < 0.67 ? 1 : 2;
+  const bin = (v: number): number => (v < 0.33 ? 0 : v < 0.67 ? 1 : 2);
   const n = vecs.length;
   let totalMI = 0;
   let pairCount = 0;
   for (let a = 0; a < axes.length; a++) {
     for (let b = a + 1; b < axes.length; b++) {
       // Build joint and marginal counts
-      const joint: number[][] = [[0,0,0],[0,0,0],[0,0,0]];
+      const joint: number[][] = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+      ];
       const margA = [0, 0, 0];
       const margB = [0, 0, 0];
       for (let t = 0; t < n; t++) {
@@ -36493,14 +36896,18 @@ export function tuningFamilySocraticRadarSpearmanMean(
   function rankVec(vec: number[]): number[] {
     const order = [...vec.keys()].sort((a, b) => vec[a]! - vec[b]!);
     const ranks = new Array<number>(vec.length);
-    order.forEach((idx, rank) => { ranks[idx] = rank + 1; });
+    order.forEach((idx, rank) => {
+      ranks[idx] = rank + 1;
+    });
     return ranks;
   }
   function pearson(a: number[], b: number[]): number {
     const n = a.length;
     const ma = a.reduce((s, v) => s + v, 0) / n;
     const mb = b.reduce((s, v) => s + v, 0) / n;
-    let num = 0, da = 0, db = 0;
+    let num = 0,
+      da = 0,
+      db = 0;
     for (let k = 0; k < n; k++) {
       const ai = a[k]! - ma;
       const bi = b[k]! - mb;
@@ -36544,7 +36951,8 @@ export function tuningFamilySocraticRadarKendallTauMean(
   let tauCount = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
-      let C = 0, D = 0;
+      let C = 0,
+        D = 0;
       for (const [a, b] of pairs) {
         const vi = vecs[i]!;
         const vj = vecs[j]!;
@@ -36581,7 +36989,8 @@ export function tuningFamilySocraticRadarConcordanceMean(
   let concCount = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
-      let C = 0, D = 0;
+      let C = 0,
+        D = 0;
       for (const [a, b] of pairs) {
         const vi = vecs[i]!;
         const vj = vecs[j]!;
@@ -36589,7 +36998,9 @@ export function tuningFamilySocraticRadarConcordanceMean(
         const signJ = Math.sign(vj[a]! - vj[b]!);
         if (signI * signJ > 0) C++;
         else if (signI * signJ < 0) D++;
-        else { C += 0.5; }
+        else {
+          C += 0.5;
+        }
       }
       const total = C + D;
       concSum += total === 0 ? 0.5 : C / total;
@@ -36613,14 +37024,14 @@ export function tuningFamilySocraticRadarFootruleDistanceMean(
   function rankVec(vec: number[]): number[] {
     const order = [...vec.keys()].sort((a, b) => vec[a]! - vec[b]!);
     const ranks = new Array<number>(vec.length);
-    order.forEach((idx, rank) => { ranks[idx] = rank + 1; });
+    order.forEach((idx, rank) => {
+      ranks[idx] = rank + 1;
+    });
     return ranks;
   }
   const n = axes.length;
   // max footrule distance for n=5: sum |i - (n+1-i)| for i=1..n = 2*(floor(n^2/4))
-  const maxFootrule = n % 2 === 0
-    ? (n * n) / 2
-    : (n * n - 1) / 2;
+  const maxFootrule = n % 2 === 0 ? (n * n) / 2 : (n * n - 1) / 2;
   const ranksArr = vecs.map(rankVec);
   let sum = 0;
   let count = 0;
@@ -36652,7 +37063,9 @@ export function tuningFamilySocraticRadarRankEntropyMean(
   function rankVec(vec: number[]): number[] {
     const order = [...vec.keys()].sort((a, b) => vec[a]! - vec[b]!);
     const ranks = new Array<number>(vec.length);
-    order.forEach((idx, rank) => { ranks[idx] = rank + 1; });
+    order.forEach((idx, rank) => {
+      ranks[idx] = rank + 1;
+    });
     return ranks;
   }
   let entropySum = 0;
@@ -36688,9 +37101,7 @@ export function tuningFamilySocraticRadarProfileMadMean(
   function median(arr: number[]): number {
     const sorted = [...arr].sort((a, b) => a - b);
     const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0
-      ? (sorted[mid - 1]! + sorted[mid]!) / 2
-      : sorted[mid]!;
+    return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
   }
   const mads = vecs.map((vec) => {
     const med = median(vec);
@@ -36711,12 +37122,15 @@ export function tuningFamilySocraticRadarCosineSimMean(
   if (tunings.length <= 1) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  let total = 0, count = 0;
+  let total = 0,
+    count = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
       const a = vecs[i]!;
       const b = vecs[j]!;
-      let dot = 0, normA = 0, normB = 0;
+      let dot = 0,
+        normA = 0,
+        normB = 0;
       for (let k = 0; k < a.length; k++) {
         dot += a[k]! * b[k]!;
         normA += a[k]! * a[k]!;
@@ -36742,14 +37156,17 @@ export function tuningFamilySocraticRadarPearsonMean(
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
   const nAxes = axes.length;
-  let total = 0, count = 0;
+  let total = 0,
+    count = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
       const a = vecs[i]!;
       const b = vecs[j]!;
       const muA = a.reduce((s, v) => s + v, 0) / nAxes;
       const muB = b.reduce((s, v) => s + v, 0) / nAxes;
-      let cov = 0, varA = 0, varB = 0;
+      let cov = 0,
+        varA = 0,
+        varB = 0;
       for (let k = 0; k < nAxes; k++) {
         const da = a[k]! - muA;
         const db = b[k]! - muB;
@@ -36778,12 +37195,14 @@ export function tuningFamilySocraticRadarBrayCurtisMean(
   if (tunings.length <= 1) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  let total = 0, count = 0;
+  let total = 0,
+    count = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
       const a = vecs[i]!;
       const b = vecs[j]!;
-      let num = 0, den = 0;
+      let num = 0,
+        den = 0;
       for (let k = 0; k < a.length; k++) {
         num += Math.abs(a[k]! - b[k]!);
         den += a[k]! + b[k]!;
@@ -36806,7 +37225,8 @@ export function tuningFamilySocraticRadarChebyshevMean(
   if (tunings.length <= 1) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  let total = 0, count = 0;
+  let total = 0,
+    count = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
       const a = vecs[i]!;
@@ -36834,7 +37254,8 @@ export function tuningFamilySocraticRadarManhattanMean(
   if (tunings.length <= 1) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  let total = 0, count = 0;
+  let total = 0,
+    count = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
       const a = vecs[i]!;
@@ -36861,7 +37282,8 @@ export function tuningFamilySocraticRadarMinkowskiP3Mean(
   if (tunings.length <= 1) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  let total = 0, count = 0;
+  let total = 0,
+    count = 0;
   for (let i = 0; i < vecs.length; i++) {
     for (let j = i + 1; j < vecs.length; j++) {
       const a = vecs[i]!;
@@ -36891,8 +37313,8 @@ export function tuningFamilySocraticRadarDegreeCentralityMean(
   const n = vecs.length;
   const euclidean = (a: number[], b: number[]): number =>
     Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
-  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
-    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  const adj: boolean[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3),
   );
   let total = 0;
   for (let i = 0; i < n; i++) {
@@ -36916,8 +37338,8 @@ export function tuningFamilySocraticRadarClosenessCentralityMean(
   const n = vecs.length;
   const euclidean = (a: number[], b: number[]): number =>
     Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
-  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
-    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  const adj: boolean[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3),
   );
   let totalCloseness = 0;
   for (let src = 0; src < n; src++) {
@@ -36961,14 +37383,14 @@ export function tuningFamilySocraticRadarBetweennessCentralityMean(
   const n = vecs.length;
   const euclidean = (a: number[], b: number[]): number =>
     Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
-  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
-    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  const adj: boolean[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3),
   );
   const betweenness = new Array<number>(n).fill(0);
   for (let s = 0; s < n; s++) {
     const dist = new Array<number>(n).fill(-1);
     const sigma = new Array<number>(n).fill(0);
-    const pred: number[][] = Array.from({length: n}, () => []);
+    const pred: number[][] = Array.from({ length: n }, () => []);
     dist[s] = 0;
     sigma[s] = 1;
     const queue = [s];
@@ -36998,7 +37420,7 @@ export function tuningFamilySocraticRadarBetweennessCentralityMean(
       if (w !== s) betweenness[w] = (betweenness[w] ?? 0) + delta[w]!;
     }
   }
-  const norm = (n - 1) * (n - 2) / 2;
+  const norm = ((n - 1) * (n - 2)) / 2;
   let total = 0;
   for (let i = 0; i < n; i++) total += betweenness[i]! / norm;
   return total / n;
@@ -37018,8 +37440,8 @@ export function tuningFamilySocraticRadarClusteringCoefficientMeanV2(
   const n = vecs.length;
   const euclidean = (a: number[], b: number[]): number =>
     Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
-  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
-    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  const adj: boolean[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3),
   );
   let totalCC = 0;
   for (let i = 0; i < n; i++) {
@@ -37028,7 +37450,10 @@ export function tuningFamilySocraticRadarClusteringCoefficientMeanV2(
       if (adj[i]![j]) neighbors.push(j);
     }
     const k = neighbors.length;
-    if (k < 2) { totalCC += 0; continue; }
+    if (k < 2) {
+      totalCC += 0;
+      continue;
+    }
     let triangles = 0;
     for (let a = 0; a < neighbors.length; a++) {
       for (let b = a + 1; b < neighbors.length; b++) {
@@ -37054,8 +37479,8 @@ export function tuningFamilySocraticRadarGraphDensityMean(
   const n = vecs.length;
   const euclidean = (a: number[], b: number[]): number =>
     Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
-  const adj: boolean[][] = Array.from({length: n}, (_, i) =>
-    Array.from({length: n}, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3)
+  const adj: boolean[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3),
   );
   const groupSize = 3;
   let totalDensity = 0;
@@ -37064,8 +37489,12 @@ export function tuningFamilySocraticRadarGraphDensityMean(
     const group: number[] = [];
     for (let gi = start; gi < Math.min(start + groupSize, n); gi++) group.push(gi);
     const m = group.length;
-    const possible = m * (m - 1) / 2;
-    if (possible === 0) { groupCount++; totalDensity += 0; continue; }
+    const possible = (m * (m - 1)) / 2;
+    if (possible === 0) {
+      groupCount++;
+      totalDensity += 0;
+      continue;
+    }
     let edges = 0;
     for (let a = 0; a < group.length; a++) {
       for (let b = a + 1; b < group.length; b++) {
@@ -37092,8 +37521,8 @@ export function tuningFamilySocraticRadarSpectralRadiusMean(
   const n = vecs.length;
   const euclidean = (a: number[], b: number[]): number =>
     Math.sqrt(a.reduce((s, v, k) => s + (v - b[k]!) * (v - b[k]!), 0));
-  const A: number[][] = Array.from({length: n}, (_, i) =>
-    Array.from({length: n}, (__, j) => (i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3) ? 1 : 0)
+  const A: number[][] = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (__, j) => (i !== j && euclidean(vecs[i]!, vecs[j]!) < 0.3 ? 1 : 0)),
   );
   let vec = new Array<number>(n).fill(1 / Math.sqrt(n));
   let eigenvalue = 0;
@@ -37542,7 +37971,7 @@ export function tuningFamilySocraticRadarFreeEnergyMean(
   rootHz?: number,
 ): number {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
-  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark' , 'convergence'];
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   if (tunings.length === 0) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
@@ -37557,7 +37986,7 @@ export function tuningFamilySocraticRadarFreeEnergyMean(
       const p = vec[k]!;
       S += -p * Math.log2(p + 1e-10);
     }
-    const F = U - T * S / Math.log2(5);
+    const F = U - (T * S) / Math.log2(5);
     sum += F;
   }
   return sum / tunings.length;
@@ -37683,7 +38112,7 @@ export function tuningFamilySocraticRadarEntanglementProxyMean(
     const HA = entropy(A) / Math.log2(3);
     const HB = entropy(B) / Math.log2(2);
     const HAB = entropy(AB) / Math.log2(5);
-    const mi = (HA + HB - HAB);
+    const mi = HA + HB - HAB;
     sum += Math.max(0, Math.min(1, mi));
   }
   return Math.max(0, Math.min(1, sum / tunings.length));
@@ -37769,12 +38198,12 @@ export function tuningFamilySocraticRadarQuantumDiscordProxy(
     const HA = entropy(A) / Math.log2(3);
     const HB = entropy(B) / Math.log2(2);
     const HAB = entropy(AB) / Math.log2(5);
-    const totalCorr = (HA + HB - HAB);
+    const totalCorr = HA + HB - HAB;
     // Classical correlation: max single-axis contribution
     let maxSingle = 0;
     for (let k = 0; k < 5; k++) {
       const p = vec[k]!;
-      const h = -p * Math.log2(p + 1e-10) / Math.log2(5);
+      const h = (-p * Math.log2(p + 1e-10)) / Math.log2(5);
       if (h > maxSingle) maxSingle = h;
     }
     const discord = totalCorr - maxSingle;
@@ -37833,7 +38262,10 @@ export function tuningFamilySocraticRadarBettiNumberProxy(
     let inComponent = false;
     for (let i = 0; i < vec.length; i++) {
       if (vec[i]! >= 0.5) {
-        if (!inComponent) { components++; inComponent = true; }
+        if (!inComponent) {
+          components++;
+          inComponent = true;
+        }
       } else {
         inComponent = false;
       }
@@ -38054,7 +38486,7 @@ export function tuningFamilySocraticRadarPhaseSpaceVolumeMean(
     return 0;
   }
   // C(5,2) = 10 pairs of axes
-  const axisPairs = axes.length * (axes.length - 1) / 2;
+  const axisPairs = (axes.length * (axes.length - 1)) / 2;
   let sum = 0;
   let count = 0;
   for (let i = 0; i < vecs.length; i++) {
@@ -38085,7 +38517,7 @@ export function tuningFamilySocraticRadarBifurcationProxyMean(
   if (tunings.length === 0) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  const discretize = (v: number): number => v < 1 / 3 ? 0 : v < 2 / 3 ? 1 : 2;
+  const discretize = (v: number): number => (v < 1 / 3 ? 0 : v < 2 / 3 ? 1 : 2);
   if (vecs.length < 2) {
     return 0;
   }
@@ -38196,7 +38628,7 @@ export function tuningFamilySocraticRadarUniversalityClassProxy(
   if (tunings.length === 0) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  const bin = (v: number): number => v < 1 / 3 ? 0 : v < 2 / 3 ? 1 : 2;
+  const bin = (v: number): number => (v < 1 / 3 ? 0 : v < 2 / 3 ? 1 : 2);
   const binVecs = vecs.map((vec) => vec.map(bin));
   const vecToKey = (vec: number[]): string => vec.join(',');
   const distinct = new Set(binVecs.map(vecToKey)).size;
@@ -38271,7 +38703,8 @@ export function tuningFamilySocraticRadarAnomalousDimensionMean(
     const sorted = [...vec].sort((a, b) => a - b);
     const minVal = sorted[0]! + eps;
     const maxVal = sorted[sorted.length - 1]!;
-    const scalingExponent = maxVal > minVal ? (Math.log(maxVal) - Math.log(minVal)) / Math.log(5) : 0;
+    const scalingExponent =
+      maxVal > minVal ? (Math.log(maxVal) - Math.log(minVal)) / Math.log(5) : 0;
     const anomalous = Math.abs(scalingExponent - 0.5) * 2;
     sum += Math.max(0, Math.min(1, anomalous));
   }
@@ -38578,8 +39011,7 @@ export function tuningFamilySocraticRadarSusceptibilityProxy(
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
   const tuningMeans = vecs.map((vec) => vec.reduce((a, b) => a + b, 0) / vec.length);
   const globalMean = tuningMeans.reduce((a, b) => a + b, 0) / tuningMeans.length;
-  const variance =
-    tuningMeans.reduce((a, b) => a + (b - globalMean) ** 2, 0) / tuningMeans.length;
+  const variance = tuningMeans.reduce((a, b) => a + (b - globalMean) ** 2, 0) / tuningMeans.length;
   return Math.max(0, Math.min(1, variance / (variance + 0.01)));
 }
 
@@ -38965,8 +39397,7 @@ export function tuningFamilySocraticRadarMultiscaleEntropyProxy(
     for (let i = 0; i < n - 2; i++) {
       for (let j = 0; j < n - 2; j++) {
         if (i === j) continue;
-        const match2 =
-          Math.abs(vec[i]! - vec[j]!) <= r && Math.abs(vec[i + 1]! - vec[j + 1]!) <= r;
+        const match2 = Math.abs(vec[i]! - vec[j]!) <= r && Math.abs(vec[i + 1]! - vec[j + 1]!) <= r;
         if (match2) {
           B++;
           if (Math.abs(vec[i + 2]! - vec[j + 2]!) <= r) A++;
@@ -39407,7 +39838,9 @@ export function tuningFamilySocraticRadarFunctorFaithfulnessProxy(
     const n = ra.length;
     const meanA = ra.reduce((s, v) => s + v, 0) / n;
     const meanB = rb.reduce((s, v) => s + v, 0) / n;
-    let num = 0, da = 0, db = 0;
+    let num = 0,
+      da = 0,
+      db = 0;
     for (let j = 0; j < n; j++) {
       const a = ra[j]! - meanA;
       const b = rb[j]! - meanB;
@@ -39840,9 +40273,7 @@ export function tuningFamilySocraticRadarExponentialMapProxy(
     const p = vecs[i]!;
     const q = vecs[i + 1]!;
     // finite difference dp = p - prev (or p itself for i=0)
-    const dp = i > 0
-      ? p.map((v, k) => v - vecs[i - 1]![k]!)
-      : p.map((v) => v);
+    const dp = i > 0 ? p.map((v, k) => v - vecs[i - 1]![k]!) : p.map((v) => v);
     // predicted next: p + dp
     const predicted = p.map((v, k) => v + dp[k]!);
     // distance between q and predicted
@@ -39917,7 +40348,7 @@ export function tuningFamilySocraticRadarPrimeFactorComplexityMean(
     for (let i = 0; i < axes.length; i++) {
       const ax = axes[i]!;
       const lpf = largestPrimeFactor(i + 2);
-      sum += p[ax] * Math.log2(lpf) / 5;
+      sum += (p[ax] * Math.log2(lpf)) / 5;
     }
     total += sum;
   }
@@ -39992,8 +40423,7 @@ export function tuningFamilySocraticRadarModularArithmeticProxy(
       return v - Math.floor(v / mod) * mod;
     });
     const mean = residuals.reduce((a, b) => a + b, 0) / residuals.length;
-    const variance =
-      residuals.reduce((a, r) => a + (r - mean) ** 2, 0) / residuals.length;
+    const variance = residuals.reduce((a, r) => a + (r - mean) ** 2, 0) / residuals.length;
     total += variance / (variance + 0.01);
   }
   return Math.max(0, Math.min(1, total / profiles.length));
@@ -40139,7 +40569,7 @@ export function tuningFamilySocraticRadarCombinationCountProxy(
   let total = 0;
   for (const p of profiles) {
     const nAbove = axes.filter((ax) => p[ax] > 0.5).length;
-    const c = nAbove * Math.max(0, nAbove - 1) / 2;
+    const c = (nAbove * Math.max(0, nAbove - 1)) / 2;
     total += c / 10;
   }
   return Math.max(0, Math.min(1, total / profiles.length));
@@ -40194,7 +40624,7 @@ export function tuningFamilySocraticRadarSterlingNumberProxy(
         const sign = i % 2 === 0 ? 1 : -1;
         let binCoeff = 1;
         for (let m = 0; m < i; m++) {
-          binCoeff = binCoeff * (j - m) / (m + 1);
+          binCoeff = (binCoeff * (j - m)) / (m + 1);
         }
         s += sign * binCoeff * Math.pow(j - i, 5);
       }
@@ -40257,7 +40687,7 @@ export function tuningFamilySocraticRadarCatalanNumberProxy(
     const n = Math.floor(mean * 4);
     let c2n = 1;
     for (let i = 0; i < n; i++) {
-      c2n = c2n * (2 * n - i) / (i + 1);
+      c2n = (c2n * (2 * n - i)) / (i + 1);
     }
     const catalan = n >= 0 ? c2n / (n + 1) : 0;
     total += catalan / catalanNorm;
@@ -40390,7 +40820,7 @@ export function tuningFamilySocraticRadarMutualInformationProxy(
     let pairCount = 0;
     for (let i = 0; i < vec.length; i++) {
       for (let j = i + 1; j < vec.length; j++) {
-        pairSum += Math.abs((vec[i]!) - (vec[j]!));
+        pairSum += Math.abs(vec[i]! - vec[j]!);
         pairCount++;
       }
     }
@@ -40423,7 +40853,7 @@ export function tuningFamilySocraticRadarFisherInformationProxy(
   for (const vec of vecs) {
     let diffSum = 0;
     for (let i = 0; i < vec.length - 1; i++) {
-      diffSum += Math.abs((vec[i + 1]!) - (vec[i]!));
+      diffSum += Math.abs(vec[i + 1]! - vec[i]!);
     }
     total += diffSum / (vec.length - 1);
   }
@@ -40478,7 +40908,7 @@ export function tuningFamilySocraticRadarClusteringCoefficientProxy(
     let pairCount = 0;
     for (let i = 0; i < vec.length; i++) {
       for (let j = i + 1; j < vec.length; j++) {
-        pairSum += (vec[i]!) * (vec[j]!);
+        pairSum += vec[i]! * vec[j]!;
         pairCount++;
       }
     }
@@ -40567,7 +40997,7 @@ export function tuningFamilySocraticRadarSmallWorldnessProxy(
     let pairCount = 0;
     for (let i = 0; i < vec.length; i++) {
       for (let j = i + 1; j < vec.length; j++) {
-        pairSum += (vec[i]!) * (vec[j]!);
+        pairSum += vec[i]! * vec[j]!;
         pairCount++;
       }
     }
@@ -40652,7 +41082,7 @@ export function tuningFamilySocraticRadarEulerCharacteristicProxyV2(
   rootHz?: number,
 ): number {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
-  const axes: AxisKey[] = ['diversity', 'versatility' , 'maturity', 'benchmark', 'convergence'];
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   if (tunings.length === 0) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
@@ -41110,7 +41540,7 @@ export function tuningFamilySocraticRadarSpeciationProxy(
     const sorted = [...vec].sort((a, b) => a - b);
     let gapCount = 0;
     for (let i = 1; i < sorted.length; i++) {
-      if ((sorted[i]! - sorted[i - 1]!) > 0.3) gapCount++;
+      if (sorted[i]! - sorted[i - 1]! > 0.3) gapCount++;
     }
     sum += gapCount / 4;
   }
@@ -41153,7 +41583,9 @@ export function tuningFamilySocraticRadarGiniCoefficientProxy(
   for (const vec of vecs) {
     const sorted = [...vec].sort((a, b) => a - b);
     const sumV = sorted.reduce((acc, x) => acc + x, 0);
-    if (sumV < 1e-10) { continue; }
+    if (sumV < 1e-10) {
+      continue;
+    }
     let weightedSum = 0;
     for (let i = 0; i < n; i++) {
       weightedSum += (i + 1) * sorted[i]!;
@@ -41261,7 +41693,10 @@ export function tuningFamilySocraticRadarMarketEfficiencyProxy(
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
   let totalEfficiency = 0;
   for (const vec of vecs) {
-    const efficiency = Math.max(0, 1 - (vec.reduce((acc, vi) => acc + Math.abs(vi - 0.5), 0) / vec.length) * 2);
+    const efficiency = Math.max(
+      0,
+      1 - (vec.reduce((acc, vi) => acc + Math.abs(vi - 0.5), 0) / vec.length) * 2,
+    );
     totalEfficiency += efficiency;
   }
   return totalEfficiency / vecs.length;
@@ -41322,7 +41757,7 @@ export function tuningFamilySocraticRadarSyntacticComplexityProxy(
     const sorted = [...vec].sort((a, b) => a - b);
     let gapCount = 0;
     for (let i = 1; i < sorted.length; i++) {
-      if ((sorted[i]! - sorted[i - 1]!) > 0.15) gapCount++;
+      if (sorted[i]! - sorted[i - 1]! > 0.15) gapCount++;
     }
     totalComplexity += gapCount / 4;
   }
@@ -41609,7 +42044,10 @@ export function tuningFamilySocraticRadarHeatCapacityProxyV2(
     const dU = sorted[4]! - sorted[0]!;
     let sumX = 0;
     let sumX2 = 0;
-    for (const x of vec) { sumX += x; sumX2 += x * x; }
+    for (const x of vec) {
+      sumX += x;
+      sumX2 += x * x;
+    }
     const mean = sumX / vec.length;
     const dT = sumX2 / vec.length - mean * mean;
     const heatCapacity = dU / (dT + 1e-10);
@@ -41633,7 +42071,10 @@ export function tuningFamilySocraticRadarPhaseTransitionProxy(
   for (const vec of vecs) {
     let sumX = 0;
     let sumX2 = 0;
-    for (const x of vec) { sumX += x; sumX2 += x * x; }
+    for (const x of vec) {
+      sumX += x;
+      sumX2 += x * x;
+    }
     const mean = sumX / vec.length;
     const variance = sumX2 / vec.length - mean * mean;
     const bimodality = Math.max(0, Math.min(1, variance * 4 * (1 - Math.abs(mean - 0.5) * 2)));
@@ -41703,7 +42144,7 @@ export function tuningFamilySocraticRadarTurbulenceProxy(
       const d = Math.abs(vec[i + 2]! - 2 * vec[i + 1]! + vec[i]!);
       secondDiffSum += d;
     }
-    const turbulence = Math.max(0, Math.min(1, (secondDiffSum / 3) / 2));
+    const turbulence = Math.max(0, Math.min(1, secondDiffSum / 3 / 2));
     total += turbulence;
   }
   return total / vecs.length;
@@ -41728,7 +42169,7 @@ export function tuningFamilySocraticRadarLaminarFlowProxy(
       const d = Math.abs(sorted[i + 2]! - 2 * sorted[i + 1]! + sorted[i]!);
       secondDiffSum += d;
     }
-    const turbulence = (secondDiffSum / 3) / 2;
+    const turbulence = secondDiffSum / 3 / 2;
     const laminar = Math.max(0, Math.min(1, 1 - turbulence));
     total += laminar;
   }
@@ -41892,7 +42333,7 @@ export function tuningFamilySocraticRadarStratificationProxy(
     const sorted = [...vec].sort((a, b) => a - b);
     let strataCount = 1;
     for (let i = 1; i < sorted.length; i++) {
-      if ((sorted[i]! - sorted[i - 1]!) > 0.2) strataCount++;
+      if (sorted[i]! - sorted[i - 1]! > 0.2) strataCount++;
     }
     total += strataCount / 5;
   }
@@ -42155,7 +42596,9 @@ export function tuningFamilySocraticRadarPredatorPreyProxy(
       total += 1;
       continue;
     }
-    const median = (sorted[Math.floor((sorted.length - 1) / 2)]! + sorted[Math.ceil((sorted.length - 1) / 2)]!) / 2;
+    const median =
+      (sorted[Math.floor((sorted.length - 1) / 2)]! + sorted[Math.ceil((sorted.length - 1) / 2)]!) /
+      2;
     let alternating = 0;
     for (let i = 0; i + 1 < vec.length; i++) {
       const a = vec[i]!;
@@ -42630,7 +43073,7 @@ export function tuningFamilySocraticRadarMarketValueProxy(
     const mean = vec.reduce((a, b) => a + b, 0) / vec.length;
     const max = Math.max(...vec);
     const min = Math.min(...vec);
-    const score = mean * (1 + max - min) / 2;
+    const score = (mean * (1 + max - min)) / 2;
     totalScore += score;
   }
   return Math.min(1, Math.max(0, totalScore / vecs.length));
@@ -43241,7 +43684,7 @@ export function tuningFamilySocraticRadarMutualInformationProxyV2(
   rootHz?: number,
 ): number {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
-  const axes: AxisKey[] = ['diversity', 'versatility' , 'maturity', 'benchmark', 'convergence'];
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
   if (tunings.length === 0) return 0;
   const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
   const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
@@ -43825,8 +44268,7 @@ export function tuningFamilySocraticRadarEpistemicCertaintyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
-  const variance =
-    axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
   const std = Math.sqrt(variance);
   return Math.min(1, Math.max(0, 1 - std / 0.5));
 }
@@ -45255,7 +45697,7 @@ export function tuningFamilySocraticRadarRiskAversionProxy(
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
   const meanSq = axisAggregates.reduce((a, b) => a + b * b, 0) / 5;
   const std = Math.sqrt(Math.max(0, meanSq - mean * mean));
-  const result = 1 - (std * 2) * (std * 2);
+  const result = 1 - std * 2 * (std * 2);
   return Math.min(1, Math.max(0, result));
 }
 
@@ -45475,7 +45917,7 @@ export function tuningFamilySocraticRadarCognitivePrimingProxy(
   });
   const maxAgg = Math.max(...axisAggregates);
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
-  const result = maxAgg * mean / (maxAgg + mean + 1e-9) * 2;
+  const result = ((maxAgg * mean) / (maxAgg + mean + 1e-9)) * 2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -45664,7 +46106,10 @@ export function tuningFamilySocraticRadarSymmetryEnergyProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const energy = (Math.abs(axisAggregates[0]! - axisAggregates[4]!) + Math.abs(axisAggregates[1]! - axisAggregates[3]!)) / 2;
+  const energy =
+    (Math.abs(axisAggregates[0]! - axisAggregates[4]!) +
+      Math.abs(axisAggregates[1]! - axisAggregates[3]!)) /
+    2;
   const result = 1 - energy;
   return Math.min(1, Math.max(0, result));
 }
@@ -45806,7 +46251,7 @@ export function tuningFamilySocraticRadarRefractionProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const result = 1 - axisAggregates.reduce((acc, a, i) => acc + Math.abs(a - i / 4), 0) / 5 * 2;
+  const result = 1 - (axisAggregates.reduce((acc, a, i) => acc + Math.abs(a - i / 4), 0) / 5) * 2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -45825,7 +46270,7 @@ export function tuningFamilySocraticRadarReflectanceProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const result = axisAggregates.filter(a => a > 0.6).length / 5;
+  const result = axisAggregates.filter((a) => a > 0.6).length / 5;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -45844,7 +46289,7 @@ export function tuningFamilySocraticRadarAbsorbanceProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const result = axisAggregates.filter(a => a < 0.4).length / 5;
+  const result = axisAggregates.filter((a) => a < 0.4).length / 5;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -45863,7 +46308,7 @@ export function tuningFamilySocraticRadarTransmittanceProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const result = axisAggregates.filter(a => a >= 0.35 && a <= 0.65).length / 5;
+  const result = axisAggregates.filter((a) => a >= 0.35 && a <= 0.65).length / 5;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -45954,7 +46399,10 @@ export function tuningFamilySocraticRadarVoiceLeadingProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const totalChange = [0, 1, 2, 3].reduce((acc, i) => acc + Math.abs(axisAggregates[i + 1]! - axisAggregates[i]!), 0);
+  const totalChange = [0, 1, 2, 3].reduce(
+    (acc, i) => acc + Math.abs(axisAggregates[i + 1]! - axisAggregates[i]!),
+    0,
+  );
   const result = 1 - totalChange / 4;
   return Math.min(1, Math.max(0, result));
 }
@@ -45976,7 +46424,11 @@ export function tuningFamilySocraticRadarCounterpointProxy(
   });
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
   const std = Math.sqrt(axisAggregates.reduce((acc, a) => acc + (a - mean) ** 2, 0) / 5);
-  const motion = [0, 1, 2, 3].reduce((acc, i) => acc + Math.abs(axisAggregates[i + 1]! - axisAggregates[i]!), 0) / 4;
+  const motion =
+    [0, 1, 2, 3].reduce(
+      (acc, i) => acc + Math.abs(axisAggregates[i + 1]! - axisAggregates[i]!),
+      0,
+    ) / 4;
   const stability = 1 - std;
   const result = (motion + stability) / 2;
   return Math.min(1, Math.max(0, result));
@@ -46000,7 +46452,7 @@ export function tuningFamilySocraticRadarRhythmicCongruenceProxy(
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / 5;
   let alternations = 0;
   for (let i = 0; i < 4; i++) {
-    if ((axisAggregates[i]! > mean) !== (axisAggregates[i + 1]! > mean)) alternations++;
+    if (axisAggregates[i]! > mean !== axisAggregates[i + 1]! > mean) alternations++;
   }
   const result = alternations / 4;
   return Math.min(1, Math.max(0, result));
@@ -46095,7 +46547,8 @@ export function tuningFamilySocraticRadarSyntaxComplexityProxyV2(
   });
   let localMax = 0;
   for (let i = 1; i <= 3; i++) {
-    if (axisAggregates[i]! > axisAggregates[i - 1]! && axisAggregates[i]! > axisAggregates[i + 1]!) localMax++;
+    if (axisAggregates[i]! > axisAggregates[i - 1]! && axisAggregates[i]! > axisAggregates[i + 1]!)
+      localMax++;
   }
   const result = localMax / 3;
   return Math.min(1, Math.max(0, result));
@@ -46518,8 +46971,7 @@ export function tuningFamilySocraticRadarGravitationalWaveProxy(
   });
   // IMPLEMENTATION: wave amplitude analog — std * 2 (high variance = strong oscillation, clamped)
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
-  const variance =
-    axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
   const std = Math.sqrt(variance);
   const result = std * 2;
   return Math.min(1, Math.max(0, result));
@@ -46606,8 +47058,7 @@ export function tuningFamilySocraticRadarQuantumVacuumProxy(
   });
   // IMPLEMENTATION: vacuum fluctuation — (1 - mean) * std * 4 (low mean + high variance = vacuum-like)
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
-  const variance =
-    axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
+  const variance = axisAggregates.reduce((a, b) => a + (b - mean) ** 2, 0) / axisAggregates.length;
   const std = Math.sqrt(variance);
   const result = (1 - mean) * std * 4;
   return Math.min(1, Math.max(0, result));
@@ -47059,7 +47510,8 @@ export function tuningFamilySocraticRadarFoodWebComplexityProxyV2(
   });
   // food web complexity: variance of axisAggregates * 4 (clamped [0,1])
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
-  const variance = axisAggregates.reduce((acc, v) => acc + (v - mean) ** 2, 0) / axisAggregates.length;
+  const variance =
+    axisAggregates.reduce((acc, v) => acc + (v - mean) ** 2, 0) / axisAggregates.length;
   const result = variance * 4;
   return Math.min(1, Math.max(0, result));
 }
@@ -47081,7 +47533,8 @@ export function tuningFamilySocraticRadarNicheSpecializationProxy(
   });
   // niche specialization: 1 - (stddev / 0.5) — how narrow/focused
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
-  const variance = axisAggregates.reduce((acc, v) => acc + (v - mean) ** 2, 0) / axisAggregates.length;
+  const variance =
+    axisAggregates.reduce((acc, v) => acc + (v - mean) ** 2, 0) / axisAggregates.length;
   const std = Math.sqrt(variance);
   const result = 1 - std / 0.5;
   return Math.min(1, Math.max(0, result));
@@ -47156,7 +47609,10 @@ export function tuningFamilySocraticRadarCoevolutionProxy(
   }
   const meanFirst = firstVals.reduce((a, b) => a + b, 0) / n;
   const meanLast = lastVals.reduce((a, b) => a + b, 0) / n;
-  const covNum = firstVals.reduce((acc, v, i) => acc + (v - meanFirst) * (lastVals[i]! - meanLast), 0);
+  const covNum = firstVals.reduce(
+    (acc, v, i) => acc + (v - meanFirst) * (lastVals[i]! - meanLast),
+    0,
+  );
   const stdFirst = Math.sqrt(firstVals.reduce((acc, v) => acc + (v - meanFirst) ** 2, 0) / n);
   const stdLast = Math.sqrt(lastVals.reduce((acc, v) => acc + (v - meanLast) ** 2, 0) / n);
   if (stdFirst === 0 || stdLast === 0) return 0.5;
@@ -47608,7 +48064,8 @@ export function tuningFamilySocraticRadarInstitutionalTrustProxy(
   });
   const aboveHalf = axisAggregates.filter((v) => v > 0.5);
   const fraction = aboveHalf.length / axisAggregates.length;
-  const meanAbove = aboveHalf.length > 0 ? aboveHalf.reduce((a, b) => a + b, 0) / aboveHalf.length : 0;
+  const meanAbove =
+    aboveHalf.length > 0 ? aboveHalf.reduce((a, b) => a + b, 0) / aboveHalf.length : 0;
   const result = fraction * meanAbove;
   return Math.min(1, Math.max(0, result));
 }
@@ -48026,7 +48483,9 @@ export function tuningFamilySocraticRadarSymmetryBreakingProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const result = Math.abs(axisAggregates[0]! - axisAggregates[4]!) + Math.abs(axisAggregates[1]! - axisAggregates[3]!) / 2;
+  const result =
+    Math.abs(axisAggregates[0]! - axisAggregates[4]!) +
+    Math.abs(axisAggregates[1]! - axisAggregates[3]!) / 2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -48169,7 +48628,8 @@ export function tuningFamilySocraticRadarNashEquilibriumProxyV5(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   const mean = axisAggregates.reduce((a, b) => a + b, 0) / axisAggregates.length;
-  const variance = axisAggregates.reduce((a, b) => a + (b - mean) * (b - mean), 0) / axisAggregates.length;
+  const variance =
+    axisAggregates.reduce((a, b) => a + (b - mean) * (b - mean), 0) / axisAggregates.length;
   const result = 1 - variance * 4;
   return Math.min(1, Math.max(0, result));
 }
@@ -49011,9 +49471,10 @@ export function tuningFamilySocraticRadarHalfLifeProxy(
   // Half-life = median of axis values (persistence in the middle)
   const sorted = [...axisAggregates].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  const result = sorted.length % 2 === 0
-    ? ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2
-    : (sorted[mid] ?? 0);
+  const result =
+    sorted.length % 2 === 0
+      ? ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2
+      : (sorted[mid] ?? 0);
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49332,7 +49793,12 @@ export function tuningFamilySocraticRadarMaterialStrengthProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // material strength: weighted sum emphasizing maturity and benchmark (structural integrity)
-  const result = axisAggregates[2]! * 0.4 + axisAggregates[3]! * 0.4 + axisAggregates[0]! * 0.1 + axisAggregates[1]! * 0.05 + axisAggregates[4]! * 0.05;
+  const result =
+    axisAggregates[2]! * 0.4 +
+    axisAggregates[3]! * 0.4 +
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.05 +
+    axisAggregates[4]! * 0.05;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49352,7 +49818,8 @@ export function tuningFamilySocraticRadarPorosityProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // porosity: gaps/spaces in tuning → low maturity + high diversity = many gaps
-  const result = (1 - axisAggregates[2]!) * 0.5 + axisAggregates[0]! * 0.3 + (1 - axisAggregates[4]!) * 0.2;
+  const result =
+    (1 - axisAggregates[2]!) * 0.5 + axisAggregates[0]! * 0.3 + (1 - axisAggregates[4]!) * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49392,7 +49859,8 @@ export function tuningFamilySocraticRadarPlasticDeformationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // plastic deformation: tuning flexibility without return to original state → versatility high, convergence low
-  const result = axisAggregates[1]! * 0.5 + (1 - axisAggregates[4]!) * 0.3 + axisAggregates[0]! * 0.2;
+  const result =
+    axisAggregates[1]! * 0.5 + (1 - axisAggregates[4]!) * 0.3 + axisAggregates[0]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49411,7 +49879,11 @@ export function tuningFamilySocraticRadarFractureResistanceProxy(
     const vals = vecs.map((v) => v[ai]!);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
-  const result = axisAggregates[2]! * 0.35 + axisAggregates[1]! * 0.35 + axisAggregates[3]! * 0.2 + axisAggregates[4]! * 0.1;
+  const result =
+    axisAggregates[2]! * 0.35 +
+    axisAggregates[1]! * 0.35 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49431,7 +49903,8 @@ export function tuningFamilySocraticRadarCorrosionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // corrosion: harmonic degradation over time → low benchmark + low maturity
-  const result = (1 - axisAggregates[3]!) * 0.4 + (1 - axisAggregates[2]!) * 0.4 + axisAggregates[0]! * 0.2;
+  const result =
+    (1 - axisAggregates[3]!) * 0.4 + (1 - axisAggregates[2]!) * 0.4 + axisAggregates[0]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49451,7 +49924,8 @@ export function tuningFamilySocraticRadarTectonicActivityProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // tectonic activity: dynamic movement → diversity + versatility (change and range)
-  const result = axisAggregates[0]! * 0.4 + axisAggregates[1]! * 0.4 + (1 - axisAggregates[2]!) * 0.2;
+  const result =
+    axisAggregates[0]! * 0.4 + axisAggregates[1]! * 0.4 + (1 - axisAggregates[2]!) * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49471,7 +49945,8 @@ export function tuningFamilySocraticRadarSeismicIntensityProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // seismic intensity: sudden dissonance peaks → high benchmark deviation + low convergence
-  const result = axisAggregates[3]! * 0.5 + (1 - axisAggregates[4]!) * 0.3 + axisAggregates[0]! * 0.2;
+  const result =
+    axisAggregates[3]! * 0.5 + (1 - axisAggregates[4]!) * 0.3 + axisAggregates[0]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49511,7 +49986,8 @@ export function tuningFamilySocraticRadarErosionRateProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // erosion rate: gradual degradation of structure → low maturity + low benchmark
-  const result = (1 - axisAggregates[2]!) * 0.45 + (1 - axisAggregates[3]!) * 0.35 + axisAggregates[1]! * 0.2;
+  const result =
+    (1 - axisAggregates[2]!) * 0.45 + (1 - axisAggregates[3]!) * 0.35 + axisAggregates[1]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49551,7 +50027,8 @@ export function tuningFamilySocraticRadarMagmaViscosityProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // magma viscosity: resistance to flow → high convergence + high maturity, low versatility
-  const result = axisAggregates[4]! * 0.35 + axisAggregates[2]! * 0.35 + (1 - axisAggregates[1]!) * 0.3;
+  const result =
+    axisAggregates[4]! * 0.35 + axisAggregates[2]! * 0.35 + (1 - axisAggregates[1]!) * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49652,7 +50129,8 @@ export function tuningFamilySocraticRadarDiodeForwardVoltageProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // diode forward voltage: threshold to allow current flow → benchmark threshold
-  const result = axisAggregates[3]! * 0.5 + (1 - axisAggregates[0]!) * 0.3 + axisAggregates[2]! * 0.2;
+  const result =
+    axisAggregates[3]! * 0.5 + (1 - axisAggregates[0]!) * 0.3 + axisAggregates[2]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49672,7 +50150,8 @@ export function tuningFamilySocraticRadarResistorNoiseProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // resistor noise (Johnson noise): random thermal fluctuation → low convergence + high diversity
-  const result = (1 - axisAggregates[4]!) * 0.4 + axisAggregates[0]! * 0.4 + (1 - axisAggregates[2]!) * 0.2;
+  const result =
+    (1 - axisAggregates[4]!) * 0.4 + axisAggregates[0]! * 0.4 + (1 - axisAggregates[2]!) * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49712,7 +50191,8 @@ export function tuningFamilySocraticRadarDragCoefficientProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // drag coefficient: resistance to harmonic flow → low convergence + high diversity
-  const result = (1 - axisAggregates[4]!) * 0.4 + axisAggregates[0]! * 0.4 + (1 - axisAggregates[1]!) * 0.2;
+  const result =
+    (1 - axisAggregates[4]!) * 0.4 + axisAggregates[0]! * 0.4 + (1 - axisAggregates[1]!) * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49796,7 +50276,8 @@ export function tuningFamilySocraticRadarTurbulentVortexProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // turbulent vortex: chaotic rotation → high diversity + low convergence + low maturity
-  const result = axisAggregates[0]! * 0.4 + (1 - axisAggregates[4]!) * 0.3 + (1 - axisAggregates[2]!) * 0.3;
+  const result =
+    axisAggregates[0]! * 0.4 + (1 - axisAggregates[4]!) * 0.3 + (1 - axisAggregates[2]!) * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49937,11 +50418,11 @@ export function tuningFamilySocraticRadarNuclearFissionProxy(
   });
   // nuclear fission: high energy release → convergence and benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49962,11 +50443,11 @@ export function tuningFamilySocraticRadarNeutronFluxProxy(
   });
   // neutron flux: chain reaction spread → diversity and benchmark heavy
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -49987,11 +50468,11 @@ export function tuningFamilySocraticRadarRadioactiveDecayProxy(
   });
   // radioactive decay: temporal progression → maturity heavy
   const result =
-    (axisAggregates[0]! * 0.10 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.40 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.4 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50012,11 +50493,11 @@ export function tuningFamilySocraticRadarIsotopeStabilityProxy(
   });
   // isotope stability: balance between variants → versatility and convergence heavy
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.10 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.1 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50037,11 +50518,11 @@ export function tuningFamilySocraticRadarBindingEnergyProxy(
   });
   // nuclear binding energy: cohesive force → benchmark and maturity heavy
   const result =
-    (axisAggregates[0]! * 0.10 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50062,11 +50543,11 @@ export function tuningFamilySocraticRadarNuclearFusionProxy(
   });
   // nuclear fusion: extreme convergence and energy output → convergence and benchmark heavy
   const result =
-    (axisAggregates[0]! * 0.10 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50087,11 +50568,11 @@ export function tuningFamilySocraticRadarMechanicalTorqueProxy(
   });
   // mechanical torque: rotational force → benchmark+diversity weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50112,11 +50593,11 @@ export function tuningFamilySocraticRadarFatigueLifeProxy(
   });
   // fatigue life: long-term endurance → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.10 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50137,11 +50618,11 @@ export function tuningFamilySocraticRadarResonanceFrequencyProxy(
   });
   // resonance frequency: resonant coupling → convergence+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50162,11 +50643,11 @@ export function tuningFamilySocraticRadarStressConcentrationProxy(
   });
   // stress concentration: local stress → diversity+benchmark
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.10 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.1 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50187,11 +50668,11 @@ export function tuningFamilySocraticRadarVibrationAmplitudeProxy(
   });
   // vibration amplitude: oscillation → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50212,11 +50693,11 @@ export function tuningFamilySocraticRadarCreepRateProxy(
   });
   // creep rate: slow deformation → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.10 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.35 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.35 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50237,11 +50718,11 @@ export function tuningFamilySocraticRadarLatticeParameterProxy(
   });
   // lattice parameter: structural periodicity → benchmark+convergence weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50262,11 +50743,11 @@ export function tuningFamilySocraticRadarCrystalSymmetryProxy(
   });
   // crystal symmetry: high symmetry → benchmark+convergence
   const result =
-    (axisAggregates[0]! * 0.10 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50287,11 +50768,11 @@ export function tuningFamilySocraticRadarCoordinationNumberProxy(
   });
   // coordination number: bonding neighbours → diversity+benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50312,11 +50793,11 @@ export function tuningFamilySocraticRadarCrystalGrainSizeProxy(
   });
   // crystal grain size: growth scale → maturity weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50337,11 +50818,11 @@ export function tuningFamilySocraticRadarMillerIndexProxy(
   });
   // miller index: plane orientation → convergence weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50362,11 +50843,11 @@ export function tuningFamilySocraticRadarBraggAngleProxy(
   });
   // bragg angle: diffraction precision → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50387,11 +50868,11 @@ export function tuningFamilySocraticRadarViscosityIndexProxy(
   });
   // viscosity: resistance to flow → convergence+maturity weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50412,11 +50893,11 @@ export function tuningFamilySocraticRadarPressureDropProxy(
   });
   // pressure drop: energy loss along flow path → benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50437,11 +50918,11 @@ export function tuningFamilySocraticRadarVelocityGradientProxy(
   });
   // velocity gradient: rate of velocity change → diversity+versatility weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50462,11 +50943,11 @@ export function tuningFamilySocraticRadarFlowRateCoefficientProxy(
   });
   // flow rate coefficient: volumetric flow efficiency → benchmark+diversity weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50487,11 +50968,11 @@ export function tuningFamilySocraticRadarShearStressIndexProxy(
   });
   // shear stress: tangential force per area → diversity+benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50512,11 +50993,11 @@ export function tuningFamilySocraticRadarBuoyancyForceProxy(
   });
   // buoyancy force: upward fluid pressure → versatility+convergence weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50537,11 +51018,11 @@ export function tuningFamilySocraticRadarChemicalReactionRateProxy(
   });
   // chemical reaction rate: kinetic energy → diversity+benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50562,11 +51043,11 @@ export function tuningFamilySocraticRadarOxidationReductionPotentialProxy(
   });
   // oxidation reduction potential: electron transfer → maturity+benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50587,11 +51068,11 @@ export function tuningFamilySocraticRadarEquilibriumConstantProxy(
   });
   // equilibrium constant: balance of reactants/products → maturity+convergence weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50612,11 +51093,11 @@ export function tuningFamilySocraticRadarCatalystActivityProxy(
   });
   // catalyst activity: reaction acceleration → versatility+convergence weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50637,11 +51118,11 @@ export function tuningFamilySocraticRadarSolutionConcentrationProxy(
   });
   // solution concentration: solute density → diversity+maturity weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50662,11 +51143,11 @@ export function tuningFamilySocraticRadarReactionYieldProxy(
   });
   // reaction yield: product output efficiency → convergence weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50687,11 +51168,11 @@ export function tuningFamilySocraticRadarPolymerChainLengthProxy(
   });
   // polymer chain length: structural extent → maturity+diversity weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50712,11 +51193,11 @@ export function tuningFamilySocraticRadarCrossLinkDensityProxy(
   });
   // cross-link density: uniform network connectivity → equal weights
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50737,11 +51218,11 @@ export function tuningFamilySocraticRadarGlassTransitionTempProxy(
   });
   // glass transition temp: thermal threshold → maturity+versatility weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50762,11 +51243,11 @@ export function tuningFamilySocraticRadarMolecularWeightProxy(
   });
   // molecular weight: mass aggregation → maturity+diversity weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50787,11 +51268,11 @@ export function tuningFamilySocraticRadarPolymerCrystallinityProxy(
   });
   // polymer crystallinity: ordered structure → benchmark+versatility weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50812,11 +51293,11 @@ export function tuningFamilySocraticRadarViscoelasticModulusProxy(
   });
   // viscoelastic modulus: dynamic mechanical response → versatility weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50837,11 +51318,11 @@ export function tuningFamilySocraticRadarMorphogenGradientProxy(
   });
   // morphogen gradient: spatial patterning → diversity+convergence weighted
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50862,11 +51343,11 @@ export function tuningFamilySocraticRadarCellDifferentiationRateProxy(
   });
   // cell differentiation rate: specialization speed → versatility weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50887,11 +51368,11 @@ export function tuningFamilySocraticRadarTissueInductionIndexProxy(
   });
   // tissue induction index: signaling influence → maturity weighted
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50912,11 +51393,11 @@ export function tuningFamilySocraticRadarDevelopmentalStageScoreProxy(
   });
   // developmental stage score: progression tracking → maturity dominant
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50937,11 +51418,11 @@ export function tuningFamilySocraticRadarEmbryonicGrowthProxy(
   });
   // embryonic growth: early expansion → benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50962,11 +51443,11 @@ export function tuningFamilySocraticRadarOrganogenesisRateProxy(
   });
   // organogenesis rate: organ formation speed → convergence weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -50987,11 +51468,11 @@ export function tuningFamilySocraticRadarManipulatorJacobianProxy(
   });
   // manipulator Jacobian: maps joint velocities to end-effector velocities → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51012,11 +51493,11 @@ export function tuningFamilySocraticRadarJointTorqueBalanceProxy(
   });
   // joint torque balance: equilibrium of rotational forces → versatility weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51037,11 +51518,11 @@ export function tuningFamilySocraticRadarMotionPlanningScoreProxy(
   });
   // motion planning: path finding in configuration space → maturity+versatility
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51062,11 +51543,11 @@ export function tuningFamilySocraticRadarActuatorResponseProxy(
   });
   // actuator response: dynamic reaction time and precision → benchmark weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51087,11 +51568,11 @@ export function tuningFamilySocraticRadarSensorFusionProxy(
   });
   // sensor fusion: integrating multi-modal sensor data → convergence+diversity
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51112,11 +51593,11 @@ export function tuningFamilySocraticRadarKinematicChainProxy(
   });
   // kinematic chain: sequential joint linkages mapping → convergence weighted
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51137,11 +51618,11 @@ export function tuningFamilySocraticRadarAntibodyAffinityProxy(
   });
   // antibody affinity: binding strength of antibody to antigen → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51162,11 +51643,11 @@ export function tuningFamilySocraticRadarTcellActivationProxy(
   });
   // T-cell activation: immune cell triggering and proliferation → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51187,11 +51668,11 @@ export function tuningFamilySocraticRadarCytokineSignalProxy(
   });
   // cytokine signaling: intercellular immune communication → convergence+versatility
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51212,11 +51693,11 @@ export function tuningFamilySocraticRadarPhagocytosisRateProxy(
   });
   // phagocytosis rate: cellular ingestion of pathogens → maturity+benchmark
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51237,11 +51718,11 @@ export function tuningFamilySocraticRadarInflammatoryIndexProxy(
   });
   // inflammatory index: intensity of immune inflammatory response → diversity+convergence
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51262,11 +51743,11 @@ export function tuningFamilySocraticRadarComplementCascadeProxy(
   });
   // complement cascade: sequential immune protein activation → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51287,11 +51768,11 @@ export function tuningFamilySocraticRadarLiftDragRatioProxy(
   });
   // lift-drag ratio: aerodynamic efficiency metric for wing performance → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51312,11 +51793,11 @@ export function tuningFamilySocraticRadarThrustVectorAngleProxy(
   });
   // thrust vector angle: direction control of rocket propulsion → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51337,11 +51818,11 @@ export function tuningFamilySocraticRadarOrbitalInclinationProxy(
   });
   // orbital inclination: angle of orbit relative to equatorial plane → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51362,11 +51843,11 @@ export function tuningFamilySocraticRadarReentryHeatFluxProxy(
   });
   // reentry heat flux: thermal load during atmospheric reentry → benchmark+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51387,11 +51868,11 @@ export function tuningFamilySocraticRadarPropellantMassRatioProxy(
   });
   // propellant mass ratio: Tsiolkovsky rocket equation efficiency → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51412,11 +51893,11 @@ export function tuningFamilySocraticRadarNozzleExhaustVelocityProxy(
   });
   // nozzle exhaust velocity: effective jet speed from engine → convergence+benchmark
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51437,11 +51918,11 @@ export function tuningFamilySocraticRadarBeamDivergenceProxy(
   });
   // beam divergence: angular spread of laser/light beam → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51462,11 +51943,11 @@ export function tuningFamilySocraticRadarCoherenceLengthProxy(
   });
   // coherence length: path length over which light remains coherent → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51487,11 +51968,11 @@ export function tuningFamilySocraticRadarPolarizationDegreeProxy(
   });
   // polarization degree: fraction of polarized light in beam → maturity+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51512,11 +51993,11 @@ export function tuningFamilySocraticRadarQuantumEfficiencyProxy(
   });
   // quantum efficiency: photon-to-electron conversion rate → benchmark+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51537,11 +52018,11 @@ export function tuningFamilySocraticRadarNumericalApertureProxy(
   });
   // numerical aperture: light-gathering power of optical system → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51562,11 +52043,11 @@ export function tuningFamilySocraticRadarSpectralResolutionProxy(
   });
   // spectral resolution: ability to distinguish adjacent wavelengths → convergence+versatility
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51587,11 +52068,11 @@ export function tuningFamilySocraticRadarAtmosphericPressureGradientProxy(
   });
   // atmospheric pressure gradient: spatial rate of pressure change → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51612,11 +52093,11 @@ export function tuningFamilySocraticRadarCloudFormationProxy(
   });
   // cloud formation: condensation nuclei and droplet aggregation → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51637,11 +52118,11 @@ export function tuningFamilySocraticRadarPrecipitationRateProxy(
   });
   // precipitation rate: water droplet fall intensity per unit time → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51662,11 +52143,11 @@ export function tuningFamilySocraticRadarThunderstormIndexProxy(
   });
   // thunderstorm index: convective instability and lightning frequency → diversity+convergence
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51687,11 +52168,11 @@ export function tuningFamilySocraticRadarHumidityGradientProxy(
   });
   // humidity gradient: spatial variation of water vapor content → versatility+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51712,11 +52193,11 @@ export function tuningFamilySocraticRadarWeatherFrontScoreProxy(
   });
   // weather front score: boundary between air masses of different temperatures → convergence+benchmark
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51737,11 +52218,11 @@ export function tuningFamilySocraticRadarImpedanceMatchingProxy(
   });
   // impedance matching: maximizing power transfer between circuits → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51762,11 +52243,11 @@ export function tuningFamilySocraticRadarSignalAmplificationProxy(
   });
   // signal amplification: increasing signal strength while minimizing noise → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51787,11 +52268,11 @@ export function tuningFamilySocraticRadarPhaseNoiseProxy(
   });
   // phase noise: random phase fluctuations in oscillator signals → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51812,11 +52293,11 @@ export function tuningFamilySocraticRadarHarmonicDistortionProxy(
   });
   // harmonic distortion: unwanted harmonic components in signal → diversity+benchmark
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51837,11 +52318,11 @@ export function tuningFamilySocraticRadarPowerFactorProxy(
   });
   // power factor: ratio of real to apparent power in AC circuits → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51862,11 +52343,11 @@ export function tuningFamilySocraticRadarBandwidthEfficiencyProxy(
   });
   // bandwidth efficiency: bits per Hz in communication channels → convergence+versatility
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51887,11 +52368,11 @@ export function tuningFamilySocraticRadarIsotopeRatioProxy(
   });
   // isotope ratio: relative abundance of isotopes in geological samples → maturity+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51912,11 +52393,11 @@ export function tuningFamilySocraticRadarElementalAbundanceProxy(
   });
   // elemental abundance: concentration of chemical elements in rock/soil → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51937,11 +52418,11 @@ export function tuningFamilySocraticRadarMineralSolubilityProxy(
   });
   // mineral solubility: dissolution rate of minerals in groundwater → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51962,11 +52443,11 @@ export function tuningFamilySocraticRadarRedoxPotentialProxy(
   });
   // redox potential: oxidation-reduction state of geochemical environment → benchmark+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -51987,11 +52468,11 @@ export function tuningFamilySocraticRadarGeochemicalFluxProxy(
   });
   // geochemical flux: mass transfer rate of elements between reservoirs → versatility+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52012,11 +52493,11 @@ export function tuningFamilySocraticRadarSedimentDepositionProxy(
   });
   // sediment deposition: settling rate of particles in aquatic environments → convergence+benchmark
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52037,11 +52518,11 @@ export function tuningFamilySocraticRadarRoomAcousticsProxy(
   });
   // room acoustics: reverberation time and modal density of enclosed space → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52062,11 +52543,11 @@ export function tuningFamilySocraticRadarAbsorptionCoefficientProxy(
   });
   // absorption coefficient: fraction of sound energy absorbed by surface → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52087,11 +52568,11 @@ export function tuningFamilySocraticRadarReflectionCoefficientProxy(
   });
   // reflection coefficient: fraction of sound reflected at boundary → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52112,11 +52593,11 @@ export function tuningFamilySocraticRadarSoundInsulationIndexProxy(
   });
   // sound insulation index: transmission loss through partitions → convergence+benchmark
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52137,11 +52618,11 @@ export function tuningFamilySocraticRadarDiffusionFactorProxy(
   });
   // diffusion factor: uniformity of sound energy distribution → versatility+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52162,11 +52643,11 @@ export function tuningFamilySocraticRadarNoiseCriterionProxy(
   });
   // noise criterion: permissible background noise level for occupancy → benchmark+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52187,11 +52668,11 @@ export function tuningFamilySocraticRadarWaterActivityProxy(
   });
   // water activity: availability of water for microbial growth in food → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52212,11 +52693,11 @@ export function tuningFamilySocraticRadarEmulsificationStabilityProxy(
   });
   // emulsification stability: droplet size distribution in oil-water emulsion → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52237,11 +52718,11 @@ export function tuningFamilySocraticRadarGelationTemperatureProxy(
   });
   // gelation temperature: sol-gel transition point for biopolymers → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52262,11 +52743,11 @@ export function tuningFamilySocraticRadarFermentationRateProxy(
   });
   // fermentation rate: microbial metabolic conversion speed → versatility+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52287,11 +52768,11 @@ export function tuningFamilySocraticRadarOsmoticPressureIndexProxy(
   });
   // osmotic pressure index: solute concentration driving water transport → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52312,11 +52793,11 @@ export function tuningFamilySocraticRadarMaillardReactionScoreProxy(
   });
   // Maillard reaction score: non-enzymatic browning intensity in heated foods → diversity+benchmark
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52337,11 +52818,11 @@ export function tuningFamilySocraticRadarCoralBleachingProxy(
   });
   // coral bleaching: thermal stress-induced expulsion of symbiotic algae → diversity+benchmark
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52362,11 +52843,11 @@ export function tuningFamilySocraticRadarPlanktonDensityProxy(
   });
   // plankton density: concentration of microscopic marine organisms → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52387,11 +52868,11 @@ export function tuningFamilySocraticRadarOceanChemosynthesisProxy(
   });
   // ocean chemosynthesis: energy production from chemical reactions at vents → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52412,11 +52893,11 @@ export function tuningFamilySocraticRadarMarineBioluminescenceProxy(
   });
   // marine bioluminescence: light emission by deep-sea organisms → convergence+versatility
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52437,11 +52918,11 @@ export function tuningFamilySocraticRadarCoralReefDiversityProxy(
   });
   // coral reef diversity: species richness in reef ecosystems → diversity+maturity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52462,11 +52943,11 @@ export function tuningFamilySocraticRadarTidalZonationProxy(
   });
   // tidal zonation: species distribution across intertidal gradient → benchmark+convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52487,11 +52968,11 @@ export function tuningFamilySocraticRadarAirQualityIndexProxy(
   });
   // air quality index: composite measure of atmospheric pollutant concentrations → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52512,11 +52993,11 @@ export function tuningFamilySocraticRadarWaterPurificationRateProxy(
   });
   // water purification rate: removal efficiency of contaminants in treatment → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52537,11 +53018,11 @@ export function tuningFamilySocraticRadarSoilRemediationEfficiencyProxy(
   });
   // soil remediation efficiency: contaminant degradation rate in contaminated soil → maturity+benchmark
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52562,11 +53043,11 @@ export function tuningFamilySocraticRadarCarbonSequestrationProxy(
   });
   // carbon sequestration: long-term storage of CO2 in natural or artificial sinks → diversity+convergence
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52587,11 +53068,11 @@ export function tuningFamilySocraticRadarWasteRecyclingRateProxy(
   });
   // waste recycling rate: fraction of waste material diverted from landfill → versatility+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52612,11 +53093,11 @@ export function tuningFamilySocraticRadarNoisePollutionIndexProxy(
   });
   // noise pollution index: community noise exposure weighted by frequency and time → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52637,11 +53118,11 @@ export function tuningFamilySocraticRadarPlanetaryAlbedoProxy(
   });
   // planetary albedo: fraction of solar radiation reflected by planet surface → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52662,11 +53143,11 @@ export function tuningFamilySocraticRadarAtmosphericLapseProxy(
   });
   // atmospheric lapse rate: temperature decrease with altitude → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52687,11 +53168,11 @@ export function tuningFamilySocraticRadarMagneticFieldDipoleProxy(
   });
   // magnetic field dipole: axial alignment of planetary magnetosphere → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52712,11 +53193,11 @@ export function tuningFamilySocraticRadarCraterSaturationProxy(
   });
   // crater saturation: density of impact craters relative to surface area → diversity+benchmark
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52737,11 +53218,11 @@ export function tuningFamilySocraticRadarSubsurfaceOceanProxy(
   });
   // subsurface ocean: liquid water beneath ice shell in icy moons → maturity+convergence
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52762,11 +53243,11 @@ export function tuningFamilySocraticRadarRegolithDepthProxy(
   });
   // regolith depth: thickness of loose surface material on planetary body → versatility+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52787,11 +53268,11 @@ export function tuningFamilySocraticRadarActionPotentialProxy(
   });
   // action potential: all-or-nothing neuronal depolarization event → diversity+benchmark
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52812,11 +53293,11 @@ export function tuningFamilySocraticRadarSynapticDelayProxy(
   });
   // synaptic delay: transmission latency at chemical synapse → convergence+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52837,11 +53318,11 @@ export function tuningFamilySocraticRadarMyelinationIndexProxy(
   });
   // myelination index: degree of myelin sheath coverage on axons → maturity+benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52862,11 +53343,11 @@ export function tuningFamilySocraticRadarReceptorSensitivityProxy(
   });
   // receptor sensitivity: ligand binding affinity and response threshold → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52887,11 +53368,11 @@ export function tuningFamilySocraticRadarDepolarizationRateProxy(
   });
   // depolarization rate: speed of membrane potential rise during AP → benchmark+versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52912,11 +53393,11 @@ export function tuningFamilySocraticRadarInhibitoryBalanceProxy(
   });
   // inhibitory balance: ratio of inhibitory to excitatory synaptic input → convergence+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52937,11 +53418,11 @@ export function tuningFamilySocraticRadarGeneExpressionLevelProxy(
   });
   // gene expression level: transcript abundance → versatility+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52962,11 +53443,11 @@ export function tuningFamilySocraticRadarProteinSynthesisRateProxy(
   });
   // protein synthesis rate: ribosome throughput → versatility+benchmark
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -52987,11 +53468,11 @@ export function tuningFamilySocraticRadarDNAMethylationProxy(
   });
   // DNA methylation: epigenetic silencing → maturity emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53012,11 +53493,11 @@ export function tuningFamilySocraticRadarChromatinAccessibilityProxy(
   });
   // chromatin accessibility: open chromatin → diversity emphasis
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53037,11 +53518,11 @@ export function tuningFamilySocraticRadarRNAStabilityProxy(
   });
   // RNA stability: half-life → benchmark emphasis
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53062,11 +53543,11 @@ export function tuningFamilySocraticRadarTranslationEfficiencyProxy(
   });
   // translation efficiency: codon usage → convergence emphasis
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53087,11 +53568,11 @@ export function tuningFamilySocraticRadarMolecularOrbitalProxy(
   });
   // molecular orbital: LCAO basis → diversity+versatility
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53112,11 +53593,11 @@ export function tuningFamilySocraticRadarElectronDensityProxy(
   });
   // electron density: charge distribution → maturity emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53137,11 +53618,11 @@ export function tuningFamilySocraticRadarHOMOLUMOGapProxy(
   });
   // HOMO-LUMO gap: frontier orbital energy gap → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53162,11 +53643,11 @@ export function tuningFamilySocraticRadarDipoleMomentProxy(
   });
   // dipole moment: charge asymmetry → convergence
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53187,11 +53668,11 @@ export function tuningFamilySocraticRadarBondOrderProxy(
   });
   // bond order: covalent bond strength → versatility
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53212,11 +53693,11 @@ export function tuningFamilySocraticRadarResonanceStructureProxy(
   });
   // resonance structure: delocalization → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53237,11 +53718,11 @@ export function tuningFamilySocraticRadarBeamDeflectionProxy(
   });
   // beam deflection: load-induced displacement → maturity emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53262,11 +53743,11 @@ export function tuningFamilySocraticRadarFoundationBearingProxy(
   });
   // foundation bearing: soil load capacity → benchmark emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53287,11 +53768,11 @@ export function tuningFamilySocraticRadarSeismicResponseProxy(
   });
   // seismic response: ground motion amplification → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53312,11 +53793,11 @@ export function tuningFamilySocraticRadarConcreteStrengthProxy(
   });
   // concrete strength: compressive capacity → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.25);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53337,11 +53818,11 @@ export function tuningFamilySocraticRadarSteelYieldProxy(
   });
   // steel yield: plastic deformation threshold → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53362,11 +53843,11 @@ export function tuningFamilySocraticRadarStructuralDampingProxy(
   });
   // structural damping: energy dissipation → convergence emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53387,11 +53868,11 @@ export function tuningFamilySocraticRadarCropYieldProxy(
   });
   // crop yield: biomass productivity → benchmark+maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.25 +
-      axisAggregates[3]! * 0.25 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53412,11 +53893,11 @@ export function tuningFamilySocraticRadarSoilFertilityProxy(
   });
   // soil fertility: nutrient availability → diversity emphasis
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53437,11 +53918,11 @@ export function tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy(
   });
   // photosynthesis efficiency: light-energy conversion → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53462,11 +53943,11 @@ export function tuningFamilySocraticRadarWaterUseEfficiencyProxy(
   });
   // water use efficiency: transpiration ratio → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53487,11 +53968,11 @@ export function tuningFamilySocraticRadarNitrogenFixationProxy(
   });
   // nitrogen fixation: biological N2 → versatility+diversity
   const result =
-    (axisAggregates[0]! * 0.25 +
-      axisAggregates[1]! * 0.25 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53512,11 +53993,11 @@ export function tuningFamilySocraticRadarHarvestIndexProxy(
   });
   // harvest index: partitioning to grain → maturity emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53537,11 +54018,11 @@ export function tuningFamilySocraticRadarQuarkConfinementProxy(
   });
   // quark confinement: color charge binding → convergence emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53562,11 +54043,11 @@ export function tuningFamilySocraticRadarGluonDensityProxy(
   });
   // gluon density: strong force mediators → versatility emphasis
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53587,11 +54068,11 @@ export function tuningFamilySocraticRadarPartonDistributionProxy(
   });
   // parton distribution: proton substructure → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53612,11 +54093,11 @@ export function tuningFamilySocraticRadarJetFragmentProxy(
   });
   // jet fragmentation: hadronization cascade → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53637,11 +54118,11 @@ export function tuningFamilySocraticRadarWBosonMassProxy(
   });
   // W boson mass: electroweak symmetry breaking → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53662,11 +54143,11 @@ export function tuningFamilySocraticRadarHiggsFieldProxy(
   });
   // Higgs field: mass generation mechanism → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53687,11 +54168,11 @@ export function tuningFamilySocraticRadarPlasmaConfinementProxy(
   });
   // plasma confinement: magnetic field containment → convergence emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53712,11 +54193,11 @@ export function tuningFamilySocraticRadarFusionCrossSectionProxy(
   });
   // fusion cross section: D-T reaction rate → benchmark emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53737,11 +54218,11 @@ export function tuningFamilySocraticRadarToroidalFieldProxy(
   });
   // toroidal field: tokamak magnetic geometry → maturity
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53762,11 +54243,11 @@ export function tuningFamilySocraticRadarNeoclassicalTransportProxy(
   });
   // neoclassical transport: trapped-particle diffusion → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53787,11 +54268,11 @@ export function tuningFamilySocraticRadarBootstrapCurrentProxy(
   });
   // bootstrap current: self-generated plasma current → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53812,11 +54293,11 @@ export function tuningFamilySocraticRadarBetaLimitProxy(
   });
   // beta limit: plasma pressure to magnetic pressure ratio → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53837,11 +54318,11 @@ export function tuningFamilySocraticRadarMembraneFlexibilityProxy(
   });
   // membrane flexibility: lipid bilayer bending modulus → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53862,11 +54343,11 @@ export function tuningFamilySocraticRadarDNAMechanicsProxy(
   });
   // DNA mechanics: persistence length and elastic deformation → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53887,11 +54368,11 @@ export function tuningFamilySocraticRadarCytoplasmViscosityProxy(
   });
   // cytoplasm viscosity: intracellular fluid resistance → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53912,11 +54393,11 @@ export function tuningFamilySocraticRadarMolecularMotorProxy(
   });
   // molecular motor: kinesin/myosin mechanochemistry → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53937,11 +54418,11 @@ export function tuningFamilySocraticRadarCellMembranePotentialProxy(
   });
   // cell membrane potential: Nernst equilibrium → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53962,11 +54443,11 @@ export function tuningFamilySocraticRadarProteinElasticityProxy(
   });
   // protein elasticity: worm-like chain entropy → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -53987,11 +54468,11 @@ export function tuningFamilySocraticRadarSequenceAlignmentProxy(
   });
   // sequence alignment: pairwise match score → benchmark emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54012,11 +54493,11 @@ export function tuningFamilySocraticRadarMotifEnrichmentProxy(
   });
   // motif enrichment: regulatory sequence overrepresentation → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54037,11 +54518,11 @@ export function tuningFamilySocraticRadarGenomicVariantProxy(
   });
   // genomic variant: SNP/indel functional impact → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54062,11 +54543,11 @@ export function tuningFamilySocraticRadarTranscriptomeProfileProxy(
   });
   // transcriptome profile: RNA-seq expression landscape → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54087,11 +54568,11 @@ export function tuningFamilySocraticRadarProteinDockingProxy(
   });
   // protein docking: binding energy minimization → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54112,11 +54593,11 @@ export function tuningFamilySocraticRadarPhylogeneticDistanceProxy(
   });
   // phylogenetic distance: evolutionary divergence → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54137,11 +54618,11 @@ export function tuningFamilySocraticRadarDrugBioavailabilityProxy(
   });
   // drug bioavailability: oral absorption fraction → benchmark emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54162,11 +54643,11 @@ export function tuningFamilySocraticRadarReceptorOccupancyProxy(
   });
   // receptor occupancy: ligand-receptor binding fraction → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54187,11 +54668,11 @@ export function tuningFamilySocraticRadarPharmacokineticsProxy(
   });
   // pharmacokinetics: ADME profile → maturity emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54212,11 +54693,11 @@ export function tuningFamilySocraticRadarDrugBindingProxy(
   });
   // drug binding: affinity constant (Kd) → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54237,11 +54718,11 @@ export function tuningFamilySocraticRadarPlasmaHalfLifeProxy(
   });
   // plasma half-life: elimination kinetics → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54262,11 +54743,11 @@ export function tuningFamilySocraticRadarDrugMetabolismProxy(
   });
   // drug metabolism: CYP450 biotransformation → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54287,11 +54768,11 @@ export function tuningFamilySocraticRadarSolarIrradianceProxy(
   });
   // solar irradiance: photovoltaic energy flux → benchmark emphasis
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54312,11 +54793,11 @@ export function tuningFamilySocraticRadarWindPowerProxy(
   });
   // wind power: Betz coefficient turbine efficiency → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54337,11 +54818,11 @@ export function tuningFamilySocraticRadarTidalEnergyProxy(
   });
   // tidal energy: ocean current kinetic flux → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54362,11 +54843,11 @@ export function tuningFamilySocraticRadarGeothermalGradientProxy(
   });
   // geothermal gradient: Earth heat flow → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54387,11 +54868,11 @@ export function tuningFamilySocraticRadarBiomassConversionProxy(
   });
   // biomass conversion: thermochemical yield → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54412,11 +54893,11 @@ export function tuningFamilySocraticRadarHydrogenFuelCellProxy(
   });
   // hydrogen fuel cell: electrochemical efficiency → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54437,11 +54918,11 @@ export function tuningFamilySocraticRadarBeatTrackingProxy(
   });
   // beat tracking: rhythmic pulse detection accuracy → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54462,11 +54943,11 @@ export function tuningFamilySocraticRadarTempoEstimationProxy(
   });
   // tempo estimation: BPM inference from onset density → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54487,11 +54968,11 @@ export function tuningFamilySocraticRadarMelodyExtractionProxy(
   });
   // melody extraction: predominant pitch salience → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54512,11 +54993,11 @@ export function tuningFamilySocraticRadarChordRecognitionProxy(
   });
   // chord recognition: harmonic template matching → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54537,11 +55018,11 @@ export function tuningFamilySocraticRadarTimbreDescriptorProxy(
   });
   // timbre descriptor: spectral shape features → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54562,11 +55043,11 @@ export function tuningFamilySocraticRadarSourceSeparationProxy(
   });
   // source separation: blind unmixing quality → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54587,11 +55068,11 @@ export function tuningFamilySocraticRadarMarketEquilibriumProxy(
   });
   // market equilibrium: supply-demand price clearing → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54612,11 +55093,11 @@ export function tuningFamilySocraticRadarPriceElasticityProxy(
   });
   // price elasticity: demand sensitivity to price → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54637,11 +55118,11 @@ export function tuningFamilySocraticRadarGameTheoryNashProxy(
   });
   // Nash equilibrium: strategic non-cooperative balance → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54662,11 +55143,11 @@ export function tuningFamilySocraticRadarOptimalControlProxy(
   });
   // optimal control: Pontryagin maximum principle → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54687,11 +55168,11 @@ export function tuningFamilySocraticRadarStochasticGrowthProxy(
   });
   // stochastic growth: random walk capital accumulation → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54712,11 +55193,11 @@ export function tuningFamilySocraticRadarCapitalFormationProxy(
   });
   // capital formation: investment-savings balance → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54737,11 +55218,11 @@ export function tuningFamilySocraticRadarEncryptionStrengthProxy(
   });
   // encryption strength: key entropy and algorithmic hardness → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54762,11 +55243,11 @@ export function tuningFamilySocraticRadarAuthenticationFactorProxy(
   });
   // authentication factor: multi-factor security assurance → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54787,11 +55268,11 @@ export function tuningFamilySocraticRadarVulnerabilityScoreProxy(
   });
   // vulnerability score: CVSS attack surface → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54812,11 +55293,11 @@ export function tuningFamilySocraticRadarThreatModelingProxy(
   });
   // threat modeling: STRIDE risk surface → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54837,11 +55318,11 @@ export function tuningFamilySocraticRadarIntrusionDetectionProxy(
   });
   // intrusion detection: anomaly signal → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54862,11 +55343,11 @@ export function tuningFamilySocraticRadarDataIntegrityProxy(
   });
   // data integrity: cryptographic hash verification → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54887,11 +55368,11 @@ export function tuningFamilySocraticRadarBrainMachineInterfaceProxy(
   });
   // brain-machine interface: neural signal decoding accuracy → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54912,11 +55393,11 @@ export function tuningFamilySocraticRadarNeuralDecodingProxy(
   });
   // neural decoding: population code reconstruction → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54937,11 +55418,11 @@ export function tuningFamilySocraticRadarCorticalMappingProxy(
   });
   // cortical mapping: somatosensory area topology → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54962,11 +55443,11 @@ export function tuningFamilySocraticRadarSpikeSortProxy(
   });
   // spike sorting: action potential classification → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54987,11 +55468,11 @@ export function tuningFamilySocraticRadarEEGCoherenceProxy(
   });
   // EEG coherence: oscillatory synchrony → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55012,11 +55493,11 @@ export function tuningFamilySocraticRadarDeepBrainStimulationProxy(
   });
   // deep brain stimulation: therapeutic modulation → balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55037,11 +55518,11 @@ export function tuningFamilySocraticRadarCognitiveBiasProxy(
   });
   // cognitive bias: anchoring/framing effects → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55062,11 +55543,11 @@ export function tuningFamilySocraticRadarWorkingMemoryProxyV4(
   });
   // working memory: capacity and load → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55087,11 +55568,11 @@ export function tuningFamilySocraticRadarAttentionBandwidthProxy(
   });
   // attention bandwidth: selective and sustained attention → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55112,11 +55593,11 @@ export function tuningFamilySocraticRadarSensoryFusionProxy(
   });
   // sensory fusion: cross-modal integration and binding → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55137,11 +55618,11 @@ export function tuningFamilySocraticRadarPatternRecognitionProxyV2(
   });
   // pattern recognition: template matching and abstraction → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55162,11 +55643,11 @@ export function tuningFamilySocraticRadarExecutiveFunctionProxy(
   });
   // executive function: planning, inhibition, flexibility — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55187,11 +55668,11 @@ export function tuningFamilySocraticRadarQuantumEntanglementProxy(
   });
   // quantum entanglement: non-local correlations and superposition → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55212,11 +55693,11 @@ export function tuningFamilySocraticRadarQubitCoherenceProxy(
   });
   // qubit coherence: decoherence time and phase stability → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55237,11 +55718,11 @@ export function tuningFamilySocraticRadarQuantumChannelProxy(
   });
   // quantum channel: capacity and fidelity → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55262,11 +55743,11 @@ export function tuningFamilySocraticRadarQuantumGateProxy(
   });
   // quantum gate: unitary operations and circuit depth → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55287,11 +55768,11 @@ export function tuningFamilySocraticRadarQuantumTeleportationProxy(
   });
   // quantum teleportation: state transfer fidelity → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55312,11 +55793,11 @@ export function tuningFamilySocraticRadarQuantumNoiseProxy(
   });
   // quantum noise: shot noise and thermal decoherence — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55337,11 +55818,11 @@ export function tuningFamilySocraticRadarJetStreamV2Proxy(
   });
   // jet stream: fast upper-atmosphere flow → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55362,11 +55843,11 @@ export function tuningFamilySocraticRadarThermalGradientV2Proxy(
   });
   // thermal gradient: temperature lapse rate and inversion layers → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55387,11 +55868,11 @@ export function tuningFamilySocraticRadarConvectivePlumeProxy(
   });
   // convective plume: buoyant updraft and entrainment → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55412,11 +55893,11 @@ export function tuningFamilySocraticRadarWindShearV2Proxy(
   });
   // wind shear: velocity gradient with altitude → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55437,11 +55918,11 @@ export function tuningFamilySocraticRadarAtmosphericWaveProxy(
   });
   // atmospheric wave: Rossby/gravity waves and oscillation → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55462,11 +55943,11 @@ export function tuningFamilySocraticRadarHumidityFieldProxy(
   });
   // humidity field: moisture transport and saturation — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55487,11 +55968,11 @@ export function tuningFamilySocraticRadarEnzymeKineticsProxyV2(
   });
   // enzyme kinetics: Michaelis-Menten rate and substrate affinity → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55512,11 +55993,11 @@ export function tuningFamilySocraticRadarMetabolicFluxProxy(
   });
   // metabolic flux: pathway throughput and regulation → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55537,11 +56018,11 @@ export function tuningFamilySocraticRadarProteinBindingProxy(
   });
   // protein binding: ligand affinity and specificity → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55562,11 +56043,11 @@ export function tuningFamilySocraticRadarReactionCouplingProxy(
   });
   // reaction coupling: thermodynamic linkage and energy transfer → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55587,11 +56068,11 @@ export function tuningFamilySocraticRadarCatalysisRateProxy(
   });
   // catalysis rate: turnover number and activation energy → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55612,11 +56093,11 @@ export function tuningFamilySocraticRadarSubstrateTurnoverProxy(
   });
   // substrate turnover: kcat and product release — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55637,11 +56118,11 @@ export function tuningFamilySocraticRadarSeismicWaveProxy(
   });
   // seismic wave: P/S wave propagation and attenuation → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55662,11 +56143,11 @@ export function tuningFamilySocraticRadarMantleConvectionProxy(
   });
   // mantle convection: thermal plumes and plate driving → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55687,11 +56168,11 @@ export function tuningFamilySocraticRadarGeomagneticFieldProxy(
   });
   // geomagnetic field: dipole orientation and secular variation → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55712,11 +56193,11 @@ export function tuningFamilySocraticRadarTectonicStressProxyV2(
   });
   // tectonic stress: strain accumulation and fault mechanics → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55737,11 +56218,11 @@ export function tuningFamilySocraticRadarCrustDensityProxy(
   });
   // crust density: compositional layering and isostasy → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55762,11 +56243,11 @@ export function tuningFamilySocraticRadarHeatFlowProxy(
   });
   // heat flow: geothermal gradient and radiogenic production — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55787,11 +56268,11 @@ export function tuningFamilySocraticRadarElectricDipoleProxy(
   });
   // electric dipole: charge separation and field polarization → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55812,11 +56293,11 @@ export function tuningFamilySocraticRadarMagneticFluxProxy(
   });
   // magnetic flux: field linkage and induction → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55837,11 +56318,11 @@ export function tuningFamilySocraticRadarPlasmaFrequencyProxy(
   });
   // plasma frequency: collective oscillation cutoff → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55862,11 +56343,11 @@ export function tuningFamilySocraticRadarSkinDepthProxy(
   });
   // skin depth: electromagnetic penetration into conductors → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55887,11 +56368,11 @@ export function tuningFamilySocraticRadarPoyntingVectorProxy(
   });
   // Poynting vector: electromagnetic energy flux density → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55912,11 +56393,11 @@ export function tuningFamilySocraticRadarMaxwellEquationProxy(
   });
   // Maxwell equations: unified electromagnetism — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55937,11 +56418,11 @@ export function tuningFamilySocraticRadarFoodWebProxy(
   });
   // food web: trophic interactions and energy flow → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55962,11 +56443,11 @@ export function tuningFamilySocraticRadarTrophicLevelProxyV2(
   });
   // trophic level: energy transfer efficiency and hierarchy → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55987,11 +56468,11 @@ export function tuningFamilySocraticRadarBiodiversityIndexProxyV2(
   });
   // biodiversity index: species richness and evenness → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56012,11 +56493,11 @@ export function tuningFamilySocraticRadarNicheOverlapProxyV3(
   });
   // niche overlap: competitive exclusion and resource partitioning → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56037,11 +56518,11 @@ export function tuningFamilySocraticRadarPopulationDynamicsProxyV2(
   });
   // population dynamics: Lotka-Volterra cycles and carrying capacity → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.15 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56062,11 +56543,11 @@ export function tuningFamilySocraticRadarEcosystemResilienceProxy(
   });
   // ecosystem resilience: disturbance recovery and stability — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56087,11 +56568,11 @@ export function tuningFamilySocraticRadarNuclearBindingProxy(
   });
   // nuclear binding: strong force cohesion and mass defect → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56112,11 +56593,11 @@ export function tuningFamilySocraticRadarRadioactiveDecayProxyV2(
   });
   // radioactive decay: half-life and decay chain → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56137,11 +56618,11 @@ export function tuningFamilySocraticRadarFissionBarrierProxy(
   });
   // fission barrier: potential energy barrier and critical deformation → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56162,11 +56643,11 @@ export function tuningFamilySocraticRadarNeutronCaptureProxy(
   });
   // neutron capture: cross-section resonance and s/r-process nucleosynthesis → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56187,11 +56668,11 @@ export function tuningFamilySocraticRadarSpinParityProxy(
   });
   // spin-parity: angular momentum quantization and symmetry conservation → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56212,11 +56693,11 @@ export function tuningFamilySocraticRadarIsotopeRatioProxyV2(
   });
   // isotope ratio: abundance fractionation and mass spectrometric signature — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56237,11 +56718,11 @@ export function tuningFamilySocraticRadarDendriticIntegrationProxy(
   });
   // dendritic integration: spatial summation of synaptic inputs → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56262,11 +56743,11 @@ export function tuningFamilySocraticRadarSynapticPlasticityProxy(
   });
   // synaptic plasticity: LTP/LTD and Hebbian learning → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56287,11 +56768,11 @@ export function tuningFamilySocraticRadarOscillatoryCouplingProxy(
   });
   // oscillatory coupling: gamma-theta cross-frequency coupling → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56312,11 +56793,11 @@ export function tuningFamilySocraticRadarNeuralSynchronyProxy(
   });
   // neural synchrony: phase-locking and coherence → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56337,11 +56818,11 @@ export function tuningFamilySocraticRadarInhibitoryBalanceProxyV2(
   });
   // inhibitory balance: E/I ratio and GABAergic control → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56362,11 +56843,11 @@ export function tuningFamilySocraticRadarReceptiveFieldProxyV2(
   });
   // receptive field: center-surround selectivity and tuning curves — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56387,11 +56868,11 @@ export function tuningFamilySocraticRadarReynoldsNumberV2Proxy(
   });
   // Reynolds number: laminar-to-turbulent transition and inertia/viscosity ratio → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56412,11 +56893,11 @@ export function tuningFamilySocraticRadarVortexStretchProxy(
   });
   // vortex stretching: enstrophy cascade and turbulent energy amplification → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56437,11 +56918,11 @@ export function tuningFamilySocraticRadarTurbulentDiffusionProxy(
   });
   // turbulent diffusion: eddy mixing and scalar transport → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56462,11 +56943,11 @@ export function tuningFamilySocraticRadarBoundaryLayerV2Proxy(
   });
   // boundary layer: viscous sublayer and displacement thickness → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56487,11 +56968,11 @@ export function tuningFamilySocraticRadarKelvinHelmholtzProxy(
   });
   // Kelvin-Helmholtz instability: shear-driven roll-up and interface deformation → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56512,11 +56993,11 @@ export function tuningFamilySocraticRadarCoriolisEffectV2Proxy(
   });
   // Coriolis effect: rotation-induced deflection and geostrophic balance — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56537,11 +57018,11 @@ export function tuningFamilySocraticRadarEntropyProductionProxy(
   });
   // entropy production: irreversibility and dissipation rate → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56562,11 +57043,11 @@ export function tuningFamilySocraticRadarGibbsFreeEnergyProxy(
   });
   // Gibbs free energy: spontaneity and chemical potential → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56587,11 +57068,11 @@ export function tuningFamilySocraticRadarHeatCapacityProxyV4(
   });
   // heat capacity: thermal energy storage and Debye/Einstein modes → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56612,11 +57093,11 @@ export function tuningFamilySocraticRadarPhaseTransitionProxyV4(
   });
   // phase transition: critical point and order parameter discontinuity → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56637,11 +57118,11 @@ export function tuningFamilySocraticRadarCarnotEfficiencyProxy(
   });
   // Carnot efficiency: ideal heat engine limit and thermodynamic reversibility → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56662,11 +57143,11 @@ export function tuningFamilySocraticRadarBlackbodyRadiationProxy(
   });
   // blackbody radiation: Planck spectrum and Wien displacement — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56687,11 +57168,11 @@ export function tuningFamilySocraticRadarPhotonEntanglementProxy(
   });
   // photon entanglement: non-local correlations and Bell inequality violation → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56712,11 +57193,11 @@ export function tuningFamilySocraticRadarCoherentStateProxy(
   });
   // coherent state: Poissonian photon statistics and phase coherence → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56737,11 +57218,11 @@ export function tuningFamilySocraticRadarSqueezeStateProxy(
   });
   // squeezed state: sub-Poissonian noise and Heisenberg uncertainty redistribution → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56762,11 +57243,11 @@ export function tuningFamilySocraticRadarLaserThresholdProxy(
   });
   // laser threshold: population inversion and gain-loss balance → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56787,11 +57268,11 @@ export function tuningFamilySocraticRadarPhotonStatisticsProxy(
   });
   // photon statistics: Mandel Q parameter and bunching/anti-bunching → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56812,11 +57293,11 @@ export function tuningFamilySocraticRadarCavityQEDProxy(
   });
   // cavity QED: vacuum Rabi splitting and strong coupling regime — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56837,11 +57318,11 @@ export function tuningFamilySocraticRadarShannonEntropyProxy(
   });
   // Shannon entropy: information content and uncertainty quantification → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56862,11 +57343,11 @@ export function tuningFamilySocraticRadarMutualInformationProxyV4(
   });
   // mutual information: shared information and statistical dependence → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56887,11 +57368,11 @@ export function tuningFamilySocraticRadarKolmogorovComplexityProxyV3(
   });
   // Kolmogorov complexity: algorithmic incompressibility and descriptive complexity → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56912,11 +57393,11 @@ export function tuningFamilySocraticRadarChannelCapacityProxyV3(
   });
   // channel capacity: Shannon-Hartley theorem and noise-limited throughput → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56937,11 +57418,11 @@ export function tuningFamilySocraticRadarDataCompressionProxy(
   });
   // data compression: redundancy reduction and source coding efficiency → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56962,11 +57443,11 @@ export function tuningFamilySocraticRadarErrorCorrectionProxy(
   });
   // error correction: Hamming distance and redundancy-reliability trade-off — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56987,11 +57468,11 @@ export function tuningFamilySocraticRadarHubbleExpansionProxy(
   });
   // Hubble expansion: metric expansion and recession velocity scaling → diversity
   const result =
-    (axisAggregates[0]! * 0.30 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57012,11 +57493,11 @@ export function tuningFamilySocraticRadarDarkMatterV2Proxy(
   });
   // dark matter: hidden mass and gravitational scaffolding → maturity
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.30 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57037,11 +57518,11 @@ export function tuningFamilySocraticRadarCosmicInflationProxy(
   });
   // cosmic inflation: exponential expansion and flatness problem resolution → versatility
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.30 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.15 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57062,11 +57543,11 @@ export function tuningFamilySocraticRadarBaryonAcousticProxy(
   });
   // baryon acoustic oscillations: sound horizon and large-scale structure → benchmark
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.30 +
-      axisAggregates[4]! * 0.15);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57087,11 +57568,11 @@ export function tuningFamilySocraticRadarCosmologicalConstantProxy(
   });
   // cosmological constant: vacuum energy and accelerated expansion → convergence
   const result =
-    (axisAggregates[0]! * 0.15 +
-      axisAggregates[1]! * 0.15 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.30);
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57112,11 +57593,11 @@ export function tuningFamilySocraticRadarGravitationalLensingProxy(
   });
   // gravitational lensing: light deflection and Einstein ring formation — balanced
   const result =
-    (axisAggregates[0]! * 0.20 +
-      axisAggregates[1]! * 0.20 +
-      axisAggregates[2]! * 0.20 +
-      axisAggregates[3]! * 0.20 +
-      axisAggregates[4]! * 0.20);
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57136,7 +57617,12 @@ export function tuningFamilySocraticRadarDnaReplicationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // DNA複製: 正確なパターン複製 → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57156,7 +57642,12 @@ export function tuningFamilySocraticRadarProteinFoldingV2Proxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // タンパク質折りたたみ: 収束重視 → convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.10 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.1 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57176,7 +57667,12 @@ export function tuningFamilySocraticRadarGenomeExpressionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ゲノム発現: 多様な遺伝子発現 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57196,7 +57692,12 @@ export function tuningFamilySocraticRadarChromatinRemodelingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // クロマチンリモデリング: 構造的柔軟性 → versatility重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57216,7 +57717,12 @@ export function tuningFamilySocraticRadarEpigeneticMarkProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // エピジェネティックマーク: 安定したマーキング → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.10 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.1 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57236,7 +57742,12 @@ export function tuningFamilySocraticRadarAlternativeSplicingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 選択的スプライシング: 多様なアイソフォーム生成 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57256,7 +57767,12 @@ export function tuningFamilySocraticRadarPartitionFunctionV2Proxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 分配関数: 全状態の統計的重み → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57276,7 +57792,12 @@ export function tuningFamilySocraticRadarBoltzmannDistributionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ボルツマン分布: 熱平衡状態の確率 → convergence重視
-  const result = axisAggregates[0]! * 0.10 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57296,7 +57817,12 @@ export function tuningFamilySocraticRadarFluctuationDissipationV2Proxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 揺動散逸定理: 揺らぎと応答の関係 → versatility重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57316,7 +57842,12 @@ export function tuningFamilySocraticRadarCriticalExponentProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 臨界指数: 相転移点近傍のべき乗則 → benchmark重視
-  const result = axisAggregates[0]! * 0.10 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57336,7 +57867,12 @@ export function tuningFamilySocraticRadarOrderParameterProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 秩序変数: 対称性の破れを記述 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.10 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.1 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57356,7 +57892,12 @@ export function tuningFamilySocraticRadarCorrelationLengthProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 相関長: 揺らぎの空間的広がり → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57376,7 +57917,12 @@ export function tuningFamilySocraticRadarTurbulenceProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 乱流: 複雑な非線形挙動 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57396,7 +57942,12 @@ export function tuningFamilySocraticRadarVortexProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 渦: 回転・収束 → convergence重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57416,7 +57967,12 @@ export function tuningFamilySocraticRadarCavitationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // キャビテーション: 空洞形成・破裂 → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57436,7 +57992,12 @@ export function tuningFamilySocraticRadarWaveDispersionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 波の分散: 周波数依存伝播 → versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57456,7 +58017,12 @@ export function tuningFamilySocraticRadarBernoulliProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ベルヌーイ: 圧力と速度の保存則 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57476,7 +58042,12 @@ export function tuningFamilySocraticRadarViscosityProxyV4(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 粘性: 流体抵抗・均等な力学 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57496,7 +58067,12 @@ export function tuningFamilySocraticRadarDiffractionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 回折: 波の広がり・多様性 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57516,7 +58092,12 @@ export function tuningFamilySocraticRadarInterferenceProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 干渉: 波の重ね合わせ → convergence重視
-  const result = axisAggregates[4]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.10;
+  const result =
+    axisAggregates[4]! * 0.3 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57536,7 +58117,12 @@ export function tuningFamilySocraticRadarPolarizationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 偏光: 方向の選択・成熟度 → maturity重視
-  const result = axisAggregates[2]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[0]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57556,7 +58142,12 @@ export function tuningFamilySocraticRadarRefractionProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 屈折: 媒質による方向変化 → benchmark重視
-  const result = axisAggregates[3]! * 0.30 + axisAggregates[2]! * 0.25 + axisAggregates[4]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[0]! * 0.10;
+  const result =
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[4]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[0]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57576,7 +58167,12 @@ export function tuningFamilySocraticRadarDispersionProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 分散: 周波数依存の分離 → versatility重視
-  const result = axisAggregates[1]! * 0.30 + axisAggregates[0]! * 0.25 + axisAggregates[4]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.10;
+  const result =
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[4]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57596,7 +58192,12 @@ export function tuningFamilySocraticRadarResonanceProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 共鳴: 振動の増幅・均等な共振 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57616,7 +58217,12 @@ export function tuningFamilySocraticRadarCrystalStructureProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 結晶構造: 周期的秩序 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57636,7 +58242,12 @@ export function tuningFamilySocraticRadarDislocationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 転位: 多様性重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57656,7 +58267,12 @@ export function tuningFamilySocraticRadarPhaseTransformationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 相変態: 収束重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57676,7 +58292,12 @@ export function tuningFamilySocraticRadarFractureProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 破壊: benchmark重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57696,7 +58317,12 @@ export function tuningFamilySocraticRadarCorrosionMaterialProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 腐食: versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57716,7 +58342,12 @@ export function tuningFamilySocraticRadarNanotubeProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ナノチューブ: balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57736,7 +58367,12 @@ export function tuningFamilySocraticRadarTectonicsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // プレートテクトニクス: 地殻変動の累積 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57756,7 +58392,12 @@ export function tuningFamilySocraticRadarSeismicProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 地震: diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57776,7 +58417,12 @@ export function tuningFamilySocraticRadarVolcanicProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 火山: convergence重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57796,7 +58442,12 @@ export function tuningFamilySocraticRadarOceanCurrentProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 海流: versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57816,7 +58467,12 @@ export function tuningFamilySocraticRadarAtmosphericProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 大気循環: benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57836,7 +58492,12 @@ export function tuningFamilySocraticRadarGeomagneticProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 地磁気: balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57856,7 +58517,12 @@ export function tuningFamilySocraticRadarNaturalSelectionV2Proxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 自然選択: 適者生存・収束 → convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57876,7 +58542,12 @@ export function tuningFamilySocraticRadarGeneticDriftProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 遺伝的浮動: 多様性増大 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57896,7 +58567,12 @@ export function tuningFamilySocraticRadarSpeciationV2Proxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 種分化: 種の分化・多様化 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57916,7 +58592,12 @@ export function tuningFamilySocraticRadarPhylogenyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 系統樹: 成熟度・歴史 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57936,7 +58617,12 @@ export function tuningFamilySocraticRadarCoevolutionV2Proxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 共進化: 相互適応 → versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57956,7 +58642,12 @@ export function tuningFamilySocraticRadarAdaptiveRadiationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 適応放散: 均衡 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57976,7 +58667,12 @@ export function tuningFamilySocraticRadarWorkingMemoryProxyV5(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ワーキングメモリ: 一時的な情報保持 → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57996,7 +58692,12 @@ export function tuningFamilySocraticRadarAttentionFilterProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 注意フィルタ: 選択的注意 → convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58016,7 +58717,12 @@ export function tuningFamilySocraticRadarPatternRecognitionProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // パターン認識: 構造の抽出 → maturity重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58036,7 +58742,12 @@ export function tuningFamilySocraticRadarCognitiveBiasProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 認知バイアス: 先入観 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58056,7 +58767,12 @@ export function tuningFamilySocraticRadarExecutiveFunctionProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 実行機能: 計画・制御 → versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58076,7 +58792,12 @@ export function tuningFamilySocraticRadarLanguageProcessingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 言語処理: 均衡 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58096,7 +58817,12 @@ export function tuningFamilySocraticRadarCarbonCycleProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 炭素循環: 地球規模の循環 → versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58116,7 +58842,12 @@ export function tuningFamilySocraticRadarGreenhouseEffectProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 温室効果: 熱の閉じ込め → convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58136,7 +58867,12 @@ export function tuningFamilySocraticRadarOceanAcidificationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 海洋酸性化: pH変化の蓄積 → maturity重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58156,7 +58892,12 @@ export function tuningFamilySocraticRadarArcticAmplificationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 北極増幅: 極域の温度増幅 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58176,7 +58917,12 @@ export function tuningFamilySocraticRadarHadleyCellProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ハドレー循環: 大気循環の基準 → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58196,7 +58942,12 @@ export function tuningFamilySocraticRadarMonsoonProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // モンスーン: 季節変動の均衡 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58216,7 +58967,12 @@ export function tuningFamilySocraticRadarCrowdDynamicsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 群集力学: 集団の動き → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58236,7 +58992,12 @@ export function tuningFamilySocraticRadarOpinionFormationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 意見形成: 合意形成 → convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58256,7 +59017,12 @@ export function tuningFamilySocraticRadarSocialContagionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 社会的伝染: 拡散の適応性 → versatility重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58276,7 +59042,12 @@ export function tuningFamilySocraticRadarNetworkEffectProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ネットワーク効果: 規模の基準 → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58296,7 +59067,12 @@ export function tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 集合知: 知識の成熟 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58316,7 +59092,12 @@ export function tuningFamilySocraticRadarSocialNormProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 社会規範: バランスの取れた評価 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58336,7 +59117,12 @@ export function tuningFamilySocraticRadarPowerLawDistributionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // べき乗則: スケールフリーな分布 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58356,7 +59142,12 @@ export function tuningFamilySocraticRadarMarketCrashProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 市場崩壊: convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58376,7 +59167,12 @@ export function tuningFamilySocraticRadarWealthInequalityProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 富の不平等: diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58396,7 +59192,12 @@ export function tuningFamilySocraticRadarHerdBehaviorProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 群集行動: versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58416,7 +59217,12 @@ export function tuningFamilySocraticRadarLiquidityCrisisProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 流動性危機: benchmark重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58436,7 +59242,12 @@ export function tuningFamilySocraticRadarMeanReversionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 平均回帰: balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58456,7 +59267,12 @@ export function tuningFamilySocraticRadarMagneticConfinementProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 磁気閉じ込め: 安定した制御 → convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58476,7 +59292,12 @@ export function tuningFamilySocraticRadarDebyeShieldingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // デバイ遮蔽: 成熟した遮蔽効果 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58496,7 +59317,12 @@ export function tuningFamilySocraticRadarPlasmaOscillationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // プラズマ振動: 多様な振動モード → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58516,7 +59342,12 @@ export function tuningFamilySocraticRadarAlfvenWaveProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // アルヴェーン波: 多目的な波動伝播 → versatility重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58536,7 +59367,12 @@ export function tuningFamilySocraticRadarMagnetohydrodynamicsProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 磁気流体力学: 基準性能の最大化 → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58556,7 +59392,12 @@ export function tuningFamilySocraticRadarFusionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 核融合: 均衡した総合力 → balanced
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58576,7 +59417,12 @@ export function tuningFamilySocraticRadarLorenzAttractorProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ローレンツアトラクター: カオス的多様性 → diversity重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58596,7 +59442,12 @@ export function tuningFamilySocraticRadarBifurcationProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 分岐: 多目的な分岐挙動 → versatility重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58616,7 +59467,12 @@ export function tuningFamilySocraticRadarLyapunovExponentProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // リャプノフ指数: 基準的カオス測定 → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58636,7 +59492,12 @@ export function tuningFamilySocraticRadarStrangeAttractorProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ストレンジアトラクター: 多様な引力 → diversity重視, convergence次点
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58656,7 +59517,12 @@ export function tuningFamilySocraticRadarPhaseSpaceProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 位相空間: 成熟した状態空間 → maturity重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58676,7 +59542,12 @@ export function tuningFamilySocraticRadarSynchronizationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 同期: 収束的一致 → convergence重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.30;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.3;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58696,7 +59567,12 @@ export function tuningFamilySocraticRadarIsotopeProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 同位体: 核安定性の多様性 (benchmark) と元素範囲 (diversity) を重視
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58716,7 +59592,12 @@ export function tuningFamilySocraticRadarRadioactiveDecayProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 放射性崩壊: 崩壊系列/エネルギー → maturity重視
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58736,7 +59617,12 @@ export function tuningFamilySocraticRadarRockCycleProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 岩石循環: 火成岩/変成岩/堆積岩 → diversity重視
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58756,7 +59642,12 @@ export function tuningFamilySocraticRadarMineralFormationProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 鉱物形成: 結晶化/格子構造 → versatility重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.3 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58776,7 +59667,12 @@ export function tuningFamilySocraticRadarChemicalWeatheringProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 化学的風化: 風化/変質プロセス → maturity重視
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58796,7 +59692,12 @@ export function tuningFamilySocraticRadarSedimentLayerProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // 堆積層: 地層学/堆積プロセス → benchmark重視
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58816,7 +59717,12 @@ export function tuningFamilySocraticRadarBloodRheologyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // BloodRheology: viscosity/flow diversity (diversity) and shear-stress benchmark
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58836,7 +59742,12 @@ export function tuningFamilySocraticRadarBiomaterialScaffoldProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // BiomaterialScaffold: structural versatility and convergence balance
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58856,7 +59767,12 @@ export function tuningFamilySocraticRadarTissueEngineeringProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // TissueEngineering: maturity/differentiation focus with benchmark validation
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58876,7 +59792,12 @@ export function tuningFamilySocraticRadarNeuralInterfaceProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // NeuralInterface: signal diversity and benchmark precision emphasis
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58896,7 +59817,12 @@ export function tuningFamilySocraticRadarProstheticLimbProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ProstheticLimb: adaptive convergence and functional versatility
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58916,7 +59842,12 @@ export function tuningFamilySocraticRadarMedicalImagingProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // MedicalImaging: benchmark resolution with versatile modality coverage
-  const result = axisAggregates[0]! * 0.10 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.1 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.3 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58936,7 +59867,12 @@ export function tuningFamilySocraticRadarSemiconductorJunctionProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SemiconductorJunction: band-gap diversity and carrier benchmark
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58956,7 +59892,12 @@ export function tuningFamilySocraticRadarPhotovoltaicEffectProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PhotovoltaicEffect: versatile light-to-energy conversion with convergence efficiency
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58976,7 +59917,12 @@ export function tuningFamilySocraticRadarBatteryStorageProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // BatteryStorage: mature technology with high benchmark capacity retention
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -58996,7 +59942,12 @@ export function tuningFamilySocraticRadarWindEnergyProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // WindEnergy: diverse turbine placement with convergent grid integration
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -59016,7 +59967,12 @@ export function tuningFamilySocraticRadarThermalStorageProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ThermalStorage: mature heat retention with versatile discharge benchmarking
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -59036,7 +59992,12 @@ export function tuningFamilySocraticRadarSmartGridProxy(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SmartGrid: versatile demand-response with balanced convergence and diversity
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -59502,11 +60463,14 @@ export function scaleCoherenceIndex(
   // Get top 2 most common step sizes
   const sortedCounts = [...counts.entries()].sort((a, b) => b[1] - a[1]);
   const top2 = new Set([sortedCounts[0]![0], sortedCounts[1]![0]]);
-  const coherentCount = steps.filter(s => top2.has(s)).length;
+  const coherentCount = steps.filter((s) => top2.has(s)).length;
   return coherentCount / n;
 }
 
-export function scaleRotationSymmetryOrder(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleRotationSymmetryOrder(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   if (scaleCents.length === 0) return 0;
   if (scaleCents.length === 1) return 1;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -59532,17 +60496,20 @@ export function scaleRotationSymmetryOrder(scaleCents: readonly number[], period
   return count;
 }
 
-export function scaleTranspositionInvarianceCount(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTranspositionInvarianceCount(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   if (scaleCents.length === 0) return 1;
   if (scaleCents.length === 1) return 1;
-  const original = scaleCents.map(p => ((p % periodCents) + periodCents) % periodCents);
+  const original = scaleCents.map((p) => ((p % periodCents) + periodCents) % periodCents);
   let count = 0;
   const transpositions = [0, ...scaleCents];
   for (const t of transpositions) {
-    const transposed = original.map(p => ((p + t) % periodCents + periodCents) % periodCents);
+    const transposed = original.map((p) => (((p + t) % periodCents) + periodCents) % periodCents);
     let invariant = true;
     for (const tp of transposed) {
-      const hasMatch = original.some(op => {
+      const hasMatch = original.some((op) => {
         const diff = Math.abs(tp - op);
         return Math.min(diff, periodCents - diff) < 5;
       });
@@ -59556,7 +60523,10 @@ export function scaleTranspositionInvarianceCount(scaleCents: readonly number[],
   return count;
 }
 
-export function scaleIntervalSpectrumWidth(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalSpectrumWidth(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   if (scaleCents.length <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   const intervals: number[] = [];
@@ -59572,7 +60542,10 @@ export function scaleIntervalSpectrumWidth(scaleCents: readonly number[], period
   return maxI - minI;
 }
 
-export function scaleStepRatioVariance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleStepRatioVariance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   if (scaleCents.length <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   const n = sorted.length;
@@ -59598,12 +60571,14 @@ export function scaleStepRatioVariance(scaleCents: readonly number[], periodCent
 }
 
 const JUST_INTERVALS_CENTS: readonly number[] = [
-  0, 111.7, 182.4, 203.9, 231.2, 266.9, 315.6, 386.3, 435.1, 498.0,
-  551.3, 582.5, 617.5, 648.7, 702.0, 764.9, 813.7, 884.4, 933.1, 968.8,
-  996.1, 1017.6, 1088.3, 1200,
+  0, 111.7, 182.4, 203.9, 231.2, 266.9, 315.6, 386.3, 435.1, 498.0, 551.3, 582.5, 617.5, 648.7,
+  702.0, 764.9, 813.7, 884.4, 933.1, 968.8, 996.1, 1017.6, 1088.3, 1200,
 ];
 
-export function scaleJustProximityScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleJustProximityScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let count = 0;
@@ -59623,7 +60598,10 @@ export function scaleJustProximityScore(scaleCents: readonly number[], periodCen
   return count / n;
 }
 
-export function scaleMaxGapRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMaxGapRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (n === 1) return 1;
@@ -59641,7 +60619,10 @@ export function scaleMaxGapRatio(scaleCents: readonly number[], periodCents: num
   return maxStep / minStep;
 }
 
-export function scaleMinStepCents(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMinStepCents(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (n === 1) return periodCents;
@@ -59656,7 +60637,10 @@ export function scaleMinStepCents(scaleCents: readonly number[], periodCents: nu
   return Math.min(...steps);
 }
 
-export function scaleMaxStepCents(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMaxStepCents(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (n === 1) return periodCents;
@@ -59716,7 +60700,10 @@ export function scaleVoiceLeadingDistance(
 }
 
 // QQQ2
-export function scaleVoiceLeadingRadius(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleVoiceLeadingRadius(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const evenScale: number[] = [];
@@ -59727,7 +60714,10 @@ export function scaleVoiceLeadingRadius(scaleCents: readonly number[], periodCen
 }
 
 // QQQ3
-export function scaleParsimonyCost(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleParsimonyCost(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   let best = Infinity;
@@ -59740,7 +60730,10 @@ export function scaleParsimonyCost(scaleCents: readonly number[], periodCents: n
 }
 
 // QQQ4
-export function scaleSelfSimilarityScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSelfSimilarityScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const reversed = scaleCents.slice().reverse();
@@ -59750,7 +60743,10 @@ export function scaleSelfSimilarityScore(scaleCents: readonly number[], periodCe
 }
 
 // RRR1
-export function scaleIntervalComplexityRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalComplexityRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -59760,7 +60756,7 @@ export function scaleIntervalComplexityRatio(scaleCents: readonly number[], peri
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
       const interval = sorted[j]! - sorted[i]!;
-      const isSimple = simpleRatiosCents.some(r => Math.abs(interval - r) < 10);
+      const isSimple = simpleRatiosCents.some((r) => Math.abs(interval - r) < 10);
       if (isSimple) countSimple++;
     }
   }
@@ -59768,14 +60764,20 @@ export function scaleIntervalComplexityRatio(scaleCents: readonly number[], peri
 }
 
 // RRR2
-export function scaleUniquePitchClassCount(scaleCents: readonly number[], _periodCents: number = 1200): number {
+export function scaleUniquePitchClassCount(
+  scaleCents: readonly number[],
+  _periodCents: number = 1200,
+): number {
   if (scaleCents.length === 0) return 0;
-  const rounded = new Set(scaleCents.map(c => Math.round(c)));
+  const rounded = new Set(scaleCents.map((c) => Math.round(c)));
   return rounded.size;
 }
 
 // RRR3
-export function scaleClusteringScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleClusteringScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   let clustered = 0;
@@ -59796,7 +60798,10 @@ export function scaleClusteringScore(scaleCents: readonly number[], periodCents:
 }
 
 // RRR4
-export function scaleDispersionIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleDispersionIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -59814,12 +60819,15 @@ export function scaleDispersionIndex(scaleCents: readonly number[], periodCents:
 }
 
 // SSS1
-export function scaleHarmonicAlignmentScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicAlignmentScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   // First 16 harmonics in cents (harmonic k: 1200 * log2(k))
   const rawHarmonics = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map(
-    (k) => (1200 * Math.log2(k)) % periodCents
+    (k) => (1200 * Math.log2(k)) % periodCents,
   );
   // Deduplicate by rounding to nearest cent
   const harmonicSet = [...new Set(rawHarmonics.map((c) => Math.round(c)))];
@@ -59839,7 +60847,10 @@ export function scaleHarmonicAlignmentScore(scaleCents: readonly number[], perio
 }
 
 // SSS2
-export function scaleSubharmonicAlignmentScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSubharmonicAlignmentScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   // Subharmonic series: compute 1200 * log2(k) mod 1200, then (1200 - value) % 1200
@@ -59865,13 +60876,23 @@ export function scaleSubharmonicAlignmentScore(scaleCents: readonly number[], pe
 }
 
 // SSS3
-export function scaleResonanceIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleResonanceIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   if (scaleCents.length === 0) return 0;
-  return (scaleHarmonicAlignmentScore(scaleCents, periodCents) + scaleSubharmonicAlignmentScore(scaleCents, periodCents)) / 2;
+  return (
+    (scaleHarmonicAlignmentScore(scaleCents, periodCents) +
+      scaleSubharmonicAlignmentScore(scaleCents, periodCents)) /
+    2
+  );
 }
 
 // SSS4
-export function scaleOvertoneRichness(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleOvertoneRichness(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let matchCount = 0;
@@ -59879,7 +60900,7 @@ export function scaleOvertoneRichness(scaleCents: readonly number[], periodCents
     const p = scaleCents[i]!;
     const pc = ((p % periodCents) + periodCents) % periodCents;
     for (let k = 2; k <= 8; k++) {
-      const harmonicCents = ((p + 1200 * Math.log2(k)) % periodCents + periodCents) % periodCents;
+      const harmonicCents = (((p + 1200 * Math.log2(k)) % periodCents) + periodCents) % periodCents;
       for (let j = 0; j < n; j++) {
         if (j === i) continue; // skip self
         const qc = ((scaleCents[j]! % periodCents) + periodCents) % periodCents;
@@ -59896,7 +60917,10 @@ export function scaleOvertoneRichness(scaleCents: readonly number[], periodCents
 }
 
 // TTT1 — Working memory load: number of distinct step sizes (rounded to nearest 10 cents)
-export function scaleWorkingMemoryLoad(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleWorkingMemoryLoad(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (n === 1) return 1;
@@ -59911,7 +60935,10 @@ export function scaleWorkingMemoryLoad(scaleCents: readonly number[], periodCent
 }
 
 // TTT2 — Cognitive clusters: group pitches where each is within 75 cents of another in the same cluster
-export function scaleCognitiveClusters(scaleCents: readonly number[], _periodCents: number = 1200): number {
+export function scaleCognitiveClusters(
+  scaleCents: readonly number[],
+  _periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -59925,7 +60952,10 @@ export function scaleCognitiveClusters(scaleCents: readonly number[], _periodCen
 }
 
 // TTT4 — Pattern regularity: smallest repeating period / n
-export function scalePatternRegularity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scalePatternRegularity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (n <= 2) return 1;
@@ -59949,7 +60979,10 @@ export function scalePatternRegularity(scaleCents: readonly number[], periodCent
 }
 
 // UUU2 — Small-world index: clustering coefficient / (path efficiency + 1e-9), clamped to [0,1]
-export function scaleSmallWorldIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSmallWorldIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   // Build adjacency (interval diff <= 100 cents, wrapped)
@@ -60030,7 +61063,10 @@ export function scaleHubScore(scaleCents: readonly number[], periodCents: number
 }
 
 // UUU4 — Bridging coefficient (Valente & Fujimoto 2010): mean bridging score over nodes with degree>=1
-export function scaleBridgingCoefficient(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleBridgingCoefficient(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   // Build adjacency using 100-cent threshold (same as UUU2)
@@ -60060,7 +61096,7 @@ export function scaleBridgingCoefficient(scaleCents: readonly number[], periodCe
         neighborDegreeInvSum += 1 / degrees[j]!;
       }
     }
-    const bridging_i = neighborDegreeInvSum > 0 ? (1 / di) / neighborDegreeInvSum : 0;
+    const bridging_i = neighborDegreeInvSum > 0 ? 1 / di / neighborDegreeInvSum : 0;
     bridgingSum += bridging_i;
     activeCount++;
   }
@@ -60079,7 +61115,10 @@ export function scaleBridgingCoefficient(scaleCents: readonly number[], periodCe
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Proportion of symmetric rotations in [0,1]
  */
-export function scaleRotationalSymmetrySteps(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleRotationalSymmetrySteps(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60106,7 +61145,10 @@ export function scaleRotationalSymmetrySteps(scaleCents: readonly number[], peri
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Proportion of symmetric reflections in [0,1]
  */
-export function scaleReflectionSymmetrySteps(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleReflectionSymmetrySteps(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60135,23 +61177,34 @@ export function scaleReflectionSymmetrySteps(scaleCents: readonly number[], peri
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Proportion of invariant transpositions in [0,1]
  */
-export function scaleTranspositionInvariance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTranspositionInvariance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   let count = 0;
   for (let d = 0; d < n; d++) {
     const shift = sorted[d]!;
-    const transposed = sorted.map(p => ((p - shift) % periodCents + periodCents) % periodCents).sort((a, b) => a - b);
+    const transposed = sorted
+      .map((p) => (((p - shift) % periodCents) + periodCents) % periodCents)
+      .sort((a, b) => a - b);
     let allMatch = true;
     for (let i = 0; i < n; i++) {
       let found = false;
       for (let j = 0; j < n; j++) {
         const diff = Math.abs(transposed[i]! - sorted[j]!);
         const wrappedDiff = Math.min(diff, periodCents - diff);
-        if (wrappedDiff < 1) { found = true; break; }
+        if (wrappedDiff < 1) {
+          found = true;
+          break;
+        }
       }
-      if (!found) { allMatch = false; break; }
+      if (!found) {
+        allMatch = false;
+        break;
+      }
     }
     if (allMatch) count++;
   }
@@ -60170,14 +61223,18 @@ export function scaleTranspositionInvariance(scaleCents: readonly number[], peri
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Complement similarity score in [0,1]
  */
-export function scaleComplementSymmetry(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleComplementSymmetry(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const chromaSize = Math.round(periodCents / 100);
   // Map scale pitches to chromatic bins (0..chromaSize-1)
   const scaleBins = new Set<number>();
   for (let i = 0; i < n; i++) {
-    const bin = Math.round(((scaleCents[i]! % periodCents) + periodCents) % periodCents / 100) % chromaSize;
+    const bin =
+      Math.round((((scaleCents[i]! % periodCents) + periodCents) % periodCents) / 100) % chromaSize;
     scaleBins.add(bin);
   }
   // Find complement bins
@@ -60209,7 +61266,10 @@ export function scaleComplementSymmetry(scaleCents: readonly number[], periodCen
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Proportion of ascending step pairs in [0,1]
  */
-export function scaleMelodicAscent(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMelodicAscent(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60234,7 +61294,10 @@ export function scaleMelodicAscent(scaleCents: readonly number[], periodCents: n
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Proportion of descending step pairs in [0,1]
  */
-export function scaleMelodicDescent(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMelodicDescent(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60260,7 +61323,10 @@ export function scaleMelodicDescent(scaleCents: readonly number[], periodCents: 
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Proportion of melodic peak pitches in [0,1]
  */
-export function scaleMelodicPeakRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMelodicPeakRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60290,7 +61356,10 @@ export function scaleMelodicPeakRatio(scaleCents: readonly number[], periodCents
  * @param periodCents - Period of the scale in cents (default 1200)
  * @returns Normalized Shannon entropy in [0,1]
  */
-export function scaleMelodicContourEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMelodicContourEntropy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 3) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60299,7 +61368,9 @@ export function scaleMelodicContourEntropy(scaleCents: readonly number[], period
     steps.push(i < n - 1 ? sorted[i + 1]! - sorted[i]! : periodCents - sorted[i]!);
   }
   // Classify each consecutive pair of steps
-  let up = 0, flat = 0, down = 0;
+  let up = 0,
+    flat = 0,
+    down = 0;
   for (let i = 0; i < n - 1; i++) {
     const s1 = steps[i]!;
     const s2 = steps[i + 1]!;
@@ -60327,7 +61398,10 @@ export function scaleMelodicContourEntropy(scaleCents: readonly number[], period
  * XXX1 — scaleTritoneTension
  * Proportion of intervals close to a tritone (600 ± 50 cents, wrapped).
  */
-export function scaleTritoneTension(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTritoneTension(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let count = 0;
@@ -60348,7 +61422,10 @@ export function scaleTritoneTension(scaleCents: readonly number[], periodCents: 
  * Proportion of intervals that are "leading tones" (within 50–150 cents of a period multiple,
  * i.e., minor 2nd at top or bottom).
  */
-export function scaleLeadingToneTension(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleLeadingToneTension(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let count = 0;
@@ -60369,7 +61446,10 @@ export function scaleLeadingToneTension(scaleCents: readonly number[], periodCen
  * Density of "suspended" intervals: intervals within 30 cents of a perfect 4th (500 cents)
  * or perfect 5th (700 cents), wrapped to period.
  */
-export function scaleSuspensionDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSuspensionDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let count = 0;
@@ -60390,7 +61470,10 @@ export function scaleSuspensionDensity(scaleCents: readonly number[], periodCent
  * Composite tension: weighted sum of tritone tension + leading-tone tension + suspension density.
  * Weights: [0.5, 0.3, 0.2].
  */
-export function scaleHarmonicTensionIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicTensionIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const tritone = scaleTritoneTension(scaleCents, periodCents);
@@ -60427,7 +61510,10 @@ export function scaleEvenness(scaleCents: readonly number[], periodCents: number
  * Ratio of the largest step to the smallest step, normalized to [0,1] via 1 - (min/max).
  * Returns 0 for n < 2 or all steps equal.
  */
-export function scaleMaxStepRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMaxStepRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60448,7 +61534,10 @@ export function scaleMaxStepRatio(scaleCents: readonly number[], periodCents: nu
  * Irregularity index (Entner/Toussaint-style): sum of |step[i] - step[i+1]| (circular) / (2 * sum_steps).
  * Returns 0 for n < 2.
  */
-export function scaleIrregularityIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIrregularityIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60473,7 +61562,10 @@ export function scaleIrregularityIndex(scaleCents: readonly number[], periodCent
  * degrees = k*s mod period (±5 cents) for some integer k.
  * Returns proportion of scale degrees covered by the best generator / n; 0 for n < 2.
  */
-export function scaleWellformedness(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleWellformedness(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -60492,9 +61584,9 @@ export function scaleWellformedness(scaleCents: readonly number[], periodCents: 
     if (gen <= 0) continue;
     let coverage = 0;
     for (const deg of sorted) {
-      const normalized = ((deg - sorted[0]!) % periodCents + periodCents) % periodCents;
+      const normalized = (((deg - sorted[0]!) % periodCents) + periodCents) % periodCents;
       const k = Math.round(normalized / gen);
-      const expected = ((k * gen) % periodCents + periodCents) % periodCents;
+      const expected = (((k * gen) % periodCents) + periodCents) % periodCents;
       if (Math.abs(normalized - expected) <= tol) coverage++;
     }
     if (coverage > bestCoverage) bestCoverage = coverage;
@@ -60509,7 +61601,10 @@ export function scaleWellformedness(scaleCents: readonly number[], periodCents: 
  * perfect unison (0), perfect 5th (700±30), perfect 4th (500±30), or octave (1200).
  * Returns (count + 1) / (n + 1); 0 for n=0.
  */
-export function scaleTonicStrengthV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTonicStrengthV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let count = 0;
@@ -60533,7 +61628,10 @@ export function scaleTonicStrengthV2(scaleCents: readonly number[], periodCents:
  * Finds the pitch closest to 700 cents (mod period).
  * Returns 1 - (min_distance / 350); clamped to [0,1]; 0 for n=0.
  */
-export function scaleDominantStrength(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleDominantStrength(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const target = 700;
@@ -60553,13 +61651,17 @@ export function scaleDominantStrength(scaleCents: readonly number[], periodCents
  * Mean angular deviation = 1 - (norm of mean vector / n).
  * Returns value in [0,1]; 0 for n=0.
  */
-export function scaleModalCenterDispersion(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleModalCenterDispersion(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let sumSin = 0;
   let sumCos = 0;
   for (let i = 0; i < n; i++) {
-    const angle = (2 * Math.PI * (((scaleCents[i]! % periodCents) + periodCents) % periodCents)) / periodCents;
+    const angle =
+      (2 * Math.PI * (((scaleCents[i]! % periodCents) + periodCents) % periodCents)) / periodCents;
     sumSin += Math.sin(angle);
     sumCos += Math.cos(angle);
   }
@@ -60573,7 +61675,10 @@ export function scaleModalCenterDispersion(scaleCents: readonly number[], period
  * Counts pitches where min(pitch mod period, period - pitch mod period) <= 100.
  * Returns count / n; 0 for n=0.
  */
-export function scaleLeadingNoteProximity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleLeadingNoteProximity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let count = 0;
@@ -60593,7 +61698,10 @@ export function scaleLeadingNoteProximity(scaleCents: readonly number[], periodC
  * nearest 50 cents, counts unique classes.
  * Returns unique_count / 12; clamped to [0,1]; 0 for n<2.
  */
-export function scaleIntervalVariety(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalVariety(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const half = periodCents / 2;
@@ -60618,7 +61726,10 @@ export function scaleIntervalVariety(scaleCents: readonly number[], periodCents:
  * CV = std_dev / mean of bin counts.
  * Returns 1 - CV / (CV + 1); value in [0,1]; 0 for n<2.
  */
-export function scaleIntervalBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const half = periodCents / 2;
@@ -60646,7 +61757,10 @@ export function scaleIntervalBalance(scaleCents: readonly number[], periodCents:
  * Same bins as AAA1 (50-cent rounded classes).
  * Returns max_count / total_pairs; 0 for n<2.
  */
-export function scaleIntervalDominance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalDominance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const half = periodCents / 2;
@@ -60673,7 +61787,10 @@ export function scaleIntervalDominance(scaleCents: readonly number[], periodCent
  * Normalized by log2(max_bins) where max_bins = ceil(period/2/50).
  * Returns 0 for n<2 or single interval class.
  */
-export function scaleIntervalEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalEntropy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const half = periodCents / 2;
@@ -60711,7 +61828,10 @@ export function scaleIntervalEntropy(scaleCents: readonly number[], periodCents:
  * For each pitch, finds the minimum distance to any other pitch (wrapped within period).
  * Returns mean_of_minimums / (periodCents/2); 0 for n<2.
  */
-export function scaleNearestNeighborMean(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleNearestNeighborMean(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const half = periodCents / 2;
@@ -60737,7 +61857,10 @@ export function scaleNearestNeighborMean(scaleCents: readonly number[], periodCe
  * Shifts all pitches up by the smallest step and computes mean displacement / (periodCents/2).
  * Returns 1 - mean_displacement / (periodCents/2); clamped to [0,1]; 0 for n<2.
  */
-export function scaleVoiceLeadingEfficiencyV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleVoiceLeadingEfficiencyV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const half = periodCents / 2;
@@ -60774,7 +61897,10 @@ export function scaleVoiceLeadingEfficiencyV2(scaleCents: readonly number[], per
  * Proportion of pitches that have another pitch within 50 cents (wrapped within period).
  * Returns count / n; 0 for n<2.
  */
-export function scaleCrowdingIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleCrowdingIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const threshold = 50;
@@ -60800,7 +61926,10 @@ export function scaleCrowdingIndex(scaleCents: readonly number[], periodCents: n
  * Computes the range covered: (highest - lowest) / periodCents.
  * Returns range / periodCents; clamped to [0,1]; 0 for n=0.
  */
-export function scaleSpreadIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpreadIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let min = scaleCents[0]!;
@@ -60820,7 +61949,10 @@ export function scaleSpreadIndex(scaleCents: readonly number[], periodCents: num
  * centroid_cents = mean of all scaleCents values.
  * Returns centroid_cents / periodCents; clamped to [0,1]; 0 for n=0.
  */
-export function scaleSpectralCentroid(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralCentroid(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let sum = 0;
@@ -60836,7 +61968,10 @@ export function scaleSpectralCentroid(scaleCents: readonly number[], periodCents
  * Standard deviation of pitch positions as a fraction of period.
  * Returns std_dev(scaleCents) / periodCents; clamped to [0,1]; 0 for n<2.
  */
-export function scaleSpectralBandwidth(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralBandwidth(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let sum = 0;
@@ -60861,7 +61996,10 @@ export function scaleSpectralBandwidth(scaleCents: readonly number[], periodCent
  * Returns (skewness + 3) / 6 to normalize to [0,1] (range [-3,3] mapped to [0,1]);
  * 0 for n<3 or std=0.
  */
-export function scaleSpectralSkewness(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralSkewness(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   void periodCents;
   const n = scaleCents.length;
   if (n < 3) return 0;
@@ -60895,7 +62033,10 @@ export function scaleSpectralSkewness(scaleCents: readonly number[], periodCents
  * Returns (kurtosis + 3) / 6 to normalize (range [0,6] for [0,1]);
  * clamped to [0,1]; 0 for n<4 or std=0.
  */
-export function scaleSpectralKurtosis(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralKurtosis(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   void periodCents;
   const n = scaleCents.length;
   if (n < 4) return 0;
@@ -60955,7 +62096,10 @@ export function scaleHarmonicSeriesAlignment(scaleCents: readonly number[]): num
  * Check if 1/r is close to a simple ratio (n/m ≤ 6).
  * Returns count / total_pairs; 0 for n<2.
  */
-export function scaleSubharmonicDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSubharmonicDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let count = 0;
@@ -60987,7 +62131,10 @@ export function scaleSubharmonicDensity(scaleCents: readonly number[], periodCen
  * Weights: [0.5, 0.3, 0.2].
  * Returns weighted sum clamped to [0,1].
  */
-export function scaleResonanceScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleResonanceScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const harmonicAlignment = scaleHarmonicSeriesAlignment(scaleCents);
   const subharmonicDensity = scaleSubharmonicDensity(scaleCents, periodCents);
   // Inline tritone tension calculation
@@ -61006,7 +62153,8 @@ export function scaleResonanceScore(scaleCents: readonly number[], periodCents: 
     }
     tritoneTension = ttTotal === 0 ? 0 : ttCount / ttTotal;
   }
-  const score = 0.5 * harmonicAlignment + 0.3 * (1 - subharmonicDensity) + 0.2 * (1 - tritoneTension);
+  const score =
+    0.5 * harmonicAlignment + 0.3 * (1 - subharmonicDensity) + 0.2 * (1 - tritoneTension);
   return Math.max(0, Math.min(1, score));
 }
 
@@ -61040,7 +62188,10 @@ export function scaleNodeDensity(scaleCents: readonly number[]): number {
 // ---------------------------------------------------------------------------
 
 /** Run k=3 k-means on scaleCents values, returning [assignments, centroids]. */
-function _kMeans3(scaleCents: readonly number[], periodCents: number): { assignments: number[]; centroids: [number, number, number] } {
+function _kMeans3(
+  scaleCents: readonly number[],
+  periodCents: number,
+): { assignments: number[]; centroids: [number, number, number] } {
   const n = scaleCents.length;
   let c0 = periodCents / 6;
   let c1 = periodCents / 2;
@@ -61058,12 +62209,24 @@ function _kMeans3(scaleCents: readonly number[], periodCents: number): { assignm
       else assignments[i] = 2;
     }
     // Recompute centroids
-    let sum0 = 0, cnt0 = 0, sum1 = 0, cnt1 = 0, sum2 = 0, cnt2 = 0;
+    let sum0 = 0,
+      cnt0 = 0,
+      sum1 = 0,
+      cnt1 = 0,
+      sum2 = 0,
+      cnt2 = 0;
     for (let i = 0; i < n; i++) {
       const p = scaleCents[i]!;
-      if (assignments[i] === 0) { sum0 += p; cnt0++; }
-      else if (assignments[i] === 1) { sum1 += p; cnt1++; }
-      else { sum2 += p; cnt2++; }
+      if (assignments[i] === 0) {
+        sum0 += p;
+        cnt0++;
+      } else if (assignments[i] === 1) {
+        sum1 += p;
+        cnt1++;
+      } else {
+        sum2 += p;
+        cnt2++;
+      }
     }
     if (cnt0 > 0) c0 = sum0 / cnt0;
     if (cnt1 > 0) c1 = sum1 / cnt1;
@@ -61080,7 +62243,10 @@ function _kMeans3(scaleCents: readonly number[], periodCents: number): { assignm
  * - Iterate 5 times: assign each pitch to nearest centroid, recompute centroids
  * - Return mean intra-cluster variance / (periodCents/6)^2; clamp [0,1]; 0 for n=0
  */
-export function scaleKMeansClusters(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleKMeansClusters(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const { assignments, centroids } = _kMeans3(scaleCents, periodCents);
@@ -61112,7 +62278,10 @@ export function scaleKMeansClusters(scaleCents: readonly number[], periodCents: 
  * - Use same k-means as EEE1
  * - Return mean of 3 pairwise centroid distances / periodCents; clamp [0,1]; 0 for n<3
  */
-export function scaleClusterSeparation(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleClusterSeparation(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 3) return 0;
   const { centroids } = _kMeans3(scaleCents, periodCents);
@@ -61131,7 +62300,10 @@ export function scaleClusterSeparation(scaleCents: readonly number[], periodCent
  * - silhouette_i = (b - a) / max(a, b); mean over all pitches
  * - Return (score + 1) / 2 to map [-1,1] to [0,1]; 0 for n<2
  */
-export function scaleSilhouetteScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSilhouetteScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const { assignments } = _kMeans3(scaleCents, periodCents);
@@ -61175,7 +62347,10 @@ export function scaleSilhouetteScore(scaleCents: readonly number[], periodCents:
  * - Compute sizes of 3 clusters
  * - Return 1 - std_dev(sizes) / mean(sizes); clamp [0,1]; 0 for n<3
  */
-export function scaleClusterBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleClusterBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 3) return 0;
   const { assignments } = _kMeans3(scaleCents, periodCents);
@@ -61185,8 +62360,7 @@ export function scaleClusterBalance(scaleCents: readonly number[], periodCents: 
   }
   const mean = (sizes[0] + sizes[1] + sizes[2]) / 3;
   if (mean === 0) return 0;
-  const variance =
-    ((sizes[0] - mean) ** 2 + (sizes[1] - mean) ** 2 + (sizes[2] - mean) ** 2) / 3;
+  const variance = ((sizes[0] - mean) ** 2 + (sizes[1] - mean) ** 2 + (sizes[2] - mean) ** 2) / 3;
   const stdDev = Math.sqrt(variance);
   return Math.max(0, Math.min(1, 1 - stdDev / mean));
 }
@@ -61197,7 +62371,10 @@ export function scaleClusterBalance(scaleCents: readonly number[], periodCents: 
  * - For each consecutive step pair (sorted + wrap), count steps < 100 cents
  * - Return count / n; 0 for n<2
  */
-export function scaleMicrotonalDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMicrotonalDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -61236,7 +62413,10 @@ export function scaleQuarterToneAlignment(scaleCents: readonly number[]): number
  * - Steps = consecutive diffs (sorted + wrap)
  * - Return microtonal_distinct / total_distinct; 0 for n<2 or no distinct steps
  */
-export function scaleMicrotonalComplexity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMicrotonalComplexity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -61262,7 +62442,10 @@ export function scaleMicrotonalComplexity(scaleCents: readonly number[], periodC
  * - For each EDO n, compute how many scale pitches are within 10 cents of an EDO degree
  * - Return best coverage / n_scale_pitches; 0 for n=0
  */
-export function scaleEdoApproximationQuality(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleEdoApproximationQuality(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const edoSizes = [5, 7, 10, 12, 19, 24, 31];
@@ -61478,10 +62661,7 @@ export function scaleOctaveCompleteness(scaleCents: readonly number[]): number {
  * - Count pitches where 0 ≤ pitch mod periodCents < periodCents (after mod)
  * - Return count / n; 0 for n=0
  */
-export function scaleSubOctaveDensity(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleSubOctaveDensity(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let count = 0;
@@ -61502,10 +62682,7 @@ export function scaleSubOctaveDensity(
  * - Count steps ≤ 200 cents
  * - Return count / n; 0 for n<2
  */
-export function scaleConjunctMotion(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleConjunctMotion(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -61526,10 +62703,7 @@ export function scaleConjunctMotion(
  * - Count steps > 200 cents
  * - Return count / n; 0 for n<2
  */
-export function scaleDisjunctMotion(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleDisjunctMotion(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -61549,10 +62723,7 @@ export function scaleDisjunctMotion(
  * - Steps = consecutive diffs (sorted + wrap)
  * - Return variance(steps) / (periodCents/n)^2; clamp [0,1]; 0 for n<2
  */
-export function scaleStepSizeVariance(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleStepSizeVariance(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -61562,8 +62733,7 @@ export function scaleStepSizeVariance(
   }
   steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
   const mean = steps.reduce((s, v) => s + v, 0) / steps.length;
-  const variance =
-    steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
+  const variance = steps.reduce((s, v) => s + (v - mean) ** 2, 0) / steps.length;
   const norm = (periodCents / n) ** 2;
   if (norm === 0) return 0;
   return Math.min(1, Math.max(0, variance / norm));
@@ -61577,10 +62747,7 @@ export function scaleStepSizeVariance(
  *   Count pairs where s[i] > 300 AND s[i+1] < 200
  * - Return count / max(n-1, 1); 0 for n<3
  */
-export function scaleGapFill(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleGapFill(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 3) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -61639,8 +62806,8 @@ export function scaleHarmonicSeriesProximity(scale: TuningSystem): number {
  */
 export function scaleJustIntonationProximity(scale: TuningSystem): number {
   const jiCents = [
-    0, 111.73, 182.40, 203.91, 315.64, 386.31, 407.82, 498.04,
-    590.22, 609.78, 701.96, 813.69, 884.36, 996.09, 1017.60, 1088.27, 1200,
+    0, 111.73, 182.4, 203.91, 315.64, 386.31, 407.82, 498.04, 590.22, 609.78, 701.96, 813.69,
+    884.36, 996.09, 1017.6, 1088.27, 1200,
   ];
   const degreeCents = scale.degrees.map((d) => pitchToCents(d));
   if (degreeCents.length === 0) return 0;
@@ -61703,15 +62870,12 @@ export function scaleMelodyCentroid(scale: TuningSystem): number {
  * - chirality = mean |scaleCents[i] - mirror[i]| / (periodCents / 2)
  * - Returns 0 if n < 2 (symmetric by definition), otherwise value in [0,1]
  */
-export function scaleChiralityScore(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleChiralityScore(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   const mirror = sorted
-    .map((c) => ((periodCents - c) % periodCents + periodCents) % periodCents)
+    .map((c) => (((periodCents - c) % periodCents) + periodCents) % periodCents)
     .sort((a, b) => a - b);
   let sum = 0;
   for (let i = 0; i < n; i++) {
@@ -61738,11 +62902,9 @@ export function scaleTranspositionClosureCount(
   let count = 0;
   for (const d of sorted) {
     const transposed = sorted
-      .map((c) => ((c + d) % periodCents + periodCents) % periodCents)
+      .map((c) => (((c + d) % periodCents) + periodCents) % periodCents)
       .sort((a, b) => a - b);
-    const isMatch = transposed.every(
-      (t, i) => Math.abs(t - sorted[i]!) < 1.0,
-    );
+    const isMatch = transposed.every((t, i) => Math.abs(t - sorted[i]!) < 1.0);
     if (isMatch) count++;
   }
   return count / n;
@@ -61765,11 +62927,9 @@ export function scaleInversionClosureCount(
   let count = 0;
   for (const a of sorted) {
     const inverted = sorted
-      .map((c) => ((2 * a - c) % periodCents + periodCents) % periodCents)
+      .map((c) => (((2 * a - c) % periodCents) + periodCents) % periodCents)
       .sort((a2, b) => a2 - b);
-    const isMatch = inverted.every(
-      (v, i) => Math.abs(v - sorted[i]!) < 1.0,
-    );
+    const isMatch = inverted.every((v, i) => Math.abs(v - sorted[i]!) < 1.0);
     if (isMatch) count++;
   }
   return count / n;
@@ -61784,10 +62944,7 @@ export function scaleInversionClosureCount(
  * - balance = 1 - magnitude (0 = perfectly balanced, 1 = all same note)
  * - Return 0 for n=0
  */
-export function scalePerfectBalance(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scalePerfectBalance(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let sumX = 0;
@@ -61834,7 +62991,7 @@ export function scaleIntervalVarietyIndex(
   const buckets = new Set<number>();
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      const interval = ((scaleCents[j]! - scaleCents[i]! + periodCents) % periodCents);
+      const interval = (scaleCents[j]! - scaleCents[i]! + periodCents) % periodCents;
       const bucket = Math.round(interval / tolerance);
       buckets.add(bucket);
     }
@@ -61844,10 +63001,7 @@ export function scaleIntervalVarietyIndex(
 }
 
 // MMM3 — scaleMaximalEvenness
-export function scaleMaximalEvenness(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleMaximalEvenness(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -61855,8 +63009,7 @@ export function scaleMaximalEvenness(
     i < n - 1 ? sorted[i + 1]! - c : periodCents - c + sorted[0]!,
   );
   const ideal = periodCents / n;
-  const meanDeviation =
-    steps.reduce((sum, s) => sum + Math.abs(s - ideal) / ideal, 0) / n;
+  const meanDeviation = steps.reduce((sum, s) => sum + Math.abs(s - ideal) / ideal, 0) / n;
   return Math.max(0, Math.min(1, 1 - meanDeviation));
 }
 
@@ -61873,8 +63026,7 @@ export function scaleDeepScaleProperty(
   for (let k = 1; k < n; k++) {
     const buckets = new Set<number>();
     for (let i = 0; i < n; i++) {
-      const interval =
-        ((sorted[(i + k) % n]! - sorted[i]! + periodCents) % periodCents);
+      const interval = (sorted[(i + k) % n]! - sorted[i]! + periodCents) % periodCents;
       buckets.add(Math.round(interval / tolerance));
     }
     multiplicities.push(buckets.size);
@@ -61904,7 +63056,7 @@ export function scaleModalCenterDiversity(
     for (let i = 0; i < n; i++) {
       const curr = sorted[(k + i) % n]!;
       const next = sorted[(k + i + 1) % n]!;
-      const step = ((next - curr + periodCents) % periodCents);
+      const step = (next - curr + periodCents) % periodCents;
       steps.push(Math.round(step / tolerance));
     }
     fingerprints.add(steps.join(','));
@@ -61931,7 +63083,7 @@ export function scaleLeadingToneStrengthV2(
     for (const dp of sorted) {
       if (dp === d) continue;
       // Check d' -> d from below (in normal or wrapped sense)
-      const diff = ((d - dp + periodCents) % periodCents);
+      const diff = (d - dp + periodCents) % periodCents;
       if (diff > 0 && diff <= leadingToneRange) {
         hasLeadingTone = true;
         break;
@@ -61946,10 +63098,7 @@ export function scaleLeadingToneStrengthV2(
  * NNN3: scaleGravityField
  * Tonal gravity — weighted pull toward stable scale degrees (root, fifth, octave).
  */
-export function scaleGravityField(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleGravityField(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const stableTargets = [0, (periodCents * 7) / 12, periodCents];
@@ -62076,7 +63225,7 @@ export function scalePitchHeightSpread(
   const n = scaleCents.length;
   if (n === 0) return 0;
   const hzToBark = (f: number): number =>
-    13 * Math.atan(0.76 * f / 1000) + 3.5 * Math.atan(Math.pow(f / 7500, 2));
+    13 * Math.atan((0.76 * f) / 1000) + 3.5 * Math.atan(Math.pow(f / 7500, 2));
   const barkValues = scaleCents.map((c) => {
     const hz = referenceHz * Math.pow(2, c / 1200);
     return hzToBark(hz);
@@ -62107,10 +63256,7 @@ export function scaleStreamSegregationIndex(
 }
 
 // PPP2 — scaleFusionIndex
-export function scaleFusionIndex(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleFusionIndex(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -62315,7 +63461,7 @@ export function scaleIntervalProbabilityEntropy(
   const freq = new Map<number, number>();
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      const interval = ((scaleCents[j]! - scaleCents[i]! + periodCents) % periodCents);
+      const interval = (scaleCents[j]! - scaleCents[i]! + periodCents) % periodCents;
       const bucket = Math.floor(interval / bucketSize);
       freq.set(bucket, (freq.get(bucket) ?? 0) + 1);
     }
@@ -62344,7 +63490,7 @@ export function scaleMarkovTransitionEntropy(
     steps.push(sorted[i + 1]! - sorted[i]!);
   }
   steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
-  const bucketed = steps.map(s => Math.floor(s / bucketSize));
+  const bucketed = steps.map((s) => Math.floor(s / bucketSize));
   const transFreq = new Map<string, number>();
   for (let i = 0; i < n; i++) {
     const key = `${bucketed[i]!},${bucketed[(i + 1) % n]!}`;
@@ -62379,10 +63525,7 @@ export function scaleExpectedIntervalSize(
 }
 
 // RRR4
-export function scaleIntervalSkewness(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleIntervalSkewness(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const intervals: number[] = [];
@@ -62424,10 +63567,7 @@ export function scaleDFTMagnitude(
 }
 
 // SSS2
-export function scaleDFTBalanceIndex(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleDFTBalanceIndex(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let sum = 0;
@@ -62439,10 +63579,7 @@ export function scaleDFTBalanceIndex(
 }
 
 // SSS3
-export function scaleDFTPeakFrequency(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleDFTPeakFrequency(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let maxMag = -Infinity;
@@ -62617,7 +63754,7 @@ export function scaleKolmogorovComplexityProxy(
     steps.push((sorted[i + 1] as number) - (sorted[i] as number));
   }
   steps.push(_periodCents - (sorted[n - 1] as number) + (sorted[0] as number));
-  const buckets = new Set(steps.map(s => Math.round(s / tolerance) * tolerance));
+  const buckets = new Set(steps.map((s) => Math.round(s / tolerance) * tolerance));
   return buckets.size / n;
 }
 
@@ -62634,7 +63771,7 @@ export function scaleRunLengthProxy(
     steps.push((sorted[i + 1] as number) - (sorted[i] as number));
   }
   steps.push(_periodCents - (sorted[n - 1] as number) + (sorted[0] as number));
-  const bucketed = steps.map(s => Math.round(s / tolerance));
+  const bucketed = steps.map((s) => Math.round(s / tolerance));
   let runCount = 1;
   for (let i = 1; i < bucketed.length; i++) {
     if ((bucketed[i] as number) !== (bucketed[i - 1] as number)) runCount++;
@@ -62669,10 +63806,7 @@ export function scaleAutocorrelationProxy(
   return Math.min(1, Math.max(0, (r1 + 1) / 2));
 }
 
-export function scaleDescriptionLength(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleDescriptionLength(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const roundedIntervals = new Set<number>();
@@ -62683,7 +63817,8 @@ export function scaleDescriptionLength(
     }
   }
   const uniqueSteps = roundedIntervals.size;
-  const mdl = (Math.log2(n + 1) + uniqueSteps * Math.log2(periodCents)) / (n * Math.log2(periodCents) + 1);
+  const mdl =
+    (Math.log2(n + 1) + uniqueSteps * Math.log2(periodCents)) / (n * Math.log2(periodCents) + 1);
   return Math.min(1, mdl);
 }
 
@@ -62709,7 +63844,7 @@ export function scaleModeCountV2(
   const steps: number[] = [];
   for (let i = 0; i < n; i++) {
     if (i < n - 1) {
-      steps.push((sorted[i + 1]! - sorted[i]!));
+      steps.push(sorted[i + 1]! - sorted[i]!);
     } else {
       steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
     }
@@ -62718,9 +63853,7 @@ export function scaleModeCountV2(
   const seen = new Set<string>();
   for (let r = 0; r < n; r++) {
     const rotated = steps.slice(r).concat(steps.slice(0, r));
-    const fingerprint = rotated
-      .map(s => Math.round(s / tolerance))
-      .join(',');
+    const fingerprint = rotated.map((s) => Math.round(s / tolerance)).join(',');
     seen.add(fingerprint);
   }
   return seen.size / n;
@@ -62732,10 +63865,7 @@ export function scaleModeCountV2(
  * Returns the maximum brightness over all rotations.
  * Returns 0 for n = 0.
  */
-export function scaleBrightest(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleBrightest(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -62770,10 +63900,7 @@ export function scaleBrightest(
  * darkness = 1 - minBrightness (over all rotations).
  * Returns 0 for n = 0.
  */
-export function scaleDarkest(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleDarkest(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -62806,10 +63933,7 @@ export function scaleDarkest(
  * spread = maxBrightness - minBrightness over all rotations.
  * Returns 0 for n < 2.
  */
-export function scaleModeBalanceSpread(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scaleModeBalanceSpread(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -62887,7 +64011,7 @@ export function scaleTranslationSymmetry(
 
   const isInvariantUnderShift = (d: number): boolean => {
     for (let i = 0; i < n; i++) {
-      const shifted = ((sorted[i]! + d) % periodCents + periodCents) % periodCents;
+      const shifted = (((sorted[i]! + d) % periodCents) + periodCents) % periodCents;
       let found = false;
       for (let j = 0; j < n; j++) {
         if (Math.abs(sorted[j]! - shifted) <= tol) {
@@ -62908,7 +64032,7 @@ export function scaleTranslationSymmetry(
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
       if (i === j) continue;
-      const raw = ((sorted[j]! - sorted[i]!) % periodCents + periodCents) % periodCents;
+      const raw = (((sorted[j]! - sorted[i]!) % periodCents) + periodCents) % periodCents;
       const key = Math.round(raw * 10);
       if (seen.has(key)) continue;
       seen.add(key);
@@ -62930,10 +64054,7 @@ export function scaleTranslationSymmetry(
  * center step matches itself.
  * Returns 1.0 for empty or single-note input.
  */
-export function scalePalindromeRatio(
-  scaleCents: readonly number[],
-  periodCents = 1200,
-): number {
+export function scalePalindromeRatio(scaleCents: readonly number[], periodCents = 1200): number {
   const n = scaleCents.length;
   if (n <= 1) return 1;
   const tol = 2;
@@ -62982,9 +64103,7 @@ export function scaleInversionEquivalence(
   const n = scaleCents.length;
   if (n === 0) return 1;
   const sorted = [...scaleCents].sort((a, b) => a - b);
-  const inverted = sorted
-    .map((c) => periodCents - c)
-    .sort((a, b) => a - b);
+  const inverted = sorted.map((c) => periodCents - c).sort((a, b) => a - b);
 
   let sumDiff = 0;
   for (let i = 0; i < n; i++) {
@@ -63005,7 +64124,10 @@ export function scaleInversionEquivalence(
  * density = n / (periodCents / 100); result = min(1, density / 12)
  * Empty scale → 0.
  */
-export function scalePitchDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scalePitchDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const density = n / (periodCents / 100);
@@ -63018,16 +64140,17 @@ export function scalePitchDensity(scaleCents: readonly number[], periodCents: nu
  * Steps are computed from sorted pitches with a final wrap-around step.
  * Empty/single → 0.
  */
-export function scaleCrowdingIndexV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleCrowdingIndexV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   let crowded = 0;
   for (let i = 0; i < n; i++) {
     const step =
-      i < n - 1
-        ? sorted[i + 1]! - sorted[i]!
-        : periodCents - sorted[n - 1]! + sorted[0]!;
+      i < n - 1 ? sorted[i + 1]! - sorted[i]! : periodCents - sorted[n - 1]! + sorted[0]!;
     if (step < 50) crowded++;
   }
   return Math.min(1, Math.max(0, crowded / n));
@@ -63038,16 +64161,17 @@ export function scaleCrowdingIndexV2(scaleCents: readonly number[], periodCents:
  * Fraction of step intervals (including wrap-around) that are "sparse" (> 300 cents apart).
  * Empty/single → 0.
  */
-export function scaleSparsityIndex(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSparsityIndex(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   let sparse = 0;
   for (let i = 0; i < n; i++) {
     const step =
-      i < n - 1
-        ? sorted[i + 1]! - sorted[i]!
-        : periodCents - sorted[n - 1]! + sorted[0]!;
+      i < n - 1 ? sorted[i + 1]! - sorted[i]! : periodCents - sorted[n - 1]! + sorted[0]!;
     if (step > 300) sparse++;
   }
   return Math.min(1, Math.max(0, sparse / n));
@@ -63072,7 +64196,10 @@ export function scaleGapBalance(scaleCents: readonly number[], periodCents: numb
  * How much of the period the scale spans (ambitus / periodCents).
  * Empty/single → 0.
  */
-export function scaleAmbitusRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleAmbitusRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let lo = scaleCents[0]!;
@@ -63091,7 +64218,10 @@ export function scaleAmbitusRatio(scaleCents: readonly number[], periodCents: nu
  * Fraction of notes in the lower half of the ambitus (≤ midpoint).
  * Empty/single → 0.
  */
-export function scaleLowerDensity(scaleCents: readonly number[], _periodCents: number = 1200): number {
+export function scaleLowerDensity(
+  scaleCents: readonly number[],
+  _periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let lo = scaleCents[0]!;
@@ -63114,7 +64244,10 @@ export function scaleLowerDensity(scaleCents: readonly number[], _periodCents: n
  * Fraction of notes in the upper half of the ambitus (> midpoint).
  * Empty/single → 0.
  */
-export function scaleUpperDensity(scaleCents: readonly number[], _periodCents: number = 1200): number {
+export function scaleUpperDensity(
+  scaleCents: readonly number[],
+  _periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   let lo = scaleCents[0]!;
@@ -63138,7 +64271,10 @@ export function scaleUpperDensity(scaleCents: readonly number[], _periodCents: n
  * Return: 1 - |lowerDensity - upperDensity|
  * Empty → 1.
  */
-export function scaleRegisterBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleRegisterBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   const lower = scaleLowerDensity(scaleCents, periodCents);
@@ -63154,7 +64290,10 @@ export function scaleRegisterBalance(scaleCents: readonly number[], periodCents:
  * Return: min(1, distinctCount / n)
  * Empty/single → 0.
  */
-export function scaleIntervalClassDiversity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalClassDiversity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -63163,7 +64302,7 @@ export function scaleIntervalClassDiversity(scaleCents: readonly number[], perio
     steps.push(sorted[i + 1]! - sorted[i]!);
   }
   steps.push(periodCents - sorted[n - 1]! + sorted[0]!);
-  const rounded = new Set(steps.map(s => Math.round(s / 10) * 10));
+  const rounded = new Set(steps.map((s) => Math.round(s / 10) * 10));
   const distinctCount = rounded.size;
   return Math.min(1, Math.max(0, distinctCount / n));
 }
@@ -63175,7 +64314,10 @@ export function scaleIntervalClassDiversity(scaleCents: readonly number[], perio
  * Return: count / n
  * Empty/single → 0.
  */
-export function scaleMajorIntervalRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMajorIntervalRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -63197,7 +64339,10 @@ export function scaleMajorIntervalRatio(scaleCents: readonly number[], periodCen
  * Return: 1 - scaleMajorIntervalRatio result
  * Empty/single → 0.
  */
-export function scaleMinorIntervalRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMinorIntervalRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   return Math.min(1, Math.max(0, 1 - scaleMajorIntervalRatio(scaleCents, periodCents)));
@@ -63209,7 +64354,10 @@ export function scaleMinorIntervalRatio(scaleCents: readonly number[], periodCen
  * Return: 1 - |majorRatio - minorRatio|
  * Empty → 1.
  */
-export function scaleIntervalClassBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalClassBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   const majorRatio = scaleMajorIntervalRatio(scaleCents, periodCents);
@@ -63226,7 +64374,10 @@ export function scaleIntervalClassBalance(scaleCents: readonly number[], periodC
  * Return: transitions / stepCount
  * Empty/single → 0.
  */
-export function scaleHarmonicRhythmDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicRhythmDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -63258,7 +64409,10 @@ export function scaleHarmonicRhythmDensity(scaleCents: readonly number[], period
  * Return: mean(diffs) / (periodCents/stepCount), clamped to [0,1].
  * Empty/single → 0.
  */
-export function scaleHarmonicAccelerationProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicAccelerationProxy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -63287,7 +64441,10 @@ export function scaleHarmonicAccelerationProxy(scaleCents: readonly number[], pe
  * Return: 1 - scaleHarmonicAccelerationProxy(scaleCents, periodCents)
  * Empty → 1, single → 1.
  */
-export function scaleHarmonicSteadinessProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicSteadinessProxy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 1;
   return Math.min(1, Math.max(0, 1 - scaleHarmonicAccelerationProxy(scaleCents, periodCents)));
@@ -63299,7 +64456,10 @@ export function scaleHarmonicSteadinessProxy(scaleCents: readonly number[], peri
  * Return: (scaleHarmonicRhythmDensity + scaleHarmonicAccelerationProxy) / 2
  * Empty → 0.
  */
-export function scaleHarmonicComplexityProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicComplexityProxy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const density = scaleHarmonicRhythmDensity(scaleCents, periodCents);
@@ -63314,7 +64474,10 @@ export function scaleHarmonicComplexityProxy(scaleCents: readonly number[], peri
  * Return: (sum of p_i) mod 1 — wraps to [0,1)
  * Empty → 0.
  */
-export function scaleChecksumProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleChecksumProxy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (periodCents === 0) return 0;
@@ -63334,7 +64497,10 @@ export function scaleChecksumProxy(scaleCents: readonly number[], periodCents: n
  * Return: mean((p_i - mean_p)^2) / 0.25 clamped to [0,1]
  * Empty → 0, single note → 0.
  */
-export function scaleHashVariance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHashVariance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (periodCents === 0) return 0;
@@ -63363,7 +64529,10 @@ export function scaleHashVariance(scaleCents: readonly number[], periodCents: nu
  * Return: max fraction over all d ∈ [0,1].
  * Empty → 0.
  */
-export function scalePeriodicityFingerprint(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scalePeriodicityFingerprint(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (periodCents === 0) return 0;
@@ -63394,7 +64563,10 @@ export function scalePeriodicityFingerprint(scaleCents: readonly number[], perio
  * Return: 1 - scalePeriodicityFingerprint(scaleCents, periodCents)
  * Empty → 1.
  */
-export function scaleUniquenessProxy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleUniquenessProxy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   return Math.min(1, Math.max(0, 1 - scalePeriodicityFingerprint(scaleCents, periodCents)));
@@ -63408,7 +64580,10 @@ export function scaleUniquenessProxy(scaleCents: readonly number[], periodCents:
  * Return: centroid (already in [0,1] since all p_i ∈ [0,1))
  * Empty → 0.5 (neutral center)
  */
-export function scaleTonalCenterOfGravity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTonalCenterOfGravity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0.5;
   if (periodCents === 0) return 0.5;
@@ -63428,7 +64603,10 @@ export function scaleTonalCenterOfGravity(scaleCents: readonly number[], periodC
  * Return: 1 - 2 * |centroid - mid| — perfect balance if centroid = 0.5
  * Empty → 1
  */
-export function scaleTonalGravityBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTonalGravityBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   const centroid = scaleTonalCenterOfGravity(scaleCents, periodCents);
@@ -63444,7 +64622,10 @@ export function scaleTonalGravityBalance(scaleCents: readonly number[], periodCe
  * Return: polarization, clamped to [0,1]
  * Empty → 0
  */
-export function scaleTonalPolarization(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTonalPolarization(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (periodCents === 0) return 0;
@@ -63463,7 +64644,10 @@ export function scaleTonalPolarization(scaleCents: readonly number[], periodCent
  * Return: 1 - scaleTonalPolarization(scaleCents, periodCents)
  * Empty → 1
  */
-export function scaleTonalCentripetal(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTonalCentripetal(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   return Math.min(1, Math.max(0, 1 - scaleTonalPolarization(scaleCents, periodCents)));
@@ -63476,7 +64660,10 @@ export function scaleTonalCentripetal(scaleCents: readonly number[], periodCents
  * Return: brightCount / n (fraction of notes matching bright intervals)
  * Empty/single (n<1) → 0
  */
-export function scaleModalBrightnessV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleModalBrightnessV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 1) return 0;
   const brightTargets = [200, 400, 700, 900, 1100];
@@ -63500,7 +64687,10 @@ export function scaleModalBrightnessV2(scaleCents: readonly number[], periodCent
  * Return: darkCount / n
  * Empty/single (n<1) → 0
  */
-export function scaleModalDarknessV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleModalDarknessV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 1) return 0;
   const darkTargets = [100, 300, 600, 800, 1000];
@@ -63525,7 +64715,10 @@ export function scaleModalDarknessV2(scaleCents: readonly number[], periodCents:
  * Return: (bright - dark + 1) / 2 — maps [-1,1] to [0,1]; 0.5 = neutral
  * Empty → 0.5
  */
-export function scaleModalBrightnessBiasV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleModalBrightnessBiasV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0.5;
   const bright = scaleModalBrightnessV2(scaleCents, periodCents);
@@ -63539,7 +64732,10 @@ export function scaleModalBrightnessBiasV2(scaleCents: readonly number[], period
  * Return: (brightCount + darkCount) / n, clamped to [0,1]
  * Empty → 0
  */
-export function scaleModalComplexityV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleModalComplexityV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const brightTargets = [200, 400, 700, 900, 1100];
@@ -63617,7 +64813,10 @@ export function scaleMaxGap(scaleCents: readonly number[], periodCents: number =
 
 // EEEE3 — scaleGapUniformity
 // How uniform the gaps between pitches are (1 = perfectly uniform, 0 = maximally uneven).
-export function scaleGapUniformity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleGapUniformity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 1;
   if (periodCents <= 0) return 1;
@@ -63639,7 +64838,10 @@ export function scaleGapUniformity(scaleCents: readonly number[], periodCents: n
 
 // EEEE4 — scaleCoverageEfficiency
 // Coverage relative to note count — how efficiently each note covers space (12-note scale as reference).
-export function scaleCoverageEfficiency(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleCoverageEfficiency(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const fillRatio = scaleFillRatio(scaleCents, periodCents);
@@ -63649,7 +64851,10 @@ export function scaleCoverageEfficiency(scaleCents: readonly number[], periodCen
 
 // FFFF1 — scaleIntervalNetworkDensity
 // Fraction of all possible interval pairs that are "close" (within 50 cents of each other, using shortest arc).
-export function scaleIntervalNetworkDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalNetworkDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   if (periodCents <= 0) return 0;
@@ -63667,7 +64872,10 @@ export function scaleIntervalNetworkDensity(scaleCents: readonly number[], perio
 
 // FFFF2 — scaleIntervalNetworkClustering
 // Average clustering coefficient: how clustered pitches are (fraction of neighbors that are also mutual neighbors).
-export function scaleIntervalNetworkClustering(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalNetworkClustering(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   if (periodCents <= 0) return 0;
@@ -63705,7 +64913,10 @@ export function scaleIntervalNetworkClustering(scaleCents: readonly number[], pe
 
 // FFFF3 — scaleIntervalHubScore
 // Identifies whether the scale has "hub" notes (notes with many connections within 200 cents).
-export function scaleIntervalHubScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalHubScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   if (periodCents <= 0) return 0;
@@ -63731,7 +64942,10 @@ export function scaleIntervalHubScore(scaleCents: readonly number[], periodCents
 
 // FFFF4 — scaleIntervalNetworkBalance
 // How balanced the network connectivity is (1 = no dominant hubs, 0 = maximally hub-dominated).
-export function scaleIntervalNetworkBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalNetworkBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 1;
   return Math.min(1, Math.max(0, 1 - scaleIntervalHubScore(scaleCents, periodCents)));
@@ -63741,7 +64955,10 @@ export function scaleIntervalNetworkBalance(scaleCents: readonly number[], perio
 // How similar is the scale to its own half-period subset?
 // Take notes in [0, period/2), normalize to period: double each pitch,
 // compare to original scale (nearest-neighbor matching within 10 cents).
-export function scaleSubsetSimilarity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSubsetSimilarity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   if (periodCents <= 0) return 0;
@@ -63771,7 +64988,10 @@ export function scaleSubsetSimilarity(scaleCents: readonly number[], periodCents
 
 // GGGG2 — scaleStepRecurrence
 // Fraction of step sizes that recur (appear more than once, within 10 cents tolerance).
-export function scaleStepRecurrence(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleStepRecurrence(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   if (periodCents <= 0) return 0;
@@ -63796,7 +65016,10 @@ export function scaleStepRecurrence(scaleCents: readonly number[], periodCents: 
 // GGGG3 — scaleOctaveEquivalence
 // How well the scale approximates octave equivalence (pitch class repetition).
 // For each pair (i,j): check if |cents[i] - cents[j]| is within 10 cents of any multiple of 1200.
-export function scaleOctaveEquivalence(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleOctaveEquivalence(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
   const totalPairs = (n * (n - 1)) / 2;
@@ -63816,7 +65039,10 @@ export function scaleOctaveEquivalence(scaleCents: readonly number[], periodCent
 // GGGG4 — scaleHierarchicalBalance
 // Balance at multiple levels of resolution.
 // Level 1: split period into 2 halves; Level 2: split into 4 quarters.
-export function scaleHierarchicalBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHierarchicalBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   if (periodCents <= 0) return 1;
@@ -63850,7 +65076,10 @@ export function scaleHierarchicalBalance(scaleCents: readonly number[], periodCe
 
 // HHHH1 — scaleLowRegisterDensity
 // Fraction of notes in the lower third of the period.
-export function scaleLowRegisterDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleLowRegisterDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const threshold = periodCents / 3;
@@ -63863,7 +65092,10 @@ export function scaleLowRegisterDensity(scaleCents: readonly number[], periodCen
 
 // HHHH2 — scaleMidRegisterDensity
 // Fraction of notes in the middle third of the period.
-export function scaleMidRegisterDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMidRegisterDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const low = periodCents / 3;
@@ -63878,7 +65110,10 @@ export function scaleMidRegisterDensity(scaleCents: readonly number[], periodCen
 
 // HHHH3 — scaleHighRegisterDensity
 // Fraction of notes in the upper third of the period.
-export function scaleHighRegisterDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHighRegisterDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const threshold = (2 * periodCents) / 3;
@@ -63892,7 +65127,10 @@ export function scaleHighRegisterDensity(scaleCents: readonly number[], periodCe
 // HHHH4 — scaleRegisterDistributionBalance
 // How balanced the three register densities are.
 // Returns 1 - std([low, mid, high]) * sqrt(3), clamped to [0,1].
-export function scaleRegisterDistributionBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleRegisterDistributionBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   const low = scaleLowRegisterDensity(scaleCents, periodCents);
@@ -63910,7 +65148,10 @@ export function scaleRegisterDistributionBalance(scaleCents: readonly number[], 
  * Counts notes within 30 cents of periodCents/2 and returns count / n.
  * Returns 0 for empty scale.
  */
-export function scaleTritoneRatioV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTritoneRatioV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const halfPeriod = periodCents / 2;
@@ -63927,7 +65168,10 @@ export function scaleTritoneRatioV2(scaleCents: readonly number[], periodCents: 
  * Dissonant = step < 120 cents (semitone-like) or step in [550, 650] cents (augmented-like).
  * Returns 0 for empty or single-note scale.
  */
-export function scaleDissonantIntervalCountV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleDissonantIntervalCountV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -63950,7 +65194,10 @@ export function scaleDissonantIntervalCountV2(scaleCents: readonly number[], per
  * consonant = n - dissonant_count; returns consonant / n (resolution dominance).
  * Returns 1 for empty scale.
  */
-export function scaleTensionResolutionRatioV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleTensionResolutionRatioV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   const dissonantFraction = scaleDissonantIntervalCountV2(scaleCents, periodCents);
@@ -63965,7 +65212,10 @@ export function scaleTensionResolutionRatioV2(scaleCents: readonly number[], per
  * Returns (scaleTritoneRatioV2 + scaleDissonantIntervalCountV2) / 2.
  * Returns 0 for empty scale.
  */
-export function scaleHarmonicTensionIndexV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicTensionIndexV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const tritone = scaleTritoneRatioV2(scaleCents, periodCents);
@@ -63980,11 +65230,14 @@ export function scaleHarmonicTensionIndexV2(scaleCents: readonly number[], perio
  * For each scale pitch, find the nearest harmonic series pitch within 20 cents.
  * Returns matchCount / n. Empty → 0.
  */
-export function scaleOvertoneAlignment(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleOvertoneAlignment(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const harmonics = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-  const harmCents = harmonics.map((h) => ((1200 * Math.log2(h)) % 1200 + 1200) % 1200);
+  const harmCents = harmonics.map((h) => (((1200 * Math.log2(h)) % 1200) + 1200) % 1200);
   let matchCount = 0;
   for (let i = 0; i < n; i++) {
     const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
@@ -64004,11 +65257,14 @@ export function scaleOvertoneAlignment(scaleCents: readonly number[], periodCent
  * For each scale pitch, find the nearest subharmonic pitch within 20 cents.
  * Returns matchCount / n. Empty → 0.
  */
-export function scaleSubharmonicAlignment(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSubharmonicAlignment(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const subharmonics = [2, 3, 4, 5, 6, 7, 8];
-  const subCents = subharmonics.map((s) => ((-1200 * Math.log2(s)) % 1200 + 1200) % 1200);
+  const subCents = subharmonics.map((s) => (((-1200 * Math.log2(s)) % 1200) + 1200) % 1200);
   let matchCount = 0;
   for (let i = 0; i < n; i++) {
     const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
@@ -64029,12 +65285,18 @@ export function scaleSubharmonicAlignment(scaleCents: readonly number[], periodC
  * Checks how many of these 7 intervals have a match within 20 cents in scaleCents.
  * Returns matchCount / 7. Empty → 0.
  */
-export function scaleHarmonicSeriesCompleteness(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicSeriesCompleteness(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const harmonics = [2, 3, 4, 5, 6, 7, 8];
-  const harmIntervals = harmonics.map((h) => ((1200 * Math.log2(h)) % 1200 + 1200) % 1200);
-  const normalizedPitches = Array.from({ length: n }, (_, i) => ((scaleCents[i]! % periodCents) + periodCents) % periodCents);
+  const harmIntervals = harmonics.map((h) => (((1200 * Math.log2(h)) % 1200) + 1200) % 1200);
+  const normalizedPitches = Array.from(
+    { length: n },
+    (_, i) => ((scaleCents[i]! % periodCents) + periodCents) % periodCents,
+  );
   let matchCount = 0;
   for (let j = 0; j < harmIntervals.length; j++) {
     const target = harmIntervals[j]!;
@@ -64055,7 +65317,10 @@ export function scaleHarmonicSeriesCompleteness(scaleCents: readonly number[], p
  * For each scale pitch, find nearest JI interval within 10 cents.
  * Returns matchCount / n. Empty → 0.
  */
-export function scaleJustIntonationProximityV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleJustIntonationProximityV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const JI_CENTS = [204, 316, 386, 498, 590, 702, 814, 884, 969, 1018, 1088];
@@ -64079,7 +65344,10 @@ export function scaleJustIntonationProximityV2(scaleCents: readonly number[], pe
  * 12-EDO pitch classes: 0, 100, 200, ..., 1100 cents.
  * Returns mean(deviations) / 50, clamped to [0, 1]. Empty → 0.
  */
-export function scaleMicrotonalDeviation(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMicrotonalDeviation(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const edo12Step = 100; // cents per 12-EDO step
@@ -64102,7 +65370,10 @@ export function scaleMicrotonalDeviation(scaleCents: readonly number[], periodCe
  * (i.e., less than 80 cents).
  * Returns count / n steps. Empty or single note → 0.
  */
-export function scaleMicrotonalIntervalCount(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMicrotonalIntervalCount(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = Array.from(scaleCents).sort((a, b) => a - b);
@@ -64122,7 +65393,10 @@ export function scaleMicrotonalIntervalCount(scaleCents: readonly number[], peri
  * (more than 30 cents from any 12-EDO class).
  * Returns count / n. Empty → 0.
  */
-export function scaleXenharmonicNovelty(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleXenharmonicNovelty(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const edo12Step = 100;
@@ -64143,7 +65417,10 @@ export function scaleXenharmonicNovelty(scaleCents: readonly number[], periodCen
  * of the nearest EDO grid point. Score = matchCount / scale_n.
  * Returns the maximum score over all EDOs, clamped to [0, 1]. Empty → 0.
  */
-export function scaleEDOApproximationScore(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleEDOApproximationScore(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const COMMON_EDOS = [5, 7, 10, 12, 17, 19, 22, 31];
@@ -64173,7 +65450,10 @@ export function scaleEDOApproximationScore(scaleCents: readonly number[], period
  * Returns: max(commonTones/n over all transpositions), clamped to [0, 1].
  * Empty → 0.
  */
-export function scaleCommonToneCount(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleCommonToneCount(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let maxFraction = 0;
@@ -64182,7 +65462,7 @@ export function scaleCommonToneCount(scaleCents: readonly number[], periodCents:
     for (let i = 0; i < n; i++) {
       const orig = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
       for (let j = 0; j < n; j++) {
-        const transposed = ((scaleCents[j]! + t) % periodCents + periodCents) % periodCents;
+        const transposed = (((scaleCents[j]! + t) % periodCents) + periodCents) % periodCents;
         if (Math.abs(orig - transposed) <= 10) {
           common++;
           break;
@@ -64204,7 +65484,10 @@ export function scaleCommonToneCount(scaleCents: readonly number[], periodCents:
  * Returns: counter / 11, clamped to [0, 1].
  * Empty or n < 3 → 0.
  */
-export function scalePivotChordPotential(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scalePivotChordPotential(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0 || n < 3) return 0;
   let pivotCount = 0;
@@ -64213,7 +65496,7 @@ export function scalePivotChordPotential(scaleCents: readonly number[], periodCe
     for (let i = 0; i < n; i++) {
       const orig = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
       for (let j = 0; j < n; j++) {
-        const transposed = ((scaleCents[j]! + t) % periodCents + periodCents) % periodCents;
+        const transposed = (((scaleCents[j]! + t) % periodCents) + periodCents) % periodCents;
         if (Math.abs(orig - transposed) <= 10) {
           common++;
           break;
@@ -64233,7 +65516,10 @@ export function scalePivotChordPotential(scaleCents: readonly number[], periodCe
  * Returns: max over 12 positions of (commonTones / max(n, 7)), clamped to [0, 1].
  * Empty → 0.
  */
-export function scaleCircleOfFifthsPosition(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleCircleOfFifthsPosition(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const template = [0, 200, 400, 500, 700, 900, 1100];
@@ -64244,7 +65530,7 @@ export function scaleCircleOfFifthsPosition(scaleCents: readonly number[], perio
     for (let i = 0; i < n; i++) {
       const pitch = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
       for (let k = 0; k < template.length; k++) {
-        const templatePitch = ((template[k]! + offset) % periodCents + periodCents) % periodCents;
+        const templatePitch = (((template[k]! + offset) % periodCents) + periodCents) % periodCents;
         if (Math.abs(pitch - templatePitch) <= 10) {
           common++;
           break;
@@ -64265,7 +65551,10 @@ export function scaleCircleOfFifthsPosition(scaleCents: readonly number[], perio
  * Returns: 1 - (bestCommon / n)  [close modulation = many shared notes].
  * Empty → 0.
  */
-export function scaleModulationDistanceV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleModulationDistanceV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   let bestCommon = 0;
@@ -64274,7 +65563,7 @@ export function scaleModulationDistanceV2(scaleCents: readonly number[], periodC
     for (let i = 0; i < n; i++) {
       const orig = ((scaleCents[i]! % periodCents) + periodCents) % periodCents;
       for (let j = 0; j < n; j++) {
-        const transposed = ((scaleCents[j]! + t) % periodCents + periodCents) % periodCents;
+        const transposed = (((scaleCents[j]! + t) % periodCents) + periodCents) % periodCents;
         if (Math.abs(orig - transposed) <= 10) {
           common++;
           break;
@@ -64293,7 +65582,10 @@ export function scaleModulationDistanceV2(scaleCents: readonly number[], periodC
  * centroid = mean of normalized pitches (weighted equally)
  * Returns: centroid; empty → 0.5
  */
-export function scaleSpectralCentroidV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralCentroidV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0.5;
   let sum = 0;
@@ -64311,7 +65603,10 @@ export function scaleSpectralCentroidV2(scaleCents: readonly number[], periodCen
  * spread = sqrt(mean((p - centroid)^2)) / 0.5  [normalize: max possible spread ≈ 0.5]
  * Returns: spread, clamped to [0,1]; empty or single note → 0
  */
-export function scaleSpectralSpread(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralSpread(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const centroid = scaleSpectralCentroidV2(scaleCents, periodCents);
@@ -64333,7 +65628,10 @@ export function scaleSpectralSpread(scaleCents: readonly number[], periodCents: 
  * flux = std(steps) / mean(steps), clamped to [0,1]
  * Empty or single note → 0
  */
-export function scaleSpectralFlux(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralFlux(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const normalized: number[] = [];
@@ -64363,7 +65661,10 @@ export function scaleSpectralFlux(scaleCents: readonly number[], periodCents: nu
  * rolloff = count of pitches with normalizedCents < 0.5, divided by n
  * Returns: rolloff; empty → 0.5
  */
-export function scaleSpectralRolloff(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleSpectralRolloff(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0.5;
   let count = 0;
@@ -64381,7 +65682,10 @@ export function scaleSpectralRolloff(scaleCents: readonly number[], periodCents:
  * consecutive pair is < 150 cents apart.
  * Returns: clusterCount / n (or 1/n if n=1); empty → 0
  */
-export function scaleClusterCount(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleClusterCount(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   void periodCents;
   const n = scaleCents.length;
   if (n === 0) return 0;
@@ -64402,7 +65706,10 @@ export function scaleClusterCount(scaleCents: readonly number[], periodCents: nu
  * clusterSizes = sizes of each maximal cluster (gap < 150 cents).
  * Returns: mean(clusterSizes) / n; empty → 0
  */
-export function scaleClusterDensity(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleClusterDensity(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   void periodCents;
   const n = scaleCents.length;
   if (n === 0) return 0;
@@ -64429,7 +65736,10 @@ export function scaleClusterDensity(scaleCents: readonly number[], periodCents: 
  * neighbors (wrap-around: last-to-first gap = periodCents - lastNote + firstNote).
  * Returns: isolatedCount / n; empty/single → 1
  */
-export function scaleIsolatedNoteRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIsolatedNoteRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 1;
   if (n === 1) return 1;
@@ -64455,7 +65765,10 @@ export function scaleIsolatedNoteRatio(scaleCents: readonly number[], periodCent
  * If 0 or 1 cluster: return 0; else return std(centroids) / (periodCents/2), clamped [0,1].
  * Empty → 0
  */
-export function scaleClusterSpread(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleClusterSpread(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -64488,7 +65801,10 @@ export function scaleClusterSpread(scaleCents: readonly number[], periodCents: n
  * Count pairs where interval[i] < interval[i+1].
  * Return count / max(n-1, 1); empty → 0, single → 0.
  */
-export function scaleAscendingTendency(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleAscendingTendency(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -64511,7 +65827,10 @@ export function scaleAscendingTendency(scaleCents: readonly number[], periodCent
  * Count pairs where interval[i] > interval[i+1].
  * Return count / max(n-1, 1); empty → 0, single → 0.
  */
-export function scaleDescendingTendency(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleDescendingTendency(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -64534,7 +65853,10 @@ export function scaleDescendingTendency(scaleCents: readonly number[], periodCen
  * descending = scaleDescendingTendency(...).
  * Empty/single → 0.
  */
-export function scaleDirectionBalance(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleDirectionBalance(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const ascending = scaleAscendingTendency(scaleCents, periodCents);
@@ -64549,7 +65871,10 @@ export function scaleDirectionBalance(scaleCents: readonly number[], periodCents
  * 1 - |diff|/periodCents across all pairs.
  * Empty/single → 1.
  */
-export function scaleIntervalSymmetry(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalSymmetry(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 1;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -64573,7 +65898,10 @@ export function scaleIntervalSymmetry(scaleCents: readonly number[], periodCents
  * Score = fraction of consecutive interval pairs that are equal (within 1 cent tolerance).
  * Empty/single → 1; two notes → 1.
  */
-export function scaleRotationSymmetry(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleRotationSymmetry(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 2) return 1;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -64596,7 +65924,10 @@ export function scaleRotationSymmetry(scaleCents: readonly number[], periodCents
  * compute -sum(p * log2(p)) for non-zero p, normalized by log2(12).
  * Empty → 0; all in same bin → 0.
  */
-export function scalePitchEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scalePitchEntropy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
   const bins = new Array<number>(12).fill(0);
@@ -64621,7 +65952,10 @@ export function scalePitchEntropy(scaleCents: readonly number[], periodCents: nu
  * Same entropy formula as QQQQ1.
  * Empty/single → 0.
  */
-export function scaleIntervalEntropyV2(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleIntervalEntropyV2(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -64652,7 +65986,10 @@ export function scaleIntervalEntropyV2(scaleCents: readonly number[], periodCent
  * Same Shannon entropy formula, normalized by log2(10).
  * Empty/single/two notes → 0.
  */
-export function scaleRhythmicEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleRhythmicEntropy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 2) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -64687,7 +66024,10 @@ export function scaleRhythmicEntropy(scaleCents: readonly number[], periodCents:
  * Bin pairwise interval "complexity" into 10 bins over [1,2].
  * Empty/single → 0.
  */
-export function scaleHarmonicEntropy(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleHarmonicEntropy(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   void periodCents;
   const n = scaleCents.length;
   if (n <= 1) return 0;
@@ -64712,14 +66052,16 @@ export function scaleHarmonicEntropy(scaleCents: readonly number[], periodCents:
   return Math.min(1, Math.max(0, entropy / Math.log2(10)));
 }
 
-
 // RRRR1 — scaleCenterOfMass
 /**
  * Weighted center of pitch positions (uniform weights = arithmetic mean of normalized pitches).
  * Normalizes each pitch to [0,1] within period, then returns mean.
  * Empty → 0.5 (center).
  */
-export function scaleCenterOfMass(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleCenterOfMass(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n === 0) return 0.5;
   let sum = 0;
@@ -64735,7 +66077,10 @@ export function scaleCenterOfMass(scaleCents: readonly number[], periodCents: nu
  * Normalized by max possible variance (0.25 for uniform [0,1]).
  * Empty/single → 0.
  */
-export function scaleMomentOfInertia(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleMomentOfInertia(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const positions: number[] = [];
@@ -64752,7 +66097,10 @@ export function scaleMomentOfInertia(scaleCents: readonly number[], periodCents:
  * Radius of gyration = sqrt(variance of normalized pitches).
  * Empty/single → 0; maximum is 0.5 for fully spread pitches, normalized to [0,1].
  */
-export function scaleGyrationRadius(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleGyrationRadius(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const positions: number[] = [];
@@ -64770,8 +66118,17 @@ export function scaleGyrationRadius(scaleCents: readonly number[], periodCents: 
  * Measures "spin": high center-of-mass AND high spread = high angular momentum.
  * Empty → 0.
  */
-export function scaleAngularMomentum(scaleCents: readonly number[], periodCents: number = 1200): number {
-  return Math.min(1, Math.max(0, scaleCenterOfMass(scaleCents, periodCents) * scaleGyrationRadius(scaleCents, periodCents)));
+export function scaleAngularMomentum(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
+  return Math.min(
+    1,
+    Math.max(
+      0,
+      scaleCenterOfMass(scaleCents, periodCents) * scaleGyrationRadius(scaleCents, periodCents),
+    ),
+  );
 }
 
 // SSSS1 — scaleSkewness
@@ -64822,14 +66179,17 @@ export function scaleKurtosis(scaleCents: readonly number[], periodCents: number
  * Q1 = value at index floor(n/4), Q3 = value at index floor(3n/4) of sorted normalized positions.
  * Empty/single → 0.
  */
-export function scaleQuartileSpread(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleQuartileSpread(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents]
-    .map(c => (((c % periodCents) + periodCents) % periodCents) / periodCents)
+    .map((c) => (((c % periodCents) + periodCents) % periodCents) / periodCents)
     .sort((a, b) => a - b);
   const q1 = sorted[Math.floor(n / 4)]!;
-  const q3 = sorted[Math.min(n - 1, Math.floor(3 * n / 4))]!;
+  const q3 = sorted[Math.min(n - 1, Math.floor((3 * n) / 4))]!;
   return Math.min(1, Math.max(0, q3 - q1));
 }
 
@@ -64839,18 +66199,21 @@ export function scaleQuartileSpread(scaleCents: readonly number[], periodCents: 
  * Uses same Q1, Q3, IQR computation as scaleQuartileSpread.
  * Empty/single → 0.
  */
-export function scaleOutlierRatio(scaleCents: readonly number[], periodCents: number = 1200): number {
+export function scaleOutlierRatio(
+  scaleCents: readonly number[],
+  periodCents: number = 1200,
+): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
   const sorted = [...scaleCents]
-    .map(c => (((c % periodCents) + periodCents) % periodCents) / periodCents)
+    .map((c) => (((c % periodCents) + periodCents) % periodCents) / periodCents)
     .sort((a, b) => a - b);
   const q1 = sorted[Math.floor(n / 4)]!;
-  const q3 = sorted[Math.min(n - 1, Math.floor(3 * n / 4))]!;
+  const q3 = sorted[Math.min(n - 1, Math.floor((3 * n) / 4))]!;
   const iqr = q3 - q1;
   const lower = q1 - 1.5 * iqr;
   const upper = q3 + 1.5 * iqr;
-  const outliers = sorted.filter(v => v < lower || v > upper).length;
+  const outliers = sorted.filter((v) => v < lower || v > upper).length;
   return outliers / n;
 }
 
@@ -65290,7 +66653,9 @@ export function scaleOvertoneRatioProximity(pitches: readonly Pitch[]): number {
 export function scaleJustTuningDeviation(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Common just tuning pitches in cents (5-limit just intonation)
-  const justCents = [0, 112, 182, 204, 294, 316, 386, 408, 498, 590, 590, 702, 814, 884, 906, 996, 1018, 1088, 1200];
+  const justCents = [
+    0, 112, 182, 204, 294, 316, 386, 408, 498, 590, 590, 702, 814, 884, 906, 996, 1018, 1088, 1200,
+  ];
   const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   let totalDev = 0;
   for (const c of cents) {
@@ -65315,7 +66680,7 @@ export function scaleHighRegisterRatio(pitches: readonly Pitch[]): number {
   const lo = cents[0]!;
   const range = cents[cents.length - 1]! - lo;
   if (range === 0) return 0;
-  const threshold = lo + range * 2 / 3;
+  const threshold = lo + (range * 2) / 3;
   const high = cents.filter((c) => c >= threshold).length;
   return high / cents.length;
 }
@@ -65374,7 +66739,7 @@ export function scaleSpanRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
   const cents = pitches.map((p) => pitchToCents(p));
   const actualSpan = Math.max(...cents) - Math.min(...cents);
-  const expectedSpan = 1200 * (pitches.length - 1) / pitches.length;
+  const expectedSpan = (1200 * (pitches.length - 1)) / pitches.length;
   if (expectedSpan === 0) return 0;
   return Math.min(1, Math.max(0, actualSpan / expectedSpan));
 }
@@ -65474,7 +66839,9 @@ export function scaleDiatonicMatchScore(pitches: readonly Pitch[]): number {
 export function scaleSemitoneClusterDensity(pitches: readonly Pitch[]): number {
   // fraction of adjacent pairs (when sorted by cents) within 100 cents of each other
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   let clusters = 0;
   for (let i = 0; i < sorted.length - 1; i++) {
     if (sorted[i + 1]! - sorted[i]! < 100) clusters++;
@@ -65505,7 +66872,9 @@ export function scaleColorToneRatio(pitches: readonly Pitch[]): number {
   const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   let colorCount = 0;
   for (const c of cents) {
-    const isDiatonic = majorCents.some((m) => Math.abs(c - m) < 50 || Math.abs(c - m - 1200) < 50 || Math.abs(c - m + 1200) < 50);
+    const isDiatonic = majorCents.some(
+      (m) => Math.abs(c - m) < 50 || Math.abs(c - m - 1200) < 50 || Math.abs(c - m + 1200) < 50,
+    );
     if (!isDiatonic) colorCount++;
   }
   return Math.min(1, Math.max(0, colorCount / pitches.length));
@@ -65521,13 +66890,19 @@ export function scaleIntervalTension(pitches: readonly Pitch[]): number {
       const interval = Math.abs(cents[i]! - cents[j]!);
       const ic = Math.min(interval, 1200 - interval); // interval class (0-600)
       let tension = 0.1;
-      if (ic < 50) tension = 0.05;        // unison
-      else if (ic < 150) tension = 0.9;   // minor 2nd
-      else if (ic < 250) tension = 0.4;   // major 2nd
-      else if (ic < 350) tension = 0.2;   // minor 3rd
-      else if (ic < 450) tension = 0.15;  // major 3rd
-      else if (ic < 550) tension = 0.1;   // perfect 4th/5th
-      else tension = 1.0;                 // tritone
+      if (ic < 50)
+        tension = 0.05; // unison
+      else if (ic < 150)
+        tension = 0.9; // minor 2nd
+      else if (ic < 250)
+        tension = 0.4; // major 2nd
+      else if (ic < 350)
+        tension = 0.2; // minor 3rd
+      else if (ic < 450)
+        tension = 0.15; // major 3rd
+      else if (ic < 550)
+        tension = 0.1; // perfect 4th/5th
+      else tension = 1.0; // tritone
       tensions.push(tension);
     }
   }
@@ -65539,12 +66914,15 @@ export function scaleIntervalTension(pitches: readonly Pitch[]): number {
 
 export function scaleTranspositionCount(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
-  const rawPcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12);
+  const rawPcs = pitches.map(
+    (p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) % 12,
+  );
   const pcs = new Set(rawPcs);
   let count = 0;
   for (let t = 0; t < 12; t++) {
     const transposed = new Set([...pcs].map((pc) => (pc + t) % 12));
-    const matches = [...transposed].every((pc) => pcs.has(pc)) && [...pcs].every((pc) => transposed.has(pc));
+    const matches =
+      [...transposed].every((pc) => pcs.has(pc)) && [...pcs].every((pc) => transposed.has(pc));
     if (matches) count++;
   }
   return Math.min(1, Math.max(0, count / 12));
@@ -65552,13 +66930,13 @@ export function scaleTranspositionCount(pitches: readonly Pitch[]): number {
 
 export function scaleAxisSymmetryScore(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12);
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) % 12);
   const pcSet = new Set(pcs);
   let bestMatch = 0;
   for (let axis = 0; axis < 12; axis++) {
     let matches = 0;
     for (const pc of pcSet) {
-      const reflected = ((axis * 2 - pc) % 12 + 12) % 12;
+      const reflected = (((axis * 2 - pc) % 12) + 12) % 12;
       if (pcSet.has(reflected)) matches++;
     }
     const score = matches / pcSet.size;
@@ -65584,7 +66962,9 @@ export function scaleDegreeWeightBalance(pitches: readonly Pitch[]): number {
 
 export function scaleHemitoniaRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   let hemitoniaCount = 0;
   let wholeToneCount = 0;
   for (let i = 0; i < sorted.length - 1; i++) {
@@ -65601,7 +66981,9 @@ export function scaleHemitoniaRatio(pitches: readonly Pitch[]): number {
 
 export function scaleNoteGroupingScore(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   // Count how many adjacent pairs form "within-group" connections (gap < 200c)
   let withinGroupPairs = 0;
   for (let i = 0; i < sorted.length - 1; i++) {
@@ -65612,7 +66994,9 @@ export function scaleNoteGroupingScore(pitches: readonly Pitch[]): number {
 
 export function scaleInterclusterGap(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const gaps: number[] = [];
   for (let i = 0; i < sorted.length - 1; i++) {
     const gap = sorted[i + 1]! - sorted[i]!;
@@ -65626,7 +67010,9 @@ export function scaleInterclusterGap(pitches: readonly Pitch[]): number {
 export function scaleGroupCount(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   if (pitches.length === 1) return 1 / 6;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   let groups = 1;
   for (let i = 0; i < sorted.length - 1; i++) {
     if (sorted[i + 1]! - sorted[i]! >= 200) groups++;
@@ -65636,7 +67022,9 @@ export function scaleGroupCount(pitches: readonly Pitch[]): number {
 
 export function scaleClusterDensityVariation(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   // Find clusters (groups of notes with gaps < 200c between them)
   const clusters: number[] = [1];
   for (let i = 0; i < sorted.length - 1; i++) {
@@ -65694,7 +67082,9 @@ export function analyzeScale(pitches: readonly Pitch[]): ScaleAnalysisProfile {
 
 export function scaleIntervalPatternEntropy(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   // Compute step intervals, quantized to nearest 50 cents
   const steps: number[] = [];
   for (let i = 0; i < sorted.length - 1; i++) {
@@ -65718,7 +67108,9 @@ export function scaleIntervalPatternEntropy(pitches: readonly Pitch[]): number {
 
 export function scaleGapUniformityV2(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const gaps: number[] = [];
   for (let i = 0; i < sorted.length - 1; i++) {
     gaps.push(sorted[i + 1]! - sorted[i]!);
@@ -65734,7 +67126,9 @@ export function scaleMaximalEvennessV2(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   if (pitches.length === 1) return 1;
   const n = pitches.length;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   // Expected maximally even positions: k * 1200 / n for k=0..n-1
   let totalDeviation = 0;
   for (let k = 0; k < n; k++) {
@@ -65747,8 +67141,9 @@ export function scaleMaximalEvennessV2(pitches: readonly Pitch[]): number {
 
 export function scalePeriodicity(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200)))]
-    .sort((a, b) => a - b);
+  const sorted = [
+    ...new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200))),
+  ].sort((a, b) => a - b);
   const n = sorted.length;
   // Check if scale has a period smaller than the octave (e.g., divides at 600c for tritone period)
   const divisors = [2, 3, 4, 6];
@@ -65758,7 +67153,10 @@ export function scalePeriodicity(pitches: readonly Pitch[]): number {
     for (const c of sorted) {
       const inFirstPeriod = c % period;
       const matchFound = sorted.some((c2) => Math.abs((c2 % period) - inFirstPeriod) < 25);
-      if (!matchFound) { allMatch = false; break; }
+      if (!matchFound) {
+        allMatch = false;
+        break;
+      }
     }
     if (allMatch && n > 0) {
       // Check that the period actually repeats (not just trivially fits)
@@ -65828,13 +67226,19 @@ export function scaleRootConsonanceScore(pitches: readonly Pitch[]): number {
   for (const c of cents) {
     const ic = Math.min(c, 1200 - c);
     let consonance = 0.1;
-    if (ic < 25) consonance = 1.0;        // unison
-    else if (ic < 150) consonance = 0.1;  // minor 2nd (dissonant)
-    else if (ic < 250) consonance = 0.3;  // major 2nd
-    else if (ic < 350) consonance = 0.7;  // minor 3rd
-    else if (ic < 450) consonance = 0.8;  // major 3rd
-    else if (ic < 550) consonance = 0.9;  // perfect 4th/5th
-    else consonance = 0.05;               // tritone (most dissonant)
+    if (ic < 25)
+      consonance = 1.0; // unison
+    else if (ic < 150)
+      consonance = 0.1; // minor 2nd (dissonant)
+    else if (ic < 250)
+      consonance = 0.3; // major 2nd
+    else if (ic < 350)
+      consonance = 0.7; // minor 3rd
+    else if (ic < 450)
+      consonance = 0.8; // major 3rd
+    else if (ic < 550)
+      consonance = 0.9; // perfect 4th/5th
+    else consonance = 0.05; // tritone (most dissonant)
     totalConsonance += consonance;
   }
   return Math.min(1, Math.max(0, totalConsonance / pitches.length));
@@ -65868,8 +67272,16 @@ export function scaleSubdominantScore(pitches: readonly Pitch[]): number {
   let score = 0;
   let count = 0;
   for (const c of cents) {
-    const distTo4th = Math.min(Math.abs(c - 500), Math.abs(c - 500 - 1200), Math.abs(c - 500 + 1200));
-    const distTo5th = Math.min(Math.abs(c - 700), Math.abs(c - 700 - 1200), Math.abs(c - 700 + 1200));
+    const distTo4th = Math.min(
+      Math.abs(c - 500),
+      Math.abs(c - 500 - 1200),
+      Math.abs(c - 500 + 1200),
+    );
+    const distTo5th = Math.min(
+      Math.abs(c - 700),
+      Math.abs(c - 700 - 1200),
+      Math.abs(c - 700 + 1200),
+    );
     const minDist = Math.min(distTo4th, distTo5th);
     score += Math.max(0, 1 - minDist / 200); // full score within 200c
     count++;
@@ -65879,7 +67291,9 @@ export function scaleSubdominantScore(pitches: readonly Pitch[]): number {
 
 export function scaleLeadingToneStrengthV3(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   let leadingCount = 0;
   for (let i = 0; i < sorted.length; i++) {
     for (let j = 0; j < sorted.length; j++) {
@@ -65902,14 +67316,18 @@ export function scaleOctaveEquivalenceScoreV2(pitches: readonly Pitch[]): number
   for (const p of pitches) {
     const rawCents = pitchToCents(p);
     const octave = Math.floor(rawCents / 1200);
-    const pc = Math.round(((rawCents % 1200) + 1200) % 1200 / 50) * 50;
+    const pc = Math.round((((rawCents % 1200) + 1200) % 1200) / 50) * 50;
     if (!pcGroups.has(pc)) pcGroups.set(pc, 0);
     pcGroups.set(pc, Math.max(pcGroups.get(pc)!, octave));
   }
   // Score = fraction of pitch classes that appear at more than one octave
   let multiOctaveCount = 0;
   const allCents = pitches.map((p) => pitchToCents(p));
-  const uniquePCs = [...new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50))];
+  const uniquePCs = [
+    ...new Set(
+      pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 50) * 50),
+    ),
+  ];
   for (const pc of uniquePCs) {
     const matching = allCents.filter((c) => Math.abs((((c % 1200) + 1200) % 1200) - pc) < 50);
     const octaves = new Set(matching.map((c) => Math.round(c / 1200)));
@@ -65935,12 +67353,19 @@ export function scaleModeAffinityScore(pitches: readonly Pitch[]): number {
     [0, 200, 300, 500, 700, 800, 1000], // Aeolian
     [0, 100, 300, 500, 600, 800, 1000], // Locrian
   ];
-  const inputPCs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100);
+  const inputPCs = pitches.map(
+    (p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) * 100,
+  );
   let best = 0;
   for (const mode of modes) {
     let matches = 0;
     for (const ic of inputPCs) {
-      if (mode.some((m) => Math.abs(m - ic) < 50 || Math.abs(m - ic - 1200) < 50 || Math.abs(m - ic + 1200) < 50)) {
+      if (
+        mode.some(
+          (m) =>
+            Math.abs(m - ic) < 50 || Math.abs(m - ic - 1200) < 50 || Math.abs(m - ic + 1200) < 50,
+        )
+      ) {
         matches++;
       }
     }
@@ -65954,12 +67379,14 @@ export function scaleModularityScore(pitches: readonly Pitch[]): number {
   // Measures how well pitches cluster into distinct groups (musical "modules")
   // Uses gap analysis: large gaps between adjacent pitches indicate modular structure
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const gaps: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     gaps.push(sorted[i]! - sorted[i - 1]!);
   }
-  gaps.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  gaps.push(sorted[0]! + 1200 - sorted[sorted.length - 1]!); // wrap
   const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length;
   const variance = gaps.reduce((a, b) => a + (b - mean) ** 2, 0) / gaps.length;
   const cv = mean > 0 ? Math.sqrt(variance) / mean : 0; // coefficient of variation
@@ -65991,11 +67418,16 @@ export function scalePentatonicAffinity(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const majorPenta = [0, 200, 400, 700, 900];
   const minorPenta = [0, 300, 500, 700, 1000];
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50);
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 50) * 50);
   const scoreForSet = (refSet: number[]) => {
     let matches = 0;
     for (const pc of pcs) {
-      if (refSet.some((r) => Math.abs(r - pc) < 75 || Math.abs(r - pc - 1200) < 75 || Math.abs(r - pc + 1200) < 75)) {
+      if (
+        refSet.some(
+          (r) =>
+            Math.abs(r - pc) < 75 || Math.abs(r - pc - 1200) < 75 || Math.abs(r - pc + 1200) < 75,
+        )
+      ) {
         matches++;
       }
     }
@@ -66025,7 +67457,9 @@ export function scaleRetrogradeSymmetryV2(pitches: readonly Pitch[]): number {
   // Measures palindrome-like symmetry of interval sequence
   // Compares forward and backward interval sequences
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const intervals: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     intervals.push(sorted[i]! - sorted[i - 1]!);
@@ -66044,14 +67478,17 @@ export function scaleTranspositionSymmetryV2(pitches: readonly Pitch[]): number 
   // Measures how many transpositions of the scale produce the same pitch class set
   // (i.e., transpositional symmetry / limited transposition like whole tone / diminished)
   if (pitches.length === 0) return 0;
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50);
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 50) * 50);
   const pcSet = new Set(pcs);
   let symmetricTranspositions = 0;
   for (let t = 50; t < 1200; t += 50) {
     const transposed = new Set(pcs.map((c) => Math.round(((c + t) % 1200) / 50) * 50));
     let allMatch = true;
     for (const pc of pcSet) {
-      if (!transposed.has(pc)) { allMatch = false; break; }
+      if (!transposed.has(pc)) {
+        allMatch = false;
+        break;
+      }
     }
     if (allMatch && transposed.size === pcSet.size) symmetricTranspositions++;
   }
@@ -66063,12 +67500,14 @@ export function scaleRotationalSymmetryV2(pitches: readonly Pitch[]): number {
   // Measures rotational symmetry: how many rotations of the interval pattern equal the original
   // (Modes of limited transposition have high rotational symmetry)
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const intervals: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     intervals.push(sorted[i]! - sorted[i - 1]!);
   }
-  intervals.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  intervals.push(sorted[0]! + 1200 - sorted[sorted.length - 1]!); // wrap
   let symmetricRotations = 0;
   for (let r = 1; r < intervals.length; r++) {
     const rotated = [...intervals.slice(r), ...intervals.slice(0, r)];
@@ -66157,7 +67596,7 @@ export function scaleDominantMotionPotential(pitches: readonly Pitch[]): number 
   // Looks for tritone interval (600c) which resolves in dominant function
   // Also checks for leading tone (1100c) presence
   if (pitches.length === 0) return 0;
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50);
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 50) * 50);
   let score = 0;
   // Check for tritone (600c) — strong dominant function indicator
   if (pcs.some((c) => Math.abs(c - 600) < 75)) score += 0.5;
@@ -66172,9 +67611,14 @@ export function scaleIIVIPotential(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   const hasNote = (target: number, tolerance = 60) =>
-    pcs.some((c) => Math.abs(c - target) < tolerance || Math.abs(c - target - 1200) < tolerance || Math.abs(c - target + 1200) < tolerance);
+    pcs.some(
+      (c) =>
+        Math.abs(c - target) < tolerance ||
+        Math.abs(c - target - 1200) < tolerance ||
+        Math.abs(c - target + 1200) < tolerance,
+    );
   let score = 0;
-  if (hasNote(0)) score += 0.25;   // root
+  if (hasNote(0)) score += 0.25; // root
   if (hasNote(200)) score += 0.25; // major 2nd (ii chord root)
   if (hasNote(500)) score += 0.25; // perfect 4th (ii chord 3rd / V chord 7th)
   if (hasNote(700)) score += 0.25; // perfect 5th (V chord root)
@@ -66191,7 +67635,14 @@ export function scaleSecondaryDominantCount(pitches: readonly Pitch[]): number {
   for (const pc of pcs) {
     // Check if (pc + 700) mod 1200 is also in the scale (i.e., pc is a dom7 root)
     const target = (pc + 700) % 1200;
-    if (pcs.some((c) => Math.abs(c - target) < 60 || Math.abs(c - target - 1200) < 60 || Math.abs(c - target + 1200) < 60)) {
+    if (
+      pcs.some(
+        (c) =>
+          Math.abs(c - target) < 60 ||
+          Math.abs(c - target - 1200) < 60 ||
+          Math.abs(c - target + 1200) < 60,
+      )
+    ) {
       dominantRoots++;
     }
   }
@@ -66203,9 +67654,9 @@ export function scaleModalMixtureScore(pitches: readonly Pitch[]): number {
   // Looks for notes that differ by a semitone from the "pure" major scale equivalents
   // i.e., flat 3rd (300c), flat 6th (800c), flat 7th (1000c) alongside major counterparts
   if (pitches.length === 0) return 0;
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50);
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 50) * 50);
   const mixtureNotes = [300, 800, 1000]; // b3, b6, b7 (from minor/dorian/mixolydian)
-  const majorNotes = [400, 900, 1100];  // M3, M6, M7
+  const majorNotes = [400, 900, 1100]; // M3, M6, M7
   let mixtureCount = 0;
   for (let i = 0; i < mixtureNotes.length; i++) {
     const hasMajor = pcs.some((c) => Math.abs(c - majorNotes[i]!) < 75);
@@ -66229,7 +67680,10 @@ export function scaleSpectrumMatchScore(pitches: readonly Pitch[]): number {
   for (const pc of pcs) {
     for (const partial of partialCents) {
       const diff = Math.abs(pc - partial);
-      if (diff < 25 || diff > 1175) { matches++; break; }
+      if (diff < 25 || diff > 1175) {
+        matches++;
+        break;
+      }
     }
   }
   return Math.min(1, Math.max(0, matches / pitches.length));
@@ -66240,14 +67694,18 @@ export function scalePartialAlignmentDensity(pitches: readonly Pitch[]): number 
   // Uses harmonics 1-16, all reduced to first octave
   if (pitches.length === 0) return 0;
   // Harmonics 2-16 reduced mod 1200 (approx cents)
-  const harmonicPCs = [0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4440, 4569, 4688, 4800]
-    .map((c) => ((c % 1200) + 1200) % 1200);
+  const harmonicPCs = [
+    0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4440, 4569, 4688, 4800,
+  ].map((c) => ((c % 1200) + 1200) % 1200);
   const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   let aligned = 0;
   for (const pc of pcs) {
     for (const h of harmonicPCs) {
       const diff = Math.abs(pc - h);
-      if (diff < 50 || diff > 1150) { aligned++; break; }
+      if (diff < 50 || diff > 1150) {
+        aligned++;
+        break;
+      }
     }
   }
   return Math.min(1, Math.max(0, aligned / pitches.length));
@@ -66258,14 +67716,21 @@ export function scaleInharmonicityIndex(pitches: readonly Pitch[]): number {
   // Compares each pitch pair interval to nearest just ratio (5-limit)
   // Just intervals (cents): 0, 112, 182, 204, 316, 386, 498, 590, 702, 814, 884, 996, 1018, 1088, 1200
   if (pitches.length < 2) return 0;
-  const justIntervals = [0, 112, 182, 204, 316, 386, 498, 590, 702, 814, 884, 996, 1018, 1088, 1200];
-  const pcs = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const justIntervals = [
+    0, 112, 182, 204, 316, 386, 498, 590, 702, 814, 884, 996, 1018, 1088, 1200,
+  ];
+  const pcs = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   let totalDeviation = 0;
   let count = 0;
   for (let i = 0; i < pcs.length; i++) {
     for (let j = i + 1; j < pcs.length; j++) {
       const interval = pcs[j]! - pcs[i]!;
-      const nearestJust = justIntervals.reduce((best, ji) => Math.abs(ji - interval) < Math.abs(best - interval) ? ji : best, justIntervals[0]!);
+      const nearestJust = justIntervals.reduce(
+        (best, ji) => (Math.abs(ji - interval) < Math.abs(best - interval) ? ji : best),
+        justIntervals[0]!,
+      );
       totalDeviation += Math.abs(interval - nearestJust);
       count++;
     }
@@ -66292,7 +67757,7 @@ export function scaleIntervalVectorEntropy(pitches: readonly Pitch[]): number {
   // Computes entropy of the interval vector (distribution of interval classes 1-6)
   // Higher entropy = more evenly distributed interval classes
   if (pitches.length < 2) return 0;
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100));
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100));
   const icCounts = new Array<number>(7).fill(0); // IC 0-6
   for (let i = 0; i < pcs.length; i++) {
     for (let j = i + 1; j < pcs.length; j++) {
@@ -66314,8 +67779,9 @@ export function scaleIntervalClassBalanceV2(pitches: readonly Pitch[]): number {
   // Measures balance between consonant ICs (1=m2, 5=P4, 6=TT excluded; 3=m3, 4=M3) vs total
   // Consonant ICs: 3 (m3/M6), 4 (M3/m6), 5 (P4/P5) — these are stable intervals
   if (pitches.length < 2) return 0;
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100));
-  let consonant = 0, total = 0;
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100));
+  let consonant = 0,
+    total = 0;
   for (let i = 0; i < pcs.length; i++) {
     for (let j = i + 1; j < pcs.length; j++) {
       const ic = Math.min(Math.abs(pcs[i]! - pcs[j]!), 12 - Math.abs(pcs[i]! - pcs[j]!));
@@ -66330,9 +67796,12 @@ export function scaleConsistencyIndex(pitches: readonly Pitch[]): number {
   // Measures interval consistency: how often a stacked interval sum produces scale members
   // Based on: all pairs of consecutive intervals; if their sum is also in the scale → consistent
   if (pitches.length < 3) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const pcsSet = new Set(sorted.map((c) => Math.round(c / 50) * 50));
-  let consistent = 0, total = 0;
+  let consistent = 0,
+    total = 0;
   for (let i = 0; i < sorted.length; i++) {
     for (let j = i + 1; j < sorted.length; j++) {
       const interval = sorted[j]! - sorted[i]!;
@@ -66350,12 +67819,14 @@ export function scaleProportionalBalance(pitches: readonly Pitch[]): number {
   // Measures how evenly interval sizes are proportionally distributed
   // Compares consecutive interval sizes; low variance in ratios = high proportional balance
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const intervals: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     intervals.push(sorted[i]! - sorted[i - 1]!);
   }
-  intervals.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  intervals.push(sorted[0]! + 1200 - sorted[sorted.length - 1]!); // wrap
   if (intervals.length === 0) return 0;
   const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
   if (mean === 0) return 0;
@@ -66374,10 +67845,12 @@ export function scaleMelodicGravityScore(pitches: readonly Pitch[]): number {
   const stable = [0, 500, 700];
   let gravityScore = 0;
   for (const pc of pcs) {
-    const minDistToStable = Math.min(...stable.map((s) => {
-      const d = Math.abs(pc - s);
-      return Math.min(d, 1200 - d);
-    }));
+    const minDistToStable = Math.min(
+      ...stable.map((s) => {
+        const d = Math.abs(pc - s);
+        return Math.min(d, 1200 - d);
+      }),
+    );
     // High score if close to stable tone; max gravity at 0 distance
     gravityScore += Math.max(0, 1 - minDistToStable / 200);
   }
@@ -66388,14 +67861,21 @@ export function scaleAttractionForceIndex(pitches: readonly Pitch[]): number {
   // Measures mutual attraction between adjacent scale degrees
   // Smaller interval between adjacent pitches = stronger attraction (leading-tone effect)
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   let totalAttraction = 0;
   for (let i = 0; i < sorted.length; i++) {
     const next = sorted[(i + 1) % sorted.length]!;
     const prev = sorted[(i - 1 + sorted.length) % sorted.length]!;
     const intervalNext = Math.abs(next - sorted[i]!) % 1200;
     const intervalPrev = Math.abs(sorted[i]! - prev) % 1200;
-    const minInterval = Math.min(intervalNext, intervalPrev, 1200 - intervalNext, 1200 - intervalPrev);
+    const minInterval = Math.min(
+      intervalNext,
+      intervalPrev,
+      1200 - intervalNext,
+      1200 - intervalPrev,
+    );
     // Smaller interval = stronger attraction (max 1 at 0, 0 at 600)
     totalAttraction += Math.max(0, 1 - minInterval / 200);
   }
@@ -66407,8 +67887,11 @@ export function scaleTensionResolutionRatio(pitches: readonly Pitch[]): number {
   // Stable: 0, 400, 500, 700, 800 (root, M3, P4, P5, m6); Tension: 100, 200, 600, 1000, 1100
   if (pitches.length === 0) return 0;
   const stableSet = new Set([0, 400, 500, 700, 800]);
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100);
-  let stable = 0, tension = 0;
+  const pcs = pitches.map(
+    (p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) * 100,
+  );
+  let stable = 0,
+    tension = 0;
   for (const pc of pcs) {
     if (stableSet.has(pc)) stable++;
     else tension++;
@@ -66422,9 +67905,12 @@ export function scaleDirectionBias(pitches: readonly Pitch[]): number {
   // Measures whether the scale "leans" upward or downward in pitch space
   // Compares sum of intervals above median vs below median
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const median = sorted[Math.floor(sorted.length / 2)]!;
-  let above = 0, below = 0;
+  let above = 0,
+    below = 0;
   for (const pc of sorted) {
     if (pc > median) above += pc - median;
     else below += median - pc;
@@ -66443,11 +67929,14 @@ export function scaleTonicClarityScore(pitches: readonly Pitch[]): number {
   // Scores based on: presence of root (0c), P5 (700c), M3 (400c), and absence of tritone (600c)
   if (pitches.length === 0) return 0;
   const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  const hasNote = (t: number) => pcs.some((c) => Math.abs(c - t) < 60 || Math.abs(c - t - 1200) < 60 || Math.abs(c - t + 1200) < 60);
+  const hasNote = (t: number) =>
+    pcs.some(
+      (c) => Math.abs(c - t) < 60 || Math.abs(c - t - 1200) < 60 || Math.abs(c - t + 1200) < 60,
+    );
   let score = 0;
-  if (hasNote(0)) score += 0.35;    // root present
-  if (hasNote(700)) score += 0.30;  // P5 strongly defines key
-  if (hasNote(400)) score += 0.20;  // M3 clarifies major quality
+  if (hasNote(0)) score += 0.35; // root present
+  if (hasNote(700)) score += 0.3; // P5 strongly defines key
+  if (hasNote(400)) score += 0.2; // M3 clarifies major quality
   if (!hasNote(600)) score += 0.15; // absence of tritone = less ambiguity
   return Math.min(1, Math.max(0, score));
 }
@@ -66459,10 +67948,10 @@ export function scaleDominantPresence(pitches: readonly Pitch[]): number {
   const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   const hasNote = (t: number) => pcs.some((c) => Math.abs(c - t) < 60);
   let score = 0;
-  if (hasNote(700)) score += 0.40;  // G (V root)
-  if (hasNote(1100)) score += 0.30; // B (V third / leading tone)
-  if (hasNote(200)) score += 0.20;  // D (V fifth)
-  if (hasNote(500)) score += 0.10;  // F (V seventh)
+  if (hasNote(700)) score += 0.4; // G (V root)
+  if (hasNote(1100)) score += 0.3; // B (V third / leading tone)
+  if (hasNote(200)) score += 0.2; // D (V fifth)
+  if (hasNote(500)) score += 0.1; // F (V seventh)
   return Math.min(1, Math.max(0, score));
 }
 
@@ -66473,9 +67962,9 @@ export function scaleSubdominantPresence(pitches: readonly Pitch[]): number {
   const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   const hasNote = (t: number) => pcs.some((c) => Math.abs(c - t) < 60);
   let score = 0;
-  if (hasNote(500)) score += 0.40;  // F (IV root)
-  if (hasNote(900)) score += 0.35;  // A (IV third)
-  if (hasNote(0)) score += 0.25;    // C (IV fifth = tonic)
+  if (hasNote(500)) score += 0.4; // F (IV root)
+  if (hasNote(900)) score += 0.35; // A (IV third)
+  if (hasNote(0)) score += 0.25; // C (IV fifth = tonic)
   return Math.min(1, Math.max(0, score));
 }
 
@@ -66496,14 +67985,16 @@ export function scaleChordColorScore(pitches: readonly Pitch[]): number {
   // Counts: major (M3+P5=0,400,700), minor (m3+P5=0,300,700), dom7 (M3+P5+m7=0,400,700,1000),
   //         maj7 (M3+P5+M7=0,400,700,1100), dim (m3+TT=0,300,600)
   if (pitches.length < 3) return 0;
-  const pcs = new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50));
-  const has = (c: number) => pcs.has(Math.round(((c % 1200) + 1200) % 1200 / 50) * 50);
+  const pcs = new Set(
+    pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 50) * 50),
+  );
+  const has = (c: number) => pcs.has(Math.round((((c % 1200) + 1200) % 1200) / 50) * 50);
   let chordTypes = 0;
-  if (has(0) && has(400) && has(700)) chordTypes++;  // major
-  if (has(0) && has(300) && has(700)) chordTypes++;  // minor
-  if (has(0) && has(400) && has(700) && has(1000)) chordTypes++;  // dom7
-  if (has(0) && has(400) && has(700) && has(1100)) chordTypes++;  // maj7
-  if (has(0) && has(300) && has(600)) chordTypes++;  // dim
+  if (has(0) && has(400) && has(700)) chordTypes++; // major
+  if (has(0) && has(300) && has(700)) chordTypes++; // minor
+  if (has(0) && has(400) && has(700) && has(1000)) chordTypes++; // dom7
+  if (has(0) && has(400) && has(700) && has(1100)) chordTypes++; // maj7
+  if (has(0) && has(300) && has(600)) chordTypes++; // dim
   return Math.min(1, Math.max(0, chordTypes / 5));
 }
 
@@ -66522,10 +68013,11 @@ export function scaleWarmthIndex(pitches: readonly Pitch[]): number {
   // vs brightness notes (major 7th, major 6th, major 3rd)
   // Warm notes: 300 (m3), 1000 (m7), 800 (m6); Bright notes: 400 (M3), 1100 (M7), 900 (M6)
   if (pitches.length === 0) return 0;
-  const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 50) * 50);
+  const pcs = pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 50) * 50);
   const warmNotes = new Set([300, 1000, 800]);
   const brightNotes = new Set([400, 1100, 900]);
-  let warm = 0, bright = 0;
+  let warm = 0,
+    bright = 0;
   for (const pc of pcs) {
     if (warmNotes.has(pc)) warm++;
     if (brightNotes.has(pc)) bright++;
@@ -66539,7 +68031,9 @@ export function scaleChromaBalance(pitches: readonly Pitch[]): number {
   // Measures how well pitches cover the 12 chroma positions (chromatic completeness)
   // Returns fraction of 12 semitone slots (100c bins) covered
   if (pitches.length === 0) return 0;
-  const occupied = new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12));
+  const occupied = new Set(
+    pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) % 12),
+  );
   return Math.min(1, Math.max(0, occupied.size / 12));
 }
 
@@ -66550,15 +68044,19 @@ export function scaleOvertoneMatchRatio(pitches: readonly Pitch[]): number {
   // Overtone series cents (1-16): 0,1200,1902,2400,2786,3102,3369,3600,3804,3986,4151,4302,4440,4569,4688,4800
   // Reduced mod 1200 to first octave
   if (pitches.length === 0) return 0;
-  const overtonePCs = [0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4440, 4569, 4688, 4800]
-    .map((c) => Math.round(((c % 1200) + 1200) % 1200));
+  const overtonePCs = [
+    0, 1200, 1902, 2400, 2786, 3102, 3369, 3600, 3804, 3986, 4151, 4302, 4440, 4569, 4688, 4800,
+  ].map((c) => Math.round(((c % 1200) + 1200) % 1200));
   const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200));
   let matches = 0;
   for (const pc of pcs) {
-    if (overtonePCs.some((ot) => {
-      const diff = Math.abs(pc - ot);
-      return diff < 30 || diff > 1170;
-    })) matches++;
+    if (
+      overtonePCs.some((ot) => {
+        const diff = Math.abs(pc - ot);
+        return diff < 30 || diff > 1170;
+      })
+    )
+      matches++;
   }
   return Math.min(1, Math.max(0, matches / pitches.length));
 }
@@ -66566,18 +68064,23 @@ export function scaleOvertoneMatchRatio(pitches: readonly Pitch[]): number {
 export function scaleUndertoneMatchRatio(pitches: readonly Pitch[]): number {
   // Measures how many scale pitches align with undertone series of root
   // Undertone series: 1/n ratios — 1/2=1200c down, 1/3=1902c down, etc.
-  // In first octave: 0, 498, 702, 840, 933, 1200-386=814... 
-  // Key undertone PCs mod 1200: 0, 498(P4), 204(M2 inv), 150, 119, 996(m7), 884(M6), 702(P5) 
+  // In first octave: 0, 498, 702, 840, 933, 1200-386=814...
+  // Key undertone PCs mod 1200: 0, 498(P4), 204(M2 inv), 150, 119, 996(m7), 884(M6), 702(P5)
   // Use: -1200, -702, -498, -386, -316, -204 cents shifted to octave
   if (pitches.length === 0) return 0;
-  const undertonePCs = [0, 498, 702, 814, 884, 996, 1086, 1152].map((c) => Math.round(((c % 1200) + 1200) % 1200));
+  const undertonePCs = [0, 498, 702, 814, 884, 996, 1086, 1152].map((c) =>
+    Math.round(((c % 1200) + 1200) % 1200),
+  );
   const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200));
   let matches = 0;
   for (const pc of pcs) {
-    if (undertonePCs.some((ut) => {
-      const diff = Math.abs(pc - ut);
-      return diff < 30 || diff > 1170;
-    })) matches++;
+    if (
+      undertonePCs.some((ut) => {
+        const diff = Math.abs(pc - ut);
+        return diff < 30 || diff > 1170;
+      })
+    )
+      matches++;
   }
   return Math.min(1, Math.max(0, matches / pitches.length));
 }
@@ -66589,15 +68092,18 @@ export function scaleJustFifthChain(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const fifthChain: number[] = [];
   for (let i = 0; i < 12; i++) {
-    fifthChain.push(Math.round(((i * 702) % 1200 + 1200) % 1200));
+    fifthChain.push(Math.round((((i * 702) % 1200) + 1200) % 1200));
   }
   const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200));
   let matches = 0;
   for (const pc of pcs) {
-    if (fifthChain.some((fc) => {
-      const diff = Math.abs(pc - fc);
-      return diff < 30 || diff > 1170;
-    })) matches++;
+    if (
+      fifthChain.some((fc) => {
+        const diff = Math.abs(pc - fc);
+        return diff < 30 || diff > 1170;
+      })
+    )
+      matches++;
   }
   return Math.min(1, Math.max(0, matches / pitches.length));
 }
@@ -66608,15 +68114,18 @@ export function scaleThirdChainScore(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const thirdChain: number[] = [];
   for (let i = 0; i < 12; i++) {
-    thirdChain.push(Math.round(((i * 386) % 1200 + 1200) % 1200));
+    thirdChain.push(Math.round((((i * 386) % 1200) + 1200) % 1200));
   }
   const pcs = pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200));
   let matches = 0;
   for (const pc of pcs) {
-    if (thirdChain.some((tc) => {
-      const diff = Math.abs(pc - tc);
-      return diff < 30 || diff > 1170;
-    })) matches++;
+    if (
+      thirdChain.some((tc) => {
+        const diff = Math.abs(pc - tc);
+        return diff < 30 || diff > 1170;
+      })
+    )
+      matches++;
   }
   return Math.min(1, Math.max(0, matches / pitches.length));
 }
@@ -66627,13 +68136,15 @@ export function scaleMelodicContourVariety(pitches: readonly Pitch[]): number {
   // Measures variety in melodic contour based on different interval sizes present
   // More distinct interval sizes = higher variety
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const intervals = new Set<number>();
   for (let i = 1; i < sorted.length; i++) {
     intervals.add(Math.round((sorted[i]! - sorted[i - 1]!) / 50) * 50); // round to 50c bins
   }
   // Also include the wrap interval
-  intervals.add(Math.round(((sorted[0]! + 1200) - sorted[sorted.length - 1]!) / 50) * 50);
+  intervals.add(Math.round((sorted[0]! + 1200 - sorted[sorted.length - 1]!) / 50) * 50);
   // Normalize: max possible distinct intervals = number of pitches
   return Math.min(1, Math.max(0, intervals.size / pitches.length));
 }
@@ -66651,15 +68162,18 @@ export function scaleStepLeapRatio(pitches: readonly Pitch[]): number {
   // Ratio of step intervals (<300c) to leap intervals (>=300c) in scale
   // Steps: intervals smaller than a minor 3rd; Leaps: larger intervals
   if (pitches.length < 2) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
-  let steps = 0, total = 0;
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
+  let steps = 0,
+    total = 0;
   for (let i = 1; i < sorted.length; i++) {
     const interval = sorted[i]! - sorted[i - 1]!;
     if (interval < 300) steps++;
     total++;
   }
   // Add wrap interval
-  const wrapInterval = (sorted[0]! + 1200) - sorted[sorted.length - 1]!;
+  const wrapInterval = sorted[0]! + 1200 - sorted[sorted.length - 1]!;
   if (wrapInterval < 300) steps++;
   total++;
   return total > 0 ? Math.min(1, Math.max(0, steps / total)) : 0;
@@ -66669,12 +68183,14 @@ export function scaleContourComplexity(pitches: readonly Pitch[]): number {
   // Measures complexity of scale contour based on direction changes
   // More changes of direction (up/down alternation) = more complex
   if (pitches.length < 3) return 0;
-  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort((a, b) => a - b);
+  const sorted = [...pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)].sort(
+    (a, b) => a - b,
+  );
   const intervals: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     intervals.push(sorted[i]! - sorted[i - 1]!);
   }
-  intervals.push((sorted[0]! + 1200) - sorted[sorted.length - 1]!); // wrap
+  intervals.push(sorted[0]! + 1200 - sorted[sorted.length - 1]!); // wrap
   // Count changes where a large interval (>300c) follows a small one (<200c) or vice versa
   let changes = 0;
   for (let i = 1; i < intervals.length; i++) {
@@ -66875,7 +68391,10 @@ export function scaleSpringConstantProxy(pitches: readonly Pitch[]): number {
 // R1441
 export function scaleGrowthRateIndex(pitches: readonly Pitch[]): number {
   if (pitches.length <= 1) return 0.5;
-  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const sorted = pitches
+    .map((p) => pitchToCents(p))
+    .slice()
+    .sort((a, b) => a - b);
   const intervals: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     intervals.push(sorted[i]! - sorted[i - 1]!);
@@ -66892,7 +68411,10 @@ export function scaleGrowthRateIndex(pitches: readonly Pitch[]): number {
 // R1442
 export function scaleDecayConstant(pitches: readonly Pitch[]): number {
   if (pitches.length <= 1) return 0;
-  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const sorted = pitches
+    .map((p) => pitchToCents(p))
+    .slice()
+    .sort((a, b) => a - b);
   const intervals: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     intervals.push(sorted[i]! - sorted[i - 1]!);
@@ -66909,7 +68431,10 @@ export function scaleDecayConstant(pitches: readonly Pitch[]): number {
 // R1443
 export function scaleTopologyScore(pitches: readonly Pitch[]): number {
   if (pitches.length <= 1) return 0;
-  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const sorted = pitches
+    .map((p) => pitchToCents(p))
+    .slice()
+    .sort((a, b) => a - b);
   const intervals: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     intervals.push(sorted[i]! - sorted[i - 1]!);
@@ -66927,7 +68452,10 @@ export function scaleTopologyScore(pitches: readonly Pitch[]): number {
 // R1444
 export function scaleConnectivityIndex(pitches: readonly Pitch[]): number {
   if (pitches.length <= 1) return 0;
-  const sorted = pitches.map((p) => pitchToCents(p)).slice().sort((a, b) => a - b);
+  const sorted = pitches
+    .map((p) => pitchToCents(p))
+    .slice()
+    .sort((a, b) => a - b);
   const n = sorted.length;
   let connected = 0;
   for (let i = 0; i < n - 1; i++) {
@@ -67201,7 +68729,10 @@ export function scaleSmallIntegerRatioScore(pitches: readonly Pitch[]): number {
     const intervalCents = Math.abs(cents[i]! - cents[i - 1]!);
     // small integer ratios: unison(0), octave(1200), fifth(702), fourth(498), major third(386), minor third(316)
     const justIntervals = [0, 316, 386, 498, 702, 884, 1200];
-    const closest = justIntervals.reduce((best, ji) => Math.abs(intervalCents - ji) < Math.abs(intervalCents - best) ? ji : best, justIntervals[0]!);
+    const closest = justIntervals.reduce(
+      (best, ji) => (Math.abs(intervalCents - ji) < Math.abs(intervalCents - best) ? ji : best),
+      justIntervals[0]!,
+    );
     if (Math.abs(intervalCents - closest) <= 15) score++;
   }
   return Math.min(1, Math.max(0, score / (cents.length - 1)));
@@ -67232,7 +68763,10 @@ export function scaleRatioComplexity(pitches: readonly Pitch[]): number {
     const intervalCents = Math.abs(cents[i]! - cents[i - 1]!);
     // complexity: how far from nearest simple ratio — normalize to [0,1] where 50c = max complexity
     const justIntervals = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
-    const closestDist = justIntervals.reduce((best, ji) => Math.min(best, Math.abs(intervalCents - ji)), Infinity);
+    const closestDist = justIntervals.reduce(
+      (best, ji) => Math.min(best, Math.abs(intervalCents - ji)),
+      Infinity,
+    );
     complexitySum += Math.min(1, closestDist / 50);
   }
   return Math.min(1, Math.max(0, complexitySum / (cents.length - 1)));
@@ -67365,7 +68899,7 @@ export function scaleAxisSymmetry(pitches: readonly Pitch[]): number {
     const axisCents = axis * 100;
     let symmetric = 0;
     for (const c of cents) {
-      const mirror = ((2 * axisCents - c) % 1200 + 1200) % 1200;
+      const mirror = (((2 * axisCents - c) % 1200) + 1200) % 1200;
       const found = cents.some((other) => Math.abs(other - mirror) <= 20);
       if (found) symmetric++;
     }
@@ -67383,8 +68917,10 @@ export function scaleHarmonicDistance(pitches: readonly Pitch[]): number {
     const intervalCents = Math.abs(cents[i]! - cents[i - 1]!);
     // approximate harmonic distance via interval deviation from just intervals
     const justIntervals = [0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 1018, 1088, 1200];
-    const nearest = justIntervals.reduce((best, ji) =>
-      Math.abs(intervalCents - ji) < Math.abs(intervalCents - best) ? ji : best, justIntervals[0]!);
+    const nearest = justIntervals.reduce(
+      (best, ji) => (Math.abs(intervalCents - ji) < Math.abs(intervalCents - best) ? ji : best),
+      justIntervals[0]!,
+    );
     totalDist += Math.abs(intervalCents - nearest) / 50;
   }
   return Math.min(1, Math.max(0, 1 - totalDist / (cents.length - 1)));
@@ -67397,8 +68933,10 @@ export function scaleEnharmonicEquivalence(pitches: readonly Pitch[]): number {
   let matches = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
-    const nearest = tetGrid.reduce((best, g) =>
-      Math.abs(c - g) < Math.abs(c - best) ? g : best, tetGrid[0]!);
+    const nearest = tetGrid.reduce(
+      (best, g) => (Math.abs(c - g) < Math.abs(c - best) ? g : best),
+      tetGrid[0]!,
+    );
     if (Math.abs(c - nearest) <= 10) matches++;
   }
   return Math.min(1, Math.max(0, matches / pitches.length));
@@ -67411,8 +68949,10 @@ export function scaleDiatonicAlignment(pitches: readonly Pitch[]): number {
   let aligned = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
-    const nearest = diatonic.reduce((best, d) =>
-      Math.abs(c - d) < Math.abs(c - best) ? d : best, diatonic[0]!);
+    const nearest = diatonic.reduce(
+      (best, d) => (Math.abs(c - d) < Math.abs(c - best) ? d : best),
+      diatonic[0]!,
+    );
     if (Math.abs(c - nearest) <= 25) aligned++;
   }
   return Math.min(1, Math.max(0, aligned / pitches.length));
@@ -67560,7 +69100,8 @@ export function scalePentatonicBalance(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const major = [0, 200, 400, 700, 900];
   const minor = [0, 300, 500, 700, 1000];
-  let maj = 0, min = 0;
+  let maj = 0,
+    min = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
     if (major.some((d) => Math.abs(c - d) <= 25)) maj++;
@@ -67606,7 +69147,7 @@ export function scaleDistributionBalance(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const bins = new Array<number>(12).fill(0);
   for (const p of pitches) {
-    const bin = Math.floor(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12;
+    const bin = Math.floor((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) % 12;
     bins[bin]! += 1;
   }
   const expected = pitches.length / 12;
@@ -67775,7 +69316,7 @@ export function scaleLydianDominantContent(pitches: readonly Pitch[]): number {
   const tol = 25;
   const matched = pitches.filter((p) =>
     targets.some((t) => {
-      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      const c = (((pitchToCents(p) - t) % 1200) + 1200) % 1200;
       return Math.min(c, 1200 - c) <= tol;
     }),
   ).length;
@@ -67789,7 +69330,7 @@ export function scaleDoubleHarmonicContent(pitches: readonly Pitch[]): number {
   const tol = 25;
   const matched = pitches.filter((p) =>
     targets.some((t) => {
-      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      const c = (((pitchToCents(p) - t) % 1200) + 1200) % 1200;
       return Math.min(c, 1200 - c) <= tol;
     }),
   ).length;
@@ -67803,7 +69344,7 @@ export function scaleHungarianMinorContent(pitches: readonly Pitch[]): number {
   const tol = 25;
   const matched = pitches.filter((p) =>
     targets.some((t) => {
-      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      const c = (((pitchToCents(p) - t) % 1200) + 1200) % 1200;
       return Math.min(c, 1200 - c) <= tol;
     }),
   ).length;
@@ -67817,7 +69358,7 @@ export function scaleNeapolitanMajorContent(pitches: readonly Pitch[]): number {
   const tol = 25;
   const matched = pitches.filter((p) =>
     targets.some((t) => {
-      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      const c = (((pitchToCents(p) - t) % 1200) + 1200) % 1200;
       return Math.min(c, 1200 - c) <= tol;
     }),
   ).length;
@@ -67832,7 +69373,8 @@ export function scaleAugmentedSecondContent(pitches: readonly Pitch[]): number {
   if (sorted.length < 2) return 0;
   let count = 0;
   for (let i = 0; i < sorted.length - 1; i++) {
-    const interval = ((pitchToCents(sorted[i + 1]!) - pitchToCents(sorted[i]!)) % 1200 + 1200) % 1200;
+    const interval =
+      (((pitchToCents(sorted[i + 1]!) - pitchToCents(sorted[i]!)) % 1200) + 1200) % 1200;
     if (interval >= 240 && interval <= 360) count++;
   }
   return Math.min(1, count / (sorted.length - 1));
@@ -67845,7 +69387,9 @@ export function scaleTritoneSubstitutionContent(pitches: readonly Pitch[]): numb
   let count = 0;
   for (let i = 0; i < sorted.length; i++) {
     for (let j = i + 1; j < sorted.length; j++) {
-      const d = Math.abs((((pitchToCents(sorted[j]!) - pitchToCents(sorted[i]!)) % 1200) + 1200) % 1200);
+      const d = Math.abs(
+        (((pitchToCents(sorted[j]!) - pitchToCents(sorted[i]!)) % 1200) + 1200) % 1200,
+      );
       const interval = Math.min(d, 1200 - d);
       if (Math.abs(interval - 600) <= 40) count++;
     }
@@ -67960,7 +69504,7 @@ export function scaleEnneatonicContent(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Enneatonic (9-note): count distinct pitch classes mod 1200 with 100c resolution
   const classes = new Set(
-    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100),
+    pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) * 100),
   );
   // Ratio of 9-note coverage: 9 distinct semitone slots expected
   return Math.min(1, classes.size / 9);
@@ -67970,7 +69514,7 @@ export function scaleHeptatonicDensity(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Heptatonic density: ratio of distinct semitone pitch classes to 7
   const classes = new Set(
-    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) * 100),
+    pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) * 100),
   );
   return Math.min(1, classes.size / 7);
 }
@@ -67983,7 +69527,9 @@ export function scaleFifthQualityScore(pitches: readonly Pitch[]): number {
   let count = 0;
   for (let i = 0; i < pitches.length; i++) {
     for (let j = i + 1; j < pitches.length; j++) {
-      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const d = Math.abs(
+        (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
+      );
       const interval = Math.min(d, 1200 - d);
       if (Math.abs(interval - target) <= tol) count++;
     }
@@ -67995,11 +69541,16 @@ export function scaleFifthQualityScore(pitches: readonly Pitch[]): number {
 export function scaleThirdQualityScore(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Major or minor third quality: pairs at ~300c (minor) or ~400c (major) ±20c
-  const tols = [{ target: 300, tol: 20 }, { target: 400, tol: 20 }];
+  const tols = [
+    { target: 300, tol: 20 },
+    { target: 400, tol: 20 },
+  ];
   let count = 0;
   for (let i = 0; i < pitches.length; i++) {
     for (let j = i + 1; j < pitches.length; j++) {
-      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const d = Math.abs(
+        (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
+      );
       const interval = Math.min(d, 1200 - d);
       if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
     }
@@ -68011,11 +69562,16 @@ export function scaleThirdQualityScore(pitches: readonly Pitch[]): number {
 export function scaleSixthQualityScore(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Major or minor sixth: ~800c (minor) or ~900c (major) ±20c
-  const tols = [{ target: 800, tol: 20 }, { target: 900, tol: 20 }];
+  const tols = [
+    { target: 800, tol: 20 },
+    { target: 900, tol: 20 },
+  ];
   let count = 0;
   for (let i = 0; i < pitches.length; i++) {
     for (let j = i + 1; j < pitches.length; j++) {
-      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const d = Math.abs(
+        (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
+      );
       const interval = Math.min(d, 1200 - d);
       if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
     }
@@ -68027,11 +69583,16 @@ export function scaleSixthQualityScore(pitches: readonly Pitch[]): number {
 export function scaleSeventhQualityScore(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Major or minor seventh: ~1000c (minor) or ~1100c (major) ±20c
-  const tols = [{ target: 1000, tol: 20 }, { target: 1100, tol: 20 }];
+  const tols = [
+    { target: 1000, tol: 20 },
+    { target: 1100, tol: 20 },
+  ];
   let count = 0;
   for (let i = 0; i < pitches.length; i++) {
     for (let j = i + 1; j < pitches.length; j++) {
-      const d = Math.abs((((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200);
+      const d = Math.abs(
+        (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
+      );
       const interval = Math.min(d, 1200 - d);
       if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
     }
@@ -68358,8 +69919,8 @@ export function scaleEnergyBalance(pitches: readonly Pitch[]): number {
 export function scalePitchMoment(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Pitch moment: mean of pitch cents mod 1200, normalized to [0,1]
-  const sum = pitches.reduce((acc, p) => acc + ((pitchToCents(p) % 1200) + 1200) % 1200, 0);
-  return Math.min(1, (sum / pitches.length) / 1200);
+  const sum = pitches.reduce((acc, p) => acc + (((pitchToCents(p) % 1200) + 1200) % 1200), 0);
+  return Math.min(1, sum / pitches.length / 1200);
 }
 
 export function scaleHarmonicWeight(pitches: readonly Pitch[]): number {
@@ -68462,7 +70023,7 @@ export function scaleCardinalityScore(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Distinct pitch classes (mod 1200, rounded to 10c) normalized by 12
   const classes = new Set(
-    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 10) * 10),
+    pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 10) * 10),
   );
   return Math.min(1, classes.size / 12);
 }
@@ -68471,7 +70032,7 @@ export function scaleSaturation(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Saturation: how densely pitches fill the octave (ratio of covered 50c slots to 24)
   const slots = new Set(
-    pitches.map((p) => Math.floor(((pitchToCents(p) % 1200) + 1200) % 1200 / 50)),
+    pitches.map((p) => Math.floor((((pitchToCents(p) % 1200) + 1200) % 1200) / 50)),
   );
   return Math.min(1, slots.size / 24);
 }
@@ -68488,7 +70049,7 @@ export function scaleGoldenRatioContent(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const phi = (1 + Math.sqrt(5)) / 2;
   // Golden-ratio-derived degrees (in cents): phi*100, phi^2*100, phi^3*100 ... mod 1200
-  const goldenDegrees = [1, 2, 3, 4, 5].map((k) => ((Math.pow(phi, k) * 100) % 1200));
+  const goldenDegrees = [1, 2, 3, 4, 5].map((k) => (Math.pow(phi, k) * 100) % 1200);
   let count = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
@@ -68532,7 +70093,7 @@ export function scaleBeautyIndex(pitches: readonly Pitch[]): number {
   // Consonant interval ratio (unison, octave, fifth, fourth, major/minor third/sixth)
   const consonant = new Set([0, 700, 500, 400, 300, 900, 800, 1200]);
   const consCount = intervals.filter((iv) =>
-    [...consonant].some((c) => Math.abs(iv - c) < 15)
+    [...consonant].some((c) => Math.abs(iv - c) < 15),
   ).length;
   const consScore = intervals.length > 0 ? consCount / intervals.length : 0;
   return Math.min(1, (symScore + consScore) / 2);
@@ -68564,7 +70125,10 @@ export function scaleModalAmbiguityScore(pitches: readonly Pitch[]): number {
     for (let j = i + 1; j < cents.length; j++) {
       const iv = cents[j]! - cents[i]!;
       for (const mi of modalIntervals) {
-        if (Math.abs(iv - mi) < 20) { foundIntervals.add(mi); break; }
+        if (Math.abs(iv - mi) < 20) {
+          foundIntervals.add(mi);
+          break;
+        }
       }
     }
   }
@@ -68606,7 +70170,11 @@ export function scaleEnharmonicPotential(pitches: readonly Pitch[]): number {
   let nearBoundary = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
-    if (etBoundaries.some((b) => Math.abs(c - b) < 25 || Math.abs(c - b - 1200) < 25 || Math.abs(c - b + 1200) < 25)) {
+    if (
+      etBoundaries.some(
+        (b) => Math.abs(c - b) < 25 || Math.abs(c - b - 1200) < 25 || Math.abs(c - b + 1200) < 25,
+      )
+    ) {
       nearBoundary++;
     }
   }
@@ -68624,9 +70192,16 @@ export function scaleHarmonicTensionProfile(pitches: readonly Pitch[]): number {
       const iv = cents[j]! - cents[i]!;
       pairs++;
       // high tension: tritone (600), minor 2nd (100), major 7th (1100)
-      if (Math.abs(iv - 600) < 30 || Math.abs(iv - 100) < 30 || Math.abs(iv - 1100) < 30) tension += 1.0;
+      if (Math.abs(iv - 600) < 30 || Math.abs(iv - 100) < 30 || Math.abs(iv - 1100) < 30)
+        tension += 1.0;
       // low tension: unison (0), P5 (700), P4 (500), octave (1200)
-      else if (iv < 20 || Math.abs(iv - 700) < 20 || Math.abs(iv - 500) < 20 || Math.abs(iv - 1200) < 20) tension += 0.0;
+      else if (
+        iv < 20 ||
+        Math.abs(iv - 700) < 20 ||
+        Math.abs(iv - 500) < 20 ||
+        Math.abs(iv - 1200) < 20
+      )
+        tension += 0.0;
       else tension += 0.5;
     }
   }
@@ -68640,7 +70215,11 @@ export function scalePentatonicAlignment(pitches: readonly Pitch[]): number {
   const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   let aligned = 0;
   for (const c of cents) {
-    if (pentatonicDegrees.some((d) => Math.abs(c - d) < 30 || Math.abs(c - d - 1200) < 30 || Math.abs(c - d + 1200) < 30)) {
+    if (
+      pentatonicDegrees.some(
+        (d) => Math.abs(c - d) < 30 || Math.abs(c - d - 1200) < 30 || Math.abs(c - d + 1200) < 30,
+      )
+    ) {
       aligned++;
     }
   }
@@ -68745,7 +70324,11 @@ export function scaleOvertoneContent(pitches: readonly Pitch[]): number {
   let aligned = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
-    if (uniqueHarmonics.some((h) => Math.abs(c - h) < 25 || Math.abs(c - h - 1200) < 25 || Math.abs(c - h + 1200) < 25)) {
+    if (
+      uniqueHarmonics.some(
+        (h) => Math.abs(c - h) < 25 || Math.abs(c - h - 1200) < 25 || Math.abs(c - h + 1200) < 25,
+      )
+    ) {
       aligned++;
     }
   }
@@ -68760,10 +70343,17 @@ export function scaleCombinationToneIndex(pitches: readonly Pitch[]): number {
   let pairs = 0;
   for (let i = 0; i < cents.length; i++) {
     for (let j = i + 1; j < cents.length; j++) {
-      const diff = ((cents[j]! - cents[i]!) % 1200 + 1200) % 1200;
+      const diff = (((cents[j]! - cents[i]!) % 1200) + 1200) % 1200;
       pairs++;
       // Check if the difference tone (mod 1200) is near any scale pitch
-      if (cents.some((c) => Math.abs(c - diff) < 25 || Math.abs(c - diff - 1200) < 25 || Math.abs(c - diff + 1200) < 25)) {
+      if (
+        cents.some(
+          (c) =>
+            Math.abs(c - diff) < 25 ||
+            Math.abs(c - diff - 1200) < 25 ||
+            Math.abs(c - diff + 1200) < 25,
+        )
+      ) {
         matches++;
       }
     }
@@ -68779,7 +70369,11 @@ export function scaleSubharmonicContent(pitches: readonly Pitch[]): number {
   let aligned = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
-    if (subharmonicMod1200.some((h) => Math.abs(c - h) < 25 || Math.abs(c - h - 1200) < 25 || Math.abs(c - h + 1200) < 25)) {
+    if (
+      subharmonicMod1200.some(
+        (h) => Math.abs(c - h) < 25 || Math.abs(c - h - 1200) < 25 || Math.abs(c - h + 1200) < 25,
+      )
+    ) {
       aligned++;
     }
   }
@@ -68851,7 +70445,9 @@ export function scaleAlteredDegreeCount(pitches: readonly Pitch[]): number {
   let altered = 0;
   for (const p of pitches) {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
-    const fits = majorScale.some((d) => Math.abs(c - d) < 25 || Math.abs(c - d - 1200) < 25 || Math.abs(c - d + 1200) < 25);
+    const fits = majorScale.some(
+      (d) => Math.abs(c - d) < 25 || Math.abs(c - d - 1200) < 25 || Math.abs(c - d + 1200) < 25,
+    );
     if (!fits) altered++;
   }
   return Math.min(1, altered / pitches.length);
@@ -69204,7 +70800,7 @@ export function scaleSubdominantDrive(pitches: readonly Pitch[]): number {
   let score = 0;
   if (hasFourth) score += 0.45;
   if (hasMinorSeventh) score += 0.35;
-  if (hasSixth) score += 0.20;
+  if (hasSixth) score += 0.2;
   return Math.min(1, score);
 }
 
@@ -69516,7 +71112,7 @@ export function scaleCardinalityRatio(pitches: readonly Pitch[]): number {
   // Cardinality ratio: distinct pitch classes / total pitches
   // High ratio = few duplicates; low ratio = many repeated pitch classes
   const distinct = new Set(
-    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100)),
+    pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100)),
   ).size;
   return Math.min(1, distinct / 12);
 }
@@ -69736,9 +71332,7 @@ export function scaleIntervalSymmetryV2(pitches: readonly Pitch[]): number {
 
 export function scaleStepUniformityV2(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return pitches.length === 0 ? 0 : 1;
-  const sorted = pitches
-    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
-    .sort((a, b) => a - b);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
   const steps: number[] = [];
   for (let i = 1; i < sorted.length; i++) steps.push(sorted[i]! - sorted[i - 1]!);
   steps.push(1200 - sorted[sorted.length - 1]! + sorted[0]!);
@@ -69762,9 +71356,7 @@ export function scaleIntervalDiversity(pitches: readonly Pitch[]): number {
 
 export function scaleLargestGapRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return pitches.length === 0 ? 0 : 1;
-  const sorted = pitches
-    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
-    .sort((a, b) => a - b);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
   const gaps: number[] = [];
   for (let i = 1; i < sorted.length; i++) gaps.push(sorted[i]! - sorted[i - 1]!);
   gaps.push(1200 - sorted[sorted.length - 1]! + sorted[0]!);
@@ -69806,9 +71398,7 @@ export function scaleClusterDensityV2(pitches: readonly Pitch[]): number {
 
 export function scaleSparsityRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return pitches.length === 0 ? 0 : 1;
-  const sorted = pitches
-    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
-    .sort((a, b) => a - b);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
   const gaps: number[] = [];
   for (let i = 1; i < sorted.length; i++) gaps.push(sorted[i]! - sorted[i - 1]!);
   gaps.push(1200 - sorted[sorted.length - 1]! + sorted[0]!);
@@ -69913,9 +71503,7 @@ export function scaleEqualDivisionScore(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return pitches.length === 0 ? 0 : 1;
   const n = pitches.length;
   const idealStep = 1200 / n;
-  const sorted = pitches
-    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
-    .sort((a, b) => a - b);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
   const steps: number[] = [];
   for (let i = 1; i < sorted.length; i++) steps.push(sorted[i]! - sorted[i - 1]!);
   steps.push(1200 - sorted[sorted.length - 1]! + sorted[0]!);
@@ -70646,9 +72234,7 @@ export function scaleTonicClarityScoreV2(pitches: readonly Pitch[]): number {
 
 export function scaleAverageStepCents(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = pitches
-    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
-    .sort((a, b) => a - b);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
   let total = 0;
   for (let i = 1; i < sorted.length; i++) {
     total += sorted[i]! - sorted[i - 1]!;
@@ -70660,16 +72246,14 @@ export function scaleAverageStepCents(pitches: readonly Pitch[]): number {
 export function scaleDiatonicSaturation(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const semitones = new Set(
-    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12),
+    pitches.map((p) => Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) % 12),
   );
   return semitones.size / 12;
 }
 
 export function scaleStepSizeVarianceV3(pitches: readonly Pitch[]): number {
   if (pitches.length < 3) return 0;
-  const sorted = pitches
-    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
-    .sort((a, b) => a - b);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
   const steps: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     steps.push(sorted[i]! - sorted[i - 1]!);
@@ -70681,9 +72265,7 @@ export function scaleStepSizeVarianceV3(pitches: readonly Pitch[]): number {
 
 export function scaleMaxMinStepRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const sorted = pitches
-    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
-    .sort((a, b) => a - b);
+  const sorted = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
   const steps: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
     steps.push(sorted[i]! - sorted[i - 1]!);
@@ -70698,7 +72280,7 @@ export function scalePitchClassEntropyV2(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const counts = new Array<number>(12).fill(0);
   for (const p of pitches) {
-    const pc = Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 100) % 12;
+    const pc = Math.round((((pitchToCents(p) % 1200) + 1200) % 1200) / 100) % 12;
     counts[pc]! += 1;
   }
   const total = pitches.length;
