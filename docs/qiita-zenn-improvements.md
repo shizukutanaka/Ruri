@@ -2112,3 +2112,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleHarmonicSpreadV2(pitches)` — 音高クラスの標準偏差による和声的広がり（0-1正規化）
 - `scaleMicrotonalDensityV2(pitches)` — 12平均律スロット±25 cent外の音高（微分音）の割合
 - `scaleModalAmbiguityV2(pitches)` — 長調・短調両スケールに30 cent以内で合致する音高の割合（調性曖昧度）
+
+### Round 191: 音階ピッチ間隔特性分析
+
+- `scaleIntervalConsistency(pitches)` — 隣接音間ステップの均一性（変動係数の逆数）
+- `scalePitchDensityV2(pitches)` — 100 cent区間ごとの音高クラス充填率（0〜12スロット正規化）
+- `scaleGapIndex(pitches)` — 最大音高間隔/オクターブ比（折返しギャップ含む）
+- `scaleOctaveSpan(pitches)` — 音高の全音域をオクターブ単位で計測（4オクターブ上限正規化）

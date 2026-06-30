@@ -55470,6 +55470,156 @@ export function tuningFamilySocraticRadarHumidityFieldProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3174 — tuningFamilySocraticRadarEnzymeKineticsProxyV2
+export function tuningFamilySocraticRadarEnzymeKineticsProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // enzyme kinetics: Michaelis-Menten rate and substrate affinity → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3176 — tuningFamilySocraticRadarMetabolicFluxProxy
+export function tuningFamilySocraticRadarMetabolicFluxProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // metabolic flux: pathway throughput and regulation → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3178 — tuningFamilySocraticRadarProteinBindingProxy
+export function tuningFamilySocraticRadarProteinBindingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // protein binding: ligand affinity and specificity → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3180 — tuningFamilySocraticRadarReactionCouplingProxy
+export function tuningFamilySocraticRadarReactionCouplingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // reaction coupling: thermodynamic linkage and energy transfer → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3182 — tuningFamilySocraticRadarCatalysisRateProxy
+export function tuningFamilySocraticRadarCatalysisRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // catalysis rate: turnover number and activation energy → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3184 — tuningFamilySocraticRadarSubstrateTurnoverProxy
+export function tuningFamilySocraticRadarSubstrateTurnoverProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // substrate turnover: kcat and product release — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -65856,4 +66006,59 @@ export function scaleModalAmbiguityV2(pitches: readonly Pitch[]): number {
     if (inMajor && inMinor) ambiguous++;
   }
   return ambiguous / pitches.length;
+}
+
+export function scaleIntervalConsistency(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Interval consistency: how similar the step sizes are between adjacent pitches
+  const sorted = [...pitches].sort((a, b) => pitchToCents(a) - pitchToCents(b));
+  const steps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) {
+    steps.push(pitchToCents(sorted[i]!) - pitchToCents(sorted[i - 1]!));
+  }
+  if (steps.length === 0) return 0;
+  const mean = steps.reduce((a, b) => a + b, 0) / steps.length;
+  if (mean === 0) return 0;
+  const cv = Math.sqrt(steps.reduce((a, s) => a + (s - mean) ** 2, 0) / steps.length) / mean;
+  // Low coefficient of variation = high consistency
+  return Math.max(0, 1 - Math.min(1, cv));
+}
+
+export function scalePitchDensityV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Pitch density: number of distinct pitch classes per 100-cent octave segment
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const bins = new Set<number>();
+  for (const c of cents) {
+    bins.add(Math.floor(c / 100));
+  }
+  // Normalize: max 12 bins for chromatic scale
+  return bins.size / 12;
+}
+
+export function scaleGapIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Gap index: size of the largest gap between adjacent pitch classes (normalized to octave)
+  const cents = [...new Set(pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200))].sort(
+    (a, b) => a - b,
+  );
+  if (cents.length < 2) return 0;
+  let maxGap = 0;
+  for (let i = 1; i < cents.length; i++) {
+    maxGap = Math.max(maxGap, cents[i]! - cents[i - 1]!);
+  }
+  // Also check wrap-around gap
+  maxGap = Math.max(maxGap, 1200 - cents[cents.length - 1]! + cents[0]!);
+  return Math.min(1, maxGap / 1200);
+}
+
+export function scaleOctaveSpan(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Octave span: total range of pitches in octaves (before modulo), normalized
+  const allCents = pitches.map((p) => pitchToCents(p));
+  const minC = Math.min(...allCents);
+  const maxC = Math.max(...allCents);
+  const spanOctaves = (maxC - minC) / 1200;
+  // Normalize to [0,1] with 4 octaves as reference maximum
+  return Math.min(1, spanOctaves / 4);
 }
