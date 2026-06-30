@@ -51870,6 +51870,156 @@ export function tuningFamilySocraticRadarBandwidthEfficiencyProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2886 — tuningFamilySocraticRadarIsotopeRatioProxy
+export function tuningFamilySocraticRadarIsotopeRatioProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // isotope ratio: relative abundance of isotopes in geological samples → maturity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2888 — tuningFamilySocraticRadarElementalAbundanceProxy
+export function tuningFamilySocraticRadarElementalAbundanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // elemental abundance: concentration of chemical elements in rock/soil → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2890 — tuningFamilySocraticRadarMineralSolubilityProxy
+export function tuningFamilySocraticRadarMineralSolubilityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // mineral solubility: dissolution rate of minerals in groundwater → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2892 — tuningFamilySocraticRadarRedoxPotentialProxy
+export function tuningFamilySocraticRadarRedoxPotentialProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // redox potential: oxidation-reduction state of geochemical environment → benchmark+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2894 — tuningFamilySocraticRadarGeochemicalFluxProxy
+export function tuningFamilySocraticRadarGeochemicalFluxProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // geochemical flux: mass transfer rate of elements between reservoirs → versatility+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2896 — tuningFamilySocraticRadarSedimentDepositionProxy
+export function tuningFamilySocraticRadarSedimentDepositionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // sediment deposition: settling rate of particles in aquatic environments → convergence+benchmark
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -60936,4 +61086,64 @@ export function scaleGapSymmetryScore(pitches: readonly Pitch[]): number {
     if (steps[i] === steps[steps.length - 1 - i]) symmetric++;
   }
   return steps.length <= 1 ? 1 : symmetric / half || 0;
+}
+
+export function scaleSecondIntervalRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Ratio of second intervals (100-200c ±20c) among all adjacent step pairs
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let seconds = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (step >= 80 && step <= 220) seconds++;
+  }
+  return Math.min(1, seconds / (sorted.length - 1));
+}
+
+export function scaleSemitoneCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Fraction of adjacent steps that are semitones (~100c ±20c)
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let semitones = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (Math.abs(step - 100) <= 20) semitones++;
+  }
+  return Math.min(1, semitones / (sorted.length - 1));
+}
+
+export function scaleWholeToneCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Fraction of adjacent steps that are whole tones (~200c ±20c)
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let wholeTones = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (Math.abs(step - 200) <= 20) wholeTones++;
+  }
+  return Math.min(1, wholeTones / (sorted.length - 1));
+}
+
+export function scaleMajorSecondRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Ratio of major seconds (ET whole tone ~200c) vs minor seconds (semitone ~100c) in step sequence
+  // Returns 1 if all steps are major seconds, 0 if all minor
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let major = 0;
+  let minor = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (Math.abs(step - 200) <= 20) major++;
+    else if (Math.abs(step - 100) <= 20) minor++;
+  }
+  const total = major + minor;
+  return total === 0 ? 0 : major / total;
 }

@@ -1937,3 +1937,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Analyses the topological shape of scale interval patterns. Convexity index measures how monotonically interval sizes change across the scale. Pitch gap index captures the largest empty region in pitch space, a measure of scale sparsity. Interval profile diversity scores how many distinct step sizes appear. Gap symmetry detects palindromic interval structures (as found in symmetric scales).
 
 **Implementation**: All functions operate on sorted pitch-class arrays with modular arithmetic. Returns ratio in [0,1].
+
+## Round 167: 音程カウント分析 (R1629–R1632)
+
+**Functions**: `scaleSecondIntervalRatio`, `scaleSemitoneCount`, `scaleWholeToneCount`, `scaleMajorSecondRatio`
+
+**Motivation**: Quantifies the stepwise motion characteristics of a scale. Second interval ratio measures how step-wise (vs. leaping) a scale is. Semitone and whole-tone counts identify chromatic vs. diatonic orientation. Major-to-minor second ratio captures the balance between whole-tone and half-tone motion, critical for distinguishing diatonic, chromatic, and microtonal scales.
+
+**Implementation**: Sorts pitches into ascending pitch-class order, then classifies each adjacent step by cent distance. Returns normalized ratios in [0,1].
