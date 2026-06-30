@@ -2227,6 +2227,12 @@ import {
   tuningFamilySocraticRadarDrugBindingProxy,
   tuningFamilySocraticRadarPlasmaHalfLifeProxy,
   tuningFamilySocraticRadarDrugMetabolismProxy,
+  tuningFamilySocraticRadarSolarIrradianceProxy,
+  tuningFamilySocraticRadarWindPowerProxy,
+  tuningFamilySocraticRadarTidalEnergyProxy,
+  tuningFamilySocraticRadarGeothermalGradientProxy,
+  tuningFamilySocraticRadarBiomassConversionProxy,
+  tuningFamilySocraticRadarHydrogenFuelCellProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -51150,6 +51156,90 @@ describe('tuningFamilySocraticRadarDrugMetabolismProxy', () => {
   });
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarDrugMetabolismProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarSolarIrradianceProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSolarIrradianceProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSolarIrradianceProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSolarIrradianceProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarWindPowerProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWindPowerProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarWindPowerProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarWindPowerProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarTidalEnergyProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTidalEnergyProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarTidalEnergyProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarTidalEnergyProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarGeothermalGradientProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarGeothermalGradientProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarGeothermalGradientProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarGeothermalGradientProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarBiomassConversionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBiomassConversionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarBiomassConversionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarBiomassConversionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarHydrogenFuelCellProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarHydrogenFuelCellProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarHydrogenFuelCellProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarHydrogenFuelCellProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(Number.isFinite(v)).toBe(true);
   });
 });

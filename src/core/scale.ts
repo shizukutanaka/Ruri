@@ -54270,6 +54270,156 @@ export function tuningFamilySocraticRadarDrugMetabolismProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3078 — tuningFamilySocraticRadarSolarIrradianceProxy
+export function tuningFamilySocraticRadarSolarIrradianceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // solar irradiance: photovoltaic energy flux → benchmark emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3080 — tuningFamilySocraticRadarWindPowerProxy
+export function tuningFamilySocraticRadarWindPowerProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // wind power: Betz coefficient turbine efficiency → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3082 — tuningFamilySocraticRadarTidalEnergyProxy
+export function tuningFamilySocraticRadarTidalEnergyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // tidal energy: ocean current kinetic flux → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3084 — tuningFamilySocraticRadarGeothermalGradientProxy
+export function tuningFamilySocraticRadarGeothermalGradientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // geothermal gradient: Earth heat flow → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3086 — tuningFamilySocraticRadarBiomassConversionProxy
+export function tuningFamilySocraticRadarBiomassConversionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // biomass conversion: thermochemical yield → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3088 — tuningFamilySocraticRadarHydrogenFuelCellProxy
+export function tuningFamilySocraticRadarHydrogenFuelCellProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // hydrogen fuel cell: electrochemical efficiency → balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
