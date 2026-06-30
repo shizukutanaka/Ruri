@@ -68381,3 +68381,55 @@ export function scaleMixolydianContentV2(pitches: readonly Pitch[]): number {
   }
   return matched / targets.length;
 }
+
+export function scaleLocrianContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Locrian mode: minor 2nd(100), diminished 5th(600)
+  const targets = [100, 300, 500, 600, 800, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleAeolianContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Aeolian (natural minor): minor 3rd(300), minor 6th(800), minor 7th(1000)
+  const targets = [200, 300, 500, 700, 800, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleIonianContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Ionian (major scale): major 3rd(400), major 7th(1100)
+  const targets = [200, 400, 500, 700, 900, 1100];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleSuperlocrianContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Superlocrian (altered scale): b2(100), b3(200), b4(300), b5(600)
+  const targets = [100, 200, 300, 600, 800, 1000];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}

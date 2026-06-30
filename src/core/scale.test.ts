@@ -2029,6 +2029,10 @@ import {
   scalePhrygianContentV2,
   scaleLydianContentV2,
   scaleMixolydianContentV2,
+  scaleLocrianContentV2,
+  scaleAeolianContentV2,
+  scaleIonianContentV2,
+  scaleSuperlocrianContent,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -54186,6 +54190,66 @@ describe('scaleBluesScaleContent', () => {
     });
     it('returns value in [0,1] for 19-EDO', () => {
       const v = scaleMixolydianContentV2(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleLocrianContentV2', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleLocrianContentV2([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleLocrianContentV2(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleLocrianContentV2(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleAeolianContentV2', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleAeolianContentV2([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleAeolianContentV2(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleAeolianContentV2(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleIonianContentV2', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleIonianContentV2([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleIonianContentV2(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleIonianContentV2(edo(19, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+  });
+  describe('scaleSuperlocrianContent', () => {
+    it('returns 0 for empty pitches', () => {
+      expect(scaleSuperlocrianContent([])).toBe(0);
+    });
+    it('returns value in [0,1] for 12-EDO', () => {
+      const v = scaleSuperlocrianContent(edo(12, 440).degrees);
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThanOrEqual(1);
+    });
+    it('returns value in [0,1] for 19-EDO', () => {
+      const v = scaleSuperlocrianContent(edo(19, 440).degrees);
       expect(v).toBeGreaterThanOrEqual(0);
       expect(v).toBeLessThanOrEqual(1);
     });
