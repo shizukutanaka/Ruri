@@ -1985,3 +1985,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Measures how closely a scale approximates standard tuning references. EDO alignment quantifies 12-TET conformity (useful for distinguishing microtonal from diatonic scales). Just approximation matches against the 5-limit JI grid. Comma content identifies the characteristic small-interval steps used in adaptive JI and comma-pump modulation. Schisma content detects ultra-fine tuning adjustments at the 2c and 19.5c level.
 
 **Implementation**: EDO alignment uses 10c tolerance to nearest 100c. Just approximation uses 8c tolerance against 12 canonical 5-limit intervals. Comma/schisma content classify adjacent step sizes by cent range. All return ratio in [0,1].
+
+## Round 173: 音階規模分析 (R1653–R1656)
+
+**Functions**: `scaleToneCount`, `scaleCardinalityScore`, `scaleSaturation`, `scaleDegreeSpread`
+
+**Motivation**: Quantifies the size and coverage of a scale. Tone count measures how many notes appear relative to the chromatic scale (12). Cardinality score counts distinct pitch classes (10c resolution). Saturation measures octave coverage in 50c slots (24 possible). Degree spread captures the interval range from lowest to highest pitch class.
+
+**Implementation**: Tone count is a simple length normalization. Cardinality uses Set deduplication with 10c rounding. Saturation uses 50c floor bins. Degree spread uses min/max of cents values. All return ratio in [0,1].

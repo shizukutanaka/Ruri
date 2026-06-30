@@ -52770,6 +52770,156 @@ export function tuningFamilySocraticRadarRegolithDepthProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2958 — tuningFamilySocraticRadarActionPotentialProxy
+export function tuningFamilySocraticRadarActionPotentialProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // action potential: all-or-nothing neuronal depolarization event → diversity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2960 — tuningFamilySocraticRadarSynapticDelayProxy
+export function tuningFamilySocraticRadarSynapticDelayProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // synaptic delay: transmission latency at chemical synapse → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2962 — tuningFamilySocraticRadarMyelinationIndexProxy
+export function tuningFamilySocraticRadarMyelinationIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // myelination index: degree of myelin sheath coverage on axons → maturity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2964 — tuningFamilySocraticRadarReceptorSensitivityProxy
+export function tuningFamilySocraticRadarReceptorSensitivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // receptor sensitivity: ligand binding affinity and response threshold → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2966 — tuningFamilySocraticRadarDepolarizationRateProxy
+export function tuningFamilySocraticRadarDepolarizationRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // depolarization rate: speed of membrane potential rise during AP → benchmark+versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2968 — tuningFamilySocraticRadarInhibitoryBalanceProxy
+export function tuningFamilySocraticRadarInhibitoryBalanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // inhibitory balance: ratio of inhibitory to excitatory synaptic input → convergence+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -62180,4 +62330,36 @@ export function scaleSchismaContent(pitches: readonly Pitch[]): number {
     if ((step >= 1 && step <= 5) || (step >= 17 && step <= 22)) schismas++;
   }
   return Math.min(1, schismas / (sorted.length - 1));
+}
+
+export function scaleToneCount(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Tone count normalized by 12 (standard chromatic scale)
+  return Math.min(1, pitches.length / 12);
+}
+
+export function scaleCardinalityScore(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Distinct pitch classes (mod 1200, rounded to 10c) normalized by 12
+  const classes = new Set(
+    pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200 / 10) * 10),
+  );
+  return Math.min(1, classes.size / 12);
+}
+
+export function scaleSaturation(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Saturation: how densely pitches fill the octave (ratio of covered 50c slots to 24)
+  const slots = new Set(
+    pitches.map((p) => Math.floor(((pitchToCents(p) % 1200) + 1200) % 1200 / 50)),
+  );
+  return Math.min(1, slots.size / 24);
+}
+
+export function scaleDegreeSpread(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Degree spread: range of pitch-class cents (max - min) normalized by 1200
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const range = Math.max(...cents) - Math.min(...cents);
+  return Math.min(1, range / 1200);
 }
