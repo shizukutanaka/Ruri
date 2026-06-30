@@ -1961,6 +1961,10 @@ import {
   scaleThirdQualityScore,
   scaleSixthQualityScore,
   scaleSeventhQualityScore,
+  scaleConvexityIndex,
+  scalePitchGapIndex,
+  scaleIntervalProfile,
+  scaleGapSymmetryScore,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2093,6 +2097,12 @@ import {
   tuningFamilySocraticRadarThunderstormIndexProxy,
   tuningFamilySocraticRadarHumidityGradientProxy,
   tuningFamilySocraticRadarWeatherFrontScoreProxy,
+  tuningFamilySocraticRadarImpedanceMatchingProxy,
+  tuningFamilySocraticRadarSignalAmplificationProxy,
+  tuningFamilySocraticRadarPhaseNoiseProxy,
+  tuningFamilySocraticRadarHarmonicDistortionProxy,
+  tuningFamilySocraticRadarPowerFactorProxy,
+  tuningFamilySocraticRadarBandwidthEfficiencyProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -49591,6 +49601,90 @@ describe('tuningFamilySocraticRadarWeatherFrontScoreProxy', () => {
     expect(Number.isFinite(v)).toBe(true);
   });
 });
+describe('tuningFamilySocraticRadarImpedanceMatchingProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarImpedanceMatchingProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarImpedanceMatchingProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarImpedanceMatchingProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarSignalAmplificationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSignalAmplificationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSignalAmplificationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSignalAmplificationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarPhaseNoiseProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPhaseNoiseProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPhaseNoiseProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPhaseNoiseProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarHarmonicDistortionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarHarmonicDistortionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarHarmonicDistortionProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarHarmonicDistortionProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarPowerFactorProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPowerFactorProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPowerFactorProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPowerFactorProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+describe('tuningFamilySocraticRadarBandwidthEfficiencyProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBandwidthEfficiencyProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarBandwidthEfficiencyProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarBandwidthEfficiencyProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
 describe('scaleLeadingToneContent', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLeadingToneContent([])).toBe(0);
@@ -49701,5 +49795,62 @@ describe('scaleSeventhQualityScore', () => {
     const v = scaleSeventhQualityScore(equalTemperament12(440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleConvexityIndex', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleConvexityIndex([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleConvexityIndex(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 1 for single step pair', () => {
+    const pitches = [0, 100, 200].map((c) => pitchFromCents(c));
+    expect(scaleConvexityIndex(pitches)).toBeLessThanOrEqual(1);
+  });
+});
+describe('scalePitchGapIndex', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scalePitchGapIndex([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scalePitchGapIndex(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns high value for sparse scale', () => {
+    const pitches = [0, 600].map((c) => pitchFromCents(c));
+    expect(scalePitchGapIndex(pitches)).toBeGreaterThan(0);
+  });
+});
+describe('scaleIntervalProfile', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleIntervalProfile([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleIntervalProfile(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns >0 for pitch set with varied steps', () => {
+    const pitches = [0, 100, 300, 700].map((c) => pitchFromCents(c));
+    expect(scaleIntervalProfile(pitches)).toBeGreaterThan(0);
+  });
+});
+describe('scaleGapSymmetryScore', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleGapSymmetryScore([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const v = scaleGapSymmetryScore(equalTemperament12(440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns 1 for palindromic interval sequence', () => {
+    const pitches = [0, 200, 400, 600, 800].map((c) => pitchFromCents(c));
+    const v = scaleGapSymmetryScore(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
   });
 });

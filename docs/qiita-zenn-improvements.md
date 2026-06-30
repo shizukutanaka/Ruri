@@ -1929,3 +1929,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Measures the prevalence of consonant interval classes within a scale. Fifth quality captures perfect-fifth richness (important for tonal stability). Third, sixth, and seventh quality scores reflect harmonic richness across the most common chord tones. Together these provide a harmonic profile complementary to the modal content scores.
 
 **Implementation**: Each function counts all pitch pairs forming the target interval (within tolerance), normalized by total pairs. Returns ratio in [0,1].
+
+## Round 166: スケール位相分析 (R1625–R1628)
+
+**Functions**: `scaleConvexityIndex`, `scalePitchGapIndex`, `scaleIntervalProfile`, `scaleGapSymmetryScore`
+
+**Motivation**: Analyses the topological shape of scale interval patterns. Convexity index measures how monotonically interval sizes change across the scale. Pitch gap index captures the largest empty region in pitch space, a measure of scale sparsity. Interval profile diversity scores how many distinct step sizes appear. Gap symmetry detects palindromic interval structures (as found in symmetric scales).
+
+**Implementation**: All functions operate on sorted pitch-class arrays with modular arithmetic. Returns ratio in [0,1].

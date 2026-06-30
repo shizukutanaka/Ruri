@@ -51720,6 +51720,156 @@ export function tuningFamilySocraticRadarWeatherFrontScoreProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2874 — tuningFamilySocraticRadarImpedanceMatchingProxy
+export function tuningFamilySocraticRadarImpedanceMatchingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // impedance matching: maximizing power transfer between circuits → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2876 — tuningFamilySocraticRadarSignalAmplificationProxy
+export function tuningFamilySocraticRadarSignalAmplificationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // signal amplification: increasing signal strength while minimizing noise → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2878 — tuningFamilySocraticRadarPhaseNoiseProxy
+export function tuningFamilySocraticRadarPhaseNoiseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // phase noise: random phase fluctuations in oscillator signals → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2880 — tuningFamilySocraticRadarHarmonicDistortionProxy
+export function tuningFamilySocraticRadarHarmonicDistortionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // harmonic distortion: unwanted harmonic components in signal → diversity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2882 — tuningFamilySocraticRadarPowerFactorProxy
+export function tuningFamilySocraticRadarPowerFactorProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // power factor: ratio of real to apparent power in AC circuits → maturity+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2884 — tuningFamilySocraticRadarBandwidthEfficiencyProxy
+export function tuningFamilySocraticRadarBandwidthEfficiencyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // bandwidth efficiency: bits per Hz in communication channels → convergence+versatility
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -60718,4 +60868,72 @@ export function scaleSeventhQualityScore(pitches: readonly Pitch[]): number {
   }
   const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
   return maxPairs === 0 ? 0 : Math.min(1, count / maxPairs);
+}
+
+export function scaleConvexityIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Convexity: sorted pitch set's interval steps are non-increasing then non-decreasing
+  // Measure as fraction of step pairs that are monotone
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    steps.push(sorted[i + 1]! - sorted[i]!);
+  }
+  if (steps.length < 2) return 1;
+  let monotone = 0;
+  for (let i = 0; i < steps.length - 1; i++) {
+    if (steps[i]! <= steps[i + 1]! || steps[i]! >= steps[i + 1]!) monotone++;
+  }
+  return Math.min(1, monotone / (steps.length - 1));
+}
+
+export function scalePitchGapIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Largest gap in cents between adjacent pitch classes (mod 1200), normalized by 1200
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let maxGap = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const gap = sorted[i + 1]! - sorted[i]!;
+    if (gap > maxGap) maxGap = gap;
+  }
+  // Also consider wrap-around gap
+  const wrapGap = 1200 - sorted[sorted.length - 1]! + sorted[0]!;
+  if (wrapGap > maxGap) maxGap = wrapGap;
+  return Math.min(1, maxGap / 1200);
+}
+
+export function scaleIntervalProfile(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Interval profile diversity: number of distinct step sizes (rounded to 50c) / pitches
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  const steps = new Set<number>();
+  for (let i = 0; i < sorted.length - 1; i++) {
+    steps.add(Math.round((sorted[i + 1]! - sorted[i]!) / 50) * 50);
+  }
+  return Math.min(1, steps.size / sorted.length);
+}
+
+export function scaleGapSymmetryScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Gap symmetry: how close is the interval sequence to a palindrome
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    steps.push(Math.round((sorted[i + 1]! - sorted[i]!) / 10) * 10);
+  }
+  if (steps.length === 0) return 1;
+  let symmetric = 0;
+  const half = Math.floor(steps.length / 2);
+  for (let i = 0; i < half; i++) {
+    if (steps[i] === steps[steps.length - 1 - i]) symmetric++;
+  }
+  return steps.length <= 1 ? 1 : symmetric / half || 0;
 }
