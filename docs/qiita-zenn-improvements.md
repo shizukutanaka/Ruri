@@ -2270,3 +2270,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleChinesePentatonicContent` — 中国五声音階（宮調: 200/400/700/900セント±25）の充足率を返す
 - `scaleIndiaPentatonicContent` — インド五音音階（ブープリ・ラーガ: 200/400/700/900セント±30）の充足率を返す
 - `scaleAfricanPentatonicContent` — アフリカ五音音階（200/500/700/1000セント±25）の充足率を返す
+
+## Round 209: 世界の音楽スケール分析ヘルパ（トルコマカーム/ペルシア/ジャワ・スレンドロ/バリ・ペログ）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleTurkishMakamContent` — トルコのマカーム（ラスト旋法: 中立音程150/350/850セント±30）の充足率を返す
+- `scalePersianContent` — ペルシア音階の特徴音程（100/400/600/800/1000/1100セント±20）の充足率を返す
+- `scaleJavaneseSlendroContent` — ジャワのスレンドロ音階（5等分近似: 240/480/720/960セント±40）の充足率を返す
+- `scaleBaliPelogContent` — バリのペログ音階（120/390/510/675/825セント±35）の充足率を返す
