@@ -1186,6 +1186,12 @@ import {
   presetFamilySocraticRadarFlowRateCoefficientProxy,
   presetFamilySocraticRadarShearStressIndexProxy,
   presetFamilySocraticRadarBuoyancyForceProxy,
+  presetFamilySocraticRadarChemicalReactionRateProxy,
+  presetFamilySocraticRadarOxidationReductionPotentialProxy,
+  presetFamilySocraticRadarEquilibriumConstantProxy,
+  presetFamilySocraticRadarCatalystActivityProxy,
+  presetFamilySocraticRadarSolutionConcentrationProxy,
+  presetFamilySocraticRadarReactionYieldProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
