@@ -52020,6 +52020,156 @@ export function tuningFamilySocraticRadarSedimentDepositionProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2898 — tuningFamilySocraticRadarRoomAcousticsProxy
+export function tuningFamilySocraticRadarRoomAcousticsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // room acoustics: reverberation time and modal density of enclosed space → maturity+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2900 — tuningFamilySocraticRadarAbsorptionCoefficientProxy
+export function tuningFamilySocraticRadarAbsorptionCoefficientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // absorption coefficient: fraction of sound energy absorbed by surface → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2902 — tuningFamilySocraticRadarReflectionCoefficientProxy
+export function tuningFamilySocraticRadarReflectionCoefficientProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // reflection coefficient: fraction of sound reflected at boundary → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2904 — tuningFamilySocraticRadarSoundInsulationIndexProxy
+export function tuningFamilySocraticRadarSoundInsulationIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // sound insulation index: transmission loss through partitions → convergence+benchmark
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2906 — tuningFamilySocraticRadarDiffusionFactorProxy
+export function tuningFamilySocraticRadarDiffusionFactorProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // diffusion factor: uniformity of sound energy distribution → versatility+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2908 — tuningFamilySocraticRadarNoiseCriterionProxy
+export function tuningFamilySocraticRadarNoiseCriterionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // noise criterion: permissible background noise level for occupancy → benchmark+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -61146,4 +61296,65 @@ export function scaleMajorSecondRatio(pitches: readonly Pitch[]): number {
   }
   const total = major + minor;
   return total === 0 ? 0 : major / total;
+}
+
+export function scaleAppoggiaturaContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Appoggiatura potential: non-chord tones near chord tones
+  // Approximate: pitches within 50-150c of chord tones [0, 400, 700] (±30c window from each chord tone)
+  // Count pitches that are 50-150c away from a chord tone
+  const chordTones = [0, 400, 700];
+  const tol = 30;
+  const appog = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return chordTones.some((ct) => {
+      const d = Math.min(Math.abs(c - ct), 1200 - Math.abs(c - ct));
+      return d >= 50 && d <= 150;
+    });
+  }).length;
+  return Math.min(1, appog / pitches.length);
+}
+
+export function scaleChordToneRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Ratio of pitches that are chord tones of a major triad [0, 400, 700] (±25c)
+  const chordTones = [0, 400, 700];
+  const tol = 25;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return chordTones.some((ct) => Math.min(Math.abs(c - ct), 1200 - Math.abs(c - ct)) <= tol);
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleNonChordToneRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Ratio of pitches that are NOT chord tones of a major triad [0, 400, 700] (±25c)
+  const chordTones = [0, 400, 700];
+  const tol = 25;
+  const nonChord = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return !chordTones.some((ct) => Math.min(Math.abs(c - ct), 1200 - Math.abs(c - ct)) <= tol);
+  }).length;
+  return Math.min(1, nonChord / pitches.length);
+}
+
+export function scaleOrnamentationIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Ornamentation index: density of non-structural pitches (passing, neighbor, etc.)
+  // Approximation: pitches within 80-220c of adjacent chord tones [0, 400, 700, 1200]
+  const structural = [0, 400, 700, 1200];
+  const ornament = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const nearStructural = structural.some((s) => Math.abs(c - (s % 1200)) <= 30);
+    if (nearStructural) return false;
+    // Is it between two structural notes?
+    for (let i = 0; i < structural.length - 1; i++) {
+      const lo = structural[i]! % 1200;
+      const hi = structural[i + 1]! % 1200;
+      if (c > lo && c < hi) return true;
+    }
+    return false;
+  }).length;
+  return Math.min(1, ornament / pitches.length);
 }

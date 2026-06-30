@@ -1945,3 +1945,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Quantifies the stepwise motion characteristics of a scale. Second interval ratio measures how step-wise (vs. leaping) a scale is. Semitone and whole-tone counts identify chromatic vs. diatonic orientation. Major-to-minor second ratio captures the balance between whole-tone and half-tone motion, critical for distinguishing diatonic, chromatic, and microtonal scales.
 
 **Implementation**: Sorts pitches into ascending pitch-class order, then classifies each adjacent step by cent distance. Returns normalized ratios in [0,1].
+
+## Round 168: 和声機能分析 (R1633–R1636)
+
+**Functions**: `scaleAppoggiaturaContent`, `scaleChordToneRatio`, `scaleNonChordToneRatio`, `scaleOrnamentationIndex`
+
+**Motivation**: Extends harmonic analysis to functional categories. Chord tone ratio measures how "triadic" a scale is relative to the major triad template. Non-chord tone ratio is its complement, capturing scale notes that require melodic resolution. Appoggiatura content detects notes in the 50–150c neighbourhood of chord tones — the typical range for ornamental dissonances. Ornamentation index estimates passing/neighbor tone density between structural tones.
+
+**Implementation**: All functions use ±25–30c cent-tolerance matching against [0, 400, 700] (major triad). Returns ratio in [0,1].
