@@ -2171,3 +2171,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleStepUniformityV2` — ステップサイズの均等性（1 - 変動係数）を返す（0=不均等、1=完全均等）（`scaleStepUniformity` が既存のため V2 サフィックス付与）
 - `scaleIntervalDiversity` — 50セント刻みバケットによる音程クラス多様性比率を返す
 - `scaleLargestGapRatio` — 隣接音度間の最大ギャップを1200セントで正規化した値を返す
+
+## Round 198: 音階分布特性分析ヘルパ（上半分比率/重心偏差/クラスター密度/疎密比）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleUpperHalfRatio` — 600セントより高い音度の比率を返す（0=全て下半分、1=全て上半分）
+- `scaleCentroidDeviation` — 音度の重心（平均セント値）の600セントからの偏差を正規化して返す
+- `scaleClusterDensityV2` — 150セント以内の音度ペアの比率（全ペア中）を返す（`scaleClusterDensity` が既存のため V2 サフィックス付与）
+- `scaleSparsityRatio` — 最大ギャップ / 平均ギャップ を正規化した疎密比を返す

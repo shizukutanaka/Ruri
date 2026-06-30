@@ -2005,6 +2005,10 @@ import {
   scaleStepUniformityV2,
   scaleIntervalDiversity,
   scaleLargestGapRatio,
+  scaleUpperHalfRatio,
+  scaleCentroidDeviation,
+  scaleClusterDensityV2,
+  scaleSparsityRatio,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2329,6 +2333,12 @@ import {
   tuningFamilySocraticRadarBoundaryLayerV2Proxy,
   tuningFamilySocraticRadarKelvinHelmholtzProxy,
   tuningFamilySocraticRadarCoriolisEffectV2Proxy,
+  tuningFamilySocraticRadarEntropyProductionProxy,
+  tuningFamilySocraticRadarGibbsFreeEnergyProxy,
+  tuningFamilySocraticRadarHeatCapacityProxyV4,
+  tuningFamilySocraticRadarPhaseTransitionProxyV4,
+  tuningFamilySocraticRadarCarnotEfficiencyProxy,
+  tuningFamilySocraticRadarBlackbodyRadiationProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -53261,6 +53271,66 @@ describe('scaleLargestGapRatio', () => {
   });
   it('returns value in [0,1] for 19-EDO', () => {
     const v = scaleLargestGapRatio(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleUpperHalfRatio', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleUpperHalfRatio([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleUpperHalfRatio(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleUpperHalfRatio(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleCentroidDeviation', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleCentroidDeviation([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleCentroidDeviation(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleCentroidDeviation(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleClusterDensityV2', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleClusterDensityV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleClusterDensityV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleClusterDensityV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleSparsityRatio', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleSparsityRatio([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleSparsityRatio(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleSparsityRatio(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
