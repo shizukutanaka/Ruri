@@ -1977,3 +1977,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 **Motivation**: Provides spectral-domain analysis of pitch-class distributions. Energy balance measures the symmetry of pitches above vs below the tritone midpoint (600c). Pitch moment computes the mean cent position as a centroid. Harmonic weight scores alignment with reduced harmonic-series partials. Spectral weight applies a 1/f rolloff weighting to emphasize lower pitch positions.
 
 **Implementation**: Energy balance uses a symmetry ratio. Pitch moment normalizes mean cents by 1200. Harmonic/spectral weight use tolerance matching and weighted sums respectively. All return [0,1].
+
+## Round 172: 純正律近似分析 (R1649–R1652)
+
+**Functions**: `scaleEDOAlignment`, `scaleJustApproximation`, `scaleCommaContent`, `scaleSchismaContent`
+
+**Motivation**: Measures how closely a scale approximates standard tuning references. EDO alignment quantifies 12-TET conformity (useful for distinguishing microtonal from diatonic scales). Just approximation matches against the 5-limit JI grid. Comma content identifies the characteristic small-interval steps used in adaptive JI and comma-pump modulation. Schisma content detects ultra-fine tuning adjustments at the 2c and 19.5c level.
+
+**Implementation**: EDO alignment uses 10c tolerance to nearest 100c. Just approximation uses 8c tolerance against 12 canonical 5-limit intervals. Comma/schisma content classify adjacent step sizes by cent range. All return ratio in [0,1].

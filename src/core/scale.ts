@@ -52620,6 +52620,156 @@ export function tuningFamilySocraticRadarNoisePollutionIndexProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2946 — tuningFamilySocraticRadarPlanetaryAlbedoProxy
+export function tuningFamilySocraticRadarPlanetaryAlbedoProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // planetary albedo: fraction of solar radiation reflected by planet surface → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2948 — tuningFamilySocraticRadarAtmosphericLapseProxy
+export function tuningFamilySocraticRadarAtmosphericLapseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // atmospheric lapse rate: temperature decrease with altitude → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2950 — tuningFamilySocraticRadarMagneticFieldDipoleProxy
+export function tuningFamilySocraticRadarMagneticFieldDipoleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // magnetic field dipole: axial alignment of planetary magnetosphere → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2952 — tuningFamilySocraticRadarCraterSaturationProxy
+export function tuningFamilySocraticRadarCraterSaturationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // crater saturation: density of impact craters relative to surface area → diversity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2954 — tuningFamilySocraticRadarSubsurfaceOceanProxy
+export function tuningFamilySocraticRadarSubsurfaceOceanProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // subsurface ocean: liquid water beneath ice shell in icy moons → maturity+convergence
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2956 — tuningFamilySocraticRadarRegolithDepthProxy
+export function tuningFamilySocraticRadarRegolithDepthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // regolith depth: thickness of loose surface material on planetary body → versatility+benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -61974,4 +62124,60 @@ export function scaleSpectralWeight(pitches: readonly Pitch[]): number {
     weightTotal += w;
   }
   return weightTotal === 0 ? 0 : Math.min(1, weightedSum / weightTotal / 1200);
+}
+
+export function scaleEDOAlignment(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // 12-EDO alignment: fraction of pitches within 10c of a 12-EDO degree
+  const tol = 10;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const nearest = Math.round(c / 100) * 100;
+    return Math.abs(c - nearest) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleJustApproximation(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Just intonation proximity: match to 5-limit JI ratios (cents)
+  // Common 5-limit intervals: 0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 996, 1088
+  const justCents = [0, 112, 204, 316, 386, 498, 590, 702, 814, 884, 996, 1088];
+  const tol = 8;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return justCents.some((j) => Math.abs(c - j) <= tol);
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleCommaContent(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Comma content: fraction of adjacent steps near comma sizes
+  // Syntonic comma = 21.5c, Pythagorean comma = 23.5c, diesis = 41.1c
+  // Detect steps in [15, 50] cents range
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let commas = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if (step >= 15 && step <= 50) commas++;
+  }
+  return Math.min(1, commas / (sorted.length - 1));
+}
+
+export function scaleSchismaContent(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Schisma content: steps near schisma (~2c) and diaschisma (~19.5c)
+  // Detect steps in [1, 5] or [17, 22] cents
+  const sorted = [...pitches]
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  let schismas = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const step = sorted[i + 1]! - sorted[i]!;
+    if ((step >= 1 && step <= 5) || (step >= 17 && step <= 22)) schismas++;
+  }
+  return Math.min(1, schismas / (sorted.length - 1));
 }
