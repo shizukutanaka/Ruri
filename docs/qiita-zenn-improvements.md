@@ -2056,3 +2056,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleOctatonicContent(pitches)` — 8音減音階（全半または半全交互: 2種類のパターン）への整合度
 - `scaleHexatonicContent(pitches)` — 6音増音階（0/300/400/700/800/1100 cent）への整合度
 - `scaleHexatonicDiversity(pitches)` — 200 cent単位の6セグメントのうち占有セグメント数の割合
+
+### Round 183: 特定音程出現率分析
+
+- `scaleMinorSecondCount(pitches)` — 隣接音程のうち短2度（50〜150 cent）の割合
+- `scaleMajorThirdCount(pitches)` — 全音程ペアのうち長3度（350〜450 cent）の割合
+- `scaleTritoneCount(pitches)` — 全音程ペアのうちトライトーン（550〜650 cent）の割合
+- `scalePerfectFifthCount(pitches)` — 全音程ペアのうち完全5度（650〜750 cent）の割合

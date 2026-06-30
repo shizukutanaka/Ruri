@@ -64229,3 +64229,63 @@ export function scaleHexatonicDiversity(pitches: readonly Pitch[]): number {
   }
   return Math.min(1, segments.size / 6);
 }
+
+export function scaleMinorSecondCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count adjacent intervals that are a minor second (50-150 cents), normalized by possible pairs
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  for (let i = 1; i < cents.length; i++) {
+    const iv = cents[i]! - cents[i - 1]!;
+    if (iv >= 50 && iv <= 150) count++;
+  }
+  return Math.min(1, count / (cents.length - 1));
+}
+
+export function scaleMajorThirdCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count pairs separated by a major third (350-450 cents) among all pitch pairs, normalized
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      if (iv >= 350 && iv <= 450) count++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, count / pairs);
+}
+
+export function scaleTritoneCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count pairs separated by a tritone (550-650 cents) among all pitch pairs, normalized
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      if (iv >= 550 && iv <= 650) count++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, count / pairs);
+}
+
+export function scalePerfectFifthCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count pairs separated by a perfect fifth (650-750 cents) among all pitch pairs, normalized
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      if (iv >= 650 && iv <= 750) count++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, count / pairs);
+}
