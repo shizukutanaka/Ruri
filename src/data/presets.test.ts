@@ -1354,6 +1354,12 @@ import {
   presetFamilySocraticRadarOptimalControlProxy,
   presetFamilySocraticRadarStochasticGrowthProxy,
   presetFamilySocraticRadarCapitalFormationProxy,
+  presetFamilySocraticRadarEncryptionStrengthProxy,
+  presetFamilySocraticRadarAuthenticationFactorProxy,
+  presetFamilySocraticRadarVulnerabilityScoreProxy,
+  presetFamilySocraticRadarThreatModelingProxy,
+  presetFamilySocraticRadarIntrusionDetectionProxy,
+  presetFamilySocraticRadarDataIntegrityProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -28997,5 +29003,83 @@ describe('presetFamilySocraticRadarCapitalFormationProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarCapitalFormationProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarEncryptionStrengthProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarEncryptionStrengthProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarEncryptionStrengthProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEncryptionStrengthProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarAuthenticationFactorProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarAuthenticationFactorProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarAuthenticationFactorProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAuthenticationFactorProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarVulnerabilityScoreProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarVulnerabilityScoreProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarVulnerabilityScoreProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarVulnerabilityScoreProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarThreatModelingProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarThreatModelingProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarThreatModelingProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThreatModelingProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarIntrusionDetectionProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarIntrusionDetectionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarIntrusionDetectionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarIntrusionDetectionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarDataIntegrityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarDataIntegrityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarDataIntegrityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDataIntegrityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
