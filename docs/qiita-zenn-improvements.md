@@ -2394,3 +2394,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleEthiopianBatiContent`: エチオピア・バティ（短調）音階との一致率
 - `scaleMeantoneAffinity`: 1/4コンマ中全音律長音階との親和度（±15¢）
 - `scaleWellTemperamentAffinity`: ヴェルクマイスターIII音律C長調との親和度（±12¢）
+
+## Round 225: 東アジア音階コンテンツヘルパ
+
+- `scaleChineseGongContent`: 中国・宮調式（純正律長五音音階 [0,204,408,702,906]¢）との一致率
+- `scaleInSenContent`: 日本・陰旋法（[0,90,498,702,1008]¢）との一致率
+- `scaleHirajoshiContent`: 日本・平調子（[0,204,294,702,792]¢）との一致率
+- `scaleYoNaContent`: 日本・四七抜き（[0,204,498,702,996]¢）との一致率

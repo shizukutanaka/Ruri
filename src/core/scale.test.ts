@@ -2593,6 +2593,10 @@ import {
   scaleEthiopianBatiContent,
   scaleMeantoneAffinity,
   scaleWellTemperamentAffinity,
+  scaleChineseGongContent,
+  scaleInSenContent,
+  scaleHirajoshiContent,
+  scaleYoNaContent,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -64800,6 +64804,70 @@ describe('scaleWellTemperamentAffinity', () => {
   });
   it('returns value in [0,1] for 19-EDO', () => {
     const v = scaleWellTemperamentAffinity(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleChineseGongContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleChineseGongContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleChineseGongContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleChineseGongContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleInSenContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleInSenContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleInSenContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleInSenContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleHirajoshiContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHirajoshiContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleHirajoshiContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleHirajoshiContent(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleYoNaContent', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleYoNaContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleYoNaContent(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleYoNaContent(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
