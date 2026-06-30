@@ -2084,3 +2084,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleSubdominantDrive(pitches)` — 完全4度・短7度・長6度の存在による下属和音的推進力スコア
 - `scaleMediantContent(pitches)` — 中音（長3度400・短3度300 cent）を含む音高の割合
 - `scaleSupertoneContent(pitches)` — 上主音（長2度200・短2度100 cent）を含む音高の割合
+
+### Round 187: 半音色彩音程分析
+
+- `scaleMinorNinthContent(pitches)` — 短9度（フラット9: 100 cent付近）の音高割合
+- `scaleDiminishedFifthContent(pitches)` — 減5度（トライトーン: 600 cent付近）の音高割合
+- `scaleAugmentedFourthContent(pitches)` — 増4度（シャープ4: 600 cent付近, ±50 cent）の音高割合
+- `scaleFlatFifthContent(pitches)` — フラット5度（570〜660 cent）の音高割合（完全5度が共存する場合は半減）
