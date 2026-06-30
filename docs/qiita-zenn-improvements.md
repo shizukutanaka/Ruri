@@ -2021,3 +2021,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleStepwiseMotionRatio(pitches)` — 隣接音程のうち全音以下（順次進行）の割合
 - `scaleIntervalRegularity(pitches)` — 隣接音程の分散の低さから導出した規則性スコア（均等分割ほど高い）
 - `scaleRegistralSpread(pitches)` — 音域の広がり（cent単位レンジ / 4800 centで正規化）
+
+### Round 178: スペクトル・倍音系列分析
+
+- `scaleIntervalHistogramPeak(pitches)` — 全音程ペアのヒストグラム最頻値の占有率（音程の偏り度）
+- `scaleOvertoneContent(pitches)` — 倍音列（自然倍音の mod 1200 近似）への整合音高割合
+- `scaleCombinationToneIndex(pitches)` — 差音（コンビネーショントーン）が音階内に落ちる割合
+- `scaleSubharmonicContent(pitches)` — 倍音列の逆数系列（サブハーモニック）への整合音高割合

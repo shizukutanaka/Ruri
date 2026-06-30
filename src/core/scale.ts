@@ -63196,3 +63196,72 @@ export function scaleRegistralSpread(pitches: readonly Pitch[]): number {
   const range = Math.max(...allCents) - Math.min(...allCents);
   return Math.min(1, range / 4800);
 }
+
+export function scaleIntervalHistogramPeak(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Peak interval class: find the most common interval size (mod 600, tritone-folded) among all pitch pairs
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const histogram = new Map<number, number>();
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      // fold to [0, 600]
+      const folded = iv > 600 ? 1200 - iv : iv;
+      const bucket = Math.round(folded / 100) * 100;
+      histogram.set(bucket, (histogram.get(bucket) ?? 0) + 1);
+    }
+  }
+  const total = [...histogram.values()].reduce((a, b) => a + b, 0);
+  const peak = Math.max(...histogram.values());
+  return total === 0 ? 0 : Math.min(1, peak / total);
+}
+
+export function scaleOvertoneContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Overtone alignment: how many pitches fall near harmonic series cents (0, 1200, 1902, 2400, 2786, 3102, 3369, 3600)
+  // Folded mod 1200: 0, 0, 702, 0, 386, 702, 969, 0
+  const harmonicMod1200 = [0, 0, 702, 0, 386, 702, 969, 0, 204, 0, 1088, 0];
+  const uniqueHarmonics = [...new Set(harmonicMod1200)]; // [0, 702, 386, 969, 204, 1088]
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (uniqueHarmonics.some((h) => Math.abs(c - h) < 25 || Math.abs(c - h - 1200) < 25 || Math.abs(c - h + 1200) < 25)) {
+      aligned++;
+    }
+  }
+  return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleCombinationToneIndex(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Combination tones: difference tones between pairs — if they fall within the scale, score increases
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let matches = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const diff = ((cents[j]! - cents[i]!) % 1200 + 1200) % 1200;
+      pairs++;
+      // Check if the difference tone (mod 1200) is near any scale pitch
+      if (cents.some((c) => Math.abs(c - diff) < 25 || Math.abs(c - diff - 1200) < 25 || Math.abs(c - diff + 1200) < 25)) {
+        matches++;
+      }
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, matches / pairs);
+}
+
+export function scaleSubharmonicContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Subharmonic: pitches near undertone series mod 1200 (inversion of overtone series)
+  // Undertone degrees mod 1200: 0, 498, 814, 1200-386=814, 231, 498, 231, 0
+  const subharmonicMod1200 = [0, 498, 814, 386, 231, 969]; // unique subharmonic classes
+  let aligned = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (subharmonicMod1200.some((h) => Math.abs(c - h) < 25 || Math.abs(c - h - 1200) < 25 || Math.abs(c - h + 1200) < 25)) {
+      aligned++;
+    }
+  }
+  return Math.min(1, aligned / pitches.length);
+}
