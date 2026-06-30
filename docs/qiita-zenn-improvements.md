@@ -2162,3 +2162,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleNeutralSeventhContent` — 中立七度（950セント±30、マカームなど微分音楽に特有）の存在比率を返す
 
 すべて `pitchToCents(p)` で値を取得し、`% 1200` で正規化後に目標値との距離を判定する。
+
+## Round 197: 音階構造特性分析ヘルパ（対称性/ステップ均等性/音程多様性/最大ギャップ比）
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleIntervalSymmetryV2` — ピッチの鏡像対称性（600セント軸）を持つ度数の比率を返す（`scaleIntervalSymmetry` が既存のため V2 サフィックス付与）
+- `scaleStepUniformityV2` — ステップサイズの均等性（1 - 変動係数）を返す（0=不均等、1=完全均等）（`scaleStepUniformity` が既存のため V2 サフィックス付与）
+- `scaleIntervalDiversity` — 50セント刻みバケットによる音程クラス多様性比率を返す
+- `scaleLargestGapRatio` — 隣接音度間の最大ギャップを1200セントで正規化した値を返す

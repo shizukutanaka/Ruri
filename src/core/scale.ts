@@ -56370,6 +56370,156 @@ export function tuningFamilySocraticRadarReceptiveFieldProxyV2(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3246 — tuningFamilySocraticRadarReynoldsNumberV2Proxy
+export function tuningFamilySocraticRadarReynoldsNumberV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Reynolds number: laminar-to-turbulent transition and inertia/viscosity ratio → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3248 — tuningFamilySocraticRadarVortexStretchProxy
+export function tuningFamilySocraticRadarVortexStretchProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // vortex stretching: enstrophy cascade and turbulent energy amplification → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3250 — tuningFamilySocraticRadarTurbulentDiffusionProxy
+export function tuningFamilySocraticRadarTurbulentDiffusionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // turbulent diffusion: eddy mixing and scalar transport → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3252 — tuningFamilySocraticRadarBoundaryLayerV2Proxy
+export function tuningFamilySocraticRadarBoundaryLayerV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // boundary layer: viscous sublayer and displacement thickness → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3254 — tuningFamilySocraticRadarKelvinHelmholtzProxy
+export function tuningFamilySocraticRadarKelvinHelmholtzProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Kelvin-Helmholtz instability: shear-driven roll-up and interface deformation → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3256 — tuningFamilySocraticRadarCoriolisEffectV2Proxy
+export function tuningFamilySocraticRadarCoriolisEffectV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Coriolis effect: rotation-induced deflection and geostrophic balance — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -67051,4 +67201,53 @@ export function scaleNeutralSeventhContent(pitches: readonly Pitch[]): number {
     if (Math.abs(c - target) <= tolerance) count++;
   }
   return Math.min(1, count / pitches.length);
+}
+
+export function scaleIntervalSymmetryV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let symmetric = 0;
+  for (const c of cents) {
+    const mirror = (1200 - c + 1200) % 1200;
+    if (cents.some((x) => Math.abs(x - mirror) <= 20)) symmetric++;
+  }
+  return Math.min(1, symmetric / cents.length);
+}
+
+export function scaleStepUniformityV2(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return pitches.length === 0 ? 0 : 1;
+  const sorted = pitches
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) steps.push(sorted[i]! - sorted[i - 1]!);
+  steps.push(1200 - sorted[sorted.length - 1]! + sorted[0]!);
+  const mean = steps.reduce((a, b) => a + b, 0) / steps.length;
+  if (mean === 0) return 1;
+  const variance = steps.reduce((a, b) => a + (b - mean) ** 2, 0) / steps.length;
+  const cv = Math.sqrt(variance) / mean;
+  return Math.min(1, Math.max(0, 1 - cv));
+}
+
+export function scaleIntervalDiversity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) intervals.push(cents[i]! - cents[i - 1]!);
+  intervals.push(1200 - cents[cents.length - 1]! + cents[0]!);
+  const bucketSize = 50;
+  const buckets = new Set(intervals.map((x) => Math.round(x / bucketSize)));
+  return Math.min(1, buckets.size / intervals.length);
+}
+
+export function scaleLargestGapRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return pitches.length === 0 ? 0 : 1;
+  const sorted = pitches
+    .map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200)
+    .sort((a, b) => a - b);
+  const gaps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) gaps.push(sorted[i]! - sorted[i - 1]!);
+  gaps.push(1200 - sorted[sorted.length - 1]! + sorted[0]!);
+  const maxGap = Math.max(...gaps);
+  return Math.min(1, maxGap / 1200);
 }
