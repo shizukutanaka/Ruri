@@ -1318,6 +1318,12 @@ import {
   presetFamilySocraticRadarNeoclassicalTransportProxy,
   presetFamilySocraticRadarBootstrapCurrentProxy,
   presetFamilySocraticRadarBetaLimitProxy,
+  presetFamilySocraticRadarMembraneFlexibilityProxy,
+  presetFamilySocraticRadarDNAMechanicsProxy,
+  presetFamilySocraticRadarCytoplasmViscosityProxy,
+  presetFamilySocraticRadarMolecularMotorProxy,
+  presetFamilySocraticRadarCellMembranePotentialProxy,
+  presetFamilySocraticRadarProteinElasticityProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -28493,5 +28499,83 @@ describe('presetFamilySocraticRadarBetaLimitProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarBetaLimitProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarMembraneFlexibilityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarMembraneFlexibilityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarMembraneFlexibilityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMembraneFlexibilityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarDNAMechanicsProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarDNAMechanicsProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarDNAMechanicsProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDNAMechanicsProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarCytoplasmViscosityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarCytoplasmViscosityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarCytoplasmViscosityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCytoplasmViscosityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarMolecularMotorProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarMolecularMotorProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarMolecularMotorProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMolecularMotorProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarCellMembranePotentialProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarCellMembranePotentialProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarCellMembranePotentialProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCellMembranePotentialProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+describe('presetFamilySocraticRadarProteinElasticityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarProteinElasticityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarProteinElasticityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarProteinElasticityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
