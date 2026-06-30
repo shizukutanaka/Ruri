@@ -64439,3 +64439,67 @@ export function scalePerfectFifthCount(pitches: readonly Pitch[]): number {
   }
   return pairs === 0 ? 0 : Math.min(1, count / pairs);
 }
+
+export function scaleMinorSixthCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count pitch pairs separated by a minor sixth (750-850 cents), normalized by total pairs
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      if (iv >= 750 && iv <= 850) count++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, count / pairs);
+}
+
+export function scaleMajorSixthCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count pitch pairs separated by a major sixth (850-950 cents), normalized by total pairs
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      if (iv >= 850 && iv <= 950) count++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, count / pairs);
+}
+
+export function scalePerfectOctaveRatio(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count pitch pairs separated by an octave (1150-1250 cents), normalized by total pairs
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      if (iv >= 1150 && iv <= 1250) count++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, count / pairs);
+}
+
+export function scaleMinorSeventhCount(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Count pitch pairs separated by a minor seventh (950-1050 cents), normalized by total pairs
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  let count = 0;
+  let pairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = cents[j]! - cents[i]!;
+      pairs++;
+      if (iv >= 950 && iv <= 1050) count++;
+    }
+  }
+  return pairs === 0 ? 0 : Math.min(1, count / pairs);
+}

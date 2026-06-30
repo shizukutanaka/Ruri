@@ -2063,3 +2063,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleMajorThirdCount(pitches)` — 全音程ペアのうち長3度（350〜450 cent）の割合
 - `scaleTritoneCount(pitches)` — 全音程ペアのうちトライトーン（550〜650 cent）の割合
 - `scalePerfectFifthCount(pitches)` — 全音程ペアのうち完全5度（650〜750 cent）の割合
+
+### Round 184: 音程出現率分析 続編
+
+- `scaleMinorSixthCount(pitches)` — 全音程ペアのうち短6度（750〜850 cent）の割合
+- `scaleMajorSixthCount(pitches)` — 全音程ペアのうち長6度（850〜950 cent）の割合
+- `scaleMinorSeventhCount(pitches)` — 全音程ペアのうち短7度（950〜1050 cent）の割合
+- `scalePerfectOctaveRatio(pitches)` — 全音程ペアのうちオクターブ（1150〜1250 cent）の割合
