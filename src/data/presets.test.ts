@@ -1588,6 +1588,12 @@ import {
   presetFamilySocraticRadarNonlinearOpticsProxy,
   presetFamilySocraticRadarPlasmonicProxy,
   presetFamilySocraticRadarMetamaterialProxy,
+  presetFamilySocraticRadarOzoneDepletionProxy,
+  presetFamilySocraticRadarAerosolProxy,
+  presetFamilySocraticRadarPhotochemistryProxy,
+  presetFamilySocraticRadarTroposphereProxy,
+  presetFamilySocraticRadarStratosphereProxy,
+  presetFamilySocraticRadarAirQualityProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
