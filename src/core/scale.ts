@@ -55020,6 +55020,156 @@ export function tuningFamilySocraticRadarDeepBrainStimulationProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3138 — tuningFamilySocraticRadarCognitiveBiasProxy
+export function tuningFamilySocraticRadarCognitiveBiasProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // cognitive bias: anchoring/framing effects → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3140 — tuningFamilySocraticRadarWorkingMemoryProxyV4
+export function tuningFamilySocraticRadarWorkingMemoryProxyV4(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // working memory: capacity and load → maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3142 — tuningFamilySocraticRadarAttentionBandwidthProxy
+export function tuningFamilySocraticRadarAttentionBandwidthProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // attention bandwidth: selective and sustained attention → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3144 — tuningFamilySocraticRadarSensoryFusionProxy
+export function tuningFamilySocraticRadarSensoryFusionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // sensory fusion: cross-modal integration and binding → benchmark
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3146 — tuningFamilySocraticRadarPatternRecognitionProxyV2
+export function tuningFamilySocraticRadarPatternRecognitionProxyV2(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // pattern recognition: template matching and abstraction → convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3148 — tuningFamilySocraticRadarExecutiveFunctionProxy
+export function tuningFamilySocraticRadarExecutiveFunctionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // executive function: planning, inhibition, flexibility — balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -65262,4 +65412,50 @@ export function scaleFlatFifthContent(pitches: readonly Pitch[]): number {
   const base = Math.min(1, flatFifthCount / pitches.length);
   // Reduce score if perfect fifth is also present (reduces "flatness")
   return hasPerfectFifth ? base * 0.5 : base;
+}
+
+export function scaleLeadingToneStrengthV4(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Leading tone: major 7th at 1100 cents — strong pull to tonic
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 1100) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleSubtonicContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Subtonic: minor 7th at 1000 cents — weaker, unresolved quality
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 1000) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleNeutralThirdContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Neutral third: between minor 3rd (300) and major 3rd (400); near 350 cents
+  // Common in maqam/Arabic scales; wider tolerance to capture micro-variations
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    // 330–370 cent range for neutral third; exclude clear minor/major thirds
+    if (c >= 315 && c <= 385 && Math.abs(c - 300) >= 15 && Math.abs(c - 400) >= 15) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleChromaticSaturationV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Chromatic saturation: how many of the 12 chromatic slots (100-cent bins) are filled
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  const bins = new Set<number>();
+  for (const c of cents) {
+    bins.add(Math.round(c / 100) % 12);
+  }
+  return bins.size / 12;
 }

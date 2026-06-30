@@ -2091,3 +2091,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleDiminishedFifthContent(pitches)` — 減5度（トライトーン: 600 cent付近）の音高割合
 - `scaleAugmentedFourthContent(pitches)` — 増4度（シャープ4: 600 cent付近, ±50 cent）の音高割合
 - `scaleFlatFifthContent(pitches)` — フラット5度（570〜660 cent）の音高割合（完全5度が共存する場合は半減）
+
+### Round 188: 音階音程特性分析
+
+- `scaleLeadingToneStrengthV4(pitches)` — 導音（長7度: 1100 cent付近）の音高割合による導音強度
+- `scaleSubtonicContent(pitches)` — 下属7度（短7度: 1000 cent付近）の音高割合
+- `scaleNeutralThirdContent(pitches)` — 中立3度（315〜385 cent, 短3度・長3度を除外）の音高割合
+- `scaleChromaticSaturationV2(pitches)` — 12半音スロットへの充填率（マクロ半音彩度）
