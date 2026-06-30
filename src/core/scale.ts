@@ -70101,3 +70101,65 @@ export function scaleRagaMarwa(pitches: readonly Pitch[]): number {
   }
   return matched / targets.length;
 }
+
+export function scaleIntervalRichnessScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervals = new Set<number>();
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = Math.round((cents[j]! - cents[i]!) / 50) * 50;
+      intervals.add(iv);
+    }
+  }
+  const maxPossible = (cents.length * (cents.length - 1)) / 2;
+  return Math.min(1, intervals.size / maxPossible);
+}
+
+export function scaleDissonanceDensity(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  // Dissonant intervals: minor 2nd(100), tritone(600), major 7th(1100)
+  const dissonant = [100, 200, 600, 1000, 1100];
+  let dissonantPairs = 0;
+  let totalPairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = Math.abs(cents[i]! - cents[j]!);
+      const norm = Math.min(iv, 1200 - iv);
+      totalPairs++;
+      if (dissonant.some((d) => Math.abs(norm - d) <= 30)) dissonantPairs++;
+    }
+  }
+  return totalPairs === 0 ? 0 : dissonantPairs / totalPairs;
+}
+
+export function scaleConsonanceBias(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  // Consonant intervals: unison(0), perfect 5th(700), perfect 4th(500), major 3rd(400), minor 3rd(300)
+  const consonant = [0, 300, 400, 500, 700, 800, 900];
+  let consonantPairs = 0;
+  let totalPairs = 0;
+  for (let i = 0; i < cents.length; i++) {
+    for (let j = i + 1; j < cents.length; j++) {
+      const iv = Math.abs(cents[i]! - cents[j]!);
+      const norm = Math.min(iv, 1200 - iv);
+      totalPairs++;
+      if (consonant.some((c) => Math.abs(norm - c) <= 25)) consonantPairs++;
+    }
+  }
+  return totalPairs === 0 ? 0 : consonantPairs / totalPairs;
+}
+
+export function scaleTonicClarityScoreV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  // Tonic clarity: strong root support via perfect 5th(700) and major/minor 3rd
+  const tonicSupport = [0, 300, 400, 700];
+  let score = 0;
+  for (const t of tonicSupport) {
+    if (cents.some((c) => Math.abs(c - t) <= 20)) score++;
+  }
+  return score / tonicSupport.length;
+}

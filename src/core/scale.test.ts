@@ -2069,6 +2069,10 @@ import {
   scaleRagaBageshri,
   scaleRagaPurvi,
   scaleRagaMarwa,
+  scaleIntervalRichnessScore,
+  scaleDissonanceDensity,
+  scaleConsonanceBias,
+  scaleTonicClarityScoreV2,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -55730,3 +55734,63 @@ describe('scaleBluesScaleContent', () => {
       expect(v).toBeLessThanOrEqual(1);
     });
   });
+describe('scaleIntervalRichnessScore', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleIntervalRichnessScore([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleIntervalRichnessScore(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleIntervalRichnessScore(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleDissonanceDensity', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleDissonanceDensity([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleDissonanceDensity(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleDissonanceDensity(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleConsonanceBias', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleConsonanceBias([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleConsonanceBias(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleConsonanceBias(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+describe('scaleTonicClarityScoreV2', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleTonicClarityScoreV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleTonicClarityScoreV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleTonicClarityScoreV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
