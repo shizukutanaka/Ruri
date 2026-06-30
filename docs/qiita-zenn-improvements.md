@@ -2207,3 +2207,12 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scalePentatonicContent` — ペンタトニックの特徴音程（240/480/720/960セント±40）の充足率を返す
 - `scaleOctatonicContentV2` — オクタトニック（減音階）の特徴音程（150セント刻み7点±25）の充足率を返す（`scaleOctatonicContent` が既存のため V2 サフィックス付与）
 - `scaleWholeToneContentV3` — 全音音階の特徴音程（200セント刻み5点±25）の充足率を返す（`scaleWholeToneContent`/`V2` が既存のため V3 サフィックス付与）
+
+## Round 202: 音階対称性・倍音列・ミーントーン・ブルース音階分析ヘルパ
+
+`src/core/scale.ts` に以下の4関数を追加:
+
+- `scaleSymmetryScoreV2` — 音階の反転対称性スコア（各音度の1200-c鏡像が音階内に存在する割合）を返す（`scaleSymmetryScore` が既存のため V2 サフィックス付与）
+- `scaleHarmonicSeriesContent` — 倍音列の特徴音程（702/498/386/316セントなど11点±20）の充足率を返す
+- `scaleMeantoneContent` — クォーターコンマミーントーンの特徴音程（696.6/386.3/310.3/1082.9セント±8）の充足率を返す
+- `scaleBluesScaleContent` — ブルース音階の特徴音程（300/600/700セント±25）の充足率を返す

@@ -57120,6 +57120,126 @@ export function tuningFamilySocraticRadarGravitationalLensingProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3306 — tuningFamilySocraticRadarDnaReplicationProxy
+export function tuningFamilySocraticRadarDnaReplicationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // DNA複製: 正確なパターン複製 → benchmark重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.30 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3308 — tuningFamilySocraticRadarProteinFoldingV2Proxy
+export function tuningFamilySocraticRadarProteinFoldingV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // タンパク質折りたたみ: 収束重視 → convergence重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.10 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.30;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3310 — tuningFamilySocraticRadarGenomeExpressionProxy
+export function tuningFamilySocraticRadarGenomeExpressionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // ゲノム発現: 多様な遺伝子発現 → diversity重視
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3312 — tuningFamilySocraticRadarChromatinRemodelingProxy
+export function tuningFamilySocraticRadarChromatinRemodelingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // クロマチンリモデリング: 構造的柔軟性 → versatility重視
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3314 — tuningFamilySocraticRadarEpigeneticMarkProxy
+export function tuningFamilySocraticRadarEpigeneticMarkProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // エピジェネティックマーク: 安定したマーキング → maturity重視
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.10 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3316 — tuningFamilySocraticRadarAlternativeSplicingProxy
+export function tuningFamilySocraticRadarAlternativeSplicingProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // 選択的スプライシング: 多様なアイソフォーム生成 → balanced
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -68035,6 +68155,57 @@ export function scaleWholeToneContentV3(pitches: readonly Pitch[]): number {
   for (const t of targets) {
     const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
     if (cents.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleSymmetryScoreV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const n = cents.length;
+  let symmetricPairs = 0;
+  for (let i = 0; i < n; i++) {
+    const mirror = 1200 - cents[i]!;
+    if (cents.some((c) => Math.abs(c - mirror) <= 15)) symmetricPairs++;
+  }
+  return symmetricPairs / n;
+}
+
+export function scaleHarmonicSeriesContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Harmonic series intervals from fundamental: 100*n cents approx for partials 2-12
+  const targets = [702, 498, 386, 316, 267, 231, 204, 182, 165, 151, 139];
+  const tolerance = 20;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleMeantoneContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Quarter-comma meantone: fifth=696.6, major third=386.3, minor third=310.3
+  const targets = [696.6, 386.3, 310.3, 1082.9];
+  const tolerance = 8;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / targets.length;
+}
+
+export function scaleBluesScaleContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Blues scale characteristic tones: minor 3rd(300), tritone(600), perfect 5th(700)
+  const targets = [300, 600, 700];
+  const tolerance = 25;
+  let matched = 0;
+  for (const t of targets) {
+    const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
   return matched / targets.length;
 }
