@@ -2535,6 +2535,12 @@ import {
   tuningFamilySocraticRadarWetlandProxy,
   tuningFamilySocraticRadarMangroveProxy,
   tuningFamilySocraticRadarDeforestationProxy,
+  tuningFamilySocraticRadarKinematicsProxy,
+  tuningFamilySocraticRadarManipulatorArmProxy,
+  tuningFamilySocraticRadarGraspPlanningProxy,
+  tuningFamilySocraticRadarHapticFeedbackProxy,
+  tuningFamilySocraticRadarSwarmRoboticsProxy,
+  tuningFamilySocraticRadarSoftRoboticsProxy,
   scaleAverageStepCents,
   scaleDiatonicSaturation,
   scaleStepSizeVarianceV3,
@@ -64313,6 +64319,96 @@ describe('tuningFamilySocraticRadarDeforestationProxy', () => {
   });
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarDeforestationProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarKinematicsProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarKinematicsProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarKinematicsProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarKinematicsProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarManipulatorArmProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarManipulatorArmProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarManipulatorArmProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarManipulatorArmProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarGraspPlanningProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarGraspPlanningProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarGraspPlanningProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarGraspPlanningProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarHapticFeedbackProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarHapticFeedbackProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarHapticFeedbackProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarHapticFeedbackProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarSwarmRoboticsProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSwarmRoboticsProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSwarmRoboticsProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSwarmRoboticsProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarSoftRoboticsProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSoftRoboticsProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarSoftRoboticsProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSoftRoboticsProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(isFinite(v)).toBe(true);
   });
 });
