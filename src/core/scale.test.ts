@@ -1945,6 +1945,10 @@ import {
   scaleDoubleHarmonicContent,
   scaleHungarianMinorContent,
   scaleNeapolitanMajorContent,
+  scaleAugmentedSecondContent,
+  scaleTritoneSubstitutionContent,
+  scaleNeapolitanChordContent,
+  scaleGermanSixthContent,
   tuningFamilySocraticRadarAntibodyTiterProxy,
   tuningFamilySocraticRadarPathogenLoadProxy,
   tuningFamilySocraticRadarInflammationIndex,
@@ -2053,6 +2057,12 @@ import {
   tuningFamilySocraticRadarActuatorResponseProxy,
   tuningFamilySocraticRadarSensorFusionProxy,
   tuningFamilySocraticRadarKinematicChainProxy,
+  tuningFamilySocraticRadarAntibodyAffinityProxy,
+  tuningFamilySocraticRadarTcellActivationProxy,
+  tuningFamilySocraticRadarCytokineSignalProxy,
+  tuningFamilySocraticRadarPhagocytosisRateProxy,
+  tuningFamilySocraticRadarInflammatoryIndexProxy,
+  tuningFamilySocraticRadarComplementCascadeProxy,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -49078,5 +49088,156 @@ describe('tuningFamilySocraticRadarKinematicChainProxy', () => {
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarKinematicChainProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarAntibodyAffinityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAntibodyAffinityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarAntibodyAffinityProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarAntibodyAffinityProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarTcellActivationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTcellActivationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarTcellActivationProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarTcellActivationProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarCytokineSignalProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCytokineSignalProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarCytokineSignalProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCytokineSignalProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarPhagocytosisRateProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPhagocytosisRateProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarPhagocytosisRateProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPhagocytosisRateProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarInflammatoryIndexProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarInflammatoryIndexProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarInflammatoryIndexProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarInflammatoryIndexProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarComplementCascadeProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarComplementCascadeProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET', () => {
+    const v = tuningFamilySocraticRadarComplementCascadeProxy([equalTemperament12(440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarComplementCascadeProxy([equalTemperament12(440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('scaleAugmentedSecondContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleAugmentedSecondContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const pitches = equalTemperament12(440).degrees;
+    const v = scaleAugmentedSecondContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('detects augmented second interval', () => {
+    const pitches = [0, 300].map((c) => pitchFromCents(c));
+    expect(scaleAugmentedSecondContent(pitches)).toBeGreaterThan(0);
+  });
+});
+describe('scaleTritoneSubstitutionContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleTritoneSubstitutionContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const pitches = equalTemperament12(440).degrees;
+    const v = scaleTritoneSubstitutionContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('detects tritone interval', () => {
+    const pitches = [0, 600].map((c) => pitchFromCents(c));
+    expect(scaleTritoneSubstitutionContent(pitches)).toBeGreaterThan(0);
+  });
+});
+describe('scaleNeapolitanChordContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleNeapolitanChordContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const pitches = equalTemperament12(440).degrees;
+    const v = scaleNeapolitanChordContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('detects flat-II degree', () => {
+    const pitches = [0, 100, 400, 700].map((c) => pitchFromCents(c));
+    expect(scaleNeapolitanChordContent(pitches)).toBeGreaterThan(0);
+  });
+});
+describe('scaleGermanSixthContent', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleGermanSixthContent([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-TET degrees', () => {
+    const pitches = equalTemperament12(440).degrees;
+    const v = scaleGermanSixthContent(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns high value for exact German sixth degrees', () => {
+    const pitches = [0, 400, 600, 800].map((c) => pitchFromCents(c));
+    expect(scaleGermanSixthContent(pitches)).toBeGreaterThanOrEqual(0.5);
   });
 });

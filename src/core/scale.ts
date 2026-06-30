@@ -51120,6 +51120,156 @@ export function tuningFamilySocraticRadarKinematicChainProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2826 — tuningFamilySocraticRadarAntibodyAffinityProxy
+export function tuningFamilySocraticRadarAntibodyAffinityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // antibody affinity: binding strength of antibody to antigen → benchmark+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2828 — tuningFamilySocraticRadarTcellActivationProxy
+export function tuningFamilySocraticRadarTcellActivationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // T-cell activation: immune cell triggering and proliferation → versatility+diversity
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2830 — tuningFamilySocraticRadarCytokineSignalProxy
+export function tuningFamilySocraticRadarCytokineSignalProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // cytokine signaling: intercellular immune communication → convergence+versatility
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2832 — tuningFamilySocraticRadarPhagocytosisRateProxy
+export function tuningFamilySocraticRadarPhagocytosisRateProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // phagocytosis rate: cellular ingestion of pathogens → maturity+benchmark
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2834 — tuningFamilySocraticRadarInflammatoryIndexProxy
+export function tuningFamilySocraticRadarInflammatoryIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // inflammatory index: intensity of immune inflammatory response → diversity+convergence
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2836 — tuningFamilySocraticRadarComplementCascadeProxy
+export function tuningFamilySocraticRadarComplementCascadeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // complement cascade: sequential immune protein activation → convergence+maturity
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -59902,4 +60052,62 @@ export function scaleNeapolitanMajorContent(pitches: readonly Pitch[]): number {
     }),
   ).length;
   return Math.min(1, matched / pitches.length);
+}
+
+export function scaleAugmentedSecondContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Count interval pairs with ~300 cents (augmented second = 3 semitones in ET, but aug2 ~= 150c in just)
+  // Here: count adjacent pairs with interval in [240, 360] cents modulo 1200
+  const sorted = [...pitches].sort((a, b) => pitchToCents(a) - pitchToCents(b));
+  if (sorted.length < 2) return 0;
+  let count = 0;
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const interval = ((pitchToCents(sorted[i + 1]!) - pitchToCents(sorted[i]!)) % 1200 + 1200) % 1200;
+    if (interval >= 240 && interval <= 360) count++;
+  }
+  return Math.min(1, count / (sorted.length - 1));
+}
+
+export function scaleTritoneSubstitutionContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Tritone (600c) presence: count pairs with interval ~600 cents (±40c)
+  const sorted = [...pitches].sort((a, b) => pitchToCents(a) - pitchToCents(b));
+  let count = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    for (let j = i + 1; j < sorted.length; j++) {
+      const d = Math.abs((((pitchToCents(sorted[j]!) - pitchToCents(sorted[i]!)) % 1200) + 1200) % 1200);
+      const interval = Math.min(d, 1200 - d);
+      if (Math.abs(interval - 600) <= 40) count++;
+    }
+  }
+  const maxPairs = (sorted.length * (sorted.length - 1)) / 2;
+  return maxPairs === 0 ? 0 : Math.min(1, count / maxPairs);
+}
+
+export function scaleNeapolitanChordContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Neapolitan chord: flat-II degree (≈100 cents) present
+  // Count pitches near 100 cents (±25c) modulo 1200
+  const tol = 25;
+  const target = 100;
+  const matched = pitches.filter((p) => {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    return Math.min(Math.abs(c - target), 1200 - Math.abs(c - target)) <= tol;
+  }).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleGermanSixthContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // German augmented sixth chord requires: b6 (800c), 1 (0c), 3 (400c), #4 (600c)
+  // Approximate: check presence of pitches near 0, 400, 600, 800 cents (±25c)
+  const targets = [0, 400, 600, 800];
+  const tol = 25;
+  const matched = targets.filter((t) =>
+    pitches.some((p) => {
+      const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+      return Math.min(Math.abs(c - t), 1200 - Math.abs(c - t)) <= tol;
+    }),
+  ).length;
+  return matched / targets.length;
 }
