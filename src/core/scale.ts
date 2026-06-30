@@ -50970,6 +50970,156 @@ export function tuningFamilySocraticRadarOrganogenesisRateProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2814 — tuningFamilySocraticRadarManipulatorJacobianProxy
+export function tuningFamilySocraticRadarManipulatorJacobianProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // manipulator Jacobian: maps joint velocities to end-effector velocities → diversity+versatility
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2816 — tuningFamilySocraticRadarJointTorqueBalanceProxy
+export function tuningFamilySocraticRadarJointTorqueBalanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // joint torque balance: equilibrium of rotational forces → versatility weighted
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.25 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2818 — tuningFamilySocraticRadarMotionPlanningScoreProxy
+export function tuningFamilySocraticRadarMotionPlanningScoreProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // motion planning: path finding in configuration space → maturity+versatility
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2820 — tuningFamilySocraticRadarActuatorResponseProxy
+export function tuningFamilySocraticRadarActuatorResponseProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // actuator response: dynamic reaction time and precision → benchmark weighted
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2822 — tuningFamilySocraticRadarSensorFusionProxy
+export function tuningFamilySocraticRadarSensorFusionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // sensor fusion: integrating multi-modal sensor data → convergence+diversity
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2824 — tuningFamilySocraticRadarKinematicChainProxy
+export function tuningFamilySocraticRadarKinematicChainProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // kinematic chain: sequential joint linkages mapping → convergence weighted
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -59696,4 +59846,60 @@ export function scalePhrygianDominantContent(pitches: readonly Pitch[]): number 
     if (phryDom.some((d) => Math.abs(c - d) <= 25)) count++;
   }
   return count / pitches.length;
+}
+
+export function scaleLydianDominantContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Lydian Dominant (4th mode of melodic minor): 0, 200, 400, 600, 700, 900, 1000 cents
+  const targets = [0, 200, 400, 600, 700, 900, 1000];
+  const tol = 25;
+  const matched = pitches.filter((p) =>
+    targets.some((t) => {
+      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      return Math.min(c, 1200 - c) <= tol;
+    }),
+  ).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleDoubleHarmonicContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Double Harmonic (Byzantine): 0, 100, 400, 500, 700, 800, 1100 cents
+  const targets = [0, 100, 400, 500, 700, 800, 1100];
+  const tol = 25;
+  const matched = pitches.filter((p) =>
+    targets.some((t) => {
+      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      return Math.min(c, 1200 - c) <= tol;
+    }),
+  ).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleHungarianMinorContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Hungarian Minor: 0, 200, 300, 600, 700, 800, 1100 cents
+  const targets = [0, 200, 300, 600, 700, 800, 1100];
+  const tol = 25;
+  const matched = pitches.filter((p) =>
+    targets.some((t) => {
+      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      return Math.min(c, 1200 - c) <= tol;
+    }),
+  ).length;
+  return Math.min(1, matched / pitches.length);
+}
+
+export function scaleNeapolitanMajorContent(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Neapolitan Major: 0, 100, 300, 500, 700, 900, 1100 cents
+  const targets = [0, 100, 300, 500, 700, 900, 1100];
+  const tol = 25;
+  const matched = pitches.filter((p) =>
+    targets.some((t) => {
+      const c = ((pitchToCents(p) - t) % 1200 + 1200) % 1200;
+      return Math.min(c, 1200 - c) <= tol;
+    }),
+  ).length;
+  return Math.min(1, matched / pitches.length);
 }

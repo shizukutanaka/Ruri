@@ -1889,3 +1889,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 | R1604 | `scalePhrygianDominantContent` | フリジアン・ドミナント(スパニッシュ・フリジアン)への一致率(±25c) |
 
 **設計根拠**: 残る3教会旋法(ロクリアン/エオリアン/イオニアン)とフリジアン・ドミナントを追加し、全7教会旋法+スペイン旋法を網羅する。フラメンコ・スパニッシュ・中東音楽の特徴音程を捕捉できる。
+
+## Round 161: 特殊旋法分析 (R1605–R1608)
+
+**Functions**: `scaleLydianDominantContent`, `scaleDoubleHarmonicContent`, `scaleHungarianMinorContent`, `scaleNeapolitanMajorContent`
+
+**Motivation**: Extends modal analysis to exotic scales used in jazz, Byzantine, and Eastern European music. Lydian Dominant (acoustic scale) is fundamental to jazz composition. Double Harmonic (Byzantine) and Hungarian Minor provide augmented second intervals characteristic of Middle Eastern music. Neapolitan Major enables analysis of Baroque-era harmonic practices.
+
+**Implementation**: Each function matches pitches within ±25 cents of the target modal degrees using modular arithmetic. Returns ratio of matched pitches in [0,1].
