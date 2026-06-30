@@ -53670,6 +53670,156 @@ export function tuningFamilySocraticRadarHiggsFieldProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3030 — tuningFamilySocraticRadarPlasmaConfinementProxy
+export function tuningFamilySocraticRadarPlasmaConfinementProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // plasma confinement: magnetic field containment → convergence emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.15 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3032 — tuningFamilySocraticRadarFusionCrossSectionProxy
+export function tuningFamilySocraticRadarFusionCrossSectionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // fusion cross section: D-T reaction rate → benchmark emphasis
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.30 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3034 — tuningFamilySocraticRadarToroidalFieldProxy
+export function tuningFamilySocraticRadarToroidalFieldProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // toroidal field: tokamak magnetic geometry → maturity
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3036 — tuningFamilySocraticRadarNeoclassicalTransportProxy
+export function tuningFamilySocraticRadarNeoclassicalTransportProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // neoclassical transport: trapped-particle diffusion → versatility
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.30 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3038 — tuningFamilySocraticRadarBootstrapCurrentProxy
+export function tuningFamilySocraticRadarBootstrapCurrentProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // bootstrap current: self-generated plasma current → diversity
+  const result =
+    (axisAggregates[0]! * 0.30 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3040 — tuningFamilySocraticRadarBetaLimitProxy
+export function tuningFamilySocraticRadarBetaLimitProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // beta limit: plasma pressure to magnetic pressure ratio → balanced
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -63414,4 +63564,62 @@ export function scaleSubharmonicContent(pitches: readonly Pitch[]): number {
     }
   }
   return Math.min(1, aligned / pitches.length);
+}
+
+export function scaleHarmonicDriftScore(pitches: readonly Pitch[]): number {
+  if (pitches.length < 2) return 0;
+  // Harmonic drift: variance of interval sizes from a "target" diatonic step (200 cents)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) intervals.push(cents[i]! - cents[i - 1]!);
+  if (intervals.length === 0) return 0;
+  const target = 200; // whole step reference
+  const drift = intervals.reduce((acc, iv) => acc + Math.abs(iv - target), 0) / intervals.length;
+  // drift of 0 → score 1 (uniform whole-tone scale), max drift ~600 → score 0
+  return Math.min(1, Math.max(0, 1 - drift / 600));
+}
+
+export function scaleIntervalStacking(pitches: readonly Pitch[]): number {
+  if (pitches.length < 3) return 0;
+  // Interval stacking: how uniform are consecutive intervals (e.g., all equal = EDO character)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200).sort((a, b) => a - b);
+  const intervals: number[] = [];
+  for (let i = 1; i < cents.length; i++) intervals.push(cents[i]! - cents[i - 1]!);
+  if (intervals.length === 0) return 0;
+  const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+  const maxDev = intervals.reduce((a, b) => Math.max(a, Math.abs(b - mean)), 0);
+  // Uniformity: low max deviation → high stacking score
+  return Math.min(1, Math.max(0, 1 - maxDev / 600));
+}
+
+export function scalePitchClassEntropy(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Shannon entropy of pitch classes (semitone buckets of 100 cents)
+  const buckets = new Array<number>(12).fill(0);
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    const bucket = Math.min(11, Math.floor(c / 100));
+    buckets[bucket]++;
+  }
+  const total = pitches.length;
+  let entropy = 0;
+  for (const count of buckets) {
+    if (count > 0) {
+      const prob = count / total;
+      entropy -= prob * Math.log2(prob);
+    }
+  }
+  // Max entropy = log2(12) ≈ 3.585 for uniform distribution over 12 semitones
+  return Math.min(1, entropy / Math.log2(12));
+}
+
+export function scaleDegreeDensityProfile(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Degree density: how many distinct pitch-class semitone slots (out of 12) are occupied
+  const occupied = new Set<number>();
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    occupied.add(Math.round(c / 100) % 12);
+  }
+  return Math.min(1, occupied.size / 12);
 }

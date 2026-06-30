@@ -2028,3 +2028,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleOvertoneContent(pitches)` — 倍音列（自然倍音の mod 1200 近似）への整合音高割合
 - `scaleCombinationToneIndex(pitches)` — 差音（コンビネーショントーン）が音階内に落ちる割合
 - `scaleSubharmonicContent(pitches)` — 倍音列の逆数系列（サブハーモニック）への整合音高割合
+
+### Round 179: ピッチクラス・情報理論分析
+
+- `scaleHarmonicDriftScore(pitches)` — 隣接音程の全音（200 cent）基準からのドリフト量の低さ（均等全音音階への近さ）
+- `scaleIntervalStacking(pitches)` — 隣接音程の最大偏差から導出した均一スタッキングスコア（EDO的均等さ）
+- `scalePitchClassEntropy(pitches)` — 半音バケットのシャノン情報エントロピー（12平均律クラス上での分布均等度）
+- `scaleDegreeDensityProfile(pitches)` — 12半音スロットのうち占有された半音クラスの割合
