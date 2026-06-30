@@ -50220,6 +50220,156 @@ export function tuningFamilySocraticRadarCreepRateProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q2754 — tuningFamilySocraticRadarLatticeParameterProxy
+export function tuningFamilySocraticRadarLatticeParameterProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // lattice parameter: structural periodicity → benchmark+convergence weighted
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.20);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2756 — tuningFamilySocraticRadarCrystalSymmetryProxy
+export function tuningFamilySocraticRadarCrystalSymmetryProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // crystal symmetry: high symmetry → benchmark+convergence
+  const result =
+    (axisAggregates[0]! * 0.10 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.20 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.30);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2758 — tuningFamilySocraticRadarCoordinationNumberProxy
+export function tuningFamilySocraticRadarCoordinationNumberProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // coordination number: bonding neighbours → diversity+benchmark weighted
+  const result =
+    (axisAggregates[0]! * 0.25 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.25 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2760 — tuningFamilySocraticRadarCrystalGrainSizeProxy
+export function tuningFamilySocraticRadarCrystalGrainSizeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // crystal grain size: growth scale → maturity weighted
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.30 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.15);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2762 — tuningFamilySocraticRadarMillerIndexProxy
+export function tuningFamilySocraticRadarMillerIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // miller index: plane orientation → convergence weighted
+  const result =
+    (axisAggregates[0]! * 0.20 +
+      axisAggregates[1]! * 0.20 +
+      axisAggregates[2]! * 0.15 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q2764 — tuningFamilySocraticRadarBraggAngleProxy
+export function tuningFamilySocraticRadarBraggAngleProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // bragg angle: diffraction precision → maturity+convergence
+  const result =
+    (axisAggregates[0]! * 0.15 +
+      axisAggregates[1]! * 0.15 +
+      axisAggregates[2]! * 0.25 +
+      axisAggregates[3]! * 0.20 +
+      axisAggregates[4]! * 0.25);
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -58701,4 +58851,50 @@ export function scaleDiminishedChordContent(pitches: readonly Pitch[]): number {
     if (dim.some((d) => Math.abs(c - d) <= 25)) count++;
   }
   return count / pitches.length;
+}
+
+export function scaleWholeToneAffinity(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const wt = [0, 200, 400, 600, 800, 1000];
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (wt.some((d) => Math.abs(c - d) <= 25)) count++;
+  }
+  return count / pitches.length;
+}
+
+export function scaleOctatonicAlignment(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const oct = [0, 200, 300, 500, 600, 800, 900, 1100];
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (oct.some((d) => Math.abs(c - d) <= 20)) count++;
+  }
+  return count / pitches.length;
+}
+
+export function scaleHexatonicBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const hex = [0, 300, 400, 700, 800, 1100];
+  let count = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (hex.some((d) => Math.abs(c - d) <= 25)) count++;
+  }
+  return count / pitches.length;
+}
+
+export function scalePentatonicBalance(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const major = [0, 200, 400, 700, 900];
+  const minor = [0, 300, 500, 700, 1000];
+  let maj = 0, min = 0;
+  for (const p of pitches) {
+    const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
+    if (major.some((d) => Math.abs(c - d) <= 25)) maj++;
+    if (minor.some((d) => Math.abs(c - d) <= 25)) min++;
+  }
+  return (maj / pitches.length + min / pitches.length) / 2;
 }
