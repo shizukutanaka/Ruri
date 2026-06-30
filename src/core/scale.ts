@@ -65459,3 +65459,50 @@ export function scaleChromaticSaturationV2(pitches: readonly Pitch[]): number {
   }
   return bins.size / 12;
 }
+
+export function scaleTritoneSymmetryV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Tritone symmetry: measures how evenly pitches are distributed across the tritone axis
+  // High symmetry = pitches map to themselves under 600-cent transposition
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let symmetric = 0;
+  for (const c of cents) {
+    const partner = (c + 600) % 1200;
+    if (cents.some((other) => Math.abs(other - partner) < 25)) symmetric++;
+  }
+  return pitches.length > 0 ? symmetric / pitches.length : 0;
+}
+
+export function scaleWholeToneContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Whole-tone content: pitches falling on the whole-tone scale grid (200-cent multiples)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    const nearest = Math.round(c / 200) * 200;
+    if (Math.abs(c - nearest) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleDiminishedChordContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Diminished chord tones: minor 3rd (300) and tritone (600) and diminished 7th (900)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 300) < 30 || Math.abs(c - 600) < 30 || Math.abs(c - 900) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}
+
+export function scaleAugmentedTriadContentV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Augmented triad tones: major 3rd (400) and augmented 5th (800)
+  const cents = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let count = 0;
+  for (const c of cents) {
+    if (Math.abs(c - 400) < 30 || Math.abs(c - 800) < 30) count++;
+  }
+  return Math.min(1, count / pitches.length);
+}

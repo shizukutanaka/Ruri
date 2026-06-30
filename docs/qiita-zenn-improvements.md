@@ -2098,3 +2098,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleSubtonicContent(pitches)` — 下属7度（短7度: 1000 cent付近）の音高割合
 - `scaleNeutralThirdContent(pitches)` — 中立3度（315〜385 cent, 短3度・長3度を除外）の音高割合
 - `scaleChromaticSaturationV2(pitches)` — 12半音スロットへの充填率（マクロ半音彩度）
+
+### Round 189: 音階和音素材分析
+
+- `scaleTritoneSymmetryV2(pitches)` — トライトーン軸対称性（600 cent移調で自己対応する音高の割合）
+- `scaleWholeToneContentV2(pitches)` — 全音音階グリッド（200 cent格子）への適合音高割合
+- `scaleDiminishedChordContentV2(pitches)` — 減三和音構成音（300/600/900 cent）の音高割合
+- `scaleAugmentedTriadContentV2(pitches)` — 増三和音構成音（400/800 cent）の音高割合
