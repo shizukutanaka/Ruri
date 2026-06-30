@@ -1552,6 +1552,12 @@ import {
   presetFamilySocraticRadarPointCloudProxy,
   presetFamilySocraticRadarVideoAnalysisProxy,
   presetFamilySocraticRadarSpeechRecognitionProxy,
+  presetFamilySocraticRadarGenomeSequencingProxy,
+  presetFamilySocraticRadarProteinStructurePredictionProxy,
+  presetFamilySocraticRadarRNAFoldingProxy,
+  presetFamilySocraticRadarMetagenomicAnalysisProxy,
+  presetFamilySocraticRadarPhylogeneticTreeProxy,
+  presetFamilySocraticRadarEpigenomicsAnalysisProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';

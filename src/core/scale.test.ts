@@ -2543,6 +2543,10 @@ import {
   scaleTensionRatio,
   scaleExtendedHarmonyScore,
   scaleAlterationDensity,
+  scaleOctatonicDensity,
+  scaleHexatonicDensity,
+  scalePentatonicMinorDensity,
+  scalePentatonicMajorDensity,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -63982,5 +63986,69 @@ describe('tuningFamilySocraticRadarSpeechRecognitionProxy', () => {
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarSpeechRecognitionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('scaleOctatonicDensity', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleOctatonicDensity([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleOctatonicDensity(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleOctatonicDensity(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleHexatonicDensity', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scaleHexatonicDensity([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleHexatonicDensity(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleHexatonicDensity(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scalePentatonicMinorDensity', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scalePentatonicMinorDensity([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scalePentatonicMinorDensity(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scalePentatonicMinorDensity(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scalePentatonicMajorDensity', () => {
+  it('returns 0 for empty scale', () => {
+    expect(scalePentatonicMajorDensity([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scalePentatonicMajorDensity(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scalePentatonicMajorDensity(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

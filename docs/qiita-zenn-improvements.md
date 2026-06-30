@@ -2359,3 +2359,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleTensionRatio`: テンション音（短2度/三全音/長7度）の密度
 - `scaleExtendedHarmonyScore`: 拡張和声（9・11・13度とその変形）のカバー率
 - `scaleAlterationDensity`: 全音階からの逸脱音（±40¢超）の割合
+
+## Round 220: スケール密度ヘルパ（オクタトニック・ヘキサトニック・ペンタトニック）
+
+- `scaleOctatonicDensity`: 全音/半音交互スケール（オクタトニック）との一致率（2形式の最大値）
+- `scaleHexatonicDensity`: ヘキサトニック（増和音）スケールとの一致率
+- `scalePentatonicMinorDensity`: マイナーペンタトニックスケールとの一致率
+- `scalePentatonicMajorDensity`: メジャーペンタトニックスケールとの一致率

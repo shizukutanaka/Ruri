@@ -1545,6 +1545,12 @@ import {
   tuningFamilySocraticRadarPointCloudProxy,
   tuningFamilySocraticRadarVideoAnalysisProxy,
   tuningFamilySocraticRadarSpeechRecognitionProxy,
+  tuningFamilySocraticRadarCycloneProxy,
+  tuningFamilySocraticRadarAnticycloneProxy,
+  tuningFamilySocraticRadarThunderstormProxy,
+  tuningFamilySocraticRadarHeatWaveProxy,
+  tuningFamilySocraticRadarBlizzardProxy,
+  tuningFamilySocraticRadarFogProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -29090,4 +29096,94 @@ export function presetFamilySocraticRadarSpeechRecognitionProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarSpeechRecognitionProxy(tunings, spectrum, rootHz);
+}
+
+// Q3523
+export function presetFamilySocraticRadarCycloneProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCycloneProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCycloneProxy(tunings, spectrum, rootHz);
+}
+
+// Q3525
+export function presetFamilySocraticRadarAnticycloneProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarAnticycloneProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarAnticycloneProxy(tunings, spectrum, rootHz);
+}
+
+// Q3527
+export function presetFamilySocraticRadarThunderstormProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarThunderstormProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarThunderstormProxy(tunings, spectrum, rootHz);
+}
+
+// Q3529
+export function presetFamilySocraticRadarHeatWaveProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarHeatWaveProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarHeatWaveProxy(tunings, spectrum, rootHz);
+}
+
+// Q3531
+export function presetFamilySocraticRadarBlizzardProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarBlizzardProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarBlizzardProxy(tunings, spectrum, rootHz);
+}
+
+// Q3533
+export function presetFamilySocraticRadarFogProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarFogProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarFogProxy(tunings, spectrum, rootHz);
 }
