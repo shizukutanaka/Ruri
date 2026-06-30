@@ -1293,6 +1293,12 @@ import {
   tuningFamilySocraticRadarConcreteStrengthProxy,
   tuningFamilySocraticRadarSteelYieldProxy,
   tuningFamilySocraticRadarStructuralDampingProxy,
+  tuningFamilySocraticRadarCropYieldProxy,
+  tuningFamilySocraticRadarSoilFertilityProxy,
+  tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy,
+  tuningFamilySocraticRadarWaterUseEfficiencyProxy,
+  tuningFamilySocraticRadarNitrogenFixationProxy,
+  tuningFamilySocraticRadarHarvestIndexProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -25027,4 +25033,94 @@ export function presetFamilySocraticRadarStructuralDampingProxy(
     return loadTuningPreset(preset);
   });
   return tuningFamilySocraticRadarStructuralDampingProxy(tunings, spectrum, rootHz);
+}
+
+// Q3007 — presetFamilySocraticRadarCropYieldProxy
+export function presetFamilySocraticRadarCropYieldProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarCropYieldProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarCropYieldProxy(tunings, spectrum, rootHz);
+}
+
+// Q3009 — presetFamilySocraticRadarSoilFertilityProxy
+export function presetFamilySocraticRadarSoilFertilityProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarSoilFertilityProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarSoilFertilityProxy(tunings, spectrum, rootHz);
+}
+
+// Q3011 — presetFamilySocraticRadarPhotosynthesisEfficiencyProxy
+export function presetFamilySocraticRadarPhotosynthesisEfficiencyProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy(tunings, spectrum, rootHz);
+}
+
+// Q3013 — presetFamilySocraticRadarWaterUseEfficiencyProxy
+export function presetFamilySocraticRadarWaterUseEfficiencyProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarWaterUseEfficiencyProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarWaterUseEfficiencyProxy(tunings, spectrum, rootHz);
+}
+
+// Q3015 — presetFamilySocraticRadarNitrogenFixationProxy
+export function presetFamilySocraticRadarNitrogenFixationProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarNitrogenFixationProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarNitrogenFixationProxy(tunings, spectrum, rootHz);
+}
+
+// Q3017 — presetFamilySocraticRadarHarvestIndexProxy
+export function presetFamilySocraticRadarHarvestIndexProxy(
+  presetIds: string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+  presets: readonly TuningPreset[] = ALL_PRESETS,
+): ReturnType<typeof tuningFamilySocraticRadarHarvestIndexProxy> {
+  const tunings = presetIds.map((presetId) => {
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) throw new RangeError(`Unknown preset: ${presetId}`);
+    return loadTuningPreset(preset);
+  });
+  return tuningFamilySocraticRadarHarvestIndexProxy(tunings, spectrum, rootHz);
 }
