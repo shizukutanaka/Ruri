@@ -2462,3 +2462,11 @@ Added 4 flamenco/Spanish scale analysis helpers:
 - `scaleAndalusianCadence` — Andalusian cadence scale
 - `scaleSpanishGypsy` — Spanish Gypsy / Double Harmonic Major
 - `scaleFlamencoScale` — Flamenco scale (8-tone)
+
+## Round 234: オセアニア音階ヘルパ
+
+Added 4 Oceanian scale analysis helpers:
+- `scaleMaoriPentatonic` — Māori near-equidistant pentatonic
+- `scaleHawaiianScale` — Hawaiian just intonation major-like scale
+- `scaleAboriginalPentatonic` — Australian Aboriginal pentatonic
+- `scaleMelanesianScale` — Melanesian 5-tone scale

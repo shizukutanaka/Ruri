@@ -1642,6 +1642,12 @@ import {
   presetFamilySocraticRadarNutrientCyclingProxy,
   presetFamilySocraticRadarHabitatFragmentationProxyV2,
   presetFamilySocraticRadarTrophicCascadeProxy,
+  presetFamilySocraticRadarCrystalGrowthProxy,
+  presetFamilySocraticRadarPolymerChainV2Proxy,
+  presetFamilySocraticRadarMetallurgicalPhaseProxy,
+  presetFamilySocraticRadarNanostructureSynthesisProxy,
+  presetFamilySocraticRadarCorrosionKineticsProxy,
+  presetFamilySocraticRadarThinFilmDepositionProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -39574,5 +39580,89 @@ describe('presetFamilySocraticRadarTrophicCascadeProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarTrophicCascadeProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarCrystalGrowthProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCrystalGrowthProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCrystalGrowthProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCrystalGrowthProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarPolymerChainV2Proxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarPolymerChainV2Proxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarPolymerChainV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPolymerChainV2Proxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarMetallurgicalPhaseProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarMetallurgicalPhaseProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarMetallurgicalPhaseProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMetallurgicalPhaseProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarNanostructureSynthesisProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarNanostructureSynthesisProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarNanostructureSynthesisProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNanostructureSynthesisProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarCorrosionKineticsProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarCorrosionKineticsProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarCorrosionKineticsProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCorrosionKineticsProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarThinFilmDepositionProxy', () => {
+  it('returns finite for single preset', () => {
+    const v = presetFamilySocraticRadarThinFilmDepositionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    const v = presetFamilySocraticRadarThinFilmDepositionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThinFilmDepositionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
