@@ -2809,3 +2809,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleFilipinoCulintang`: フィリピンのクリンタン音階 (pentatonic, 0-200-400-700-900c)
 - `scaleMalaysianScale`: マレーシアの音階 (major heptatonic, 0-200-400-500-700-900-1100c)
 - `scaleCambodianScale`: カンボジアの音階 (neutral intervals, 0-200-350-500-700-900-1050c)
+
+### Round276: 大洋州音階ヘルパ (Oceanian Scales)
+- `scaleMaoriScaleV2`: マオリの音階V2 (major pentatonic, 0-200-400-700-900c)
+- `scalePolynesianScale`: ポリネシアの音階 (minor pentatonic, 0-200-500-700-1000c)
+- `scaleAboriginalDreaming`: アボリジナルのドリーミング音階 (0-300-500-700-1000c)
+- `scalePapuaNewGuineaScale`: パプアニューギニアの音階 (0-200-400-600-900c)
