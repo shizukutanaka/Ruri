@@ -1910,6 +1910,12 @@ import {
   tuningFamilySocraticRadarThyroidProxy,
   tuningFamilySocraticRadarAdrenalProxy,
   tuningFamilySocraticRadarGlucoseHomeostasisProxy,
+  tuningFamilySocraticRadarRetinaProxy,
+  tuningFamilySocraticRadarCorneaProxy,
+  tuningFamilySocraticRadarLensAccommodationProxy,
+  tuningFamilySocraticRadarPhotoreceptorProxy,
+  tuningFamilySocraticRadarVisualCortexProxy,
+  tuningFamilySocraticRadarIntraocularPressureProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -34836,4 +34842,88 @@ export function presetFamilySocraticRadarGlucoseHomeostasisProxy(
     return loadTuningPreset(p);
   });
   return tuningFamilySocraticRadarGlucoseHomeostasisProxy(tunings, spectrum, rootHz);
+}
+
+// Q4243 — presetFamilySocraticRadarRetinaProxy
+export function presetFamilySocraticRadarRetinaProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarRetinaProxy(tunings, spectrum, rootHz);
+}
+
+// Q4245 — presetFamilySocraticRadarCorneaProxy
+export function presetFamilySocraticRadarCorneaProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarCorneaProxy(tunings, spectrum, rootHz);
+}
+
+// Q4247 — presetFamilySocraticRadarLensAccommodationProxy
+export function presetFamilySocraticRadarLensAccommodationProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarLensAccommodationProxy(tunings, spectrum, rootHz);
+}
+
+// Q4249 — presetFamilySocraticRadarPhotoreceptorProxy
+export function presetFamilySocraticRadarPhotoreceptorProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarPhotoreceptorProxy(tunings, spectrum, rootHz);
+}
+
+// Q4251 — presetFamilySocraticRadarVisualCortexProxy
+export function presetFamilySocraticRadarVisualCortexProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarVisualCortexProxy(tunings, spectrum, rootHz);
+}
+
+// Q4253 — presetFamilySocraticRadarIntraocularPressureProxy
+export function presetFamilySocraticRadarIntraocularPressureProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarIntraocularPressureProxy(tunings, spectrum, rootHz);
 }

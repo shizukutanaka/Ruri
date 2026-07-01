@@ -2942,6 +2942,12 @@ import {
   tuningFamilySocraticRadarThyroidProxy,
   tuningFamilySocraticRadarAdrenalProxy,
   tuningFamilySocraticRadarGlucoseHomeostasisProxy,
+  tuningFamilySocraticRadarRetinaProxy,
+  tuningFamilySocraticRadarCorneaProxy,
+  tuningFamilySocraticRadarLensAccommodationProxy,
+  tuningFamilySocraticRadarPhotoreceptorProxy,
+  tuningFamilySocraticRadarVisualCortexProxy,
+  tuningFamilySocraticRadarIntraocularPressureProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -3142,6 +3148,10 @@ import {
   scaleHopiScale,
   scaleIroquoisScale,
   scaleInuitScale,
+  scaleMongolianBowl,
+  scaleTibetanSinging,
+  scaleNepaleseScale,
+  scaleLadakhiScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';

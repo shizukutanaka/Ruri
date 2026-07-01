@@ -83248,3 +83248,51 @@ export function scaleInuitScale(pitches: readonly Pitch[]): number {
   }
   return matched / inuit.length;
 }
+
+export function scaleMongolianBowl(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const mongolianBowl = [0, 200, 400, 700, 900];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of mongolianBowl) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / mongolianBowl.length;
+}
+
+export function scaleTibetanSinging(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const tibetanSinging = [0, 200, 350, 500, 700, 850, 1050];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of tibetanSinging) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / tibetanSinging.length;
+}
+
+export function scaleNepaleseScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const nepalese = [0, 200, 400, 500, 700, 900, 1100];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of nepalese) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / nepalese.length;
+}
+
+export function scaleLadakhiScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const ladakhi = [0, 150, 350, 500, 700, 900, 1100];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of ladakhi) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / ladakhi.length;
+}
