@@ -2841,6 +2841,12 @@ import {
   tuningFamilySocraticRadarPhylogeneticDivergenceProxyV2,
   tuningFamilySocraticRadarCoevolutionaryArmsRaceProxy,
   tuningFamilySocraticRadarHorizontalGeneTransferProxyV2,
+  tuningFamilySocraticRadarPartitionFunctionV3Proxy,
+  tuningFamilySocraticRadarPhaseTransitionOrderProxy,
+  tuningFamilySocraticRadarIsingModelSpinProxy,
+  tuningFamilySocraticRadarRenormalizationGroupProxy,
+  tuningFamilySocraticRadarFluctuationDissipationV3Proxy,
+  tuningFamilySocraticRadarErgodicityChaosProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -70483,6 +70489,48 @@ describe('tuningFamilySocraticRadarHorizontalGeneTransferProxyV2', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarHorizontalGeneTransferProxyV2([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarHorizontalGeneTransferProxyV2([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarHorizontalGeneTransferProxyV2([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarPartitionFunctionV3Proxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarPartitionFunctionV3Proxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarPartitionFunctionV3Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarPartitionFunctionV3Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarPhaseTransitionOrderProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarPhaseTransitionOrderProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarPhaseTransitionOrderProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarPhaseTransitionOrderProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarIsingModelSpinProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarIsingModelSpinProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarIsingModelSpinProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarIsingModelSpinProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarRenormalizationGroupProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarRenormalizationGroupProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarRenormalizationGroupProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarRenormalizationGroupProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarFluctuationDissipationV3Proxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarFluctuationDissipationV3Proxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarFluctuationDissipationV3Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarFluctuationDissipationV3Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarErgodicityChaosProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarErgodicityChaosProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarErgodicityChaosProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarErgodicityChaosProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
 });
 
 // Round264 コーカサス音階
