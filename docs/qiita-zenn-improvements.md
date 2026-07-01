@@ -2614,3 +2614,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleFijianScale` | フィジー伝統音階 | 0,240,480,720,960 | 50¢ |
 | `scaleTonganScale` | トンガ伝統音階 | 0,204,408,702,906 | 45¢ |
 | `scalePapuaNewGuinea` | パプアニューギニア高地音階 | 0,267,498,765,996 | 50¢ |
+
+## Round 251 — 中米音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleMayanPentatonic` | マヤ5音音階 | 0,240,480,720,960 | 50¢ |
+| `scaleAztecScale` | アステカ4音音階 | 0,267,498,765 | 50¢ |
+| `scaleGarifulaScale` | ガリフナ音階 | 0,204,498,702,996 | 45¢ |
+| `scaleZapotecScale` | サポテカ音階 | 0,204,408,702,906 | 45¢ |
