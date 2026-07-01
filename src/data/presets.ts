@@ -2150,6 +2150,12 @@ import {
   tuningFamilySocraticRadarIronMetabolismProxy,
   tuningFamilySocraticRadarHemoglobinopathyProxy,
   tuningFamilySocraticRadarCoagulationFactorProxy,
+  tuningFamilySocraticRadarEndocrineDisruptorProxy,
+  tuningFamilySocraticRadarInsulinResistanceProxy,
+  tuningFamilySocraticRadarThyroidHormoneProxy,
+  tuningFamilySocraticRadarAdrenalAxisProxy,
+  tuningFamilySocraticRadarGonadotropinProxy,
+  tuningFamilySocraticRadarMetabolicSyndromeProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -38422,4 +38428,88 @@ export function presetFamilySocraticRadarCoagulationFactorProxy(
     return loadTuningPreset(p);
   });
   return tuningFamilySocraticRadarCoagulationFactorProxy(tunings, spectrum, rootHz);
+}
+
+// Q4723 — presetFamilySocraticRadarEndocrineDisruptorProxy
+export function presetFamilySocraticRadarEndocrineDisruptorProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarEndocrineDisruptorProxy(tunings, spectrum, rootHz);
+}
+
+// Q4725 — presetFamilySocraticRadarInsulinResistanceProxy
+export function presetFamilySocraticRadarInsulinResistanceProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarInsulinResistanceProxy(tunings, spectrum, rootHz);
+}
+
+// Q4727 — presetFamilySocraticRadarThyroidHormoneProxy
+export function presetFamilySocraticRadarThyroidHormoneProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarThyroidHormoneProxy(tunings, spectrum, rootHz);
+}
+
+// Q4729 — presetFamilySocraticRadarAdrenalAxisProxy
+export function presetFamilySocraticRadarAdrenalAxisProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarAdrenalAxisProxy(tunings, spectrum, rootHz);
+}
+
+// Q4731 — presetFamilySocraticRadarGonadotropinProxy
+export function presetFamilySocraticRadarGonadotropinProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarGonadotropinProxy(tunings, spectrum, rootHz);
+}
+
+// Q4733 — presetFamilySocraticRadarMetabolicSyndromeProxy
+export function presetFamilySocraticRadarMetabolicSyndromeProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarMetabolicSyndromeProxy(tunings, spectrum, rootHz);
 }
