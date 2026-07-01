@@ -2030,6 +2030,12 @@ import {
   tuningFamilySocraticRadarPandemicSpreadProxy,
   tuningFamilySocraticRadarVaccineHesitancyProxy,
   tuningFamilySocraticRadarQuarantineProxy,
+  tuningFamilySocraticRadarAllergyProxy,
+  tuningFamilySocraticRadarAsthmaProxy,
+  tuningFamilySocraticRadarAnaphylaxisProxy,
+  tuningFamilySocraticRadarHistamineProxy,
+  tuningFamilySocraticRadarEosinophilProxy,
+  tuningFamilySocraticRadarAtopyProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -36622,4 +36628,88 @@ export function presetFamilySocraticRadarQuarantineProxy(
     return loadTuningPreset(p);
   });
   return tuningFamilySocraticRadarQuarantineProxy(tunings, spectrum, rootHz);
+}
+
+// Q4483 — presetFamilySocraticRadarAllergyProxy
+export function presetFamilySocraticRadarAllergyProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarAllergyProxy(tunings, spectrum, rootHz);
+}
+
+// Q4485 — presetFamilySocraticRadarAsthmaProxy
+export function presetFamilySocraticRadarAsthmaProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarAsthmaProxy(tunings, spectrum, rootHz);
+}
+
+// Q4487 — presetFamilySocraticRadarAnaphylaxisProxy
+export function presetFamilySocraticRadarAnaphylaxisProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarAnaphylaxisProxy(tunings, spectrum, rootHz);
+}
+
+// Q4489 — presetFamilySocraticRadarHistamineProxy
+export function presetFamilySocraticRadarHistamineProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarHistamineProxy(tunings, spectrum, rootHz);
+}
+
+// Q4491 — presetFamilySocraticRadarEosinophilProxy
+export function presetFamilySocraticRadarEosinophilProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarEosinophilProxy(tunings, spectrum, rootHz);
+}
+
+// Q4493 — presetFamilySocraticRadarAtopyProxy
+export function presetFamilySocraticRadarAtopyProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarAtopyProxy(tunings, spectrum, rootHz);
 }
