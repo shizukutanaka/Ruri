@@ -2891,3 +2891,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleYupikScale`: Yupik pentatonic scale [0, 150, 350, 700, 850]
 - `scaleTlingitScale`: Tlingit hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleAthabaskanScale`: Athabaskan hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round288: メソアメリカ音階 (Mesoamerican Scales)
+
+- `scaleMayanScale`: Mayan pentatonic scale [0, 200, 400, 700, 900]
+- `scaleNahuatlScale`: Nahuatl hexatonic scale [0, 200, 300, 500, 700, 900]
+- `scaleMixtecScale`: Mixtec heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleOlmecScale`: Olmec pentatonic scale [0, 150, 350, 700, 850]
