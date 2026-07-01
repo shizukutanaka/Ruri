@@ -2605,3 +2605,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleAlbanianIso` | アルバニア・イソ声部 | 0,182,386,498,702,884,1088 | 40¢ |
 | `scaleMacedonianScale` | マケドニア民謡音階 | 0,100,400,500,700,800,1100 | 40¢ |
 | `scaleBosnianSevdah` | ボスニア・セヴダー | 0,150,350,500,700,850,1050 | 40¢ |
+
+## Round 250 — 太平洋島嶼音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleSamoanScale` | サモア伝統音階 | 0,204,498,702,996 | 50¢ |
+| `scaleFijianScale` | フィジー伝統音階 | 0,240,480,720,960 | 50¢ |
+| `scaleTonganScale` | トンガ伝統音階 | 0,204,408,702,906 | 45¢ |
+| `scalePapuaNewGuinea` | パプアニューギニア高地音階 | 0,267,498,765,996 | 50¢ |
