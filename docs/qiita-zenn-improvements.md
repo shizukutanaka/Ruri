@@ -2779,3 +2779,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleSwedishPolskaScale`: スウェーデンのポルスカ音階 (melodic minor variant, 0-200-300-500-700-900-1100c)
 - `scaleFinnishRunoV2`: フィンランドのルノ音階V2 (harmonic minor variant, 0-200-300-500-700-800-1100c)
 - `scaleDanishScale`: デンマーク音階 (major heptatonic, 0-200-400-500-700-900-1100c)
+
+### Round271: 西アフリカ音階ヘルパ (West African Scales)
+- `scaleGhanaianHighlife`: ガーナのハイライフ音階 (major pentatonic, 0-200-400-700-900c)
+- `scaleWolofScale`: ウォロフ音階 (minor pentatonic, 0-200-500-700-1000c)
+- `scaleMandinkaScale`: マンディンカ音階 (melodic minor, 0-200-300-500-700-900-1100c)
+- `scaleHausaScale`: ハウサ音階 (Mixolydian, 0-200-400-500-700-900-1000c)
