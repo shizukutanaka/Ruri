@@ -1768,6 +1768,12 @@ import {
   presetFamilySocraticRadarMetabolicPathwayProxy,
   presetFamilySocraticRadarCellSignalingProxy,
   presetFamilySocraticRadarATPSynthesisProxy,
+  presetFamilySocraticRadarCarbonCycleV3Proxy,
+  presetFamilySocraticRadarOceanCirculationProxy,
+  presetFamilySocraticRadarAtmosphericConvectionProxy,
+  presetFamilySocraticRadarPermafrostThawProxy,
+  presetFamilySocraticRadarMonsoonSystemProxy,
+  presetFamilySocraticRadarGlacierRetreatProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -41321,4 +41327,40 @@ describe('presetFamilySocraticRadarATPSynthesisProxy', () => {
   it('single preset finite', () => { const v = presetFamilySocraticRadarATPSynthesisProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('two presets finite', () => { const v = presetFamilySocraticRadarATPSynthesisProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarATPSynthesisProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarCarbonCycleV3Proxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarCarbonCycleV3Proxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarCarbonCycleV3Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarCarbonCycleV3Proxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarOceanCirculationProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarOceanCirculationProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarOceanCirculationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarOceanCirculationProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarAtmosphericConvectionProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarAtmosphericConvectionProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarAtmosphericConvectionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarAtmosphericConvectionProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarPermafrostThawProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarPermafrostThawProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarPermafrostThawProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarPermafrostThawProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarMonsoonSystemProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarMonsoonSystemProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarMonsoonSystemProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarMonsoonSystemProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarGlacierRetreatProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarGlacierRetreatProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarGlacierRetreatProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarGlacierRetreatProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
 });
