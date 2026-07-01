@@ -2668,3 +2668,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleKhmerScale | クメール五音音階 | [0, 171, 343, 686, 857]¢ | 55¢ |
 | scaleJavaneseSlendroV2 | ジャワ・スレンドロ | [0, 240, 480, 720, 960]¢ | 60¢ |
 | scaleBurmeseHeptatonicV2 | ビルマ七音音階 | [0, 204, 408, 498, 702, 906, 1110]¢ | 50¢ |
+
+## Round 257 — 南アメリカ音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleAndesQuechuaScale | アンデス・ケチュア五音音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
+| scaleAmazonianScale | アマゾン先住民音階 | [0, 165, 386, 702, 884]¢ | 55¢ |
+| scaleGuaraniScale | グアラニー五音音階 | [0, 204, 408, 702, 906]¢ | 50¢ |
+| scaleAymaraScaleV2 | アイマラ五音音階 | [0, 240, 480, 720, 960]¢ | 60¢ |

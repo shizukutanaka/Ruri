@@ -79116,3 +79116,51 @@ export function scaleBurmeseHeptatonicV2(pitches: readonly Pitch[]): number {
   }
   return matched / burmese.length;
 }
+
+export function scaleAndesQuechuaScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const andesQuechua = [0, 204, 498, 702, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of andesQuechua) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / andesQuechua.length;
+}
+
+export function scaleAmazonianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const amazonian = [0, 165, 386, 702, 884];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of amazonian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / amazonian.length;
+}
+
+export function scaleGuaraniScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const guarani = [0, 204, 408, 702, 906];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of guarani) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / guarani.length;
+}
+
+export function scaleAymaraScaleV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const aymara = [0, 240, 480, 720, 960];
+  const tolerance = 60;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of aymara) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / aymara.length;
+}

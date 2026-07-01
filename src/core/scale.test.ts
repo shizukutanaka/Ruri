@@ -2903,6 +2903,10 @@ import {
   scaleKhmerScale,
   scaleJavaneseSlendroV2,
   scaleBurmeseHeptatonicV2,
+  scaleAndesQuechuaScale,
+  scaleAmazonianScale,
+  scaleGuaraniScale,
+  scaleAymaraScaleV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -69940,4 +69944,29 @@ describe('tuningFamilySocraticRadarGlacierRetreatProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarGlacierRetreatProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarGlacierRetreatProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarGlacierRetreatProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round257 南アメリカ音階
+describe('scaleAndesQuechuaScale', () => {
+  it('empty returns 0', () => { expect(scaleAndesQuechuaScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleAndesQuechuaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleAndesQuechuaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleAmazonianScale', () => {
+  it('empty returns 0', () => { expect(scaleAmazonianScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleAmazonianScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleAmazonianScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleGuaraniScale', () => {
+  it('empty returns 0', () => { expect(scaleGuaraniScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleGuaraniScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleGuaraniScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleAymaraScaleV2', () => {
+  it('empty returns 0', () => { expect(scaleAymaraScaleV2([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleAymaraScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleAymaraScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
