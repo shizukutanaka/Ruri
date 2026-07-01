@@ -2859,6 +2859,10 @@ import {
   scaleAztecScale,
   scaleGarifulaScale,
   scaleZapotecScale,
+  scalePygmyScale,
+  scaleAkanScale,
+  scaleEweScale,
+  scaleYorubaScaleV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -69599,4 +69603,33 @@ describe('tuningFamilySocraticRadarFrequencyCombGenerationProxy', () => {
     const v = tuningFamilySocraticRadarFrequencyCombGenerationProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(isFinite(v)).toBe(true);
   });
+});
+
+// Round252 西アフリカ音階
+describe('scalePygmyScale', () => {
+  const spec = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(scalePygmyScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scalePygmyScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scalePygmyScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleAkanScale', () => {
+  const spec = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(scaleAkanScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleAkanScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleAkanScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleEweScale', () => {
+  const spec = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(scaleEweScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleEweScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleEweScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleYorubaScaleV2', () => {
+  const spec = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(scaleYorubaScaleV2([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });

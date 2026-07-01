@@ -78396,3 +78396,51 @@ export function scaleZapotecScale(pitches: readonly Pitch[]): number {
   }
   return matched / zapotec.length;
 }
+
+export function scalePygmyScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const pygmy = [0, 165, 498, 1035];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of pygmy) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / pygmy.length;
+}
+
+export function scaleAkanScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const akan = [0, 204, 408, 702, 906];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of akan) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / akan.length;
+}
+
+export function scaleEweScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const ewe = [0, 180, 384, 696, 900];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of ewe) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / ewe.length;
+}
+
+export function scaleYorubaScaleV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const yoruba = [0, 165, 498, 675, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of yoruba) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / yoruba.length;
+}
