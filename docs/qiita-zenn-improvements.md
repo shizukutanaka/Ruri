@@ -3115,3 +3115,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleTrinidadianSteelpanScale`: Trinidadian Steelpan heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleJamaicanDancehallScale`: Jamaican Dancehall heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
 - `scaleHaitianKompaScale`: Haitian Kompa heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round320: スペイン地方音階 (Spanish Regional Scales)
+
+- `scaleBaskCountryScale`: Basque Country heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleNavarreScale`: Navarre heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleAragonScale`: Aragon heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
+- `scaleGalicianScaleV2`: Galician heptatonic scale variant [0, 200, 400, 500, 700, 900, 1000]
