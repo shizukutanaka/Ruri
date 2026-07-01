@@ -3045,3 +3045,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleNagaScale`: Naga hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleKarenScale`: Karen pentatonic scale [0, 150, 350, 700, 850]
 - `scaleShanScale`: Shan hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round310: ルーマニア地方音階 (Romanian Regional Scales)
+
+- `scaleMoldovanScale`: Moldovan heptatonic scale [0, 200, 300, 500, 700, 800, 1100]
+- `scaleTranssylvanianScale`: Transylvanian heptatonic scale [0, 200, 400, 500, 700, 800, 1100]
+- `scaleWallachianScale`: Wallachian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleBanatScale`: Banat heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
