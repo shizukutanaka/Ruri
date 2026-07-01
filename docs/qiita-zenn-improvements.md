@@ -3087,3 +3087,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleRomaScale`: Roma gypsy scale [0, 200, 300, 600, 700, 800, 1100]
 - `scaleSintiScale`: Sinti heptatonic scale [0, 100, 400, 500, 700, 800, 1100]
 - `scaleTransdanubianScale`: Transdanubian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+
+## Round316: アルバニア音階 (Albanian Scales)
+
+- `scaleAlbanianScaleV2`: Albanian heptatonic scale variant [0, 200, 400, 500, 700, 900, 1100]
+- `scaleArbereshScale`: Arbëresh heptatonic scale [0, 200, 300, 500, 700, 800, 1100]
+- `scaleToskScale`: Tosk heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleGhegScale`: Gheg heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
