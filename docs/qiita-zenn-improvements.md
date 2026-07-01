@@ -3108,3 +3108,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleGypsyKingsScale`: Gypsy Kings phrygian-like scale [0, 100, 400, 500, 700, 800, 1100]
 - `scaleGranadaScale`: Granada phrygian-like scale [0, 100, 300, 500, 700, 800, 1000]
 - `scaleSevillanaScale`: Sevillana heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
+
+## Round319: カリブ音楽音階v2 (Caribbean Music Scales v2)
+
+- `scaleCaribbeanCalypsoV2`: Caribbean Calypso heptatonic scale variant [0, 200, 400, 500, 700, 900, 1100]
+- `scaleTrinidadianSteelpanScale`: Trinidadian Steelpan heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleJamaicanDancehallScale`: Jamaican Dancehall heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+- `scaleHaitianKompaScale`: Haitian Kompa heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
