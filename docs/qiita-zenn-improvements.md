@@ -3031,3 +3031,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleNeapolitanScaleV2`: Neapolitan phrygian-like scale variant [0, 100, 300, 500, 700, 800, 1100]
 - `scaleTuscanScale`: Tuscan heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleLombardScale`: Lombard heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+
+## Round308: 西スラブ音階 (West Slavic Scales)
+
+- `scaleWestSlavicScale`: West Slavic heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scalePolishScaleV2`: Polish heptatonic scale variant [0, 200, 400, 500, 700, 800, 1100]
+- `scaleCzechScaleV2`: Czech heptatonic scale variant [0, 200, 400, 500, 700, 900, 1000]
+- `scaleSlovakScale`: Slovak heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
