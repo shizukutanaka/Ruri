@@ -2940,3 +2940,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleIrishScale`: Irish heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleScottishScale`: Scottish pentatonic scale [0, 200, 400, 700, 900]
 - `scaleBretonScale`: Breton heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+
+## Round295: イベリア地方音階 (Iberian Regional Scales)
+
+- `scaleBasqueScale`: Basque heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleAndalusianScale`: Andalusian flamenco-like scale [0, 100, 400, 500, 700, 800, 1100]
+- `scaleAsturianScale`: Asturian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleValencianScale`: Valencian heptatonic scale [0, 200, 300, 500, 700, 900, 1100]
