@@ -2982,3 +2982,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleTorresStraitScale`: Torres Strait hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleMaoriScaleV3`: Maori pentatonic scale variant [0, 150, 350, 700, 850]
 - `scaleTasmanianScale`: Tasmanian hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round301: マカーム音階 (Maqom Scales)
+
+- `scalePersianClassical`: Persian classical dastgah-like scale [0, 90, 400, 500, 700, 790, 1100]
+- `scaleAzerbaijaniScale`: Azerbaijani mugham-like scale [0, 150, 350, 500, 700, 850, 1050]
+- `scaleUzbekMaqom`: Uzbek Shashmaqom scale [0, 200, 350, 500, 700, 900, 1050]
+- `scaleTajikMaqom`: Tajik Shashmaqom scale [0, 200, 400, 500, 700, 800, 1100]
