@@ -70592,3 +70592,45 @@ describe('scaleUkrainianDorianScale', () => {
   it('12-EDO in [0,1]', () => { const v = scaleUkrainianDorianScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleUkrainianDorianScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
+
+describe('tuningFamilySocraticRadarBandStructureDispersionProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarBandStructureDispersionProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarBandStructureDispersionProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarBandStructureDispersionProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarFermiSurfaceTopologyProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarFermiSurfaceTopologyProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarFermiSurfaceTopologyProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarFermiSurfaceTopologyProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarPhononDispersionCurveProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarPhononDispersionCurveProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarPhononDispersionCurveProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarPhononDispersionCurveProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarSuperconductingGapProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarSuperconductingGapProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarSuperconductingGapProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarSuperconductingGapProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarHallEffectMobilityProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarHallEffectMobilityProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarHallEffectMobilityProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarHallEffectMobilityProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarExcitonBindingEnergyProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarExcitonBindingEnergyProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarExcitonBindingEnergyProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarExcitonBindingEnergyProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
