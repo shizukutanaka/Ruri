@@ -2533,3 +2533,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleCzechLidova` | チェコ民謡音階 | 0,204,294,498,702,906,996 | 40¢ |
 | `scaleUkrainianDorian` | ウクライナ・ドリアン | 0,204,294,498,702,906,996 | 40¢ |
 | `scaleSerbianKolo` | セルビア・コロ | 0,94,294,498,702,792,1088 | 40¢ |
+
+## Round 242 — 南米先住民音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleQuechuaPentatonic` | ケチュア5音音階 | 0,240,480,720,960 | 50¢ |
+| `scaleAymaraScale` | アイマラ音階 | 0,204,498,702,996 | 45¢ |
+| `scaleGuaraniPentatonic` | グアラニー5音音階 | 0,267,498,765,996 | 50¢ |
+| `scaleTupiScale` | トゥピ音階 | 0,204,408,702,906 | 45¢ |
