@@ -2842,3 +2842,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleHopiScale`: Hopi pentatonic scale [0, 200, 400, 700, 900]
 - `scaleIroquoisScale`: Iroquois pentatonic scale [0, 200, 400, 500, 700]
 - `scaleInuitScale`: Inuit pentatonic scale [0, 150, 350, 700, 900]
+
+## Round281: ヒマラヤ音階 (Himalayan Scales)
+
+- `scaleMongolianBowl`: Mongolian singing bowl pentatonic [0, 200, 400, 700, 900]
+- `scaleTibetanSinging`: Tibetan singing bowl heptatonic [0, 200, 350, 500, 700, 850, 1050]
+- `scaleNepaleseScale`: Nepalese diatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleLadakhiScale`: Ladakhi folk scale [0, 150, 350, 500, 700, 900, 1100]
