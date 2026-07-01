@@ -2933,3 +2933,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleOzarkScale`: Ozark pentatonic scale [0, 200, 400, 700, 900]
 - `scaleCajunScale`: Cajun heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
 - `scaleZydecoScale`: Zydeco heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+
+## Round294: ケルト音階 (Celtic Scales)
+
+- `scaleWelshScale`: Welsh heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleIrishScale`: Irish heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleScottishScale`: Scottish pentatonic scale [0, 200, 400, 700, 900]
+- `scaleBretonScale`: Breton heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
