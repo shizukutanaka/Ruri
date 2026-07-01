@@ -78444,3 +78444,51 @@ export function scaleYorubaScaleV2(pitches: readonly Pitch[]): number {
   }
   return matched / yoruba.length;
 }
+
+export function scaleSwedishHerdingScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const swedishHerding = [0, 204, 294, 498, 702, 996, 1110];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of swedishHerding) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / swedishHerding.length;
+}
+
+export function scaleNorwegianSlattScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const norwegianSlatt = [0, 182, 386, 498, 702, 884, 1088];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of norwegianSlatt) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / norwegianSlatt.length;
+}
+
+export function scaleFinnishKanteliScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const finnishKanteli = [0, 204, 408, 498, 702, 906, 1110];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of finnishKanteli) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / finnishKanteli.length;
+}
+
+export function scaleSamiJoikScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const samiJoik = [0, 165, 498, 702, 996];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of samiJoik) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / samiJoik.length;
+}

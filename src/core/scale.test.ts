@@ -2863,6 +2863,10 @@ import {
   scaleAkanScale,
   scaleEweScale,
   scaleYorubaScaleV2,
+  scaleSwedishHerdingScale,
+  scaleNorwegianSlattScale,
+  scaleFinnishKanteliScale,
+  scaleSamiJoikScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -69632,4 +69636,29 @@ describe('scaleYorubaScaleV2', () => {
   it('empty returns 0', () => { expect(scaleYorubaScaleV2([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+// Round253 北欧音階
+describe('scaleSwedishHerdingScale', () => {
+  it('empty returns 0', () => { expect(scaleSwedishHerdingScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleSwedishHerdingScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleSwedishHerdingScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleNorwegianSlattScale', () => {
+  it('empty returns 0', () => { expect(scaleNorwegianSlattScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleNorwegianSlattScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleNorwegianSlattScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleFinnishKanteliScale', () => {
+  it('empty returns 0', () => { expect(scaleFinnishKanteliScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleFinnishKanteliScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleFinnishKanteliScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleSamiJoikScale', () => {
+  it('empty returns 0', () => { expect(scaleSamiJoikScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleSamiJoikScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleSamiJoikScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
