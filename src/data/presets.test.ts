@@ -1780,6 +1780,12 @@ import {
   presetFamilySocraticRadarOceanAcidificationV3Proxy,
   presetFamilySocraticRadarBioluminescenceProxy,
   presetFamilySocraticRadarPelagicZonationProxy,
+  presetFamilySocraticRadarTectonicPlateProxy,
+  presetFamilySocraticRadarVolcanicEruptionProxy,
+  presetFamilySocraticRadarSeismicWavePropagationV2Proxy,
+  presetFamilySocraticRadarMineralCrystallizationProxy,
+  presetFamilySocraticRadarErosionSedimentationProxy,
+  presetFamilySocraticRadarGeothermalGradientV2Proxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -41405,4 +41411,40 @@ describe('presetFamilySocraticRadarPelagicZonationProxy', () => {
   it('single preset finite', () => { const v = presetFamilySocraticRadarPelagicZonationProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('two presets finite', () => { const v = presetFamilySocraticRadarPelagicZonationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarPelagicZonationProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarTectonicPlateProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarTectonicPlateProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarTectonicPlateProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarTectonicPlateProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarVolcanicEruptionProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarVolcanicEruptionProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarVolcanicEruptionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarVolcanicEruptionProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarSeismicWavePropagationV2Proxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarSeismicWavePropagationV2Proxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarSeismicWavePropagationV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarSeismicWavePropagationV2Proxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarMineralCrystallizationProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarMineralCrystallizationProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarMineralCrystallizationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarMineralCrystallizationProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarErosionSedimentationProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarErosionSedimentationProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarErosionSedimentationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarErosionSedimentationProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarGeothermalGradientV2Proxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarGeothermalGradientV2Proxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarGeothermalGradientV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarGeothermalGradientV2Proxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
 });
