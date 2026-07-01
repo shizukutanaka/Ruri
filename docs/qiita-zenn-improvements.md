@@ -3122,3 +3122,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleNavarreScale`: Navarre heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
 - `scaleAragonScale`: Aragon heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
 - `scaleGalicianScaleV2`: Galician heptatonic scale variant [0, 200, 400, 500, 700, 900, 1000]
+
+## Round321: アンデス音階v2 (Andean Scales v2)
+
+- `scaleAndeanQuenaScale`: Andean Quena pentatonic scale [0, 200, 400, 700, 900]
+- `scaleBolivianSaya`: Bolivian Saya hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleEcuadorianSanjuanito`: Ecuadorian Sanjuanito hexatonic scale [0, 200, 300, 500, 700, 900]
+- `scaleColombianVallenato`: Colombian Vallenato heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
