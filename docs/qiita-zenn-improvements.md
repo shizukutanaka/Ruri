@@ -2863,3 +2863,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleShonaScale`: Shona hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleMozambiquanScale`: Mozambiquan heptatonic [0, 200, 300, 500, 700, 900, 1100]
 - `scaleBotswanaScale`: Botswana pentatonic [0, 200, 400, 700, 900]
+
+## Round284: 中東音階v2 (Middle Eastern Scales v2)
+
+- `scaleSyrianScale`: Syrian maqam scale [0, 200, 350, 500, 700, 900, 1050]
+- `scaleIraqiMaqam`: Iraqi maqam with augmented 2nd [0, 200, 350, 500, 700, 850, 1100]
+- `scalePalestinianScale`: Palestinian folk scale [0, 150, 350, 500, 700, 900, 1050]
+- `scaleYemeniScale`: Yemeni diatonic scale [0, 200, 400, 500, 700, 900, 1100]
