@@ -2883,6 +2883,10 @@ import {
   scaleKenyaBengaScale,
   scaleMalagasyScaleV2,
   scaleUgandanPentatonicScale,
+  scaleKazakhPentatonicScale,
+  scaleUzbekScale,
+  scaleTajikScale,
+  scaleTurkmenScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -69786,4 +69790,29 @@ describe('tuningFamilySocraticRadarNeurotransmitterReleaseProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarNeurotransmitterReleaseProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarNeurotransmitterReleaseProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarNeurotransmitterReleaseProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round255 中央アジア音階
+describe('scaleKazakhPentatonicScale', () => {
+  it('empty returns 0', () => { expect(scaleKazakhPentatonicScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleKazakhPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleKazakhPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleUzbekScale', () => {
+  it('empty returns 0', () => { expect(scaleUzbekScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleUzbekScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleUzbekScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleTajikScale', () => {
+  it('empty returns 0', () => { expect(scaleTajikScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleTajikScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleTajikScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleTurkmenScale', () => {
+  it('empty returns 0', () => { expect(scaleTurkmenScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleTurkmenScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleTurkmenScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });

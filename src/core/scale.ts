@@ -78780,3 +78780,51 @@ export function scaleUgandanPentatonicScale(pitches: readonly Pitch[]): number {
   }
   return matched / ugandanAmadinda.length;
 }
+
+export function scaleKazakhPentatonicScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const kazakhPentatonic = [0, 204, 498, 702, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of kazakhPentatonic) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / kazakhPentatonic.length;
+}
+
+export function scaleUzbekScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const uzbek = [0, 182, 386, 498, 702, 884, 1088];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of uzbek) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / uzbek.length;
+}
+
+export function scaleTajikScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const tajik = [0, 204, 294, 498, 702, 906, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of tajik) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / tajik.length;
+}
+
+export function scaleTurkmenScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const turkmen = [0, 165, 498, 702, 1035];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of turkmen) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / turkmen.length;
+}

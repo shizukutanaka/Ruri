@@ -2650,3 +2650,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleKenyaBengaScale | ケニア・ベンガ五音音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
 | scaleMalagasyScaleV2 | マダガスカル五音音階 | [0, 165, 498, 702, 1035]¢ | 55¢ |
 | scaleUgandanPentatonicScale | ウガンダ・アマディンダ五音音階 | [0, 240, 480, 720, 960]¢ | 50¢ |
+
+## Round 255 — 中央アジア音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleKazakhPentatonicScale | カザフ五音音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
+| scaleUzbekScale | ウズベク七音音階 | [0, 182, 386, 498, 702, 884, 1088]¢ | 50¢ |
+| scaleTajikScale | タジク七音音階 | [0, 204, 294, 498, 702, 906, 996]¢ | 50¢ |
+| scaleTurkmenScale | トルクメン五音音階 | [0, 165, 498, 702, 1035]¢ | 55¢ |
