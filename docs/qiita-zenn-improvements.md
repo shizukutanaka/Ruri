@@ -2677,3 +2677,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleAmazonianScale | アマゾン先住民音階 | [0, 165, 386, 702, 884]¢ | 55¢ |
 | scaleGuaraniScale | グアラニー五音音階 | [0, 204, 408, 702, 906]¢ | 50¢ |
 | scaleAymaraScaleV2 | アイマラ五音音階 | [0, 240, 480, 720, 960]¢ | 60¢ |
+
+## Round 258 — カリブ海音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleCubanSonScale | キューバ・ソン五音音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
+| scaleCalypsoScaleV2 | トリニダード・カリプソ音階 | [0, 204, 386, 702, 884]¢ | 50¢ |
+| scaleHaitianMerengueScale | ハイチ・メレンゲ五音音階 | [0, 204, 408, 498, 702]¢ | 50¢ |
+| scaleJamaicanMentoScale | ジャマイカ・メント音階 | [0, 204, 498, 702, 1088]¢ | 50¢ |

@@ -2805,6 +2805,12 @@ import {
   tuningFamilySocraticRadarOceanAcidificationV3Proxy,
   tuningFamilySocraticRadarBioluminescenceProxy,
   tuningFamilySocraticRadarPelagicZonationProxy,
+  tuningFamilySocraticRadarTectonicPlateProxy,
+  tuningFamilySocraticRadarVolcanicEruptionProxy,
+  tuningFamilySocraticRadarSeismicWavePropagationV2Proxy,
+  tuningFamilySocraticRadarMineralCrystallizationProxy,
+  tuningFamilySocraticRadarErosionSedimentationProxy,
+  tuningFamilySocraticRadarGeothermalGradientV2Proxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -2913,6 +2919,10 @@ import {
   scaleAmazonianScale,
   scaleGuaraniScale,
   scaleAymaraScaleV2,
+  scaleCubanSonScale,
+  scaleCalypsoScaleV2,
+  scaleHaitianMerengueScale,
+  scaleJamaicanMentoScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70017,4 +70027,29 @@ describe('scaleAymaraScaleV2', () => {
   it('empty returns 0', () => { expect(scaleAymaraScaleV2([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleAymaraScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleAymaraScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+// Round258 カリブ海音階
+describe('scaleCubanSonScale', () => {
+  it('empty returns 0', () => { expect(scaleCubanSonScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleCubanSonScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleCubanSonScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleCalypsoScaleV2', () => {
+  it('empty returns 0', () => { expect(scaleCalypsoScaleV2([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleCalypsoScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleCalypsoScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleHaitianMerengueScale', () => {
+  it('empty returns 0', () => { expect(scaleHaitianMerengueScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleHaitianMerengueScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleHaitianMerengueScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleJamaicanMentoScale', () => {
+  it('empty returns 0', () => { expect(scaleJamaicanMentoScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleJamaicanMentoScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleJamaicanMentoScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
