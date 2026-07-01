@@ -3038,3 +3038,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scalePolishScaleV2`: Polish heptatonic scale variant [0, 200, 400, 500, 700, 800, 1100]
 - `scaleCzechScaleV2`: Czech heptatonic scale variant [0, 200, 400, 500, 700, 900, 1000]
 - `scaleSlovakScale`: Slovak heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+
+## Round309: チベット・ビルマ音階 (Tibeto-Burman Scales)
+
+- `scaleTibetoBurmanScale`: Tibeto-Burman pentatonic scale [0, 200, 400, 700, 900]
+- `scaleNagaScale`: Naga hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleKarenScale`: Karen pentatonic scale [0, 150, 350, 700, 850]
+- `scaleShanScale`: Shan hexatonic scale [0, 200, 400, 700, 900, 1100]
