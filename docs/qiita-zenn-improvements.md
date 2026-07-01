@@ -2506,3 +2506,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleWestAfricanPentatonic` | 西アフリカ5音音階 | 0,204,498,702,906 | 45¢ |
 | `scaleNorthAfricanRasd` | 北アフリカ・ラスド | 0,204,342,498,702,906,1044 | 40¢ |
 | `scaleZuluScale` | ズールー音階 | 0,267,498,765,996 | 50¢ |
+
+## Round 239 — 中央アジア音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleUzbekShashmakom` | ウズベク・シャシュマコム | 0,204,342,498,702,906,1044 | 40¢ |
+| `scaleMongolianPentatonic` | モンゴル5音音階 | 0,204,498,702,906 | 45¢ |
+| `scaleTibetanRitual` | チベット儀礼音階 | 0,182,498,680,996 | 50¢ |
+| `scaleKazakhDombra` | カザフ・ドンブラ | 0,231,498,729,996 | 45¢ |
