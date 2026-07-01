@@ -3024,3 +3024,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleSardinianScale`: Sardinian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleCorsicanScale`: Corsican heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
 - `scaleMalteseScale`: Maltese heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round307: イタリア地方音階 (Italian Regional Scales)
+
+- `scaleVenetianScale`: Venetian heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleNeapolitanScaleV2`: Neapolitan phrygian-like scale variant [0, 100, 300, 500, 700, 800, 1100]
+- `scaleTuscanScale`: Tuscan heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleLombardScale`: Lombard heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
