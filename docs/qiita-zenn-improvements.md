@@ -3094,3 +3094,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleArbereshScale`: Arbëresh heptatonic scale [0, 200, 300, 500, 700, 800, 1100]
 - `scaleToskScale`: Tosk heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleGhegScale`: Gheg heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+
+## Round317: ジョージア地方音階 (Georgian Regional Scales)
+
+- `scaleGeorgianScaleV2`: Georgian polyphonic heptatonic scale variant [0, 200, 400, 500, 700, 900, 1100]
+- `scaleSvanScale`: Svan pentatonic scale [0, 200, 400, 700, 900]
+- `scaleMingrelianScale`: Mingrelian heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
+- `scaleAdjaraScale`: Adjara heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
