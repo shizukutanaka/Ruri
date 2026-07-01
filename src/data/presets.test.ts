@@ -2091,6 +2091,12 @@ import {
   presetFamilySocraticRadarEndometriosisProxy,
   presetFamilySocraticRadarMenopauseProxy,
   presetFamilySocraticRadarPCOSProxy,
+  presetFamilySocraticRadarHepatitisProxy,
+  presetFamilySocraticRadarCirrhosisProgressionProxy,
+  presetFamilySocraticRadarLiverFibrosisProxy,
+  presetFamilySocraticRadarPortalHypertensionProxy,
+  presetFamilySocraticRadarAscitesProxy,
+  presetFamilySocraticRadarJaundiceProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -45300,5 +45306,77 @@ describe('presetFamilySocraticRadarPCOSProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarPCOSProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarHepatitisProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarHepatitisProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarHepatitisProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarHepatitisProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarCirrhosisProgressionProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCirrhosisProgressionProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCirrhosisProgressionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCirrhosisProgressionProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarLiverFibrosisProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarLiverFibrosisProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarLiverFibrosisProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarLiverFibrosisProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarPortalHypertensionProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPortalHypertensionProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPortalHypertensionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPortalHypertensionProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarAscitesProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarAscitesProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarAscitesProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAscitesProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarJaundiceProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarJaundiceProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarJaundiceProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarJaundiceProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
   });
 });

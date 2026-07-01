@@ -3052,3 +3052,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleTranssylvanianScale`: Transylvanian heptatonic scale [0, 200, 400, 500, 700, 800, 1100]
 - `scaleWallachianScale`: Wallachian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleBanatScale`: Banat heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+
+## Round311: 東スラブ音階 (East Slavic Scales)
+
+- `scaleUkrainianScaleV2`: Ukrainian heptatonic scale variant [0, 200, 300, 500, 700, 800, 1100]
+- `scaleBelarusianScale`: Belarusian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleCossackScale`: Cossack heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+- `scaleRusynScale`: Rusyn heptatonic scale [0, 200, 400, 500, 700, 800, 1000]
