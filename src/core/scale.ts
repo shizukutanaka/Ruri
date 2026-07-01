@@ -78948,3 +78948,51 @@ export function scaleTurkmenScale(pitches: readonly Pitch[]): number {
   }
   return matched / turkmen.length;
 }
+
+export function scaleThaiPentScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const thaiPent = [0, 171, 514, 686, 1029];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of thaiPent) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / thaiPent.length;
+}
+
+export function scaleKhmerScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const khmer = [0, 171, 343, 686, 857];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of khmer) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / khmer.length;
+}
+
+export function scaleJavaneseSlendroV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const slendro = [0, 240, 480, 720, 960];
+  const tolerance = 60;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of slendro) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / slendro.length;
+}
+
+export function scaleBurmeseHeptatonicV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const burmese = [0, 204, 408, 498, 702, 906, 1110];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of burmese) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / burmese.length;
+}

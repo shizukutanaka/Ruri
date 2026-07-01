@@ -2893,6 +2893,10 @@ import {
   scaleUzbekScale,
   scaleTajikScale,
   scaleTurkmenScale,
+  scaleThaiPentScale,
+  scaleKhmerScale,
+  scaleJavaneseSlendroV2,
+  scaleBurmeseHeptatonicV2,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -69863,4 +69867,29 @@ describe('tuningFamilySocraticRadarATPSynthesisProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarATPSynthesisProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarATPSynthesisProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarATPSynthesisProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round256 東南アジア音階
+describe('scaleThaiPentScale', () => {
+  it('empty returns 0', () => { expect(scaleThaiPentScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleThaiPentScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleThaiPentScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleKhmerScale', () => {
+  it('empty returns 0', () => { expect(scaleKhmerScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleKhmerScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleKhmerScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleJavaneseSlendroV2', () => {
+  it('empty returns 0', () => { expect(scaleJavaneseSlendroV2([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleJavaneseSlendroV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleJavaneseSlendroV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleBurmeseHeptatonicV2', () => {
+  it('empty returns 0', () => { expect(scaleBurmeseHeptatonicV2([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleBurmeseHeptatonicV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleBurmeseHeptatonicV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
