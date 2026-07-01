@@ -2633,9 +2633,9 @@ import {
   scaleMaqamBayati,
   scaleMaqamRast,
   scaleMaqamSaba,
-  scaleRagaBhairav,
+  scaleRagaBhairavV2,
   scaleRagaYaman,
-  scaleRagaBhairavi,
+  scaleRagaBhairaviV2,
   scaleRagaKafi,
   tuningFamilySocraticRadarOrbitalMechanicsProxy,
   tuningFamilySocraticRadarRocketPropulsionProxy,
@@ -2649,6 +2649,10 @@ import {
   tuningFamilySocraticRadarQuantumAnnealingProxy,
   tuningFamilySocraticRadarVariationalQuantumCircuitProxy,
   tuningFamilySocraticRadarQuantumSamplingProxy,
+  scaleHungarianMinor,
+  scaleBulgarianRhythmicScale,
+  scaleRomanianMinor,
+  scaleZigeunerScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -65867,17 +65871,17 @@ describe('tuningFamilySocraticRadarLaunchWindowProxy', () => {
   });
 });
 
-describe('scaleRagaBhairav', () => {
+describe('scaleRagaBhairavV2', () => {
   it('returns 0 for empty pitches', () => {
-    expect(scaleRagaBhairav([])).toBe(0);
+    expect(scaleRagaBhairavV2([])).toBe(0);
   });
   it('returns value in [0,1] for 12-EDO', () => {
-    const v = scaleRagaBhairav(edo(12, 440).degrees);
+    const v = scaleRagaBhairavV2(edo(12, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
   it('returns value in [0,1] for 19-EDO', () => {
-    const v = scaleRagaBhairav(edo(19, 440).degrees);
+    const v = scaleRagaBhairavV2(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
@@ -65899,17 +65903,17 @@ describe('scaleRagaYaman', () => {
   });
 });
 
-describe('scaleRagaBhairavi', () => {
+describe('scaleRagaBhairaviV2', () => {
   it('returns 0 for empty pitches', () => {
-    expect(scaleRagaBhairavi([])).toBe(0);
+    expect(scaleRagaBhairaviV2([])).toBe(0);
   });
   it('returns value in [0,1] for 12-EDO', () => {
-    const v = scaleRagaBhairavi(edo(12, 440).degrees);
+    const v = scaleRagaBhairaviV2(edo(12, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
   it('returns value in [0,1] for 19-EDO', () => {
-    const v = scaleRagaBhairavi(edo(19, 440).degrees);
+    const v = scaleRagaBhairaviV2(edo(19, 440).degrees);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
