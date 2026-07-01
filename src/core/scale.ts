@@ -74505,3 +74505,55 @@ export function scaleZuluContent(pitches: readonly Pitch[]): number {
   }
   return matched / zulu.length;
 }
+
+export function scaleMaqamHijaz(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Hijaz: [0, 94, 408, 498, 702, 792, 1088]¢ (characteristic augmented 2nd)
+  const hijaz = [0, 94, 408, 498, 702, 792, 1088];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of hijaz) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / hijaz.length;
+}
+
+export function scaleMaqamBayati(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Bayati: [0, 150, 294, 498, 702, 792, 996]¢ (neutral 2nd characteristic)
+  const bayati = [0, 150, 294, 498, 702, 792, 996];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of bayati) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / bayati.length;
+}
+
+export function scaleMaqamRast(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Rast: [0, 204, 350, 498, 702, 906, 1052]¢ (neutral 3rd and 7th)
+  const rast = [0, 204, 350, 498, 702, 906, 1052];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of rast) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / rast.length;
+}
+
+export function scaleMaqamSaba(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Maqam Saba: [0, 150, 294, 408, 702, 792, 996]¢ (diminished 4th character)
+  const saba = [0, 150, 294, 408, 702, 792, 996];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of saba) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / saba.length;
+}
