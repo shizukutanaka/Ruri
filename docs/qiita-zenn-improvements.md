@@ -2905,3 +2905,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleWayuuScale`: Wayuu pentatonic scale [0, 150, 350, 700, 850]
 - `scaleShuarScale`: Shuar hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleXinguScale`: Xingu hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round290: 南アジア音階v2 (South Asian Scales v2)
+
+- `scaleCarnaticScale`: Carnatic 12-tone chromatic reference [0, 100, 200, ..., 1100]
+- `scaleHindustaniScale`: Hindustani heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleTamilScale`: Tamil folk heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
+- `scaleGujaratiScale`: Gujarati heptatonic scale [0, 200, 400, 500, 700, 900, 1100]

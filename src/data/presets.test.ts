@@ -1965,6 +1965,12 @@ import {
   presetFamilySocraticRadarLymphNodeProxy,
   presetFamilySocraticRadarInterferonProxy,
   presetFamilySocraticRadarComplementSystemProxy,
+  presetFamilySocraticRadarGastricProxy,
+  presetFamilySocraticRadarIntestinalProxy,
+  presetFamilySocraticRadarMicrobiomeProxy,
+  presetFamilySocraticRadarPeristalsisProxy,
+  presetFamilySocraticRadarGutFloraProxy,
+  presetFamilySocraticRadarNutrientAbsorptionProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -43663,5 +43669,77 @@ describe('presetFamilySocraticRadarComplementSystemProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarComplementSystemProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarGastricProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarGastricProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarGastricProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGastricProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarIntestinalProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarIntestinalProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarIntestinalProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarIntestinalProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarMicrobiomeProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarMicrobiomeProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarMicrobiomeProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMicrobiomeProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarPeristalsisProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPeristalsisProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarPeristalsisProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPeristalsisProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarGutFloraProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarGutFloraProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarGutFloraProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGutFloraProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarNutrientAbsorptionProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarNutrientAbsorptionProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarNutrientAbsorptionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNutrientAbsorptionProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
   });
 });
