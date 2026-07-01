@@ -3017,3 +3017,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleAcadianScale`: Acadian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleFrenchCanadianScale`: French Canadian heptatonic scale [0, 200, 400, 500, 700, 800, 1000]
 - `scaleMetisScale`: Metis pentatonic scale [0, 200, 400, 700, 900]
+
+## Round306: 地中海島嶼音階 (Mediterranean Island Scales)
+
+- `scaleSicilianScale`: Sicilian phrygian-like scale [0, 100, 400, 500, 700, 800, 1100]
+- `scaleSardinianScale`: Sardinian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleCorsicanScale`: Corsican heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
+- `scaleMalteseScale`: Maltese heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
