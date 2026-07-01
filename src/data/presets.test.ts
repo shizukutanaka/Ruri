@@ -1756,6 +1756,12 @@ import {
   presetFamilySocraticRadarPoyntingVectorV2Proxy,
   presetFamilySocraticRadarElectromagneticWaveProxy,
   presetFamilySocraticRadarBrewsterAngleProxy,
+  presetFamilySocraticRadarNeuralSynapticPlasticityProxy,
+  presetFamilySocraticRadarActionPotentialV2Proxy,
+  presetFamilySocraticRadarHippocampalThetaRhythmProxy,
+  presetFamilySocraticRadarCorticalOscillationProxy,
+  presetFamilySocraticRadarAxonMyelinationProxy,
+  presetFamilySocraticRadarNeurotransmitterReleaseProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -41237,4 +41243,40 @@ describe('presetFamilySocraticRadarBrewsterAngleProxy', () => {
   it('single preset finite', () => { const v = presetFamilySocraticRadarBrewsterAngleProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('two presets finite', () => { const v = presetFamilySocraticRadarBrewsterAngleProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarBrewsterAngleProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarNeuralSynapticPlasticityProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarNeuralSynapticPlasticityProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarNeuralSynapticPlasticityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarNeuralSynapticPlasticityProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarActionPotentialV2Proxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarActionPotentialV2Proxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarActionPotentialV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarActionPotentialV2Proxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarHippocampalThetaRhythmProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarHippocampalThetaRhythmProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarHippocampalThetaRhythmProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarHippocampalThetaRhythmProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarCorticalOscillationProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarCorticalOscillationProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarCorticalOscillationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarCorticalOscillationProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarAxonMyelinationProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarAxonMyelinationProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarAxonMyelinationProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarAxonMyelinationProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarNeurotransmitterReleaseProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarNeurotransmitterReleaseProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarNeurotransmitterReleaseProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarNeurotransmitterReleaseProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
 });
