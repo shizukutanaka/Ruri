@@ -3080,3 +3080,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleTatarScale`: Tatar hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleBashkirScale`: Bashkir pentatonic scale [0, 150, 350, 700, 850]
 - `scaleChuvashScale`: Chuvash hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round315: ハンガリー・ロマ音階 (Hungarian & Roma Scales)
+
+- `scaleHungarianScaleV2`: Hungarian gypsy-scale variant [0, 200, 300, 600, 700, 800, 1100]
+- `scaleRomaScale`: Roma gypsy scale [0, 200, 300, 600, 700, 800, 1100]
+- `scaleSintiScale`: Sinti heptatonic scale [0, 100, 400, 500, 700, 800, 1100]
+- `scaleTransdanubianScale`: Transdanubian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
