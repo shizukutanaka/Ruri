@@ -3066,3 +3066,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleMordvinScale`: Mordvin hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleMariScale`: Mari pentatonic scale [0, 150, 350, 700, 850]
 - `scaleUdmurtScale`: Udmurt hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round313: 南スラブ音階 (South Slavic Scales)
+
+- `scaleSouthSlavicScale`: South Slavic heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleMacedonianScaleV2`: Macedonian heptatonic scale variant [0, 200, 300, 500, 700, 800, 1100]
+- `scaleSerbianScaleV2`: Serbian heptatonic scale variant [0, 100, 400, 500, 700, 800, 1100]
+- `scaleKosovarScale`: Kosovar heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
