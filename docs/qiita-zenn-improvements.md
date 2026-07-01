@@ -2926,3 +2926,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleMicronesianScale`: Micronesian pentatonic scale [0, 150, 350, 700, 850]
 - `scaleKiribatiScale`: Kiribati hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleMarshalleseScale`: Marshallese hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round293: アパラチア音階 (Appalachian & American Folk Scales)
+
+- `scaleAppalachianScale`: Appalachian folk heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleOzarkScale`: Ozark pentatonic scale [0, 200, 400, 700, 900]
+- `scaleCajunScale`: Cajun heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleZydecoScale`: Zydeco heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
