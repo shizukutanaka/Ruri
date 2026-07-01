@@ -2587,3 +2587,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleKenyanBenga` | ケニア・ベンガ | 0,204,408,498,702,906,1110 | 40¢ |
 | `scaleMasaiScale` | マサイ儀礼音階 | 0,240,480,720,960 | 50¢ |
 | `scaleMalagasyScale` | マダガスカル音階 | 0,204,408,702,906 | 45¢ |
+
+## Round 248 — 南欧民謡音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|----------|
+| `scaleItalianTarantella` | イタリア・タランテラ | 0,100,300,500,700,800,1000 | 40¢ |
+| `scaleGreekRembetiko` | ギリシャ・レンベティコ | 0,100,350,500,700,800,1100 | 40¢ |
+| `scalePortugueseFado` | ポルトガル・ファド | 0,100,400,500,700,800,1000 | 40¢ |
+| `scaleCroatianTamburica` | クロアチア・タンブリツァ | 0,200,400,500,700,900,1100 | 40¢ |
