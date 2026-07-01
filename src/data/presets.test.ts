@@ -1792,6 +1792,12 @@ import {
   presetFamilySocraticRadarExoplanetTransitProxy,
   presetFamilySocraticRadarGravitationalWaveStrainProxy,
   presetFamilySocraticRadarCosmicRaySpectralProxy,
+  presetFamilySocraticRadarGrapheneElectronicProxy,
+  presetFamilySocraticRadarShapeMemoryAlloyProxy,
+  presetFamilySocraticRadarPiezoelectricCouplingProxy,
+  presetFamilySocraticRadarTopologicalInsulatorV2Proxy,
+  presetFamilySocraticRadarSpintronicTransportProxy,
+  presetFamilySocraticRadarMetamaterialRefractionProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -41489,4 +41495,40 @@ describe('presetFamilySocraticRadarCosmicRaySpectralProxy', () => {
   it('single preset finite', () => { const v = presetFamilySocraticRadarCosmicRaySpectralProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('two presets finite', () => { const v = presetFamilySocraticRadarCosmicRaySpectralProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
   it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarCosmicRaySpectralProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarGrapheneElectronicProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarGrapheneElectronicProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarGrapheneElectronicProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarGrapheneElectronicProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarShapeMemoryAlloyProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarShapeMemoryAlloyProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarShapeMemoryAlloyProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarShapeMemoryAlloyProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarPiezoelectricCouplingProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarPiezoelectricCouplingProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarPiezoelectricCouplingProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarPiezoelectricCouplingProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarTopologicalInsulatorV2Proxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarTopologicalInsulatorV2Proxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarTopologicalInsulatorV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarTopologicalInsulatorV2Proxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarSpintronicTransportProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarSpintronicTransportProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarSpintronicTransportProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarSpintronicTransportProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarMetamaterialRefractionProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarMetamaterialRefractionProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarMetamaterialRefractionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarMetamaterialRefractionProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
 });
