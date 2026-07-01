@@ -1666,6 +1666,12 @@ import {
   presetFamilySocraticRadarCoralReefDynamicsProxy,
   presetFamilySocraticRadarMarineStratificationProxy,
   presetFamilySocraticRadarPelagicFoodWebProxy,
+  presetFamilySocraticRadarAtmosphericCarbonCycleProxy,
+  presetFamilySocraticRadarArcticAmplificationV2Proxy,
+  presetFamilySocraticRadarMonsoonDynamicsProxy,
+  presetFamilySocraticRadarIceSheetDynamicsV2Proxy,
+  presetFamilySocraticRadarClimateModelEnsembleProxy,
+  presetFamilySocraticRadarSeaLevelRiseV2Proxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -39934,5 +39940,89 @@ describe('presetFamilySocraticRadarPelagicFoodWebProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarPelagicFoodWebProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarAtmosphericCarbonCycleProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarAtmosphericCarbonCycleProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarAtmosphericCarbonCycleProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAtmosphericCarbonCycleProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarArcticAmplificationV2Proxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarArcticAmplificationV2Proxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarArcticAmplificationV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarArcticAmplificationV2Proxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarMonsoonDynamicsProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarMonsoonDynamicsProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarMonsoonDynamicsProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMonsoonDynamicsProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarIceSheetDynamicsV2Proxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarIceSheetDynamicsV2Proxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarIceSheetDynamicsV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarIceSheetDynamicsV2Proxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarClimateModelEnsembleProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarClimateModelEnsembleProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarClimateModelEnsembleProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarClimateModelEnsembleProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarSeaLevelRiseV2Proxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarSeaLevelRiseV2Proxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarSeaLevelRiseV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarSeaLevelRiseV2Proxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
