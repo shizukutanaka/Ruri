@@ -79956,3 +79956,51 @@ export function scaleTuaregScale(pitches: readonly Pitch[]): number {
   }
   return matched / tuareg.length;
 }
+
+export function scaleGuangdongMusicScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const guangdongMusic = [0, 204, 408, 498, 702, 906, 1110];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of guangdongMusic) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / guangdongMusic.length;
+}
+
+export function scaleSichuanOperaScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const sichuanOpera = [0, 204, 294, 498, 702, 906, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of sichuanOpera) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / sichuanOpera.length;
+}
+
+export function scaleShanshuiGuqinScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const shanshuiGuqin = [0, 204, 498, 702, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of shanshuiGuqin) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / shanshuiGuqin.length;
+}
+
+export function scaleYunnanMinorityScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const yunnanMinority = [0, 165, 498, 702, 1035];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of yunnanMinority) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / yunnanMinority.length;
+}

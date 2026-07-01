@@ -2953,6 +2953,10 @@ import {
   scaleNubianScale,
   scaleGnawaMusicScale,
   scaleTuaregScale,
+  scaleGuangdongMusicScale,
+  scaleSichuanOperaScale,
+  scaleShanshuiGuqinScale,
+  scaleYunnanMinorityScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70325,4 +70329,29 @@ describe('tuningFamilySocraticRadarShockWaveCompressionProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarShockWaveCompressionProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarShockWaveCompressionProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarShockWaveCompressionProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round262 中国地方音階
+describe('scaleGuangdongMusicScale', () => {
+  it('empty returns 0', () => { expect(scaleGuangdongMusicScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleGuangdongMusicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleGuangdongMusicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleSichuanOperaScale', () => {
+  it('empty returns 0', () => { expect(scaleSichuanOperaScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleSichuanOperaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleSichuanOperaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleShanshuiGuqinScale', () => {
+  it('empty returns 0', () => { expect(scaleShanshuiGuqinScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleShanshuiGuqinScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleShanshuiGuqinScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleYunnanMinorityScale', () => {
+  it('empty returns 0', () => { expect(scaleYunnanMinorityScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleYunnanMinorityScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleYunnanMinorityScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
