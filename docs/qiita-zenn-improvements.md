@@ -3003,3 +3003,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleBluegrassScale`: Bluegrass heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleGospelScale`: Gospel heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
 - `scaleAppalachianScaleV2`: Appalachian pentatonic variant [0, 200, 400, 700, 900]
+
+## Round304: 北大西洋島嶼音階 (North Atlantic Island Scales)
+
+- `scaleGreenlandicScale`: Greenlandic pentatonic scale [0, 200, 400, 700, 900]
+- `scaleFaroeseScale`: Faroese heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleShetlandScale`: Shetland hexatonic scale [0, 200, 400, 700, 900, 1100]
+- `scaleOrkneyScale`: Orkney hexatonic scale [0, 200, 400, 500, 700, 900]
