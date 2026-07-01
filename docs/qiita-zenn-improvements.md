@@ -2470,3 +2470,12 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleHawaiianScale` — Hawaiian just intonation major-like scale
 - `scaleAboriginalPentatonic` — Australian Aboriginal pentatonic
 - `scaleMelanesianScale` — Melanesian 5-tone scale
+
+## Round 235 — ラテンアメリカ音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleCubanMontuno` | キューバン・モントゥーノ | 0,200,300,500,700,900,1000 | 40¢ |
+| `scaleAndeanPentatonic` | アンデス5音音階 | 0,204,408,702,906 | 45¢ |
+| `scaleSambaBaiao` | ブラジリアン・バイアン | 0,200,300,500,700,800,1000 | 40¢ |
+| `scaleTangoScale` | アルゼンチン・タンゴ | 0,200,300,500,600,800,900,1100 | 35¢ |
