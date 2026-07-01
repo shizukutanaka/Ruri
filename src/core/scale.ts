@@ -82120,3 +82120,51 @@ export function scaleBarbadianScale(pitches: readonly Pitch[]): number {
   }
   return matched / barbadian.length;
 }
+
+export function scaleVietnameseScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const vietnamese = [0, 200, 300, 500, 700, 800, 1000];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of vietnamese) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / vietnamese.length;
+}
+
+export function scaleFilipinoCulintang(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const filipinoCulintang = [0, 200, 400, 700, 900];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of filipinoCulintang) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / filipinoCulintang.length;
+}
+
+export function scaleMalaysianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const malaysian = [0, 200, 400, 500, 700, 900, 1100];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of malaysian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / malaysian.length;
+}
+
+export function scaleCambodianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const cambodian = [0, 200, 350, 500, 700, 900, 1050];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of cambodian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / cambodian.length;
+}

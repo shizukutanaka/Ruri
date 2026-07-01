@@ -2803,3 +2803,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleJamaicanReggaeScale`: ジャマイカのレゲエ音階 (Mixolydian, 0-200-400-500-700-900-1000c)
 - `scaleTrinidadianScale`: トリニダードの音階 (Lydian Dominant, 0-200-400-600-700-900-1100c)
 - `scaleBarbadianScale`: バルバドスの音階 (major heptatonic, 0-200-400-500-700-900-1100c)
+
+### Round275: 東南アジア音階ヘルパ (Southeast Asian Scales)
+- `scaleVietnameseScale`: ベトナムの音階 (natural minor, 0-200-300-500-700-800-1000c)
+- `scaleFilipinoCulintang`: フィリピンのクリンタン音階 (pentatonic, 0-200-400-700-900c)
+- `scaleMalaysianScale`: マレーシアの音階 (major heptatonic, 0-200-400-500-700-900-1100c)
+- `scaleCambodianScale`: カンボジアの音階 (neutral intervals, 0-200-350-500-700-900-1050c)
