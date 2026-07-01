@@ -2815,3 +2815,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scalePolynesianScale`: ポリネシアの音階 (minor pentatonic, 0-200-500-700-1000c)
 - `scaleAboriginalDreaming`: アボリジナルのドリーミング音階 (0-300-500-700-1000c)
 - `scalePapuaNewGuineaScale`: パプアニューギニアの音階 (0-200-400-600-900c)
+
+### Round277: 北アフリカ音階ヘルパ (North African Scales)
+- `scaleMoroccanGnawa`: モロッコのグナワ音階 (pentatonic with microtones, 0-150-500-700-850c)
+- `scaleTunisianMaqam`: チュニジアのマカーム (neutral intervals, 0-200-350-500-700-900-1050c)
+- `scaleAlgerianChabi`: アルジェリアのシャアビ音階 (harmonic minor variant, 0-200-300-500-700-800-1100c)
+- `scaleEgyptianRast`: エジプトのラスト音階 (Rast maqam, 0-200-350-500-700-900-1050c)
