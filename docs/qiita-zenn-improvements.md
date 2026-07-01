@@ -2835,3 +2835,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleCameroonMakossa`: Cameroon Makossa scale [0, 200, 300, 500, 700, 900, 1000]
 - `scaleGaboneseTraditional`: Gabonese Traditional scale [0, 150, 350, 500, 700, 850, 1100]
 - `scaleRwandanInanga`: Rwandan Inanga pentatonic [0, 200, 400, 700, 900]
+
+## Round280: 北米先住民音階 (Native American Scales)
+
+- `scaleNavajoScale`: Navajo hexatonic scale [0, 200, 350, 500, 700, 900]
+- `scaleHopiScale`: Hopi pentatonic scale [0, 200, 400, 700, 900]
+- `scaleIroquoisScale`: Iroquois pentatonic scale [0, 200, 400, 500, 700]
+- `scaleInuitScale`: Inuit pentatonic scale [0, 150, 350, 700, 900]
