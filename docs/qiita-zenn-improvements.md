@@ -2749,3 +2749,9 @@ Added 4 Oceanian scale analysis helpers:
 | scaleHungarianMinorScale | ハンガリー短音階 | [0, 204, 294, 612, 702, 792, 1110]¢ | 50¢ |
 | scalePolishHighlandScale | ポーランド高地音階 | [0, 204, 408, 612, 702, 906, 1110]¢ | 50¢ |
 | scaleUkrainianDorianScale | ウクライナ・ドリアン | [0, 204, 294, 612, 702, 906, 1088]¢ | 50¢ |
+
+### Round266: イベリア半島音階ヘルパ (Iberian Peninsula Scales)
+- `scaleFlamencoScaleV2`: フラメンコスケール変体 (Phrygian Dominant with raised 6th, 0-100-400-500-700-900-1100c)
+- `scalePortugueseFadoScale`: ポルトガル・ファドスケール (harmonic minor variant, 0-200-300-500-700-800-1100c)
+- `scaleCatalanScale`: カタルーニャスケール (Mixolydian, 0-200-400-500-700-900-1000c)
+- `scaleGalicianScale`: ガリシアスケール (Celtic-influenced Dorian, 0-200-300-500-700-900-1000c)

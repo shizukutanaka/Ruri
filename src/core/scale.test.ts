@@ -2853,6 +2853,12 @@ import {
   tuningFamilySocraticRadarSuperconductingGapProxy,
   tuningFamilySocraticRadarHallEffectMobilityProxy,
   tuningFamilySocraticRadarExcitonBindingEnergyProxy,
+  tuningFamilySocraticRadarWorkingMemoryCapacityProxyV2,
+  tuningFamilySocraticRadarAttentionSelectivityProxy,
+  tuningFamilySocraticRadarPatternRecognitionProxyV4,
+  tuningFamilySocraticRadarSemanticsNetworkProxy,
+  tuningFamilySocraticRadarEpisodicMemoryProxy,
+  tuningFamilySocraticRadarExecutiveFunctionProxyV3,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -2993,6 +2999,10 @@ import {
   scaleHungarianMinorScale,
   scalePolishHighlandScale,
   scaleUkrainianDorianScale,
+  scaleFlamencoScaleV2,
+  scalePortugueseFadoScale,
+  scaleCatalanScale,
+  scaleGalicianScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70633,4 +70643,166 @@ describe('tuningFamilySocraticRadarExcitonBindingEnergyProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarExcitonBindingEnergyProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarExcitonBindingEnergyProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarExcitonBindingEnergyProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarWorkingMemoryCapacityProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarWorkingMemoryCapacityProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarWorkingMemoryCapacityProxyV2([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarWorkingMemoryCapacityProxyV2([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarAttentionSelectivityProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAttentionSelectivityProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarAttentionSelectivityProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarAttentionSelectivityProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarPatternRecognitionProxyV4', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPatternRecognitionProxyV4([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarPatternRecognitionProxyV4([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPatternRecognitionProxyV4([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarSemanticsNetworkProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSemanticsNetworkProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarSemanticsNetworkProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSemanticsNetworkProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarEpisodicMemoryProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarEpisodicMemoryProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarEpisodicMemoryProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarEpisodicMemoryProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarExecutiveFunctionProxyV3', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarExecutiveFunctionProxyV3([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarExecutiveFunctionProxyV3([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarExecutiveFunctionProxyV3([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('scaleFlamencoScaleV2', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleFlamencoScaleV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleFlamencoScaleV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleFlamencoScaleV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scalePortugueseFadoScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scalePortugueseFadoScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scalePortugueseFadoScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scalePortugueseFadoScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleCatalanScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleCatalanScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleCatalanScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleCatalanScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleGalicianScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleGalicianScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleGalicianScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleGalicianScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
