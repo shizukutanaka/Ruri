@@ -2877,3 +2877,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleMongolianLongSong`: Mongolian long song hexatonic [0, 200, 400, 500, 700, 900]
 - `scaleManchuScale`: Manchu folk hexatonic [0, 200, 400, 700, 900, 1100]
 - `scaleAinuScale`: Ainu traditional pentatonic [0, 200, 300, 700, 900]
+
+## Round286: シベリア音階 (Siberian Scales)
+
+- `scaleYakutScale`: Yakut pentatonic scale [0, 200, 400, 700, 900]
+- `scaleChukchiScale`: Chukchi pentatonic scale [0, 150, 350, 700, 850]
+- `scaleEvenkScale`: Evenk hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleBuryatScale`: Buryat hexatonic scale [0, 200, 400, 700, 900, 1100]
