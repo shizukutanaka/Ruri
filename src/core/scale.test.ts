@@ -2649,6 +2649,12 @@ import {
   tuningFamilySocraticRadarQuantumAnnealingProxy,
   tuningFamilySocraticRadarVariationalQuantumCircuitProxy,
   tuningFamilySocraticRadarQuantumSamplingProxy,
+  tuningFamilySocraticRadarCarbonCycleV2Proxy,
+  tuningFamilySocraticRadarOceanAcidificationV2Proxy,
+  tuningFamilySocraticRadarIceSheetDynamicsProxy,
+  tuningFamilySocraticRadarSeaLevelRiseProxy,
+  tuningFamilySocraticRadarClimateModelingProxy,
+  tuningFamilySocraticRadarExtremeWeatherProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -66022,5 +66028,69 @@ describe('tuningFamilySocraticRadarQuantumSamplingProxy', () => {
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarQuantumSamplingProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('scaleHungarianMinor', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleHungarianMinor([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleHungarianMinor(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleHungarianMinor(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleBulgarianRhythmicScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleBulgarianRhythmicScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleBulgarianRhythmicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleBulgarianRhythmicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleRomanianMinor', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleRomanianMinor([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleRomanianMinor(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleRomanianMinor(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleZigeunerScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleZigeunerScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO', () => {
+    const v = scaleZigeunerScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO', () => {
+    const v = scaleZigeunerScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

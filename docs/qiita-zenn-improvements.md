@@ -2434,7 +2434,15 @@ Added 4 Middle Eastern maqam scale analysis helpers:
 ## Round 230: インド音楽ラーガ音階ヘルパ
 
 Added 4 Indian raga scale analysis helpers:
-- `scaleRagaBhairav` — Raga Bhairav (komal Re/Dha, morning raga)
+- `scaleRagaBhairavV2` — Raga Bhairav (komal Re/Dha, morning raga)
 - `scaleRagaYaman` — Raga Yaman (tivra Ma, evening raga)
-- `scaleRagaBhairavi` — Raga Bhairavi (komal Re/Ga/Dha/Ni)
+- `scaleRagaBhairaviV2` — Raga Bhairavi (komal Re/Ga/Dha/Ni)
 - `scaleRagaKafi` — Raga Kafi (komal Ga/Ni, Dorian-like)
+
+## Round 231: 東欧民謡音階ヘルパ
+
+Added 4 Eastern European folk scale analysis helpers:
+- `scaleHungarianMinor` — Hungarian minor (double augmented 2nd)
+- `scaleBulgarianRhythmicScale` — Bulgarian/Balkan asymmetric 7-tone
+- `scaleRomanianMinor` — Romanian minor (acoustic scale)
+- `scaleZigeunerScale` — Zigeuner/Double harmonic scale
