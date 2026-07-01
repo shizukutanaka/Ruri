@@ -3059,3 +3059,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleBelarusianScale`: Belarusian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleCossackScale`: Cossack heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
 - `scaleRusynScale`: Rusyn heptatonic scale [0, 200, 400, 500, 700, 800, 1000]
+
+## Round312: ウラル語族音階 (Uralic Scales)
+
+- `scaleUralicScale`: Uralic pentatonic scale [0, 200, 400, 700, 900]
+- `scaleMordvinScale`: Mordvin hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleMariScale`: Mari pentatonic scale [0, 150, 350, 700, 850]
+- `scaleUdmurtScale`: Udmurt hexatonic scale [0, 200, 400, 700, 900, 1100]
