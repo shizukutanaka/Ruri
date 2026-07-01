@@ -2933,6 +2933,10 @@ import {
   scaleMaqamNahawandScale,
   scaleMaqamKurdScale,
   scaleMaqamAjamScale,
+  scaleAboriginalPentatonicScale,
+  scaleMaoriScale,
+  scaleVanuatuScale,
+  scaleSolomonIslandsScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70171,4 +70175,29 @@ describe('scaleMaqamAjamScale', () => {
   it('empty returns 0', () => { expect(scaleMaqamAjamScale([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleMaqamAjamScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleMaqamAjamScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+// Round260 オセアニア先住民音階
+describe('scaleAboriginalPentatonicScale', () => {
+  it('empty returns 0', () => { expect(scaleAboriginalPentatonicScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleAboriginalPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleAboriginalPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleMaoriScale', () => {
+  it('empty returns 0', () => { expect(scaleMaoriScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleMaoriScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleMaoriScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleVanuatuScale', () => {
+  it('empty returns 0', () => { expect(scaleVanuatuScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleVanuatuScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleVanuatuScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleSolomonIslandsScale', () => {
+  it('empty returns 0', () => { expect(scaleSolomonIslandsScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleSolomonIslandsScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleSolomonIslandsScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });

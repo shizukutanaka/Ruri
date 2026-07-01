@@ -2695,3 +2695,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleMaqamNahawandScale | マカーム・ナハワンド | [0, 204, 294, 498, 702, 792, 1088]¢ | 50¢ |
 | scaleMaqamKurdScale | マカーム・クルド | [0, 94, 294, 498, 702, 792, 996]¢ | 50¢ |
 | scaleMaqamAjamScale | マカーム・アジャム | [0, 204, 408, 498, 702, 906, 1110]¢ | 50¢ |
+
+## Round 260 — オセアニア先住民音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleAboriginalPentatonicScale | オーストラリア先住民五音音階 | [0, 204, 498, 702, 996]¢ | 55¢ |
+| scaleMaoriScale | マオリ（ニュージーランド）音階 | [0, 204, 408, 702, 906]¢ | 50¢ |
+| scaleVanuatuScale | バヌアツ五音音階 | [0, 240, 480, 720, 960]¢ | 60¢ |
+| scaleSolomonIslandsScale | ソロモン諸島五音音階 | [0, 165, 498, 702, 1035]¢ | 55¢ |

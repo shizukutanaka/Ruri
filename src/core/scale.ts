@@ -79620,3 +79620,51 @@ export function scaleMaqamAjamScale(pitches: readonly Pitch[]): number {
   }
   return matched / maqamAjam.length;
 }
+
+export function scaleAboriginalPentatonicScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const aboriginalPentatonic = [0, 204, 498, 702, 996];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of aboriginalPentatonic) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / aboriginalPentatonic.length;
+}
+
+export function scaleMaoriScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const maori = [0, 204, 408, 702, 906];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of maori) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / maori.length;
+}
+
+export function scaleVanuatuScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const vanuatu = [0, 240, 480, 720, 960];
+  const tolerance = 60;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of vanuatu) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / vanuatu.length;
+}
+
+export function scaleSolomonIslandsScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const solomonIslands = [0, 165, 498, 702, 1035];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of solomonIslands) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / solomonIslands.length;
+}
