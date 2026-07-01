@@ -2524,3 +2524,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleFinnishRuno` | フィンランド・ルノ唱 | 0,204,408,702,906 | 45¢ |
 | `scaleSwedishHardingfele` | スウェーデン・ハルダンゲル | 0,204,294,498,702,792,996 | 40¢ |
 | `scaleIcelandicTvisongur` | アイスランド・トヴィソングル | 0,204,498,702,996 | 45¢ |
+
+## Round 241 — 東欧民謡音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scalePolishMazurka` | ポーランド・マズルカ | 0,204,408,612,702,906,1110 | 40¢ |
+| `scaleCzechLidova` | チェコ民謡音階 | 0,204,294,498,702,906,996 | 40¢ |
+| `scaleUkrainianDorian` | ウクライナ・ドリアン | 0,204,294,498,702,906,996 | 40¢ |
+| `scaleSerbianKolo` | セルビア・コロ | 0,94,294,498,702,792,1088 | 40¢ |
