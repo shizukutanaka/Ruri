@@ -2947,3 +2947,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleAndalusianScale`: Andalusian flamenco-like scale [0, 100, 400, 500, 700, 800, 1100]
 - `scaleAsturianScale`: Asturian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleValencianScale`: Valencian heptatonic scale [0, 200, 300, 500, 700, 900, 1100]
+
+## Round296: 低地諸国音階 (Low Countries Scales)
+
+- `scaleFlemishScale`: Flemish heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleDutchScale`: Dutch heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleWalloonScale`: Walloon heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+- `scaleLuxembourgScale`: Luxembourg heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
