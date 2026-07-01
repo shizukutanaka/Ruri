@@ -2757,6 +2757,12 @@ import {
   tuningFamilySocraticRadarBaronAcousticOscillationProxy,
   tuningFamilySocraticRadarCosmologicalPerturbationProxy,
   tuningFamilySocraticRadarReionizationEpochProxy,
+  tuningFamilySocraticRadarNuclearBindingEnergyProxy,
+  tuningFamilySocraticRadarRadioactiveDecayChainProxy,
+  tuningFamilySocraticRadarFissionCrossectionProxy,
+  tuningFamilySocraticRadarNeutronModerationProxy,
+  tuningFamilySocraticRadarNuclearFusionIgnitionProxy,
+  tuningFamilySocraticRadarIsotopeAbundanceProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -2829,6 +2835,10 @@ import {
   scaleGreekRembetiko,
   scalePortugueseFado,
   scaleCroatianTamburica,
+  scaleBulgarianAsymmetric,
+  scaleAlbanianIso,
+  scaleMacedonianScale,
+  scaleBosnianSevdah,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -69013,6 +69023,96 @@ describe('tuningFamilySocraticRadarReionizationEpochProxy', () => {
   });
 });
 
+describe('tuningFamilySocraticRadarNuclearBindingEnergyProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNuclearBindingEnergyProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarNuclearBindingEnergyProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNuclearBindingEnergyProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarRadioactiveDecayChainProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarRadioactiveDecayChainProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarRadioactiveDecayChainProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarRadioactiveDecayChainProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarFissionCrossectionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarFissionCrossectionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarFissionCrossectionProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarFissionCrossectionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarNeutronModerationProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNeutronModerationProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarNeutronModerationProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNeutronModerationProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarNuclearFusionIgnitionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNuclearFusionIgnitionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarNuclearFusionIgnitionProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNuclearFusionIgnitionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarIsotopeAbundanceProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarIsotopeAbundanceProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarIsotopeAbundanceProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarIsotopeAbundanceProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
 describe('scaleItalianTarantella', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleItalianTarantella([])).toBe(0);
@@ -69080,6 +69180,78 @@ describe('scaleCroatianTamburica', () => {
   it('returns value in [0,1] for 19-EDO degrees', () => {
     const pitches = edo(19, 440).degrees;
     const v = scaleCroatianTamburica(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleBulgarianAsymmetric', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleBulgarianAsymmetric([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleBulgarianAsymmetric(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleBulgarianAsymmetric(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleAlbanianIso', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleAlbanianIso([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleAlbanianIso(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleAlbanianIso(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMacedonianScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleMacedonianScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleMacedonianScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleMacedonianScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleBosnianSevdah', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleBosnianSevdah([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleBosnianSevdah(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleBosnianSevdah(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

@@ -2596,3 +2596,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleGreekRembetiko` | ギリシャ・レンベティコ | 0,100,350,500,700,800,1100 | 40¢ |
 | `scalePortugueseFado` | ポルトガル・ファド | 0,100,400,500,700,800,1000 | 40¢ |
 | `scaleCroatianTamburica` | クロアチア・タンブリツァ | 0,200,400,500,700,900,1100 | 40¢ |
+
+## Round 249 — バルカン音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleBulgarianAsymmetric` | ブルガリア非対称音階 | 0,200,300,500,700,800,1000 | 40¢ |
+| `scaleAlbanianIso` | アルバニア・イソ声部 | 0,182,386,498,702,884,1088 | 40¢ |
+| `scaleMacedonianScale` | マケドニア民謡音階 | 0,100,400,500,700,800,1100 | 40¢ |
+| `scaleBosnianSevdah` | ボスニア・セヴダー | 0,150,350,500,700,850,1050 | 40¢ |

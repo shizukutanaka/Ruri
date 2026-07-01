@@ -64022,6 +64022,126 @@ export function tuningFamilySocraticRadarReionizationEpochProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3870 — tuningFamilySocraticRadarNuclearBindingEnergyProxy
+export function tuningFamilySocraticRadarNuclearBindingEnergyProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // NuclearBindingEnergy: nucleon diversity and binding convergence
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3872 — tuningFamilySocraticRadarRadioactiveDecayChainProxy
+export function tuningFamilySocraticRadarRadioactiveDecayChainProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // RadioactiveDecayChain: diversity emphasis for sequential decay transitions
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3874 — tuningFamilySocraticRadarFissionCrossectionProxy
+export function tuningFamilySocraticRadarFissionCrossectionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // FissionCrossection: versatility emphasis for neutron capture cross-section
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3876 — tuningFamilySocraticRadarNeutronModerationProxy
+export function tuningFamilySocraticRadarNeutronModerationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // NeutronModeration: benchmark emphasis for neutron energy spectrum moderation
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3878 — tuningFamilySocraticRadarNuclearFusionIgnitionProxy
+export function tuningFamilySocraticRadarNuclearFusionIgnitionProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // NuclearFusionIgnition: uniform weighting for plasma ignition threshold
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3880 — tuningFamilySocraticRadarIsotopeAbundanceProxy
+export function tuningFamilySocraticRadarIsotopeAbundanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // IsotopeAbundance: convergence emphasis for natural isotope distribution
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -77891,4 +78011,52 @@ export function scaleCroatianTamburica(pitches: readonly Pitch[]): number {
     if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
   return matched / tamburica.length;
+}
+
+export function scaleBulgarianAsymmetric(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const bulgarian = [0, 200, 300, 500, 700, 800, 1000];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of bulgarian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / bulgarian.length;
+}
+
+export function scaleAlbanianIso(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const albanian = [0, 182, 386, 498, 702, 884, 1088];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of albanian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / albanian.length;
+}
+
+export function scaleMacedonianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const macedonian = [0, 100, 400, 500, 700, 800, 1100];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of macedonian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / macedonian.length;
+}
+
+export function scaleBosnianSevdah(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const sevdah = [0, 150, 350, 500, 700, 850, 1050];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of sevdah) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / sevdah.length;
 }
