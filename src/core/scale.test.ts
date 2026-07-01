@@ -2721,6 +2721,12 @@ import {
   tuningFamilySocraticRadarEpigeneticModificationProxy,
   tuningFamilySocraticRadarCRISPREditingPrecisionProxy,
   tuningFamilySocraticRadarMolecularChaperoneDynamicsProxy,
+  tuningFamilySocraticRadarNaturalSelectionPressureProxy,
+  tuningFamilySocraticRadarGeneticDriftSimulationProxy,
+  tuningFamilySocraticRadarPhylogeneticDivergenceProxy,
+  tuningFamilySocraticRadarAdaptiveRadiationV2Proxy,
+  tuningFamilySocraticRadarCoevolutionaryDynamicsProxy,
+  tuningFamilySocraticRadarHorizontalGeneTransferProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -2769,6 +2775,10 @@ import {
   scaleAymaraScale,
   scaleGuaraniPentatonic,
   scaleTupiScale,
+  scaleRagaTodiV2,
+  scaleRagaPurviV2,
+  scaleRagaMarwaV2,
+  scaleRagaLalita,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -68048,6 +68058,78 @@ describe('scaleTupiScale', () => {
   it('returns value in [0,1] for 19-EDO degrees', () => {
     const pitches = edo(19, 440).degrees;
     const v = scaleTupiScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleRagaTodiV2', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleRagaTodiV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleRagaTodiV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleRagaTodiV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleRagaPurviV2', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleRagaPurviV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleRagaPurviV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleRagaPurviV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleRagaMarwaV2', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleRagaMarwaV2([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleRagaMarwaV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleRagaMarwaV2(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleRagaLalita', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleRagaLalita([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleRagaLalita(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleRagaLalita(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });

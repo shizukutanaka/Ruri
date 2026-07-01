@@ -63301,6 +63301,126 @@ export function tuningFamilySocraticRadarMolecularChaperoneDynamicsProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3798 — tuningFamilySocraticRadarNaturalSelectionPressureProxy
+export function tuningFamilySocraticRadarNaturalSelectionPressureProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // NaturalSelectionPressure: fitness diversity and adaptive convergence
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3800 — tuningFamilySocraticRadarGeneticDriftSimulationProxy
+export function tuningFamilySocraticRadarGeneticDriftSimulationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // GeneticDriftSimulation: stochastic allele frequency shifts
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3802 — tuningFamilySocraticRadarPhylogeneticDivergenceProxy
+export function tuningFamilySocraticRadarPhylogeneticDivergenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // PhylogeneticDivergence: evolutionary branching and clade separation
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3804 — tuningFamilySocraticRadarAdaptiveRadiationV2Proxy
+export function tuningFamilySocraticRadarAdaptiveRadiationV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // AdaptiveRadiation: rapid speciation into ecological niches
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3806 — tuningFamilySocraticRadarCoevolutionaryDynamicsProxy
+export function tuningFamilySocraticRadarCoevolutionaryDynamicsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // CoevolutionaryDynamics: reciprocal evolutionary pressures between species
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3808 — tuningFamilySocraticRadarHorizontalGeneTransferProxy
+export function tuningFamilySocraticRadarHorizontalGeneTransferProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // HorizontalGeneTransfer: lateral gene transfer across lineages
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -76882,4 +77002,52 @@ export function scaleTupiScale(pitches: readonly Pitch[]): number {
     if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
   return matched / tupi.length;
+}
+
+export function scaleRagaTodiV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const todi = [0, 90, 294, 612, 702, 792, 1088];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of todi) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / todi.length;
+}
+
+export function scaleRagaPurviV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const purvi = [0, 90, 408, 612, 702, 792, 1088];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of purvi) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / purvi.length;
+}
+
+export function scaleRagaMarwaV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const marwa = [0, 90, 408, 612, 906, 1110];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of marwa) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / marwa.length;
+}
+
+export function scaleRagaLalita(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const lalita = [0, 90, 294, 612, 792, 1088];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of lalita) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / lalita.length;
 }
