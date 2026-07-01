@@ -2791,3 +2791,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleTurkishMakamHicaz`: トルコのマカームヒジャズ (augmented 2nd, 0-100-400-500-700-800-1100c)
 - `scaleIranianShur`: イランのシュール音階 (half-flat 2nd, 0-150-300-500-700-800-1000c)
 - `scaleLebaneseMaqam`: レバノンのマカーム (natural minor, 0-200-300-500-700-900-1000c)
+
+### Round273: 南アジア音階ヘルパ (South Asian Scales)
+- `scaleBengaliScale`: ベンガルの音階 (natural minor, 0-200-300-500-700-800-1000c)
+- `scalePunjabiScale`: パンジャブの音階 (Phrygian Dominant, 0-100-400-500-700-800-1100c)
+- `scaleRajasthaniScale`: ラジャスタンの音階 (Mixolydian, 0-200-400-500-700-900-1000c)
+- `scaleSriLankaScale`: スリランカの音階 (melodic minor, 0-200-300-500-700-900-1100c)
