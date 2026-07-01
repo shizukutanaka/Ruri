@@ -1678,6 +1678,12 @@ import {
   presetFamilySocraticRadarEarthquakeNucleationProxy,
   presetFamilySocraticRadarGeomagneticStormProxy,
   presetFamilySocraticRadarTectonicPlateVelocityProxy,
+  presetFamilySocraticRadarPhotonEntanglementProxyV2,
+  presetFamilySocraticRadarLaserCoherenceProxy,
+  presetFamilySocraticRadarQuantumSqueezingProxy,
+  presetFamilySocraticRadarOpticalCavityQEDProxy,
+  presetFamilySocraticRadarSpontaneousEmissionProxy,
+  presetFamilySocraticRadarHolographicInterferenceProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';

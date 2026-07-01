@@ -2515,3 +2515,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleMongolianPentatonic` | モンゴル5音音階 | 0,204,498,702,906 | 45¢ |
 | `scaleTibetanRitual` | チベット儀礼音階 | 0,182,498,680,996 | 50¢ |
 | `scaleKazakhDombra` | カザフ・ドンブラ | 0,231,498,729,996 | 45¢ |
+
+## Round 240 — 北欧民謡音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleNordicGammalDans` | 北欧ガンマルダンス | 0,204,408,612,702,906,1110 | 40¢ |
+| `scaleFinnishRuno` | フィンランド・ルノ唱 | 0,204,408,702,906 | 45¢ |
+| `scaleSwedishHardingfele` | スウェーデン・ハルダンゲル | 0,204,294,498,702,792,996 | 40¢ |
+| `scaleIcelandicTvisongur` | アイスランド・トヴィソングル | 0,204,498,702,996 | 45¢ |
