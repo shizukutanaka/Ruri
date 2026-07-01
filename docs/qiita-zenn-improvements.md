@@ -2422,3 +2422,11 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleYorubaContent`: ヨルバ5音音階（[0,250,490,730,970]¢ ほぼ等分）との一致率
 - `scaleAkanContent`: アカン（ガーナ）7音等分音階（[0,165,330,495,660,825,990]¢）との一致率
 - `scaleZuluContent`: ズールー・イシカタミヤ音階（[0,200,400,700,900]¢）との一致率
+
+## Round 229: 中東マカーム音階ヘルパ
+
+Added 4 Middle Eastern maqam scale analysis helpers:
+- `scaleMaqamHijaz` — Maqam Hijaz scale content (characteristic augmented 2nd)
+- `scaleMaqamBayati` — Maqam Bayati scale content (neutral 2nd)
+- `scaleMaqamRast` — Maqam Rast scale content (neutral 3rd and 7th)
+- `scaleMaqamSaba` — Maqam Saba scale content (diminished 4th)
