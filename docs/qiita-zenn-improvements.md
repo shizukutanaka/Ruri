@@ -2454,3 +2454,11 @@ Added 4 jazz scale analysis helpers:
 - `scaleAlteredScale` — Altered scale / Super Locrian
 - `scaleLydianDominant` — Lydian dominant / Overtone scale
 - `scaleHalfWholeDiminished` — Half-whole diminished (8-tone symmetric)
+
+## Round 233: フラメンコ・スペイン音階ヘルパ
+
+Added 4 flamenco/Spanish scale analysis helpers:
+- `scalePhrygianDominant` — Phrygian dominant (Spanish/flamenco characteristic)
+- `scaleAndalusianCadence` — Andalusian cadence scale
+- `scaleSpanishGypsy` — Spanish Gypsy / Double Harmonic Major
+- `scaleFlamencoScale` — Flamenco scale (8-tone)
