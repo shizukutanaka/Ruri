@@ -2767,3 +2767,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleUzbekDotar`: ウズベクのドゥタール音階 (neutral intervals, 0-200-350-500-700-900-1050c)
 - `scaleTajikFalak`: タジクのファラク音階 (natural minor, 0-200-300-500-700-800-1000c)
 - `scaleKyrgyzScale`: キルギスのスケール (Dorian variant, 0-200-300-500-700-900-1000c)
+
+### Round269: 南アメリカ音階ヘルパ (South American Scales)
+- `scaleAndeseanScale`: アンデス音階 (Andean pentatonic, 0-200-500-700-900c)
+- `scaleChileanCueca`: チリのクエカ音階 (major heptatonic, 0-200-400-500-700-900-1100c)
+- `scaleArgentineZamba`: アルゼンチンのサンバ音階 (natural minor, 0-200-300-500-700-800-1000c)
+- `scaleBolivianScale`: ボリビア音階 (minor pentatonic, 0-200-500-700-1000c)
