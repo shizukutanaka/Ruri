@@ -2882,6 +2882,12 @@ import {
   tuningFamilySocraticRadarGreenhouseEffectProxyV2,
   tuningFamilySocraticRadarOceanCirculationProxyV2,
   tuningFamilySocraticRadarPermafrostDegradationProxy,
+  tuningFamilySocraticRadarDarkMatterDistributionProxy,
+  tuningFamilySocraticRadarNeutronStarMergerProxy,
+  tuningFamilySocraticRadarBlackHoleAccretionProxy,
+  tuningFamilySocraticRadarGravitationalWaveProxyV2,
+  tuningFamilySocraticRadarCosmicInflationProxyV3,
+  tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -71119,6 +71125,96 @@ describe('tuningFamilySocraticRadarPermafrostDegradationProxy', () => {
   });
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarPermafrostDegradationProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarDarkMatterDistributionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDarkMatterDistributionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarDarkMatterDistributionProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarDarkMatterDistributionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarNeutronStarMergerProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarNeutronStarMergerProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarNeutronStarMergerProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarNeutronStarMergerProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarBlackHoleAccretionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBlackHoleAccretionProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarBlackHoleAccretionProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarBlackHoleAccretionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarGravitationalWaveProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarGravitationalWaveProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarGravitationalWaveProxyV2([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarGravitationalWaveProxyV2([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarCosmicInflationProxyV3', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCosmicInflationProxyV3([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCosmicInflationProxyV3([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCosmicInflationProxyV3([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
     expect(isFinite(v)).toBe(true);
   });
 });

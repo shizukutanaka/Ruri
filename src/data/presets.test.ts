@@ -1857,6 +1857,12 @@ import {
   presetFamilySocraticRadarGreenhouseEffectProxyV2,
   presetFamilySocraticRadarOceanCirculationProxyV2,
   presetFamilySocraticRadarPermafrostDegradationProxy,
+  presetFamilySocraticRadarDarkMatterDistributionProxy,
+  presetFamilySocraticRadarNeutronStarMergerProxy,
+  presetFamilySocraticRadarBlackHoleAccretionProxy,
+  presetFamilySocraticRadarGravitationalWaveProxyV2,
+  presetFamilySocraticRadarCosmicInflationProxyV3,
+  presetFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -42175,5 +42181,89 @@ describe('presetFamilySocraticRadarPermafrostDegradationProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarPermafrostDegradationProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarDarkMatterDistributionProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarDarkMatterDistributionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarDarkMatterDistributionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarDarkMatterDistributionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarNeutronStarMergerProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarNeutronStarMergerProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarNeutronStarMergerProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarNeutronStarMergerProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarBlackHoleAccretionProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarBlackHoleAccretionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarBlackHoleAccretionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarBlackHoleAccretionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarGravitationalWaveProxyV2', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarGravitationalWaveProxyV2(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarGravitationalWaveProxyV2(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGravitationalWaveProxyV2(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarCosmicInflationProxyV3', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarCosmicInflationProxyV3(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarCosmicInflationProxyV3(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCosmicInflationProxyV3(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
