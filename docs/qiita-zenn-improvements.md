@@ -3101,3 +3101,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleSvanScale`: Svan pentatonic scale [0, 200, 400, 700, 900]
 - `scaleMingrelianScale`: Mingrelian heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
 - `scaleAdjaraScale`: Adjara heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+
+## Round318: フラメンコ音階 (Flamenco Scales)
+
+- `scaleAndalucianFlamenco`: Andalucian Flamenco phrygian-like scale [0, 100, 400, 500, 700, 800, 1000]
+- `scaleGypsyKingsScale`: Gypsy Kings phrygian-like scale [0, 100, 400, 500, 700, 800, 1100]
+- `scaleGranadaScale`: Granada phrygian-like scale [0, 100, 300, 500, 700, 800, 1000]
+- `scaleSevillanaScale`: Sevillana heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
