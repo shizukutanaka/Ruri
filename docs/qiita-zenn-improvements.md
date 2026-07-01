@@ -2415,3 +2415,10 @@ k-meansクラスタリングによるピッチ空間の構造分析を行う4つ
 - `scaleLowRegisterDensityV2`: 低音域（0〜400¢）の音符密度
 - `scaleMidRegisterDensityV2`: 中音域（400〜800¢）の音符密度
 - `scaleHighRegisterDensityV2`: 高音域（800〜1200¢）の音符密度
+
+## Round 228: アフリカ音階コンテンツヘルパ
+
+- `scaleAfricanPentatonicContentV2`: 西アフリカ・ペンタトニック（[0,204,498,702,996]¢）との一致率
+- `scaleYorubaContent`: ヨルバ5音音階（[0,250,490,730,970]¢ ほぼ等分）との一致率
+- `scaleAkanContent`: アカン（ガーナ）7音等分音階（[0,165,330,495,660,825,990]¢）との一致率
+- `scaleZuluContent`: ズールー・イシカタミヤ音階（[0,200,400,700,900]¢）との一致率

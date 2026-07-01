@@ -1606,6 +1606,12 @@ import {
   presetFamilySocraticRadarHealthPsychologyProxy,
   presetFamilySocraticRadarPersonalityModelProxy,
   presetFamilySocraticRadarEmotionRegulationProxy,
+  presetFamilySocraticRadarThermoelectricEffectProxy,
+  presetFamilySocraticRadarPiezoelectricEffectProxy,
+  presetFamilySocraticRadarFerroelectricProxy,
+  presetFamilySocraticRadarSuperonductorProxy,
+  presetFamilySocraticRadarTopologicalInsulatorProxy,
+  presetFamilySocraticRadarMagneticSkyrmionProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
