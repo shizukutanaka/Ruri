@@ -81952,3 +81952,51 @@ export function scaleSriLankaScale(pitches: readonly Pitch[]): number {
   }
   return matched / sriLanka.length;
 }
+
+export function scalePuertoRicanScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const puertoRican = [0, 200, 300, 500, 700, 900, 1000];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of puertoRican) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / puertoRican.length;
+}
+
+export function scaleJamaicanReggaeScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const jamaicanReggae = [0, 200, 400, 500, 700, 900, 1000];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of jamaicanReggae) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / jamaicanReggae.length;
+}
+
+export function scaleTrinidadianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const trinidadian = [0, 200, 400, 600, 700, 900, 1100];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of trinidadian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / trinidadian.length;
+}
+
+export function scaleBarbadianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const barbadian = [0, 200, 400, 500, 700, 900, 1100];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of barbadian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / barbadian.length;
+}

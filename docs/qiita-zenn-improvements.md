@@ -2797,3 +2797,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scalePunjabiScale`: パンジャブの音階 (Phrygian Dominant, 0-100-400-500-700-800-1100c)
 - `scaleRajasthaniScale`: ラジャスタンの音階 (Mixolydian, 0-200-400-500-700-900-1000c)
 - `scaleSriLankaScale`: スリランカの音階 (melodic minor, 0-200-300-500-700-900-1100c)
+
+### Round274: カリブ海音階ヘルパ (Caribbean Scales)
+- `scalePuertoRicanScale`: プエルトリコの音階 (Dorian, 0-200-300-500-700-900-1000c)
+- `scaleJamaicanReggaeScale`: ジャマイカのレゲエ音階 (Mixolydian, 0-200-400-500-700-900-1000c)
+- `scaleTrinidadianScale`: トリニダードの音階 (Lydian Dominant, 0-200-400-600-700-900-1100c)
+- `scaleBarbadianScale`: バルバドスの音階 (major heptatonic, 0-200-400-500-700-900-1100c)
