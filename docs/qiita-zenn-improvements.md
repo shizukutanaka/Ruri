@@ -2898,3 +2898,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleNahuatlScale`: Nahuatl hexatonic scale [0, 200, 300, 500, 700, 900]
 - `scaleMixtecScale`: Mixtec heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
 - `scaleOlmecScale`: Olmec pentatonic scale [0, 150, 350, 700, 850]
+
+## Round289: アマゾン先住民音階 (Amazonian Indigenous Scales)
+
+- `scaleYanomamiScale`: Yanomami pentatonic scale [0, 200, 400, 700, 900]
+- `scaleWayuuScale`: Wayuu pentatonic scale [0, 150, 350, 700, 850]
+- `scaleShuarScale`: Shuar hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleXinguScale`: Xingu hexatonic scale [0, 200, 400, 700, 900, 1100]

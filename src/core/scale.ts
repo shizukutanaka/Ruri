@@ -68682,6 +68682,126 @@ export function tuningFamilySocraticRadarDendriteProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q4338 — tuningFamilySocraticRadarLymphaticProxy
+export function tuningFamilySocraticRadarLymphaticProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Lymphatic: fluid drainage and immune cell circulation
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q4340 — tuningFamilySocraticRadarThymusProxy
+export function tuningFamilySocraticRadarThymusProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Thymus: T-cell maturation and selection efficiency
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q4342 — tuningFamilySocraticRadarSpleenProxy
+export function tuningFamilySocraticRadarSpleenProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Spleen: blood filtration and old erythrocyte clearance
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q4344 — tuningFamilySocraticRadarLymphNodeProxy
+export function tuningFamilySocraticRadarLymphNodeProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Lymph node: antigen filtration and lymphocyte activation
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q4346 — tuningFamilySocraticRadarInterferonProxy
+export function tuningFamilySocraticRadarInterferonProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Interferon: antiviral signaling cascade amplification
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q4348 — tuningFamilySocraticRadarComplementSystemProxy
+export function tuningFamilySocraticRadarComplementSystemProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Complement system: cascading protein opsonization response
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -84471,4 +84591,52 @@ export function scaleOlmecScale(pitches: readonly Pitch[]): number {
     if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
   return matched / olmec.length;
+}
+
+export function scaleYanomamiScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const yanomami = [0, 200, 400, 700, 900];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of yanomami) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / yanomami.length;
+}
+
+export function scaleWayuuScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const wayuu = [0, 150, 350, 700, 850];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of wayuu) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / wayuu.length;
+}
+
+export function scaleShuarScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const shuar = [0, 200, 400, 500, 700, 900];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of shuar) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / shuar.length;
+}
+
+export function scaleXinguScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const xingu = [0, 200, 400, 700, 900, 1100];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of xingu) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / xingu.length;
 }
