@@ -2954,3 +2954,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleDutchScale`: Dutch heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleWalloonScale`: Walloon heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
 - `scaleLuxembourgScale`: Luxembourg heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round297: 西バルカン音階 (Western Balkans Scales)
+
+- `scaleSlovenianScale`: Slovenian heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleCroatianScaleV2`: Croatian heptatonic scale variant [0, 200, 300, 500, 700, 800, 1100]
+- `scaleBosnianScale`: Bosnian sevdalinka-like scale [0, 100, 400, 500, 700, 800, 1100]
+- `scaleMontenegrinScale`: Montenegrin pentatonic scale [0, 200, 400, 700, 900]
