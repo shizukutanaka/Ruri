@@ -2761,3 +2761,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleEritreanPentatonic`: エリトリア五音音階 (pentatonic variant, 0-200-500-700-1000c)
 - `scaleSomaliModal`: ソマリアのモーダル音階 (with neutral 3rd, 0-200-350-700-900c)
 - `scaleDjiboutianScale`: ジブチのスケール (natural minor heptatonic, 0-200-300-500-700-900-1000c)
+
+### Round268: 中央アジア音階ヘルパ (Central Asian Scales)
+- `scaleKazakhSteppeScale`: カザフスタンのステップ音階 (major heptatonic, 0-200-400-500-700-900-1100c)
+- `scaleUzbekDotar`: ウズベクのドゥタール音階 (neutral intervals, 0-200-350-500-700-900-1050c)
+- `scaleTajikFalak`: タジクのファラク音階 (natural minor, 0-200-300-500-700-800-1000c)
+- `scaleKyrgyzScale`: キルギスのスケール (Dorian variant, 0-200-300-500-700-900-1000c)
