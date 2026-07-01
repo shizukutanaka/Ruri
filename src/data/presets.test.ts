@@ -1684,6 +1684,12 @@ import {
   presetFamilySocraticRadarOpticalCavityQEDProxy,
   presetFamilySocraticRadarSpontaneousEmissionProxy,
   presetFamilySocraticRadarHolographicInterferenceProxy,
+  presetFamilySocraticRadarWorkingMemoryCapacityProxy,
+  presetFamilySocraticRadarAttentionBottleneckProxy,
+  presetFamilySocraticRadarPredictiveCodingProxy,
+  presetFamilySocraticRadarEmbodiedCognitionProxy,
+  presetFamilySocraticRadarMetacognitionIndexProxy,
+  presetFamilySocraticRadarCognitiveBiasNetworkProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -40204,5 +40210,89 @@ describe('presetFamilySocraticRadarHolographicInterferenceProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarHolographicInterferenceProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarWorkingMemoryCapacityProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarWorkingMemoryCapacityProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarWorkingMemoryCapacityProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarWorkingMemoryCapacityProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarAttentionBottleneckProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarAttentionBottleneckProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarAttentionBottleneckProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAttentionBottleneckProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarPredictiveCodingProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarPredictiveCodingProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarPredictiveCodingProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarPredictiveCodingProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarEmbodiedCognitionProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarEmbodiedCognitionProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarEmbodiedCognitionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEmbodiedCognitionProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarMetacognitionIndexProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarMetacognitionIndexProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarMetacognitionIndexProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarMetacognitionIndexProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarCognitiveBiasNetworkProxy', () => {
+  it('returns finite value for single preset', () => {
+    const v = presetFamilySocraticRadarCognitiveBiasNetworkProxy(['12-tet'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('returns finite value for two presets', () => {
+    const v = presetFamilySocraticRadarCognitiveBiasNetworkProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCognitiveBiasNetworkProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
 });
