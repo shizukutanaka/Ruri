@@ -2996,3 +2996,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleKabyleScale`: Kabyle heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
 - `scaleAmazighScale`: Amazigh pentatonic scale [0, 150, 350, 700, 850]
 - `scaleChaouiScale`: Chaoui heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round303: アメリカ地方音楽音階 (American Regional Music Scales)
+
+- `scaleTexMexScale`: Tex-Mex heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleBluegrassScale`: Bluegrass heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleGospelScale`: Gospel heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+- `scaleAppalachianScaleV2`: Appalachian pentatonic variant [0, 200, 400, 700, 900]
