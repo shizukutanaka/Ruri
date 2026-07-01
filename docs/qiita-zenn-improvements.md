@@ -2755,3 +2755,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scalePortugueseFadoScale`: ポルトガル・ファドスケール (harmonic minor variant, 0-200-300-500-700-800-1100c)
 - `scaleCatalanScale`: カタルーニャスケール (Mixolydian, 0-200-400-500-700-900-1000c)
 - `scaleGalicianScale`: ガリシアスケール (Celtic-influenced Dorian, 0-200-300-500-700-900-1000c)
+
+### Round267: 東アフリカ音階ヘルパ (East African Scales)
+- `scaleEthiopianAnchihoye`: エチオピアのアンチホイェスケール (Anchihoye pentatonic, 0-150-500-700-850c)
+- `scaleEritreanPentatonic`: エリトリア五音音階 (pentatonic variant, 0-200-500-700-1000c)
+- `scaleSomaliModal`: ソマリアのモーダル音階 (with neutral 3rd, 0-200-350-700-900c)
+- `scaleDjiboutianScale`: ジブチのスケール (natural minor heptatonic, 0-200-300-500-700-900-1000c)
