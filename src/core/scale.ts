@@ -74824,7 +74824,7 @@ export function scaleRagaYaman(pitches: readonly Pitch[]): number {
   return matched / yaman.length;
 }
 
-export function scaleRagaBhairaviv2(pitches: readonly Pitch[]): number {
+export function scaleRagaBhairaviV2(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   // Raga Bhairavi V2: [0, 112, 294, 498, 702, 814, 996]¢ (komal Re/Ga/Dha/Ni)
   const bhairavi = [0, 112, 294, 498, 702, 814, 996];
