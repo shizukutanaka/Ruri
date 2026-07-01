@@ -2578,3 +2578,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleLakotaPentatonic` | ラコタ5音音階 | 0,267,498,765,996 | 50¢ |
 | `scaleHaidaScale` | ハイダ儀礼音階 | 0,150,498,702,1050 | 50¢ |
 | `scaleCherokeePentatonic` | チェロキー5音音階 | 0,204,498,702,996 | 45¢ |
+
+## Round 247 — 東アフリカ音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleSomaliPentatonic` | ソマリア5音音階 | 0,204,498,702,996 | 45¢ |
+| `scaleKenyanBenga` | ケニア・ベンガ | 0,204,408,498,702,906,1110 | 40¢ |
+| `scaleMasaiScale` | マサイ儀礼音階 | 0,240,480,720,960 | 50¢ |
+| `scaleMalagasyScale` | マダガスカル音階 | 0,204,408,702,906 | 45¢ |

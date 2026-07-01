@@ -2745,6 +2745,12 @@ import {
   tuningFamilySocraticRadarAlfvenWaveDynamicsProxy,
   tuningFamilySocraticRadarTokamakEquilibriumProxy,
   tuningFamilySocraticRadarInertialConfinementProxy,
+  tuningFamilySocraticRadarStringVibrationModeProxy,
+  tuningFamilySocraticRadarCalabriYauCompactificationProxy,
+  tuningFamilySocraticRadarDualitySymmetryProxy,
+  tuningFamilySocraticRadarBraneWorldDynamicsProxy,
+  tuningFamilySocraticRadarHolographicEntropyProxy,
+  tuningFamilySocraticRadarSupersymmetryBreakingProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -2809,6 +2815,10 @@ import {
   scaleLakotaPentatonic,
   scaleHaidaScale,
   scaleCherokeePentatonic,
+  scaleSomaliPentatonic,
+  scaleKenyanBenga,
+  scaleMasaiScale,
+  scaleMalagasyScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -68646,6 +68656,78 @@ describe('scaleCherokeePentatonic', () => {
   it('returns value in [0,1] for 19-EDO degrees', () => {
     const pitches = edo(19, 440).degrees;
     const v = scaleCherokeePentatonic(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleSomaliPentatonic', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleSomaliPentatonic([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleSomaliPentatonic(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleSomaliPentatonic(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleKenyanBenga', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleKenyanBenga([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleKenyanBenga(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleKenyanBenga(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMasaiScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleMasaiScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleMasaiScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleMasaiScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMalagasyScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleMalagasyScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleMalagasyScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleMalagasyScale(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
