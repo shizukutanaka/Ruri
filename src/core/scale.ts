@@ -79788,3 +79788,51 @@ export function scaleSolomonIslandsScale(pitches: readonly Pitch[]): number {
   }
   return matched / solomonIslands.length;
 }
+
+export function scaleBerberPentatonicScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const berberPentatonic = [0, 204, 386, 702, 906];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of berberPentatonic) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / berberPentatonic.length;
+}
+
+export function scaleNubianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const nubian = [0, 204, 498, 702, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of nubian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / nubian.length;
+}
+
+export function scaleGnawaMusicScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const gnawa = [0, 204, 294, 702, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of gnawa) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / gnawa.length;
+}
+
+export function scaleTuaregScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const tuareg = [0, 165, 498, 702, 1035];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of tuareg) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / tuareg.length;
+}

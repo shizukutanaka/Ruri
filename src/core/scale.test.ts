@@ -2943,6 +2943,10 @@ import {
   scaleMaoriScale,
   scaleVanuatuScale,
   scaleSolomonIslandsScale,
+  scaleBerberPentatonicScale,
+  scaleNubianScale,
+  scaleGnawaMusicScale,
+  scaleTuaregScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70248,4 +70252,29 @@ describe('scaleSolomonIslandsScale', () => {
   it('empty returns 0', () => { expect(scaleSolomonIslandsScale([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleSolomonIslandsScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleSolomonIslandsScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+// Round261 北アフリカ音階
+describe('scaleBerberPentatonicScale', () => {
+  it('empty returns 0', () => { expect(scaleBerberPentatonicScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleBerberPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleBerberPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleNubianScale', () => {
+  it('empty returns 0', () => { expect(scaleNubianScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleNubianScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleNubianScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleGnawaMusicScale', () => {
+  it('empty returns 0', () => { expect(scaleGnawaMusicScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleGnawaMusicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleGnawaMusicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleTuaregScale', () => {
+  it('empty returns 0', () => { expect(scaleTuaregScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleTuaregScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleTuaregScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });

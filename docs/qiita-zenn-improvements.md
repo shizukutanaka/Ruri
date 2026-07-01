@@ -2704,3 +2704,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleMaoriScale | マオリ（ニュージーランド）音階 | [0, 204, 408, 702, 906]¢ | 50¢ |
 | scaleVanuatuScale | バヌアツ五音音階 | [0, 240, 480, 720, 960]¢ | 60¢ |
 | scaleSolomonIslandsScale | ソロモン諸島五音音階 | [0, 165, 498, 702, 1035]¢ | 55¢ |
+
+## Round 261 — 北アフリカ音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleBerberPentatonicScale | ベルベル（アマジグ）五音音階 | [0, 204, 386, 702, 906]¢ | 50¢ |
+| scaleNubianScale | ヌビア音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
+| scaleGnawaMusicScale | グナワ音楽音階 | [0, 204, 294, 702, 996]¢ | 50¢ |
+| scaleTuaregScale | トゥアレグ五音音階 | [0, 165, 498, 702, 1035]¢ | 55¢ |
