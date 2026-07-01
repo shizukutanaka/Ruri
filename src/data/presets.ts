@@ -1864,7 +1864,7 @@ import {
   tuningFamilySocraticRadarSuperconductorCriticalProxy,
   tuningFamilySocraticRadarDiffractionGratingProxy,
   tuningFamilySocraticRadarInterferometryPhaseProxy,
-  tuningFamilySocraticRadarLaserCoherenceProxy,
+  tuningFamilySocraticRadarLaserCoherenceProxyV2,
   tuningFamilySocraticRadarFiberBraggGratingProxy,
   tuningFamilySocraticRadarPhotonicCrystalBandProxy,
   tuningFamilySocraticRadarWaveguideDispersionProxy,
@@ -34153,7 +34153,7 @@ export function presetFamilySocraticRadarInterferometryPhaseProxy(
 }
 
 // Q4151
-export function presetFamilySocraticRadarLaserCoherenceProxy(
+export function presetFamilySocraticRadarLaserCoherenceProxyV2(
   presetIds: readonly string[],
   spectrum: ReturnType<typeof harmonicSpectrum>,
   rootHz?: number,
@@ -34163,7 +34163,7 @@ export function presetFamilySocraticRadarLaserCoherenceProxy(
     if (!t) throw new RangeError(`Unknown preset: ${id}`);
     return loadTuningPreset(t);
   });
-  return tuningFamilySocraticRadarLaserCoherenceProxy(tunings, spectrum, rootHz);
+  return tuningFamilySocraticRadarLaserCoherenceProxyV2(tunings, spectrum, rootHz);
 }
 
 // Q4153

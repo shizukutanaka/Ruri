@@ -66802,8 +66802,8 @@ export function tuningFamilySocraticRadarInterferometryPhaseProxy(
   return Math.min(1, Math.max(0, result));
 }
 
-// Q4150 — tuningFamilySocraticRadarLaserCoherenceProxy
-export function tuningFamilySocraticRadarLaserCoherenceProxy(
+// Q4150 — tuningFamilySocraticRadarLaserCoherenceProxyV2
+export function tuningFamilySocraticRadarLaserCoherenceProxyV2(
   tunings: readonly TuningSystem[],
   spectrum: Spectrum,
   rootHz?: number,
