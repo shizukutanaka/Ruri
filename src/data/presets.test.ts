@@ -1911,6 +1911,12 @@ import {
   presetFamilySocraticRadarPlateletProxy,
   presetFamilySocraticRadarCoagulationProxy,
   presetFamilySocraticRadarBloodViscosityProxy,
+  presetFamilySocraticRadarEndocrinProxy,
+  presetFamilySocraticRadarInsulinProxy,
+  presetFamilySocraticRadarCortisolProxy,
+  presetFamilySocraticRadarThyroidProxy,
+  presetFamilySocraticRadarAdrenalProxy,
+  presetFamilySocraticRadarGlucoseHomeostasisProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -42961,5 +42967,77 @@ describe('presetFamilySocraticRadarBloodViscosityProxy', () => {
   });
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarBloodViscosityProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarEndocrinProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarEndocrinProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarEndocrinProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarEndocrinProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarInsulinProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarInsulinProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarInsulinProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarInsulinProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarCortisolProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCortisolProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarCortisolProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarCortisolProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarThyroidProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarThyroidProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarThyroidProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarThyroidProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarAdrenalProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarAdrenalProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarAdrenalProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarAdrenalProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
+  });
+});
+
+describe('presetFamilySocraticRadarGlucoseHomeostasisProxy', () => {
+  it('returns finite for single preset', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarGlucoseHomeostasisProxy(['12-tet'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('returns finite for two presets', () => {
+    expect(Number.isFinite(presetFamilySocraticRadarGlucoseHomeostasisProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6)))).toBe(true);
+  });
+  it('throws RangeError for unknown preset', () => {
+    expect(() => presetFamilySocraticRadarGlucoseHomeostasisProxy(['unknown-preset'], harmonicSpectrum(6))).toThrow(RangeError);
   });
 });
