@@ -80460,3 +80460,51 @@ export function scaleChechenLezgiScale(pitches: readonly Pitch[]): number {
   }
   return matched / chechenLezgi.length;
 }
+
+export function scaleRomanianDorian(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const romanianDorian = [0, 204, 294, 612, 702, 906, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of romanianDorian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / romanianDorian.length;
+}
+
+export function scaleHungarianMinorScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const hungarianMinor = [0, 204, 294, 612, 702, 792, 1110];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of hungarianMinor) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / hungarianMinor.length;
+}
+
+export function scalePolishHighlandScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const polishHighland = [0, 204, 408, 612, 702, 906, 1110];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of polishHighland) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / polishHighland.length;
+}
+
+export function scaleUkrainianDorianScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const ukrainianDorian = [0, 204, 294, 612, 702, 906, 1088];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of ukrainianDorian) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / ukrainianDorian.length;
+}

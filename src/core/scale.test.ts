@@ -2983,6 +2983,10 @@ import {
   scaleArmenianDudukScale,
   scaleAzerbaijaniMughamScale,
   scaleChechenLezgiScale,
+  scaleRomanianDorian,
+  scaleHungarianMinorScale,
+  scalePolishHighlandScale,
+  scaleUkrainianDorianScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70556,4 +70560,29 @@ describe('scaleChechenLezgiScale', () => {
   it('empty returns 0', () => { expect(scaleChechenLezgiScale([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleChechenLezgiScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleChechenLezgiScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+// Round265 東欧音階
+describe('scaleRomanianDorian', () => {
+  it('empty returns 0', () => { expect(scaleRomanianDorian([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleRomanianDorian(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleRomanianDorian(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleHungarianMinorScale', () => {
+  it('empty returns 0', () => { expect(scaleHungarianMinorScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleHungarianMinorScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleHungarianMinorScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scalePolishHighlandScale', () => {
+  it('empty returns 0', () => { expect(scalePolishHighlandScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scalePolishHighlandScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scalePolishHighlandScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleUkrainianDorianScale', () => {
+  it('empty returns 0', () => { expect(scaleUkrainianDorianScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleUkrainianDorianScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleUkrainianDorianScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
