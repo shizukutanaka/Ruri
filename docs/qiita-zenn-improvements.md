@@ -2446,3 +2446,11 @@ Added 4 Eastern European folk scale analysis helpers:
 - `scaleBulgarianRhythmicScale` — Bulgarian/Balkan asymmetric 7-tone
 - `scaleRomanianMinor` — Romanian minor (acoustic scale)
 - `scaleZigeunerScale` — Zigeuner/Double harmonic scale
+
+## Round 232: ジャズ音階ヘルパ
+
+Added 4 jazz scale analysis helpers:
+- `scaleBebopDominant` — Bebop dominant scale (8-tone with chromatic passing tone)
+- `scaleAlteredScale` — Altered scale / Super Locrian
+- `scaleLydianDominant` — Lydian dominant / Overtone scale
+- `scaleHalfWholeDiminished` — Half-whole diminished (8-tone symmetric)
