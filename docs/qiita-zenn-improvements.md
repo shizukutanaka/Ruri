@@ -2919,3 +2919,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleByzantineScale`: Byzantine hijaz-like scale [0, 100, 400, 500, 700, 800, 1100]
 - `scaleCypriotScale`: Cypriot folk heptatonic scale [0, 200, 350, 500, 700, 900, 1050]
 - `scaleAnatolianFolkScale`: Anatolian folk heptatonic scale [0, 200, 350, 500, 700, 800, 1000]
+
+## Round292: ミクロネシア音階 (Micronesian Scales)
+
+- `scaleWestPolynesianScale`: West Polynesian pentatonic scale [0, 200, 400, 700, 900]
+- `scaleMicronesianScale`: Micronesian pentatonic scale [0, 150, 350, 700, 850]
+- `scaleKiribatiScale`: Kiribati hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleMarshalleseScale`: Marshallese hexatonic scale [0, 200, 400, 700, 900, 1100]
