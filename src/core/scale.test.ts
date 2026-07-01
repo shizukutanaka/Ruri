@@ -2811,6 +2811,12 @@ import {
   tuningFamilySocraticRadarMineralCrystallizationProxy,
   tuningFamilySocraticRadarErosionSedimentationProxy,
   tuningFamilySocraticRadarGeothermalGradientV2Proxy,
+  tuningFamilySocraticRadarStellarNucleosynthesisV2Proxy,
+  tuningFamilySocraticRadarPulsarTimingV2Proxy,
+  tuningFamilySocraticRadarGalacticRotationCurveProxy,
+  tuningFamilySocraticRadarExoplanetTransitProxy,
+  tuningFamilySocraticRadarGravitationalWaveStrainProxy,
+  tuningFamilySocraticRadarCosmicRaySpectralProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -70098,6 +70104,48 @@ describe('tuningFamilySocraticRadarGeothermalGradientV2Proxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarGeothermalGradientV2Proxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarGeothermalGradientV2Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarGeothermalGradientV2Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarStellarNucleosynthesisV2Proxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarStellarNucleosynthesisV2Proxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarStellarNucleosynthesisV2Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarStellarNucleosynthesisV2Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarPulsarTimingV2Proxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarPulsarTimingV2Proxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarPulsarTimingV2Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarPulsarTimingV2Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarGalacticRotationCurveProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarGalacticRotationCurveProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarGalacticRotationCurveProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarGalacticRotationCurveProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarExoplanetTransitProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarExoplanetTransitProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarExoplanetTransitProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarExoplanetTransitProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarGravitationalWaveStrainProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarGravitationalWaveStrainProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarGravitationalWaveStrainProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarGravitationalWaveStrainProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarCosmicRaySpectralProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarCosmicRaySpectralProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarCosmicRaySpectralProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarCosmicRaySpectralProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
 });
 
 // Round259 中東音階
