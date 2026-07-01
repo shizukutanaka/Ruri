@@ -2989,3 +2989,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleAzerbaijaniScale`: Azerbaijani mugham-like scale [0, 150, 350, 500, 700, 850, 1050]
 - `scaleUzbekMaqom`: Uzbek Shashmaqom scale [0, 200, 350, 500, 700, 900, 1050]
 - `scaleTajikMaqom`: Tajik Shashmaqom scale [0, 200, 400, 500, 700, 800, 1100]
+
+## Round302: ベルベル音階 (Berber Scales)
+
+- `scaleBerberScale`: Berber pentatonic scale [0, 200, 400, 700, 900]
+- `scaleKabyleScale`: Kabyle heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
+- `scaleAmazighScale`: Amazigh pentatonic scale [0, 150, 350, 700, 850]
+- `scaleChaouiScale`: Chaoui heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
