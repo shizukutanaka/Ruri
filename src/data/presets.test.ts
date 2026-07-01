@@ -1750,6 +1750,12 @@ import {
   presetFamilySocraticRadarPlasmoniCouplingProxy,
   presetFamilySocraticRadarOpticalCoherenceTomographyProxy,
   presetFamilySocraticRadarFrequencyCombGenerationProxy,
+  presetFamilySocraticRadarMaxwellEquationV2Proxy,
+  presetFamilySocraticRadarFaradayInductionProxy,
+  presetFamilySocraticRadarLorentzForceProxy,
+  presetFamilySocraticRadarPoyntingVectorV2Proxy,
+  presetFamilySocraticRadarElectromagneticWaveProxy,
+  presetFamilySocraticRadarBrewsterAngleProxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
@@ -41195,4 +41201,40 @@ describe('presetFamilySocraticRadarFrequencyCombGenerationProxy', () => {
   it('throws RangeError for unknown preset', () => {
     expect(() => presetFamilySocraticRadarFrequencyCombGenerationProxy(['unknown-preset'], harmonicSpectrum(6), 440)).toThrow(RangeError);
   });
+});
+
+describe('presetFamilySocraticRadarMaxwellEquationV2Proxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarMaxwellEquationV2Proxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarMaxwellEquationV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarMaxwellEquationV2Proxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarFaradayInductionProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarFaradayInductionProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarFaradayInductionProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarFaradayInductionProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarLorentzForceProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarLorentzForceProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarLorentzForceProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarLorentzForceProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarPoyntingVectorV2Proxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarPoyntingVectorV2Proxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarPoyntingVectorV2Proxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarPoyntingVectorV2Proxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarElectromagneticWaveProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarElectromagneticWaveProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarElectromagneticWaveProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarElectromagneticWaveProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
+});
+
+describe('presetFamilySocraticRadarBrewsterAngleProxy', () => {
+  it('single preset finite', () => { const v = presetFamilySocraticRadarBrewsterAngleProxy(['12-tet'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('two presets finite', () => { const v = presetFamilySocraticRadarBrewsterAngleProxy(['12-tet', 'just-5-limit'], harmonicSpectrum(6), 440); expect(isFinite(v)).toBe(true); });
+  it('unknown preset throws', () => { expect(() => presetFamilySocraticRadarBrewsterAngleProxy(['nonexistent'], harmonicSpectrum(6))).toThrow(RangeError); });
 });
