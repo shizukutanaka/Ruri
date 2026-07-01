@@ -2954,6 +2954,12 @@ import {
   tuningFamilySocraticRadarKeratinProxy,
   tuningFamilySocraticRadarWoundHealingProxy,
   tuningFamilySocraticRadarSebaceousGlandProxy,
+  tuningFamilySocraticRadarRespiratoryProxy,
+  tuningFamilySocraticRadarAlveolarProxy,
+  tuningFamilySocraticRadarBronchialProxy,
+  tuningFamilySocraticRadarPulmonaryProxy,
+  tuningFamilySocraticRadarSurfactantProxy,
+  tuningFamilySocraticRadarDiaphragmProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -3162,6 +3168,10 @@ import {
   scaleSenegaleseWolof,
   scaleMaliBamanaSuleba,
   scaleGuineanJeliya,
+  scaleZimbabweMbira,
+  scaleShonaScale,
+  scaleMozambiquanScale,
+  scaleBotswanaScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -73540,5 +73550,77 @@ describe('tuningFamilySocraticRadarSebaceousGlandProxy', () => {
   it('returns finite value for two tunings', () => {
     const v = tuningFamilySocraticRadarSebaceousGlandProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6));
     expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('scaleZimbabweMbira', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleZimbabweMbira([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleZimbabweMbira(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleZimbabweMbira(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleShonaScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleShonaScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleShonaScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleShonaScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleMozambiquanScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleMozambiquanScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleMozambiquanScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleMozambiquanScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleBotswanaScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleBotswanaScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleBotswanaScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleBotswanaScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
   });
 });

@@ -2856,3 +2856,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleSenegaleseWolof`: Senegalese Wolof maqam scale [0, 200, 350, 500, 700, 900, 1050]
 - `scaleMaliBamanaSuleba`: Mali Bamana Suleba pentatonic [0, 200, 400, 700, 900]
 - `scaleGuineanJeliya`: Guinean Jeliya hexatonic [0, 200, 400, 500, 700, 900]
+
+## Round283: 南部アフリカ音階 (Southern African Scales)
+
+- `scaleZimbabweMbira`: Zimbabwe Mbira hexatonic [0, 200, 400, 700, 900, 1100]
+- `scaleShonaScale`: Shona hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleMozambiquanScale`: Mozambiquan heptatonic [0, 200, 300, 500, 700, 900, 1100]
+- `scaleBotswanaScale`: Botswana pentatonic [0, 200, 400, 700, 900]
