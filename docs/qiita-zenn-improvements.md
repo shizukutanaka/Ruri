@@ -2722,3 +2722,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleSichuanOperaScale | 四川オペラ音階 | [0, 204, 294, 498, 702, 906, 996]¢ | 50¢ |
 | scaleShanshuiGuqinScale | 古琴山水音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
 | scaleYunnanMinorityScale | 雲南少数民族五音音階 | [0, 165, 498, 702, 1035]¢ | 55¢ |
+
+## Round 263 — インド古典音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleRagaBhairavScale | ラーガ・バイラヴ | [0, 112, 386, 498, 702, 814, 1088]¢ | 50¢ |
+| scaleRagaYamanScale | ラーガ・ヤマン | [0, 204, 408, 612, 702, 906, 1110]¢ | 50¢ |
+| scaleRagaDeshScale | ラーガ・デシュ | [0, 204, 386, 498, 702, 906, 996]¢ | 50¢ |
+| scaleRagaKafiScale | ラーガ・カーフィー | [0, 204, 294, 498, 702, 906, 996]¢ | 50¢ |

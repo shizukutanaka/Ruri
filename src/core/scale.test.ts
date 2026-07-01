@@ -2963,6 +2963,10 @@ import {
   scaleSichuanOperaScale,
   scaleShanshuiGuqinScale,
   scaleYunnanMinorityScale,
+  scaleRagaBhairavScale,
+  scaleRagaYamanScale,
+  scaleRagaDeshScale,
+  scaleRagaKafiScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70402,4 +70406,29 @@ describe('tuningFamilySocraticRadarBayesianInferenceProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarBayesianInferenceProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarBayesianInferenceProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarBayesianInferenceProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round263 インド古典音階
+describe('scaleRagaBhairavScale', () => {
+  it('empty returns 0', () => { expect(scaleRagaBhairavScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleRagaBhairavScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleRagaBhairavScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleRagaYamanScale', () => {
+  it('empty returns 0', () => { expect(scaleRagaYamanScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleRagaYamanScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleRagaYamanScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleRagaDeshScale', () => {
+  it('empty returns 0', () => { expect(scaleRagaDeshScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleRagaDeshScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleRagaDeshScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleRagaKafiScale', () => {
+  it('empty returns 0', () => { expect(scaleRagaKafiScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleRagaKafiScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleRagaKafiScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });
