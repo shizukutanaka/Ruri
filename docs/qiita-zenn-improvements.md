@@ -2430,3 +2430,11 @@ Added 4 Middle Eastern maqam scale analysis helpers:
 - `scaleMaqamBayati` — Maqam Bayati scale content (neutral 2nd)
 - `scaleMaqamRast` — Maqam Rast scale content (neutral 3rd and 7th)
 - `scaleMaqamSaba` — Maqam Saba scale content (diminished 4th)
+
+## Round 230: インド音楽ラーガ音階ヘルパ
+
+Added 4 Indian raga scale analysis helpers:
+- `scaleRagaBhairav` — Raga Bhairav (komal Re/Dha, morning raga)
+- `scaleRagaYaman` — Raga Yaman (tivra Ma, evening raga)
+- `scaleRagaBhairavi` — Raga Bhairavi (komal Re/Ga/Dha/Ni)
+- `scaleRagaKafi` — Raga Kafi (komal Ga/Ni, Dorian-like)
