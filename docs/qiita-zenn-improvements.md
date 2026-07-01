@@ -2975,3 +2975,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleBavarianScale`: Bavarian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleTyroleanScale`: Tyrolean hexatonic scale [0, 200, 400, 700, 900, 1100]
 - `scaleSwissAlpineScale`: Swiss Alpine hexatonic scale [0, 200, 400, 500, 700, 900]
+
+## Round300: オーストラリア先住民音階 (Australian Aboriginal Scales)
+
+- `scaleAboriginalScale`: Aboriginal pentatonic scale [0, 200, 400, 700, 900]
+- `scaleTorresStraitScale`: Torres Strait hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleMaoriScaleV3`: Maori pentatonic scale variant [0, 150, 350, 700, 850]
+- `scaleTasmanianScale`: Tasmanian hexatonic scale [0, 200, 400, 700, 900, 1100]
