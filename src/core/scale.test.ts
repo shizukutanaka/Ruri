@@ -3194,6 +3194,12 @@ import {
   tuningFamilySocraticRadarPneumoniaProxy,
   tuningFamilySocraticRadarCOPDProxy,
   tuningFamilySocraticRadarPleuralEffusionProxy,
+  tuningFamilySocraticRadarClinicalTrialProxy,
+  tuningFamilySocraticRadarPharmacovigilanceProxy,
+  tuningFamilySocraticRadarDrugInteractionProxy,
+  tuningFamilySocraticRadarBiosimilarProxy,
+  tuningFamilySocraticRadarTherapeuticMonitoringProxy,
+  tuningFamilySocraticRadarTherapeuticIndexProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -3562,6 +3568,10 @@ import {
   scaleMandeScale,
   scaleSonghaiScale,
   scaleFulaniScale,
+  scaleCentralAmericanScale,
+  scaleGuatemalanMarimba,
+  scaleHondurasGarifuna,
+  scaleNicaraguanScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -80277,6 +80287,96 @@ describe('tuningFamilySocraticRadarPleuralEffusionProxy', () => {
   });
 });
 
+describe('tuningFamilySocraticRadarClinicalTrialProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarClinicalTrialProxy([], harmonicSpectrum(6))).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarClinicalTrialProxy([edo(12, 440)], harmonicSpectrum(6));
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarClinicalTrialProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6));
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarPharmacovigilanceProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarPharmacovigilanceProxy([], harmonicSpectrum(6))).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarPharmacovigilanceProxy([edo(12, 440)], harmonicSpectrum(6));
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarPharmacovigilanceProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6));
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarDrugInteractionProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarDrugInteractionProxy([], harmonicSpectrum(6))).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarDrugInteractionProxy([edo(12, 440)], harmonicSpectrum(6));
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarDrugInteractionProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6));
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarBiosimilarProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarBiosimilarProxy([], harmonicSpectrum(6))).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarBiosimilarProxy([edo(12, 440)], harmonicSpectrum(6));
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarBiosimilarProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6));
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarTherapeuticMonitoringProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTherapeuticMonitoringProxy([], harmonicSpectrum(6))).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarTherapeuticMonitoringProxy([edo(12, 440)], harmonicSpectrum(6));
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarTherapeuticMonitoringProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6));
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarTherapeuticIndexProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarTherapeuticIndexProxy([], harmonicSpectrum(6))).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarTherapeuticIndexProxy([edo(12, 440)], harmonicSpectrum(6));
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarTherapeuticIndexProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6));
+    expect(Number.isFinite(v)).toBe(true);
+  });
+});
+
 describe('scaleAndeanQuenaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAndeanQuenaScale([])).toBe(0);
@@ -80416,6 +80516,78 @@ describe('scaleFulaniScale', () => {
   it('returns value in [0,1] for 19-EDO pitches', () => {
     const pitches = edo(19, 440).degrees;
     const v = scaleFulaniScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleCentralAmericanScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleCentralAmericanScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleCentralAmericanScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleCentralAmericanScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleGuatemalanMarimba', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleGuatemalanMarimba([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleGuatemalanMarimba(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleGuatemalanMarimba(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleHondurasGarifuna', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleHondurasGarifuna([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleHondurasGarifuna(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleHondurasGarifuna(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleNicaraguanScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleNicaraguanScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO pitches', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleNicaraguanScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO pitches', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleNicaraguanScale(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
   });
