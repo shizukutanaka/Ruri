@@ -3073,3 +3073,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleMacedonianScaleV2`: Macedonian heptatonic scale variant [0, 200, 300, 500, 700, 800, 1100]
 - `scaleSerbianScaleV2`: Serbian heptatonic scale variant [0, 100, 400, 500, 700, 800, 1100]
 - `scaleKosovarScale`: Kosovar heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+
+## Round314: テュルク系音階 (Turkic Scales)
+
+- `scaleTurkicScale`: Turkic pentatonic scale [0, 200, 400, 700, 900]
+- `scaleTatarScale`: Tatar hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleBashkirScale`: Bashkir pentatonic scale [0, 150, 350, 700, 850]
+- `scaleChuvashScale`: Chuvash hexatonic scale [0, 200, 400, 700, 900, 1100]
