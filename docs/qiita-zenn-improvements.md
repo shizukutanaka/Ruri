@@ -2785,3 +2785,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleWolofScale`: ウォロフ音階 (minor pentatonic, 0-200-500-700-1000c)
 - `scaleMandinkaScale`: マンディンカ音階 (melodic minor, 0-200-300-500-700-900-1100c)
 - `scaleHausaScale`: ハウサ音階 (Mixolydian, 0-200-400-500-700-900-1000c)
+
+### Round272: 中東音階ヘルパ (Middle Eastern Scales)
+- `scaleArabicMaqamRast`: アラビアのマカームラスト (neutral intervals, 0-200-350-500-700-900-1050c)
+- `scaleTurkishMakamHicaz`: トルコのマカームヒジャズ (augmented 2nd, 0-100-400-500-700-800-1100c)
+- `scaleIranianShur`: イランのシュール音階 (half-flat 2nd, 0-150-300-500-700-800-1000c)
+- `scaleLebaneseMaqam`: レバノンのマカーム (natural minor, 0-200-300-500-700-900-1000c)
