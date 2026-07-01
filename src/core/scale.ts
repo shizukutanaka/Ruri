@@ -78612,3 +78612,51 @@ export function scaleSamiJoikScale(pitches: readonly Pitch[]): number {
   }
   return matched / samiJoik.length;
 }
+
+export function scaleEthiopianTizitaScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const ethiopianTizita = [0, 204, 294, 702, 906];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of ethiopianTizita) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / ethiopianTizita.length;
+}
+
+export function scaleKenyaBengaScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const kenyaBenga = [0, 204, 498, 702, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of kenyaBenga) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / kenyaBenga.length;
+}
+
+export function scaleMalagasyScaleV2(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const malagasy = [0, 165, 498, 702, 1035];
+  const tolerance = 55;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of malagasy) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / malagasy.length;
+}
+
+export function scaleUgandanPentatonicScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const ugandanAmadinda = [0, 240, 480, 720, 960];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of ugandanAmadinda) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / ugandanAmadinda.length;
+}

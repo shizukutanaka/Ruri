@@ -2873,6 +2873,10 @@ import {
   scaleNorwegianSlattScale,
   scaleFinnishKanteliScale,
   scaleSamiJoikScale,
+  scaleEthiopianTizitaScale,
+  scaleKenyaBengaScale,
+  scaleMalagasyScaleV2,
+  scaleUgandanPentatonicScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -69709,4 +69713,29 @@ describe('tuningFamilySocraticRadarBrewsterAngleProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarBrewsterAngleProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarBrewsterAngleProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarBrewsterAngleProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round254 東アフリカ音階
+describe('scaleEthiopianTizitaScale', () => {
+  it('empty returns 0', () => { expect(scaleEthiopianTizitaScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleEthiopianTizitaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleEthiopianTizitaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleKenyaBengaScale', () => {
+  it('empty returns 0', () => { expect(scaleKenyaBengaScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleKenyaBengaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleKenyaBengaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleMalagasyScaleV2', () => {
+  it('empty returns 0', () => { expect(scaleMalagasyScaleV2([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleMalagasyScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleMalagasyScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleUgandanPentatonicScale', () => {
+  it('empty returns 0', () => { expect(scaleUgandanPentatonicScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleUgandanPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleUgandanPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });

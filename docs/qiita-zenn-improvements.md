@@ -2641,3 +2641,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleNorwegianSlattScale | ノルウェースラット音階 | [0, 182, 386, 498, 702, 884, 1088]¢ | 50¢ |
 | scaleFinnishKanteliScale | フィンランドカンテレ音階 | [0, 204, 408, 498, 702, 906, 1110]¢ | 50¢ |
 | scaleSamiJoikScale | サーミ・ヨイク五音音階 | [0, 165, 498, 702, 996]¢ | 55¢ |
+
+## Round 254 — 東アフリカ音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleEthiopianTizitaScale | エチオピア・ティジタ音階 | [0, 204, 294, 702, 906]¢ | 50¢ |
+| scaleKenyaBengaScale | ケニア・ベンガ五音音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
+| scaleMalagasyScaleV2 | マダガスカル五音音階 | [0, 165, 498, 702, 1035]¢ | 55¢ |
+| scaleUgandanPentatonicScale | ウガンダ・アマディンダ五音音階 | [0, 240, 480, 720, 960]¢ | 50¢ |
