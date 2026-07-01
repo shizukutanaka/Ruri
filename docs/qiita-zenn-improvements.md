@@ -2849,3 +2849,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleTibetanSinging`: Tibetan singing bowl heptatonic [0, 200, 350, 500, 700, 850, 1050]
 - `scaleNepaleseScale`: Nepalese diatonic scale [0, 200, 400, 500, 700, 900, 1100]
 - `scaleLadakhiScale`: Ladakhi folk scale [0, 150, 350, 500, 700, 900, 1100]
+
+## Round282: 西アフリカ音階v2 (West African Scales v2)
+
+- `scaleNigerianJuju`: Nigerian Juju diatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleSenegaleseWolof`: Senegalese Wolof maqam scale [0, 200, 350, 500, 700, 900, 1050]
+- `scaleMaliBamanaSuleba`: Mali Bamana Suleba pentatonic [0, 200, 400, 700, 900]
+- `scaleGuineanJeliya`: Guinean Jeliya hexatonic [0, 200, 400, 500, 700, 900]
