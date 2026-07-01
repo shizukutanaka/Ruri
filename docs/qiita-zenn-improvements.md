@@ -2912,3 +2912,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleHindustaniScale`: Hindustani heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
 - `scaleTamilScale`: Tamil folk heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
 - `scaleGujaratiScale`: Gujarati heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round291: 東地中海音階 (Eastern Mediterranean Scales)
+
+- `scaleGreekModalScale`: Greek modal heptatonic scale [0, 200, 300, 500, 700, 800, 1000]
+- `scaleByzantineScale`: Byzantine hijaz-like scale [0, 100, 400, 500, 700, 800, 1100]
+- `scaleCypriotScale`: Cypriot folk heptatonic scale [0, 200, 350, 500, 700, 900, 1050]
+- `scaleAnatolianFolkScale`: Anatolian folk heptatonic scale [0, 200, 350, 500, 700, 800, 1000]
