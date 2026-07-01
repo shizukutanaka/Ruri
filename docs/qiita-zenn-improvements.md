@@ -2968,3 +2968,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleSamiScale`: Sami pentatonic scale [0, 150, 350, 700, 850]
 - `scaleKareliaScale`: Karelian hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleErzyaScale`: Erzya hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round299: アルプス音階 (Alpine Scales)
+
+- `scaleAustrianAlpineScale`: Austrian Alpine heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleBavarianScale`: Bavarian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleTyroleanScale`: Tyrolean hexatonic scale [0, 200, 400, 700, 900, 1100]
+- `scaleSwissAlpineScale`: Swiss Alpine hexatonic scale [0, 200, 400, 500, 700, 900]
