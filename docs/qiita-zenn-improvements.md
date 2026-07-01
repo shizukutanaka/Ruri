@@ -2961,3 +2961,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleCroatianScaleV2`: Croatian heptatonic scale variant [0, 200, 300, 500, 700, 800, 1100]
 - `scaleBosnianScale`: Bosnian sevdalinka-like scale [0, 100, 400, 500, 700, 800, 1100]
 - `scaleMontenegrinScale`: Montenegrin pentatonic scale [0, 200, 400, 700, 900]
+
+## Round298: フィン・ウゴル音階 (Finno-Ugric Scales)
+
+- `scaleFinnoUgricScale`: Finno-Ugric pentatonic scale [0, 200, 400, 700, 900]
+- `scaleSamiScale`: Sami pentatonic scale [0, 150, 350, 700, 850]
+- `scaleKareliaScale`: Karelian hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleErzyaScale`: Erzya hexatonic scale [0, 200, 400, 700, 900, 1100]
