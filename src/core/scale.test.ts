@@ -2787,6 +2787,12 @@ import {
   tuningFamilySocraticRadarCorticalOscillationProxy,
   tuningFamilySocraticRadarAxonMyelinationProxy,
   tuningFamilySocraticRadarNeurotransmitterReleaseProxy,
+  tuningFamilySocraticRadarEnzymeKineticsProxyV3,
+  tuningFamilySocraticRadarProteinFoldingProxyV2,
+  tuningFamilySocraticRadarDNAReplicationProxyV2,
+  tuningFamilySocraticRadarMetabolicPathwayProxy,
+  tuningFamilySocraticRadarCellSignalingProxy,
+  tuningFamilySocraticRadarATPSynthesisProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -69815,4 +69821,46 @@ describe('scaleTurkmenScale', () => {
   it('empty returns 0', () => { expect(scaleTurkmenScale([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleTurkmenScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleTurkmenScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('tuningFamilySocraticRadarEnzymeKineticsProxyV3', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarEnzymeKineticsProxyV3([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarEnzymeKineticsProxyV3([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarEnzymeKineticsProxyV3([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarProteinFoldingProxyV2', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarProteinFoldingProxyV2([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarProteinFoldingProxyV2([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarProteinFoldingProxyV2([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarDNAReplicationProxyV2', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarDNAReplicationProxyV2([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarDNAReplicationProxyV2([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarDNAReplicationProxyV2([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarMetabolicPathwayProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarMetabolicPathwayProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarMetabolicPathwayProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarMetabolicPathwayProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarCellSignalingProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarCellSignalingProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarCellSignalingProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarCellSignalingProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarATPSynthesisProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarATPSynthesisProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarATPSynthesisProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarATPSynthesisProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
 });
