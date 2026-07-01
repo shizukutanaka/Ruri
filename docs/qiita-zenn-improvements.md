@@ -2569,3 +2569,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleReggaePentatonic` | レゲエ5音音階 | 0,300,500,700,1000 | 45¢ |
 | `scaleZoukScale` | ズーク | 0,200,400,500,700,900,1100 | 40¢ |
 | `scaleMerengueScale` | メレンゲ | 0,200,300,500,700,800,1000 | 40¢ |
+
+## Round 246 — 北アメリカ先住民音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleNavajoNightChant` | ナバホ・ナイトチャント | 0,204,408,702,906 | 50¢ |
+| `scaleLakotaPentatonic` | ラコタ5音音階 | 0,267,498,765,996 | 50¢ |
+| `scaleHaidaScale` | ハイダ儀礼音階 | 0,150,498,702,1050 | 50¢ |
+| `scaleCherokeePentatonic` | チェロキー5音音階 | 0,204,498,702,996 | 45¢ |
