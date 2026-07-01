@@ -2560,3 +2560,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleGhanaPentatonic` | ガーナ5音音階 | 0,240,480,720,960 | 50¢ |
 | `scaleMaliKora` | マリ・コラ音階 | 0,204,408,498,702,906,1110 | 40¢ |
 | `scaleGriotScale` | グリオット音階 | 0,180,408,612,792,996 | 45¢ |
+
+## Round 245 — カリブ音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleCalypsoScale` | カリプソ | 0,200,300,500,700,900,1000 | 40¢ |
+| `scaleReggaePentatonic` | レゲエ5音音階 | 0,300,500,700,1000 | 45¢ |
+| `scaleZoukScale` | ズーク | 0,200,400,500,700,900,1100 | 40¢ |
+| `scaleMerengueScale` | メレンゲ | 0,200,300,500,700,800,1000 | 40¢ |
