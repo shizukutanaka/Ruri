@@ -2799,6 +2799,12 @@ import {
   tuningFamilySocraticRadarPermafrostThawProxy,
   tuningFamilySocraticRadarMonsoonSystemProxy,
   tuningFamilySocraticRadarGlacierRetreatProxy,
+  tuningFamilySocraticRadarTidalResonanceProxy,
+  tuningFamilySocraticRadarCoralReefBiodiversityProxy,
+  tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy,
+  tuningFamilySocraticRadarOceanAcidificationV3Proxy,
+  tuningFamilySocraticRadarBioluminescenceProxy,
+  tuningFamilySocraticRadarPelagicZonationProxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -69944,6 +69950,48 @@ describe('tuningFamilySocraticRadarGlacierRetreatProxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarGlacierRetreatProxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarGlacierRetreatProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarGlacierRetreatProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarTidalResonanceProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarTidalResonanceProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarTidalResonanceProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarTidalResonanceProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarCoralReefBiodiversityProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarCoralReefBiodiversityProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarCoralReefBiodiversityProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarCoralReefBiodiversityProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarOceanAcidificationV3Proxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarOceanAcidificationV3Proxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarOceanAcidificationV3Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarOceanAcidificationV3Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarBioluminescenceProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarBioluminescenceProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarBioluminescenceProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarBioluminescenceProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+describe('tuningFamilySocraticRadarPelagicZonationProxy', () => {
+  const spectrum = harmonicSpectrum(6);
+  it('empty returns 0', () => { expect(tuningFamilySocraticRadarPelagicZonationProxy([], spectrum, 440)).toBe(0); });
+  it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarPelagicZonationProxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('two tunings finite', () => { const v = tuningFamilySocraticRadarPelagicZonationProxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
 });
 
 // Round257 南アメリカ音階

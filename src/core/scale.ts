@@ -64862,6 +64862,126 @@ export function tuningFamilySocraticRadarGlacierRetreatProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3954 — tuningFamilySocraticRadarTidalResonanceProxy
+export function tuningFamilySocraticRadarTidalResonanceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // TidalResonance: harmonic tidal diversity and resonance convergence
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3956 — tuningFamilySocraticRadarCoralReefBiodiversityProxy
+export function tuningFamilySocraticRadarCoralReefBiodiversityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // CoralReefBiodiversity: versatility and diversity in reef ecosystem tonal richness
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3958 — tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy
+export function tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // DeepSeaHydrothermalV2: maturity emphasis for hydrothermal vent ecology
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3960 — tuningFamilySocraticRadarOceanAcidificationV3Proxy
+export function tuningFamilySocraticRadarOceanAcidificationV3Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // OceanAcidificationV3: benchmark emphasis for ocean acidification chemistry
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3962 — tuningFamilySocraticRadarBioluminescenceProxy
+export function tuningFamilySocraticRadarBioluminescenceProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // Bioluminescence: convergence emphasis for bioluminescence spectra
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3964 — tuningFamilySocraticRadarPelagicZonationProxy
+export function tuningFamilySocraticRadarPelagicZonationProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // PelagicZonation: uniform pelagic zone stratification across all axes
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
