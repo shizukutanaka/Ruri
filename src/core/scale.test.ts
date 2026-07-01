@@ -2691,6 +2691,12 @@ import {
   tuningFamilySocraticRadarCoralReefDynamicsProxy,
   tuningFamilySocraticRadarMarineStratificationProxy,
   tuningFamilySocraticRadarPelagicFoodWebProxy,
+  tuningFamilySocraticRadarAtmosphericCarbonCycleProxy,
+  tuningFamilySocraticRadarArcticAmplificationV2Proxy,
+  tuningFamilySocraticRadarMonsoonDynamicsProxy,
+  tuningFamilySocraticRadarIceSheetDynamicsV2Proxy,
+  tuningFamilySocraticRadarClimateModelEnsembleProxy,
+  tuningFamilySocraticRadarSeaLevelRiseV2Proxy,
   scaleHungarianMinor,
   scaleBulgarianRhythmicScale,
   scaleRomanianMinor,
@@ -2719,6 +2725,10 @@ import {
   scaleMaqamHijazV2,
   scalePersianDastgah,
   scaleArabicMaqamSaba,
+  scaleEthiopianKignit,
+  scaleWestAfricanPentatonic,
+  scaleNorthAfricanRasd,
+  scaleZuluScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -67190,5 +67200,167 @@ describe('scaleArabicMaqamSaba', () => {
     const v = scaleArabicMaqamSaba(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleEthiopianKignit', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleEthiopianKignit([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleEthiopianKignit(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleEthiopianKignit(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleWestAfricanPentatonic', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleWestAfricanPentatonic([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleWestAfricanPentatonic(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleWestAfricanPentatonic(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleNorthAfricanRasd', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleNorthAfricanRasd([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleNorthAfricanRasd(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleNorthAfricanRasd(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('scaleZuluScale', () => {
+  it('returns 0 for empty pitches', () => {
+    expect(scaleZuluScale([])).toBe(0);
+  });
+  it('returns value in [0,1] for 12-EDO degrees', () => {
+    const pitches = edo(12, 440).degrees;
+    const v = scaleZuluScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns value in [0,1] for 19-EDO degrees', () => {
+    const pitches = edo(19, 440).degrees;
+    const v = scaleZuluScale(pitches);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('tuningFamilySocraticRadarAtmosphericCarbonCycleProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarAtmosphericCarbonCycleProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarAtmosphericCarbonCycleProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarAtmosphericCarbonCycleProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarArcticAmplificationV2Proxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarArcticAmplificationV2Proxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarArcticAmplificationV2Proxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarArcticAmplificationV2Proxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarMonsoonDynamicsProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarMonsoonDynamicsProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarMonsoonDynamicsProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarMonsoonDynamicsProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarIceSheetDynamicsV2Proxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarIceSheetDynamicsV2Proxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarIceSheetDynamicsV2Proxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarIceSheetDynamicsV2Proxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarClimateModelEnsembleProxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarClimateModelEnsembleProxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarClimateModelEnsembleProxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarClimateModelEnsembleProxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
+  });
+});
+
+describe('tuningFamilySocraticRadarSeaLevelRiseV2Proxy', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(tuningFamilySocraticRadarSeaLevelRiseV2Proxy([], harmonicSpectrum(6), 440)).toBe(0);
+  });
+  it('returns value in [0,1] for single tuning', () => {
+    const v = tuningFamilySocraticRadarSeaLevelRiseV2Proxy([edo(12, 440)], harmonicSpectrum(6), 440);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('returns finite value for two tunings', () => {
+    const v = tuningFamilySocraticRadarSeaLevelRiseV2Proxy([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), 440);
+    expect(isFinite(v)).toBe(true);
   });
 });

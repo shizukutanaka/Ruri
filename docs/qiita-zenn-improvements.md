@@ -2497,3 +2497,12 @@ Added 4 Oceanian scale analysis helpers:
 | `scaleMaqamHijazV2` | マカーム・ヒジャーズ | 0,94,342,498,702,792,1088 | 35¢ |
 | `scalePersianDastgah` | ペルシャ・ダスタガー | 0,135,294,498,702,835,996 | 40¢ |
 | `scaleArabicMaqamSaba` | マカーム・サバー | 0,150,294,408,498,702,852 | 35¢ |
+
+## Round 238 — アフリカ音階ヘルパ
+
+| 関数 | スケール | 音程列 (¢) | Tolerance |
+|------|----------|-----------|-----------|
+| `scaleEthiopianKignit` | エチオピア・キグニット | 0,150,498,702,1050 | 45¢ |
+| `scaleWestAfricanPentatonic` | 西アフリカ5音音階 | 0,204,498,702,906 | 45¢ |
+| `scaleNorthAfricanRasd` | 北アフリカ・ラスド | 0,204,342,498,702,906,1044 | 40¢ |
+| `scaleZuluScale` | ズールー音階 | 0,267,498,765,996 | 50¢ |
