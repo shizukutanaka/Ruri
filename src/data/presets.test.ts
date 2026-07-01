@@ -1875,6 +1875,12 @@ import {
   presetFamilySocraticRadarFiberBraggGratingProxy,
   presetFamilySocraticRadarPhotonicCrystalBandProxy,
   presetFamilySocraticRadarWaveguideDispersionProxy,
+  presetFamilySocraticRadarViscousFlowProxy,
+  presetFamilySocraticRadarBoundaryLayerSeparationProxy,
+  presetFamilySocraticRadarShockWavePropagationProxy,
+  presetFamilySocraticRadarTurbulenceIntensityProxyV2,
+  presetFamilySocraticRadarVortexDynamicsProxyV2,
+  presetFamilySocraticRadarReynoldsNumberV3Proxy,
 } from './presets.js';
 import { type TuningPreset, loadTuningPreset } from './tuning-data.js';
 import { rankModesByStability, tuningReport } from '../core/scale.js';
