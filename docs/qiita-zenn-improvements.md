@@ -2828,3 +2828,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleColombianCumbia`: Colombian Cumbia scale [0, 200, 400, 500, 700, 900, 1100]
 - `scalePeruvianValsCriollo`: Peruvian Vals Criollo scale [0, 200, 400, 600, 700, 900, 1100]
 - `scaleVenezuelanJoropo`: Venezuelan Joropo scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round279: 中央アフリカ音階 (Central African Scales)
+
+- `scaleCongoleseSoukous`: Congolese Soukous scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleCameroonMakossa`: Cameroon Makossa scale [0, 200, 300, 500, 700, 900, 1000]
+- `scaleGaboneseTraditional`: Gabonese Traditional scale [0, 150, 350, 500, 700, 850, 1100]
+- `scaleRwandanInanga`: Rwandan Inanga pentatonic [0, 200, 400, 700, 900]
