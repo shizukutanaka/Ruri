@@ -2773,3 +2773,9 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleChileanCueca`: チリのクエカ音階 (major heptatonic, 0-200-400-500-700-900-1100c)
 - `scaleArgentineZamba`: アルゼンチンのサンバ音階 (natural minor, 0-200-300-500-700-800-1000c)
 - `scaleBolivianScale`: ボリビア音階 (minor pentatonic, 0-200-500-700-1000c)
+
+### Round270: 北欧音階ヘルパ (Nordic Scales)
+- `scaleNorwegianFolkScale`: ノルウェー民謡音階 (Mixolydian variant, 0-200-400-500-700-900-1000c)
+- `scaleSwedishPolskaScale`: スウェーデンのポルスカ音階 (melodic minor variant, 0-200-300-500-700-900-1100c)
+- `scaleFinnishRunoV2`: フィンランドのルノ音階V2 (harmonic minor variant, 0-200-300-500-700-800-1100c)
+- `scaleDanishScale`: デンマーク音階 (major heptatonic, 0-200-400-500-700-900-1100c)
