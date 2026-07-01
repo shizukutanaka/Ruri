@@ -61981,6 +61981,126 @@ export function tuningFamilySocraticRadarExtremeWeatherProxy(
   return Math.min(1, Math.max(0, result));
 }
 
+// Q3666 — tuningFamilySocraticRadarSynapticPlasticityV2Proxy
+export function tuningFamilySocraticRadarSynapticPlasticityV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // SynapticPlasticity: Hebbian learning diversity and LTP/LTD maturity
+  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3668 — tuningFamilySocraticRadarNeuralOscillationV2Proxy
+export function tuningFamilySocraticRadarNeuralOscillationV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // NeuralOscillation: rhythmic versatility and convergence of oscillatory patterns
+  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.30 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3670 — tuningFamilySocraticRadarCorticalMappingV2Proxy
+export function tuningFamilySocraticRadarCorticalMappingV2Proxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // CorticalMapping: spatial maturity and benchmark of topographic organization
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3672 — tuningFamilySocraticRadarNeurotransmitterDynamicsProxy
+export function tuningFamilySocraticRadarNeurotransmitterDynamicsProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // NeurotransmitterDynamics: chemical diversity and benchmark of synaptic signaling
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3674 — tuningFamilySocraticRadarNeuroplasticityIndexProxy
+export function tuningFamilySocraticRadarNeuroplasticityIndexProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // NeuroplasticityIndex: developmental maturity and diversity of adaptive capacity
+  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.15;
+  return Math.min(1, Math.max(0, result));
+}
+
+// Q3676 — tuningFamilySocraticRadarBrainConnectivityProxy
+export function tuningFamilySocraticRadarBrainConnectivityProxy(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  // BrainConnectivity: network convergence and versatility of structural connectivity
+  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  return Math.min(1, Math.max(0, result));
+}
+
 // KKK1
 export function scaleMorphDistance(
   fromCents: readonly number[],
@@ -74903,6 +75023,58 @@ export function scaleMaqamRast(pitches: readonly Pitch[]): number {
     if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
   return matched / rast.length;
+}
+
+export function scaleBebopDominant(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Bebop dominant: [0, 204, 408, 498, 702, 906, 996, 1110]¢ (passing tone between b7 and octave)
+  const bebop = [0, 204, 408, 498, 702, 906, 996, 1110];
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of bebop) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / bebop.length;
+}
+
+export function scaleAlteredScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Altered scale (Super Locrian): [0, 94, 204, 294, 498, 702, 996]¢
+  const altered = [0, 94, 204, 294, 498, 702, 996];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of altered) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / altered.length;
+}
+
+export function scaleLydianDominant(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Lydian dominant (Overtone scale): [0, 204, 408, 612, 702, 906, 996]¢
+  const lydianDom = [0, 204, 408, 612, 702, 906, 996];
+  const tolerance = 35;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of lydianDom) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / lydianDom.length;
+}
+
+export function scaleHalfWholeDiminished(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  // Half-whole diminished (8-tone): [0, 100, 300, 400, 600, 700, 900, 1000]¢
+  const hwDim = [0, 100, 300, 400, 600, 700, 900, 1000];
+  const tolerance = 30;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of hwDim) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / hwDim.length;
 }
 
 export function scaleMaqamSaba(pitches: readonly Pitch[]): number {
