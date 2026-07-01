@@ -3129,3 +3129,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleBolivianSaya`: Bolivian Saya hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleEcuadorianSanjuanito`: Ecuadorian Sanjuanito hexatonic scale [0, 200, 300, 500, 700, 900]
 - `scaleColombianVallenato`: Colombian Vallenato heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round322: 西アフリカ吟遊詩人音階 (West African Griot Scales)
+
+- `scaleWestAfricanGriotScale`: West African Griot heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleMandeScale`: Mande pentatonic scale [0, 200, 400, 700, 900]
+- `scaleSonghaiScale`: Songhai hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleFulaniScale`: Fulani pentatonic scale [0, 150, 350, 700, 850]
