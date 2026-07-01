@@ -2870,3 +2870,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleIraqiMaqam`: Iraqi maqam with augmented 2nd [0, 200, 350, 500, 700, 850, 1100]
 - `scalePalestinianScale`: Palestinian folk scale [0, 150, 350, 500, 700, 900, 1050]
 - `scaleYemeniScale`: Yemeni diatonic scale [0, 200, 400, 500, 700, 900, 1100]
+
+## Round285: 東アジア音階v2 (East Asian Scales v2)
+
+- `scaleKoreanScale`: Korean pentatonic scale [0, 200, 400, 700, 900]
+- `scaleMongolianLongSong`: Mongolian long song hexatonic [0, 200, 400, 500, 700, 900]
+- `scaleManchuScale`: Manchu folk hexatonic [0, 200, 400, 700, 900, 1100]
+- `scaleAinuScale`: Ainu traditional pentatonic [0, 200, 300, 700, 900]
