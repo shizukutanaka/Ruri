@@ -2884,3 +2884,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleChukchiScale`: Chukchi pentatonic scale [0, 150, 350, 700, 850]
 - `scaleEvenkScale`: Evenk hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleBuryatScale`: Buryat hexatonic scale [0, 200, 400, 700, 900, 1100]
+
+## Round287: アラスカ先住民音階 (Alaskan Native Scales)
+
+- `scaleAleutScale`: Aleut pentatonic scale [0, 200, 400, 700, 900]
+- `scaleYupikScale`: Yupik pentatonic scale [0, 150, 350, 700, 850]
+- `scaleTlingitScale`: Tlingit hexatonic scale [0, 200, 400, 500, 700, 900]
+- `scaleAthabaskanScale`: Athabaskan hexatonic scale [0, 200, 400, 700, 900, 1100]
