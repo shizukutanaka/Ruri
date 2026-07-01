@@ -2821,3 +2821,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleTunisianMaqam`: チュニジアのマカーム (neutral intervals, 0-200-350-500-700-900-1050c)
 - `scaleAlgerianChabi`: アルジェリアのシャアビ音階 (harmonic minor variant, 0-200-300-500-700-800-1100c)
 - `scaleEgyptianRast`: エジプトのラスト音階 (Rast maqam, 0-200-350-500-700-900-1050c)
+
+## Round278: 南米音階 (South American Scales)
+
+- `scaleBrazilianChoro`: Brazilian Choro scale [0, 200, 300, 500, 700, 900, 1000]
+- `scaleColombianCumbia`: Colombian Cumbia scale [0, 200, 400, 500, 700, 900, 1100]
+- `scalePeruvianValsCriollo`: Peruvian Vals Criollo scale [0, 200, 400, 600, 700, 900, 1100]
+- `scaleVenezuelanJoropo`: Venezuelan Joropo scale [0, 200, 400, 500, 700, 900, 1100]
