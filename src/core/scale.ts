@@ -79452,3 +79452,51 @@ export function scaleJamaicanMentoScale(pitches: readonly Pitch[]): number {
   }
   return matched / jamaicanMento.length;
 }
+
+export function scaleMaqamSabaScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const maqamSaba = [0, 204, 294, 408, 702, 792, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of maqamSaba) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / maqamSaba.length;
+}
+
+export function scaleMaqamNahawandScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const maqamNahawand = [0, 204, 294, 498, 702, 792, 1088];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of maqamNahawand) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / maqamNahawand.length;
+}
+
+export function scaleMaqamKurdScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const maqamKurd = [0, 94, 294, 498, 702, 792, 996];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of maqamKurd) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / maqamKurd.length;
+}
+
+export function scaleMaqamAjamScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const maqamAjam = [0, 204, 408, 498, 702, 906, 1110];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of maqamAjam) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / maqamAjam.length;
+}

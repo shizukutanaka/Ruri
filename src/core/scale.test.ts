@@ -2923,6 +2923,10 @@ import {
   scaleCalypsoScaleV2,
   scaleHaitianMerengueScale,
   scaleJamaicanMentoScale,
+  scaleMaqamSabaScale,
+  scaleMaqamNahawandScale,
+  scaleMaqamKurdScale,
+  scaleMaqamAjamScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70094,4 +70098,29 @@ describe('tuningFamilySocraticRadarGeothermalGradientV2Proxy', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarGeothermalGradientV2Proxy([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarGeothermalGradientV2Proxy([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarGeothermalGradientV2Proxy([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round259 中東音階
+describe('scaleMaqamSabaScale', () => {
+  it('empty returns 0', () => { expect(scaleMaqamSabaScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleMaqamSabaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleMaqamSabaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleMaqamNahawandScale', () => {
+  it('empty returns 0', () => { expect(scaleMaqamNahawandScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleMaqamNahawandScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleMaqamNahawandScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleMaqamKurdScale', () => {
+  it('empty returns 0', () => { expect(scaleMaqamKurdScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleMaqamKurdScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleMaqamKurdScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleMaqamAjamScale', () => {
+  it('empty returns 0', () => { expect(scaleMaqamAjamScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleMaqamAjamScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleMaqamAjamScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });

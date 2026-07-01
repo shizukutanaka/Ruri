@@ -2686,3 +2686,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleCalypsoScaleV2 | トリニダード・カリプソ音階 | [0, 204, 386, 702, 884]¢ | 50¢ |
 | scaleHaitianMerengueScale | ハイチ・メレンゲ五音音階 | [0, 204, 408, 498, 702]¢ | 50¢ |
 | scaleJamaicanMentoScale | ジャマイカ・メント音階 | [0, 204, 498, 702, 1088]¢ | 50¢ |
+
+## Round 259 — 中東音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleMaqamSabaScale | マカーム・サバー | [0, 204, 294, 408, 702, 792, 996]¢ | 50¢ |
+| scaleMaqamNahawandScale | マカーム・ナハワンド | [0, 204, 294, 498, 702, 792, 1088]¢ | 50¢ |
+| scaleMaqamKurdScale | マカーム・クルド | [0, 94, 294, 498, 702, 792, 996]¢ | 50¢ |
+| scaleMaqamAjamScale | マカーム・アジャム | [0, 204, 408, 498, 702, 906, 1110]¢ | 50¢ |
