@@ -3136,3 +3136,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleMandeScale`: Mande pentatonic scale [0, 200, 400, 700, 900]
 - `scaleSonghaiScale`: Songhai hexatonic scale [0, 200, 400, 500, 700, 900]
 - `scaleFulaniScale`: Fulani pentatonic scale [0, 150, 350, 700, 850]
+
+## Round323: 中央アメリカ音階 (Central American Scales)
+
+- `scaleCentralAmericanScale`: Central American heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleGuatemalanMarimba`: Guatemalan Marimba heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleHondurasGarifuna`: Honduras Garifuna pentatonic scale [0, 200, 400, 700, 900]
+- `scaleNicaraguanScale`: Nicaraguan heptatonic scale [0, 200, 300, 500, 700, 900, 1000]
