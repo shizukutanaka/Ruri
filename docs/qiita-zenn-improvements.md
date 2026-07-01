@@ -3010,3 +3010,10 @@ Added 4 Oceanian scale analysis helpers:
 - `scaleFaroeseScale`: Faroese heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
 - `scaleShetlandScale`: Shetland hexatonic scale [0, 200, 400, 700, 900, 1100]
 - `scaleOrkneyScale`: Orkney hexatonic scale [0, 200, 400, 500, 700, 900]
+
+## Round305: フランス系カナダ音階 (French Canadian Scales)
+
+- `scaleQuebecoisScale`: Quebecois heptatonic scale [0, 200, 400, 500, 700, 900, 1100]
+- `scaleAcadianScale`: Acadian heptatonic scale [0, 200, 400, 500, 700, 900, 1000]
+- `scaleFrenchCanadianScale`: French Canadian heptatonic scale [0, 200, 400, 500, 700, 800, 1000]
+- `scaleMetisScale`: Metis pentatonic scale [0, 200, 400, 700, 900]
