@@ -2973,6 +2973,10 @@ import {
   scaleRagaYamanScale,
   scaleRagaDeshScale,
   scaleRagaKafiScale,
+  scaleGeorgianPolyphonicScale,
+  scaleArmenianDudukScale,
+  scaleAzerbaijaniMughamScale,
+  scaleChechenLezgiScale,
 } from './scale.js';
 import { intervalVector } from './pcset.js';
 import { type TuningSystem, equalTemperament12, edo, degreeToFreq } from './tuning.js';
@@ -70479,4 +70483,29 @@ describe('tuningFamilySocraticRadarHorizontalGeneTransferProxyV2', () => {
   it('empty returns 0', () => { expect(tuningFamilySocraticRadarHorizontalGeneTransferProxyV2([], spectrum, 440)).toBe(0); });
   it('single tuning in [0,1]', () => { const v = tuningFamilySocraticRadarHorizontalGeneTransferProxyV2([edo(12, 440)], spectrum, 440); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('two tunings finite', () => { const v = tuningFamilySocraticRadarHorizontalGeneTransferProxyV2([edo(12, 440), edo(19, 440)], spectrum, 440); expect(isFinite(v)).toBe(true); });
+});
+
+// Round264 コーカサス音階
+describe('scaleGeorgianPolyphonicScale', () => {
+  it('empty returns 0', () => { expect(scaleGeorgianPolyphonicScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleGeorgianPolyphonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleGeorgianPolyphonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleArmenianDudukScale', () => {
+  it('empty returns 0', () => { expect(scaleArmenianDudukScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleArmenianDudukScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleArmenianDudukScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleAzerbaijaniMughamScale', () => {
+  it('empty returns 0', () => { expect(scaleAzerbaijaniMughamScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleAzerbaijaniMughamScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleAzerbaijaniMughamScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+});
+
+describe('scaleChechenLezgiScale', () => {
+  it('empty returns 0', () => { expect(scaleChechenLezgiScale([])).toBe(0); });
+  it('12-EDO in [0,1]', () => { const v = scaleChechenLezgiScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('19-EDO in [0,1]', () => { const v = scaleChechenLezgiScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
 });

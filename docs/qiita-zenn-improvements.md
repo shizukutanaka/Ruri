@@ -2731,3 +2731,12 @@ Added 4 Oceanian scale analysis helpers:
 | scaleRagaYamanScale | ラーガ・ヤマン | [0, 204, 408, 612, 702, 906, 1110]¢ | 50¢ |
 | scaleRagaDeshScale | ラーガ・デシュ | [0, 204, 386, 498, 702, 906, 996]¢ | 50¢ |
 | scaleRagaKafiScale | ラーガ・カーフィー | [0, 204, 294, 498, 702, 906, 996]¢ | 50¢ |
+
+## Round 264 — コーカサス音階ヘルパ
+
+| 関数名 | スケール | セント値 | 許容幅 |
+|--------|---------|---------|--------|
+| scaleGeorgianPolyphonicScale | グルジア多声音階 | [0, 204, 408, 498, 702, 906, 1110]¢ | 50¢ |
+| scaleArmenianDudukScale | アルメニア・ドゥドゥク音階 | [0, 204, 294, 498, 702, 792, 996]¢ | 50¢ |
+| scaleAzerbaijaniMughamScale | アゼルバイジャン・ムガム音階 | [0, 204, 386, 498, 702, 906, 1088]¢ | 50¢ |
+| scaleChechenLezgiScale | チェチェン/レズギ五音音階 | [0, 204, 498, 702, 996]¢ | 50¢ |
