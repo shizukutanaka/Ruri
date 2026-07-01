@@ -2084,6 +2084,12 @@ import {
   tuningFamilySocraticRadarBirthWeightProxy,
   tuningFamilySocraticRadarLactationProxy,
   tuningFamilySocraticRadarApgarScoreProxy,
+  tuningFamilySocraticRadarGynecologyProxy,
+  tuningFamilySocraticRadarMenstrualCycleProxy,
+  tuningFamilySocraticRadarOvarianReserveProxy,
+  tuningFamilySocraticRadarEndometriosisProxy,
+  tuningFamilySocraticRadarMenopauseProxy,
+  tuningFamilySocraticRadarPCOSProxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -37432,4 +37438,88 @@ export function presetFamilySocraticRadarApgarScoreProxy(
     return loadTuningPreset(p);
   });
   return tuningFamilySocraticRadarApgarScoreProxy(tunings, spectrum, rootHz);
+}
+
+// Q4591 — presetFamilySocraticRadarGynecologyProxy
+export function presetFamilySocraticRadarGynecologyProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarGynecologyProxy(tunings, spectrum, rootHz);
+}
+
+// Q4593 — presetFamilySocraticRadarMenstrualCycleProxy
+export function presetFamilySocraticRadarMenstrualCycleProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarMenstrualCycleProxy(tunings, spectrum, rootHz);
+}
+
+// Q4595 — presetFamilySocraticRadarOvarianReserveProxy
+export function presetFamilySocraticRadarOvarianReserveProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarOvarianReserveProxy(tunings, spectrum, rootHz);
+}
+
+// Q4597 — presetFamilySocraticRadarEndometriosisProxy
+export function presetFamilySocraticRadarEndometriosisProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarEndometriosisProxy(tunings, spectrum, rootHz);
+}
+
+// Q4599 — presetFamilySocraticRadarMenopauseProxy
+export function presetFamilySocraticRadarMenopauseProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarMenopauseProxy(tunings, spectrum, rootHz);
+}
+
+// Q4601 — presetFamilySocraticRadarPCOSProxy
+export function presetFamilySocraticRadarPCOSProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarPCOSProxy(tunings, spectrum, rootHz);
 }
