@@ -77051,3 +77051,51 @@ export function scaleRagaLalita(pitches: readonly Pitch[]): number {
   }
   return matched / lalita.length;
 }
+
+export function scaleYorubaScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const yoruba = [0, 204, 408, 702, 906];
+  const tolerance = 45;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of yoruba) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / yoruba.length;
+}
+
+export function scaleGhanaPentatonic(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const ghana = [0, 240, 480, 720, 960];
+  const tolerance = 50;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of ghana) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / ghana.length;
+}
+
+export function scaleMaliKora(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const mali = [0, 204, 408, 498, 702, 906, 1110];
+  const tolerance = 40;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of mali) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / mali.length;
+}
+
+export function scaleGriotScale(pitches: readonly Pitch[]): number {
+  if (pitches.length === 0) return 0;
+  const griot = [0, 180, 408, 612, 792, 996];
+  const tolerance = 45;
+  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
+  let matched = 0;
+  for (const t of griot) {
+    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
+  }
+  return matched / griot.length;
+}
