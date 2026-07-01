@@ -1841,7 +1841,6 @@ import {
   tuningFamilySocraticRadarPlasmaInstabilityProxyV2,
   tuningFamilySocraticRadarBiodiversityIndexProxyV4,
   tuningFamilySocraticRadarEcosystemResilienceProxyV3,
-  tuningFamilySocraticRadarHabitatFragmentationProxyV2,
   tuningFamilySocraticRadarCarbonSequestrationProxyV2,
   tuningFamilySocraticRadarTrophicCascadeProxyV2,
   tuningFamilySocraticRadarSpeciesExtinctionProxy,

@@ -66342,26 +66342,6 @@ export function tuningFamilySocraticRadarEcosystemResilienceProxyV3(
   return Math.min(1, Math.max(0, result));
 }
 
-// Q4102 — tuningFamilySocraticRadarHabitatFragmentationProxyV2
-export function tuningFamilySocraticRadarHabitatFragmentationProxyV2(
-  tunings: readonly TuningSystem[],
-  spectrum: Spectrum,
-  rootHz?: number,
-): number {
-  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
-  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
-  if (tunings.length === 0) return 0;
-  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
-  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
-  const axisAggregates = axes.map((_, ai) => {
-    const vals = vecs.map((v) => v[ai]!);
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
-  });
-  // HabitatFragmentationV2: landscape diversity and connectivity maturity
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
-  return Math.min(1, Math.max(0, result));
-}
-
 // Q4104 — tuningFamilySocraticRadarCarbonSequestrationProxyV2
 export function tuningFamilySocraticRadarCarbonSequestrationProxyV2(
   tunings: readonly TuningSystem[],
