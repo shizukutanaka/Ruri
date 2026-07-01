@@ -2108,6 +2108,12 @@ import {
   tuningFamilySocraticRadarParkinsonismProxy,
   tuningFamilySocraticRadarMultipleSclerosisProxy,
   tuningFamilySocraticRadarEEGSpectrumProxy,
+  tuningFamilySocraticRadarDermatopathologyProxy,
+  tuningFamilySocraticRadarPsoriasisProxy,
+  tuningFamilySocraticRadarEczemaProxy,
+  tuningFamilySocraticRadarMelanomaProxy,
+  tuningFamilySocraticRadarSkinBarrierProxy,
+  tuningFamilySocraticRadarWoundHealingV2Proxy,
   type Scale,
   type ScaleChordMapEntry,
   type TuningReportType,
@@ -37792,4 +37798,88 @@ export function presetFamilySocraticRadarEEGSpectrumProxy(
     return loadTuningPreset(p);
   });
   return tuningFamilySocraticRadarEEGSpectrumProxy(tunings, spectrum, rootHz);
+}
+
+// Q4639 — presetFamilySocraticRadarDermatopathologyProxy
+export function presetFamilySocraticRadarDermatopathologyProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarDermatopathologyProxy(tunings, spectrum, rootHz);
+}
+
+// Q4641 — presetFamilySocraticRadarPsoriasisProxy
+export function presetFamilySocraticRadarPsoriasisProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarPsoriasisProxy(tunings, spectrum, rootHz);
+}
+
+// Q4643 — presetFamilySocraticRadarEczemaProxy
+export function presetFamilySocraticRadarEczemaProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarEczemaProxy(tunings, spectrum, rootHz);
+}
+
+// Q4645 — presetFamilySocraticRadarMelanomaProxy
+export function presetFamilySocraticRadarMelanomaProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarMelanomaProxy(tunings, spectrum, rootHz);
+}
+
+// Q4647 — presetFamilySocraticRadarSkinBarrierProxy
+export function presetFamilySocraticRadarSkinBarrierProxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarSkinBarrierProxy(tunings, spectrum, rootHz);
+}
+
+// Q4649 — presetFamilySocraticRadarWoundHealingV2Proxy
+export function presetFamilySocraticRadarWoundHealingV2Proxy(
+  presetIds: readonly string[],
+  spectrum: Spectrum,
+  rootHz?: number,
+): number {
+  const tunings = presetIds.map((id) => {
+    const p = ALL_PRESETS.find((x) => x.id === id);
+    if (!p) throw new RangeError(`Unknown preset: ${id}`);
+    return loadTuningPreset(p);
+  });
+  return tuningFamilySocraticRadarWoundHealingV2Proxy(tunings, spectrum, rootHz);
 }
