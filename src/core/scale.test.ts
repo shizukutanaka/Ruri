@@ -441,6 +441,7 @@ import {
   tuningFamilySocraticFullReport,
   tuningFamilySocraticFullReportNarrative,
   tuningFamilySocraticRadarProfile,
+  tuningFamilySocraticRadarWeighted,
   tuningFamilySocraticRadarProfileNarrative,
   tuningFamilySocraticRadarComparison,
   tuningFamilySocraticRadarComparisonNarrative,
@@ -80590,5 +80591,87 @@ describe('scaleNicaraguanScale', () => {
     const v = scaleNicaraguanScale(pitches);
     expect(v).toBeGreaterThanOrEqual(0);
     expect(v).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('tuningFamilySocraticRadarWeighted', () => {
+  it('returns 0 for empty tunings', () => {
+    expect(
+      tuningFamilySocraticRadarWeighted([], harmonicSpectrum(6), {
+        diversity: 0.2,
+        versatility: 0.2,
+        maturity: 0.2,
+        benchmark: 0.2,
+        convergence: 0.2,
+      }),
+    ).toBe(0);
+  });
+
+  it('returns value in [0,1] for equal weights', () => {
+    const v = tuningFamilySocraticRadarWeighted([edo(12, 440), edo(19, 440)], harmonicSpectrum(6), {
+      diversity: 0.2,
+      versatility: 0.2,
+      maturity: 0.2,
+      benchmark: 0.2,
+      convergence: 0.2,
+    });
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+
+  it('reproduces tuningFamilySocraticRadarMaterialStrengthProxy exactly across random tuning families', () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: 5, max: 24 }), { minLength: 1, maxLength: 4 }),
+        (divisions) => {
+          const tunings = divisions.map((n) => edo(n, 440));
+          const expected = tuningFamilySocraticRadarMaterialStrengthProxy(
+            tunings,
+            harmonicSpectrum(6),
+          );
+          const actual = tuningFamilySocraticRadarWeighted(tunings, harmonicSpectrum(6), {
+            diversity: 0.1,
+            versatility: 0.05,
+            maturity: 0.4,
+            benchmark: 0.4,
+            convergence: 0.05,
+          });
+          expect(actual).toBeCloseTo(expected, 10);
+        },
+      ),
+      { numRuns: 25 },
+    );
+  });
+
+  it('reproduces tuningFamilySocraticRadarPorosityProxy exactly (invert maturity + convergence)', () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: 5, max: 24 }), { minLength: 1, maxLength: 4 }),
+        (divisions) => {
+          const tunings = divisions.map((n) => edo(n, 440));
+          const expected = tuningFamilySocraticRadarPorosityProxy(tunings, harmonicSpectrum(6));
+          const actual = tuningFamilySocraticRadarWeighted(
+            tunings,
+            harmonicSpectrum(6),
+            { diversity: 0.3, versatility: 0, maturity: 0.5, benchmark: 0, convergence: 0.2 },
+            { invert: ['maturity', 'convergence'] },
+          );
+          expect(actual).toBeCloseTo(expected, 10);
+        },
+      ),
+      { numRuns: 25 },
+    );
+  });
+
+  it('clamps result to [0,1] even with out-of-range weights', () => {
+    const v = tuningFamilySocraticRadarWeighted([edo(12, 440)], harmonicSpectrum(6), {
+      diversity: 5,
+      versatility: 5,
+      maturity: 5,
+      benchmark: 5,
+      convergence: 5,
+    });
+    expect(v).toBeLessThanOrEqual(1);
+    expect(v).toBeGreaterThanOrEqual(0);
   });
 });

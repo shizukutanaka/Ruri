@@ -15400,6 +15400,47 @@ export function tuningFamilySocraticRadarProfile(
 }
 
 // ---------------------------------------------------------------------------
+// tuningFamilySocraticRadarWeighted — generic weighted-average reducer over
+// tuningFamilySocraticRadarProfile axes. Consolidation primitive: most
+// `tuningFamilySocraticRadar*Proxy` functions differ only in these five
+// weights (and an optional per-axis inversion), so new call sites should
+// prefer this over hand-writing another near-duplicate Proxy function.
+// ---------------------------------------------------------------------------
+
+export function tuningFamilySocraticRadarWeighted(
+  tunings: readonly TuningSystem[],
+  spectrum: Spectrum,
+  weights: {
+    diversity: number;
+    versatility: number;
+    maturity: number;
+    benchmark: number;
+    convergence: number;
+  },
+  opts?: { rootHz?: number; invert?: readonly ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] },
+): number {
+  type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
+  const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
+  if (tunings.length === 0) return 0;
+  const rootHz = opts?.rootHz;
+  const invertSet = new Set(opts?.invert ?? []);
+  const profiles = tunings.map((t) => tuningFamilySocraticRadarProfile([t], spectrum, rootHz));
+  const vecs = profiles.map((p) => axes.map((ax) => p[ax]));
+  const axisAggregates = axes.map((_, ai) => {
+    const vals = vecs.map((v) => v[ai]!);
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  });
+  let result = 0;
+  for (let i = 0; i < axes.length; i++) {
+    const axis = axes[i]!;
+    const raw = axisAggregates[i]!;
+    const value = invertSet.has(axis) ? 1 - raw : raw;
+    result += value * weights[axis];
+  }
+  return Math.min(1, Math.max(0, result));
+}
+
+// ---------------------------------------------------------------------------
 // Q838 — tuningFamilySocraticRadarProfileNarrative
 // ---------------------------------------------------------------------------
 
