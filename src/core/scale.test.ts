@@ -442,6 +442,7 @@ import {
   tuningFamilySocraticFullReportNarrative,
   tuningFamilySocraticRadarProfile,
   tuningFamilySocraticRadarWeighted,
+  detectNearestScale,
   tuningFamilySocraticRadarProfileNarrative,
   tuningFamilySocraticRadarComparison,
   tuningFamilySocraticRadarComparisonNarrative,
@@ -80673,5 +80674,39 @@ describe('tuningFamilySocraticRadarWeighted', () => {
     });
     expect(v).toBeLessThanOrEqual(1);
     expect(v).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('detectNearestScale', () => {
+  it('returns topN results (default 10) for empty input, all scoring 0', () => {
+    const results = detectNearestScale([]);
+    expect(results.length).toBe(10);
+    for (const r of results) {
+      expect(r.score).toBe(0);
+      expect(typeof r.name).toBe('string');
+    }
+  });
+
+  it('respects a custom topN', () => {
+    const results = detectNearestScale([], { topN: 3 });
+    expect(results.length).toBe(3);
+  });
+
+  it('ranks results in descending score order', () => {
+    const pitches = [0, 150, 500, 700, 850].map((c) => pitchFromCents(c));
+    const results = detectNearestScale(pitches, { topN: 20 });
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i - 1]!.score).toBeGreaterThanOrEqual(results[i]!.score);
+    }
+  });
+
+  it('ranks "Moroccan Gnawa" at or near the top for its own target cents', () => {
+    const pitches = [0, 150, 500, 700, 850].map((c) => pitchFromCents(c));
+    const results = detectNearestScale(pitches, { topN: 361 });
+    const moroccan = results.find((r) => r.name === 'Moroccan Gnawa');
+    expect(moroccan).toBeDefined();
+    expect(moroccan!.score).toBe(1);
+    // it should be a top-scoring match (score 1.0), though ties are possible
+    expect(results[0]!.score).toBe(1);
   });
 });

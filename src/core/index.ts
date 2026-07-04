@@ -5,6 +5,7 @@ export * from './tuning.js';
 export * from './scale.js';
 export * from './chord.js';
 export * from './chord-search.js';
+export * from './chord-voicing.js';
 export * from './spectrum.js';
 export * from './dissonance.js';
 export * from './generate.js';
