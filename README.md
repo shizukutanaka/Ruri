@@ -264,6 +264,28 @@ if (isScaleCompatible(myScale, tuning)) {
 }
 ```
 
+```ts
+// h) 逆引き: ピッチ列 → 最も近い名前付き音階 (世界の音楽伝統361種を横断検索)
+import { cents, detectNearestScale } from 'ruri';
+
+const pitches = [0, 150, 500, 700, 850].map((c) => cents(c));
+const matches = detectNearestScale(pitches, { topN: 5 });
+// matches[0] → { name: 'Moroccan Gnawa', score: 1 } (完全一致)
+// score は 0-1 (対象音階の何割の音がこの入力に含まれるか)
+
+// h-2) 和音 → 最小不協和ボイシング: オクターブ配置を総当たりして最も響く並びを選ぶ
+import { chordFromSemitones } from 'ruri';
+import { optimalChordVoicing } from 'ruri';
+import { harmonicSpectrum } from 'ruri';
+
+const triad = chordFromSemitones('major', [0, 4, 7]);
+const voicing = optimalChordVoicing(triad, 220, harmonicSpectrum());
+// voicing.freqsHz        → 各音の最終周波数 (Hz)
+// voicing.octaveOffsets  → 各音に適用したオクターブシフト (0 = そのまま)
+// voicing.dissonance     → そのボイシングの感覚的不協和スコア (小さいほど協和)
+// opts.registerRange (既定 [-1, 1]) で探索するオクターブ幅を調整可能
+```
+
 ## 設計原則
 
 - **cents/比の二層**: 純正律は比を一次保持、cents は導出(精度保全)。
@@ -282,6 +304,7 @@ if (isScaleCompatible(myScale, tuning)) {
 | `tuning` | 調律系(周期・基準・出自) + 不変条件 |
 | `scale` | 旋法/スケール/ジンス/ラーガ |
 | `chord` | 和音抽象(ルート相対音程) |
+| `chord-voicing` | 最小不協和オクターブボイシング探索 |
 | `spectrum` | 楽器の部分音集合(harmonic/stretched/bell) |
 | `dissonance` | Plomp-Levelt/Sethares 感覚的不協和 |
 | `generate` | MOS・well-formed判定・最大均等 |
