@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 ## [Unreleased]
 
 ### Added
+
 - Core tuning engine: cents/ratio pitch model, tuning systems with non-octave periods, fail-fast invariants.
 - Idiom-independent scale/chord generation (MOS, well-formed test, maximally even sets).
 - Consonance evaluation: Plomp-Levelt/Sethares roughness + Stolzenburg harmonicity (acoustic-only, timbre-dependent).
@@ -47,13 +48,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 - `optimalChordOrder(chords, rootHz)` (`src/core/chord-search.ts`): find the permutation of `Chord[]` that minimises total voice-leading cost. For n ≤ 8 uses Heap's algorithm for exact global optimum (40320 max iterations); for n > 8 uses nearest-neighbour heuristic with all starting points. Returns `OptimalProgressionResult` with the reordered chords, original-index permutation, and totalCents. Closes the gap between `progressionSmoothness` (measuring cost) and actually optimising the order.
 - `isScaleCompatible(scale, tuning)` (`src/core/scale.ts`): public predicate form of the internal `assertTuningMatch` guard. Returns `true` iff `scale.tuningId === tuning.id` and all degree indices are in `[0, tuning.degrees.length)`. Allows callers to validate dynamically-constructed `Scale` objects before passing them to functions that would throw.
 - `voicesForChordObject(chord, rootHz, spectrum, gain?)` (`src/core/synth.ts`): bridge from the portable `Chord` type directly into Web Audio `Voice[]` in one call. Equivalent to `voicesForChord(realizeChordFreqs(chord, rootHz), spectrum, gain)`, closing the last abstraction gap in the synthesis chain: `chordFromSemitones → voicesForChordObject → schedule OscillatorNode`.
-- `tuningSuitability(tuning, spectrum, opts?)` (`src/core/dissonance.ts`): the inverse of `spectrumToTuning` — measures how well an *existing* tuning system covers the consonant intervals of a given timbre. Returns `{ coverage, avgErrorCents, totalConsonantIntervals, matchedCount }`. `coverage` is the fraction of the timbre's consonant intervals captured within `toleranceCents` (default 25c ≈ quarter-tone). `tuningSuitability(edo(12), harmonicSpectrum())` shows 12-TET fits harmonic timbres well; `tuningSuitability(edo(12), bellSpectrum())` confirms poorer fit — the library's core thesis quantified.
+- `tuningSuitability(tuning, spectrum, opts?)` (`src/core/dissonance.ts`): the inverse of `spectrumToTuning` — measures how well an _existing_ tuning system covers the consonant intervals of a given timbre. Returns `{ coverage, avgErrorCents, totalConsonantIntervals, matchedCount }`. `coverage` is the fraction of the timbre's consonant intervals captured within `toleranceCents` (default 25c ≈ quarter-tone). `tuningSuitability(edo(12), harmonicSpectrum())` shows 12-TET fits harmonic timbres well; `tuningSuitability(edo(12), bellSpectrum())` confirms poorer fit — the library's core thesis quantified.
+- `detectNearestScale(pitches, opts?)` (`src/core/scale.ts`): reverse lookup over 361 named scales spanning world music traditions — scores each by what fraction of its defining cents a pitch list covers, returns ranked matches.
+- `optimalChordVoicing(chord, rootHz, spectrum, opts?)` (`src/core/chord-voicing.ts`, new module): brute-forces octave placement per chord member within `opts.registerRange` (default ±1 octave) and returns the voicing minimising `chordDissonance` for the given timbre.
+
+### Changed
+
+- **Breaking (pre-1.0)**: `src/core/index.ts` and `src/data/index.ts` no longer re-export the internal generated-function families (`tuningFamilySocratic*`/`tuningFamilyAmbassador*` radar helpers, their 361 named-scale-matcher specializations, and the corresponding `presetFamilySocratic*`/`presetFamilyAmbassador*` preset bridges — ~4,437 functions total). These were implementation-detail bridges never covered by documentation or the README's usage guide; hiding them shrinks the published `.d.ts` surface by two orders of magnitude (`dist/core/index.d.ts`: ~16,700 → 31 lines; `dist/data/index.d.ts`: ~4,700 → 2 lines) with no change to any documented API. `scale.ts`/`presets.ts` are otherwise untouched — internal cross-file imports are unaffected.
 
 ### Fixed
+
 - `localMinima`: descending-plateau false positive — plateaus now report once at their first index only when strictly below both differing neighbours; ascending-plateau and end-touching cases are no longer reported.
 - Piano `fingerPianoChord`: single-note guard hardened (behaviour unchanged for callers).
 
 ### Notes
-- Pre-1.0: APIs may change. 246 tests, ~96% statement coverage, zero runtime dependencies.
+
+- Pre-1.0: APIs may change. Zero runtime dependencies.
 
 [Unreleased]: https://github.com/shizukutanaka/ruri/commits/main
