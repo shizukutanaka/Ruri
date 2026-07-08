@@ -30259,8 +30259,8 @@ describe('YY1 scaleReflectionSymmetry', () => {
   it('empty scale returns 0', () => {
     expect(scaleReflectionSymmetry([])).toBe(0);
   });
-  it('single pitch returns 0', () => {
-    expect(scaleReflectionSymmetry([0])).toBe(0);
+  it('single pitch is trivially symmetric about itself', () => {
+    expect(scaleReflectionSymmetry([0])).toBe(1);
   });
   it('returns value in [0,1]', () => {
     const r = scaleReflectionSymmetry([0, 400, 700, 900]);
@@ -43939,8 +43939,8 @@ describe('Q2212 tuningFamilySocraticRadarPopulationDynamicsProxy', () => {
 
 // PPPP1 — scaleReflectionSymmetry
 describe('PPPP1 scaleReflectionSymmetry', () => {
-  it('returns 1 for empty scale', () => {
-    expect(scaleReflectionSymmetry([])).toBe(1);
+  it('returns 0 for empty scale', () => {
+    expect(scaleReflectionSymmetry([])).toBe(0);
   });
   it('returns 1 for single note', () => {
     expect(scaleReflectionSymmetry([600])).toBe(1);
@@ -43955,8 +43955,8 @@ describe('PPPP1 scaleReflectionSymmetry', () => {
 
 // PPPP2 — scaleTranslationSymmetry
 describe('PPPP2 scaleTranslationSymmetry', () => {
-  it('returns 1 for empty scale', () => {
-    expect(scaleTranslationSymmetry([])).toBe(1);
+  it('returns 0 for empty scale', () => {
+    expect(scaleTranslationSymmetry([])).toBe(0);
   });
   it('returns 1 for single note', () => {
     expect(scaleTranslationSymmetry([600])).toBe(1);
@@ -43985,8 +43985,8 @@ describe('PPPP3 scaleRotationSymmetry', () => {
 
 // PPPP4 — scaleInversionSymmetry
 describe('PPPP4 scaleInversionSymmetry', () => {
-  it('returns 1 for empty scale', () => {
-    expect(scaleInversionSymmetry([])).toBe(1);
+  it('returns 0 for empty scale', () => {
+    expect(scaleInversionSymmetry([])).toBe(0);
   });
   it('returns 1 for single note', () => {
     expect(scaleInversionSymmetry([600])).toBe(1);

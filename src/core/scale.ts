@@ -31862,7 +31862,6 @@ export function scaleReflectionSymmetry(
   periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
-  if (n <= 1) return 1;
 
   // Collect candidate axes: midpoints between all pairs of pitches mod periodCents
   const axes = new Set<number>();
@@ -35240,7 +35239,7 @@ export function scaleInversionSymmetry(
   scaleCents: readonly number[],
   periodCents: number = 1200,
 ): number {
-  if (scaleCents.length <= 1) return 1;
+  if (scaleCents.length === 0) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   let count = 0;
   for (let i = 0; i < sorted.length; i++) {
@@ -39731,6 +39730,7 @@ export function tuningFamilySocraticRadarCompetitionIndexMean(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
+  if (tunings.length === 0) return 0;
   return 1 - tuningFamilySocraticRadarCooperationIndexMean(tunings, spectrum, rootHz);
 }
 
@@ -64208,7 +64208,8 @@ export function scaleTranslationSymmetry(
   periodCents = 1200,
 ): number {
   const n = scaleCents.length;
-  if (n <= 1) return 1;
+  if (n === 0) return 0;
+  if (n === 1) return 1;
   const tol = 5;
   const sorted = [...scaleCents].sort((a, b) => a - b);
 
