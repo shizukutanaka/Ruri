@@ -72723,27 +72723,11 @@ export function scaleHexatonicDensity(pitches: readonly Pitch[]): number {
 }
 
 export function scalePentatonicMinorDensity(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const pentatonicMinor = [0, 300, 500, 700, 1000];
-  const tolerance = 30;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of pentatonicMinor) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / pentatonicMinor.length;
+  return matchScaleTemplate(pitches, [0, 300, 500, 700, 1000], 30);
 }
 
 export function scalePentatonicMajorDensity(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const pentatonicMajor = [0, 200, 400, 700, 900];
-  const tolerance = 30;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of pentatonicMajor) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / pentatonicMajor.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 30);
 }
 
 export function scaleMaqamRastContent(pitches: readonly Pitch[]): number {
@@ -72957,51 +72941,19 @@ export function scaleWellTemperamentAffinity(pitches: readonly Pitch[]): number 
 }
 
 export function scaleChineseGongContent(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gong = [0, 204, 408, 702, 906];
-  const tolerance = 30;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gong) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gong.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 30);
 }
 
 export function scaleInSenContent(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const inSen = [0, 90, 498, 702, 1008];
-  const tolerance = 30;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of inSen) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / inSen.length;
+  return matchScaleTemplate(pitches, [0, 90, 498, 702, 1008], 30);
 }
 
 export function scaleHirajoshiContent(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hirajoshi = [0, 204, 294, 702, 792];
-  const tolerance = 30;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hirajoshi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hirajoshi.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 702, 792], 30);
 }
 
 export function scaleYoNaContent(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yoNa = [0, 204, 498, 702, 996];
-  const tolerance = 30;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yoNa) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yoNa.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 30);
 }
 
 export function scaleIntervalSpectralBalance(pitches: readonly Pitch[]): number {
@@ -73404,783 +73356,263 @@ export function scaleMelanesianScale(pitches: readonly Pitch[]): number {
 }
 
 export function scaleCubanMontuno(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cuban = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cuban) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cuban.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 40);
 }
 
 export function scaleAndeanPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const andean = [0, 204, 408, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of andean) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / andean.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 45);
 }
 
 export function scaleSambaBaiao(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const samba = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of samba) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / samba.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 40);
 }
 
 export function scaleTangoScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tango = [0, 200, 300, 500, 600, 800, 900, 1100];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tango) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tango.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 600, 800, 900, 1100], 35);
 }
 
 export function scaleJavaneseSlendro(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const slendro = [0, 231, 474, 717, 960];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of slendro) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / slendro.length;
+  return matchScaleTemplate(pitches, [0, 231, 474, 717, 960], 50);
 }
 
 export function scaleBaliPelog(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const pelog = [0, 120, 271, 535, 675, 785, 1075];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of pelog) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / pelog.length;
+  return matchScaleTemplate(pitches, [0, 120, 271, 535, 675, 785, 1075], 45);
 }
 
 export function scaleThai7Tone(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const thai7 = [0, 171, 343, 514, 686, 857, 1029];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of thai7) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / thai7.length;
+  return matchScaleTemplate(pitches, [0, 171, 343, 514, 686, 857, 1029], 40);
 }
 
 export function scaleBurmeseHeptatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const burmese = [0, 182, 386, 498, 702, 884, 1088];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of burmese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / burmese.length;
+  return matchScaleTemplate(pitches, [0, 182, 386, 498, 702, 884, 1088], 40);
 }
 
 export function scaleMaqamRastV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const rast = [0, 204, 342, 498, 702, 906, 1044];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of rast) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / rast.length;
+  return matchScaleTemplate(pitches, [0, 204, 342, 498, 702, 906, 1044], 35);
 }
 
 export function scaleMaqamHijazV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hijaz = [0, 94, 342, 498, 702, 792, 1088];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hijaz) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hijaz.length;
+  return matchScaleTemplate(pitches, [0, 94, 342, 498, 702, 792, 1088], 35);
 }
 
 export function scalePersianDastgah(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const dastgah = [0, 135, 294, 498, 702, 835, 996];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of dastgah) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / dastgah.length;
+  return matchScaleTemplate(pitches, [0, 135, 294, 498, 702, 835, 996], 40);
 }
 
 export function scaleArabicMaqamSaba(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const saba = [0, 150, 294, 408, 498, 702, 852];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of saba) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / saba.length;
+  return matchScaleTemplate(pitches, [0, 150, 294, 408, 498, 702, 852], 35);
 }
 
 export function scaleEthiopianKignit(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kignit = [0, 150, 498, 702, 1050];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kignit) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kignit.length;
+  return matchScaleTemplate(pitches, [0, 150, 498, 702, 1050], 45);
 }
 
 export function scaleWestAfricanPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const westAfrican = [0, 204, 498, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of westAfrican) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / westAfrican.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 906], 45);
 }
 
 export function scaleNorthAfricanRasd(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const rasd = [0, 204, 342, 498, 702, 906, 1044];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of rasd) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / rasd.length;
+  return matchScaleTemplate(pitches, [0, 204, 342, 498, 702, 906, 1044], 40);
 }
 
 export function scaleZuluScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const zulu = [0, 267, 498, 765, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of zulu) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / zulu.length;
+  return matchScaleTemplate(pitches, [0, 267, 498, 765, 996], 50);
 }
 
 export function scaleUzbekShashmakom(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const uzbek = [0, 204, 342, 498, 702, 906, 1044];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of uzbek) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / uzbek.length;
+  return matchScaleTemplate(pitches, [0, 204, 342, 498, 702, 906, 1044], 40);
 }
 
 export function scaleMongolianPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mongolian = [0, 204, 498, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mongolian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mongolian.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 906], 45);
 }
 
 export function scaleTibetanRitual(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tibetan = [0, 182, 498, 680, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tibetan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tibetan.length;
+  return matchScaleTemplate(pitches, [0, 182, 498, 680, 996], 50);
 }
 
 export function scaleKazakhDombra(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kazakh = [0, 231, 498, 729, 996];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kazakh) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kazakh.length;
+  return matchScaleTemplate(pitches, [0, 231, 498, 729, 996], 45);
 }
 
 export function scaleNordicGammalDans(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gammal = [0, 204, 408, 612, 702, 906, 1110];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gammal) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gammal.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 612, 702, 906, 1110], 40);
 }
 
 export function scaleFinnishRuno(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const runo = [0, 204, 408, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of runo) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / runo.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 45);
 }
 
 export function scaleSwedishHardingfele(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const harding = [0, 204, 294, 498, 702, 792, 996];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of harding) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / harding.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 792, 996], 40);
 }
 
 export function scaleIcelandicTvisongur(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tvisongur = [0, 204, 498, 702, 996];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tvisongur) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tvisongur.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 45);
 }
 
 export function scalePolishMazurka(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mazurka = [0, 204, 408, 612, 702, 906, 1110];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mazurka) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mazurka.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 612, 702, 906, 1110], 40);
 }
 
 export function scaleCzechLidova(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const lidova = [0, 204, 294, 498, 702, 906, 996];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of lidova) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / lidova.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 906, 996], 40);
 }
 
 export function scaleUkrainianDorian(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ukrainian = [0, 204, 294, 498, 702, 906, 996];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ukrainian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ukrainian.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 906, 996], 40);
 }
 
 export function scaleSerbianKolo(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kolo = [0, 94, 294, 498, 702, 792, 1088];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kolo) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kolo.length;
+  return matchScaleTemplate(pitches, [0, 94, 294, 498, 702, 792, 1088], 40);
 }
 
 export function scaleQuechuaPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const quechua = [0, 240, 480, 720, 960];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of quechua) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / quechua.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 50);
 }
 
 export function scaleAymaraScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const aymara = [0, 204, 498, 702, 996];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of aymara) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / aymara.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 45);
 }
 
 export function scaleGuaraniPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const guarani = [0, 267, 498, 765, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of guarani) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / guarani.length;
+  return matchScaleTemplate(pitches, [0, 267, 498, 765, 996], 50);
 }
 
 export function scaleTupiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tupi = [0, 204, 408, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tupi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tupi.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 45);
 }
 
 export function scaleRagaTodiV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const todi = [0, 90, 294, 612, 702, 792, 1088];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of todi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / todi.length;
+  return matchScaleTemplate(pitches, [0, 90, 294, 612, 702, 792, 1088], 35);
 }
 
 export function scaleRagaPurviV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const purvi = [0, 90, 408, 612, 702, 792, 1088];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of purvi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / purvi.length;
+  return matchScaleTemplate(pitches, [0, 90, 408, 612, 702, 792, 1088], 35);
 }
 
 export function scaleRagaMarwaV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const marwa = [0, 90, 408, 612, 906, 1110];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of marwa) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / marwa.length;
+  return matchScaleTemplate(pitches, [0, 90, 408, 612, 906, 1110], 35);
 }
 
 export function scaleRagaLalita(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const lalita = [0, 90, 294, 612, 792, 1088];
-  const tolerance = 35;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of lalita) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / lalita.length;
+  return matchScaleTemplate(pitches, [0, 90, 294, 612, 792, 1088], 35);
 }
 
 export function scaleYorubaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yoruba = [0, 204, 408, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yoruba) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yoruba.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 45);
 }
 
 export function scaleGhanaPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ghana = [0, 240, 480, 720, 960];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ghana) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ghana.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 50);
 }
 
 export function scaleMaliKora(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mali = [0, 204, 408, 498, 702, 906, 1110];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mali) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mali.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702, 906, 1110], 40);
 }
 
 export function scaleGriotScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const griot = [0, 180, 408, 612, 792, 996];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of griot) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / griot.length;
+  return matchScaleTemplate(pitches, [0, 180, 408, 612, 792, 996], 45);
 }
 
 export function scaleCalypsoScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const calypso = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of calypso) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / calypso.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 40);
 }
 
 export function scaleReggaePentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const reggae = [0, 300, 500, 700, 1000];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of reggae) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / reggae.length;
+  return matchScaleTemplate(pitches, [0, 300, 500, 700, 1000], 45);
 }
 
 export function scaleZoukScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const zouk = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of zouk) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / zouk.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 40);
 }
 
 export function scaleMerengueScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const merengue = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of merengue) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / merengue.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 40);
 }
 
 export function scaleNavajoNightChant(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const navajo = [0, 204, 408, 702, 906];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of navajo) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / navajo.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 50);
 }
 
 export function scaleLakotaPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const lakota = [0, 267, 498, 765, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of lakota) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / lakota.length;
+  return matchScaleTemplate(pitches, [0, 267, 498, 765, 996], 50);
 }
 
 export function scaleHaidaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const haida = [0, 150, 498, 702, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of haida) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / haida.length;
+  return matchScaleTemplate(pitches, [0, 150, 498, 702, 1050], 50);
 }
 
 export function scaleCherokeePentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cherokee = [0, 204, 498, 702, 996];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cherokee) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cherokee.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 45);
 }
 
 export function scaleSomaliPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const somali = [0, 204, 498, 702, 996];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of somali) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / somali.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 45);
 }
 
 export function scaleKenyanBenga(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const benga = [0, 204, 408, 498, 702, 906, 1110];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of benga) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / benga.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702, 906, 1110], 40);
 }
 
 export function scaleMasaiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const masai = [0, 240, 480, 720, 960];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of masai) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / masai.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 50);
 }
 
 export function scaleMalagasyScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const malagasy = [0, 204, 408, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of malagasy) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / malagasy.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 45);
 }
 
 export function scaleItalianTarantella(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tarantella = [0, 100, 300, 500, 700, 800, 1000];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tarantella) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tarantella.length;
+  return matchScaleTemplate(pitches, [0, 100, 300, 500, 700, 800, 1000], 40);
 }
 
 export function scaleGreekRembetiko(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const rembetiko = [0, 100, 350, 500, 700, 800, 1100];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of rembetiko) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / rembetiko.length;
+  return matchScaleTemplate(pitches, [0, 100, 350, 500, 700, 800, 1100], 40);
 }
 
 export function scalePortugueseFado(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const fado = [0, 100, 400, 500, 700, 800, 1000];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of fado) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / fado.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1000], 40);
 }
 
 export function scaleCroatianTamburica(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tamburica = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tamburica) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tamburica.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 40);
 }
 
 export function scaleBulgarianAsymmetric(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bulgarian = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bulgarian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bulgarian.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 40);
 }
 
 export function scaleAlbanianIso(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const albanian = [0, 182, 386, 498, 702, 884, 1088];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of albanian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / albanian.length;
+  return matchScaleTemplate(pitches, [0, 182, 386, 498, 702, 884, 1088], 40);
 }
 
 export function scaleMacedonianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const macedonian = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of macedonian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / macedonian.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 40);
 }
 
 export function scaleBosnianSevdah(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sevdah = [0, 150, 350, 500, 700, 850, 1050];
-  const tolerance = 40;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sevdah) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sevdah.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 500, 700, 850, 1050], 40);
 }
 
 export function scaleSamoanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const samoan = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of samoan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / samoan.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleFijianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const fijian = [0, 240, 480, 720, 960];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of fijian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / fijian.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 50);
 }
 
 export function scaleTonganScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tongan = [0, 204, 408, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tongan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tongan.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 45);
 }
 
 export function scalePapuaNewGuinea(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const png = [0, 267, 498, 765, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of png) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / png.length;
+  return matchScaleTemplate(pitches, [0, 267, 498, 765, 996], 50);
 }
 
 export function scaleMayanPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mayan = [0, 240, 480, 720, 960];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mayan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mayan.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 50);
 }
 
 export function scaleAztecScale(pitches: readonly Pitch[]): number {
@@ -74196,3483 +73628,1183 @@ export function scaleAztecScale(pitches: readonly Pitch[]): number {
 }
 
 export function scaleGarifulaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const garifula = [0, 204, 498, 702, 996];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of garifula) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / garifula.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 45);
 }
 
 export function scaleZapotecScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const zapotec = [0, 204, 408, 702, 906];
-  const tolerance = 45;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of zapotec) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / zapotec.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 45);
 }
 
 export function scalePygmyScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const pygmy = [0, 165, 498, 1035];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of pygmy) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / pygmy.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 1035], 55);
 }
 
 export function scaleAkanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const akan = [0, 204, 408, 702, 906];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of akan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / akan.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 50);
 }
 
 export function scaleEweScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ewe = [0, 180, 384, 696, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ewe) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ewe.length;
+  return matchScaleTemplate(pitches, [0, 180, 384, 696, 900], 50);
 }
 
 export function scaleYorubaScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yoruba = [0, 165, 498, 675, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yoruba) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yoruba.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 675, 996], 50);
 }
 
 export function scaleSwedishHerdingScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const swedishHerding = [0, 204, 294, 498, 702, 996, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of swedishHerding) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / swedishHerding.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 996, 1110], 50);
 }
 
 export function scaleNorwegianSlattScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const norwegianSlatt = [0, 182, 386, 498, 702, 884, 1088];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of norwegianSlatt) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / norwegianSlatt.length;
+  return matchScaleTemplate(pitches, [0, 182, 386, 498, 702, 884, 1088], 50);
 }
 
 export function scaleFinnishKanteliScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const finnishKanteli = [0, 204, 408, 498, 702, 906, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of finnishKanteli) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / finnishKanteli.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702, 906, 1110], 50);
 }
 
 export function scaleSamiJoikScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const samiJoik = [0, 165, 498, 702, 996];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of samiJoik) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / samiJoik.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 702, 996], 55);
 }
 
 export function scaleEthiopianTizitaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ethiopianTizita = [0, 204, 294, 702, 906];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ethiopianTizita) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ethiopianTizita.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 702, 906], 50);
 }
 
 export function scaleKenyaBengaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kenyaBenga = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kenyaBenga) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kenyaBenga.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleMalagasyScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const malagasy = [0, 165, 498, 702, 1035];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of malagasy) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / malagasy.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 702, 1035], 55);
 }
 
 export function scaleUgandanPentatonicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ugandanAmadinda = [0, 240, 480, 720, 960];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ugandanAmadinda) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ugandanAmadinda.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 50);
 }
 
 export function scaleKazakhPentatonicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kazakhPentatonic = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kazakhPentatonic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kazakhPentatonic.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleUzbekScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const uzbek = [0, 182, 386, 498, 702, 884, 1088];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of uzbek) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / uzbek.length;
+  return matchScaleTemplate(pitches, [0, 182, 386, 498, 702, 884, 1088], 50);
 }
 
 export function scaleTajikScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tajik = [0, 204, 294, 498, 702, 906, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tajik) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tajik.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 906, 996], 50);
 }
 
 export function scaleTurkmenScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const turkmen = [0, 165, 498, 702, 1035];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of turkmen) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / turkmen.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 702, 1035], 55);
 }
 
 export function scaleThaiPentScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const thaiPent = [0, 171, 514, 686, 1029];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of thaiPent) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / thaiPent.length;
+  return matchScaleTemplate(pitches, [0, 171, 514, 686, 1029], 55);
 }
 
 export function scaleKhmerScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const khmer = [0, 171, 343, 686, 857];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of khmer) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / khmer.length;
+  return matchScaleTemplate(pitches, [0, 171, 343, 686, 857], 55);
 }
 
 export function scaleJavaneseSlendroV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const slendro = [0, 240, 480, 720, 960];
-  const tolerance = 60;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of slendro) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / slendro.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 60);
 }
 
 export function scaleBurmeseHeptatonicV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const burmese = [0, 204, 408, 498, 702, 906, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of burmese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / burmese.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702, 906, 1110], 50);
 }
 
 export function scaleAndesQuechuaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const andesQuechua = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of andesQuechua) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / andesQuechua.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleAmazonianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const amazonian = [0, 165, 386, 702, 884];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of amazonian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / amazonian.length;
+  return matchScaleTemplate(pitches, [0, 165, 386, 702, 884], 55);
 }
 
 export function scaleGuaraniScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const guarani = [0, 204, 408, 702, 906];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of guarani) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / guarani.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 50);
 }
 
 export function scaleAymaraScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const aymara = [0, 240, 480, 720, 960];
-  const tolerance = 60;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of aymara) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / aymara.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 60);
 }
 
 export function scaleCubanSonScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cubanSon = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cubanSon) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cubanSon.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleCalypsoScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const calypso = [0, 204, 386, 702, 884];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of calypso) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / calypso.length;
+  return matchScaleTemplate(pitches, [0, 204, 386, 702, 884], 50);
 }
 
 export function scaleHaitianMerengueScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const haitianMerengue = [0, 204, 408, 498, 702];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of haitianMerengue) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / haitianMerengue.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702], 50);
 }
 
 export function scaleJamaicanMentoScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const jamaicanMento = [0, 204, 498, 702, 1088];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of jamaicanMento) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / jamaicanMento.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 1088], 50);
 }
 
 export function scaleMaqamSabaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maqamSaba = [0, 204, 294, 408, 702, 792, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maqamSaba) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maqamSaba.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 408, 702, 792, 996], 50);
 }
 
 export function scaleMaqamNahawandScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maqamNahawand = [0, 204, 294, 498, 702, 792, 1088];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maqamNahawand) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maqamNahawand.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 792, 1088], 50);
 }
 
 export function scaleMaqamKurdScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maqamKurd = [0, 94, 294, 498, 702, 792, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maqamKurd) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maqamKurd.length;
+  return matchScaleTemplate(pitches, [0, 94, 294, 498, 702, 792, 996], 50);
 }
 
 export function scaleMaqamAjamScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maqamAjam = [0, 204, 408, 498, 702, 906, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maqamAjam) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maqamAjam.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702, 906, 1110], 50);
 }
 
 export function scaleAboriginalPentatonicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const aboriginalPentatonic = [0, 204, 498, 702, 996];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of aboriginalPentatonic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / aboriginalPentatonic.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 55);
 }
 
 export function scaleMaoriScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maori = [0, 204, 408, 702, 906];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maori) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maori.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 702, 906], 50);
 }
 
 export function scaleVanuatuScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const vanuatu = [0, 240, 480, 720, 960];
-  const tolerance = 60;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of vanuatu) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / vanuatu.length;
+  return matchScaleTemplate(pitches, [0, 240, 480, 720, 960], 60);
 }
 
 export function scaleSolomonIslandsScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const solomonIslands = [0, 165, 498, 702, 1035];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of solomonIslands) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / solomonIslands.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 702, 1035], 55);
 }
 
 export function scaleBerberPentatonicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const berberPentatonic = [0, 204, 386, 702, 906];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of berberPentatonic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / berberPentatonic.length;
+  return matchScaleTemplate(pitches, [0, 204, 386, 702, 906], 50);
 }
 
 export function scaleNubianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const nubian = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of nubian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / nubian.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleGnawaMusicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gnawa = [0, 204, 294, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gnawa) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gnawa.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 702, 996], 50);
 }
 
 export function scaleTuaregScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tuareg = [0, 165, 498, 702, 1035];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tuareg) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tuareg.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 702, 1035], 55);
 }
 
 export function scaleGuangdongMusicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const guangdongMusic = [0, 204, 408, 498, 702, 906, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of guangdongMusic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / guangdongMusic.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702, 906, 1110], 50);
 }
 
 export function scaleSichuanOperaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sichuanOpera = [0, 204, 294, 498, 702, 906, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sichuanOpera) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sichuanOpera.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 906, 996], 50);
 }
 
 export function scaleShanshuiGuqinScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const shanshuiGuqin = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of shanshuiGuqin) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / shanshuiGuqin.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleYunnanMinorityScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yunnanMinority = [0, 165, 498, 702, 1035];
-  const tolerance = 55;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yunnanMinority) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yunnanMinority.length;
+  return matchScaleTemplate(pitches, [0, 165, 498, 702, 1035], 55);
 }
 
 export function scaleRagaBhairavScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ragaBhairav = [0, 112, 386, 498, 702, 814, 1088];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ragaBhairav) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ragaBhairav.length;
+  return matchScaleTemplate(pitches, [0, 112, 386, 498, 702, 814, 1088], 50);
 }
 
 export function scaleRagaYamanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ragaYaman = [0, 204, 408, 612, 702, 906, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ragaYaman) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ragaYaman.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 612, 702, 906, 1110], 50);
 }
 
 export function scaleRagaDeshScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ragaDesh = [0, 204, 386, 498, 702, 906, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ragaDesh) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ragaDesh.length;
+  return matchScaleTemplate(pitches, [0, 204, 386, 498, 702, 906, 996], 50);
 }
 
 export function scaleRagaKafiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ragaKafi = [0, 204, 294, 498, 702, 906, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ragaKafi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ragaKafi.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 906, 996], 50);
 }
 
 export function scaleGeorgianPolyphonicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const georgianPolyphonic = [0, 204, 408, 498, 702, 906, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of georgianPolyphonic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / georgianPolyphonic.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 498, 702, 906, 1110], 50);
 }
 
 export function scaleArmenianDudukScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const armenianDuduk = [0, 204, 294, 498, 702, 792, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of armenianDuduk) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / armenianDuduk.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 498, 702, 792, 996], 50);
 }
 
 export function scaleAzerbaijaniMughamScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const azerbaijaniMugham = [0, 204, 386, 498, 702, 906, 1088];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of azerbaijaniMugham) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / azerbaijaniMugham.length;
+  return matchScaleTemplate(pitches, [0, 204, 386, 498, 702, 906, 1088], 50);
 }
 
 export function scaleChechenLezgiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const chechenLezgi = [0, 204, 498, 702, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of chechenLezgi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / chechenLezgi.length;
+  return matchScaleTemplate(pitches, [0, 204, 498, 702, 996], 50);
 }
 
 export function scaleRomanianDorian(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const romanianDorian = [0, 204, 294, 612, 702, 906, 996];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of romanianDorian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / romanianDorian.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 612, 702, 906, 996], 50);
 }
 
 export function scaleHungarianMinorScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hungarianMinor = [0, 204, 294, 612, 702, 792, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hungarianMinor) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hungarianMinor.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 612, 702, 792, 1110], 50);
 }
 
 export function scalePolishHighlandScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const polishHighland = [0, 204, 408, 612, 702, 906, 1110];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of polishHighland) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / polishHighland.length;
+  return matchScaleTemplate(pitches, [0, 204, 408, 612, 702, 906, 1110], 50);
 }
 
 export function scaleUkrainianDorianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ukrainianDorian = [0, 204, 294, 612, 702, 906, 1088];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ukrainianDorian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ukrainianDorian.length;
+  return matchScaleTemplate(pitches, [0, 204, 294, 612, 702, 906, 1088], 50);
 }
 
 export function scaleFlamencoScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const flamencoV2 = [0, 100, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of flamencoV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / flamencoV2.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scalePortugueseFadoScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const portugueseFado = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of portugueseFado) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / portugueseFado.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleCatalanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const catalan = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of catalan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / catalan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleGalicianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const galician = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of galician) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / galician.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleEthiopianAnchihoye(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const anchihoyeScale = [0, 150, 500, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of anchihoyeScale) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / anchihoyeScale.length;
+  return matchScaleTemplate(pitches, [0, 150, 500, 700, 850], 50);
 }
 
 export function scaleEritreanPentatonic(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const eritreanPentatonic = [0, 200, 500, 700, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of eritreanPentatonic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / eritreanPentatonic.length;
+  return matchScaleTemplate(pitches, [0, 200, 500, 700, 1000], 50);
 }
 
 export function scaleSomaliModal(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const somaliModal = [0, 200, 350, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of somaliModal) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / somaliModal.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 700, 900], 50);
 }
 
 export function scaleDjiboutianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const djiboutian = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of djiboutian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / djiboutian.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleKazakhSteppeScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kazakhSteppe = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kazakhSteppe) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kazakhSteppe.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleUzbekDotar(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const uzbekDotar = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of uzbekDotar) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / uzbekDotar.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleTajikFalak(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tajikFalak = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tajikFalak) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tajikFalak.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleKyrgyzScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kyrgyzScale = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kyrgyzScale) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kyrgyzScale.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleAndeseanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const andesean = [0, 200, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of andesean) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / andesean.length;
+  return matchScaleTemplate(pitches, [0, 200, 500, 700, 900], 50);
 }
 
 export function scaleChileanCueca(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const chileanCueca = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of chileanCueca) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / chileanCueca.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleArgentineZamba(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const argentineZamba = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of argentineZamba) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / argentineZamba.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleBolivianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bolivian = [0, 200, 500, 700, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bolivian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bolivian.length;
+  return matchScaleTemplate(pitches, [0, 200, 500, 700, 1000], 50);
 }
 
 export function scaleNorwegianFolkScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const norwegianFolk = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of norwegianFolk) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / norwegianFolk.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleSwedishPolskaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const swedishPolska = [0, 200, 300, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of swedishPolska) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / swedishPolska.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1100], 50);
 }
 
 export function scaleFinnishRunoV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const finnishRunoV2 = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of finnishRunoV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / finnishRunoV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleDanishScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const danishScale = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of danishScale) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / danishScale.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleGhanaianHighlife(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ghanaianHighlife = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ghanaianHighlife) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ghanaianHighlife.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleWolofScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const wolof = [0, 200, 500, 700, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of wolof) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / wolof.length;
+  return matchScaleTemplate(pitches, [0, 200, 500, 700, 1000], 50);
 }
 
 export function scaleMandinkaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mandinka = [0, 200, 300, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mandinka) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mandinka.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1100], 50);
 }
 
 export function scaleHausaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hausa = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hausa) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hausa.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleArabicMaqamRast(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const arabicRast = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of arabicRast) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / arabicRast.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleTurkishMakamHicaz(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const turkishHicaz = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of turkishHicaz) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / turkishHicaz.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleIranianShur(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const iranianShur = [0, 150, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of iranianShur) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / iranianShur.length;
+  return matchScaleTemplate(pitches, [0, 150, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleLebaneseMaqam(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const lebanese = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of lebanese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / lebanese.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleBengaliScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bengali = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bengali) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bengali.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scalePunjabiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const punjabi = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of punjabi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / punjabi.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleRajasthaniScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const rajasthani = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of rajasthani) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / rajasthani.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleSriLankaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sriLanka = [0, 200, 300, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sriLanka) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sriLanka.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1100], 50);
 }
 
 export function scalePuertoRicanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const puertoRican = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of puertoRican) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / puertoRican.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleJamaicanReggaeScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const jamaicanReggae = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of jamaicanReggae) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / jamaicanReggae.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleTrinidadianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const trinidadian = [0, 200, 400, 600, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of trinidadian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / trinidadian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 600, 700, 900, 1100], 50);
 }
 
 export function scaleBarbadianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const barbadian = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of barbadian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / barbadian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleVietnameseScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const vietnamese = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of vietnamese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / vietnamese.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleFilipinoCulintang(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const filipinoCulintang = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of filipinoCulintang) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / filipinoCulintang.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleMalaysianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const malaysian = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of malaysian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / malaysian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleCambodianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cambodian = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cambodian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cambodian.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleMaoriScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maoriV2 = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maoriV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maoriV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scalePolynesianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const polynesian = [0, 200, 500, 700, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of polynesian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / polynesian.length;
+  return matchScaleTemplate(pitches, [0, 200, 500, 700, 1000], 50);
 }
 
 export function scaleAboriginalDreaming(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const aboriginalDreaming = [0, 300, 500, 700, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of aboriginalDreaming) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / aboriginalDreaming.length;
+  return matchScaleTemplate(pitches, [0, 300, 500, 700, 1000], 50);
 }
 
 export function scalePapuaNewGuineaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const papuaNewGuinea = [0, 200, 400, 600, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of papuaNewGuinea) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / papuaNewGuinea.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 600, 900], 50);
 }
 
 export function scaleMoroccanGnawa(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const moroccanGnawa = [0, 150, 500, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of moroccanGnawa) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / moroccanGnawa.length;
+  return matchScaleTemplate(pitches, [0, 150, 500, 700, 850], 50);
 }
 
 export function scaleTunisianMaqam(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tunisianMaqam = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tunisianMaqam) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tunisianMaqam.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleAlgerianChabi(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const algerianChabi = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of algerianChabi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / algerianChabi.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleEgyptianRast(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const egyptianRast = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of egyptianRast) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / egyptianRast.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleBrazilianChoro(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const brazilianChoro = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of brazilianChoro) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / brazilianChoro.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleColombianCumbia(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const colombianCumbia = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of colombianCumbia) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / colombianCumbia.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scalePeruvianValsCriollo(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const peruvianVals = [0, 200, 400, 600, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of peruvianVals) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / peruvianVals.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 600, 700, 900, 1100], 50);
 }
 
 export function scaleVenezuelanJoropo(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const venezuelanJoropo = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of venezuelanJoropo) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / venezuelanJoropo.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleCongoleseSoukous(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const congolese = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of congolese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / congolese.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleCameroonMakossa(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cameroon = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cameroon) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cameroon.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleGaboneseTraditional(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gabonese = [0, 150, 350, 500, 700, 850, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gabonese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gabonese.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 500, 700, 850, 1100], 50);
 }
 
 export function scaleRwandanInanga(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const rwandan = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of rwandan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / rwandan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleNavajoScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const navajo = [0, 200, 350, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of navajo) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / navajo.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900], 50);
 }
 
 export function scaleHopiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hopi = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hopi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hopi.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleIroquoisScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const iroquois = [0, 200, 400, 500, 700];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of iroquois) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / iroquois.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700], 50);
 }
 
 export function scaleInuitScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const inuit = [0, 150, 350, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of inuit) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / inuit.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 900], 50);
 }
 
 export function scaleMongolianBowl(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mongolianBowl = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mongolianBowl) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mongolianBowl.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleTibetanSinging(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tibetanSinging = [0, 200, 350, 500, 700, 850, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tibetanSinging) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tibetanSinging.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 850, 1050], 50);
 }
 
 export function scaleNepaleseScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const nepalese = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of nepalese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / nepalese.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleLadakhiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ladakhi = [0, 150, 350, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ladakhi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ladakhi.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 500, 700, 900, 1100], 50);
 }
 
 export function scaleNigerianJuju(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const nigerianJuju = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of nigerianJuju) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / nigerianJuju.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleSenegaleseWolof(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const senegaleseWolof = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of senegaleseWolof) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / senegaleseWolof.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleMaliBamanaSuleba(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maliBamana = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maliBamana) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maliBamana.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleGuineanJeliya(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const guineanJeliya = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of guineanJeliya) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / guineanJeliya.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleZimbabweMbira(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const zimbabweMbira = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of zimbabweMbira) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / zimbabweMbira.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleShonaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const shona = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of shona) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / shona.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleMozambiquanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mozambiquan = [0, 200, 300, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mozambiquan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mozambiquan.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1100], 50);
 }
 
 export function scaleBotswanaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const botswana = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of botswana) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / botswana.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleSyrianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const syrian = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of syrian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / syrian.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleIraqiMaqam(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const iraqiMaqam = [0, 200, 350, 500, 700, 850, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of iraqiMaqam) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / iraqiMaqam.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 850, 1100], 50);
 }
 
 export function scalePalestinianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const palestinian = [0, 150, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of palestinian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / palestinian.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleYemeniScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yemeni = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yemeni) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yemeni.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleKoreanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const korean = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of korean) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / korean.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleMongolianLongSong(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mongolianLongSong = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mongolianLongSong) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mongolianLongSong.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleManchuScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const manchu = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of manchu) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / manchu.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleAinuScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ainu = [0, 200, 300, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ainu) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ainu.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 700, 900], 50);
 }
 
 export function scaleYakutScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yakut = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yakut) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yakut.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleChukchiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const chukchi = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of chukchi) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / chukchi.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleEvenkScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const evenk = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of evenk) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / evenk.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleBuryatScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const buryat = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of buryat) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / buryat.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleAleutScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const aleut = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of aleut) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / aleut.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleYupikScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yupik = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yupik) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yupik.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleTlingitScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tlingit = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tlingit) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tlingit.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleAthabaskanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const athabaskan = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of athabaskan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / athabaskan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleMayanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mayan = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mayan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mayan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleNahuatlScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const nahuatl = [0, 200, 300, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of nahuatl) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / nahuatl.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900], 50);
 }
 
 export function scaleMixtecScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mixtec = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mixtec) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mixtec.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleOlmecScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const olmec = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of olmec) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / olmec.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleYanomamiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const yanomami = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of yanomami) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / yanomami.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleWayuuScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const wayuu = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of wayuu) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / wayuu.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleShuarScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const shuar = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of shuar) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / shuar.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleXinguScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const xingu = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of xingu) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / xingu.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleCarnaticScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const carnatic = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of carnatic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / carnatic.length;
+  return matchScaleTemplate(pitches, [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100], 50);
 }
 
 export function scaleHindustaniScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hindustani = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hindustani) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hindustani.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleTamilScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tamil = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tamil) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tamil.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleGujaratiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gujarati = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gujarati) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gujarati.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleGreekModalScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const greekModal = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of greekModal) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / greekModal.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleByzantineScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const byzantine = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of byzantine) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / byzantine.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleCypriotScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cypriot = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cypriot) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cypriot.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleAnatolianFolkScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const anatolianFolk = [0, 200, 350, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of anatolianFolk) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / anatolianFolk.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 800, 1000], 50);
 }
 
 export function scaleWestPolynesianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const westPolynesian = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of westPolynesian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / westPolynesian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleMicronesianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const micronesian = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of micronesian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / micronesian.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleKiribatiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kiribati = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kiribati) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kiribati.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleMarshalleseScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const marshallese = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of marshallese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / marshallese.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleAppalachianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const appalachian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of appalachian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / appalachian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleOzarkScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ozark = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ozark) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ozark.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleCajunScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cajun = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cajun) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cajun.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleZydecoScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const zydeco = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of zydeco) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / zydeco.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleWelshScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const welsh = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of welsh) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / welsh.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleIrishScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const irish = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of irish) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / irish.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleScottishScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const scottish = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of scottish) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / scottish.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleBretonScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const breton = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of breton) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / breton.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleBasqueScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const basque = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of basque) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / basque.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleAndalusianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const andalusian = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of andalusian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / andalusian.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleAsturianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const asturian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of asturian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / asturian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleValencianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const valencian = [0, 200, 300, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of valencian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / valencian.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1100], 50);
 }
 
 export function scaleFlemishScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const flemish = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of flemish) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / flemish.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleDutchScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const dutch = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of dutch) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / dutch.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleWalloonScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const walloon = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of walloon) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / walloon.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleLuxembourgScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const luxembourg = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of luxembourg) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / luxembourg.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleSlovenianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const slovenian = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of slovenian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / slovenian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleCroatianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const croatianV2 = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of croatianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / croatianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleBosnianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bosnian = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bosnian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bosnian.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleMontenegrinScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const montenegrin = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of montenegrin) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / montenegrin.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleFinnoUgricScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const finnoUgric = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of finnoUgric) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / finnoUgric.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleSamiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sami = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sami) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sami.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleKareliaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const karelia = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of karelia) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / karelia.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleErzyaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const erzya = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of erzya) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / erzya.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleAustrianAlpineScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const austrianAlpine = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of austrianAlpine) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / austrianAlpine.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleBavarianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bavarian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bavarian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bavarian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleTyroleanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tyrolean = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tyrolean) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tyrolean.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleSwissAlpineScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const swissAlpine = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of swissAlpine) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / swissAlpine.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleAboriginalScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const aboriginal = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of aboriginal) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / aboriginal.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleTorresStraitScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const torresStrait = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of torresStrait) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / torresStrait.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleMaoriScaleV3(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maoriV3 = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maoriV3) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maoriV3.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleTasmanianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tasmanian = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tasmanian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tasmanian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scalePersianClassical(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const persianClassical = [0, 90, 400, 500, 700, 790, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of persianClassical) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / persianClassical.length;
+  return matchScaleTemplate(pitches, [0, 90, 400, 500, 700, 790, 1100], 50);
 }
 
 export function scaleAzerbaijaniScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const azerbaijani = [0, 150, 350, 500, 700, 850, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of azerbaijani) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / azerbaijani.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 500, 700, 850, 1050], 50);
 }
 
 export function scaleUzbekMaqom(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const uzbekMaqom = [0, 200, 350, 500, 700, 900, 1050];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of uzbekMaqom) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / uzbekMaqom.length;
+  return matchScaleTemplate(pitches, [0, 200, 350, 500, 700, 900, 1050], 50);
 }
 
 export function scaleTajikMaqom(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tajikMaqom = [0, 200, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tajikMaqom) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tajikMaqom.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleBerberScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const berber = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of berber) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / berber.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleKabyleScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kabyle = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kabyle) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kabyle.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleAmazighScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const amazigh = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of amazigh) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / amazigh.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleChaouiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const chaoui = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of chaoui) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / chaoui.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleTexMexScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const texMex = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of texMex) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / texMex.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleBluegrassScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bluegrass = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bluegrass) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bluegrass.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleGospelScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gospel = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gospel) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gospel.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleAppalachianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const appalachianV2 = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of appalachianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / appalachianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleGreenlandicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const greenlandic = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of greenlandic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / greenlandic.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleFaroeseScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const faroese = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of faroese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / faroese.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleShetlandScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const shetland = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of shetland) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / shetland.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleOrkneyScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const orkney = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of orkney) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / orkney.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleQuebecoisScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const quebecois = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of quebecois) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / quebecois.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleAcadianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const acadian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of acadian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / acadian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleFrenchCanadianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const frenchCanadian = [0, 200, 400, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of frenchCanadian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / frenchCanadian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 800, 1000], 50);
 }
 
 export function scaleMetisScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const metis = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of metis) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / metis.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleSicilianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sicilian = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sicilian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sicilian.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleSardinianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sardinian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sardinian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sardinian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleCorsicanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const corsican = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of corsican) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / corsican.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleMalteseScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const maltese = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of maltese) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / maltese.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleVenetianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const venetian = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of venetian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / venetian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleNeapolitanScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const neapolitanV2 = [0, 100, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of neapolitanV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / neapolitanV2.length;
+  return matchScaleTemplate(pitches, [0, 100, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleTuscanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tuscan = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tuscan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tuscan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleLombardScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const lombard = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of lombard) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / lombard.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleWestSlavicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const westSlavic = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of westSlavic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / westSlavic.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scalePolishScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const polishV2 = [0, 200, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of polishV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / polishV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleCzechScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const czechV2 = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of czechV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / czechV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleSlovakScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const slovak = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of slovak) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / slovak.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleTibetoBurmanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tibetoBurman = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tibetoBurman) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tibetoBurman.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleNagaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const naga = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of naga) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / naga.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleKarenScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const karen = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of karen) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / karen.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleShanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const shan = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of shan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / shan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleMoldovanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const moldovan = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of moldovan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / moldovan.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleTranssylvanianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const transsylvanian = [0, 200, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of transsylvanian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / transsylvanian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleWallachianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const wallachian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of wallachian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / wallachian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleBanatScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const banat = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of banat) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / banat.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleUkrainianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ukrainianV2 = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ukrainianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ukrainianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleBelarusianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const belarusian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of belarusian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / belarusian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleCossackScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const cossack = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of cossack) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / cossack.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleRusynScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const rusyn = [0, 200, 400, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of rusyn) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / rusyn.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 800, 1000], 50);
 }
 
 export function scaleUralicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const uralic = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of uralic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / uralic.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleMordvinScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mordvin = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mordvin) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mordvin.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleMariScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mari = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mari) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mari.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleUdmurtScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const udmurt = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of udmurt) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / udmurt.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleSouthSlavicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const southSlavic = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of southSlavic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / southSlavic.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleMacedonianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const macedonianV2 = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of macedonianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / macedonianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleSerbianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const serbianV2 = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of serbianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / serbianV2.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleKosovarScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const kosovar = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of kosovar) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / kosovar.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleTurkicScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const turkic = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of turkic) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / turkic.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleTatarScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tatar = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tatar) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tatar.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleBashkirScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bashkir = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bashkir) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bashkir.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleChuvashScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const chuvash = [0, 200, 400, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of chuvash) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / chuvash.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900, 1100], 50);
 }
 
 export function scaleHungarianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hungarianV2 = [0, 200, 300, 600, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hungarianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hungarianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 600, 700, 800, 1100], 50);
 }
 
 export function scaleRomaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const roma = [0, 200, 300, 600, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of roma) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / roma.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 600, 700, 800, 1100], 50);
 }
 
 export function scaleSintiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sinti = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sinti) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sinti.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleTransdanubianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const transdanubian = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of transdanubian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / transdanubian.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleAlbanianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const albanianV2 = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of albanianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / albanianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleArbereshScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const arberesh = [0, 200, 300, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of arberesh) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / arberesh.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1100], 50);
 }
 
 export function scaleToskScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const tosk = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of tosk) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / tosk.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleGhegScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gheg = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gheg) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gheg.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleGeorgianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const georgianV2 = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of georgianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / georgianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleSvanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const svan = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of svan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / svan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleMingrelianScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mingrelian = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mingrelian) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mingrelian.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleAdjaraScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const adjara = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of adjara) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / adjara.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleAndalucianFlamenco(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const andalucianFlamenco = [0, 100, 400, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of andalucianFlamenco) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / andalucianFlamenco.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1000], 50);
 }
 
 export function scaleGypsyKingsScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const gypsyKings = [0, 100, 400, 500, 700, 800, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of gypsyKings) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / gypsyKings.length;
+  return matchScaleTemplate(pitches, [0, 100, 400, 500, 700, 800, 1100], 50);
 }
 
 export function scaleGranadaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const granada = [0, 100, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of granada) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / granada.length;
+  return matchScaleTemplate(pitches, [0, 100, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleSevillanaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const sevillana = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of sevillana) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / sevillana.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleCaribbeanCalypsoV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const caribbeanCalypsoV2 = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of caribbeanCalypsoV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / caribbeanCalypsoV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleTrinidadianSteelpanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const trinidadianSteelpan = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of trinidadianSteelpan) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / trinidadianSteelpan.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleJamaicanDancehallScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const jamaicanDancehall = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of jamaicanDancehall) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / jamaicanDancehall.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
 }
 
 export function scaleHaitianKompaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const haitianKompa = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of haitianKompa) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / haitianKompa.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleBaskCountryScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const baskCountry = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of baskCountry) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / baskCountry.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleNavarreScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const navarre = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of navarre) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / navarre.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleAragonScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const aragon = [0, 200, 300, 500, 700, 800, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of aragon) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / aragon.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 800, 1000], 50);
 }
 
 export function scaleGalicianScaleV2(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const galicianV2 = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of galicianV2) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / galicianV2.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleAndeanQuenaScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const andeanQuena = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of andeanQuena) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / andeanQuena.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleBolivianSaya(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const bolivianSaya = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of bolivianSaya) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / bolivianSaya.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleEcuadorianSanjuanito(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const ecuadorianSanjuanito = [0, 200, 300, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of ecuadorianSanjuanito) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / ecuadorianSanjuanito.length;
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900], 50);
 }
 
 export function scaleColombianVallenato(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const colombianVallenato = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of colombianVallenato) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / colombianVallenato.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleWestAfricanGriotScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const westAfricanGriot = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of westAfricanGriot) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / westAfricanGriot.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleMandeScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const mande = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of mande) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / mande.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleSonghaiScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const songhai = [0, 200, 400, 500, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of songhai) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / songhai.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900], 50);
 }
 
 export function scaleFulaniScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const fulani = [0, 150, 350, 700, 850];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of fulani) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / fulani.length;
+  return matchScaleTemplate(pitches, [0, 150, 350, 700, 850], 50);
 }
 
 export function scaleCentralAmericanScale(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const centralAmerican = [0, 200, 400, 500, 700, 900, 1100];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of centralAmerican) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / centralAmerican.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1100], 50);
 }
 
 export function scaleGuatemalanMarimba(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const guatemalanMarimba = [0, 200, 400, 500, 700, 900, 1000];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of guatemalanMarimba) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / guatemalanMarimba.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 500, 700, 900, 1000], 50);
 }
 
 export function scaleHondurasGarifuna(pitches: readonly Pitch[]): number {
-  if (pitches.length === 0) return 0;
-  const hondurasGarifuna = [0, 200, 400, 700, 900];
-  const tolerance = 50;
-  const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
-  let matched = 0;
-  for (const t of hondurasGarifuna) {
-    if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
-  }
-  return matched / hondurasGarifuna.length;
+  return matchScaleTemplate(pitches, [0, 200, 400, 700, 900], 50);
 }
 
 export function scaleNicaraguanScale(pitches: readonly Pitch[]): number {
+  return matchScaleTemplate(pitches, [0, 200, 300, 500, 700, 900, 1000], 50);
+}
+
+// ---------------------------------------------------------------------------
+// matchScaleTemplate — generic consolidation primitive for the Round-series
+// named-scale matchers below. Each matcher scores what fraction of a target
+// cents set is covered (within `tolerance`) by the input pitches.
+// ---------------------------------------------------------------------------
+
+function matchScaleTemplate(
+  pitches: readonly Pitch[],
+  targetCents: readonly number[],
+  tolerance: number,
+): number {
   if (pitches.length === 0) return 0;
-  const nicaraguan = [0, 200, 300, 500, 700, 900, 1000];
-  const tolerance = 50;
   const cs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   let matched = 0;
-  for (const t of nicaraguan) {
+  for (const t of targetCents) {
     if (cs.some((c) => Math.abs(c - t) <= tolerance)) matched++;
   }
-  return matched / nicaraguan.length;
+  return matched / targetCents.length;
 }
 
 // ---------------------------------------------------------------------------
