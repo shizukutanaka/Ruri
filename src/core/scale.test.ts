@@ -41394,7 +41394,7 @@ describe('EEEE3 scaleGapUniformity', () => {
     expect(scaleGapUniformity([])).toBe(1);
   });
   it('returns 1 for equal-step scale', () => {
-    const wholeTone = [200, 400, 600, 800, 1000];
+    const wholeTone = [0, 200, 400, 600, 800, 1000];
     const v = scaleGapUniformity(wholeTone);
     expect(v).toBeCloseTo(1, 3);
   });
@@ -41849,7 +41849,7 @@ describe('GGGG2 scaleStepRecurrence', () => {
     expect(scaleStepRecurrence([600])).toBe(0);
   });
   it('returns 1 for equal-step scale', () => {
-    const wholeTone = [200, 400, 600, 800, 1000];
+    const wholeTone = [0, 200, 400, 600, 800, 1000];
     const v = scaleStepRecurrence(wholeTone);
     expect(v).toBe(1); // all steps = 200, all recur
   });
@@ -43179,7 +43179,7 @@ describe('LLLL1 scaleCommonToneCount', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
   it('returns 1 for chromatic scale (all transpositions match)', () => {
-    const chromatic = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    const chromatic = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
     const v = scaleCommonToneCount(chromatic);
     expect(v).toBe(1);
   });
@@ -43233,7 +43233,7 @@ describe('LLLL4 scaleModulationDistanceV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
   it('returns 0 for chromatic (all notes match under any transposition)', () => {
-    const chromatic = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
+    const chromatic = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100];
     const v = scaleModulationDistanceV2(chromatic);
     expect(v).toBe(0);
   });
@@ -43978,7 +43978,7 @@ describe('PPPP3 scaleRotationSymmetry', () => {
     expect(scaleRotationSymmetry([600])).toBe(1);
   });
   it('returns close to 1 for equal interval scale', () => {
-    const v = scaleRotationSymmetry([300, 600, 900]);
+    const v = scaleRotationSymmetry([0, 300, 600, 900]);
     expect(v).toBeCloseTo(1, 1);
   });
 });
@@ -50631,9 +50631,12 @@ describe('R1313 scaleTranspositionSymmetryV2', () => {
     expect(scaleTranspositionSymmetryV2([])).toBe(0);
   });
   it('returns high value for whole tone scale', () => {
+    // Whole-tone is invariant under shifts of 200/400/600/800/1000c — 5 of the 11
+    // possible non-trivial semitone transpositions, i.e. the maximum any proper
+    // (non-chromatic) scale can achieve, hence 5/11 rather than a value above 0.5.
     const pitches = [0, 200, 400, 600, 800, 1000].map((c) => pitchFromCents(c));
     const v = scaleTranspositionSymmetryV2(pitches);
-    expect(v).toBeGreaterThan(0.5);
+    expect(v).toBeCloseTo(5 / 11, 5);
   });
   it('returns 0 for non-symmetric scale', () => {
     const pitches = [0, 200, 400, 500, 700, 900, 1100].map((c) => pitchFromCents(c));

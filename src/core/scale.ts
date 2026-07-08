@@ -31862,7 +31862,7 @@ export function scaleReflectionSymmetry(
   periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
-  if (n <= 1) return 0;
+  if (n <= 1) return 1;
 
   // Collect candidate axes: midpoints between all pairs of pitches mod periodCents
   const axes = new Set<number>();
@@ -35240,7 +35240,7 @@ export function scaleInversionSymmetry(
   scaleCents: readonly number[],
   periodCents: number = 1200,
 ): number {
-  if (scaleCents.length === 0) return 0;
+  if (scaleCents.length <= 1) return 1;
   const sorted = [...scaleCents].sort((a, b) => a - b);
   let count = 0;
   for (let i = 0; i < sorted.length; i++) {
@@ -62338,6 +62338,7 @@ export function scaleResonanceScore(
   scaleCents: readonly number[],
   periodCents: number = 1200,
 ): number {
+  if (scaleCents.length === 0) return 0;
   const harmonicAlignment = scaleHarmonicSeriesAlignment(scaleCents);
   const subharmonicDensity = scaleSubharmonicDensity(scaleCents, periodCents);
   // Inline tritone tension calculation
@@ -64207,8 +64208,7 @@ export function scaleTranslationSymmetry(
   periodCents = 1200,
 ): number {
   const n = scaleCents.length;
-  if (n === 0) return 0;
-  if (n === 1) return Math.min(1, 1 / n);
+  if (n <= 1) return 1;
   const tol = 5;
   const sorted = [...scaleCents].sort((a, b) => a - b);
 
@@ -66634,10 +66634,9 @@ export function scaleMaxStepFraction(pitches: readonly Pitch[]): number {
 
 export function scaleRegisterBalanceV2(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0.5;
-  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
-  const lo = cents[0]!;
-  const hi = cents[cents.length - 1]!;
-  const mid = (lo + hi) / 2;
+  const period = 1200;
+  const cents = pitches.map((p) => (((pitchToCents(p) % period) + period) % period));
+  const mid = period / 2;
   const lower = cents.filter((c) => c < mid).length;
   const upper = cents.filter((c) => c > mid).length;
   const total = lower + upper;
@@ -66879,11 +66878,9 @@ export function scaleJustTuningDeviation(pitches: readonly Pitch[]): number {
 /** R1211: Fraction of pitches in the upper third of the scale's range. */
 export function scaleHighRegisterRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
-  const lo = cents[0]!;
-  const range = cents[cents.length - 1]! - lo;
-  if (range === 0) return 0;
-  const threshold = lo + (range * 2) / 3;
+  const period = 1200;
+  const cents = pitches.map((p) => (((pitchToCents(p) % period) + period) % period));
+  const threshold = (period * 2) / 3;
   const high = cents.filter((c) => c >= threshold).length;
   return high / cents.length;
 }
@@ -66891,11 +66888,9 @@ export function scaleHighRegisterRatio(pitches: readonly Pitch[]): number {
 /** R1212: Fraction of pitches in the lower third of the scale's range. */
 export function scaleLowRegisterRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
-  const cents = pitches.map((p) => pitchToCents(p)).sort((a, b) => a - b);
-  const lo = cents[0]!;
-  const range = cents[cents.length - 1]! - lo;
-  if (range === 0) return 1;
-  const threshold = lo + range / 3;
+  const period = 1200;
+  const cents = pitches.map((p) => (((pitchToCents(p) % period) + period) % period));
+  const threshold = period / 3;
   const low = cents.filter((c) => c <= threshold).length;
   return low / cents.length;
 }
@@ -67347,26 +67342,20 @@ export function scalePeriodicity(pitches: readonly Pitch[]): number {
   const sorted = [
     ...new Set(pitches.map((p) => Math.round(((pitchToCents(p) % 1200) + 1200) % 1200))),
   ].sort((a, b) => a - b);
-  const n = sorted.length;
-  // Check if scale has a period smaller than the octave (e.g., divides at 600c for tritone period)
+  // Check if scale has a period smaller than the octave (e.g., divides at 600c for tritone period):
+  // every note, shifted forward by the candidate period, must land on another note in the scale.
   const divisors = [2, 3, 4, 6];
   for (const d of divisors) {
     const period = 1200 / d;
-    let allMatch = true;
-    for (const c of sorted) {
-      const inFirstPeriod = c % period;
-      const matchFound = sorted.some((c2) => Math.abs((c2 % period) - inFirstPeriod) < 25);
-      if (!matchFound) {
-        allMatch = false;
-        break;
-      }
-    }
-    if (allMatch && n > 0) {
-      // Check that the period actually repeats (not just trivially fits)
-      const firstPeriodNotes = sorted.filter((c) => c < period);
-      if (firstPeriodNotes.length > 0 && firstPeriodNotes.length < n) {
-        return Math.min(1, Math.max(0, 1 - 1 / d));
-      }
+    const allMatch = sorted.every((c) => {
+      const shifted = (c + period) % 1200;
+      return sorted.some((c2) => {
+        const diff = Math.abs(c2 - shifted);
+        return Math.min(diff, 1200 - diff) < 25;
+      });
+    });
+    if (allMatch) {
+      return Math.min(1, Math.max(0, 1 - 1 / d));
     }
   }
   return 0;
@@ -68150,8 +68139,8 @@ export function scaleDominantPresence(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
   const pcs = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   const hasNote = (t: number) => pcs.some((c) => Math.abs(c - t) < 60);
-  let score = 0;
-  if (hasNote(700)) score += 0.4; // G (V root)
+  if (!hasNote(700)) return 0; // no dominant function without the V root (G)
+  let score = 0.4; // G (V root)
   if (hasNote(1100)) score += 0.3; // B (V third / leading tone)
   if (hasNote(200)) score += 0.2; // D (V fifth)
   if (hasNote(500)) score += 0.1; // F (V seventh)
@@ -68716,12 +68705,23 @@ export function scaleMinorThirdContent(pitches: readonly Pitch[]): number {
   return Math.min(1, Math.max(0, count / (centsArr.length - 1)));
 }
 
+// Circular mean of pitch classes on the 1200-cent octave circle. Falls back to the
+// opposite pole from the tonic (600c) when the distribution is perfectly symmetric
+// and has no well-defined directional lean (e.g. an evenly-spaced closed cycle).
+function scaleCircularMeanCents(pitches: readonly Pitch[]): number {
+  const centsArr = pitches.map((p) => (((pitchToCents(p) % 1200) + 1200) % 1200));
+  const angles = centsArr.map((c) => (c / 1200) * 2 * Math.PI);
+  const sinSum = angles.reduce((s, a) => s + Math.sin(a), 0);
+  const cosSum = angles.reduce((s, a) => s + Math.cos(a), 0);
+  if (Math.hypot(sinSum, cosSum) < 1e-9) return 600;
+  const meanAngle = Math.atan2(sinSum, cosSum);
+  return ((meanAngle / (2 * Math.PI)) * 1200 + 1200) % 1200;
+}
+
 // R1461
 export function scaleGravitationalCenter(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0.5;
-  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
-  const mean = centsArr.reduce((sum, c) => sum + c, 0) / centsArr.length;
-  return mean / 1200;
+  return scaleCircularMeanCents(pitches) / 1200;
 }
 
 // R1462
@@ -68737,8 +68737,7 @@ export function scalePitchVariance(pitches: readonly Pitch[]): number {
 // R1463
 export function scaleBalancePoint(pitches: readonly Pitch[]): number {
   if (pitches.length === 0) return 0;
-  const centsArr = pitches.map((p) => pitchToCents(p) % 1200);
-  const mean = centsArr.reduce((sum, c) => sum + c, 0) / centsArr.length;
+  const mean = scaleCircularMeanCents(pitches);
   return 1 - Math.abs(mean - 600) / 600;
 }
 
@@ -68800,7 +68799,7 @@ export function scaleIntervalDensityPeak(pitches: readonly Pitch[]): number {
   }
   const binCounts = new Array<number>(6).fill(0);
   for (const interval of intervals) {
-    const bin = Math.min(5, Math.floor(interval / 200));
+    const bin = Math.min(5, Math.max(0, Math.ceil(interval / 200) - 1));
     binCounts[bin]!++;
   }
   let peakBin = 0;
@@ -69733,8 +69732,7 @@ export function scaleFifthQualityScore(pitches: readonly Pitch[]): number {
       const d = Math.abs(
         (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
       );
-      const interval = Math.min(d, 1200 - d);
-      if (Math.abs(interval - target) <= tol) count++;
+      if (Math.abs(d - target) <= tol || Math.abs(1200 - d - target) <= tol) count++;
     }
   }
   const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
@@ -69775,8 +69773,10 @@ export function scaleSixthQualityScore(pitches: readonly Pitch[]): number {
       const d = Math.abs(
         (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
       );
-      const interval = Math.min(d, 1200 - d);
-      if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
+      if (
+        tols.some(({ target, tol }) => Math.abs(d - target) <= tol || Math.abs(1200 - d - target) <= tol)
+      )
+        count++;
     }
   }
   const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
@@ -69796,8 +69796,10 @@ export function scaleSeventhQualityScore(pitches: readonly Pitch[]): number {
       const d = Math.abs(
         (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
       );
-      const interval = Math.min(d, 1200 - d);
-      if (tols.some(({ target, tol }) => Math.abs(interval - target) <= tol)) count++;
+      if (
+        tols.some(({ target, tol }) => Math.abs(d - target) <= tol || Math.abs(1200 - d - target) <= tol)
+      )
+        count++;
     }
   }
   const maxPairs = (pitches.length * (pitches.length - 1)) / 2;
