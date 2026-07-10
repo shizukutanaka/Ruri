@@ -1,7 +1,11 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    // Excludes stray git worktrees left under .claude/worktrees/ (created by
+    // agent sessions in this environment) whose own test files would
+    // otherwise be picked up alongside the real src/ tree.
+    exclude: [...configDefaults.exclude, '**/.claude/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary'],
