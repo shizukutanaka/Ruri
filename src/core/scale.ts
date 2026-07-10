@@ -15416,7 +15416,10 @@ export function tuningFamilySocraticRadarWeighted(
     benchmark: number;
     convergence: number;
   },
-  opts?: { rootHz?: number | undefined; invert?: readonly ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[] },
+  opts?: {
+    rootHz?: number | undefined;
+    invert?: readonly ('diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence')[];
+  },
 ): number {
   type AxisKey = 'diversity' | 'versatility' | 'maturity' | 'benchmark' | 'convergence';
   const axes: AxisKey[] = ['diversity', 'versatility', 'maturity', 'benchmark', 'convergence'];
@@ -47733,7 +47736,12 @@ export function tuningFamilySocraticRadarOceanicCurrentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q2474 — tuningFamilySocraticRadarTidalAmplitudeProxy
@@ -49810,7 +49818,12 @@ export function tuningFamilySocraticRadarMaterialStrengthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.05, maturity: 0.4, benchmark: 0.4, convergence: 0.05 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.05, maturity: 0.4, benchmark: 0.4, convergence: 0.05 },
+    { rootHz },
+  );
 }
 
 // Q2672 — tuningFamilySocraticRadarPorosityProxy
@@ -49819,7 +49832,12 @@ export function tuningFamilySocraticRadarPorosityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.0, maturity: 0.5, benchmark: 0.0, convergence: 0.2 }, { rootHz, invert: ['maturity', 'convergence'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.0, maturity: 0.5, benchmark: 0.0, convergence: 0.2 },
+    { rootHz, invert: ['maturity', 'convergence'] },
+  );
 }
 
 // Q2674 — tuningFamilySocraticRadarThermalConductivityProxy
@@ -49828,7 +49846,12 @@ export function tuningFamilySocraticRadarThermalConductivityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.4, maturity: 0.0, benchmark: 0.2, convergence: 0.4 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.4, maturity: 0.0, benchmark: 0.2, convergence: 0.4 },
+    { rootHz },
+  );
 }
 
 // Q2676 — tuningFamilySocraticRadarPlasticDeformationProxy
@@ -49837,7 +49860,12 @@ export function tuningFamilySocraticRadarPlasticDeformationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.5, maturity: 0.0, benchmark: 0.0, convergence: 0.3 }, { rootHz, invert: ['convergence'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.5, maturity: 0.0, benchmark: 0.0, convergence: 0.3 },
+    { rootHz, invert: ['convergence'] },
+  );
 }
 
 // Q2678 — tuningFamilySocraticRadarFractureResistanceProxy
@@ -49846,7 +49874,12 @@ export function tuningFamilySocraticRadarFractureResistanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.35, maturity: 0.35, benchmark: 0.2, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.35, maturity: 0.35, benchmark: 0.2, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q2680 — tuningFamilySocraticRadarCorrosionProxy
@@ -49855,7 +49888,12 @@ export function tuningFamilySocraticRadarCorrosionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.0, maturity: 0.4, benchmark: 0.4, convergence: 0.0 }, { rootHz, invert: ['benchmark', 'maturity'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.0, maturity: 0.4, benchmark: 0.4, convergence: 0.0 },
+    { rootHz, invert: ['benchmark', 'maturity'] },
+  );
 }
 
 // Q2682 — tuningFamilySocraticRadarTectonicActivityProxy
@@ -49864,7 +49902,12 @@ export function tuningFamilySocraticRadarTectonicActivityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.4, versatility: 0.4, maturity: 0.2, benchmark: 0.0, convergence: 0.0 }, { rootHz, invert: ['maturity'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.4, versatility: 0.4, maturity: 0.2, benchmark: 0.0, convergence: 0.0 },
+    { rootHz, invert: ['maturity'] },
+  );
 }
 
 // Q2684 — tuningFamilySocraticRadarSeismicIntensityProxy
@@ -49873,7 +49916,12 @@ export function tuningFamilySocraticRadarSeismicIntensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.0, maturity: 0.0, benchmark: 0.5, convergence: 0.3 }, { rootHz, invert: ['convergence'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.0, maturity: 0.0, benchmark: 0.5, convergence: 0.3 },
+    { rootHz, invert: ['convergence'] },
+  );
 }
 
 // Q2686 — tuningFamilySocraticRadarVolcanicIndexProxy
@@ -49882,7 +49930,12 @@ export function tuningFamilySocraticRadarVolcanicIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.4, versatility: 0.3, maturity: 0.3, benchmark: 0.0, convergence: 0.0 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.4, versatility: 0.3, maturity: 0.3, benchmark: 0.0, convergence: 0.0 },
+    { rootHz },
+  );
 }
 
 // Q2688 — tuningFamilySocraticRadarErosionRateProxy
@@ -49891,7 +49944,12 @@ export function tuningFamilySocraticRadarErosionRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.2, maturity: 0.45, benchmark: 0.35, convergence: 0.0 }, { rootHz, invert: ['maturity', 'benchmark'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.2, maturity: 0.45, benchmark: 0.35, convergence: 0.0 },
+    { rootHz, invert: ['maturity', 'benchmark'] },
+  );
 }
 
 // Q2690 — tuningFamilySocraticRadarStrataFormationProxy
@@ -49900,7 +49958,12 @@ export function tuningFamilySocraticRadarStrataFormationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.0, maturity: 0.4, benchmark: 0.2, convergence: 0.4 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.0, maturity: 0.4, benchmark: 0.2, convergence: 0.4 },
+    { rootHz },
+  );
 }
 
 // Q2692 — tuningFamilySocraticRadarMagmaViscosityProxy
@@ -49909,7 +49972,12 @@ export function tuningFamilySocraticRadarMagmaViscosityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.3, maturity: 0.35, benchmark: 0.0, convergence: 0.35 }, { rootHz, invert: ['versatility'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.3, maturity: 0.35, benchmark: 0.0, convergence: 0.35 },
+    { rootHz, invert: ['versatility'] },
+  );
 }
 
 // Q2694 — tuningFamilySocraticRadarTransistorGainProxy
@@ -49918,7 +49986,12 @@ export function tuningFamilySocraticRadarTransistorGainProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.3, maturity: 0.0, benchmark: 0.5, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.3, maturity: 0.0, benchmark: 0.5, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2696 — tuningFamilySocraticRadarCapacitorChargingProxy
@@ -49927,7 +50000,12 @@ export function tuningFamilySocraticRadarCapacitorChargingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.0, maturity: 0.35, benchmark: 0.2, convergence: 0.45 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.0, maturity: 0.35, benchmark: 0.2, convergence: 0.45 },
+    { rootHz },
+  );
 }
 
 // Q2698 — tuningFamilySocraticRadarInductorResonanceProxy
@@ -49936,7 +50014,12 @@ export function tuningFamilySocraticRadarInductorResonanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.4, versatility: 0.3, maturity: 0.0, benchmark: 0.3, convergence: 0.0 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.4, versatility: 0.3, maturity: 0.0, benchmark: 0.3, convergence: 0.0 },
+    { rootHz },
+  );
 }
 
 // Q2700 — tuningFamilySocraticRadarSemiconductorBandGapProxy
@@ -49966,7 +50049,12 @@ export function tuningFamilySocraticRadarDiodeForwardVoltageProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.0, maturity: 0.2, benchmark: 0.5, convergence: 0.0 }, { rootHz, invert: ['diversity'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.0, maturity: 0.2, benchmark: 0.5, convergence: 0.0 },
+    { rootHz, invert: ['diversity'] },
+  );
 }
 
 // Q2704 — tuningFamilySocraticRadarResistorNoiseProxy
@@ -49975,7 +50063,12 @@ export function tuningFamilySocraticRadarResistorNoiseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.4, versatility: 0.0, maturity: 0.2, benchmark: 0.0, convergence: 0.4 }, { rootHz, invert: ['convergence', 'maturity'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.4, versatility: 0.0, maturity: 0.2, benchmark: 0.0, convergence: 0.4 },
+    { rootHz, invert: ['convergence', 'maturity'] },
+  );
 }
 
 // Q2706 — tuningFamilySocraticRadarAerodynamicLiftProxy
@@ -49984,7 +50077,12 @@ export function tuningFamilySocraticRadarAerodynamicLiftProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.0, versatility: 0.4, maturity: 0.0, benchmark: 0.4, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.0, versatility: 0.4, maturity: 0.0, benchmark: 0.4, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2708 — tuningFamilySocraticRadarDragCoefficientProxy
@@ -49993,7 +50091,12 @@ export function tuningFamilySocraticRadarDragCoefficientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.4, versatility: 0.2, maturity: 0.0, benchmark: 0.0, convergence: 0.4 }, { rootHz, invert: ['convergence', 'versatility'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.4, versatility: 0.2, maturity: 0.0, benchmark: 0.0, convergence: 0.4 },
+    { rootHz, invert: ['convergence', 'versatility'] },
+  );
 }
 
 // Q2710 — tuningFamilySocraticRadarBoundaryLayerProxy
@@ -50066,7 +50169,12 @@ export function tuningFamilySocraticRadarTurbulentVortexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.4, versatility: 0.0, maturity: 0.3, benchmark: 0.0, convergence: 0.3 }, { rootHz, invert: ['convergence', 'maturity'] });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.4, versatility: 0.0, maturity: 0.3, benchmark: 0.0, convergence: 0.3 },
+    { rootHz, invert: ['convergence', 'maturity'] },
+  );
 }
 
 // Q2718 — tuningFamilySocraticRadarOceanDepthProxy
@@ -50195,7 +50303,12 @@ export function tuningFamilySocraticRadarNuclearFissionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2732 — tuningFamilySocraticRadarNeutronFluxProxy
@@ -50204,7 +50317,12 @@ export function tuningFamilySocraticRadarNeutronFluxProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2734 — tuningFamilySocraticRadarRadioactiveDecayProxy
@@ -50213,7 +50331,12 @@ export function tuningFamilySocraticRadarRadioactiveDecayProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.15, maturity: 0.4, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.15, maturity: 0.4, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2736 — tuningFamilySocraticRadarIsotopeStabilityProxy
@@ -50222,7 +50345,12 @@ export function tuningFamilySocraticRadarIsotopeStabilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.1, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.1, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q2738 — tuningFamilySocraticRadarBindingEnergyProxy
@@ -50231,7 +50359,12 @@ export function tuningFamilySocraticRadarBindingEnergyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2740 — tuningFamilySocraticRadarNuclearFusionProxy
@@ -50240,7 +50373,12 @@ export function tuningFamilySocraticRadarNuclearFusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q2742 — tuningFamilySocraticRadarMechanicalTorqueProxy
@@ -50249,7 +50387,12 @@ export function tuningFamilySocraticRadarMechanicalTorqueProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2744 — tuningFamilySocraticRadarFatigueLifeProxy
@@ -50258,7 +50401,12 @@ export function tuningFamilySocraticRadarFatigueLifeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.2, maturity: 0.3, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.2, maturity: 0.3, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2746 — tuningFamilySocraticRadarResonanceFrequencyProxy
@@ -50267,7 +50415,12 @@ export function tuningFamilySocraticRadarResonanceFrequencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2748 — tuningFamilySocraticRadarStressConcentrationProxy
@@ -50276,7 +50429,12 @@ export function tuningFamilySocraticRadarStressConcentrationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.1, maturity: 0.15, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.1, maturity: 0.15, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2750 — tuningFamilySocraticRadarVibrationAmplitudeProxy
@@ -50285,7 +50443,12 @@ export function tuningFamilySocraticRadarVibrationAmplitudeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2752 — tuningFamilySocraticRadarCreepRateProxy
@@ -50294,7 +50457,12 @@ export function tuningFamilySocraticRadarCreepRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.15, maturity: 0.35, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.15, maturity: 0.35, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2754 — tuningFamilySocraticRadarLatticeParameterProxy
@@ -50303,7 +50471,12 @@ export function tuningFamilySocraticRadarLatticeParameterProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2756 — tuningFamilySocraticRadarCrystalSymmetryProxy
@@ -50312,7 +50485,12 @@ export function tuningFamilySocraticRadarCrystalSymmetryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q2758 — tuningFamilySocraticRadarCoordinationNumberProxy
@@ -50321,7 +50499,12 @@ export function tuningFamilySocraticRadarCoordinationNumberProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2760 — tuningFamilySocraticRadarCrystalGrainSizeProxy
@@ -50330,7 +50513,12 @@ export function tuningFamilySocraticRadarCrystalGrainSizeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2762 — tuningFamilySocraticRadarMillerIndexProxy
@@ -50339,7 +50527,12 @@ export function tuningFamilySocraticRadarMillerIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2764 — tuningFamilySocraticRadarBraggAngleProxy
@@ -50348,7 +50541,12 @@ export function tuningFamilySocraticRadarBraggAngleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2766 — tuningFamilySocraticRadarViscosityIndexProxy
@@ -50357,7 +50555,12 @@ export function tuningFamilySocraticRadarViscosityIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2768 — tuningFamilySocraticRadarPressureDropProxy
@@ -50366,7 +50569,12 @@ export function tuningFamilySocraticRadarPressureDropProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2770 — tuningFamilySocraticRadarVelocityGradientProxy
@@ -50375,7 +50583,12 @@ export function tuningFamilySocraticRadarVelocityGradientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2772 — tuningFamilySocraticRadarFlowRateCoefficientProxy
@@ -50384,7 +50597,12 @@ export function tuningFamilySocraticRadarFlowRateCoefficientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2774 — tuningFamilySocraticRadarShearStressIndexProxy
@@ -50393,7 +50611,12 @@ export function tuningFamilySocraticRadarShearStressIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2776 — tuningFamilySocraticRadarBuoyancyForceProxy
@@ -50402,7 +50625,12 @@ export function tuningFamilySocraticRadarBuoyancyForceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2778 — tuningFamilySocraticRadarChemicalReactionRateProxy
@@ -50411,7 +50639,12 @@ export function tuningFamilySocraticRadarChemicalReactionRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2780 — tuningFamilySocraticRadarOxidationReductionPotentialProxy
@@ -50420,7 +50653,12 @@ export function tuningFamilySocraticRadarOxidationReductionPotentialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2782 — tuningFamilySocraticRadarEquilibriumConstantProxy
@@ -50429,7 +50667,12 @@ export function tuningFamilySocraticRadarEquilibriumConstantProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2784 — tuningFamilySocraticRadarCatalystActivityProxy
@@ -50438,7 +50681,12 @@ export function tuningFamilySocraticRadarCatalystActivityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2786 — tuningFamilySocraticRadarSolutionConcentrationProxy
@@ -50447,7 +50695,12 @@ export function tuningFamilySocraticRadarSolutionConcentrationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2788 — tuningFamilySocraticRadarReactionYieldProxy
@@ -50456,7 +50709,12 @@ export function tuningFamilySocraticRadarReactionYieldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2790 — tuningFamilySocraticRadarPolymerChainLengthProxy
@@ -50465,7 +50723,12 @@ export function tuningFamilySocraticRadarPolymerChainLengthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2792 — tuningFamilySocraticRadarCrossLinkDensityProxy
@@ -50474,7 +50737,12 @@ export function tuningFamilySocraticRadarCrossLinkDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2794 — tuningFamilySocraticRadarGlassTransitionTempProxy
@@ -50483,7 +50751,12 @@ export function tuningFamilySocraticRadarGlassTransitionTempProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2796 — tuningFamilySocraticRadarMolecularWeightProxy
@@ -50492,7 +50765,12 @@ export function tuningFamilySocraticRadarMolecularWeightProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2798 — tuningFamilySocraticRadarPolymerCrystallinityProxy
@@ -50501,7 +50779,12 @@ export function tuningFamilySocraticRadarPolymerCrystallinityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2800 — tuningFamilySocraticRadarViscoelasticModulusProxy
@@ -50510,7 +50793,12 @@ export function tuningFamilySocraticRadarViscoelasticModulusProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2802 — tuningFamilySocraticRadarMorphogenGradientProxy
@@ -50519,7 +50807,12 @@ export function tuningFamilySocraticRadarMorphogenGradientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2804 — tuningFamilySocraticRadarCellDifferentiationRateProxy
@@ -50528,7 +50821,12 @@ export function tuningFamilySocraticRadarCellDifferentiationRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2806 — tuningFamilySocraticRadarTissueInductionIndexProxy
@@ -50537,7 +50835,12 @@ export function tuningFamilySocraticRadarTissueInductionIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2808 — tuningFamilySocraticRadarDevelopmentalStageScoreProxy
@@ -50546,7 +50849,12 @@ export function tuningFamilySocraticRadarDevelopmentalStageScoreProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2810 — tuningFamilySocraticRadarEmbryonicGrowthProxy
@@ -50555,7 +50863,12 @@ export function tuningFamilySocraticRadarEmbryonicGrowthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2812 — tuningFamilySocraticRadarOrganogenesisRateProxy
@@ -50564,7 +50877,12 @@ export function tuningFamilySocraticRadarOrganogenesisRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2814 — tuningFamilySocraticRadarManipulatorJacobianProxy
@@ -50573,7 +50891,12 @@ export function tuningFamilySocraticRadarManipulatorJacobianProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2816 — tuningFamilySocraticRadarJointTorqueBalanceProxy
@@ -50582,7 +50905,12 @@ export function tuningFamilySocraticRadarJointTorqueBalanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2818 — tuningFamilySocraticRadarMotionPlanningScoreProxy
@@ -50591,7 +50919,12 @@ export function tuningFamilySocraticRadarMotionPlanningScoreProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2820 — tuningFamilySocraticRadarActuatorResponseProxy
@@ -50600,7 +50933,12 @@ export function tuningFamilySocraticRadarActuatorResponseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2822 — tuningFamilySocraticRadarSensorFusionProxy
@@ -50609,7 +50947,12 @@ export function tuningFamilySocraticRadarSensorFusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2824 — tuningFamilySocraticRadarKinematicChainProxy
@@ -50618,7 +50961,12 @@ export function tuningFamilySocraticRadarKinematicChainProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2826 — tuningFamilySocraticRadarAntibodyAffinityProxy
@@ -50627,7 +50975,12 @@ export function tuningFamilySocraticRadarAntibodyAffinityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2828 — tuningFamilySocraticRadarTcellActivationProxy
@@ -50636,7 +50989,12 @@ export function tuningFamilySocraticRadarTcellActivationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2830 — tuningFamilySocraticRadarCytokineSignalProxy
@@ -50645,7 +51003,12 @@ export function tuningFamilySocraticRadarCytokineSignalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2832 — tuningFamilySocraticRadarPhagocytosisRateProxy
@@ -50654,7 +51017,12 @@ export function tuningFamilySocraticRadarPhagocytosisRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2834 — tuningFamilySocraticRadarInflammatoryIndexProxy
@@ -50663,7 +51031,12 @@ export function tuningFamilySocraticRadarInflammatoryIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2836 — tuningFamilySocraticRadarComplementCascadeProxy
@@ -50672,7 +51045,12 @@ export function tuningFamilySocraticRadarComplementCascadeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2838 — tuningFamilySocraticRadarLiftDragRatioProxy
@@ -50681,7 +51059,12 @@ export function tuningFamilySocraticRadarLiftDragRatioProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2840 — tuningFamilySocraticRadarThrustVectorAngleProxy
@@ -50690,7 +51073,12 @@ export function tuningFamilySocraticRadarThrustVectorAngleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2842 — tuningFamilySocraticRadarOrbitalInclinationProxy
@@ -50699,7 +51087,12 @@ export function tuningFamilySocraticRadarOrbitalInclinationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2844 — tuningFamilySocraticRadarReentryHeatFluxProxy
@@ -50708,7 +51101,12 @@ export function tuningFamilySocraticRadarReentryHeatFluxProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2846 — tuningFamilySocraticRadarPropellantMassRatioProxy
@@ -50717,7 +51115,12 @@ export function tuningFamilySocraticRadarPropellantMassRatioProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2848 — tuningFamilySocraticRadarNozzleExhaustVelocityProxy
@@ -50726,7 +51129,12 @@ export function tuningFamilySocraticRadarNozzleExhaustVelocityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2850 — tuningFamilySocraticRadarBeamDivergenceProxy
@@ -50735,7 +51143,12 @@ export function tuningFamilySocraticRadarBeamDivergenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2852 — tuningFamilySocraticRadarCoherenceLengthProxy
@@ -50744,7 +51157,12 @@ export function tuningFamilySocraticRadarCoherenceLengthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2854 — tuningFamilySocraticRadarPolarizationDegreeProxy
@@ -50753,7 +51171,12 @@ export function tuningFamilySocraticRadarPolarizationDegreeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2856 — tuningFamilySocraticRadarQuantumEfficiencyProxy
@@ -50762,7 +51185,12 @@ export function tuningFamilySocraticRadarQuantumEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2858 — tuningFamilySocraticRadarNumericalApertureProxy
@@ -50771,7 +51199,12 @@ export function tuningFamilySocraticRadarNumericalApertureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2860 — tuningFamilySocraticRadarSpectralResolutionProxy
@@ -50780,7 +51213,12 @@ export function tuningFamilySocraticRadarSpectralResolutionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2862 — tuningFamilySocraticRadarAtmosphericPressureGradientProxy
@@ -50789,7 +51227,12 @@ export function tuningFamilySocraticRadarAtmosphericPressureGradientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2864 — tuningFamilySocraticRadarCloudFormationProxy
@@ -50798,7 +51241,12 @@ export function tuningFamilySocraticRadarCloudFormationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2866 — tuningFamilySocraticRadarPrecipitationRateProxy
@@ -50807,7 +51255,12 @@ export function tuningFamilySocraticRadarPrecipitationRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2868 — tuningFamilySocraticRadarThunderstormIndexProxy
@@ -50816,7 +51269,12 @@ export function tuningFamilySocraticRadarThunderstormIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2870 — tuningFamilySocraticRadarHumidityGradientProxy
@@ -50825,7 +51283,12 @@ export function tuningFamilySocraticRadarHumidityGradientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2872 — tuningFamilySocraticRadarWeatherFrontScoreProxy
@@ -50834,7 +51297,12 @@ export function tuningFamilySocraticRadarWeatherFrontScoreProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2874 — tuningFamilySocraticRadarImpedanceMatchingProxy
@@ -50843,7 +51311,12 @@ export function tuningFamilySocraticRadarImpedanceMatchingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2876 — tuningFamilySocraticRadarSignalAmplificationProxy
@@ -50852,7 +51325,12 @@ export function tuningFamilySocraticRadarSignalAmplificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2878 — tuningFamilySocraticRadarPhaseNoiseProxy
@@ -50861,7 +51339,12 @@ export function tuningFamilySocraticRadarPhaseNoiseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2880 — tuningFamilySocraticRadarHarmonicDistortionProxy
@@ -50870,7 +51353,12 @@ export function tuningFamilySocraticRadarHarmonicDistortionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2882 — tuningFamilySocraticRadarPowerFactorProxy
@@ -50879,7 +51367,12 @@ export function tuningFamilySocraticRadarPowerFactorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2884 — tuningFamilySocraticRadarBandwidthEfficiencyProxy
@@ -50888,7 +51381,12 @@ export function tuningFamilySocraticRadarBandwidthEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2886 — tuningFamilySocraticRadarIsotopeRatioProxy
@@ -50897,7 +51395,12 @@ export function tuningFamilySocraticRadarIsotopeRatioProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2888 — tuningFamilySocraticRadarElementalAbundanceProxy
@@ -50906,7 +51409,12 @@ export function tuningFamilySocraticRadarElementalAbundanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2890 — tuningFamilySocraticRadarMineralSolubilityProxy
@@ -50915,7 +51423,12 @@ export function tuningFamilySocraticRadarMineralSolubilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2892 — tuningFamilySocraticRadarRedoxPotentialProxy
@@ -50924,7 +51437,12 @@ export function tuningFamilySocraticRadarRedoxPotentialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2894 — tuningFamilySocraticRadarGeochemicalFluxProxy
@@ -50933,7 +51451,12 @@ export function tuningFamilySocraticRadarGeochemicalFluxProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2896 — tuningFamilySocraticRadarSedimentDepositionProxy
@@ -50942,7 +51465,12 @@ export function tuningFamilySocraticRadarSedimentDepositionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2898 — tuningFamilySocraticRadarRoomAcousticsProxy
@@ -50951,7 +51479,12 @@ export function tuningFamilySocraticRadarRoomAcousticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2900 — tuningFamilySocraticRadarAbsorptionCoefficientProxy
@@ -50960,7 +51493,12 @@ export function tuningFamilySocraticRadarAbsorptionCoefficientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2902 — tuningFamilySocraticRadarReflectionCoefficientProxy
@@ -50969,7 +51507,12 @@ export function tuningFamilySocraticRadarReflectionCoefficientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2904 — tuningFamilySocraticRadarSoundInsulationIndexProxy
@@ -50978,7 +51521,12 @@ export function tuningFamilySocraticRadarSoundInsulationIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2906 — tuningFamilySocraticRadarDiffusionFactorProxy
@@ -50987,7 +51535,12 @@ export function tuningFamilySocraticRadarDiffusionFactorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2908 — tuningFamilySocraticRadarNoiseCriterionProxy
@@ -50996,7 +51549,12 @@ export function tuningFamilySocraticRadarNoiseCriterionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2910 — tuningFamilySocraticRadarWaterActivityProxy
@@ -51005,7 +51563,12 @@ export function tuningFamilySocraticRadarWaterActivityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2912 — tuningFamilySocraticRadarEmulsificationStabilityProxy
@@ -51014,7 +51577,12 @@ export function tuningFamilySocraticRadarEmulsificationStabilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2914 — tuningFamilySocraticRadarGelationTemperatureProxy
@@ -51023,7 +51591,12 @@ export function tuningFamilySocraticRadarGelationTemperatureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2916 — tuningFamilySocraticRadarFermentationRateProxy
@@ -51032,7 +51605,12 @@ export function tuningFamilySocraticRadarFermentationRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2918 — tuningFamilySocraticRadarOsmoticPressureIndexProxy
@@ -51041,7 +51619,12 @@ export function tuningFamilySocraticRadarOsmoticPressureIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2920 — tuningFamilySocraticRadarMaillardReactionScoreProxy
@@ -51050,7 +51633,12 @@ export function tuningFamilySocraticRadarMaillardReactionScoreProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2922 — tuningFamilySocraticRadarCoralBleachingProxy
@@ -51059,7 +51647,12 @@ export function tuningFamilySocraticRadarCoralBleachingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2924 — tuningFamilySocraticRadarPlanktonDensityProxy
@@ -51068,7 +51661,12 @@ export function tuningFamilySocraticRadarPlanktonDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2926 — tuningFamilySocraticRadarOceanChemosynthesisProxy
@@ -51077,7 +51675,12 @@ export function tuningFamilySocraticRadarOceanChemosynthesisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2928 — tuningFamilySocraticRadarMarineBioluminescenceProxy
@@ -51086,7 +51689,12 @@ export function tuningFamilySocraticRadarMarineBioluminescenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2930 — tuningFamilySocraticRadarCoralReefDiversityProxy
@@ -51095,7 +51703,12 @@ export function tuningFamilySocraticRadarCoralReefDiversityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2932 — tuningFamilySocraticRadarTidalZonationProxy
@@ -51104,7 +51717,12 @@ export function tuningFamilySocraticRadarTidalZonationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2934 — tuningFamilySocraticRadarAirQualityIndexProxy
@@ -51113,7 +51731,12 @@ export function tuningFamilySocraticRadarAirQualityIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2936 — tuningFamilySocraticRadarWaterPurificationRateProxy
@@ -51122,7 +51745,12 @@ export function tuningFamilySocraticRadarWaterPurificationRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2938 — tuningFamilySocraticRadarSoilRemediationEfficiencyProxy
@@ -51131,7 +51759,12 @@ export function tuningFamilySocraticRadarSoilRemediationEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2940 — tuningFamilySocraticRadarCarbonSequestrationProxy
@@ -51140,7 +51773,12 @@ export function tuningFamilySocraticRadarCarbonSequestrationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2942 — tuningFamilySocraticRadarWasteRecyclingRateProxy
@@ -51149,7 +51787,12 @@ export function tuningFamilySocraticRadarWasteRecyclingRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2944 — tuningFamilySocraticRadarNoisePollutionIndexProxy
@@ -51158,7 +51801,12 @@ export function tuningFamilySocraticRadarNoisePollutionIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2946 — tuningFamilySocraticRadarPlanetaryAlbedoProxy
@@ -51167,7 +51815,12 @@ export function tuningFamilySocraticRadarPlanetaryAlbedoProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2948 — tuningFamilySocraticRadarAtmosphericLapseProxy
@@ -51176,7 +51829,12 @@ export function tuningFamilySocraticRadarAtmosphericLapseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2950 — tuningFamilySocraticRadarMagneticFieldDipoleProxy
@@ -51185,7 +51843,12 @@ export function tuningFamilySocraticRadarMagneticFieldDipoleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2952 — tuningFamilySocraticRadarCraterSaturationProxy
@@ -51194,7 +51857,12 @@ export function tuningFamilySocraticRadarCraterSaturationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2954 — tuningFamilySocraticRadarSubsurfaceOceanProxy
@@ -51203,7 +51871,12 @@ export function tuningFamilySocraticRadarSubsurfaceOceanProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2956 — tuningFamilySocraticRadarRegolithDepthProxy
@@ -51212,7 +51885,12 @@ export function tuningFamilySocraticRadarRegolithDepthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2958 — tuningFamilySocraticRadarActionPotentialProxy
@@ -51221,7 +51899,12 @@ export function tuningFamilySocraticRadarActionPotentialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2960 — tuningFamilySocraticRadarSynapticDelayProxy
@@ -51230,7 +51913,12 @@ export function tuningFamilySocraticRadarSynapticDelayProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2962 — tuningFamilySocraticRadarMyelinationIndexProxy
@@ -51239,7 +51927,12 @@ export function tuningFamilySocraticRadarMyelinationIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2964 — tuningFamilySocraticRadarReceptorSensitivityProxy
@@ -51248,7 +51941,12 @@ export function tuningFamilySocraticRadarReceptorSensitivityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2966 — tuningFamilySocraticRadarDepolarizationRateProxy
@@ -51257,7 +51955,12 @@ export function tuningFamilySocraticRadarDepolarizationRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2968 — tuningFamilySocraticRadarInhibitoryBalanceProxy
@@ -51266,7 +51969,12 @@ export function tuningFamilySocraticRadarInhibitoryBalanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2970 — tuningFamilySocraticRadarGeneExpressionLevelProxy
@@ -51275,7 +51983,12 @@ export function tuningFamilySocraticRadarGeneExpressionLevelProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2972 — tuningFamilySocraticRadarProteinSynthesisRateProxy
@@ -51284,7 +51997,12 @@ export function tuningFamilySocraticRadarProteinSynthesisRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2974 — tuningFamilySocraticRadarDNAMethylationProxy
@@ -51293,7 +52011,12 @@ export function tuningFamilySocraticRadarDNAMethylationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2976 — tuningFamilySocraticRadarChromatinAccessibilityProxy
@@ -51302,7 +52025,12 @@ export function tuningFamilySocraticRadarChromatinAccessibilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2978 — tuningFamilySocraticRadarRNAStabilityProxy
@@ -51311,7 +52039,12 @@ export function tuningFamilySocraticRadarRNAStabilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2980 — tuningFamilySocraticRadarTranslationEfficiencyProxy
@@ -51320,7 +52053,12 @@ export function tuningFamilySocraticRadarTranslationEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2982 — tuningFamilySocraticRadarMolecularOrbitalProxy
@@ -51329,7 +52067,12 @@ export function tuningFamilySocraticRadarMolecularOrbitalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2984 — tuningFamilySocraticRadarElectronDensityProxy
@@ -51338,7 +52081,12 @@ export function tuningFamilySocraticRadarElectronDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2986 — tuningFamilySocraticRadarHOMOLUMOGapProxy
@@ -51347,7 +52095,12 @@ export function tuningFamilySocraticRadarHOMOLUMOGapProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q2988 — tuningFamilySocraticRadarDipoleMomentProxy
@@ -51356,7 +52109,12 @@ export function tuningFamilySocraticRadarDipoleMomentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q2990 — tuningFamilySocraticRadarBondOrderProxy
@@ -51365,7 +52123,12 @@ export function tuningFamilySocraticRadarBondOrderProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2992 — tuningFamilySocraticRadarResonanceStructureProxy
@@ -51374,7 +52137,12 @@ export function tuningFamilySocraticRadarResonanceStructureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2994 — tuningFamilySocraticRadarBeamDeflectionProxy
@@ -51383,7 +52151,12 @@ export function tuningFamilySocraticRadarBeamDeflectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2996 — tuningFamilySocraticRadarFoundationBearingProxy
@@ -51392,7 +52165,12 @@ export function tuningFamilySocraticRadarFoundationBearingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q2998 — tuningFamilySocraticRadarSeismicResponseProxy
@@ -51401,7 +52179,12 @@ export function tuningFamilySocraticRadarSeismicResponseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3000 — tuningFamilySocraticRadarConcreteStrengthProxy
@@ -51410,7 +52193,12 @@ export function tuningFamilySocraticRadarConcreteStrengthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3002 — tuningFamilySocraticRadarSteelYieldProxy
@@ -51419,7 +52207,12 @@ export function tuningFamilySocraticRadarSteelYieldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3004 — tuningFamilySocraticRadarStructuralDampingProxy
@@ -51428,7 +52221,12 @@ export function tuningFamilySocraticRadarStructuralDampingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3006 — tuningFamilySocraticRadarCropYieldProxy
@@ -51437,7 +52235,12 @@ export function tuningFamilySocraticRadarCropYieldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3008 — tuningFamilySocraticRadarSoilFertilityProxy
@@ -51446,7 +52249,12 @@ export function tuningFamilySocraticRadarSoilFertilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3010 — tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy
@@ -51455,7 +52263,12 @@ export function tuningFamilySocraticRadarPhotosynthesisEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3012 — tuningFamilySocraticRadarWaterUseEfficiencyProxy
@@ -51464,7 +52277,12 @@ export function tuningFamilySocraticRadarWaterUseEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3014 — tuningFamilySocraticRadarNitrogenFixationProxy
@@ -51473,7 +52291,12 @@ export function tuningFamilySocraticRadarNitrogenFixationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3016 — tuningFamilySocraticRadarHarvestIndexProxy
@@ -51482,7 +52305,12 @@ export function tuningFamilySocraticRadarHarvestIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3018 — tuningFamilySocraticRadarQuarkConfinementProxy
@@ -51491,7 +52319,12 @@ export function tuningFamilySocraticRadarQuarkConfinementProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3020 — tuningFamilySocraticRadarGluonDensityProxy
@@ -51500,7 +52333,12 @@ export function tuningFamilySocraticRadarGluonDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3022 — tuningFamilySocraticRadarPartonDistributionProxy
@@ -51509,7 +52347,12 @@ export function tuningFamilySocraticRadarPartonDistributionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3024 — tuningFamilySocraticRadarJetFragmentProxy
@@ -51518,7 +52361,12 @@ export function tuningFamilySocraticRadarJetFragmentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3026 — tuningFamilySocraticRadarWBosonMassProxy
@@ -51527,7 +52375,12 @@ export function tuningFamilySocraticRadarWBosonMassProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3028 — tuningFamilySocraticRadarHiggsFieldProxy
@@ -51536,7 +52389,12 @@ export function tuningFamilySocraticRadarHiggsFieldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3030 — tuningFamilySocraticRadarPlasmaConfinementProxy
@@ -51545,7 +52403,12 @@ export function tuningFamilySocraticRadarPlasmaConfinementProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3032 — tuningFamilySocraticRadarFusionCrossSectionProxy
@@ -51554,7 +52417,12 @@ export function tuningFamilySocraticRadarFusionCrossSectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3034 — tuningFamilySocraticRadarToroidalFieldProxy
@@ -51563,7 +52431,12 @@ export function tuningFamilySocraticRadarToroidalFieldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3036 — tuningFamilySocraticRadarNeoclassicalTransportProxy
@@ -51572,7 +52445,12 @@ export function tuningFamilySocraticRadarNeoclassicalTransportProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3038 — tuningFamilySocraticRadarBootstrapCurrentProxy
@@ -51581,7 +52459,12 @@ export function tuningFamilySocraticRadarBootstrapCurrentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3040 — tuningFamilySocraticRadarBetaLimitProxy
@@ -51590,7 +52473,12 @@ export function tuningFamilySocraticRadarBetaLimitProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3042 — tuningFamilySocraticRadarMembraneFlexibilityProxy
@@ -51599,7 +52487,12 @@ export function tuningFamilySocraticRadarMembraneFlexibilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3044 — tuningFamilySocraticRadarDNAMechanicsProxy
@@ -51608,7 +52501,12 @@ export function tuningFamilySocraticRadarDNAMechanicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3046 — tuningFamilySocraticRadarCytoplasmViscosityProxy
@@ -51617,7 +52515,12 @@ export function tuningFamilySocraticRadarCytoplasmViscosityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3048 — tuningFamilySocraticRadarMolecularMotorProxy
@@ -51626,7 +52529,12 @@ export function tuningFamilySocraticRadarMolecularMotorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3050 — tuningFamilySocraticRadarCellMembranePotentialProxy
@@ -51635,7 +52543,12 @@ export function tuningFamilySocraticRadarCellMembranePotentialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3052 — tuningFamilySocraticRadarProteinElasticityProxy
@@ -51644,7 +52557,12 @@ export function tuningFamilySocraticRadarProteinElasticityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3054 — tuningFamilySocraticRadarSequenceAlignmentProxy
@@ -51653,7 +52571,12 @@ export function tuningFamilySocraticRadarSequenceAlignmentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3056 — tuningFamilySocraticRadarMotifEnrichmentProxy
@@ -51662,7 +52585,12 @@ export function tuningFamilySocraticRadarMotifEnrichmentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3058 — tuningFamilySocraticRadarGenomicVariantProxy
@@ -51671,7 +52599,12 @@ export function tuningFamilySocraticRadarGenomicVariantProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3060 — tuningFamilySocraticRadarTranscriptomeProfileProxy
@@ -51680,7 +52613,12 @@ export function tuningFamilySocraticRadarTranscriptomeProfileProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3062 — tuningFamilySocraticRadarProteinDockingProxy
@@ -51689,7 +52627,12 @@ export function tuningFamilySocraticRadarProteinDockingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3064 — tuningFamilySocraticRadarPhylogeneticDistanceProxy
@@ -51698,7 +52641,12 @@ export function tuningFamilySocraticRadarPhylogeneticDistanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3066 — tuningFamilySocraticRadarDrugBioavailabilityProxy
@@ -51707,7 +52655,12 @@ export function tuningFamilySocraticRadarDrugBioavailabilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3068 — tuningFamilySocraticRadarReceptorOccupancyProxy
@@ -51716,7 +52669,12 @@ export function tuningFamilySocraticRadarReceptorOccupancyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3070 — tuningFamilySocraticRadarPharmacokineticsProxy
@@ -51725,7 +52683,12 @@ export function tuningFamilySocraticRadarPharmacokineticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3072 — tuningFamilySocraticRadarDrugBindingProxy
@@ -51734,7 +52697,12 @@ export function tuningFamilySocraticRadarDrugBindingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3074 — tuningFamilySocraticRadarPlasmaHalfLifeProxy
@@ -51743,7 +52711,12 @@ export function tuningFamilySocraticRadarPlasmaHalfLifeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3076 — tuningFamilySocraticRadarDrugMetabolismProxy
@@ -51752,7 +52725,12 @@ export function tuningFamilySocraticRadarDrugMetabolismProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3078 — tuningFamilySocraticRadarSolarIrradianceProxy
@@ -51761,7 +52739,12 @@ export function tuningFamilySocraticRadarSolarIrradianceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3080 — tuningFamilySocraticRadarWindPowerProxy
@@ -51770,7 +52753,12 @@ export function tuningFamilySocraticRadarWindPowerProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3082 — tuningFamilySocraticRadarTidalEnergyProxy
@@ -51779,7 +52767,12 @@ export function tuningFamilySocraticRadarTidalEnergyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3084 — tuningFamilySocraticRadarGeothermalGradientProxy
@@ -51788,7 +52781,12 @@ export function tuningFamilySocraticRadarGeothermalGradientProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3086 — tuningFamilySocraticRadarBiomassConversionProxy
@@ -51797,7 +52795,12 @@ export function tuningFamilySocraticRadarBiomassConversionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3088 — tuningFamilySocraticRadarHydrogenFuelCellProxy
@@ -51806,7 +52809,12 @@ export function tuningFamilySocraticRadarHydrogenFuelCellProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3090 — tuningFamilySocraticRadarBeatTrackingProxy
@@ -51815,7 +52823,12 @@ export function tuningFamilySocraticRadarBeatTrackingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3092 — tuningFamilySocraticRadarTempoEstimationProxy
@@ -51824,7 +52837,12 @@ export function tuningFamilySocraticRadarTempoEstimationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3094 — tuningFamilySocraticRadarMelodyExtractionProxy
@@ -51833,7 +52851,12 @@ export function tuningFamilySocraticRadarMelodyExtractionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3096 — tuningFamilySocraticRadarChordRecognitionProxy
@@ -51842,7 +52865,12 @@ export function tuningFamilySocraticRadarChordRecognitionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3098 — tuningFamilySocraticRadarTimbreDescriptorProxy
@@ -51851,7 +52879,12 @@ export function tuningFamilySocraticRadarTimbreDescriptorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3100 — tuningFamilySocraticRadarSourceSeparationProxy
@@ -51860,7 +52893,12 @@ export function tuningFamilySocraticRadarSourceSeparationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3102 — tuningFamilySocraticRadarMarketEquilibriumProxy
@@ -51869,7 +52907,12 @@ export function tuningFamilySocraticRadarMarketEquilibriumProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3104 — tuningFamilySocraticRadarPriceElasticityProxy
@@ -51878,7 +52921,12 @@ export function tuningFamilySocraticRadarPriceElasticityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3106 — tuningFamilySocraticRadarGameTheoryNashProxy
@@ -51887,7 +52935,12 @@ export function tuningFamilySocraticRadarGameTheoryNashProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3108 — tuningFamilySocraticRadarOptimalControlProxy
@@ -51896,7 +52949,12 @@ export function tuningFamilySocraticRadarOptimalControlProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3110 — tuningFamilySocraticRadarStochasticGrowthProxy
@@ -51905,7 +52963,12 @@ export function tuningFamilySocraticRadarStochasticGrowthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3112 — tuningFamilySocraticRadarCapitalFormationProxy
@@ -51914,7 +52977,12 @@ export function tuningFamilySocraticRadarCapitalFormationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3114 — tuningFamilySocraticRadarEncryptionStrengthProxy
@@ -51923,7 +52991,12 @@ export function tuningFamilySocraticRadarEncryptionStrengthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3116 — tuningFamilySocraticRadarAuthenticationFactorProxy
@@ -51932,7 +53005,12 @@ export function tuningFamilySocraticRadarAuthenticationFactorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3118 — tuningFamilySocraticRadarVulnerabilityScoreProxy
@@ -51941,7 +53019,12 @@ export function tuningFamilySocraticRadarVulnerabilityScoreProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3120 — tuningFamilySocraticRadarThreatModelingProxy
@@ -51950,7 +53033,12 @@ export function tuningFamilySocraticRadarThreatModelingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3122 — tuningFamilySocraticRadarIntrusionDetectionProxy
@@ -51959,7 +53047,12 @@ export function tuningFamilySocraticRadarIntrusionDetectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3124 — tuningFamilySocraticRadarDataIntegrityProxy
@@ -51968,7 +53061,12 @@ export function tuningFamilySocraticRadarDataIntegrityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3126 — tuningFamilySocraticRadarBrainMachineInterfaceProxy
@@ -51977,7 +53075,12 @@ export function tuningFamilySocraticRadarBrainMachineInterfaceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3128 — tuningFamilySocraticRadarNeuralDecodingProxy
@@ -51986,7 +53089,12 @@ export function tuningFamilySocraticRadarNeuralDecodingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3130 — tuningFamilySocraticRadarCorticalMappingProxy
@@ -51995,7 +53103,12 @@ export function tuningFamilySocraticRadarCorticalMappingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3132 — tuningFamilySocraticRadarSpikeSortProxy
@@ -52004,7 +53117,12 @@ export function tuningFamilySocraticRadarSpikeSortProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3134 — tuningFamilySocraticRadarEEGCoherenceProxy
@@ -52013,7 +53131,12 @@ export function tuningFamilySocraticRadarEEGCoherenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3136 — tuningFamilySocraticRadarDeepBrainStimulationProxy
@@ -52022,7 +53145,12 @@ export function tuningFamilySocraticRadarDeepBrainStimulationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3138 — tuningFamilySocraticRadarCognitiveBiasProxy
@@ -52031,7 +53159,12 @@ export function tuningFamilySocraticRadarCognitiveBiasProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3140 — tuningFamilySocraticRadarWorkingMemoryProxyV4
@@ -52065,7 +53198,12 @@ export function tuningFamilySocraticRadarAttentionBandwidthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3144 — tuningFamilySocraticRadarSensoryFusionProxy
@@ -52074,7 +53212,12 @@ export function tuningFamilySocraticRadarSensoryFusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3146 — tuningFamilySocraticRadarPatternRecognitionProxyV2
@@ -52108,7 +53251,12 @@ export function tuningFamilySocraticRadarExecutiveFunctionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3150 — tuningFamilySocraticRadarQuantumEntanglementProxy
@@ -52117,7 +53265,12 @@ export function tuningFamilySocraticRadarQuantumEntanglementProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3152 — tuningFamilySocraticRadarQubitCoherenceProxy
@@ -52126,7 +53279,12 @@ export function tuningFamilySocraticRadarQubitCoherenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3154 — tuningFamilySocraticRadarQuantumChannelProxy
@@ -52135,7 +53293,12 @@ export function tuningFamilySocraticRadarQuantumChannelProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3156 — tuningFamilySocraticRadarQuantumGateProxy
@@ -52144,7 +53307,12 @@ export function tuningFamilySocraticRadarQuantumGateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3158 — tuningFamilySocraticRadarQuantumTeleportationProxy
@@ -52153,7 +53321,12 @@ export function tuningFamilySocraticRadarQuantumTeleportationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3160 — tuningFamilySocraticRadarQuantumNoiseProxy
@@ -52162,7 +53335,12 @@ export function tuningFamilySocraticRadarQuantumNoiseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3162 — tuningFamilySocraticRadarJetStreamV2Proxy
@@ -52171,7 +53349,12 @@ export function tuningFamilySocraticRadarJetStreamV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3164 — tuningFamilySocraticRadarThermalGradientV2Proxy
@@ -52180,7 +53363,12 @@ export function tuningFamilySocraticRadarThermalGradientV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3166 — tuningFamilySocraticRadarConvectivePlumeProxy
@@ -52189,7 +53377,12 @@ export function tuningFamilySocraticRadarConvectivePlumeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3168 — tuningFamilySocraticRadarWindShearV2Proxy
@@ -52198,7 +53391,12 @@ export function tuningFamilySocraticRadarWindShearV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3170 — tuningFamilySocraticRadarAtmosphericWaveProxy
@@ -52207,7 +53405,12 @@ export function tuningFamilySocraticRadarAtmosphericWaveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3172 — tuningFamilySocraticRadarHumidityFieldProxy
@@ -52216,7 +53419,12 @@ export function tuningFamilySocraticRadarHumidityFieldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3174 — tuningFamilySocraticRadarEnzymeKineticsProxyV2
@@ -52250,7 +53458,12 @@ export function tuningFamilySocraticRadarMetabolicFluxProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3178 — tuningFamilySocraticRadarProteinBindingProxy
@@ -52259,7 +53472,12 @@ export function tuningFamilySocraticRadarProteinBindingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3180 — tuningFamilySocraticRadarReactionCouplingProxy
@@ -52268,7 +53486,12 @@ export function tuningFamilySocraticRadarReactionCouplingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3182 — tuningFamilySocraticRadarCatalysisRateProxy
@@ -52277,7 +53500,12 @@ export function tuningFamilySocraticRadarCatalysisRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3184 — tuningFamilySocraticRadarSubstrateTurnoverProxy
@@ -52286,7 +53514,12 @@ export function tuningFamilySocraticRadarSubstrateTurnoverProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3186 — tuningFamilySocraticRadarSeismicWaveProxy
@@ -52295,7 +53528,12 @@ export function tuningFamilySocraticRadarSeismicWaveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3188 — tuningFamilySocraticRadarMantleConvectionProxy
@@ -52304,7 +53542,12 @@ export function tuningFamilySocraticRadarMantleConvectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3190 — tuningFamilySocraticRadarGeomagneticFieldProxy
@@ -52313,7 +53556,12 @@ export function tuningFamilySocraticRadarGeomagneticFieldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3192 — tuningFamilySocraticRadarTectonicStressProxyV2
@@ -52347,7 +53595,12 @@ export function tuningFamilySocraticRadarCrustDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3196 — tuningFamilySocraticRadarHeatFlowProxy
@@ -52356,7 +53609,12 @@ export function tuningFamilySocraticRadarHeatFlowProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3198 — tuningFamilySocraticRadarElectricDipoleProxy
@@ -52365,7 +53623,12 @@ export function tuningFamilySocraticRadarElectricDipoleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3200 — tuningFamilySocraticRadarMagneticFluxProxy
@@ -52374,7 +53637,12 @@ export function tuningFamilySocraticRadarMagneticFluxProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3202 — tuningFamilySocraticRadarPlasmaFrequencyProxy
@@ -52383,7 +53651,12 @@ export function tuningFamilySocraticRadarPlasmaFrequencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3204 — tuningFamilySocraticRadarSkinDepthProxy
@@ -52392,7 +53665,12 @@ export function tuningFamilySocraticRadarSkinDepthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3206 — tuningFamilySocraticRadarPoyntingVectorProxy
@@ -52401,7 +53679,12 @@ export function tuningFamilySocraticRadarPoyntingVectorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3208 — tuningFamilySocraticRadarMaxwellEquationProxy
@@ -52410,7 +53693,12 @@ export function tuningFamilySocraticRadarMaxwellEquationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3210 — tuningFamilySocraticRadarFoodWebProxy
@@ -52419,7 +53707,12 @@ export function tuningFamilySocraticRadarFoodWebProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3212 — tuningFamilySocraticRadarTrophicLevelProxyV2
@@ -52528,7 +53821,12 @@ export function tuningFamilySocraticRadarEcosystemResilienceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3222 — tuningFamilySocraticRadarNuclearBindingProxy
@@ -52537,7 +53835,12 @@ export function tuningFamilySocraticRadarNuclearBindingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3224 — tuningFamilySocraticRadarRadioactiveDecayProxyV2
@@ -52571,7 +53874,12 @@ export function tuningFamilySocraticRadarFissionBarrierProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3228 — tuningFamilySocraticRadarNeutronCaptureProxy
@@ -52580,7 +53888,12 @@ export function tuningFamilySocraticRadarNeutronCaptureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3230 — tuningFamilySocraticRadarSpinParityProxy
@@ -52589,7 +53902,12 @@ export function tuningFamilySocraticRadarSpinParityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3232 — tuningFamilySocraticRadarIsotopeRatioProxyV2
@@ -52623,7 +53941,12 @@ export function tuningFamilySocraticRadarDendriticIntegrationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3236 — tuningFamilySocraticRadarSynapticPlasticityProxy
@@ -52632,7 +53955,12 @@ export function tuningFamilySocraticRadarSynapticPlasticityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3238 — tuningFamilySocraticRadarOscillatoryCouplingProxy
@@ -52641,7 +53969,12 @@ export function tuningFamilySocraticRadarOscillatoryCouplingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3240 — tuningFamilySocraticRadarNeuralSynchronyProxy
@@ -52650,7 +53983,12 @@ export function tuningFamilySocraticRadarNeuralSynchronyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3242 — tuningFamilySocraticRadarInhibitoryBalanceProxyV2
@@ -52709,7 +54047,12 @@ export function tuningFamilySocraticRadarReynoldsNumberV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3248 — tuningFamilySocraticRadarVortexStretchProxy
@@ -52718,7 +54061,12 @@ export function tuningFamilySocraticRadarVortexStretchProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3250 — tuningFamilySocraticRadarTurbulentDiffusionProxy
@@ -52727,7 +54075,12 @@ export function tuningFamilySocraticRadarTurbulentDiffusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3252 — tuningFamilySocraticRadarBoundaryLayerV2Proxy
@@ -52736,7 +54089,12 @@ export function tuningFamilySocraticRadarBoundaryLayerV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3254 — tuningFamilySocraticRadarKelvinHelmholtzProxy
@@ -52745,7 +54103,12 @@ export function tuningFamilySocraticRadarKelvinHelmholtzProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3256 — tuningFamilySocraticRadarCoriolisEffectV2Proxy
@@ -52754,7 +54117,12 @@ export function tuningFamilySocraticRadarCoriolisEffectV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3258 — tuningFamilySocraticRadarEntropyProductionProxy
@@ -52763,7 +54131,12 @@ export function tuningFamilySocraticRadarEntropyProductionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3260 — tuningFamilySocraticRadarGibbsFreeEnergyProxy
@@ -52772,7 +54145,12 @@ export function tuningFamilySocraticRadarGibbsFreeEnergyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3262 — tuningFamilySocraticRadarHeatCapacityProxyV4
@@ -52831,7 +54209,12 @@ export function tuningFamilySocraticRadarCarnotEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3268 — tuningFamilySocraticRadarBlackbodyRadiationProxy
@@ -52840,7 +54223,12 @@ export function tuningFamilySocraticRadarBlackbodyRadiationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3270 — tuningFamilySocraticRadarPhotonEntanglementProxy
@@ -52849,7 +54237,12 @@ export function tuningFamilySocraticRadarPhotonEntanglementProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3272 — tuningFamilySocraticRadarCoherentStateProxy
@@ -52858,7 +54251,12 @@ export function tuningFamilySocraticRadarCoherentStateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3274 — tuningFamilySocraticRadarSqueezeStateProxy
@@ -52867,7 +54265,12 @@ export function tuningFamilySocraticRadarSqueezeStateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3276 — tuningFamilySocraticRadarLaserThresholdProxy
@@ -52876,7 +54279,12 @@ export function tuningFamilySocraticRadarLaserThresholdProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3278 — tuningFamilySocraticRadarPhotonStatisticsProxy
@@ -52885,7 +54293,12 @@ export function tuningFamilySocraticRadarPhotonStatisticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3280 — tuningFamilySocraticRadarCavityQEDProxy
@@ -52894,7 +54307,12 @@ export function tuningFamilySocraticRadarCavityQEDProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3282 — tuningFamilySocraticRadarShannonEntropyProxy
@@ -52903,7 +54321,12 @@ export function tuningFamilySocraticRadarShannonEntropyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3284 — tuningFamilySocraticRadarMutualInformationProxyV4
@@ -52987,7 +54410,12 @@ export function tuningFamilySocraticRadarDataCompressionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3292 — tuningFamilySocraticRadarErrorCorrectionProxy
@@ -52996,7 +54424,12 @@ export function tuningFamilySocraticRadarErrorCorrectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3294 — tuningFamilySocraticRadarHubbleExpansionProxy
@@ -53005,7 +54438,12 @@ export function tuningFamilySocraticRadarHubbleExpansionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3296 — tuningFamilySocraticRadarDarkMatterV2Proxy
@@ -53014,7 +54452,12 @@ export function tuningFamilySocraticRadarDarkMatterV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3298 — tuningFamilySocraticRadarCosmicInflationProxy
@@ -53023,7 +54466,12 @@ export function tuningFamilySocraticRadarCosmicInflationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3300 — tuningFamilySocraticRadarBaryonAcousticProxy
@@ -53032,7 +54480,12 @@ export function tuningFamilySocraticRadarBaryonAcousticProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3302 — tuningFamilySocraticRadarCosmologicalConstantProxy
@@ -53041,7 +54494,12 @@ export function tuningFamilySocraticRadarCosmologicalConstantProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3304 — tuningFamilySocraticRadarGravitationalLensingProxy
@@ -53050,7 +54508,12 @@ export function tuningFamilySocraticRadarGravitationalLensingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3306 — tuningFamilySocraticRadarDnaReplicationProxy
@@ -53059,7 +54522,12 @@ export function tuningFamilySocraticRadarDnaReplicationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.3, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.2, benchmark: 0.3, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3308 — tuningFamilySocraticRadarProteinFoldingV2Proxy
@@ -53068,7 +54536,12 @@ export function tuningFamilySocraticRadarProteinFoldingV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.1, maturity: 0.25, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.1, maturity: 0.25, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3310 — tuningFamilySocraticRadarGenomeExpressionProxy
@@ -53077,7 +54550,12 @@ export function tuningFamilySocraticRadarGenomeExpressionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3312 — tuningFamilySocraticRadarChromatinRemodelingProxy
@@ -53086,7 +54564,12 @@ export function tuningFamilySocraticRadarChromatinRemodelingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3314 — tuningFamilySocraticRadarEpigeneticMarkProxy
@@ -53095,7 +54578,12 @@ export function tuningFamilySocraticRadarEpigeneticMarkProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.1, maturity: 0.3, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.1, maturity: 0.3, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3316 — tuningFamilySocraticRadarAlternativeSplicingProxy
@@ -53104,7 +54592,12 @@ export function tuningFamilySocraticRadarAlternativeSplicingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3318 — tuningFamilySocraticRadarPartitionFunctionV2Proxy
@@ -53113,7 +54606,12 @@ export function tuningFamilySocraticRadarPartitionFunctionV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3320 — tuningFamilySocraticRadarBoltzmannDistributionProxy
@@ -53122,7 +54620,12 @@ export function tuningFamilySocraticRadarBoltzmannDistributionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3322 — tuningFamilySocraticRadarFluctuationDissipationV2Proxy
@@ -53131,7 +54634,12 @@ export function tuningFamilySocraticRadarFluctuationDissipationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.3, maturity: 0.2, benchmark: 0.15, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3324 — tuningFamilySocraticRadarCriticalExponentProxy
@@ -53140,7 +54648,12 @@ export function tuningFamilySocraticRadarCriticalExponentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3326 — tuningFamilySocraticRadarOrderParameterProxy
@@ -53149,7 +54662,12 @@ export function tuningFamilySocraticRadarOrderParameterProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.1, maturity: 0.3, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.1, maturity: 0.3, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3328 — tuningFamilySocraticRadarCorrelationLengthProxy
@@ -53158,7 +54676,12 @@ export function tuningFamilySocraticRadarCorrelationLengthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3330 — tuningFamilySocraticRadarTurbulenceProxyV3
@@ -53192,7 +54715,12 @@ export function tuningFamilySocraticRadarVortexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3334 — tuningFamilySocraticRadarCavitationProxy
@@ -53201,7 +54729,12 @@ export function tuningFamilySocraticRadarCavitationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3336 — tuningFamilySocraticRadarWaveDispersionProxy
@@ -53210,7 +54743,12 @@ export function tuningFamilySocraticRadarWaveDispersionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3338 — tuningFamilySocraticRadarBernoulliProxy
@@ -53219,7 +54757,12 @@ export function tuningFamilySocraticRadarBernoulliProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3340 — tuningFamilySocraticRadarViscosityProxyV4
@@ -53253,7 +54796,12 @@ export function tuningFamilySocraticRadarDiffractionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3344 — tuningFamilySocraticRadarInterferenceProxyV2
@@ -53287,7 +54835,12 @@ export function tuningFamilySocraticRadarPolarizationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.3, benchmark: 0.15, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.3, benchmark: 0.15, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3348 — tuningFamilySocraticRadarRefractionProxyV2
@@ -53346,7 +54899,12 @@ export function tuningFamilySocraticRadarResonanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3354 — tuningFamilySocraticRadarCrystalStructureProxy
@@ -53355,7 +54913,12 @@ export function tuningFamilySocraticRadarCrystalStructureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3356 — tuningFamilySocraticRadarDislocationProxy
@@ -53364,7 +54927,12 @@ export function tuningFamilySocraticRadarDislocationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3358 — tuningFamilySocraticRadarPhaseTransformationProxy
@@ -53373,7 +54941,12 @@ export function tuningFamilySocraticRadarPhaseTransformationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3360 — tuningFamilySocraticRadarFractureProxy
@@ -53382,7 +54955,12 @@ export function tuningFamilySocraticRadarFractureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3362 — tuningFamilySocraticRadarCorrosionMaterialProxy
@@ -53391,7 +54969,12 @@ export function tuningFamilySocraticRadarCorrosionMaterialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3364 — tuningFamilySocraticRadarNanotubeProxy
@@ -53400,7 +54983,12 @@ export function tuningFamilySocraticRadarNanotubeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3366 — tuningFamilySocraticRadarTectonicsProxy
@@ -53409,7 +54997,12 @@ export function tuningFamilySocraticRadarTectonicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3368 — tuningFamilySocraticRadarSeismicProxy
@@ -53418,7 +55011,12 @@ export function tuningFamilySocraticRadarSeismicProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3370 — tuningFamilySocraticRadarVolcanicProxy
@@ -53427,7 +55025,12 @@ export function tuningFamilySocraticRadarVolcanicProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3372 — tuningFamilySocraticRadarOceanCurrentProxy
@@ -53436,7 +55039,12 @@ export function tuningFamilySocraticRadarOceanCurrentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3374 — tuningFamilySocraticRadarAtmosphericProxy
@@ -53445,7 +55053,12 @@ export function tuningFamilySocraticRadarAtmosphericProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3376 — tuningFamilySocraticRadarGeomagneticProxy
@@ -53454,7 +55067,12 @@ export function tuningFamilySocraticRadarGeomagneticProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3378 — tuningFamilySocraticRadarNaturalSelectionV2Proxy
@@ -53463,7 +55081,12 @@ export function tuningFamilySocraticRadarNaturalSelectionV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3380 — tuningFamilySocraticRadarGeneticDriftProxy
@@ -53472,7 +55095,12 @@ export function tuningFamilySocraticRadarGeneticDriftProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3382 — tuningFamilySocraticRadarSpeciationV2Proxy
@@ -53481,7 +55109,12 @@ export function tuningFamilySocraticRadarSpeciationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3384 — tuningFamilySocraticRadarPhylogenyProxy
@@ -53490,7 +55123,12 @@ export function tuningFamilySocraticRadarPhylogenyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3386 — tuningFamilySocraticRadarCoevolutionV2Proxy
@@ -53499,7 +55137,12 @@ export function tuningFamilySocraticRadarCoevolutionV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3388 — tuningFamilySocraticRadarAdaptiveRadiationProxy
@@ -53508,7 +55151,12 @@ export function tuningFamilySocraticRadarAdaptiveRadiationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3390 — tuningFamilySocraticRadarWorkingMemoryProxyV5
@@ -53542,7 +55190,12 @@ export function tuningFamilySocraticRadarAttentionFilterProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3394 — tuningFamilySocraticRadarPatternRecognitionProxyV3
@@ -53626,7 +55279,12 @@ export function tuningFamilySocraticRadarLanguageProcessingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3402 — tuningFamilySocraticRadarCarbonCycleProxy
@@ -53635,7 +55293,12 @@ export function tuningFamilySocraticRadarCarbonCycleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.25, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.25, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3404 — tuningFamilySocraticRadarGreenhouseEffectProxy
@@ -53644,7 +55307,12 @@ export function tuningFamilySocraticRadarGreenhouseEffectProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3406 — tuningFamilySocraticRadarOceanAcidificationProxy
@@ -53653,7 +55321,12 @@ export function tuningFamilySocraticRadarOceanAcidificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3408 — tuningFamilySocraticRadarArcticAmplificationProxy
@@ -53662,7 +55335,12 @@ export function tuningFamilySocraticRadarArcticAmplificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3410 — tuningFamilySocraticRadarHadleyCellProxy
@@ -53671,7 +55349,12 @@ export function tuningFamilySocraticRadarHadleyCellProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3412 — tuningFamilySocraticRadarMonsoonProxy
@@ -53680,7 +55363,12 @@ export function tuningFamilySocraticRadarMonsoonProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3414 — tuningFamilySocraticRadarCrowdDynamicsProxy
@@ -53689,7 +55377,12 @@ export function tuningFamilySocraticRadarCrowdDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3416 — tuningFamilySocraticRadarOpinionFormationProxy
@@ -53698,7 +55391,12 @@ export function tuningFamilySocraticRadarOpinionFormationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3418 — tuningFamilySocraticRadarSocialContagionProxy
@@ -53707,7 +55405,12 @@ export function tuningFamilySocraticRadarSocialContagionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3420 — tuningFamilySocraticRadarNetworkEffectProxy
@@ -53716,7 +55419,12 @@ export function tuningFamilySocraticRadarNetworkEffectProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3422 — tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy
@@ -53725,7 +55433,12 @@ export function tuningFamilySocraticRadarCollectiveIntelligenceV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3424 — tuningFamilySocraticRadarSocialNormProxy
@@ -53734,7 +55447,12 @@ export function tuningFamilySocraticRadarSocialNormProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3426 — tuningFamilySocraticRadarPowerLawDistributionProxy
@@ -53743,7 +55461,12 @@ export function tuningFamilySocraticRadarPowerLawDistributionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3428 — tuningFamilySocraticRadarMarketCrashProxy
@@ -53752,7 +55475,12 @@ export function tuningFamilySocraticRadarMarketCrashProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3430 — tuningFamilySocraticRadarWealthInequalityProxy
@@ -53761,7 +55489,12 @@ export function tuningFamilySocraticRadarWealthInequalityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3432 — tuningFamilySocraticRadarHerdBehaviorProxy
@@ -53770,7 +55503,12 @@ export function tuningFamilySocraticRadarHerdBehaviorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3434 — tuningFamilySocraticRadarLiquidityCrisisProxy
@@ -53779,7 +55517,12 @@ export function tuningFamilySocraticRadarLiquidityCrisisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3436 — tuningFamilySocraticRadarMeanReversionProxy
@@ -53788,7 +55531,12 @@ export function tuningFamilySocraticRadarMeanReversionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3438 — tuningFamilySocraticRadarMagneticConfinementProxy
@@ -53797,7 +55545,12 @@ export function tuningFamilySocraticRadarMagneticConfinementProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3440 — tuningFamilySocraticRadarDebyeShieldingProxy
@@ -53806,7 +55559,12 @@ export function tuningFamilySocraticRadarDebyeShieldingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3442 — tuningFamilySocraticRadarPlasmaOscillationProxy
@@ -53815,7 +55573,12 @@ export function tuningFamilySocraticRadarPlasmaOscillationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3444 — tuningFamilySocraticRadarAlfvenWaveProxy
@@ -53824,7 +55587,12 @@ export function tuningFamilySocraticRadarAlfvenWaveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3446 — tuningFamilySocraticRadarMagnetohydrodynamicsProxy
@@ -53833,7 +55601,12 @@ export function tuningFamilySocraticRadarMagnetohydrodynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3448 — tuningFamilySocraticRadarFusionProxy
@@ -53842,7 +55615,12 @@ export function tuningFamilySocraticRadarFusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3450 — tuningFamilySocraticRadarLorenzAttractorProxy
@@ -53851,7 +55629,12 @@ export function tuningFamilySocraticRadarLorenzAttractorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.25, maturity: 0.15, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3452 — tuningFamilySocraticRadarBifurcationProxyV2
@@ -53935,7 +55718,12 @@ export function tuningFamilySocraticRadarPhaseSpaceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.3, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.3, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3460 — tuningFamilySocraticRadarSynchronizationProxy
@@ -53944,7 +55732,12 @@ export function tuningFamilySocraticRadarSynchronizationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.3 },
+    { rootHz },
+  );
 }
 
 // Q3462 — tuningFamilySocraticRadarIsotopeProxy
@@ -53953,7 +55746,12 @@ export function tuningFamilySocraticRadarIsotopeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3464 — tuningFamilySocraticRadarRadioactiveDecayProxyV3
@@ -53987,7 +55785,12 @@ export function tuningFamilySocraticRadarRockCycleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3468 — tuningFamilySocraticRadarMineralFormationProxy
@@ -53996,7 +55799,12 @@ export function tuningFamilySocraticRadarMineralFormationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3470 — tuningFamilySocraticRadarChemicalWeatheringProxy
@@ -54005,7 +55813,12 @@ export function tuningFamilySocraticRadarChemicalWeatheringProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3472 — tuningFamilySocraticRadarSedimentLayerProxy
@@ -54014,7 +55827,12 @@ export function tuningFamilySocraticRadarSedimentLayerProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3474 — tuningFamilySocraticRadarBloodRheologyProxy
@@ -54023,7 +55841,12 @@ export function tuningFamilySocraticRadarBloodRheologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3476 — tuningFamilySocraticRadarBiomaterialScaffoldProxy
@@ -54032,7 +55855,12 @@ export function tuningFamilySocraticRadarBiomaterialScaffoldProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3478 — tuningFamilySocraticRadarTissueEngineeringProxy
@@ -54041,7 +55869,12 @@ export function tuningFamilySocraticRadarTissueEngineeringProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3480 — tuningFamilySocraticRadarNeuralInterfaceProxy
@@ -54050,7 +55883,12 @@ export function tuningFamilySocraticRadarNeuralInterfaceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3482 — tuningFamilySocraticRadarProstheticLimbProxy
@@ -54059,7 +55897,12 @@ export function tuningFamilySocraticRadarProstheticLimbProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3484 — tuningFamilySocraticRadarMedicalImagingProxy
@@ -54068,7 +55911,12 @@ export function tuningFamilySocraticRadarMedicalImagingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.1, versatility: 0.25, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.1, versatility: 0.25, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3486 — tuningFamilySocraticRadarSemiconductorJunctionProxy
@@ -54077,7 +55925,12 @@ export function tuningFamilySocraticRadarSemiconductorJunctionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3488 — tuningFamilySocraticRadarPhotovoltaicEffectProxy
@@ -54086,7 +55939,12 @@ export function tuningFamilySocraticRadarPhotovoltaicEffectProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3490 — tuningFamilySocraticRadarBatteryStorageProxy
@@ -54095,7 +55953,12 @@ export function tuningFamilySocraticRadarBatteryStorageProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3492 — tuningFamilySocraticRadarWindEnergyProxy
@@ -54104,7 +55967,12 @@ export function tuningFamilySocraticRadarWindEnergyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3494 — tuningFamilySocraticRadarThermalStorageProxy
@@ -54113,7 +55981,12 @@ export function tuningFamilySocraticRadarThermalStorageProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3496 — tuningFamilySocraticRadarSmartGridProxy
@@ -54122,7 +55995,12 @@ export function tuningFamilySocraticRadarSmartGridProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3498 — tuningFamilySocraticRadarGenomeSequencingProxy
@@ -54131,7 +56009,12 @@ export function tuningFamilySocraticRadarGenomeSequencingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3500 — tuningFamilySocraticRadarProteinStructurePredictionProxy
@@ -54140,7 +56023,12 @@ export function tuningFamilySocraticRadarProteinStructurePredictionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3502 — tuningFamilySocraticRadarRNAFoldingProxy
@@ -54149,7 +56037,12 @@ export function tuningFamilySocraticRadarRNAFoldingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3504 — tuningFamilySocraticRadarMetagenomicAnalysisProxy
@@ -54158,7 +56051,12 @@ export function tuningFamilySocraticRadarMetagenomicAnalysisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3506 — tuningFamilySocraticRadarPhylogeneticTreeProxy
@@ -54167,7 +56065,12 @@ export function tuningFamilySocraticRadarPhylogeneticTreeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3508 — tuningFamilySocraticRadarEpigenomicsAnalysisProxy
@@ -54176,7 +56079,12 @@ export function tuningFamilySocraticRadarEpigenomicsAnalysisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3510 — tuningFamilySocraticRadarObjectDetectionProxy
@@ -54185,7 +56093,12 @@ export function tuningFamilySocraticRadarObjectDetectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3512 — tuningFamilySocraticRadarSemanticSegmentationProxy
@@ -54194,7 +56107,12 @@ export function tuningFamilySocraticRadarSemanticSegmentationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3514 — tuningFamilySocraticRadarImageClassificationProxy
@@ -54203,7 +56121,12 @@ export function tuningFamilySocraticRadarImageClassificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3516 — tuningFamilySocraticRadarPointCloudProxy
@@ -54212,7 +56135,12 @@ export function tuningFamilySocraticRadarPointCloudProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3518 — tuningFamilySocraticRadarVideoAnalysisProxy
@@ -54221,7 +56149,12 @@ export function tuningFamilySocraticRadarVideoAnalysisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3520 — tuningFamilySocraticRadarSpeechRecognitionProxy
@@ -54230,7 +56163,12 @@ export function tuningFamilySocraticRadarSpeechRecognitionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3522 — tuningFamilySocraticRadarCycloneProxy
@@ -54239,7 +56177,12 @@ export function tuningFamilySocraticRadarCycloneProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3524 — tuningFamilySocraticRadarAnticycloneProxy
@@ -54248,7 +56191,12 @@ export function tuningFamilySocraticRadarAnticycloneProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3526 — tuningFamilySocraticRadarThunderstormProxy
@@ -54257,7 +56205,12 @@ export function tuningFamilySocraticRadarThunderstormProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3528 — tuningFamilySocraticRadarHeatWaveProxy
@@ -54266,7 +56219,12 @@ export function tuningFamilySocraticRadarHeatWaveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3530 — tuningFamilySocraticRadarBlizzardProxy
@@ -54275,7 +56233,12 @@ export function tuningFamilySocraticRadarBlizzardProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3532 — tuningFamilySocraticRadarFogProxy
@@ -54284,7 +56247,12 @@ export function tuningFamilySocraticRadarFogProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3534 — tuningFamilySocraticRadarSoilErosionProxy
@@ -54293,7 +56261,12 @@ export function tuningFamilySocraticRadarSoilErosionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3536 — tuningFamilySocraticRadarLandDegradationProxy
@@ -54302,7 +56275,12 @@ export function tuningFamilySocraticRadarLandDegradationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3538 — tuningFamilySocraticRadarDesertificationProxy
@@ -54311,7 +56289,12 @@ export function tuningFamilySocraticRadarDesertificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3540 — tuningFamilySocraticRadarWetlandProxy
@@ -54320,7 +56303,12 @@ export function tuningFamilySocraticRadarWetlandProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3542 — tuningFamilySocraticRadarMangroveProxy
@@ -54329,7 +56317,12 @@ export function tuningFamilySocraticRadarMangroveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3544 — tuningFamilySocraticRadarDeforestationProxy
@@ -54338,7 +56331,12 @@ export function tuningFamilySocraticRadarDeforestationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3546 — tuningFamilySocraticRadarKinematicsProxy
@@ -54347,7 +56345,12 @@ export function tuningFamilySocraticRadarKinematicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3548 — tuningFamilySocraticRadarManipulatorArmProxy
@@ -54356,7 +56359,12 @@ export function tuningFamilySocraticRadarManipulatorArmProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3550 — tuningFamilySocraticRadarGraspPlanningProxy
@@ -54365,7 +56373,12 @@ export function tuningFamilySocraticRadarGraspPlanningProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3552 — tuningFamilySocraticRadarHapticFeedbackProxy
@@ -54374,7 +56387,12 @@ export function tuningFamilySocraticRadarHapticFeedbackProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3554 — tuningFamilySocraticRadarSwarmRoboticsProxy
@@ -54383,7 +56401,12 @@ export function tuningFamilySocraticRadarSwarmRoboticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3556 — tuningFamilySocraticRadarSoftRoboticsProxy
@@ -54392,7 +56415,12 @@ export function tuningFamilySocraticRadarSoftRoboticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3558 — tuningFamilySocraticRadarNanomaterialProxy
@@ -54401,7 +56429,12 @@ export function tuningFamilySocraticRadarNanomaterialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3560 — tuningFamilySocraticRadarGrapheneProxy
@@ -54410,7 +56443,12 @@ export function tuningFamilySocraticRadarGrapheneProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3562 — tuningFamilySocraticRadarQuantumDotProxy
@@ -54419,7 +56457,12 @@ export function tuningFamilySocraticRadarQuantumDotProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3564 — tuningFamilySocraticRadarNanoparticleProxy
@@ -54428,7 +56471,12 @@ export function tuningFamilySocraticRadarNanoparticleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3566 — tuningFamilySocraticRadarSelfAssemblyProxy
@@ -54437,7 +56485,12 @@ export function tuningFamilySocraticRadarSelfAssemblyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3568 — tuningFamilySocraticRadarSpintronicsProxy
@@ -54446,7 +56499,12 @@ export function tuningFamilySocraticRadarSpintronicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3570 — tuningFamilySocraticRadarLaserCavityProxy
@@ -54455,7 +56513,12 @@ export function tuningFamilySocraticRadarLaserCavityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3572 — tuningFamilySocraticRadarOpticalFiberProxy
@@ -54464,7 +56527,12 @@ export function tuningFamilySocraticRadarOpticalFiberProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3574 — tuningFamilySocraticRadarHolographyProxy
@@ -54473,7 +56541,12 @@ export function tuningFamilySocraticRadarHolographyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3576 — tuningFamilySocraticRadarNonlinearOpticsProxy
@@ -54482,7 +56555,12 @@ export function tuningFamilySocraticRadarNonlinearOpticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3578 — tuningFamilySocraticRadarPlasmonicProxy
@@ -54491,7 +56569,12 @@ export function tuningFamilySocraticRadarPlasmonicProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3580 — tuningFamilySocraticRadarMetamaterialProxy
@@ -54500,7 +56583,12 @@ export function tuningFamilySocraticRadarMetamaterialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3582 — tuningFamilySocraticRadarOzoneDepletionProxy
@@ -54509,7 +56597,12 @@ export function tuningFamilySocraticRadarOzoneDepletionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3584 — tuningFamilySocraticRadarAerosolProxy
@@ -54518,7 +56611,12 @@ export function tuningFamilySocraticRadarAerosolProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3586 — tuningFamilySocraticRadarPhotochemistryProxy
@@ -54527,7 +56625,12 @@ export function tuningFamilySocraticRadarPhotochemistryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3588 — tuningFamilySocraticRadarTroposphereProxy
@@ -54536,7 +56639,12 @@ export function tuningFamilySocraticRadarTroposphereProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3590 — tuningFamilySocraticRadarStratosphereProxy
@@ -54545,7 +56653,12 @@ export function tuningFamilySocraticRadarStratosphereProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3592 — tuningFamilySocraticRadarAirQualityProxy
@@ -54554,7 +56667,12 @@ export function tuningFamilySocraticRadarAirQualityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3594 — tuningFamilySocraticRadarInformationDiffusionProxy
@@ -54563,7 +56681,12 @@ export function tuningFamilySocraticRadarInformationDiffusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3596 — tuningFamilySocraticRadarEchoChamberProxy
@@ -54572,7 +56695,12 @@ export function tuningFamilySocraticRadarEchoChamberProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.25, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3598 — tuningFamilySocraticRadarViralSpreadProxy
@@ -54581,7 +56709,12 @@ export function tuningFamilySocraticRadarViralSpreadProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3600 — tuningFamilySocraticRadarDigitalTwinProxy
@@ -54590,7 +56723,12 @@ export function tuningFamilySocraticRadarDigitalTwinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3602 — tuningFamilySocraticRadarInternetOfThingsProxy
@@ -54599,7 +56737,12 @@ export function tuningFamilySocraticRadarInternetOfThingsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3604 — tuningFamilySocraticRadarEdgeComputingProxy
@@ -54608,7 +56751,12 @@ export function tuningFamilySocraticRadarEdgeComputingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3606 — tuningFamilySocraticRadarDevelopmentalPsychologyProxy
@@ -54617,7 +56765,12 @@ export function tuningFamilySocraticRadarDevelopmentalPsychologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.35, benchmark: 0.2, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.35, benchmark: 0.2, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3608 — tuningFamilySocraticRadarSocialPsychologyProxy
@@ -54626,7 +56779,12 @@ export function tuningFamilySocraticRadarSocialPsychologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3610 — tuningFamilySocraticRadarNeuropsychologyIndexProxy
@@ -54635,7 +56793,12 @@ export function tuningFamilySocraticRadarNeuropsychologyIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3612 — tuningFamilySocraticRadarHealthPsychologyProxy
@@ -54644,7 +56807,12 @@ export function tuningFamilySocraticRadarHealthPsychologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3614 — tuningFamilySocraticRadarPersonalityModelProxy
@@ -54653,7 +56821,12 @@ export function tuningFamilySocraticRadarPersonalityModelProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3616 — tuningFamilySocraticRadarEmotionRegulationProxy
@@ -54662,7 +56835,12 @@ export function tuningFamilySocraticRadarEmotionRegulationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3618 — tuningFamilySocraticRadarThermoelectricEffectProxy
@@ -54671,7 +56849,12 @@ export function tuningFamilySocraticRadarThermoelectricEffectProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3620 — tuningFamilySocraticRadarPiezoelectricEffectProxy
@@ -54680,7 +56863,12 @@ export function tuningFamilySocraticRadarPiezoelectricEffectProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3622 — tuningFamilySocraticRadarFerroelectricProxy
@@ -54689,7 +56877,12 @@ export function tuningFamilySocraticRadarFerroelectricProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3624 — tuningFamilySocraticRadarSuperonductorProxy
@@ -54698,7 +56891,12 @@ export function tuningFamilySocraticRadarSuperonductorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.3, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3626 — tuningFamilySocraticRadarTopologicalInsulatorProxy
@@ -54707,7 +56905,12 @@ export function tuningFamilySocraticRadarTopologicalInsulatorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3628 — tuningFamilySocraticRadarMagneticSkyrmionProxy
@@ -54716,7 +56919,12 @@ export function tuningFamilySocraticRadarMagneticSkyrmionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3630 — tuningFamilySocraticRadarOrbitalMechanicsProxy
@@ -54725,7 +56933,12 @@ export function tuningFamilySocraticRadarOrbitalMechanicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3632 — tuningFamilySocraticRadarRocketPropulsionProxy
@@ -54734,7 +56947,12 @@ export function tuningFamilySocraticRadarRocketPropulsionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3634 — tuningFamilySocraticRadarSpacecraftReentryProxy
@@ -54743,7 +56961,12 @@ export function tuningFamilySocraticRadarSpacecraftReentryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3636 — tuningFamilySocraticRadarSatelliteCommProxy
@@ -54752,7 +56975,12 @@ export function tuningFamilySocraticRadarSatelliteCommProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.3, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3638 — tuningFamilySocraticRadarSpaceDebrisProxy
@@ -54761,7 +56989,12 @@ export function tuningFamilySocraticRadarSpaceDebrisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3640 — tuningFamilySocraticRadarLaunchWindowProxy
@@ -54770,7 +57003,12 @@ export function tuningFamilySocraticRadarLaunchWindowProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3642 — tuningFamilySocraticRadarQubitCoherenceV2Proxy
@@ -54779,7 +57017,12 @@ export function tuningFamilySocraticRadarQubitCoherenceV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3644 — tuningFamilySocraticRadarQuantumEntanglementV2Proxy
@@ -54788,7 +57031,12 @@ export function tuningFamilySocraticRadarQuantumEntanglementV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3646 — tuningFamilySocraticRadarQuantumErrorCorrectionProxy
@@ -54797,7 +57045,12 @@ export function tuningFamilySocraticRadarQuantumErrorCorrectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3648 — tuningFamilySocraticRadarQuantumAnnealingProxy
@@ -54806,7 +57059,12 @@ export function tuningFamilySocraticRadarQuantumAnnealingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3650 — tuningFamilySocraticRadarVariationalQuantumCircuitProxy
@@ -54815,7 +57073,12 @@ export function tuningFamilySocraticRadarVariationalQuantumCircuitProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.25, benchmark: 0.2, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.25, benchmark: 0.2, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3652 — tuningFamilySocraticRadarQuantumSamplingProxy
@@ -54824,7 +57087,12 @@ export function tuningFamilySocraticRadarQuantumSamplingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3654 — tuningFamilySocraticRadarCarbonCycleV2Proxy
@@ -54833,7 +57101,12 @@ export function tuningFamilySocraticRadarCarbonCycleV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3656 — tuningFamilySocraticRadarOceanAcidificationV2Proxy
@@ -54842,7 +57115,12 @@ export function tuningFamilySocraticRadarOceanAcidificationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3658 — tuningFamilySocraticRadarIceSheetDynamicsProxy
@@ -54851,7 +57129,12 @@ export function tuningFamilySocraticRadarIceSheetDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3660 — tuningFamilySocraticRadarSeaLevelRiseProxy
@@ -54860,7 +57143,12 @@ export function tuningFamilySocraticRadarSeaLevelRiseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3662 — tuningFamilySocraticRadarClimateModelingProxy
@@ -54869,7 +57157,12 @@ export function tuningFamilySocraticRadarClimateModelingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.3, maturity: 0.25, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.3, maturity: 0.25, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3664 — tuningFamilySocraticRadarExtremeWeatherProxy
@@ -54878,7 +57171,12 @@ export function tuningFamilySocraticRadarExtremeWeatherProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3666 — tuningFamilySocraticRadarSynapticPlasticityV2Proxy
@@ -54887,7 +57185,12 @@ export function tuningFamilySocraticRadarSynapticPlasticityV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3668 — tuningFamilySocraticRadarNeuralOscillationV2Proxy
@@ -54896,7 +57199,12 @@ export function tuningFamilySocraticRadarNeuralOscillationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3670 — tuningFamilySocraticRadarCorticalMappingV2Proxy
@@ -54905,7 +57213,12 @@ export function tuningFamilySocraticRadarCorticalMappingV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3672 — tuningFamilySocraticRadarNeurotransmitterDynamicsProxy
@@ -54914,7 +57227,12 @@ export function tuningFamilySocraticRadarNeurotransmitterDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3674 — tuningFamilySocraticRadarNeuroplasticityIndexProxy
@@ -54923,7 +57241,12 @@ export function tuningFamilySocraticRadarNeuroplasticityIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3676 — tuningFamilySocraticRadarBrainConnectivityProxy
@@ -54932,7 +57255,12 @@ export function tuningFamilySocraticRadarBrainConnectivityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3678 — tuningFamilySocraticRadarFoodWebDynamicsProxy
@@ -54941,7 +57269,12 @@ export function tuningFamilySocraticRadarFoodWebDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3680 — tuningFamilySocraticRadarBiodiversityIndexProxyV3
@@ -54960,7 +57293,12 @@ export function tuningFamilySocraticRadarBiodiversityIndexProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // BiodiversityIndex: species diversity benchmark
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.10;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.1;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54980,7 +57318,12 @@ export function tuningFamilySocraticRadarEcosystemResilienceProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // EcosystemResilience: maturity and convergence
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.30 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.3 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -54990,7 +57333,12 @@ export function tuningFamilySocraticRadarNutrientCyclingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3686 — tuningFamilySocraticRadarHabitatFragmentationProxyV2
@@ -55009,7 +57357,12 @@ export function tuningFamilySocraticRadarHabitatFragmentationProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // HabitatFragmentation: spatial diversity and convergence
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55019,7 +57372,12 @@ export function tuningFamilySocraticRadarTrophicCascadeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3690 — tuningFamilySocraticRadarCrystalGrowthProxy
@@ -55028,7 +57386,12 @@ export function tuningFamilySocraticRadarCrystalGrowthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3692 — tuningFamilySocraticRadarPolymerChainV2Proxy
@@ -55037,7 +57400,12 @@ export function tuningFamilySocraticRadarPolymerChainV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3694 — tuningFamilySocraticRadarMetallurgicalPhaseProxy
@@ -55046,7 +57414,12 @@ export function tuningFamilySocraticRadarMetallurgicalPhaseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.3, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3696 — tuningFamilySocraticRadarNanostructureSynthesisProxy
@@ -55055,7 +57428,12 @@ export function tuningFamilySocraticRadarNanostructureSynthesisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3698 — tuningFamilySocraticRadarCorrosionKineticsProxy
@@ -55064,7 +57442,12 @@ export function tuningFamilySocraticRadarCorrosionKineticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3700 — tuningFamilySocraticRadarThinFilmDepositionProxy
@@ -55073,7 +57456,12 @@ export function tuningFamilySocraticRadarThinFilmDepositionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.3, maturity: 0.15, benchmark: 0.25, convergence: 0.1 },
+    { rootHz },
+  );
 }
 
 // Q3702 — tuningFamilySocraticRadarLaminarFlowV3Proxy
@@ -55082,7 +57470,12 @@ export function tuningFamilySocraticRadarLaminarFlowV3Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3704 — tuningFamilySocraticRadarTurbulenceModelingProxy
@@ -55091,7 +57484,12 @@ export function tuningFamilySocraticRadarTurbulenceModelingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3706 — tuningFamilySocraticRadarBoundaryLayerV3Proxy
@@ -55100,7 +57498,12 @@ export function tuningFamilySocraticRadarBoundaryLayerV3Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3708 — tuningFamilySocraticRadarVortexDynamicsProxy
@@ -55109,7 +57512,12 @@ export function tuningFamilySocraticRadarVortexDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3710 — tuningFamilySocraticRadarCompressibleFlowProxy
@@ -55118,7 +57526,12 @@ export function tuningFamilySocraticRadarCompressibleFlowProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3712 — tuningFamilySocraticRadarHydroelasticCouplingProxy
@@ -55127,7 +57540,12 @@ export function tuningFamilySocraticRadarHydroelasticCouplingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3714 — tuningFamilySocraticRadarStellarNucleosynthesisProxy
@@ -55136,7 +57554,12 @@ export function tuningFamilySocraticRadarStellarNucleosynthesisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3716 — tuningFamilySocraticRadarGalacticRotationProxy
@@ -55145,7 +57568,12 @@ export function tuningFamilySocraticRadarGalacticRotationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3718 — tuningFamilySocraticRadarPulsarTimingProxy
@@ -55154,7 +57582,12 @@ export function tuningFamilySocraticRadarPulsarTimingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.15, maturity: 0.3, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3720 — tuningFamilySocraticRadarCosmicInflationV2Proxy
@@ -55163,7 +57596,12 @@ export function tuningFamilySocraticRadarCosmicInflationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3722 — tuningFamilySocraticRadarDarkMatterHaloProxy
@@ -55172,7 +57610,12 @@ export function tuningFamilySocraticRadarDarkMatterHaloProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3724 — tuningFamilySocraticRadarGravitationalLensingV2Proxy
@@ -55181,7 +57624,12 @@ export function tuningFamilySocraticRadarGravitationalLensingV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3726 — tuningFamilySocraticRadarThermohalineCirculationProxy
@@ -55190,7 +57638,12 @@ export function tuningFamilySocraticRadarThermohalineCirculationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3728 — tuningFamilySocraticRadarOceanicTidalForcingProxy
@@ -55199,7 +57652,12 @@ export function tuningFamilySocraticRadarOceanicTidalForcingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3730 — tuningFamilySocraticRadarDeepSeaHydrothermalProxy
@@ -55208,7 +57666,12 @@ export function tuningFamilySocraticRadarDeepSeaHydrothermalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3732 — tuningFamilySocraticRadarCoralReefDynamicsProxy
@@ -55217,7 +57680,12 @@ export function tuningFamilySocraticRadarCoralReefDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3734 — tuningFamilySocraticRadarMarineStratificationProxy
@@ -55226,7 +57694,12 @@ export function tuningFamilySocraticRadarMarineStratificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3736 — tuningFamilySocraticRadarPelagicFoodWebProxy
@@ -55235,7 +57708,12 @@ export function tuningFamilySocraticRadarPelagicFoodWebProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3738 — tuningFamilySocraticRadarAtmosphericCarbonCycleProxy
@@ -55244,7 +57722,12 @@ export function tuningFamilySocraticRadarAtmosphericCarbonCycleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3740 — tuningFamilySocraticRadarArcticAmplificationV2Proxy
@@ -55253,7 +57736,12 @@ export function tuningFamilySocraticRadarArcticAmplificationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3742 — tuningFamilySocraticRadarMonsoonDynamicsProxy
@@ -55262,7 +57750,12 @@ export function tuningFamilySocraticRadarMonsoonDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3744 — tuningFamilySocraticRadarIceSheetDynamicsV2Proxy
@@ -55271,7 +57764,12 @@ export function tuningFamilySocraticRadarIceSheetDynamicsV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.3, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3746 — tuningFamilySocraticRadarClimateModelEnsembleProxy
@@ -55280,7 +57778,12 @@ export function tuningFamilySocraticRadarClimateModelEnsembleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3748 — tuningFamilySocraticRadarSeaLevelRiseV2Proxy
@@ -55289,7 +57792,12 @@ export function tuningFamilySocraticRadarSeaLevelRiseV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3750 — tuningFamilySocraticRadarSeismicWavePropagationProxy
@@ -55298,7 +57806,12 @@ export function tuningFamilySocraticRadarSeismicWavePropagationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3752 — tuningFamilySocraticRadarMagneticFieldReversalProxy
@@ -55307,7 +57820,12 @@ export function tuningFamilySocraticRadarMagneticFieldReversalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3754 — tuningFamilySocraticRadarMantelConvectionProxy
@@ -55316,7 +57834,12 @@ export function tuningFamilySocraticRadarMantelConvectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3756 — tuningFamilySocraticRadarEarthquakeNucleationProxy
@@ -55325,7 +57848,12 @@ export function tuningFamilySocraticRadarEarthquakeNucleationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3758 — tuningFamilySocraticRadarGeomagneticStormProxy
@@ -55334,7 +57862,12 @@ export function tuningFamilySocraticRadarGeomagneticStormProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3760 — tuningFamilySocraticRadarTectonicPlateVelocityProxy
@@ -55343,7 +57876,12 @@ export function tuningFamilySocraticRadarTectonicPlateVelocityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3762 — tuningFamilySocraticRadarPhotonEntanglementProxyV2
@@ -55362,7 +57900,12 @@ export function tuningFamilySocraticRadarPhotonEntanglementProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PhotonEntanglementV2: quantum diversity and nonlocal convergence
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55372,7 +57915,12 @@ export function tuningFamilySocraticRadarLaserCoherenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3766 — tuningFamilySocraticRadarQuantumSqueezingProxy
@@ -55381,7 +57929,12 @@ export function tuningFamilySocraticRadarQuantumSqueezingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3768 — tuningFamilySocraticRadarOpticalCavityQEDProxy
@@ -55390,7 +57943,12 @@ export function tuningFamilySocraticRadarOpticalCavityQEDProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3770 — tuningFamilySocraticRadarSpontaneousEmissionProxy
@@ -55399,7 +57957,12 @@ export function tuningFamilySocraticRadarSpontaneousEmissionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3772 — tuningFamilySocraticRadarHolographicInterferenceProxy
@@ -55408,7 +57971,12 @@ export function tuningFamilySocraticRadarHolographicInterferenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3774 — tuningFamilySocraticRadarWorkingMemoryCapacityProxy
@@ -55417,7 +57985,12 @@ export function tuningFamilySocraticRadarWorkingMemoryCapacityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3776 — tuningFamilySocraticRadarAttentionBottleneckProxy
@@ -55426,7 +57999,12 @@ export function tuningFamilySocraticRadarAttentionBottleneckProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3778 — tuningFamilySocraticRadarPredictiveCodingProxy
@@ -55435,7 +58013,12 @@ export function tuningFamilySocraticRadarPredictiveCodingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3780 — tuningFamilySocraticRadarEmbodiedCognitionProxy
@@ -55444,7 +58027,12 @@ export function tuningFamilySocraticRadarEmbodiedCognitionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3782 — tuningFamilySocraticRadarMetacognitionIndexProxy
@@ -55453,7 +58041,12 @@ export function tuningFamilySocraticRadarMetacognitionIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3784 — tuningFamilySocraticRadarCognitiveBiasNetworkProxy
@@ -55462,7 +58055,12 @@ export function tuningFamilySocraticRadarCognitiveBiasNetworkProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3786 — tuningFamilySocraticRadarDNAReplicationFidelityProxy
@@ -55471,7 +58069,12 @@ export function tuningFamilySocraticRadarDNAReplicationFidelityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3788 — tuningFamilySocraticRadarProteinFoldingLandscapeProxy
@@ -55480,7 +58083,12 @@ export function tuningFamilySocraticRadarProteinFoldingLandscapeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3790 — tuningFamilySocraticRadarRNASplicingDiversityProxy
@@ -55489,7 +58097,12 @@ export function tuningFamilySocraticRadarRNASplicingDiversityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3792 — tuningFamilySocraticRadarEpigeneticModificationProxy
@@ -55498,7 +58111,12 @@ export function tuningFamilySocraticRadarEpigeneticModificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3794 — tuningFamilySocraticRadarCRISPREditingPrecisionProxy
@@ -55507,7 +58125,12 @@ export function tuningFamilySocraticRadarCRISPREditingPrecisionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3796 — tuningFamilySocraticRadarMolecularChaperoneDynamicsProxy
@@ -55516,7 +58139,12 @@ export function tuningFamilySocraticRadarMolecularChaperoneDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3798 — tuningFamilySocraticRadarNaturalSelectionPressureProxy
@@ -55525,7 +58153,12 @@ export function tuningFamilySocraticRadarNaturalSelectionPressureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.3, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3800 — tuningFamilySocraticRadarGeneticDriftSimulationProxy
@@ -55534,7 +58167,12 @@ export function tuningFamilySocraticRadarGeneticDriftSimulationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3802 — tuningFamilySocraticRadarPhylogeneticDivergenceProxy
@@ -55543,7 +58181,12 @@ export function tuningFamilySocraticRadarPhylogeneticDivergenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3804 — tuningFamilySocraticRadarAdaptiveRadiationV2Proxy
@@ -55552,7 +58195,12 @@ export function tuningFamilySocraticRadarAdaptiveRadiationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3806 — tuningFamilySocraticRadarCoevolutionaryDynamicsProxy
@@ -55561,7 +58209,12 @@ export function tuningFamilySocraticRadarCoevolutionaryDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3808 — tuningFamilySocraticRadarHorizontalGeneTransferProxy
@@ -55570,7 +58223,12 @@ export function tuningFamilySocraticRadarHorizontalGeneTransferProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3810 — tuningFamilySocraticRadarEntropyProductionRateProxy
@@ -55579,7 +58237,12 @@ export function tuningFamilySocraticRadarEntropyProductionRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3812 — tuningFamilySocraticRadarPhaseTransitionDynamicsProxy
@@ -55588,7 +58251,12 @@ export function tuningFamilySocraticRadarPhaseTransitionDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3814 — tuningFamilySocraticRadarHeatCapacityAnomalyProxy
@@ -55597,7 +58265,12 @@ export function tuningFamilySocraticRadarHeatCapacityAnomalyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3816 — tuningFamilySocraticRadarThermodynamicCycleEfficiencyProxy
@@ -55606,7 +58279,12 @@ export function tuningFamilySocraticRadarThermodynamicCycleEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3818 — tuningFamilySocraticRadarNonEquilibriumFluctuationProxy
@@ -55615,7 +58293,12 @@ export function tuningFamilySocraticRadarNonEquilibriumFluctuationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3820 — tuningFamilySocraticRadarBoltzmannDistributionProxyV2
@@ -55634,7 +58317,12 @@ export function tuningFamilySocraticRadarBoltzmannDistributionProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // BoltzmannDistributionV2: convergence emphasis for thermal equilibrium probability
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55644,7 +58332,12 @@ export function tuningFamilySocraticRadarPartitionFunctionComplexityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3824 — tuningFamilySocraticRadarCorrelationLengthDivergenceProxy
@@ -55653,7 +58346,12 @@ export function tuningFamilySocraticRadarCorrelationLengthDivergenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3826 — tuningFamilySocraticRadarOrderParameterFluctuationProxy
@@ -55662,7 +58360,12 @@ export function tuningFamilySocraticRadarOrderParameterFluctuationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3828 — tuningFamilySocraticRadarRenormalizationGroupFlowProxy
@@ -55671,7 +58374,12 @@ export function tuningFamilySocraticRadarRenormalizationGroupFlowProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3830 — tuningFamilySocraticRadarMeanFieldApproximationProxy
@@ -55680,7 +58388,12 @@ export function tuningFamilySocraticRadarMeanFieldApproximationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3832 — tuningFamilySocraticRadarCriticalExponentScalingProxy
@@ -55689,7 +58402,12 @@ export function tuningFamilySocraticRadarCriticalExponentScalingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3834 — tuningFamilySocraticRadarMagneticConfinementV2Proxy
@@ -55698,7 +58416,12 @@ export function tuningFamilySocraticRadarMagneticConfinementV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3836 — tuningFamilySocraticRadarPlasmaInstabilityProxy
@@ -55707,7 +58430,12 @@ export function tuningFamilySocraticRadarPlasmaInstabilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3838 — tuningFamilySocraticRadarDebyeShieldingV2Proxy
@@ -55716,7 +58444,12 @@ export function tuningFamilySocraticRadarDebyeShieldingV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3840 — tuningFamilySocraticRadarAlfvenWaveDynamicsProxy
@@ -55725,7 +58458,12 @@ export function tuningFamilySocraticRadarAlfvenWaveDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3842 — tuningFamilySocraticRadarTokamakEquilibriumProxy
@@ -55734,7 +58472,12 @@ export function tuningFamilySocraticRadarTokamakEquilibriumProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3844 — tuningFamilySocraticRadarInertialConfinementProxy
@@ -55743,9 +58486,13 @@ export function tuningFamilySocraticRadarInertialConfinementProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
-
 
 // Q3846 — tuningFamilySocraticRadarStringVibrationModeProxy
 export function tuningFamilySocraticRadarStringVibrationModeProxy(
@@ -55753,7 +58500,12 @@ export function tuningFamilySocraticRadarStringVibrationModeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3848 — tuningFamilySocraticRadarCalabriYauCompactificationProxy
@@ -55762,7 +58514,12 @@ export function tuningFamilySocraticRadarCalabriYauCompactificationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3850 — tuningFamilySocraticRadarDualitySymmetryProxy
@@ -55771,7 +58528,12 @@ export function tuningFamilySocraticRadarDualitySymmetryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3852 — tuningFamilySocraticRadarBraneWorldDynamicsProxy
@@ -55780,7 +58542,12 @@ export function tuningFamilySocraticRadarBraneWorldDynamicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3854 — tuningFamilySocraticRadarHolographicEntropyProxy
@@ -55789,7 +58556,12 @@ export function tuningFamilySocraticRadarHolographicEntropyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3856 — tuningFamilySocraticRadarSupersymmetryBreakingProxy
@@ -55798,7 +58570,12 @@ export function tuningFamilySocraticRadarSupersymmetryBreakingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3858 — tuningFamilySocraticRadarBigBangNucleosynthesisProxy
@@ -55807,7 +58584,12 @@ export function tuningFamilySocraticRadarBigBangNucleosynthesisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3860 — tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxy
@@ -55816,7 +58598,12 @@ export function tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3862 — tuningFamilySocraticRadarDarkEnergyEquationProxy
@@ -55825,7 +58612,12 @@ export function tuningFamilySocraticRadarDarkEnergyEquationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3864 — tuningFamilySocraticRadarBaronAcousticOscillationProxy
@@ -55834,7 +58626,12 @@ export function tuningFamilySocraticRadarBaronAcousticOscillationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3866 — tuningFamilySocraticRadarCosmologicalPerturbationProxy
@@ -55843,7 +58640,12 @@ export function tuningFamilySocraticRadarCosmologicalPerturbationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3868 — tuningFamilySocraticRadarReionizationEpochProxy
@@ -55852,7 +58654,12 @@ export function tuningFamilySocraticRadarReionizationEpochProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3870 — tuningFamilySocraticRadarNuclearBindingEnergyProxy
@@ -55861,7 +58668,12 @@ export function tuningFamilySocraticRadarNuclearBindingEnergyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3872 — tuningFamilySocraticRadarRadioactiveDecayChainProxy
@@ -55870,7 +58682,12 @@ export function tuningFamilySocraticRadarRadioactiveDecayChainProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3874 — tuningFamilySocraticRadarFissionCrossectionProxy
@@ -55879,7 +58696,12 @@ export function tuningFamilySocraticRadarFissionCrossectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3876 — tuningFamilySocraticRadarNeutronModerationProxy
@@ -55888,7 +58710,12 @@ export function tuningFamilySocraticRadarNeutronModerationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3878 — tuningFamilySocraticRadarNuclearFusionIgnitionProxy
@@ -55897,7 +58724,12 @@ export function tuningFamilySocraticRadarNuclearFusionIgnitionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3880 — tuningFamilySocraticRadarIsotopeAbundanceProxy
@@ -55906,7 +58738,12 @@ export function tuningFamilySocraticRadarIsotopeAbundanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3882 — tuningFamilySocraticRadarHiggsBosonCouplingProxy
@@ -55915,7 +58752,12 @@ export function tuningFamilySocraticRadarHiggsBosonCouplingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3884 — tuningFamilySocraticRadarQuarkConfinementProxyV2
@@ -55934,7 +58776,12 @@ export function tuningFamilySocraticRadarQuarkConfinementProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // QuarkConfinement: diversity emphasis for color charge binding strength
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -55944,7 +58791,12 @@ export function tuningFamilySocraticRadarLeptogenesisAsymmetryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3888 — tuningFamilySocraticRadarGluonPlasmaViscosityProxy
@@ -55953,7 +58805,12 @@ export function tuningFamilySocraticRadarGluonPlasmaViscosityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3890 — tuningFamilySocraticRadarNeutrinoOscillationProxy
@@ -55962,7 +58819,12 @@ export function tuningFamilySocraticRadarNeutrinoOscillationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3892 — tuningFamilySocraticRadarSpinFoamAmplitudeProxy
@@ -55971,7 +58833,12 @@ export function tuningFamilySocraticRadarSpinFoamAmplitudeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3894 — tuningFamilySocraticRadarPhotonicBandgapProxy
@@ -55980,7 +58847,12 @@ export function tuningFamilySocraticRadarPhotonicBandgapProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3896 — tuningFamilySocraticRadarNonlinearOpticsV2Proxy
@@ -55989,7 +58861,12 @@ export function tuningFamilySocraticRadarNonlinearOpticsV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3898 — tuningFamilySocraticRadarMetasurfaceResonanceProxy
@@ -55998,7 +58875,12 @@ export function tuningFamilySocraticRadarMetasurfaceResonanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3900 — tuningFamilySocraticRadarPlasmoniCouplingProxy
@@ -56007,7 +58889,12 @@ export function tuningFamilySocraticRadarPlasmoniCouplingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3902 — tuningFamilySocraticRadarOpticalCoherenceTomographyProxy
@@ -56016,7 +58903,12 @@ export function tuningFamilySocraticRadarOpticalCoherenceTomographyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3904 — tuningFamilySocraticRadarFrequencyCombGenerationProxy
@@ -56025,7 +58917,12 @@ export function tuningFamilySocraticRadarFrequencyCombGenerationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3906 — tuningFamilySocraticRadarMaxwellEquationV2Proxy
@@ -56034,7 +58931,12 @@ export function tuningFamilySocraticRadarMaxwellEquationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3908 — tuningFamilySocraticRadarFaradayInductionProxy
@@ -56043,7 +58945,12 @@ export function tuningFamilySocraticRadarFaradayInductionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3910 — tuningFamilySocraticRadarLorentzForceProxy
@@ -56052,7 +58959,12 @@ export function tuningFamilySocraticRadarLorentzForceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3912 — tuningFamilySocraticRadarPoyntingVectorV2Proxy
@@ -56061,7 +58973,12 @@ export function tuningFamilySocraticRadarPoyntingVectorV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3914 — tuningFamilySocraticRadarElectromagneticWaveProxy
@@ -56070,7 +58987,12 @@ export function tuningFamilySocraticRadarElectromagneticWaveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3916 — tuningFamilySocraticRadarBrewsterAngleProxy
@@ -56079,7 +59001,12 @@ export function tuningFamilySocraticRadarBrewsterAngleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3918 — tuningFamilySocraticRadarNeuralSynapticPlasticityProxy
@@ -56088,7 +59015,12 @@ export function tuningFamilySocraticRadarNeuralSynapticPlasticityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3920 — tuningFamilySocraticRadarActionPotentialV2Proxy
@@ -56097,7 +59029,12 @@ export function tuningFamilySocraticRadarActionPotentialV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3922 — tuningFamilySocraticRadarHippocampalThetaRhythmProxy
@@ -56106,7 +59043,12 @@ export function tuningFamilySocraticRadarHippocampalThetaRhythmProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3924 — tuningFamilySocraticRadarCorticalOscillationProxy
@@ -56115,7 +59057,12 @@ export function tuningFamilySocraticRadarCorticalOscillationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3926 — tuningFamilySocraticRadarAxonMyelinationProxy
@@ -56124,7 +59071,12 @@ export function tuningFamilySocraticRadarAxonMyelinationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3928 — tuningFamilySocraticRadarNeurotransmitterReleaseProxy
@@ -56133,7 +59085,12 @@ export function tuningFamilySocraticRadarNeurotransmitterReleaseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3930 — tuningFamilySocraticRadarEnzymeKineticsProxyV3
@@ -56152,7 +59109,12 @@ export function tuningFamilySocraticRadarEnzymeKineticsProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // EnzymeKinetics: catalytic diversity and convergence
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56172,7 +59134,12 @@ export function tuningFamilySocraticRadarProteinFoldingProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ProteinFolding: folding versatility and benchmark
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56192,7 +59159,12 @@ export function tuningFamilySocraticRadarDNAReplicationProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // DNAReplication: fidelity maturity emphasis
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56202,7 +59174,12 @@ export function tuningFamilySocraticRadarMetabolicPathwayProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3938 — tuningFamilySocraticRadarCellSignalingProxy
@@ -56211,7 +59188,12 @@ export function tuningFamilySocraticRadarCellSignalingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3940 — tuningFamilySocraticRadarATPSynthesisProxy
@@ -56220,7 +59202,12 @@ export function tuningFamilySocraticRadarATPSynthesisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3942 — tuningFamilySocraticRadarCarbonCycleV3Proxy
@@ -56229,7 +59216,12 @@ export function tuningFamilySocraticRadarCarbonCycleV3Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3944 — tuningFamilySocraticRadarOceanCirculationProxy
@@ -56238,7 +59230,12 @@ export function tuningFamilySocraticRadarOceanCirculationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3946 — tuningFamilySocraticRadarAtmosphericConvectionProxy
@@ -56247,7 +59244,12 @@ export function tuningFamilySocraticRadarAtmosphericConvectionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3948 — tuningFamilySocraticRadarPermafrostThawProxy
@@ -56256,7 +59258,12 @@ export function tuningFamilySocraticRadarPermafrostThawProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3950 — tuningFamilySocraticRadarMonsoonSystemProxy
@@ -56265,7 +59272,12 @@ export function tuningFamilySocraticRadarMonsoonSystemProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3952 — tuningFamilySocraticRadarGlacierRetreatProxy
@@ -56274,7 +59286,12 @@ export function tuningFamilySocraticRadarGlacierRetreatProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3954 — tuningFamilySocraticRadarTidalResonanceProxy
@@ -56283,7 +59300,12 @@ export function tuningFamilySocraticRadarTidalResonanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3956 — tuningFamilySocraticRadarCoralReefBiodiversityProxy
@@ -56292,7 +59314,12 @@ export function tuningFamilySocraticRadarCoralReefBiodiversityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3958 — tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy
@@ -56301,7 +59328,12 @@ export function tuningFamilySocraticRadarDeepSeaHydrothermalV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3960 — tuningFamilySocraticRadarOceanAcidificationV3Proxy
@@ -56310,7 +59342,12 @@ export function tuningFamilySocraticRadarOceanAcidificationV3Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3962 — tuningFamilySocraticRadarBioluminescenceProxy
@@ -56319,7 +59356,12 @@ export function tuningFamilySocraticRadarBioluminescenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3964 — tuningFamilySocraticRadarPelagicZonationProxy
@@ -56328,7 +59370,12 @@ export function tuningFamilySocraticRadarPelagicZonationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3966 — tuningFamilySocraticRadarTectonicPlateProxy
@@ -56337,7 +59384,12 @@ export function tuningFamilySocraticRadarTectonicPlateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3968 — tuningFamilySocraticRadarVolcanicEruptionProxy
@@ -56346,7 +59398,12 @@ export function tuningFamilySocraticRadarVolcanicEruptionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3970 — tuningFamilySocraticRadarSeismicWavePropagationV2Proxy
@@ -56355,7 +59412,12 @@ export function tuningFamilySocraticRadarSeismicWavePropagationV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3972 — tuningFamilySocraticRadarMineralCrystallizationProxy
@@ -56364,7 +59426,12 @@ export function tuningFamilySocraticRadarMineralCrystallizationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3974 — tuningFamilySocraticRadarErosionSedimentationProxy
@@ -56373,7 +59440,12 @@ export function tuningFamilySocraticRadarErosionSedimentationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3976 — tuningFamilySocraticRadarGeothermalGradientV2Proxy
@@ -56382,7 +59454,12 @@ export function tuningFamilySocraticRadarGeothermalGradientV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3978 — tuningFamilySocraticRadarStellarNucleosynthesisV2Proxy
@@ -56391,7 +59468,12 @@ export function tuningFamilySocraticRadarStellarNucleosynthesisV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3980 — tuningFamilySocraticRadarPulsarTimingV2Proxy
@@ -56400,7 +59482,12 @@ export function tuningFamilySocraticRadarPulsarTimingV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3982 — tuningFamilySocraticRadarGalacticRotationCurveProxy
@@ -56409,7 +59496,12 @@ export function tuningFamilySocraticRadarGalacticRotationCurveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3984 — tuningFamilySocraticRadarExoplanetTransitProxy
@@ -56418,7 +59510,12 @@ export function tuningFamilySocraticRadarExoplanetTransitProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3986 — tuningFamilySocraticRadarGravitationalWaveStrainProxy
@@ -56427,7 +59524,12 @@ export function tuningFamilySocraticRadarGravitationalWaveStrainProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q3988 — tuningFamilySocraticRadarCosmicRaySpectralProxy
@@ -56436,7 +59538,12 @@ export function tuningFamilySocraticRadarCosmicRaySpectralProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3990 — tuningFamilySocraticRadarGrapheneElectronicProxy
@@ -56445,7 +59552,12 @@ export function tuningFamilySocraticRadarGrapheneElectronicProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3992 — tuningFamilySocraticRadarShapeMemoryAlloyProxy
@@ -56454,7 +59566,12 @@ export function tuningFamilySocraticRadarShapeMemoryAlloyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3994 — tuningFamilySocraticRadarPiezoelectricCouplingProxy
@@ -56463,7 +59580,12 @@ export function tuningFamilySocraticRadarPiezoelectricCouplingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q3996 — tuningFamilySocraticRadarTopologicalInsulatorV2Proxy
@@ -56472,7 +59594,12 @@ export function tuningFamilySocraticRadarTopologicalInsulatorV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q3998 — tuningFamilySocraticRadarSpintronicTransportProxy
@@ -56481,7 +59608,12 @@ export function tuningFamilySocraticRadarSpintronicTransportProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4000 — tuningFamilySocraticRadarMetamaterialRefractionProxy
@@ -56490,7 +59622,12 @@ export function tuningFamilySocraticRadarMetamaterialRefractionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4002 — tuningFamilySocraticRadarKolmogorovTurbulenceProxy
@@ -56499,7 +59636,12 @@ export function tuningFamilySocraticRadarKolmogorovTurbulenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4004 — tuningFamilySocraticRadarReynoldsNumberTransitionProxy
@@ -56508,7 +59650,12 @@ export function tuningFamilySocraticRadarReynoldsNumberTransitionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4006 — tuningFamilySocraticRadarVortexStretchingProxy
@@ -56517,7 +59664,12 @@ export function tuningFamilySocraticRadarVortexStretchingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q4008 — tuningFamilySocraticRadarBernoulliStreamlineProxy
@@ -56526,7 +59678,12 @@ export function tuningFamilySocraticRadarBernoulliStreamlineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4010 — tuningFamilySocraticRadarNavierStokesSolutionProxy
@@ -56535,7 +59692,12 @@ export function tuningFamilySocraticRadarNavierStokesSolutionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4012 — tuningFamilySocraticRadarShockWaveCompressionProxy
@@ -56544,7 +59706,12 @@ export function tuningFamilySocraticRadarShockWaveCompressionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4014 — tuningFamilySocraticRadarShannonEntropyCapacityProxy
@@ -56553,7 +59720,12 @@ export function tuningFamilySocraticRadarShannonEntropyCapacityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4016 — tuningFamilySocraticRadarKolmogorovComplexityProxyV4
@@ -56572,7 +59744,12 @@ export function tuningFamilySocraticRadarKolmogorovComplexityProxyV4(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // KolmogorovComplexityV4: structural description length and versatility
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56592,7 +59769,12 @@ export function tuningFamilySocraticRadarMutualInformationProxyV5(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // MutualInformationV5: shared information and maturity correlation
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56602,7 +59784,12 @@ export function tuningFamilySocraticRadarErrorCorrectionCodeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4022 — tuningFamilySocraticRadarDataCompressionRatioProxy
@@ -56611,7 +59798,12 @@ export function tuningFamilySocraticRadarDataCompressionRatioProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4024 — tuningFamilySocraticRadarBayesianInferenceProxy
@@ -56620,7 +59812,12 @@ export function tuningFamilySocraticRadarBayesianInferenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4026 — tuningFamilySocraticRadarNaturalSelectionFitnessProxy
@@ -56629,7 +59826,12 @@ export function tuningFamilySocraticRadarNaturalSelectionFitnessProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4028 — tuningFamilySocraticRadarGeneticDriftBottleneckProxy
@@ -56638,7 +59840,12 @@ export function tuningFamilySocraticRadarGeneticDriftBottleneckProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4030 — tuningFamilySocraticRadarConvergentEvolutionProxy
@@ -56647,7 +59854,12 @@ export function tuningFamilySocraticRadarConvergentEvolutionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q4032 — tuningFamilySocraticRadarPhylogeneticDivergenceProxyV2
@@ -56666,7 +59878,12 @@ export function tuningFamilySocraticRadarPhylogeneticDivergenceProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PhylogeneticDivergenceV2: evolutionary branching and benchmark separation
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56676,7 +59893,12 @@ export function tuningFamilySocraticRadarCoevolutionaryArmsRaceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4036 — tuningFamilySocraticRadarHorizontalGeneTransferProxyV2
@@ -56695,7 +59917,12 @@ export function tuningFamilySocraticRadarHorizontalGeneTransferProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // HorizontalGeneTransferV2: lateral transfer uniform integration across all axes
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56705,7 +59932,12 @@ export function tuningFamilySocraticRadarPartitionFunctionV3Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4040 — tuningFamilySocraticRadarPhaseTransitionOrderProxy
@@ -56714,7 +59946,12 @@ export function tuningFamilySocraticRadarPhaseTransitionOrderProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4042 — tuningFamilySocraticRadarIsingModelSpinProxy
@@ -56723,7 +59960,12 @@ export function tuningFamilySocraticRadarIsingModelSpinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q4044 — tuningFamilySocraticRadarRenormalizationGroupProxy
@@ -56732,7 +59974,12 @@ export function tuningFamilySocraticRadarRenormalizationGroupProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4046 — tuningFamilySocraticRadarFluctuationDissipationV3Proxy
@@ -56741,7 +59988,12 @@ export function tuningFamilySocraticRadarFluctuationDissipationV3Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4048 — tuningFamilySocraticRadarErgodicityChaosProxy
@@ -56750,7 +60002,12 @@ export function tuningFamilySocraticRadarErgodicityChaosProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4050 — tuningFamilySocraticRadarBandStructureDispersionProxy
@@ -56759,7 +60016,12 @@ export function tuningFamilySocraticRadarBandStructureDispersionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4052 — tuningFamilySocraticRadarFermiSurfaceTopologyProxy
@@ -56768,7 +60030,12 @@ export function tuningFamilySocraticRadarFermiSurfaceTopologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4054 — tuningFamilySocraticRadarPhononDispersionCurveProxy
@@ -56777,7 +60044,12 @@ export function tuningFamilySocraticRadarPhononDispersionCurveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q4056 — tuningFamilySocraticRadarSuperconductingGapProxy
@@ -56786,7 +60058,12 @@ export function tuningFamilySocraticRadarSuperconductingGapProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4058 — tuningFamilySocraticRadarHallEffectMobilityProxy
@@ -56795,7 +60072,12 @@ export function tuningFamilySocraticRadarHallEffectMobilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4060 — tuningFamilySocraticRadarExcitonBindingEnergyProxy
@@ -56804,7 +60086,12 @@ export function tuningFamilySocraticRadarExcitonBindingEnergyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4062 — tuningFamilySocraticRadarWorkingMemoryCapacityProxyV2
@@ -56823,7 +60110,12 @@ export function tuningFamilySocraticRadarWorkingMemoryCapacityProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // WorkingMemoryCapacityV2: capacity load and retention versatility
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56833,7 +60125,12 @@ export function tuningFamilySocraticRadarAttentionSelectivityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4066 — tuningFamilySocraticRadarPatternRecognitionProxyV4
@@ -56852,7 +60149,12 @@ export function tuningFamilySocraticRadarPatternRecognitionProxyV4(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PatternRecognitionV4: diversity of cognitive templates
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56862,7 +60164,12 @@ export function tuningFamilySocraticRadarSemanticsNetworkProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4070 — tuningFamilySocraticRadarEpisodicMemoryProxy
@@ -56871,7 +60178,12 @@ export function tuningFamilySocraticRadarEpisodicMemoryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4072 — tuningFamilySocraticRadarExecutiveFunctionProxyV3
@@ -56890,7 +60202,12 @@ export function tuningFamilySocraticRadarExecutiveFunctionProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ExecutiveFunctionV3: executive benchmark and control
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56900,7 +60217,12 @@ export function tuningFamilySocraticRadarQuantumDecoherenceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4076 — tuningFamilySocraticRadarQuantumSuperpositionProxy
@@ -56909,7 +60231,12 @@ export function tuningFamilySocraticRadarQuantumSuperpositionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4078 — tuningFamilySocraticRadarQuantumGateErrorProxy
@@ -56918,7 +60245,12 @@ export function tuningFamilySocraticRadarQuantumGateErrorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4080 — tuningFamilySocraticRadarQuantumCircuitDepthProxy
@@ -56927,7 +60259,12 @@ export function tuningFamilySocraticRadarQuantumCircuitDepthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4082 — tuningFamilySocraticRadarQuantumEntanglementProxyV3
@@ -56946,7 +60283,12 @@ export function tuningFamilySocraticRadarQuantumEntanglementProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // QuantumEntanglementV3: uniform entanglement across axes
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56966,7 +60308,12 @@ export function tuningFamilySocraticRadarQuantumTeleportationProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // QuantumTeleportationV2: teleportation convergence and fidelity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56986,7 +60333,12 @@ export function tuningFamilySocraticRadarPlasmaConfinementProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PlasmaConfinementV2: confinement maturity and benchmark stability
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -56996,7 +60348,12 @@ export function tuningFamilySocraticRadarMagneticFusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4090 — tuningFamilySocraticRadarInertialConfinementProxyV2
@@ -57015,7 +60372,12 @@ export function tuningFamilySocraticRadarInertialConfinementProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // InertialConfinementV2: implosion benchmark and compression diversity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57025,7 +60387,12 @@ export function tuningFamilySocraticRadarTritiumBreedingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.25, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4094 — tuningFamilySocraticRadarFusionIgnitionProxy
@@ -57034,7 +60401,12 @@ export function tuningFamilySocraticRadarFusionIgnitionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4096 — tuningFamilySocraticRadarPlasmaInstabilityProxyV2
@@ -57053,7 +60425,12 @@ export function tuningFamilySocraticRadarPlasmaInstabilityProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // PlasmaInstabilityV2: turbulent diversity and instability modes
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57073,7 +60450,12 @@ export function tuningFamilySocraticRadarBiodiversityIndexProxyV4(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // BiodiversityIndexV4: species richness diversity and ecological benchmark
-  const result = axisAggregates[0]! * 0.30 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.15;
+  const result =
+    axisAggregates[0]! * 0.3 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.15;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57093,7 +60475,12 @@ export function tuningFamilySocraticRadarEcosystemResilienceProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // EcosystemResilienceV3: adaptive versatility and recovery convergence
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57113,7 +60500,12 @@ export function tuningFamilySocraticRadarCarbonSequestrationProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // CarbonSequestrationV2: storage maturity and sink convergence
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57133,7 +60525,12 @@ export function tuningFamilySocraticRadarTrophicCascadeProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // TrophicCascadeV2: cascade benchmark and predator diversity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57143,7 +60540,12 @@ export function tuningFamilySocraticRadarSpeciesExtinctionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q4110 — tuningFamilySocraticRadarClimateModelingProxyV2
@@ -57162,7 +60564,12 @@ export function tuningFamilySocraticRadarClimateModelingProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ClimateModelingV2: simulation versatility and projection convergence
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57182,7 +60589,12 @@ export function tuningFamilySocraticRadarSeaLevelRiseProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // SeaLevelRiseV3: coastal benchmark and inundation diversity
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57202,7 +60614,12 @@ export function tuningFamilySocraticRadarArcticAmplificationProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ArcticAmplificationV3: polar diversity and feedback maturity
-  const result = axisAggregates[0]! * 0.25 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.25 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57222,7 +60639,12 @@ export function tuningFamilySocraticRadarGreenhouseEffectProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // GreenhouseEffectV2: radiative convergence and forcing benchmark
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57242,7 +60664,12 @@ export function tuningFamilySocraticRadarOceanCirculationProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // OceanCirculationV2: thermohaline maturity and current diversity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.15 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.15 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57252,7 +60679,12 @@ export function tuningFamilySocraticRadarPermafrostDegradationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q4122 — tuningFamilySocraticRadarDarkMatterDistributionProxy
@@ -57261,7 +60693,12 @@ export function tuningFamilySocraticRadarDarkMatterDistributionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4124 — tuningFamilySocraticRadarNeutronStarMergerProxy
@@ -57270,7 +60707,12 @@ export function tuningFamilySocraticRadarNeutronStarMergerProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4126 — tuningFamilySocraticRadarBlackHoleAccretionProxy
@@ -57279,7 +60721,12 @@ export function tuningFamilySocraticRadarBlackHoleAccretionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.15 },
+    { rootHz },
+  );
 }
 
 // Q4128 — tuningFamilySocraticRadarGravitationalWaveProxyV2
@@ -57298,7 +60745,12 @@ export function tuningFamilySocraticRadarGravitationalWaveProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // GravitationalWaveV2: wave versatility and detector convergence
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.25 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.25 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57318,7 +60770,12 @@ export function tuningFamilySocraticRadarCosmicInflationProxyV3(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // CosmicInflationV3: inflation maturity and scalar field diversity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.15 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.15 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57338,7 +60795,12 @@ export function tuningFamilySocraticRadarCosmicMicrowaveBackgroundProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // CosmicMicrowaveBackgroundV2: CMB convergence and anisotropy benchmark
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57348,7 +60810,12 @@ export function tuningFamilySocraticRadarNanomaterialSynthesisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4136 — tuningFamilySocraticRadarCrystalGrowthRateProxy
@@ -57357,7 +60824,12 @@ export function tuningFamilySocraticRadarCrystalGrowthRateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4138 — tuningFamilySocraticRadarPolymerElasticityProxy
@@ -57366,7 +60838,12 @@ export function tuningFamilySocraticRadarPolymerElasticityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4140 — tuningFamilySocraticRadarCeramicFractureToughnessProxy
@@ -57375,7 +60852,12 @@ export function tuningFamilySocraticRadarCeramicFractureToughnessProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4142 — tuningFamilySocraticRadarCompositeLayerInterfaceProxy
@@ -57384,7 +60866,12 @@ export function tuningFamilySocraticRadarCompositeLayerInterfaceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4144 — tuningFamilySocraticRadarSuperconductorCriticalProxy
@@ -57393,7 +60880,12 @@ export function tuningFamilySocraticRadarSuperconductorCriticalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4146 — tuningFamilySocraticRadarDiffractionGratingProxy
@@ -57402,7 +60894,12 @@ export function tuningFamilySocraticRadarDiffractionGratingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4148 — tuningFamilySocraticRadarInterferometryPhaseProxy
@@ -57411,7 +60908,12 @@ export function tuningFamilySocraticRadarInterferometryPhaseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4150 — tuningFamilySocraticRadarLaserCoherenceProxyV2
@@ -57430,7 +60932,12 @@ export function tuningFamilySocraticRadarLaserCoherenceProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // LaserCoherence: coherence maturity and lasing threshold benchmark
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.25 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.25 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57440,7 +60947,12 @@ export function tuningFamilySocraticRadarFiberBraggGratingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4154 — tuningFamilySocraticRadarPhotonicCrystalBandProxy
@@ -57449,7 +60961,12 @@ export function tuningFamilySocraticRadarPhotonicCrystalBandProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4156 — tuningFamilySocraticRadarWaveguideDispersionProxy
@@ -57458,7 +60975,12 @@ export function tuningFamilySocraticRadarWaveguideDispersionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4158 — tuningFamilySocraticRadarViscousFlowProxy
@@ -57467,7 +60989,12 @@ export function tuningFamilySocraticRadarViscousFlowProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4160 — tuningFamilySocraticRadarBoundaryLayerSeparationProxy
@@ -57476,7 +61003,12 @@ export function tuningFamilySocraticRadarBoundaryLayerSeparationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4162 — tuningFamilySocraticRadarShockWavePropagationProxy
@@ -57485,7 +61017,12 @@ export function tuningFamilySocraticRadarShockWavePropagationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4164 — tuningFamilySocraticRadarTurbulenceIntensityProxyV2
@@ -57504,7 +61041,12 @@ export function tuningFamilySocraticRadarTurbulenceIntensityProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // TurbulenceIntensityV2: turbulent benchmark and eddy diversity
-  const result = axisAggregates[0]! * 0.15 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.25 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.15 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.25 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57524,7 +61066,12 @@ export function tuningFamilySocraticRadarVortexDynamicsProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // VortexDynamicsV2: uniform vortical energy balance
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57534,7 +61081,12 @@ export function tuningFamilySocraticRadarReynoldsNumberV3Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4170 — tuningFamilySocraticRadarSemiconductorDopingProxy
@@ -57543,7 +61095,12 @@ export function tuningFamilySocraticRadarSemiconductorDopingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4172 — tuningFamilySocraticRadarMosfetChannelMobilityProxy
@@ -57552,7 +61109,12 @@ export function tuningFamilySocraticRadarMosfetChannelMobilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4174 — tuningFamilySocraticRadarPNJunctionDiodeProxy
@@ -57561,7 +61123,12 @@ export function tuningFamilySocraticRadarPNJunctionDiodeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4176 — tuningFamilySocraticRadarBandGapEngineeringProxy
@@ -57570,7 +61137,12 @@ export function tuningFamilySocraticRadarBandGapEngineeringProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4178 — tuningFamilySocraticRadarCarrierDiffusionProxy
@@ -57579,7 +61151,12 @@ export function tuningFamilySocraticRadarCarrierDiffusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4180 — tuningFamilySocraticRadarCrystallineDefectProxy
@@ -57588,7 +61165,12 @@ export function tuningFamilySocraticRadarCrystallineDefectProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4182 — tuningFamilySocraticRadarNMRChemicalShiftProxy
@@ -57597,7 +61179,12 @@ export function tuningFamilySocraticRadarNMRChemicalShiftProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4184 — tuningFamilySocraticRadarMRIRelaxationProxy
@@ -57606,7 +61193,12 @@ export function tuningFamilySocraticRadarMRIRelaxationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4186 — tuningFamilySocraticRadarSpinEchoProxy
@@ -57615,7 +61207,12 @@ export function tuningFamilySocraticRadarSpinEchoProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4188 — tuningFamilySocraticRadarGradientEchoProxy
@@ -57624,7 +61221,12 @@ export function tuningFamilySocraticRadarGradientEchoProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4190 — tuningFamilySocraticRadarKSpaceTrajectoryProxy
@@ -57633,7 +61235,12 @@ export function tuningFamilySocraticRadarKSpaceTrajectoryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4192 — tuningFamilySocraticRadarMagneticSusceptibilityProxy
@@ -57642,7 +61249,12 @@ export function tuningFamilySocraticRadarMagneticSusceptibilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4194 — tuningFamilySocraticRadarProteomicsProxy
@@ -57651,7 +61263,12 @@ export function tuningFamilySocraticRadarProteomicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4196 — tuningFamilySocraticRadarMetabolomicsProxy
@@ -57660,7 +61277,12 @@ export function tuningFamilySocraticRadarMetabolomicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4198 — tuningFamilySocraticRadarSingleCellSequencingProxy
@@ -57669,7 +61291,12 @@ export function tuningFamilySocraticRadarSingleCellSequencingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4200 — tuningFamilySocraticRadarTranscriptomicsProxy
@@ -57678,7 +61305,12 @@ export function tuningFamilySocraticRadarTranscriptomicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4202 — tuningFamilySocraticRadarGenomicVariantProxyV2
@@ -57697,7 +61329,12 @@ export function tuningFamilySocraticRadarGenomicVariantProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // GenomicVariantV2: variant convergence and allelic diversity
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.15 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.25;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.15 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.25;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57717,7 +61354,12 @@ export function tuningFamilySocraticRadarChromatinAccessibilityProxyV2(
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   });
   // ChromatinAccessibilityV2: uniform chromatin openness balance
-  const result = axisAggregates[0]! * 0.20 + axisAggregates[1]! * 0.20 + axisAggregates[2]! * 0.20 + axisAggregates[3]! * 0.20 + axisAggregates[4]! * 0.20;
+  const result =
+    axisAggregates[0]! * 0.2 +
+    axisAggregates[1]! * 0.2 +
+    axisAggregates[2]! * 0.2 +
+    axisAggregates[3]! * 0.2 +
+    axisAggregates[4]! * 0.2;
   return Math.min(1, Math.max(0, result));
 }
 
@@ -57727,7 +61369,12 @@ export function tuningFamilySocraticRadarPlanetaryMassProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4208 — tuningFamilySocraticRadarAtmosphericEscapeProxy
@@ -57736,7 +61383,12 @@ export function tuningFamilySocraticRadarAtmosphericEscapeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4210 — tuningFamilySocraticRadarCraterDensityProxy
@@ -57745,7 +61397,12 @@ export function tuningFamilySocraticRadarCraterDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4212 — tuningFamilySocraticRadarTidalLockingProxy
@@ -57754,7 +61411,12 @@ export function tuningFamilySocraticRadarTidalLockingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4214 — tuningFamilySocraticRadarPlanetaryMigrationProxy
@@ -57763,7 +61425,12 @@ export function tuningFamilySocraticRadarPlanetaryMigrationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4216 — tuningFamilySocraticRadarProtoplanetaryDiskProxy
@@ -57772,7 +61439,12 @@ export function tuningFamilySocraticRadarProtoplanetaryDiskProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4218 — tuningFamilySocraticRadarHematopoiesisProxy
@@ -57781,7 +61453,12 @@ export function tuningFamilySocraticRadarHematopoiesisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4220 — tuningFamilySocraticRadarErythrocyteProxy
@@ -57790,7 +61467,12 @@ export function tuningFamilySocraticRadarErythrocyteProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4222 — tuningFamilySocraticRadarLeukocyteProxy
@@ -57799,7 +61481,12 @@ export function tuningFamilySocraticRadarLeukocyteProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4224 — tuningFamilySocraticRadarPlateletProxy
@@ -57808,7 +61495,12 @@ export function tuningFamilySocraticRadarPlateletProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4226 — tuningFamilySocraticRadarCoagulationProxy
@@ -57817,7 +61509,12 @@ export function tuningFamilySocraticRadarCoagulationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4228 — tuningFamilySocraticRadarBloodViscosityProxy
@@ -57826,7 +61523,12 @@ export function tuningFamilySocraticRadarBloodViscosityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4230 — tuningFamilySocraticRadarEndocrinProxy
@@ -57835,7 +61537,12 @@ export function tuningFamilySocraticRadarEndocrinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4232 — tuningFamilySocraticRadarInsulinProxy
@@ -57844,7 +61551,12 @@ export function tuningFamilySocraticRadarInsulinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4234 — tuningFamilySocraticRadarCortisolProxy
@@ -57853,7 +61565,12 @@ export function tuningFamilySocraticRadarCortisolProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4236 — tuningFamilySocraticRadarThyroidProxy
@@ -57862,7 +61579,12 @@ export function tuningFamilySocraticRadarThyroidProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4238 — tuningFamilySocraticRadarAdrenalProxy
@@ -57871,7 +61593,12 @@ export function tuningFamilySocraticRadarAdrenalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4240 — tuningFamilySocraticRadarGlucoseHomeostasisProxy
@@ -57880,7 +61607,12 @@ export function tuningFamilySocraticRadarGlucoseHomeostasisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4242 — tuningFamilySocraticRadarRetinaProxy
@@ -57889,7 +61621,12 @@ export function tuningFamilySocraticRadarRetinaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4244 — tuningFamilySocraticRadarCorneaProxy
@@ -57898,7 +61635,12 @@ export function tuningFamilySocraticRadarCorneaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4246 — tuningFamilySocraticRadarLensAccommodationProxy
@@ -57907,7 +61649,12 @@ export function tuningFamilySocraticRadarLensAccommodationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4248 — tuningFamilySocraticRadarPhotoreceptorProxy
@@ -57916,7 +61663,12 @@ export function tuningFamilySocraticRadarPhotoreceptorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4250 — tuningFamilySocraticRadarVisualCortexProxy
@@ -57925,7 +61677,12 @@ export function tuningFamilySocraticRadarVisualCortexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4252 — tuningFamilySocraticRadarIntraocularPressureProxy
@@ -57934,7 +61691,12 @@ export function tuningFamilySocraticRadarIntraocularPressureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4254 — tuningFamilySocraticRadarDermatologyProxy
@@ -57943,7 +61705,12 @@ export function tuningFamilySocraticRadarDermatologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4256 — tuningFamilySocraticRadarMelanocyteProxy
@@ -57952,7 +61719,12 @@ export function tuningFamilySocraticRadarMelanocyteProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4258 — tuningFamilySocraticRadarCollagenProxy
@@ -57961,7 +61733,12 @@ export function tuningFamilySocraticRadarCollagenProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4260 — tuningFamilySocraticRadarKeratinProxy
@@ -57970,7 +61747,12 @@ export function tuningFamilySocraticRadarKeratinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4262 — tuningFamilySocraticRadarWoundHealingProxy
@@ -57979,7 +61761,12 @@ export function tuningFamilySocraticRadarWoundHealingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4264 — tuningFamilySocraticRadarSebaceousGlandProxy
@@ -57988,7 +61775,12 @@ export function tuningFamilySocraticRadarSebaceousGlandProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4266 — tuningFamilySocraticRadarRespiratoryProxy
@@ -57997,7 +61789,12 @@ export function tuningFamilySocraticRadarRespiratoryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4268 — tuningFamilySocraticRadarAlveolarProxy
@@ -58006,7 +61803,12 @@ export function tuningFamilySocraticRadarAlveolarProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4270 — tuningFamilySocraticRadarBronchialProxy
@@ -58015,7 +61817,12 @@ export function tuningFamilySocraticRadarBronchialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4272 — tuningFamilySocraticRadarPulmonaryProxy
@@ -58024,7 +61831,12 @@ export function tuningFamilySocraticRadarPulmonaryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4274 — tuningFamilySocraticRadarSurfactantProxy
@@ -58033,7 +61845,12 @@ export function tuningFamilySocraticRadarSurfactantProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4276 — tuningFamilySocraticRadarDiaphragmProxy
@@ -58042,7 +61859,12 @@ export function tuningFamilySocraticRadarDiaphragmProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4278 — tuningFamilySocraticRadarCardiacProxy
@@ -58051,7 +61873,12 @@ export function tuningFamilySocraticRadarCardiacProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4280 — tuningFamilySocraticRadarMyocardialProxy
@@ -58060,7 +61887,12 @@ export function tuningFamilySocraticRadarMyocardialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4282 — tuningFamilySocraticRadarArrhythmiaProxy
@@ -58069,7 +61901,12 @@ export function tuningFamilySocraticRadarArrhythmiaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4284 — tuningFamilySocraticRadarCoronaryProxy
@@ -58078,7 +61915,12 @@ export function tuningFamilySocraticRadarCoronaryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4286 — tuningFamilySocraticRadarVentricularProxy
@@ -58087,7 +61929,12 @@ export function tuningFamilySocraticRadarVentricularProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4288 — tuningFamilySocraticRadarPacemakerProxy
@@ -58096,7 +61943,12 @@ export function tuningFamilySocraticRadarPacemakerProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4290 — tuningFamilySocraticRadarNephronProxy
@@ -58105,7 +61957,12 @@ export function tuningFamilySocraticRadarNephronProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4292 — tuningFamilySocraticRadarGlomerularProxy
@@ -58114,7 +61971,12 @@ export function tuningFamilySocraticRadarGlomerularProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4294 — tuningFamilySocraticRadarTubularReabsorptionProxy
@@ -58123,7 +61985,12 @@ export function tuningFamilySocraticRadarTubularReabsorptionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4296 — tuningFamilySocraticRadarRenalClearanceProxy
@@ -58132,7 +61999,12 @@ export function tuningFamilySocraticRadarRenalClearanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4298 — tuningFamilySocraticRadarElectrolyteBalanceProxy
@@ -58141,7 +62013,12 @@ export function tuningFamilySocraticRadarElectrolyteBalanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4300 — tuningFamilySocraticRadarDialysisEfficiencyProxy
@@ -58150,7 +62027,12 @@ export function tuningFamilySocraticRadarDialysisEfficiencyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4302 — tuningFamilySocraticRadarHepatocyteProxy
@@ -58159,7 +62041,12 @@ export function tuningFamilySocraticRadarHepatocyteProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4304 — tuningFamilySocraticRadarBileSecretionProxy
@@ -58168,7 +62055,12 @@ export function tuningFamilySocraticRadarBileSecretionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4306 — tuningFamilySocraticRadarHepaticDetoxProxy
@@ -58177,7 +62069,12 @@ export function tuningFamilySocraticRadarHepaticDetoxProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4308 — tuningFamilySocraticRadarPancreaticEnzymeProxy
@@ -58186,7 +62083,12 @@ export function tuningFamilySocraticRadarPancreaticEnzymeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4310 — tuningFamilySocraticRadarGallbladderProxy
@@ -58195,7 +62097,12 @@ export function tuningFamilySocraticRadarGallbladderProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4312 — tuningFamilySocraticRadarCirrhosisIndexProxy
@@ -58204,7 +62111,12 @@ export function tuningFamilySocraticRadarCirrhosisIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4314 — tuningFamilySocraticRadarOsteoblastProxy
@@ -58213,7 +62125,12 @@ export function tuningFamilySocraticRadarOsteoblastProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4316 — tuningFamilySocraticRadarBoneDensityProxy
@@ -58222,7 +62139,12 @@ export function tuningFamilySocraticRadarBoneDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4318 — tuningFamilySocraticRadarCartilageProxy
@@ -58231,7 +62153,12 @@ export function tuningFamilySocraticRadarCartilageProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4320 — tuningFamilySocraticRadarOsteoporosisRiskProxy
@@ -58240,7 +62167,12 @@ export function tuningFamilySocraticRadarOsteoporosisRiskProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4322 — tuningFamilySocraticRadarSkeletalMuscleProxy
@@ -58249,7 +62181,12 @@ export function tuningFamilySocraticRadarSkeletalMuscleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4324 — tuningFamilySocraticRadarTendonElasticityProxy
@@ -58258,7 +62195,12 @@ export function tuningFamilySocraticRadarTendonElasticityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4326 — tuningFamilySocraticRadarNeuromuscularProxy
@@ -58267,7 +62209,12 @@ export function tuningFamilySocraticRadarNeuromuscularProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4328 — tuningFamilySocraticRadarNeurotransmitterProxy
@@ -58276,7 +62223,12 @@ export function tuningFamilySocraticRadarNeurotransmitterProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4330 — tuningFamilySocraticRadarAxonProxy
@@ -58285,7 +62237,12 @@ export function tuningFamilySocraticRadarAxonProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4332 — tuningFamilySocraticRadarMyelinProxy
@@ -58294,7 +62251,12 @@ export function tuningFamilySocraticRadarMyelinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4334 — tuningFamilySocraticRadarGlialCellProxy
@@ -58303,7 +62265,12 @@ export function tuningFamilySocraticRadarGlialCellProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4336 — tuningFamilySocraticRadarDendriteProxy
@@ -58312,7 +62279,12 @@ export function tuningFamilySocraticRadarDendriteProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4338 — tuningFamilySocraticRadarLymphaticProxy
@@ -58321,7 +62293,12 @@ export function tuningFamilySocraticRadarLymphaticProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4340 — tuningFamilySocraticRadarThymusProxy
@@ -58330,7 +62307,12 @@ export function tuningFamilySocraticRadarThymusProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4342 — tuningFamilySocraticRadarSpleenProxy
@@ -58339,7 +62321,12 @@ export function tuningFamilySocraticRadarSpleenProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4344 — tuningFamilySocraticRadarLymphNodeProxy
@@ -58348,7 +62335,12 @@ export function tuningFamilySocraticRadarLymphNodeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4346 — tuningFamilySocraticRadarInterferonProxy
@@ -58357,7 +62349,12 @@ export function tuningFamilySocraticRadarInterferonProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4348 — tuningFamilySocraticRadarComplementSystemProxy
@@ -58366,7 +62363,12 @@ export function tuningFamilySocraticRadarComplementSystemProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4350 — tuningFamilySocraticRadarGastricProxy
@@ -58375,7 +62377,12 @@ export function tuningFamilySocraticRadarGastricProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4352 — tuningFamilySocraticRadarIntestinalProxy
@@ -58384,7 +62391,12 @@ export function tuningFamilySocraticRadarIntestinalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4354 — tuningFamilySocraticRadarMicrobiomeProxy
@@ -58393,7 +62405,12 @@ export function tuningFamilySocraticRadarMicrobiomeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4356 — tuningFamilySocraticRadarPeristalsisProxy
@@ -58402,7 +62419,12 @@ export function tuningFamilySocraticRadarPeristalsisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4358 — tuningFamilySocraticRadarGutFloraProxy
@@ -58411,7 +62433,12 @@ export function tuningFamilySocraticRadarGutFloraProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4360 — tuningFamilySocraticRadarNutrientAbsorptionProxy
@@ -58420,7 +62447,12 @@ export function tuningFamilySocraticRadarNutrientAbsorptionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4362 — tuningFamilySocraticRadarPsychiatricProxy
@@ -58429,7 +62461,12 @@ export function tuningFamilySocraticRadarPsychiatricProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4364 — tuningFamilySocraticRadarDepressionScaleProxy
@@ -58438,7 +62475,12 @@ export function tuningFamilySocraticRadarDepressionScaleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4366 — tuningFamilySocraticRadarAnxietyIndexProxy
@@ -58447,7 +62489,12 @@ export function tuningFamilySocraticRadarAnxietyIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4368 — tuningFamilySocraticRadarSerotoninProxy
@@ -58456,7 +62503,12 @@ export function tuningFamilySocraticRadarSerotoninProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4370 — tuningFamilySocraticRadarDopamineProxy
@@ -58465,7 +62517,12 @@ export function tuningFamilySocraticRadarDopamineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4372 — tuningFamilySocraticRadarMoodStabilityProxy
@@ -58474,7 +62531,12 @@ export function tuningFamilySocraticRadarMoodStabilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4374 — tuningFamilySocraticRadarOncogeneProxy
@@ -58483,7 +62545,12 @@ export function tuningFamilySocraticRadarOncogeneProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4376 — tuningFamilySocraticRadarTumorSuppressorProxy
@@ -58492,7 +62559,12 @@ export function tuningFamilySocraticRadarTumorSuppressorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4378 — tuningFamilySocraticRadarApoptosisProxy
@@ -58501,7 +62573,12 @@ export function tuningFamilySocraticRadarApoptosisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4380 — tuningFamilySocraticRadarMetastasisProxy
@@ -58510,7 +62587,12 @@ export function tuningFamilySocraticRadarMetastasisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4382 — tuningFamilySocraticRadarChemotherapyResponseProxy
@@ -58519,7 +62601,12 @@ export function tuningFamilySocraticRadarChemotherapyResponseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4384 — tuningFamilySocraticRadarTumorMicroenvironmentProxy
@@ -58528,7 +62615,12 @@ export function tuningFamilySocraticRadarTumorMicroenvironmentProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4386 — tuningFamilySocraticRadarPituitaryProxy
@@ -58537,7 +62629,12 @@ export function tuningFamilySocraticRadarPituitaryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4388 — tuningFamilySocraticRadarHypothalamusProxy
@@ -58546,7 +62643,12 @@ export function tuningFamilySocraticRadarHypothalamusProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4390 — tuningFamilySocraticRadarGrowthHormoneProxy
@@ -58555,7 +62657,12 @@ export function tuningFamilySocraticRadarGrowthHormoneProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4392 — tuningFamilySocraticRadarMelatoninProxy
@@ -58564,7 +62671,12 @@ export function tuningFamilySocraticRadarMelatoninProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4394 — tuningFamilySocraticRadarGlucagonProxy
@@ -58573,7 +62685,12 @@ export function tuningFamilySocraticRadarGlucagonProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4396 — tuningFamilySocraticRadarParathyroidProxy
@@ -58582,7 +62699,12 @@ export function tuningFamilySocraticRadarParathyroidProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4398 — tuningFamilySocraticRadarCochlearProxy
@@ -58591,7 +62713,12 @@ export function tuningFamilySocraticRadarCochlearProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4400 — tuningFamilySocraticRadarVestibularProxy
@@ -58600,7 +62727,12 @@ export function tuningFamilySocraticRadarVestibularProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4402 — tuningFamilySocraticRadarTinnitusProxy
@@ -58609,7 +62741,12 @@ export function tuningFamilySocraticRadarTinnitusProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4404 — tuningFamilySocraticRadarHearingLossProxy
@@ -58618,7 +62755,12 @@ export function tuningFamilySocraticRadarHearingLossProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4406 — tuningFamilySocraticRadarAudiologyProxy
@@ -58627,7 +62769,12 @@ export function tuningFamilySocraticRadarAudiologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4408 — tuningFamilySocraticRadarOtoacousticEmissionProxy
@@ -58636,7 +62783,12 @@ export function tuningFamilySocraticRadarOtoacousticEmissionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4410 — tuningFamilySocraticRadarRehabilitationProxy
@@ -58645,7 +62797,12 @@ export function tuningFamilySocraticRadarRehabilitationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4412 — tuningFamilySocraticRadarPhysicalTherapyProxy
@@ -58654,7 +62811,12 @@ export function tuningFamilySocraticRadarPhysicalTherapyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4414 — tuningFamilySocraticRadarGaitAnalysisProxy
@@ -58663,7 +62825,12 @@ export function tuningFamilySocraticRadarGaitAnalysisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4416 — tuningFamilySocraticRadarBiomechanicsProxy
@@ -58672,7 +62839,12 @@ export function tuningFamilySocraticRadarBiomechanicsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4418 — tuningFamilySocraticRadarProprioceptionProxy
@@ -58681,7 +62853,12 @@ export function tuningFamilySocraticRadarProprioceptionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4420 — tuningFamilySocraticRadarMotorControlProxy
@@ -58690,7 +62867,12 @@ export function tuningFamilySocraticRadarMotorControlProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4422 — tuningFamilySocraticRadarUrologicProxy
@@ -58699,7 +62881,12 @@ export function tuningFamilySocraticRadarUrologicProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4424 — tuningFamilySocraticRadarProstateProxy
@@ -58708,7 +62895,12 @@ export function tuningFamilySocraticRadarProstateProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4426 — tuningFamilySocraticRadarBladderProxy
@@ -58717,7 +62909,12 @@ export function tuningFamilySocraticRadarBladderProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4428 — tuningFamilySocraticRadarUreteralProxy
@@ -58726,7 +62923,12 @@ export function tuningFamilySocraticRadarUreteralProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4430 — tuningFamilySocraticRadarErectileFunctionProxy
@@ -58735,7 +62937,12 @@ export function tuningFamilySocraticRadarErectileFunctionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4432 — tuningFamilySocraticRadarFertilityProxy
@@ -58744,7 +62951,12 @@ export function tuningFamilySocraticRadarFertilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4434 — tuningFamilySocraticRadarDentalProxy
@@ -58753,7 +62965,12 @@ export function tuningFamilySocraticRadarDentalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4436 — tuningFamilySocraticRadarPeriodontalProxy
@@ -58762,7 +62979,12 @@ export function tuningFamilySocraticRadarPeriodontalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4438 — tuningFamilySocraticRadarEnamelProxy
@@ -58771,7 +62993,12 @@ export function tuningFamilySocraticRadarEnamelProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4440 — tuningFamilySocraticRadarMalocclusionProxy
@@ -58780,7 +63007,12 @@ export function tuningFamilySocraticRadarMalocclusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4442 — tuningFamilySocraticRadarSalivaryGlandProxy
@@ -58789,7 +63021,12 @@ export function tuningFamilySocraticRadarSalivaryGlandProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4444 — tuningFamilySocraticRadarOralHealthProxy
@@ -58798,7 +63035,12 @@ export function tuningFamilySocraticRadarOralHealthProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4446 — tuningFamilySocraticRadarPodiatryProxy
@@ -58807,7 +63049,12 @@ export function tuningFamilySocraticRadarPodiatryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4448 — tuningFamilySocraticRadarPlantarProxy
@@ -58816,7 +63063,12 @@ export function tuningFamilySocraticRadarPlantarProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4450 — tuningFamilySocraticRadarAnkleStabilityProxy
@@ -58825,7 +63077,12 @@ export function tuningFamilySocraticRadarAnkleStabilityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4452 — tuningFamilySocraticRadarArchSupportProxy
@@ -58834,7 +63091,12 @@ export function tuningFamilySocraticRadarArchSupportProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4454 — tuningFamilySocraticRadarFootPressureProxy
@@ -58843,7 +63105,12 @@ export function tuningFamilySocraticRadarFootPressureProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4456 — tuningFamilySocraticRadarHeelStrikeProxy
@@ -58852,7 +63119,12 @@ export function tuningFamilySocraticRadarHeelStrikeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4458 — tuningFamilySocraticRadarLeukemiaProxy
@@ -58861,7 +63133,12 @@ export function tuningFamilySocraticRadarLeukemiaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4460 — tuningFamilySocraticRadarLymphomaProxy
@@ -58870,7 +63147,12 @@ export function tuningFamilySocraticRadarLymphomaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4462 — tuningFamilySocraticRadarBoneMarrowProxy
@@ -58879,7 +63161,12 @@ export function tuningFamilySocraticRadarBoneMarrowProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4464 — tuningFamilySocraticRadarPlasmaCellProxy
@@ -58888,7 +63175,12 @@ export function tuningFamilySocraticRadarPlasmaCellProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4466 — tuningFamilySocraticRadarStemCellProxy
@@ -58897,7 +63189,12 @@ export function tuningFamilySocraticRadarStemCellProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4468 — tuningFamilySocraticRadarHematologyProxy
@@ -58906,7 +63203,12 @@ export function tuningFamilySocraticRadarHematologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4470 — tuningFamilySocraticRadarInfectiousDiseaseProxy
@@ -58915,7 +63217,12 @@ export function tuningFamilySocraticRadarInfectiousDiseaseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4472 — tuningFamilySocraticRadarBacterialResistanceProxy
@@ -58924,7 +63231,12 @@ export function tuningFamilySocraticRadarBacterialResistanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4474 — tuningFamilySocraticRadarViralLoadProxy
@@ -58933,7 +63245,12 @@ export function tuningFamilySocraticRadarViralLoadProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4476 — tuningFamilySocraticRadarPandemicSpreadProxy
@@ -58942,7 +63259,12 @@ export function tuningFamilySocraticRadarPandemicSpreadProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4478 — tuningFamilySocraticRadarVaccineHesitancyProxy
@@ -58951,7 +63273,12 @@ export function tuningFamilySocraticRadarVaccineHesitancyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4480 — tuningFamilySocraticRadarQuarantineProxy
@@ -58960,7 +63287,12 @@ export function tuningFamilySocraticRadarQuarantineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4482 — tuningFamilySocraticRadarAllergyProxy
@@ -58969,7 +63301,12 @@ export function tuningFamilySocraticRadarAllergyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4484 — tuningFamilySocraticRadarAsthmaProxy
@@ -58978,7 +63315,12 @@ export function tuningFamilySocraticRadarAsthmaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4486 — tuningFamilySocraticRadarAnaphylaxisProxy
@@ -58987,7 +63329,12 @@ export function tuningFamilySocraticRadarAnaphylaxisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4488 — tuningFamilySocraticRadarHistamineProxy
@@ -58996,7 +63343,12 @@ export function tuningFamilySocraticRadarHistamineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4490 — tuningFamilySocraticRadarEosinophilProxy
@@ -59005,7 +63357,12 @@ export function tuningFamilySocraticRadarEosinophilProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4492 — tuningFamilySocraticRadarAtopyProxy
@@ -59014,7 +63371,12 @@ export function tuningFamilySocraticRadarAtopyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4494 — tuningFamilySocraticRadarRheumatologyProxy
@@ -59023,7 +63385,12 @@ export function tuningFamilySocraticRadarRheumatologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4496 — tuningFamilySocraticRadarArthritisProxy
@@ -59032,7 +63399,12 @@ export function tuningFamilySocraticRadarArthritisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4498 — tuningFamilySocraticRadarInflammatoryMarkerProxy
@@ -59041,7 +63413,12 @@ export function tuningFamilySocraticRadarInflammatoryMarkerProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4500 — tuningFamilySocraticRadarConnectiveTissueProxy
@@ -59050,7 +63427,12 @@ export function tuningFamilySocraticRadarConnectiveTissueProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4502 — tuningFamilySocraticRadarAutoantibodyProxy
@@ -59059,7 +63441,12 @@ export function tuningFamilySocraticRadarAutoantibodyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4504 — tuningFamilySocraticRadarLupusProxy
@@ -59068,7 +63455,12 @@ export function tuningFamilySocraticRadarLupusProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4506 — tuningFamilySocraticRadarGeriatricsProxy
@@ -59077,7 +63469,12 @@ export function tuningFamilySocraticRadarGeriatricsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4508 — tuningFamilySocraticRadarFrailtyProxy
@@ -59086,7 +63483,12 @@ export function tuningFamilySocraticRadarFrailtyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4510 — tuningFamilySocraticRadarSarcopeniaProxy
@@ -59095,7 +63497,12 @@ export function tuningFamilySocraticRadarSarcopeniaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4512 — tuningFamilySocraticRadarCognitiveDeclineProxy
@@ -59104,7 +63511,12 @@ export function tuningFamilySocraticRadarCognitiveDeclineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4514 — tuningFamilySocraticRadarPolypharmacyProxy
@@ -59113,7 +63525,12 @@ export function tuningFamilySocraticRadarPolypharmacyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4516 — tuningFamilySocraticRadarLongevityProxy
@@ -59122,7 +63539,12 @@ export function tuningFamilySocraticRadarLongevityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4518 — tuningFamilySocraticRadarPediatricsProxy
@@ -59131,7 +63553,12 @@ export function tuningFamilySocraticRadarPediatricsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4520 — tuningFamilySocraticRadarNeonatalProxy
@@ -59140,7 +63567,12 @@ export function tuningFamilySocraticRadarNeonatalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4522 — tuningFamilySocraticRadarGrowthChartProxy
@@ -59149,7 +63581,12 @@ export function tuningFamilySocraticRadarGrowthChartProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4524 — tuningFamilySocraticRadarDevelopmentalMilestoneProxy
@@ -59158,7 +63595,12 @@ export function tuningFamilySocraticRadarDevelopmentalMilestoneProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4526 — tuningFamilySocraticRadarImmunizationScheduleProxy
@@ -59167,7 +63609,12 @@ export function tuningFamilySocraticRadarImmunizationScheduleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4528 — tuningFamilySocraticRadarPrematurityProxy
@@ -59176,7 +63623,12 @@ export function tuningFamilySocraticRadarPrematurityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4530 — tuningFamilySocraticRadarEmergencyMedicineProxy
@@ -59185,7 +63637,12 @@ export function tuningFamilySocraticRadarEmergencyMedicineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4532 — tuningFamilySocraticRadarTriageProxy
@@ -59194,7 +63651,12 @@ export function tuningFamilySocraticRadarTriageProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4534 — tuningFamilySocraticRadarTraumaScoreProxy
@@ -59203,7 +63665,12 @@ export function tuningFamilySocraticRadarTraumaScoreProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4536 — tuningFamilySocraticRadarResuscitationProxy
@@ -59212,7 +63679,12 @@ export function tuningFamilySocraticRadarResuscitationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4538 — tuningFamilySocraticRadarSepsisRiskProxy
@@ -59221,7 +63693,12 @@ export function tuningFamilySocraticRadarSepsisRiskProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4540 — tuningFamilySocraticRadarShockIndexProxy
@@ -59230,7 +63707,12 @@ export function tuningFamilySocraticRadarShockIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4542 — tuningFamilySocraticRadarAnesthesiologyProxy
@@ -59239,7 +63721,12 @@ export function tuningFamilySocraticRadarAnesthesiologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4544 — tuningFamilySocraticRadarPainManagementProxy
@@ -59248,7 +63735,12 @@ export function tuningFamilySocraticRadarPainManagementProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4546 — tuningFamilySocraticRadarSedationProxy
@@ -59257,7 +63749,12 @@ export function tuningFamilySocraticRadarSedationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4548 — tuningFamilySocraticRadarOpioidReceptorProxy
@@ -59266,7 +63763,12 @@ export function tuningFamilySocraticRadarOpioidReceptorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4550 — tuningFamilySocraticRadarNerveBlockProxy
@@ -59275,7 +63777,12 @@ export function tuningFamilySocraticRadarNerveBlockProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4552 — tuningFamilySocraticRadarPostOpRecoveryProxy
@@ -59284,7 +63791,12 @@ export function tuningFamilySocraticRadarPostOpRecoveryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4554 — tuningFamilySocraticRadarRadiologyProxy
@@ -59293,7 +63805,12 @@ export function tuningFamilySocraticRadarRadiologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4556 — tuningFamilySocraticRadarUltrasoundProxy
@@ -59302,7 +63819,12 @@ export function tuningFamilySocraticRadarUltrasoundProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4558 — tuningFamilySocraticRadarMRIContrastProxy
@@ -59311,7 +63833,12 @@ export function tuningFamilySocraticRadarMRIContrastProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4560 — tuningFamilySocraticRadarCTScanProxy
@@ -59320,7 +63847,12 @@ export function tuningFamilySocraticRadarCTScanProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4562 — tuningFamilySocraticRadarPETScanProxy
@@ -59329,7 +63861,12 @@ export function tuningFamilySocraticRadarPETScanProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4564 — tuningFamilySocraticRadarXRayDensityProxy
@@ -59338,7 +63875,12 @@ export function tuningFamilySocraticRadarXRayDensityProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4566 — tuningFamilySocraticRadarPathologyProxy
@@ -59347,7 +63889,12 @@ export function tuningFamilySocraticRadarPathologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4568 — tuningFamilySocraticRadarBiopsyProxy
@@ -59356,7 +63903,12 @@ export function tuningFamilySocraticRadarBiopsyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4570 — tuningFamilySocraticRadarCytologyProxy
@@ -59365,7 +63917,12 @@ export function tuningFamilySocraticRadarCytologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4572 — tuningFamilySocraticRadarHistopathologyProxy
@@ -59374,7 +63931,12 @@ export function tuningFamilySocraticRadarHistopathologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4574 — tuningFamilySocraticRadarTumorGradingProxy
@@ -59383,7 +63945,12 @@ export function tuningFamilySocraticRadarTumorGradingProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4576 — tuningFamilySocraticRadarMolecularDiagnosticsProxy
@@ -59392,7 +63959,12 @@ export function tuningFamilySocraticRadarMolecularDiagnosticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4578 — tuningFamilySocraticRadarObstetricsProxy
@@ -59401,7 +63973,12 @@ export function tuningFamilySocraticRadarObstetricsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4580 — tuningFamilySocraticRadarPlacentaProxy
@@ -59410,7 +63987,12 @@ export function tuningFamilySocraticRadarPlacentaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4582 — tuningFamilySocraticRadarUmbilicalCordProxy
@@ -59419,7 +64001,12 @@ export function tuningFamilySocraticRadarUmbilicalCordProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4584 — tuningFamilySocraticRadarBirthWeightProxy
@@ -59428,7 +64015,12 @@ export function tuningFamilySocraticRadarBirthWeightProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4586 — tuningFamilySocraticRadarLactationProxy
@@ -59437,7 +64029,12 @@ export function tuningFamilySocraticRadarLactationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4588 — tuningFamilySocraticRadarApgarScoreProxy
@@ -59446,7 +64043,12 @@ export function tuningFamilySocraticRadarApgarScoreProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4590 — tuningFamilySocraticRadarGynecologyProxy
@@ -59455,7 +64057,12 @@ export function tuningFamilySocraticRadarGynecologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4592 — tuningFamilySocraticRadarMenstrualCycleProxy
@@ -59464,7 +64071,12 @@ export function tuningFamilySocraticRadarMenstrualCycleProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4594 — tuningFamilySocraticRadarOvarianReserveProxy
@@ -59473,7 +64085,12 @@ export function tuningFamilySocraticRadarOvarianReserveProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4596 — tuningFamilySocraticRadarEndometriosisProxy
@@ -59482,7 +64099,12 @@ export function tuningFamilySocraticRadarEndometriosisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4598 — tuningFamilySocraticRadarMenopauseProxy
@@ -59491,7 +64113,12 @@ export function tuningFamilySocraticRadarMenopauseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4600 — tuningFamilySocraticRadarPCOSProxy
@@ -59500,7 +64127,12 @@ export function tuningFamilySocraticRadarPCOSProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4602 — tuningFamilySocraticRadarHepatitisProxy
@@ -59509,7 +64141,12 @@ export function tuningFamilySocraticRadarHepatitisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4604 — tuningFamilySocraticRadarCirrhosisProgressionProxy
@@ -59518,7 +64155,12 @@ export function tuningFamilySocraticRadarCirrhosisProgressionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4606 — tuningFamilySocraticRadarLiverFibrosisProxy
@@ -59527,7 +64169,12 @@ export function tuningFamilySocraticRadarLiverFibrosisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4608 — tuningFamilySocraticRadarPortalHypertensionProxy
@@ -59536,7 +64183,12 @@ export function tuningFamilySocraticRadarPortalHypertensionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4610 — tuningFamilySocraticRadarAscitesProxy
@@ -59545,7 +64197,12 @@ export function tuningFamilySocraticRadarAscitesProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4612 — tuningFamilySocraticRadarJaundiceProxy
@@ -59554,7 +64211,12 @@ export function tuningFamilySocraticRadarJaundiceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4614 — tuningFamilySocraticRadarNephrologyProxy
@@ -59563,7 +64225,12 @@ export function tuningFamilySocraticRadarNephrologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4616 — tuningFamilySocraticRadarDialysisAccessProxy
@@ -59572,7 +64239,12 @@ export function tuningFamilySocraticRadarDialysisAccessProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4618 — tuningFamilySocraticRadarRenalTransplantProxy
@@ -59581,7 +64253,12 @@ export function tuningFamilySocraticRadarRenalTransplantProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4620 — tuningFamilySocraticRadarProteinuriaProxy
@@ -59590,7 +64267,12 @@ export function tuningFamilySocraticRadarProteinuriaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4622 — tuningFamilySocraticRadarCreatinineClearanceProxy
@@ -59599,7 +64281,12 @@ export function tuningFamilySocraticRadarCreatinineClearanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4624 — tuningFamilySocraticRadarAcidBaseBalanceProxy
@@ -59608,7 +64295,12 @@ export function tuningFamilySocraticRadarAcidBaseBalanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4626 — tuningFamilySocraticRadarNeurologyProxy
@@ -59617,7 +64309,12 @@ export function tuningFamilySocraticRadarNeurologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4628 — tuningFamilySocraticRadarStrokeRiskProxy
@@ -59626,7 +64323,12 @@ export function tuningFamilySocraticRadarStrokeRiskProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4630 — tuningFamilySocraticRadarEpilepsyProxy
@@ -59635,7 +64337,12 @@ export function tuningFamilySocraticRadarEpilepsyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4632 — tuningFamilySocraticRadarParkinsonismProxy
@@ -59644,7 +64351,12 @@ export function tuningFamilySocraticRadarParkinsonismProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4634 — tuningFamilySocraticRadarMultipleSclerosisProxy
@@ -59653,7 +64365,12 @@ export function tuningFamilySocraticRadarMultipleSclerosisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4636 — tuningFamilySocraticRadarEEGSpectrumProxy
@@ -59662,7 +64379,12 @@ export function tuningFamilySocraticRadarEEGSpectrumProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4638 — tuningFamilySocraticRadarDermatopathologyProxy
@@ -59671,7 +64393,12 @@ export function tuningFamilySocraticRadarDermatopathologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4640 — tuningFamilySocraticRadarPsoriasisProxy
@@ -59680,7 +64407,12 @@ export function tuningFamilySocraticRadarPsoriasisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4642 — tuningFamilySocraticRadarEczemaProxy
@@ -59689,7 +64421,12 @@ export function tuningFamilySocraticRadarEczemaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4644 — tuningFamilySocraticRadarMelanomaProxy
@@ -59698,7 +64435,12 @@ export function tuningFamilySocraticRadarMelanomaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4646 — tuningFamilySocraticRadarSkinBarrierProxy
@@ -59707,7 +64449,12 @@ export function tuningFamilySocraticRadarSkinBarrierProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4648 — tuningFamilySocraticRadarWoundHealingV2Proxy
@@ -59716,7 +64463,12 @@ export function tuningFamilySocraticRadarWoundHealingV2Proxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4650 — tuningFamilySocraticRadarOphthalmicSurgeryProxy
@@ -59725,7 +64477,12 @@ export function tuningFamilySocraticRadarOphthalmicSurgeryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4652 — tuningFamilySocraticRadarGlaucomaProxy
@@ -59734,7 +64491,12 @@ export function tuningFamilySocraticRadarGlaucomaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4654 — tuningFamilySocraticRadarCataractProxy
@@ -59743,7 +64505,12 @@ export function tuningFamilySocraticRadarCataractProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4656 — tuningFamilySocraticRadarRetinopathyProxy
@@ -59752,7 +64519,12 @@ export function tuningFamilySocraticRadarRetinopathyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4658 — tuningFamilySocraticRadarMacularDegenerationProxy
@@ -59761,7 +64533,12 @@ export function tuningFamilySocraticRadarMacularDegenerationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4660 — tuningFamilySocraticRadarStrabismusProxy
@@ -59770,7 +64547,12 @@ export function tuningFamilySocraticRadarStrabismusProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4662 — tuningFamilySocraticRadarOrthodonticsProxy
@@ -59779,7 +64561,12 @@ export function tuningFamilySocraticRadarOrthodonticsProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4664 — tuningFamilySocraticRadarToothEruptionProxy
@@ -59788,7 +64575,12 @@ export function tuningFamilySocraticRadarToothEruptionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4666 — tuningFamilySocraticRadarRootCanalProxy
@@ -59797,7 +64589,12 @@ export function tuningFamilySocraticRadarRootCanalProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4668 — tuningFamilySocraticRadarDentalImplantProxy
@@ -59806,7 +64603,12 @@ export function tuningFamilySocraticRadarDentalImplantProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4670 — tuningFamilySocraticRadarBruxismProxy
@@ -59815,7 +64617,12 @@ export function tuningFamilySocraticRadarBruxismProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4672 — tuningFamilySocraticRadarTMJDisorderProxy
@@ -59824,7 +64631,12 @@ export function tuningFamilySocraticRadarTMJDisorderProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4674 — tuningFamilySocraticRadarSportsMedicineProxy
@@ -59833,7 +64645,12 @@ export function tuningFamilySocraticRadarSportsMedicineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4676 — tuningFamilySocraticRadarConcussionProxy
@@ -59842,7 +64659,12 @@ export function tuningFamilySocraticRadarConcussionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4678 — tuningFamilySocraticRadarACLInjuryProxy
@@ -59851,7 +64673,12 @@ export function tuningFamilySocraticRadarACLInjuryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4680 — tuningFamilySocraticRadarMuscleStrainProxy
@@ -59860,7 +64687,12 @@ export function tuningFamilySocraticRadarMuscleStrainProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4682 — tuningFamilySocraticRadarVO2MaxProxy
@@ -59869,7 +64701,12 @@ export function tuningFamilySocraticRadarVO2MaxProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4684 — tuningFamilySocraticRadarLactateThresholdProxy
@@ -59878,7 +64715,12 @@ export function tuningFamilySocraticRadarLactateThresholdProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4686 — tuningFamilySocraticRadarNeonatalIntensiveCareProxy
@@ -59887,7 +64729,12 @@ export function tuningFamilySocraticRadarNeonatalIntensiveCareProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4688 — tuningFamilySocraticRadarRespiratoryDistressProxy
@@ -59896,7 +64743,12 @@ export function tuningFamilySocraticRadarRespiratoryDistressProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4690 — tuningFamilySocraticRadarSurfactantTherapyProxy
@@ -59905,7 +64757,12 @@ export function tuningFamilySocraticRadarSurfactantTherapyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4692 — tuningFamilySocraticRadarPatentDuctusArteriosusProxy
@@ -59914,7 +64771,12 @@ export function tuningFamilySocraticRadarPatentDuctusArteriosusProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4694 — tuningFamilySocraticRadarNecrotizingEnterocolitisProxy
@@ -59923,7 +64785,12 @@ export function tuningFamilySocraticRadarNecrotizingEnterocolitisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4696 — tuningFamilySocraticRadarBronchopulmonaryDysplasiaProxy
@@ -59932,7 +64799,12 @@ export function tuningFamilySocraticRadarBronchopulmonaryDysplasiaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4698 — tuningFamilySocraticRadarPsychosomaticMedicineProxy
@@ -59941,7 +64813,12 @@ export function tuningFamilySocraticRadarPsychosomaticMedicineProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4700 — tuningFamilySocraticRadarSomatizationProxy
@@ -59950,7 +64827,12 @@ export function tuningFamilySocraticRadarSomatizationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4702 — tuningFamilySocraticRadarStressResponseProxy
@@ -59959,7 +64841,12 @@ export function tuningFamilySocraticRadarStressResponseProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4704 — tuningFamilySocraticRadarBiofeedbackProxy
@@ -59968,7 +64855,12 @@ export function tuningFamilySocraticRadarBiofeedbackProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4706 — tuningFamilySocraticRadarChronicFatigueProxy
@@ -59977,7 +64869,12 @@ export function tuningFamilySocraticRadarChronicFatigueProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4708 — tuningFamilySocraticRadarPsychoneuroimmunologyProxy
@@ -59986,7 +64883,12 @@ export function tuningFamilySocraticRadarPsychoneuroimmunologyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4710 — tuningFamilySocraticRadarHematopoiesisRegulationProxy
@@ -59995,7 +64897,12 @@ export function tuningFamilySocraticRadarHematopoiesisRegulationProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4712 — tuningFamilySocraticRadarErythropoietinProxy
@@ -60004,7 +64911,12 @@ export function tuningFamilySocraticRadarErythropoietinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4714 — tuningFamilySocraticRadarThrombopoietinProxy
@@ -60013,7 +64925,12 @@ export function tuningFamilySocraticRadarThrombopoietinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4716 — tuningFamilySocraticRadarIronMetabolismProxy
@@ -60022,7 +64939,12 @@ export function tuningFamilySocraticRadarIronMetabolismProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4718 — tuningFamilySocraticRadarHemoglobinopathyProxy
@@ -60031,7 +64953,12 @@ export function tuningFamilySocraticRadarHemoglobinopathyProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4720 — tuningFamilySocraticRadarCoagulationFactorProxy
@@ -60040,7 +64967,12 @@ export function tuningFamilySocraticRadarCoagulationFactorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4722 — tuningFamilySocraticRadarEndocrineDisruptorProxy
@@ -60049,7 +64981,12 @@ export function tuningFamilySocraticRadarEndocrineDisruptorProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4724 — tuningFamilySocraticRadarInsulinResistanceProxy
@@ -60058,7 +64995,12 @@ export function tuningFamilySocraticRadarInsulinResistanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4726 — tuningFamilySocraticRadarThyroidHormoneProxy
@@ -60067,7 +65009,12 @@ export function tuningFamilySocraticRadarThyroidHormoneProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4728 — tuningFamilySocraticRadarAdrenalAxisProxy
@@ -60076,7 +65023,12 @@ export function tuningFamilySocraticRadarAdrenalAxisProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4730 — tuningFamilySocraticRadarGonadotropinProxy
@@ -60085,7 +65037,12 @@ export function tuningFamilySocraticRadarGonadotropinProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4732 — tuningFamilySocraticRadarMetabolicSyndromeProxy
@@ -60094,7 +65051,12 @@ export function tuningFamilySocraticRadarMetabolicSyndromeProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4734 — tuningFamilySocraticRadarPulmonaryFunctionTestProxy
@@ -60103,7 +65065,12 @@ export function tuningFamilySocraticRadarPulmonaryFunctionTestProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4736 — tuningFamilySocraticRadarSpirometryProxy
@@ -60112,7 +65079,12 @@ export function tuningFamilySocraticRadarSpirometryProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4738 — tuningFamilySocraticRadarLungCancerScreeningProxy
@@ -60121,7 +65093,12 @@ export function tuningFamilySocraticRadarLungCancerScreeningProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4740 — tuningFamilySocraticRadarPneumoniaProxy
@@ -60130,7 +65107,12 @@ export function tuningFamilySocraticRadarPneumoniaProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4742 — tuningFamilySocraticRadarCOPDProxy
@@ -60139,7 +65121,12 @@ export function tuningFamilySocraticRadarCOPDProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4744 — tuningFamilySocraticRadarPleuralEffusionProxy
@@ -60148,7 +65135,12 @@ export function tuningFamilySocraticRadarPleuralEffusionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4746 — tuningFamilySocraticRadarClinicalTrialProxy
@@ -60157,7 +65149,12 @@ export function tuningFamilySocraticRadarClinicalTrialProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.25, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4748 — tuningFamilySocraticRadarPharmacovigilanceProxy
@@ -60166,7 +65163,12 @@ export function tuningFamilySocraticRadarPharmacovigilanceProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.25, maturity: 0.2, benchmark: 0.15, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4750 — tuningFamilySocraticRadarDrugInteractionProxy
@@ -60175,7 +65177,12 @@ export function tuningFamilySocraticRadarDrugInteractionProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.15, versatility: 0.2, maturity: 0.25, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4752 — tuningFamilySocraticRadarBiosimilarProxy
@@ -60184,7 +65191,12 @@ export function tuningFamilySocraticRadarBiosimilarProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.15, maturity: 0.2, benchmark: 0.25, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // Q4754 — tuningFamilySocraticRadarTherapeuticMonitoringProxy
@@ -60193,7 +65205,12 @@ export function tuningFamilySocraticRadarTherapeuticMonitoringProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.15, benchmark: 0.2, convergence: 0.25 },
+    { rootHz },
+  );
 }
 
 // Q4756 — tuningFamilySocraticRadarTherapeuticIndexProxy
@@ -60202,7 +65219,12 @@ export function tuningFamilySocraticRadarTherapeuticIndexProxy(
   spectrum: Spectrum,
   rootHz?: number,
 ): number {
-  return tuningFamilySocraticRadarWeighted(tunings, spectrum, { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 }, { rootHz });
+  return tuningFamilySocraticRadarWeighted(
+    tunings,
+    spectrum,
+    { diversity: 0.2, versatility: 0.2, maturity: 0.2, benchmark: 0.2, convergence: 0.2 },
+    { rootHz },
+  );
 }
 
 // KKK1
@@ -66636,7 +71658,7 @@ export function scaleMaxStepFraction(pitches: readonly Pitch[]): number {
 export function scaleRegisterBalanceV2(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0.5;
   const period = 1200;
-  const cents = pitches.map((p) => (((pitchToCents(p) % period) + period) % period));
+  const cents = pitches.map((p) => ((pitchToCents(p) % period) + period) % period);
   const mid = period / 2;
   const lower = cents.filter((c) => c < mid).length;
   const upper = cents.filter((c) => c > mid).length;
@@ -66880,7 +71902,7 @@ export function scaleJustTuningDeviation(pitches: readonly Pitch[]): number {
 export function scaleHighRegisterRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
   const period = 1200;
-  const cents = pitches.map((p) => (((pitchToCents(p) % period) + period) % period));
+  const cents = pitches.map((p) => ((pitchToCents(p) % period) + period) % period);
   const threshold = (period * 2) / 3;
   const high = cents.filter((c) => c >= threshold).length;
   return high / cents.length;
@@ -66890,7 +71912,7 @@ export function scaleHighRegisterRatio(pitches: readonly Pitch[]): number {
 export function scaleLowRegisterRatio(pitches: readonly Pitch[]): number {
   if (pitches.length < 2) return 0;
   const period = 1200;
-  const cents = pitches.map((p) => (((pitchToCents(p) % period) + period) % period));
+  const cents = pitches.map((p) => ((pitchToCents(p) % period) + period) % period);
   const threshold = period / 3;
   const low = cents.filter((c) => c <= threshold).length;
   return low / cents.length;
@@ -68710,7 +73732,7 @@ export function scaleMinorThirdContent(pitches: readonly Pitch[]): number {
 // opposite pole from the tonic (600c) when the distribution is perfectly symmetric
 // and has no well-defined directional lean (e.g. an evenly-spaced closed cycle).
 function scaleCircularMeanCents(pitches: readonly Pitch[]): number {
-  const centsArr = pitches.map((p) => (((pitchToCents(p) % 1200) + 1200) % 1200));
+  const centsArr = pitches.map((p) => ((pitchToCents(p) % 1200) + 1200) % 1200);
   const angles = centsArr.map((c) => (c / 1200) * 2 * Math.PI);
   const sinSum = angles.reduce((s, a) => s + Math.sin(a), 0);
   const cosSum = angles.reduce((s, a) => s + Math.cos(a), 0);
@@ -69775,7 +74797,9 @@ export function scaleSixthQualityScore(pitches: readonly Pitch[]): number {
         (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
       );
       if (
-        tols.some(({ target, tol }) => Math.abs(d - target) <= tol || Math.abs(1200 - d - target) <= tol)
+        tols.some(
+          ({ target, tol }) => Math.abs(d - target) <= tol || Math.abs(1200 - d - target) <= tol,
+        )
       )
         count++;
     }
@@ -69798,7 +74822,9 @@ export function scaleSeventhQualityScore(pitches: readonly Pitch[]): number {
         (((pitchToCents(pitches[j]!) - pitchToCents(pitches[i]!)) % 1200) + 1200) % 1200,
       );
       if (
-        tols.some(({ target, tol }) => Math.abs(d - target) <= tol || Math.abs(1200 - d - target) <= tol)
+        tols.some(
+          ({ target, tol }) => Math.abs(d - target) <= tol || Math.abs(1200 - d - target) <= tol,
+        )
       )
         count++;
     }
@@ -74246,7 +79272,11 @@ export function scaleXinguScale(pitches: readonly Pitch[]): number {
 }
 
 export function scaleCarnaticScale(pitches: readonly Pitch[]): number {
-  return matchScaleTemplate(pitches, [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100], 50);
+  return matchScaleTemplate(
+    pitches,
+    [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100],
+    50,
+  );
 }
 
 export function scaleHindustaniScale(pitches: readonly Pitch[]): number {

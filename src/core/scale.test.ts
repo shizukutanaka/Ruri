@@ -1534,7 +1534,6 @@ describe('scaleToCents', () => {
   });
 });
 
-
 describe('scaleToFreqs — bridge to the frequency world', () => {
   it('test_root_is_reference_hz', () => {
     const freqs = scaleToFreqs(major, t12);
@@ -1574,7 +1573,6 @@ describe('scaleToFreqs — bridge to the frequency world', () => {
     expect(() => scaleToFreqs(wrong, t12)).toThrow(RangeError);
   });
 });
-
 
 // Socratic Q39: modal rotation is a first-class Scale operation.
 describe('scaleMode — modal rotation', () => {
@@ -1658,7 +1656,6 @@ describe('scaleMode — modal rotation', () => {
   });
 });
 
-
 // Socratic Q41: scaleToTuning bridges Scale → TuningSystem for rankChords / pipeline.
 describe('scaleToTuning — modal layer → TuningSystem bridge', () => {
   it('test_degree_count_matches_scale_length', () => {
@@ -1723,7 +1720,6 @@ describe('scaleToTuning — modal layer → TuningSystem bridge', () => {
   });
 });
 
-
 // Socratic Q42: tuningToScale bridges TuningSystem → Scale (generation → modal layer).
 describe('tuningToScale — TuningSystem → Scale bridge', () => {
   it('test_degree_indices_span_all_degrees', () => {
@@ -1778,7 +1774,6 @@ describe('tuningToScale — TuningSystem → Scale bridge', () => {
     expect(recoveredCents).toEqual(originalCents);
   });
 });
-
 
 // Socratic Q43: scaleDissonance and rankModes close the modal→acoustic evaluation gap.
 describe('scaleDissonance + rankModes — modal acoustic analysis', () => {
@@ -1839,7 +1834,6 @@ describe('scaleDissonance + rankModes — modal acoustic analysis', () => {
   });
 });
 
-
 // Q51: `assertTuningMatch` は内部にのみあるが、外部から Scale の整合性を確認できるか？
 describe('isScaleCompatible — public guard predicate (Q51)', () => {
   const t12 = equalTemperament12(440);
@@ -1893,7 +1887,6 @@ describe('isScaleCompatible — public guard predicate (Q51)', () => {
     expect(() => scaleToCents(incompatible, t12)).toThrow(RangeError);
   });
 });
-
 
 // Q57: Scale → diatonic chord ranking in one call
 describe('rankScaleChords — rank chord subsets of a Scale (Q57)', () => {
@@ -1950,7 +1943,6 @@ describe('rankScaleChords — rank chord subsets of a Scale (Q57)', () => {
     expect(harmScores).not.toEqual(bellScores);
   });
 });
-
 
 // Q59: Scale → Float32Array melodic audio in one call
 describe('synthScaleFromScale — Scale to melodic audio (Q59)', () => {
@@ -2010,7 +2002,6 @@ describe('synthScaleFromScale — Scale to melodic audio (Q59)', () => {
     expect(direct.length).toBe(Math.floor(opts.sampleRate * opts.noteSeconds) * freqs.length);
   });
 });
-
 
 // Q64: Scale is first-class — should building a chord from scale-local offsets be one call?
 describe('chordFromScale — chord from scale-local degree offsets (Q64)', () => {
@@ -2078,7 +2069,6 @@ describe('chordFromScale — chord from scale-local degree offsets (Q64)', () =>
   });
 });
 
-
 // Q66: For each mode, rank its diatonic chords → leaderboard sorted by best chord's score
 describe('rankModeChords — modal chord leaderboard (Q66)', () => {
   const spectrum = harmonicSpectrum();
@@ -2144,7 +2134,6 @@ describe('rankModeChords — modal chord leaderboard (Q66)', () => {
   });
 });
 
-
 // Q68: Collapse rankModes → rankScaleChords → rankedChordToChord into one call
 describe('chordFromBestMode — best chord from most consonant mode (Q68)', () => {
   const spectrum = harmonicSpectrum();
@@ -2195,7 +2184,6 @@ describe('chordFromBestMode — best chord from most consonant mode (Q68)', () =
     expect(() => chordFromBestMode(wrong, t12)).toThrow(RangeError);
   });
 });
-
 
 // Q70: Scale[] is first-class — should ranking multiple pre-built Scales by consonance be one call?
 describe('rankScalesForTimbre — rank Scale[] by sensory dissonance (Q70)', () => {
@@ -2272,7 +2260,6 @@ describe('rankScalesForTimbre — rank Scale[] by sensory dissonance (Q70)', () 
   });
 });
 
-
 // Q70 (convenience): bestScaleForTimbre — the single most consonant Scale
 describe('bestScaleForTimbre — most consonant Scale for a timbre (Q70)', () => {
   const spectrum = harmonicSpectrum();
@@ -2302,7 +2289,6 @@ describe('bestScaleForTimbre — most consonant Scale for a timbre (Q70)', () =>
     expect(() => bestScaleForTimbre([], t12, spectrum)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q89 — scaleIntervalHistogram
@@ -2398,7 +2384,6 @@ describe('scaleIntervalHistogram (Q89)', () => {
     expect(() => scaleIntervalHistogram(major, t12, -50)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q95 — scaleSimilarity
@@ -2523,7 +2508,6 @@ describe('scaleSimilarity (Q95)', () => {
   });
 });
 
-
 // Q97 — scaleHarmonicity: Scale → Stolzenburg periodicity in one call
 describe('scaleHarmonicity (Q97)', () => {
   it('test_returns_finite_positive_for_major_scale', () => {
@@ -2599,7 +2583,6 @@ describe('scaleHarmonicity (Q97)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q104 — scaleProgressionHarmonicity: Scale[] → periodicity curve in one call
 // ---------------------------------------------------------------------------
@@ -2659,7 +2642,6 @@ describe('scaleProgressionHarmonicity (Q104)', () => {
     expect(c440).toEqual(c220);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q103 — buildChordProgression: Scale + pattern → Chord[] in one call
@@ -2766,7 +2748,6 @@ describe('buildChordProgression (Q103)', () => {
   });
 });
 
-
 // Q106: Scale is first-class — "all modes at once" should be one call, not a manual loop
 describe('scaleModeSeries — all modal rotations as Scale[] in one call (Q106)', () => {
   it('test_returns_n_modes_for_n_degree_scale', () => {
@@ -2814,7 +2795,6 @@ describe('scaleModeSeries — all modal rotations as Scale[] in one call (Q106)'
     expect(() => scaleModeSeries(major, wrongTuning)).toThrow(RangeError);
   });
 });
-
 
 // Q110 — rankModeSeriesByHarmonicity: all modal rotations ranked by Stolzenburg periodicity
 describe('rankModeSeriesByHarmonicity (Q110)', () => {
@@ -2870,7 +2850,6 @@ describe('rankModeSeriesByHarmonicity (Q110)', () => {
     expect(() => rankModeSeriesByHarmonicity(major, wrongTuning)).toThrow(RangeError);
   });
 });
-
 
 // Q115 — rankAllModesForTimbre: combined roughness + harmonicity leaderboard
 describe('rankAllModesForTimbre (Q115)', () => {
@@ -2932,7 +2911,6 @@ describe('rankAllModesForTimbre (Q115)', () => {
     expect(() => rankAllModesForTimbre(major, edo(19), spectrum)).toThrow(RangeError);
   });
 });
-
 
 // Q116 — chordProgressionAnalysis: comprehensive per-step analysis
 describe('chordProgressionAnalysis (Q116)', () => {
@@ -3016,7 +2994,6 @@ describe('chordProgressionAnalysis (Q116)', () => {
   });
 });
 
-
 // Q117 — scaleToChordMap: all diatonic chords at each scale degree
 describe('scaleToChordMap (Q117)', () => {
   const major12: Scale = {
@@ -3085,7 +3062,6 @@ describe('scaleToChordMap (Q117)', () => {
   });
 });
 
-
 // Q118 — progressionFromPattern: Roman-numeral root pattern → Chord progression
 describe('progressionFromPattern (Q118)', () => {
   const major12: Scale = {
@@ -3145,7 +3121,6 @@ describe('progressionFromPattern (Q118)', () => {
   });
 });
 
-
 // Q119 — bestProgressionForScale: most consonant N-chord progression in one call
 describe('bestProgressionForScale (Q119)', () => {
   const spectrum = harmonicSpectrum();
@@ -3195,7 +3170,6 @@ describe('bestProgressionForScale (Q119)', () => {
     expect(() => bestProgressionForScale(major12, edo(19), spectrum)).toThrow(RangeError);
   });
 });
-
 
 // Q120 — rankScaleChordsByHarmonicity: diatonic chords ranked by Stolzenburg periodicity
 describe('rankScaleChordsByHarmonicity (Q120)', () => {
@@ -3250,7 +3224,6 @@ describe('rankScaleChordsByHarmonicity (Q120)', () => {
     expect(() => rankScaleChordsByHarmonicity(major12, edo(19))).toThrow(RangeError);
   });
 });
-
 
 // Q121 — scaleModalAnalysis: comprehensive per-mode report
 describe('scaleModalAnalysis (Q121)', () => {
@@ -3317,7 +3290,6 @@ describe('scaleModalAnalysis (Q121)', () => {
   });
 });
 
-
 // Q127 — chordMapAnalysis: score every diatonic chord with dissonance + harmonicity
 describe('chordMapAnalysis (Q127)', () => {
   const spectrum = harmonicSpectrum();
@@ -3380,7 +3352,6 @@ describe('chordMapAnalysis (Q127)', () => {
   });
 });
 
-
 // Q128 — bestChordMapEntry: the single most consonant diatonic chord
 describe('bestChordMapEntry (Q128)', () => {
   const spectrum = harmonicSpectrum();
@@ -3422,7 +3393,6 @@ describe('bestChordMapEntry (Q128)', () => {
     expect(Number.isFinite(best.harmonicity) || best.harmonicity === Infinity).toBe(true);
   });
 });
-
 
 // Q131 — rankChordMapByHarmonicity: sort ScaleChordMapEntry[] by Stolzenburg harmonicity
 describe('rankChordMapByHarmonicity (Q131)', () => {
@@ -3480,7 +3450,6 @@ describe('rankChordMapByHarmonicity (Q131)', () => {
   });
 });
 
-
 // Q133 — bestModeForTuning: find the most harmonically optimal modal rotation
 describe('bestModeForTuning (Q133)', () => {
   it('test_returns_a_scale', () => {
@@ -3528,7 +3497,6 @@ describe('bestModeForTuning (Q133)', () => {
     }
   });
 });
-
 
 // Q136 — rankChordMapCombined: rank chord map by weighted dissonance + harmonicity
 describe('rankChordMapCombined (Q136)', () => {
@@ -3589,7 +3557,6 @@ describe('rankChordMapCombined (Q136)', () => {
   });
 });
 
-
 // Q137 — bestChordForMidiNote: best chord for a MIDI note number
 describe('bestChordForMidiNote (Q137)', () => {
   it('test_returns_chord_and_root_hz', () => {
@@ -3643,7 +3610,6 @@ describe('bestChordForMidiNote (Q137)', () => {
     expect(r72.rootHz).toBeCloseTo(r60.rootHz * 2, 3);
   });
 });
-
 
 // Q140 — rankChordMapByDissonance: sort ScaleChordMapEntry[] by Sethares roughness (ascending)
 describe('rankChordMapByDissonance (Q140)', () => {
@@ -3699,7 +3665,6 @@ describe('rankChordMapByDissonance (Q140)', () => {
   });
 });
 
-
 // Q146 — bestModeChordAnalysis: tuning → best mode → chordMapAnalysis in one call
 describe('bestModeChordAnalysis (Q146)', () => {
   const spectrum = harmonicSpectrum();
@@ -3753,7 +3718,6 @@ describe('bestModeChordAnalysis (Q146)', () => {
   });
 });
 
-
 // Q148 — worstChordMapEntry: return the most dissonant ScaleChordMapEntry in one call
 describe('worstChordMapEntry (Q148)', () => {
   const major12: Scale = {
@@ -3794,7 +3758,6 @@ describe('worstChordMapEntry (Q148)', () => {
     expect(result.degreeOffset).toBe(chordMap[0]!.degreeOffset);
   });
 });
-
 
 // Q150 — filterChordMapByHarmonicity: keep only entries with harmonicity <= maxHarmonicity
 describe('filterChordMapByHarmonicity (Q150)', () => {
@@ -3841,7 +3804,6 @@ describe('filterChordMapByHarmonicity (Q150)', () => {
     expect(result).toHaveLength(0);
   });
 });
-
 
 // Q153 — chordMapMedianDissonance: compute median dissonance of a chord map
 describe('chordMapMedianDissonance (Q153)', () => {
@@ -3891,7 +3853,6 @@ describe('chordMapMedianDissonance (Q153)', () => {
   });
 });
 
-
 // Q156 — filterChordMapByDissonance: keep entries at or below a dissonance threshold
 describe('filterChordMapByDissonance (Q156)', () => {
   const major12: Scale = {
@@ -3939,7 +3900,6 @@ describe('filterChordMapByDissonance (Q156)', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 });
-
 
 // Q158 — chordMapMeanDissonance: compute mean dissonance of a chord map
 describe('chordMapMeanDissonance (Q158)', () => {
@@ -3998,7 +3958,6 @@ describe('chordMapMeanDissonance (Q158)', () => {
   });
 });
 
-
 // Q160 — progressionScoreSummary: scale → chord progression analysis → JSON summary
 describe('progressionScoreSummary (Q160)', () => {
   const major12: Scale = {
@@ -4048,7 +4007,6 @@ describe('progressionScoreSummary (Q160)', () => {
   });
 });
 
-
 // Q164 — chordMapSummary: complete statistical summary of chord map analysis
 describe('chordMapSummary (Q164)', () => {
   const t12 = equalTemperament12(440);
@@ -4090,7 +4048,6 @@ describe('chordMapSummary (Q164)', () => {
     expect(() => chordMapSummary(major12, edo(19), spectrum)).toThrow(RangeError);
   });
 });
-
 
 // Q166 — filterChordMapByCriteria: filter by harmonicity AND dissonance simultaneously
 describe('filterChordMapByCriteria (Q166)', () => {
@@ -4149,7 +4106,6 @@ describe('filterChordMapByCriteria (Q166)', () => {
   });
 });
 
-
 // Q170 — bestModeProgressionSummary
 describe('bestModeProgressionSummary (Q170)', () => {
   it('test_returns_progression_score_summary_shape', () => {
@@ -4197,7 +4153,6 @@ describe('bestModeProgressionSummary (Q170)', () => {
   });
 });
 
-
 // Q176 — tuningHarmonicityProfile: harmonicity per mode-index in rotation order
 describe('tuningHarmonicityProfile (Q176)', () => {
   it('test_returns_array_with_one_value_per_degree', () => {
@@ -4243,7 +4198,6 @@ describe('tuningHarmonicityProfile (Q176)', () => {
     expect(() => tuningHarmonicityProfile(empty)).toThrow(RangeError);
   });
 });
-
 
 // Q178 — chordMapWithLabels: annotate chord map entries with interval name labels
 describe('chordMapWithLabels (Q178)', () => {
@@ -4291,7 +4245,6 @@ describe('chordMapWithLabels (Q178)', () => {
   });
 });
 
-
 // Q183 — scaleToMinimalTuning: project scale degrees back to a minimal TuningSystem
 describe('scaleToMinimalTuning (Q183)', () => {
   it('test_returns_tuning_with_same_id_and_name_as_scale', () => {
@@ -4338,7 +4291,6 @@ describe('scaleToMinimalTuning (Q183)', () => {
   });
 });
 
-
 // Q184 — chordMapDissonancePercentiles: full dissonance distribution as percentile record
 describe('chordMapDissonancePercentiles (Q184)', () => {
   it('test_returns_record_with_default_percentile_keys', () => {
@@ -4382,7 +4334,6 @@ describe('chordMapDissonancePercentiles (Q184)', () => {
     }
   });
 });
-
 
 // Q185 — groupChordMapByLabel: group chord map entries by interval-count label
 describe('groupChordMapByLabel (Q185)', () => {
@@ -4428,7 +4379,6 @@ describe('groupChordMapByLabel (Q185)', () => {
     }
   });
 });
-
 
 // Q186 — isScaleStable
 describe('isScaleStable (Q186)', () => {
@@ -4478,7 +4428,6 @@ describe('isScaleStable (Q186)', () => {
   });
 });
 
-
 // Q187 — scaleMinimalTuningRoundTrip
 describe('scaleMinimalTuningRoundTrip (Q187)', () => {
   const t12 = equalTemperament12(440);
@@ -4527,7 +4476,6 @@ describe('scaleMinimalTuningRoundTrip (Q187)', () => {
   });
 });
 
-
 // Q189 — chordMapLabelCounts
 describe('chordMapLabelCounts (Q189)', () => {
   const t12 = equalTemperament12(440);
@@ -4570,7 +4518,6 @@ describe('chordMapLabelCounts (Q189)', () => {
     }
   });
 });
-
 
 // Q191 — tuningHarmonicityCorrelation
 describe('tuningHarmonicityCorrelation (Q191)', () => {
@@ -4617,7 +4564,6 @@ describe('tuningHarmonicityCorrelation (Q191)', () => {
     expect(typeof r).toBe('number');
   });
 });
-
 
 // Q193 — harmonicityProfileChart
 describe('harmonicityProfileChart (Q193)', () => {
@@ -4667,7 +4613,6 @@ describe('harmonicityProfileChart (Q193)', () => {
   });
 });
 
-
 // Q196 — chordMapTriads
 describe('chordMapTriads (Q196)', () => {
   const t12 = equalTemperament12(440);
@@ -4714,7 +4659,6 @@ describe('chordMapTriads (Q196)', () => {
     }
   });
 });
-
 
 // Q197 — rankModesByStability
 describe('rankModesByStability (Q197)', () => {
@@ -4766,7 +4710,6 @@ describe('rankModesByStability (Q197)', () => {
   });
 });
 
-
 // Q199 — isBestModeStable
 describe('isBestModeStable (Q199)', () => {
   const t5 = edo(5);
@@ -4803,7 +4746,6 @@ describe('isBestModeStable (Q199)', () => {
     expect(() => isBestModeStable(emptyTuning, 261.63)).toThrow(RangeError);
   });
 });
-
 
 // Q200 — chordMapDyads
 describe('chordMapDyads (Q200)', () => {
@@ -4851,7 +4793,6 @@ describe('chordMapDyads (Q200)', () => {
   });
 });
 
-
 // Q201 — areTuningsSimilar
 describe('areTuningsSimilar (Q201)', () => {
   const t12 = equalTemperament12(440);
@@ -4893,7 +4834,6 @@ describe('areTuningsSimilar (Q201)', () => {
     expect(result).toBe(false);
   });
 });
-
 
 // Q203 — tuningReport
 describe('tuningReport (Q203)', () => {
@@ -4940,7 +4880,6 @@ describe('tuningReport (Q203)', () => {
   });
 });
 
-
 // Q204 — compareTuningReports
 describe('compareTuningReports (Q204)', () => {
   const t5 = edo(5);
@@ -4981,7 +4920,6 @@ describe('compareTuningReports (Q204)', () => {
   });
 });
 
-
 // Q205 — modeStabilityScores
 describe('modeStabilityScores (Q205)', () => {
   const t5 = edo(5);
@@ -5016,7 +4954,6 @@ describe('modeStabilityScores (Q205)', () => {
     expect(scores[0]).toBeCloseTo(min, 10);
   });
 });
-
 
 // Q206 — singleBestChord
 describe('singleBestChord (Q206)', () => {
@@ -5060,7 +4997,6 @@ describe('singleBestChord (Q206)', () => {
   });
 });
 
-
 // Q209 — chordMapDyadTriadRatio
 describe('chordMapDyadTriadRatio (Q209)', () => {
   const t5 = edo(5);
@@ -5101,7 +5037,6 @@ describe('chordMapDyadTriadRatio (Q209)', () => {
   });
 });
 
-
 // Q213 — chordMapDescription
 describe('chordMapDescription (Q213)', () => {
   it('test_returns_string', () => {
@@ -5136,7 +5071,6 @@ describe('chordMapDescription (Q213)', () => {
     }
   });
 });
-
 
 // Q214 — tuningReportSimilarity
 describe('tuningReportSimilarity (Q214)', () => {
@@ -5181,7 +5115,6 @@ describe('tuningReportSimilarity (Q214)', () => {
   });
 });
 
-
 // Q215 — annotateProgression
 describe('annotateProgression (Q215)', () => {
   const triad = chordFromSemitones('triad', [0, 4, 7]);
@@ -5219,7 +5152,6 @@ describe('annotateProgression (Q215)', () => {
   });
 });
 
-
 // Q216 — progressionEnergyArc
 describe('progressionEnergyArc (Q216)', () => {
   const triad = chordFromSemitones('triad', [0, 4, 7]);
@@ -5253,7 +5185,6 @@ describe('progressionEnergyArc (Q216)', () => {
     expect(typeof arc[0]).toBe('number');
   });
 });
-
 
 // Q217 — findChordByLabel
 describe('findChordByLabel (Q217)', () => {
@@ -5295,7 +5226,6 @@ describe('findChordByLabel (Q217)', () => {
   });
 });
 
-
 // Q223 — progressionClimaxChord
 describe('progressionClimaxChord (Q223)', () => {
   const triad = chordFromSemitones('triad', [0, 4, 7]);
@@ -5332,7 +5262,6 @@ describe('progressionClimaxChord (Q223)', () => {
     expect(typeof result?.dissonance).toBe('number');
   });
 });
-
 
 // Q224 — progressionResolutionChord
 describe('progressionResolutionChord (Q224)', () => {
@@ -5371,7 +5300,6 @@ describe('progressionResolutionChord (Q224)', () => {
   });
 });
 
-
 // Q225 — chordDescription
 describe('chordDescription (Q225)', () => {
   const triad = chordFromSemitones('triad', [0, 4, 7]);
@@ -5405,7 +5333,6 @@ describe('chordDescription (Q225)', () => {
     expect(typeof desc.dissonance).toBe('number');
   });
 });
-
 
 // Q227 — progressionEnergyShape
 describe('progressionEnergyShape (Q227)', () => {
@@ -5444,7 +5371,6 @@ describe('progressionEnergyShape (Q227)', () => {
   });
 });
 
-
 // Q228 — progressionNarrative
 describe('progressionNarrative (Q228)', () => {
   const t12Local = equalTemperament12(440);
@@ -5480,7 +5406,6 @@ describe('progressionNarrative (Q228)', () => {
   });
 });
 
-
 // Q231 — chordMapBestWorstBundle
 describe('chordMapBestWorstBundle (Q231)', () => {
   const t12Local = equalTemperament12(440);
@@ -5505,7 +5430,6 @@ describe('chordMapBestWorstBundle (Q231)', () => {
     expect(bundle.best.dissonance).toBeLessThanOrEqual(bundle.worst.dissonance);
   });
 });
-
 
 // Q233 — tuningIntervalHistogram
 describe('tuningIntervalHistogram (Q233)', () => {
@@ -5537,7 +5461,6 @@ describe('tuningIntervalHistogram (Q233)', () => {
   });
 });
 
-
 describe('tuningHistogramChart (Q235)', () => {
   const t12 = equalTemperament12(440);
 
@@ -5554,7 +5477,6 @@ describe('tuningHistogramChart (Q235)', () => {
     expect(tuningHistogramChart(t12)).toContain('█');
   });
 });
-
 
 describe('chordMapIntervalHistogram (Q238)', () => {
   const t12 = equalTemperament12(440);
@@ -5576,7 +5498,6 @@ describe('chordMapIntervalHistogram (Q238)', () => {
   });
 });
 
-
 describe('scaleProgressionNarrative (Q241)', () => {
   const t12 = equalTemperament12(440);
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
@@ -5595,7 +5516,6 @@ describe('scaleProgressionNarrative (Q241)', () => {
     expect(scaleProgressionNarrative(scale, t12, 261.63)).toContain('Progression');
   });
 });
-
 
 describe('scaleSimilarityMatrix (Q245)', () => {
   const t12 = equalTemperament12(440);
@@ -5623,7 +5543,6 @@ describe('scaleSimilarityMatrix (Q245)', () => {
   });
 });
 
-
 describe('progressionChordCentroid (Q249)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
   const chordMap = scaleToChordMap(scale, t12);
@@ -5642,7 +5561,6 @@ describe('progressionChordCentroid (Q249)', () => {
     expect(() => progressionChordCentroid([], 261.63)).toThrow(RangeError);
   });
 });
-
 
 describe('modeIntervalSets (Q250)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
@@ -5663,7 +5581,6 @@ describe('modeIntervalSets (Q250)', () => {
     });
   });
 });
-
 
 describe('chordMapRangeBundle (Q252)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
@@ -5690,7 +5607,6 @@ describe('chordMapRangeBundle (Q252)', () => {
   });
 });
 
-
 describe('scaleIntervalVector (Q254)', () => {
   const major: Scale = {
     id: 'major',
@@ -5708,7 +5624,6 @@ describe('scaleIntervalVector (Q254)', () => {
     vec.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
   });
 });
-
 
 describe('progressionDissonanceDelta (Q255)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
@@ -5730,7 +5645,6 @@ describe('progressionDissonanceDelta (Q255)', () => {
   });
 });
 
-
 describe('tuningModeCount (Q256)', () => {
   it('returns total equal to degree count', () => {
     const { total } = tuningModeCount(t12);
@@ -5749,7 +5663,6 @@ describe('tuningModeCount (Q256)', () => {
   });
 });
 
-
 describe('scaleToChordMapSummary (Q259)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
 
@@ -5767,7 +5680,6 @@ describe('scaleToChordMapSummary (Q259)', () => {
     expect(a.meanDissonance).toBeCloseTo(b.meanDissonance, 5);
   });
 });
-
 
 describe('tuningStabilityScore (Q260)', () => {
   it('returns a value in [0, 1]', () => {
@@ -5788,7 +5700,6 @@ describe('tuningStabilityScore (Q260)', () => {
   });
 });
 
-
 describe('chordMapVolatility (Q261)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
   const chordMap = scaleToChordMap(scale, t12);
@@ -5804,7 +5715,6 @@ describe('chordMapVolatility (Q261)', () => {
     expect(Number.isFinite(chordMapVolatility(chordMap))).toBe(true);
   });
 });
-
 
 describe('tuningHarmonicDensity (Q263)', () => {
   it('returns a non-negative number', () => {
@@ -5826,7 +5736,6 @@ describe('tuningHarmonicDensity (Q263)', () => {
     expect(Number.isFinite(tuningHarmonicDensity(t12))).toBe(true);
   });
 });
-
 
 describe('tuningSpectralFit (Q264)', () => {
   const t12 = equalTemperament12(440);
@@ -5856,7 +5765,6 @@ describe('tuningSpectralFit (Q264)', () => {
   });
 });
 
-
 describe('chordProgressionSmooth (Q265)', () => {
   const t12 = equalTemperament12(440);
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
@@ -5880,7 +5788,6 @@ describe('chordProgressionSmooth (Q265)', () => {
   });
 });
 
-
 describe('scaleChordMapVolatility (Q267)', () => {
   const t12 = equalTemperament12(440);
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
@@ -5893,7 +5800,6 @@ describe('scaleChordMapVolatility (Q267)', () => {
     expect(Number.isFinite(scaleChordMapVolatility(scale, t12))).toBe(true);
   });
 });
-
 
 describe('modeVolatilityProfile (Q268)', () => {
   const t12 = equalTemperament12(440);
@@ -5908,7 +5814,6 @@ describe('modeVolatilityProfile (Q268)', () => {
     profile.forEach((p) => expect(p.volatility).toBeGreaterThanOrEqual(0));
   });
 });
-
 
 describe('tuningSpectralFit (Q264)', () => {
   it('returns a finite non-negative number', () => {
@@ -5932,7 +5837,6 @@ describe('tuningSpectralFit (Q264)', () => {
   });
 });
 
-
 describe('chordProgressionSmooth (Q265)', () => {
   it('returns same number of chords', () => {
     const chords = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12)
@@ -5949,7 +5853,6 @@ describe('chordProgressionSmooth (Q265)', () => {
   });
 });
 
-
 describe('scaleChordMapVolatility (Q267)', () => {
   it('returns non-negative finite number', () => {
     const v = scaleChordMapVolatility(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
@@ -5957,7 +5860,6 @@ describe('scaleChordMapVolatility (Q267)', () => {
     expect(Number.isFinite(v)).toBe(true);
   });
 });
-
 
 describe('modeVolatilityProfile (Q268)', () => {
   it('returns one entry per mode', () => {
@@ -5972,7 +5874,6 @@ describe('modeVolatilityProfile (Q268)', () => {
     );
   });
 });
-
 
 describe('tuningFamilyReport (Q272)', () => {
   const t19 = edo(19);
@@ -5993,7 +5894,6 @@ describe('tuningFamilyReport (Q272)', () => {
   });
 });
 
-
 describe('progressionSmoothnessRatio (Q273)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
   const chordMap = scaleToChordMap(scale, t12);
@@ -6009,7 +5909,6 @@ describe('progressionSmoothnessRatio (Q273)', () => {
   });
 });
 
-
 describe('chordMapSpectralProfile (Q274)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
   const chordMap = scaleToChordMap(scale, t12);
@@ -6023,7 +5922,6 @@ describe('chordMapSpectralProfile (Q274)', () => {
     profile.forEach((p) => expect(p.spectralFit).toBeGreaterThanOrEqual(0));
   });
 });
-
 
 describe('chordMapSpectralRanking (Q278)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
@@ -6041,7 +5939,6 @@ describe('chordMapSpectralRanking (Q278)', () => {
     expect(chordMapSpectralRanking([], harmonicSpectrum())).toEqual([]);
   });
 });
-
 
 describe('tuningProgressionVariety (Q279)', () => {
   it('returns value in (0, 1]', () => {
@@ -6068,7 +5965,6 @@ describe('tuningProgressionVariety (Q279)', () => {
   });
 });
 
-
 describe('chordMapConsistencyScore (Q281)', () => {
   const scale = scaleModeSeries(tuningToScale(t12), t12)[0]!;
   const chordMap = scaleToChordMap(scale, t12);
@@ -6086,7 +5982,6 @@ describe('chordMapConsistencyScore (Q281)', () => {
   });
 });
 
-
 describe('chordMapSpectralRanking (Q278)', () => {
   const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
 
@@ -6101,7 +5996,6 @@ describe('chordMapSpectralRanking (Q278)', () => {
     expect(chordMapSpectralRanking([], harmonicSpectrum())).toEqual([]);
   });
 });
-
 
 describe('tuningProgressionVariety (Q279)', () => {
   it('returns value in (0, 1] for 12-TET', () => {
@@ -6125,7 +6019,6 @@ describe('tuningProgressionVariety (Q279)', () => {
   });
 });
 
-
 describe('chordMapConsistencyScore (Q281)', () => {
   const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
 
@@ -6141,7 +6034,6 @@ describe('chordMapConsistencyScore (Q281)', () => {
     expect(Number.isFinite(chordMapConsistencyScore(chordMap))).toBe(true);
   });
 });
-
 
 describe('chordMapProgressionBridge (Q282)', () => {
   const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
@@ -6159,7 +6051,6 @@ describe('chordMapProgressionBridge (Q282)', () => {
   });
 });
 
-
 describe('tuningConsistencyProfile (Q283)', () => {
   it('returns one entry per mode', () => {
     const profile = tuningConsistencyProfile(t12, undefined, 261.63);
@@ -6172,7 +6063,6 @@ describe('tuningConsistencyProfile (Q283)', () => {
     });
   });
 });
-
 
 describe('chordMapNormalizedScores (Q286)', () => {
   const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
@@ -6197,7 +6087,6 @@ describe('chordMapNormalizedScores (Q286)', () => {
   });
 });
 
-
 describe('tuningReportCard (Q288)', () => {
   it('returns a non-empty string', () => {
     const card = tuningReportCard(t12, 261.63);
@@ -6215,7 +6104,6 @@ describe('tuningReportCard (Q288)', () => {
   });
 });
 
-
 describe('chordMapEntropyScore (Q289)', () => {
   const chordMap = scaleToChordMap(scaleModeSeries(tuningToScale(t12), t12)[0]!, t12);
 
@@ -6231,7 +6119,6 @@ describe('chordMapEntropyScore (Q289)', () => {
     expect(chordMapEntropyScore([])).toBe(0);
   });
 });
-
 
 describe('tuningEntropyProfile (Q294)', () => {
   it('returns one entry per mode', () => {
@@ -6252,7 +6139,6 @@ describe('tuningEntropyProfile (Q294)', () => {
   });
 });
 
-
 describe('bestModeByEntropy (Q295)', () => {
   it('returns a Scale', () => {
     const mode = bestModeByEntropy(t12);
@@ -6271,7 +6157,6 @@ describe('bestModeByEntropy (Q295)', () => {
     expect(() => bestModeByEntropy(empty)).toThrow(RangeError);
   });
 });
-
 
 describe('tuningConsistencyEntropyDelta (Q300)', () => {
   it('returns a number in [0, 1]', () => {
@@ -6293,7 +6178,6 @@ describe('tuningConsistencyEntropyDelta (Q300)', () => {
     expect(Number.isFinite(delta)).toBe(true);
   });
 });
-
 
 describe('chordMapRankedBundle (Q302)', () => {
   const scale: Scale = {
@@ -6333,7 +6217,6 @@ describe('chordMapRankedBundle (Q302)', () => {
   });
 });
 
-
 describe('bestModeByConsistency (Q304)', () => {
   it('returns a Scale', () => {
     const mode = bestModeByConsistency(t12);
@@ -6352,7 +6235,6 @@ describe('bestModeByConsistency (Q304)', () => {
     expect(() => bestModeByConsistency(empty)).toThrow(RangeError);
   });
 });
-
 
 describe('tuningDualBestModes (Q305)', () => {
   it('returns byEntropy, byConsistency, sameMode', () => {
@@ -6376,7 +6258,6 @@ describe('tuningDualBestModes (Q305)', () => {
     expect(() => tuningDualBestModes(empty)).toThrow(RangeError);
   });
 });
-
 
 describe('chordMapVolatilityBundle (Q306)', () => {
   const scale: Scale = {
@@ -6417,7 +6298,6 @@ describe('chordMapVolatilityBundle (Q306)', () => {
   });
 });
 
-
 describe('tuningModeComparison (Q308)', () => {
   it('returns one entry per mode with all three metrics', () => {
     const cmp = tuningModeComparison(t12);
@@ -6440,7 +6320,6 @@ describe('tuningModeComparison (Q308)', () => {
   });
 });
 
-
 describe('bestModeByVolatility (Q309)', () => {
   it('returns a Scale', () => {
     const mode = bestModeByVolatility(t12);
@@ -6459,7 +6338,6 @@ describe('bestModeByVolatility (Q309)', () => {
     expect(() => bestModeByVolatility(empty)).toThrow(RangeError);
   });
 });
-
 
 describe('tuningTripleBestModes (Q310)', () => {
   it('returns byEntropy, byConsistency, byVolatility, allAgree', () => {
@@ -6487,7 +6365,6 @@ describe('tuningTripleBestModes (Q310)', () => {
     expect(() => tuningTripleBestModes(empty)).toThrow(RangeError);
   });
 });
-
 
 describe('tuningModeRanking (Q312)', () => {
   it('returns Scale[] same length as allModes', () => {
@@ -6521,7 +6398,6 @@ describe('tuningModeRanking (Q312)', () => {
   });
 });
 
-
 describe('tuningModeRankingBundle (Q313)', () => {
   it('returns byEntropy, byConsistency, byVolatility arrays', () => {
     const bundle = tuningModeRankingBundle(t12);
@@ -6554,7 +6430,6 @@ describe('tuningModeRankingBundle (Q313)', () => {
   });
 });
 
-
 describe('modeProgressionBundle (Q314)', () => {
   it('returns chords and smoothnessRatio', () => {
     const scale = tuningToScale(t12);
@@ -6579,7 +6454,6 @@ describe('modeProgressionBundle (Q314)', () => {
     expect(() => modeProgressionBundle(emptyScale, t12)).toThrow(RangeError);
   });
 });
-
 
 describe('tuningBestModeProgression (Q315)', () => {
   it('returns mode, chords, and smoothnessRatio', () => {
@@ -6607,7 +6481,6 @@ describe('tuningBestModeProgression (Q315)', () => {
     expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
-
 
 describe('tuningFullAnalysis (Q320)', () => {
   const t12 = equalTemperament12(440);
@@ -6646,7 +6519,6 @@ describe('tuningFullAnalysis (Q320)', () => {
   });
 });
 
-
 describe('tuningModeNarratives (Q324)', () => {
   const t12 = equalTemperament12(440);
 
@@ -6666,7 +6538,6 @@ describe('tuningModeNarratives (Q324)', () => {
     expect(typeof narratives[0]!.narrative).toBe('string');
   });
 });
-
 
 describe('bestModeNarrative (Q325)', () => {
   const t12 = equalTemperament12(440);
@@ -6697,7 +6568,6 @@ describe('bestModeNarrative (Q325)', () => {
   });
 });
 
-
 describe('tuningModeSummaries (Q330)', () => {
   const t12 = equalTemperament12(440);
 
@@ -6723,7 +6593,6 @@ describe('tuningModeSummaries (Q330)', () => {
     expect(summaries[0]!.summary).toHaveProperty('count');
   });
 });
-
 
 describe('tuningModeFullBundle (Q331)', () => {
   const t12 = equalTemperament12(440);
@@ -6760,7 +6629,6 @@ describe('tuningModeFullBundle (Q331)', () => {
   });
 });
 
-
 describe('tuningFamilyNarratives (Q333)', () => {
   const t12 = equalTemperament12(440);
   const t19 = edo(19);
@@ -6793,7 +6661,6 @@ describe('tuningFamilyNarratives (Q333)', () => {
     expect(result).toEqual([]);
   });
 });
-
 
 describe('tuningFamilyModeRankings (Q334)', () => {
   const t12 = equalTemperament12(440);
@@ -6838,7 +6705,6 @@ describe('tuningFamilyModeRankings (Q334)', () => {
   });
 });
 
-
 describe('tuningModeProgressionBundles (Q336)', () => {
   const t12 = equalTemperament12(440);
 
@@ -6870,7 +6736,6 @@ describe('tuningModeProgressionBundles (Q336)', () => {
     expect(bundles.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('tuningModeSpectralBundles (Q337)', () => {
   const t12 = equalTemperament12(440);
@@ -6904,7 +6769,6 @@ describe('tuningModeSpectralBundles (Q337)', () => {
     expect(typeof bundles[0]!.spectralFit).toBe('number');
   });
 });
-
 
 describe('tuningFamilyProgressionBundles (Q339)', () => {
   const t12 = equalTemperament12(440);
@@ -6946,7 +6810,6 @@ describe('tuningFamilyProgressionBundles (Q339)', () => {
     expect(result).toEqual([]);
   });
 });
-
 
 describe('tuningFamilySpectralBundles (Q342)', () => {
   it('returns one entry per tuning with per-mode spectral fits', () => {
@@ -6997,7 +6860,6 @@ describe('tuningFamilySpectralBundles (Q342)', () => {
   });
 });
 
-
 describe('chordMapFullBundle (Q345)', () => {
   const t12local = equalTemperament12(440);
   const major12: Scale = {
@@ -7046,7 +6908,6 @@ describe('chordMapFullBundle (Q345)', () => {
   });
 });
 
-
 describe('scaleModeSpectralRankings (Q346)', () => {
   const t12local = equalTemperament12(440);
   const major12: Scale = {
@@ -7088,7 +6949,6 @@ describe('scaleModeSpectralRankings (Q346)', () => {
     expect(result.spectralRanking.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('tuningModeChordMapBundles (Q348)', () => {
   it('returns one bundle per mode', () => {
@@ -7132,7 +6992,6 @@ describe('tuningModeChordMapBundles (Q348)', () => {
   });
 });
 
-
 describe('tuningFamilyChordMapBundles (Q350)', () => {
   it('returns one entry per tuning', () => {
     const t12local = equalTemperament12(440);
@@ -7168,7 +7027,6 @@ describe('tuningFamilyChordMapBundles (Q350)', () => {
     expect(result).toEqual([]);
   });
 });
-
 
 describe('scaleChordMapNarrativeBundle (Q351)', () => {
   it('returns all six metrics', () => {
@@ -7211,7 +7069,6 @@ describe('scaleChordMapNarrativeBundle (Q351)', () => {
     expect(isFinite(smoothnessRatio)).toBe(true);
   });
 });
-
 
 describe('tuningBestModeChordMapNarrative (Q352)', () => {
   it('returns mode and narrative for entropy metric', () => {
@@ -7264,7 +7121,6 @@ describe('tuningBestModeChordMapNarrative (Q352)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q357 — scaleBestProgressionNarrative
 // ---------------------------------------------------------------------------
@@ -7297,7 +7153,6 @@ describe('scaleBestProgressionNarrative (Q357)', () => {
     expect(result.smoothnessRatio).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q354 — tuningModeNarrativeCompare
@@ -7333,7 +7188,6 @@ describe('tuningModeNarrativeCompare (Q354)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q356 — tuningFamilyNarrativeCompare
 // ---------------------------------------------------------------------------
@@ -7367,7 +7221,6 @@ describe('tuningFamilyNarrativeCompare (Q356)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q358 — tuningModeBestProgressionNarratives
 // ---------------------------------------------------------------------------
@@ -7397,7 +7250,6 @@ describe('tuningModeBestProgressionNarratives (Q358)', () => {
     expect(typeof results[0]!.narrative).toBe('string');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q360 — tuningModeSmoothProgressionRatios
@@ -7434,7 +7286,6 @@ describe('tuningModeSmoothProgressionRatios (Q360)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q361 — tuningBestSmoothMode
 // ---------------------------------------------------------------------------
@@ -7468,7 +7319,6 @@ describe('tuningBestSmoothMode (Q361)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q363 — tuningFamilyBestSmoothModes
 // ---------------------------------------------------------------------------
@@ -7501,7 +7351,6 @@ describe('tuningFamilyBestSmoothModes (Q363)', () => {
     expect(result[0]!.bestSmoothMode.smoothnessRatio).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q364 — scaleProgressionFullBundle
@@ -7544,7 +7393,6 @@ describe('scaleProgressionFullBundle (Q364)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q365 — tuningModeProgressionFullBundles
 // ---------------------------------------------------------------------------
@@ -7578,7 +7426,6 @@ describe('tuningModeProgressionFullBundles (Q365)', () => {
     expect(typeof bundles[0]!.narrative).toBe('string');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q381 — chordMapDissonanceHistogram
@@ -7618,7 +7465,6 @@ describe('chordMapDissonanceHistogram (Q381)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q378 — tuningModeConsistencyEntropyProfiles
@@ -7660,7 +7506,6 @@ describe('tuningModeConsistencyEntropyProfiles (Q378)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q380 — tuningTopModesByDelta
 // ---------------------------------------------------------------------------
@@ -7696,7 +7541,6 @@ describe('tuningTopModesByDelta (Q380)', () => {
     expect(top.length).toBe(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q382 — tuningModeDissonanceHistograms
@@ -7734,7 +7578,6 @@ describe('tuningModeDissonanceHistograms (Q382)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q384 — chordMapHarmonicityHistogram
 // ---------------------------------------------------------------------------
@@ -7769,7 +7612,6 @@ describe('chordMapHarmonicityHistogram (Q384)', () => {
     expect(hist).toEqual(Array(10).fill(0));
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q385 — tuningModeHarmonicityHistograms
@@ -7806,7 +7648,6 @@ describe('tuningModeHarmonicityHistograms (Q385)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q386 — chordMapDualHistogram
@@ -7848,7 +7689,6 @@ describe('chordMapDualHistogram (Q386)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q387 — tuningModeDualHistograms
 // ---------------------------------------------------------------------------
@@ -7886,7 +7726,6 @@ describe('tuningModeDualHistograms (Q387)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q389 — tuningFamilyDualHistograms
@@ -7934,7 +7773,6 @@ describe('tuningFamilyDualHistograms (Q389)', () => {
     expect(result).toEqual([]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q390 — chordMapHistogramSummary
@@ -7989,7 +7827,6 @@ describe('chordMapHistogramSummary (Q390)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q391 — tuningModeHistogramSummaries
 // ---------------------------------------------------------------------------
@@ -8024,7 +7861,6 @@ describe('tuningModeHistogramSummaries (Q391)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q393 — tuningFamilyHistogramSummaries
@@ -8072,7 +7908,6 @@ describe('tuningFamilyHistogramSummaries (Q393)', () => {
     expect(result).toEqual([]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q394 — chordMapAnalysisFull
@@ -8135,7 +7970,6 @@ describe('chordMapAnalysisFull (Q394)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q395 — scaleChordMapAnalysisFull
 // ---------------------------------------------------------------------------
@@ -8175,7 +8009,6 @@ describe('scaleChordMapAnalysisFull (Q395)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q396 — tuningModeAnalysisFull
 // ---------------------------------------------------------------------------
@@ -8210,7 +8043,6 @@ describe('tuningModeAnalysisFull (Q396)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q398 — tuningFamilyModeAnalysisFull
 // ---------------------------------------------------------------------------
@@ -8243,7 +8075,6 @@ describe('tuningFamilyModeAnalysisFull (Q398)', () => {
     expect(first.analysisFull).toHaveProperty('volatilityBundle');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q399 — tuningHarmonicSpectralScore
@@ -8286,7 +8117,6 @@ describe('tuningHarmonicSpectralScore (Q399)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q401 — tuningFamilyHarmonicSpectralScores
 // ---------------------------------------------------------------------------
@@ -8325,7 +8155,6 @@ describe('tuningFamilyHarmonicSpectralScores (Q401)', () => {
     expect(typeof scores[0]!.score.combinedScore).toBe('number');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q402 — tuningComprehensiveReport
@@ -8382,7 +8211,6 @@ describe('tuningComprehensiveReport (Q402)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q404 — tuningFamilyComprehensiveReports
 // ---------------------------------------------------------------------------
@@ -8422,7 +8250,6 @@ describe('tuningFamilyComprehensiveReports (Q404)', () => {
     expect(typeof reports[0]!.report.stabilityScore).toBe('number');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q405 — scaleSimilarityRanking
@@ -8468,7 +8295,6 @@ describe('scaleSimilarityRanking (Q405)', () => {
     expect(typeof ranking[0]!.similarity).toBe('number');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q407 — tuningFamilySimilarityMatrix
@@ -8518,7 +8344,6 @@ describe('tuningFamilySimilarityMatrix (Q407)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q408 — tuningModeIntervalProfile
 // ---------------------------------------------------------------------------
@@ -8566,7 +8391,6 @@ describe('tuningModeIntervalProfile (Q408)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q410 — tuningFamilyIntervalProfiles
 // ---------------------------------------------------------------------------
@@ -8597,7 +8421,6 @@ describe('tuningFamilyIntervalProfiles (Q410)', () => {
     expect(result).toEqual([]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q411 — tuningMostDiverseMode
@@ -8632,7 +8455,6 @@ describe('tuningMostDiverseMode (Q411)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q413 — tuningFamilyMostDiverseModes
 // ---------------------------------------------------------------------------
@@ -8664,7 +8486,6 @@ describe('tuningFamilyMostDiverseModes (Q413)', () => {
     expect(result).toEqual([]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q414 — tuningModeComprehensiveBundle
@@ -8710,7 +8531,6 @@ describe('tuningModeComprehensiveBundle (Q414)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q416 — tuningFamilyModeComprehensiveBundles
 // ---------------------------------------------------------------------------
@@ -8751,7 +8571,6 @@ describe('tuningFamilyModeComprehensiveBundles (Q416)', () => {
     expect(result.length).toBe(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q417 — tuningBestModeComprehensive
@@ -8814,7 +8633,6 @@ describe('tuningBestModeComprehensive (Q417)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q419 — tuningFamilyBestModeComprehensive
 // ---------------------------------------------------------------------------
@@ -8857,7 +8675,6 @@ describe('tuningFamilyBestModeComprehensive (Q419)', () => {
     expect(result[0]!.bestMode).toHaveProperty('score');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q420 — tuningModeScoreRanking
@@ -8912,7 +8729,6 @@ describe('tuningModeScoreRanking (Q420)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q422 — tuningFamilyModeScoreRankings
 // ---------------------------------------------------------------------------
@@ -8958,7 +8774,6 @@ describe('tuningFamilyModeScoreRankings (Q422)', () => {
     expect(result[0]!.modeRanking.length).toBe(t12local.degrees.length);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q423 — tuningModeComprehensiveTop
@@ -9026,7 +8841,6 @@ describe('tuningModeComprehensiveTop (Q423)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q424 — tuningIntervalDiversityVsEntropy
 // ---------------------------------------------------------------------------
@@ -9078,7 +8892,6 @@ describe('tuningIntervalDiversityVsEntropy (Q424)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q426 — tuningModeParetoFront
@@ -9137,7 +8950,6 @@ describe('tuningModeParetoFront (Q426)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q428 — tuningFamilyModeParetoFronts
 // ---------------------------------------------------------------------------
@@ -9167,7 +8979,6 @@ describe('tuningFamilyModeParetoFronts (Q428)', () => {
     expect(results[0]!.paretoFront.length).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q429 — tuningModeCorrelationMatrix
@@ -9228,7 +9039,6 @@ describe('tuningModeCorrelationMatrix (Q429)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q431 — tuningFamilyModeCorrelationMatrices
 // ---------------------------------------------------------------------------
@@ -9259,7 +9069,6 @@ describe('tuningFamilyModeCorrelationMatrices (Q431)', () => {
     expect(results[0]!.correlationMatrix.matrix.length).toBe(5);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q432 — tuningParetoFrontBestMode
@@ -9317,7 +9126,6 @@ describe('tuningParetoFrontBestMode (Q432)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q434 — tuningModeTopCorrelation
 // ---------------------------------------------------------------------------
@@ -9357,7 +9165,6 @@ describe('tuningModeTopCorrelation (Q434)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q435 — tuningModeAntiCorrelation
 // ---------------------------------------------------------------------------
@@ -9395,7 +9202,6 @@ describe('tuningModeAntiCorrelation (Q435)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q438 — tuningFamilyTopCorrelations
 // ---------------------------------------------------------------------------
@@ -9421,7 +9227,6 @@ describe('tuningFamilyTopCorrelations', () => {
     expect(results).toHaveLength(tunings.length);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q440 — tuningFamilyAntiCorrelations
@@ -9449,7 +9254,6 @@ describe('tuningFamilyAntiCorrelations', () => {
     );
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q441 — tuningParetoFrontSummary
@@ -9492,7 +9296,6 @@ describe('tuningParetoFrontSummary', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q442 — tuningFamilyParetoFrontSummaries
 // ---------------------------------------------------------------------------
@@ -9515,7 +9318,6 @@ describe('tuningFamilyParetoFrontSummaries', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q444 — tuningParetoFrontVsRanking
@@ -9560,7 +9362,6 @@ describe('tuningParetoFrontVsRanking', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q445 — tuningParetoFrontRankPosition
 // ---------------------------------------------------------------------------
@@ -9595,7 +9396,6 @@ describe('tuningParetoFrontRankPosition', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q446 — tuningBestParetoRankedMode
 // ---------------------------------------------------------------------------
@@ -9625,7 +9425,6 @@ describe('tuningBestParetoRankedMode', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q447 — tuningFamilyParetoRankPositions
 // ---------------------------------------------------------------------------
@@ -9648,7 +9447,6 @@ describe('tuningFamilyParetoRankPositions', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q450 — tuningParetoFrontGap
@@ -9680,7 +9478,6 @@ describe('tuningParetoFrontGap (Q450)', () => {
     expect(maxGap).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q451 — tuningParetoFrontCoverage
@@ -9719,7 +9516,6 @@ describe('tuningParetoFrontCoverage (Q451)', () => {
     expect(coverageInTopK).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q455 — tuningParetoSummaryComparison
@@ -9761,7 +9557,6 @@ describe('tuningParetoSummaryComparison (Q455)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q456 — tuningCorrelationMatrixNarrative
 // ---------------------------------------------------------------------------
@@ -9788,7 +9583,6 @@ describe('tuningCorrelationMatrixNarrative', () => {
     expect(typeof result.narrative).toBe('string');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q465 — tuningModeMetricOutliers
@@ -9830,7 +9624,6 @@ describe('tuningModeMetricOutliers (Q465)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q467 — tuningFamilyModeMetricOutliers
 // ---------------------------------------------------------------------------
@@ -9853,7 +9646,6 @@ describe('tuningFamilyModeMetricOutliers (Q467)', () => {
     }
   });
 });
-
 
 // Q468 — tuningModeMetricOutlierSummary
 describe('tuningModeMetricOutlierSummary (Q468)', () => {
@@ -9885,7 +9677,6 @@ describe('tuningModeMetricOutlierSummary (Q468)', () => {
   });
 });
 
-
 // Q470 — tuningFamilyModeMetricOutlierSummaries
 describe('tuningFamilyModeMetricOutlierSummaries (Q470)', () => {
   it('returns one entry per tuning', () => {
@@ -9905,7 +9696,6 @@ describe('tuningFamilyModeMetricOutlierSummaries (Q470)', () => {
     }
   });
 });
-
 
 // Q471 — tuningModeMetricProfile
 describe('tuningModeMetricProfile (Q471)', () => {
@@ -9942,7 +9732,6 @@ describe('tuningModeMetricProfile (Q471)', () => {
   });
 });
 
-
 // Q473 — tuningFamilyModeMetricProfiles
 describe('tuningFamilyModeMetricProfiles (Q473)', () => {
   it('returns one entry per tuning', () => {
@@ -9963,7 +9752,6 @@ describe('tuningFamilyModeMetricProfiles (Q473)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q474 — tuningModeMetricRadarData
@@ -10013,7 +9801,6 @@ describe('tuningModeMetricRadarData (Q474)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q476 — tuningFamilyModeMetricRadarData
 // ---------------------------------------------------------------------------
@@ -10037,7 +9824,6 @@ describe('tuningFamilyModeMetricRadarData (Q476)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q477 — tuningModeMetricCluster
@@ -10086,7 +9872,6 @@ describe('tuningModeMetricCluster (Q477)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q479 — tuningFamilyModeMetricClusters
 // ---------------------------------------------------------------------------
@@ -10110,7 +9895,6 @@ describe('tuningFamilyModeMetricClusters (Q479)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10147,7 +9931,6 @@ describe('tuningClusterSummary (Q480)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningFamilyClusterSummaries (Q482)', () => {
@@ -10169,7 +9952,6 @@ describe('tuningFamilyClusterSummaries (Q482)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10208,7 +9990,6 @@ describe('tuningModeRadarRanking (Q483)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningFamilyModeRadarRankings (Q485)', () => {
@@ -10230,7 +10011,6 @@ describe('tuningFamilyModeRadarRankings (Q485)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10272,7 +10052,6 @@ describe('tuningRadarRankingVsScoreRanking (Q486)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningFamilyRadarVsScoreRankings (Q488)', () => {
@@ -10294,7 +10073,6 @@ describe('tuningFamilyRadarVsScoreRankings (Q488)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10323,7 +10101,6 @@ describe('tuningBestRadarScoreAgreement (Q489)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningFamilyBestRadarScoreAgreements (Q491)', () => {
@@ -10344,7 +10121,6 @@ describe('tuningFamilyBestRadarScoreAgreements (Q491)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10387,7 +10163,6 @@ describe('tuningModeConsensusRanking (Q492)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningFamilyModeConsensusRankings (Q494)', () => {
@@ -10408,7 +10183,6 @@ describe('tuningFamilyModeConsensusRankings (Q494)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10434,7 +10208,6 @@ describe('tuningBestConsensusMode (Q495)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningFamilyBestConsensusModes (Q497)', () => {
@@ -10455,7 +10228,6 @@ describe('tuningFamilyBestConsensusModes (Q497)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10487,7 +10259,6 @@ describe('tuningModeComprehensiveMetricBundle (Q507)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningFamilyModeComprehensiveMetricBundles (Q509)', () => {
@@ -10508,7 +10279,6 @@ describe('tuningFamilyModeComprehensiveMetricBundles (Q509)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10552,7 +10322,6 @@ describe('tuningModeConsensusClusterBundle (Q510)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningTopClusterConsensusMode (Q513)', () => {
@@ -10576,7 +10345,6 @@ describe('tuningTopClusterConsensusMode (Q513)', () => {
     expect(['high', 'mid', 'low']).toContain(result.cluster);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -10621,7 +10389,6 @@ describe('tuningModeConsensusOutlierBundle (Q516)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('tuningModeInsightSummary (Q519)', () => {
@@ -10659,7 +10426,6 @@ describe('tuningModeInsightSummary (Q519)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q525 — tuningModeEntropyDiversityMap
 // ---------------------------------------------------------------------------
@@ -10690,7 +10456,6 @@ describe('tuningModeEntropyDiversityMap (Q525)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q527 — tuningFamilyModeEntropyDiversityMaps
 // ---------------------------------------------------------------------------
@@ -10711,7 +10476,6 @@ describe('tuningFamilyModeEntropyDiversityMaps (Q527)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q528 — tuningModeConsistencyVolatilityMap
@@ -10748,7 +10512,6 @@ describe('tuningModeConsistencyVolatilityMap (Q528)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q530 — tuningFamilyModeConsistencyVolatilityMaps
 // ---------------------------------------------------------------------------
@@ -10769,7 +10532,6 @@ describe('tuningFamilyModeConsistencyVolatilityMaps (Q530)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q531 — tuningModeFiveDimMap
@@ -10809,7 +10571,6 @@ describe('tuningModeFiveDimMap (Q531)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q534 — tuningModeFiveDimNarrative
 // ---------------------------------------------------------------------------
@@ -10840,7 +10601,6 @@ describe('tuningModeFiveDimNarrative (Q534)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q536 — tuningFamilyModeFiveDimNarratives
 // ---------------------------------------------------------------------------
@@ -10856,7 +10616,6 @@ describe('tuningFamilyModeFiveDimNarratives (Q536)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q537 — tuningModeSmoothnessEntropyMap
@@ -10888,7 +10647,6 @@ describe('tuningModeSmoothnessEntropyMap (Q537)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q539 — tuningFamilyModeSmoothnessEntropyMaps
 // ---------------------------------------------------------------------------
@@ -10904,7 +10662,6 @@ describe('tuningFamilyModeSmoothnessEntropyMaps (Q539)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q540 — tuningModeDiversityVolatilityMap
@@ -10941,7 +10698,6 @@ describe('tuningModeDiversityVolatilityMap (Q540)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q542 — tuningFamilyModeDiversityVolatilityMaps
 // ---------------------------------------------------------------------------
@@ -10957,7 +10713,6 @@ describe('tuningFamilyModeDiversityVolatilityMaps (Q542)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q543 — tuningModeAllQuadrantsBundle
@@ -10990,7 +10745,6 @@ describe('tuningModeAllQuadrantsBundle (Q543)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q545 — tuningFamilyModeAllQuadrantsBundles
 // ---------------------------------------------------------------------------
@@ -11006,7 +10760,6 @@ describe('tuningFamilyModeAllQuadrantsBundles (Q545)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q546 — tuningModeAllQuadrantsNarrative
@@ -11040,7 +10793,6 @@ describe('tuningModeAllQuadrantsNarrative (Q546)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q548 — tuningFamilyModeAllQuadrantsNarratives
 // ---------------------------------------------------------------------------
@@ -11056,7 +10808,6 @@ describe('tuningFamilyModeAllQuadrantsNarratives (Q548)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q549 — tuningModeQuadrantConsensus
@@ -11096,7 +10847,6 @@ describe('tuningModeQuadrantConsensus (Q549)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q551 — tuningFamilyModeQuadrantConsensus
 // ---------------------------------------------------------------------------
@@ -11112,7 +10862,6 @@ describe('tuningFamilyModeQuadrantConsensus (Q551)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q552 — tuningBestQuadrantConsensusMode
@@ -11142,7 +10891,6 @@ describe('tuningBestQuadrantConsensusMode (Q552)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q554 — tuningFamilyBestQuadrantConsensusModes
 // ---------------------------------------------------------------------------
@@ -11158,7 +10906,6 @@ describe('tuningFamilyBestQuadrantConsensusModes (Q554)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q555 — tuningModeConsensusNarrative
@@ -11196,7 +10943,6 @@ describe('tuningModeConsensusNarrative (Q555)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q557 — tuningFamilyModeConsensusNarratives
 // ---------------------------------------------------------------------------
@@ -11212,7 +10958,6 @@ describe('tuningFamilyModeConsensusNarratives (Q557)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q558 — tuningModeQuadrantProfile
@@ -11246,7 +10991,6 @@ describe('tuningModeQuadrantProfile (Q558)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q560 — tuningFamilyModeQuadrantProfiles
 // ---------------------------------------------------------------------------
@@ -11262,7 +11006,6 @@ describe('tuningFamilyModeQuadrantProfiles (Q560)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q561 — tuningQuadrantCoverage
@@ -11302,7 +11045,6 @@ describe('tuningQuadrantCoverage (Q561)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q563 — tuningFamilyQuadrantCoverage
 // ---------------------------------------------------------------------------
@@ -11318,7 +11060,6 @@ describe('tuningFamilyQuadrantCoverage (Q563)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q564 — tuningModeGroupByProfile
@@ -11356,7 +11097,6 @@ describe('tuningModeGroupByProfile (Q564)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q566 — tuningFamilyModeGroupByProfiles
 // ---------------------------------------------------------------------------
@@ -11372,7 +11112,6 @@ describe('tuningFamilyModeGroupByProfiles (Q566)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q567 — tuningQuadrantCoverageNarrative
@@ -11405,7 +11144,6 @@ describe('tuningQuadrantCoverageNarrative (Q567)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q569 — tuningFamilyQuadrantCoverageNarratives
 // ---------------------------------------------------------------------------
@@ -11421,7 +11159,6 @@ describe('tuningFamilyQuadrantCoverageNarratives (Q569)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q570 — tuningDominantQuadrantProfile
@@ -11453,7 +11190,6 @@ describe('tuningDominantQuadrantProfile (Q570)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q572 — tuningFamilyDominantQuadrantProfiles
 // ---------------------------------------------------------------------------
@@ -11469,7 +11205,6 @@ describe('tuningFamilyDominantQuadrantProfiles (Q572)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q573 — tuningQuadrantProfileDiversity
@@ -11502,7 +11237,6 @@ describe('tuningQuadrantProfileDiversity (Q573)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q575 — tuningFamilyQuadrantProfileDiversities
 // ---------------------------------------------------------------------------
@@ -11518,7 +11252,6 @@ describe('tuningFamilyQuadrantProfileDiversities (Q575)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q576 — tuningQuadrantProfileDiversityNarrative
@@ -11551,7 +11284,6 @@ describe('tuningQuadrantProfileDiversityNarrative (Q576)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q578 — tuningFamilyQuadrantProfileDiversityNarratives
 // ---------------------------------------------------------------------------
@@ -11567,7 +11299,6 @@ describe('tuningFamilyQuadrantProfileDiversityNarratives (Q578)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q580 — tuningFamilyMostDiverseQuadrantProfile
@@ -11586,7 +11317,6 @@ describe('tuningFamilyMostDiverseQuadrantProfile (Q580)', () => {
     expect(() => tuningFamilyMostDiverseQuadrantProfile([], spec)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q585 — tuningFamilyMostSharedQuadrantProfile
@@ -11608,7 +11338,6 @@ describe('tuningFamilyMostSharedQuadrantProfile (Q585)', () => {
     expect(result).toBeNull();
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q588 — tuningModeProfileTransitions
@@ -11647,7 +11376,6 @@ describe('tuningModeProfileTransitions (Q588)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q590 — tuningProfileTransitionScore
 // ---------------------------------------------------------------------------
@@ -11674,7 +11402,6 @@ describe('tuningProfileTransitionScore (Q590)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q592 — tuningFamilyProfileTransitionScores
 // ---------------------------------------------------------------------------
@@ -11690,7 +11417,6 @@ describe('tuningFamilyProfileTransitionScores (Q592)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q594 — tuningProfileTransitionScoreNarrative
@@ -11723,7 +11449,6 @@ describe('tuningProfileTransitionScoreNarrative (Q594)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q596 — tuningFamilyProfileTransitionScoreNarratives
 // ---------------------------------------------------------------------------
@@ -11739,7 +11464,6 @@ describe('tuningFamilyProfileTransitionScoreNarratives (Q596)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q597 — tuningFamilyMostStableProfileTransition
@@ -11758,7 +11482,6 @@ describe('tuningFamilyMostStableProfileTransition (Q597)', () => {
     expect(() => tuningFamilyMostStableProfileTransition([], spec)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q601 — tuningProfileLongestRun
@@ -11784,7 +11507,6 @@ describe('tuningProfileLongestRun (Q601)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q602 — tuningProfileRunSummary
 // ---------------------------------------------------------------------------
@@ -11806,7 +11528,6 @@ describe('tuningProfileRunSummary (Q602)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q604 — tuningFamilyProfileRunSummaries
 // ---------------------------------------------------------------------------
@@ -11822,7 +11543,6 @@ describe('tuningFamilyProfileRunSummaries (Q604)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q606 — tuningProfileRunSummaryNarrative
@@ -11855,7 +11575,6 @@ describe('tuningProfileRunSummaryNarrative (Q606)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q608 — tuningFamilyProfileRunSummaryNarratives
 // ---------------------------------------------------------------------------
@@ -11871,7 +11590,6 @@ describe('tuningFamilyProfileRunSummaryNarratives (Q608)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q609 — tuningProfileRunDensity
@@ -11906,7 +11624,6 @@ describe('tuningProfileRunDensity (Q609)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q611 — tuningFamilyProfileRunDensities
 // ---------------------------------------------------------------------------
@@ -11922,7 +11639,6 @@ describe('tuningFamilyProfileRunDensities (Q611)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q613 — tuningFamilyMostChaoticProfileTransition
@@ -11941,7 +11657,6 @@ describe('tuningFamilyMostChaoticProfileTransition (Q613)', () => {
     expect(() => tuningFamilyMostChaoticProfileTransition([], spec)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q615 — tuningProfileRunDensityNarrative
@@ -11974,7 +11689,6 @@ describe('tuningProfileRunDensityNarrative (Q615)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q617 — tuningFamilyProfileRunDensityNarratives
 // ---------------------------------------------------------------------------
@@ -11990,7 +11704,6 @@ describe('tuningFamilyProfileRunDensityNarratives (Q617)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q626 — tuningModeSoloProfileModes
@@ -12020,7 +11733,6 @@ describe('tuningModeSoloProfileModes (Q626)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q628 — tuningFamilyModeSoloProfileCounts
 // ---------------------------------------------------------------------------
@@ -12036,7 +11748,6 @@ describe('tuningFamilyModeSoloProfileCounts (Q628)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q630 — tuningFamilyModeSoloProfileRatios
@@ -12055,7 +11766,6 @@ describe('tuningFamilyModeSoloProfileRatios (Q630)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q632 — tuningMostUniqueModesTuning
 // ---------------------------------------------------------------------------
@@ -12073,7 +11783,6 @@ describe('tuningMostUniqueModesTuning (Q632)', () => {
     expect(() => tuningMostUniqueModesTuning([], spec)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q633 — tuningModeSoloProfileNarrative
@@ -12106,7 +11815,6 @@ describe('tuningModeSoloProfileNarrative (Q633)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q635 — tuningFamilyModeSoloProfileNarratives
 // ---------------------------------------------------------------------------
@@ -12122,7 +11830,6 @@ describe('tuningFamilyModeSoloProfileNarratives (Q635)', () => {
     }
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // I1 — snapHzToScaleDegree
@@ -12204,7 +11911,6 @@ describe('snapHzToScaleDegree (I1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // M1 — melodicContour
 // ---------------------------------------------------------------------------
@@ -12246,7 +11952,6 @@ describe('melodicContour (M1)', () => {
     expect(melodicContour([0, 6])).toBe('U');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // M2 — harmonicRhythm
@@ -12317,7 +12022,6 @@ describe('harmonicRhythm (M2)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // M3 — scaleRotations
 // ---------------------------------------------------------------------------
@@ -12354,7 +12058,6 @@ describe('scaleRotations (M3)', () => {
     expect(scaleRotations([0])).toEqual([[0]]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // M4 — chordProgressionTension
@@ -12404,7 +12107,6 @@ describe('chordProgressionTension (M4)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // N1 — intervalVector
 // ---------------------------------------------------------------------------
@@ -12429,7 +12131,6 @@ describe('intervalVector (N1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // N2 — midiNoteToName
 // ---------------------------------------------------------------------------
@@ -12452,7 +12153,6 @@ describe('midiNoteToName (N2)', () => {
     expect(midiNoteToName(0)).toBe('C-1');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // N3 — scaleSubsets
@@ -12484,7 +12184,6 @@ describe('scaleSubsets (N3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // N4 — fundamentalBassNote
 // ---------------------------------------------------------------------------
@@ -12515,7 +12214,6 @@ describe('fundamentalBassNote (N4)', () => {
     expect(withDefault).toBe(with220);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // O1 — voiceLeadingDistance
@@ -12554,7 +12252,6 @@ describe('voiceLeadingDistance (O1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // O2 — chromaticSaturation
 // ---------------------------------------------------------------------------
@@ -12576,7 +12273,6 @@ describe('chromaticSaturation (O2)', () => {
     expect(chromaticSaturation([])).toBe(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // O3 — modalInterchange
@@ -12617,7 +12313,6 @@ describe('modalInterchange (O3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // O4 — harmonicField
 // ---------------------------------------------------------------------------
@@ -12648,7 +12343,6 @@ describe('harmonicField (O4)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // P1 — chordInversion
 // ---------------------------------------------------------------------------
@@ -12673,7 +12367,6 @@ describe('chordInversion (P1)', () => {
     expect(chordInversion([], 0)).toEqual([]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // P2 — diatonicTransposition
@@ -12703,7 +12396,6 @@ describe('diatonicTransposition (P2)', () => {
     expect(result).toEqual([0, 2, 4]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // P3 — enharmonicEquivalents
@@ -12735,7 +12427,6 @@ describe('enharmonicEquivalents (P3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // P4 — chordComplexity
 // ---------------------------------------------------------------------------
@@ -12764,7 +12455,6 @@ describe('chordComplexity (P4)', () => {
     expect(score).toBeGreaterThan(0.5);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // R1 — noteNameToMidi
@@ -12804,7 +12494,6 @@ describe('noteNameToMidi (R1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // R2 — scaleDegreeToSolfege
 // ---------------------------------------------------------------------------
@@ -12839,7 +12528,6 @@ describe('scaleDegreeToSolfege (R2)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // R3 — pitchClassSet
 // ---------------------------------------------------------------------------
@@ -12865,7 +12553,6 @@ describe('pitchClassSet (R3)', () => {
     expect(pitchClassSet([])).toEqual([]);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // R4 — chordName
@@ -12905,7 +12592,6 @@ describe('chordName (R4)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Round 10 — S1–S4
 // ---------------------------------------------------------------------------
@@ -12928,7 +12614,6 @@ describe('ambitus (S1)', () => {
     expect(ambitus([3, 3, 3])).toBe(0);
   });
 });
-
 
 describe('melodicLeaps (S2)', () => {
   it('test_no_leaps_stepwise', () => {
@@ -12963,7 +12648,6 @@ describe('melodicLeaps (S2)', () => {
   });
 });
 
-
 describe('generateChordProgression (S3)', () => {
   it('test_triad_C_major', () => {
     expect(generateChordProgression([0], 3)).toEqual([[0, 4, 7]]);
@@ -12987,7 +12671,6 @@ describe('generateChordProgression (S3)', () => {
   });
 });
 
-
 describe('transposePitchClasses (S4)', () => {
   it('test_transpose_by_0', () => {
     expect(transposePitchClasses([0, 4, 7], 0)).toEqual([0, 4, 7]);
@@ -13006,7 +12689,6 @@ describe('transposePitchClasses (S4)', () => {
   });
 });
 
-
 describe('scaleSymmetry (T1)', () => {
   it('test_whole_tone_is_symmetric', () => {
     expect(scaleSymmetry([0, 2, 4, 6, 8, 10])).toBe(true);
@@ -13023,7 +12705,6 @@ describe('scaleSymmetry (T1)', () => {
   });
 });
 
-
 describe('complementScale (T2)', () => {
   it('test_whole_tone_complement', () => {
     expect(complementScale([0, 2, 4, 6, 8, 10])).toEqual([1, 3, 5, 7, 9, 11]);
@@ -13038,7 +12719,6 @@ describe('complementScale (T2)', () => {
     expect(complementScale([0, 4, 7])).toEqual([1, 2, 3, 5, 6, 8, 9, 10, 11]);
   });
 });
-
 
 describe('scaleTranspositions (T3)', () => {
   it('test_returns_12_transpositions', () => {
@@ -13055,7 +12735,6 @@ describe('scaleTranspositions (T3)', () => {
     expect(scaleTranspositions([0, 4, 7])[5]).toEqual([0, 5, 9]);
   });
 });
-
 
 describe('computeDissonanceCurve (T4)', () => {
   const t12 = equalTemperament12(440);
@@ -13086,7 +12765,6 @@ describe('computeDissonanceCurve (T4)', () => {
   });
 });
 
-
 describe('isSubsetOf (U1)', () => {
   it('test_C_triad_in_major_scale', () => {
     expect(isSubsetOf([0, 4, 7], [0, 2, 4, 5, 7, 9, 11])).toBe(true);
@@ -13101,7 +12779,6 @@ describe('isSubsetOf (U1)', () => {
     expect(isSubsetOf([0, 4, 7], [0, 4, 7])).toBe(true);
   });
 });
-
 
 describe('pcSetIntersection (U2)', () => {
   it('test_common_notes', () => {
@@ -13118,7 +12795,6 @@ describe('pcSetIntersection (U2)', () => {
   });
 });
 
-
 describe('pcSetUnion (U3)', () => {
   it('test_union_of_disjoint_sets', () => {
     expect(pcSetUnion([0, 4], [7, 11])).toEqual([0, 4, 7, 11]);
@@ -13133,7 +12809,6 @@ describe('pcSetUnion (U3)', () => {
     expect(pcSetUnion([], [])).toEqual([]);
   });
 });
-
 
 describe('scaleDistance (U4)', () => {
   it('test_identical_sets_distance_zero', () => {
@@ -13151,7 +12826,6 @@ describe('scaleDistance (U4)', () => {
   });
 });
 
-
 describe('zetaFunction (V1)', () => {
   it('test_empty_returns_0', () => {
     expect(zetaFunction([])).toBe(0);
@@ -13167,7 +12841,6 @@ describe('zetaFunction (V1)', () => {
     expect(zetaFunction([0, 1, 2])).toBeGreaterThan(zetaFunction([0, 4, 7]));
   });
 });
-
 
 describe('roughnessProfile (V2)', () => {
   const spec = harmonicSpectrum();
@@ -13188,7 +12861,6 @@ describe('roughnessProfile (V2)', () => {
     result.forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
   });
 });
-
 
 describe('normalizeSpectrum (V3)', () => {
   it('test_empty_spectrum_returns_same', () => {
@@ -13218,7 +12890,6 @@ describe('normalizeSpectrum (V3)', () => {
   });
 });
 
-
 describe('spectrumSimilarity (V4)', () => {
   it('test_same_spectrum_returns_1', () => {
     const spec = harmonicSpectrum();
@@ -13241,7 +12912,6 @@ describe('spectrumSimilarity (V4)', () => {
   });
 });
 
-
 describe('scaleBrightness (W1)', () => {
   it('test_empty_returns_0', () => {
     expect(scaleBrightness([])).toBe(0);
@@ -13262,7 +12932,6 @@ describe('scaleBrightness (W1)', () => {
   });
 });
 
-
 describe('modeOf (W2)', () => {
   it('test_empty_returns_empty', () => {
     expect(modeOf([], 0)).toEqual([]);
@@ -13279,7 +12948,6 @@ describe('modeOf (W2)', () => {
     expect(modeOf(scale, 7)).toEqual(modeOf(scale, 0));
   });
 });
-
 
 describe('chordTension (W3)', () => {
   it('test_fully_diatonic', () => {
@@ -13300,7 +12968,6 @@ describe('chordTension (W3)', () => {
   });
 });
 
-
 describe('melodicDensity (W4)', () => {
   it('test_empty_returns_0', () => {
     expect(melodicDensity([], [])).toBe(0);
@@ -13316,7 +12983,6 @@ describe('melodicDensity (W4)', () => {
     expect(() => melodicDensity([0, 2], [1])).toThrow(RangeError);
   });
 });
-
 
 describe('spectralCentroid (X1)', () => {
   it('returns positive value for harmonicSpectrum(4)', () => {
@@ -13340,7 +13006,6 @@ describe('spectralCentroid (X1)', () => {
   });
 });
 
-
 describe('edoEnharmonicEquivalents (X2)', () => {
   it('finds perfect fifth in 12-EDO', () => {
     expect(edoEnharmonicEquivalents(700, 12, 10)).toEqual([7]);
@@ -13357,7 +13022,6 @@ describe('edoEnharmonicEquivalents (X2)', () => {
     expect(matches.length).toBeGreaterThanOrEqual(1);
   });
 });
-
 
 describe('commonTonesUnderTransposition (X3)', () => {
   it('returns empty for empty scale', () => {
@@ -13382,7 +13046,6 @@ describe('commonTonesUnderTransposition (X3)', () => {
   });
 });
 
-
 describe('scaleToIntervalHistogram (X4)', () => {
   it('throws for binSize <= 0', () => {
     expect(() => scaleToIntervalHistogram([0, 100], 0)).toThrow(RangeError);
@@ -13399,7 +13062,6 @@ describe('scaleToIntervalHistogram (X4)', () => {
     expect(scaleToIntervalHistogram([]).size).toBe(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Y1 — pitchSetComplement
@@ -13420,7 +13082,6 @@ describe('pitchSetComplement (Y1)', () => {
     expect(pitchSetComplement([0, 400, 700], 12, 10)).toHaveLength(9);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Y2 — scaleMirror
@@ -13444,7 +13105,6 @@ describe('scaleMirror (Y2)', () => {
     scale.forEach((c, i) => expect(double[i]).toBeCloseTo(c, 1));
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Y3 — modalTranspose
@@ -13470,7 +13130,6 @@ describe('modalTranspose (Y3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Y4 — scaleSymmetryAxes
 // ---------------------------------------------------------------------------
@@ -13494,7 +13153,6 @@ describe('scaleSymmetryAxes (Y4)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Round 17: Z1-Z4 tests
 // ---------------------------------------------------------------------------
@@ -13517,7 +13175,6 @@ describe('justIntonationError (Z1)', () => {
   });
 });
 
-
 describe('edoToContinuedFraction (Z2)', () => {
   it('700 cents starts with [0,...]', () => {
     const cf = edoToContinuedFraction(700, 6);
@@ -13535,7 +13192,6 @@ describe('edoToContinuedFraction (Z2)', () => {
     expect(cf[0]).toBe(1);
   });
 });
-
 
 describe('harmonicDistanceMatrix (Z3)', () => {
   it('throws for empty input', () => {
@@ -13556,7 +13212,6 @@ describe('harmonicDistanceMatrix (Z3)', () => {
     expect(m[0]![1]).toBeCloseTo(m[1]![0]!, 10);
   });
 });
-
 
 describe('scaleRoughnessProfile (Z4)', () => {
   it('returns one entry per degree', () => {
@@ -13585,7 +13240,6 @@ describe('scaleRoughnessProfile (Z4)', () => {
   });
 });
 
-
 describe('scaleComplexity (AA1)', () => {
   it('empty scale returns 0', () => {
     expect(scaleComplexity([])).toBe(0);
@@ -13604,7 +13258,6 @@ describe('scaleComplexity (AA1)', () => {
     expect(scaleComplexity(pentatonic)).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('scaleConnectedness (AA2)', () => {
   it('same scale returns 1.0', () => {
@@ -13626,7 +13279,6 @@ describe('scaleConnectedness (AA2)', () => {
   });
 });
 
-
 describe('chordVoiceLeadingDistance (AA3)', () => {
   it('same chord returns 0', () => {
     expect(chordVoiceLeadingDistance([0, 400, 700], [0, 400, 700])).toBe(0);
@@ -13641,7 +13293,6 @@ describe('chordVoiceLeadingDistance (AA3)', () => {
     expect(chordVoiceLeadingDistance([0], [100])).toBe(100);
   });
 });
-
 
 describe('melodicContourSimilarity (AA4)', () => {
   it('same melody returns 1', () => {
@@ -13660,7 +13311,6 @@ describe('melodicContourSimilarity (AA4)', () => {
     expect(r).toBeLessThanOrEqual(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // BB1 — scaleModulationDistance
@@ -13686,7 +13336,6 @@ describe('scaleModulationDistance (BB1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // BB2 — harmonicSeriesApproximation
 // ---------------------------------------------------------------------------
@@ -13707,7 +13356,6 @@ describe('harmonicSeriesApproximation (BB2)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // BB3 — tuningFrequencyDrift
 // ---------------------------------------------------------------------------
@@ -13727,7 +13375,6 @@ describe('tuningFrequencyDrift (BB3)', () => {
     expect(tuningFrequencyDrift(equalTemperament12(440), 432, 0)).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // BB4 — harmonicPartialOverlap
@@ -13755,7 +13402,6 @@ describe('harmonicPartialOverlap (BB4)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // CC1 — scaleChromaVector
 // ---------------------------------------------------------------------------
@@ -13778,7 +13424,6 @@ describe('scaleChromaVector (CC1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // CC2 — pitchGravityCenter
 // ---------------------------------------------------------------------------
@@ -13799,7 +13444,6 @@ describe('pitchGravityCenter (CC2)', () => {
     expect(pitchGravityCenter([])).toBe(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // CC3 — scaleCoherenceScore
@@ -13823,7 +13467,6 @@ describe('scaleCoherenceScore (CC3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // CC4 — rhythmicInterlockingScore
 // ---------------------------------------------------------------------------
@@ -13844,7 +13487,6 @@ describe('rhythmicInterlockingScore (CC4)', () => {
     expect(rhythmicInterlockingScore([], [])).toBe(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 21 (DD series)
@@ -13868,7 +13510,6 @@ describe('microtonalDeviationProfile (DD1)', () => {
     result.forEach((e, i) => expect(e.degree).toBe(i));
   });
 });
-
 
 describe('optimalScaleSubset (DD2)', () => {
   it('returns targetSize elements', () => {
@@ -13894,7 +13535,6 @@ describe('optimalScaleSubset (DD2)', () => {
   });
 });
 
-
 describe('beatFrequencyPairs (DD3)', () => {
   it('returns empty for single frequency', () => {
     expect(beatFrequencyPairs([440])).toEqual([]);
@@ -13915,7 +13555,6 @@ describe('beatFrequencyPairs (DD3)', () => {
   });
 });
 
-
 describe('timbreBasedConsonance (DD4)', () => {
   it('empty spectrum returns 1', () => {
     expect(timbreBasedConsonance(700, [])).toBe(1);
@@ -13935,7 +13574,6 @@ describe('timbreBasedConsonance (DD4)', () => {
     expect(timbreBasedConsonance(702, s)).toBeGreaterThan(timbreBasedConsonance(600, s));
   });
 });
-
 
 describe('perceptualTuningDistance (EE1)', () => {
   it('same tuning returns 0', () => {
@@ -13959,7 +13597,6 @@ describe('perceptualTuningDistance (EE1)', () => {
   });
 });
 
-
 describe('scaleCognitiveParsimony (EE2)', () => {
   it('empty scale returns 1', () => {
     expect(scaleCognitiveParsimony([])).toBe(1);
@@ -13982,7 +13619,6 @@ describe('scaleCognitiveParsimony (EE2)', () => {
   });
 });
 
-
 describe('harmonicEntropyApproximation (EE3)', () => {
   it('returns non-negative value', () => {
     expect(harmonicEntropyApproximation(700, 15, 16)).toBeGreaterThanOrEqual(0);
@@ -14000,7 +13636,6 @@ describe('harmonicEntropyApproximation (EE3)', () => {
     expect(fifth).toBeLessThan(tritone);
   });
 });
-
 
 describe('tuningComplexityRatio (EE4)', () => {
   it('returns value in (0,1]', () => {
@@ -14020,7 +13655,6 @@ describe('tuningComplexityRatio (EE4)', () => {
     expect(r).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 23 — FF series
@@ -14043,7 +13677,6 @@ describe('intervalConsistency (FF1)', () => {
     expect(intervalConsistency([0])).toBe(0);
   });
 });
-
 
 describe('tuningIsomorphismScore (FF2)', () => {
   it('same tuning returns 1', () => {
@@ -14069,7 +13702,6 @@ describe('tuningIsomorphismScore (FF2)', () => {
   });
 });
 
-
 describe('scaleGraphDensity (FF3)', () => {
   it('empty scale returns 0', () => {
     expect(scaleGraphDensity([])).toBe(0);
@@ -14087,7 +13719,6 @@ describe('scaleGraphDensity (FF3)', () => {
   });
 });
 
-
 describe('harmonicLatticePosition (FF4)', () => {
   it('throws for primeLimit < 2', () => {
     expect(() => harmonicLatticePosition(700, 1)).toThrow(RangeError);
@@ -14103,7 +13734,6 @@ describe('harmonicLatticePosition (FF4)', () => {
     expect(Number.isFinite(harmonicLatticePosition(702, 5).errorCents)).toBe(true);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // GG1 — pitchClassEntropy
@@ -14127,7 +13757,6 @@ describe('pitchClassEntropy (GG1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // GG2 — intervalAmbiguity
 // ---------------------------------------------------------------------------
@@ -14149,7 +13778,6 @@ describe('intervalAmbiguity (GG2)', () => {
     expect(intervalAmbiguity([0])).toBe(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // GG3 — tuningNetworkCentrality
@@ -14173,7 +13801,6 @@ describe('tuningNetworkCentrality (GG3)', () => {
     expect(large).toBeGreaterThanOrEqual(small);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // GG4 — scaleModalNetwork
@@ -14203,7 +13830,6 @@ describe('scaleModalNetwork (GG4)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // HH1 — virtualPitchStrength
 // ---------------------------------------------------------------------------
@@ -14224,7 +13850,6 @@ describe('virtualPitchStrength (HH1)', () => {
     expect(virtualPitchStrength([440, 880, 1320], 440)).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // HH2 — roughnessCurvePoints
@@ -14250,7 +13875,6 @@ describe('roughnessCurvePoints (HH2)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // HH3 — scaleExpressiveness
 // ---------------------------------------------------------------------------
@@ -14273,7 +13897,6 @@ describe('scaleExpressiveness (HH3)', () => {
     expect(wide).toBeGreaterThanOrEqual(narrow);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // HH4 — tuningHistoricalDistance
@@ -14301,7 +13924,6 @@ describe('tuningHistoricalDistance (HH4)', () => {
   });
 });
 
-
 describe('barkScale', () => {
   it('returns 0 for 0 Hz', () => {
     expect(barkScale(0)).toBe(0);
@@ -14316,7 +13938,6 @@ describe('barkScale', () => {
     expect(barkScale(20000)).toBeGreaterThan(20);
   });
 });
-
 
 describe('pitchSalience', () => {
   it('returns 0 for empty spectrum', () => {
@@ -14337,7 +13958,6 @@ describe('pitchSalience', () => {
   });
 });
 
-
 describe('scaleStepVariety', () => {
   it('returns 2 for major scale [0,200,400,500,700,900,1100]', () => {
     expect(scaleStepVariety([0, 200, 400, 500, 700, 900, 1100])).toBe(2);
@@ -14352,7 +13972,6 @@ describe('scaleStepVariety', () => {
     expect(scaleStepVariety([0, 200, 400, 600, 800], 10)).toBe(1);
   });
 });
-
 
 describe('spectrumFlux', () => {
   it('returns 0 for two identical spectra', () => {
@@ -14370,7 +13989,6 @@ describe('spectrumFlux', () => {
     expect(spectrumFlux(s1, s2)).toBeCloseTo(spectrumFlux(s2, s1), 10);
   });
 });
-
 
 // ── Round 27: JJ1–JJ4 ────────────────────────────────────────────────────────
 
@@ -14399,7 +14017,6 @@ describe('intervalClassVector (JJ1)', () => {
   });
 });
 
-
 describe('frequencyRatioComplexity (JJ2)', () => {
   it('returns 0 for ratio = 1 (unison)', () => {
     expect(frequencyRatioComplexity(1)).toBe(0);
@@ -14416,7 +14033,6 @@ describe('frequencyRatioComplexity (JJ2)', () => {
     expect(() => frequencyRatioComplexity(-1)).toThrow(RangeError);
   });
 });
-
 
 describe('melodicEntropy (JJ3)', () => {
   it('returns 0 for scale with fewer than 2 notes', () => {
@@ -14436,7 +14052,6 @@ describe('melodicEntropy (JJ3)', () => {
     expect(() => melodicEntropy([0, 200], 0)).toThrow(RangeError);
   });
 });
-
 
 describe('harmonicComplexityProfile (JJ4)', () => {
   it('returns one value per degree for equalTemperament12', () => {
@@ -14462,7 +14077,6 @@ describe('harmonicComplexityProfile (JJ4)', () => {
   });
 });
 
-
 describe('scaleHarmonicGravity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleHarmonicGravity([])).toBe(0);
@@ -14481,7 +14095,6 @@ describe('scaleHarmonicGravity', () => {
     expect(near).toBeGreaterThan(far);
   });
 });
-
 
 describe('tuningOvertoneAlignment', () => {
   it('returns value in [0, 1] for 12-TET', () => {
@@ -14511,7 +14124,6 @@ describe('tuningOvertoneAlignment', () => {
   });
 });
 
-
 describe('scaleModalDiversity', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleModalDiversity([0])).toBe(0);
@@ -14533,7 +14145,6 @@ describe('scaleModalDiversity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('tuningLatticeSpread', () => {
   it('returns 0 for single-degree tuning', () => {
@@ -14558,7 +14169,6 @@ describe('tuningLatticeSpread', () => {
   });
 });
 
-
 describe('spectralCentroidHz', () => {
   it('returns 0 for empty spectrum', () => {
     expect(spectralCentroidHz([], 440)).toBe(0);
@@ -14577,7 +14187,6 @@ describe('spectralCentroidHz', () => {
     expect(c2).toBeCloseTo(c1 * 2, 5);
   });
 });
-
 
 describe('spectralFlatness', () => {
   it('returns 0 for empty spectrum', () => {
@@ -14604,7 +14213,6 @@ describe('spectralFlatness', () => {
   });
 });
 
-
 describe('scaleRootedness', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleRootedness([])).toBe(0);
@@ -14623,7 +14231,6 @@ describe('scaleRootedness', () => {
     expect(scaleRootedness(cluster)).toBeLessThan(scaleRootedness(harmonic));
   });
 });
-
 
 describe('partialMaskingScore', () => {
   it('returns 0 for empty spectrum', () => {
@@ -14648,7 +14255,6 @@ describe('partialMaskingScore', () => {
   });
 });
 
-
 describe('scaleDensityProfile', () => {
   it('returns empty array for empty scale', () => {
     expect(scaleDensityProfile([])).toHaveLength(0);
@@ -14672,7 +14278,6 @@ describe('scaleDensityProfile', () => {
     expect(scaleDensityProfile([0], 200)).toEqual([0]);
   });
 });
-
 
 describe('tuningStepsVariance', () => {
   it('returns ~0 for 12-TET (all steps equal 100c)', () => {
@@ -14702,7 +14307,6 @@ describe('tuningStepsVariance', () => {
   });
 });
 
-
 describe('scaleChordCoverage', () => {
   it('returns 0 for empty chordIntervals', () => {
     expect(scaleChordCoverage([0, 400, 700], [])).toBe(0);
@@ -14724,7 +14328,6 @@ describe('scaleChordCoverage', () => {
     expect(scaleChordCoverage([], [400, 700])).toBe(0);
   });
 });
-
 
 describe('harmonicSeriesDeviation', () => {
   it('returns > 0 for 12-TET approximating harmonics 1-8', () => {
@@ -14754,7 +14357,6 @@ describe('harmonicSeriesDeviation', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Round 31: NN1–NN4
 // ---------------------------------------------------------------------------
@@ -14778,7 +14380,6 @@ describe('scaleTonicStrength', () => {
   });
 });
 
-
 describe('intervalDirectionalityBias', () => {
   it('returns finite number in [-1, 1] for chromatic lower half', () => {
     const result = intervalDirectionalityBias([0, 100, 200, 800, 900, 1000]);
@@ -14798,7 +14399,6 @@ describe('intervalDirectionalityBias', () => {
     expect(result).toBeGreaterThan(0);
   });
 });
-
 
 describe('chordRootAmbiguity', () => {
   it('returns value in [0, 1] for major chord', () => {
@@ -14820,7 +14420,6 @@ describe('chordRootAmbiguity', () => {
   });
 });
 
-
 describe('scaleColorfulness', () => {
   it('12-TET scale vs 12-EDO returns near 0', () => {
     const result = scaleColorfulness([0, 200, 400, 500, 700, 900, 1100], 12);
@@ -14839,7 +14438,6 @@ describe('scaleColorfulness', () => {
     expect(result).toBeLessThanOrEqual(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // OO1 — tuningResolutionFactor
@@ -14865,7 +14463,6 @@ describe('tuningResolutionFactor (OO1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // OO2 — scalePentaSubsetQuality
 // ---------------------------------------------------------------------------
@@ -14888,7 +14485,6 @@ describe('scalePentaSubsetQuality (OO2)', () => {
     expect(result).toBe(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // OO3 — harmonicFluxAcrossDegrees
@@ -14914,7 +14510,6 @@ describe('harmonicFluxAcrossDegrees (OO3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // OO4 — intervalGroupSymmetryScore
 // ---------------------------------------------------------------------------
@@ -14937,7 +14532,6 @@ describe('intervalGroupSymmetryScore (OO4)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Round 33 — PP1: scaleLeadingToneStrength
 describe('scaleLeadingToneStrength (PP1)', () => {
@@ -14959,7 +14553,6 @@ describe('scaleLeadingToneStrength (PP1)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Round 33 — PP2: tuningTranspositionInvariance
 describe('tuningTranspositionInvariance (PP2)', () => {
@@ -14979,7 +14572,6 @@ describe('tuningTranspositionInvariance (PP2)', () => {
     expect(tuningTranspositionInvariance(equalTemperament12(440), 700)).toBe(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 33 — PP3: chordFactorBalance
@@ -15003,7 +14595,6 @@ describe('chordFactorBalance (PP3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Round 33 — PP4: spectralOvertoneBalance
 describe('spectralOvertoneBalance (PP4)', () => {
@@ -15023,7 +14614,6 @@ describe('spectralOvertoneBalance (PP4)', () => {
     expect(val).toBeLessThanOrEqual(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 34: QQ1–QQ4
@@ -15051,7 +14641,6 @@ describe('scaleStepProfile', () => {
   });
 });
 
-
 describe('tuningPitchClassBalance', () => {
   it('12-TET occupies all 12 pitch classes → 1', () => {
     expect(tuningPitchClassBalance(equalTemperament12(440), 12)).toBe(1);
@@ -15068,7 +14657,6 @@ describe('tuningPitchClassBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('harmonicSeriesConvergence', () => {
   it('12-TET convergence is in (0, 1]', () => {
@@ -15091,7 +14679,6 @@ describe('harmonicSeriesConvergence', () => {
   });
 });
 
-
 describe('scaleGapsProfile', () => {
   it('detects gap of 500c between 200 and 700', () => {
     expect(scaleGapsProfile([0, 200, 700, 900])).toEqual([500]);
@@ -15110,7 +14697,6 @@ describe('scaleGapsProfile', () => {
   });
 });
 
-
 describe('scaleTritoneSaturation', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleTritoneSaturation([0])).toBe(0);
@@ -15127,7 +14713,6 @@ describe('scaleTritoneSaturation', () => {
     expect(scaleTritoneSaturation([0, 600])).toBe(1);
   });
 });
-
 
 describe('tuningFifthDeviation', () => {
   it('12-TET consecutive semitone intervals are not fifth-like, returns 0', () => {
@@ -15148,7 +14733,6 @@ describe('tuningFifthDeviation', () => {
   });
 });
 
-
 describe('scaleHarmonicAcceleration', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleHarmonicAcceleration([])).toBe(0);
@@ -15167,7 +14751,6 @@ describe('scaleHarmonicAcceleration', () => {
   });
 });
 
-
 describe('spectrumPurityScore', () => {
   it('returns 0 for empty spectrum', () => {
     expect(spectrumPurityScore([])).toBe(0);
@@ -15185,7 +14768,6 @@ describe('spectrumPurityScore', () => {
     expect(spectrumPurityScore([{ ratio: 2, amplitude: 1 }])).toBeCloseTo(1, 10);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 36: SS1–SS4
@@ -15213,7 +14795,6 @@ describe('scaleChromaticCoverage', () => {
   });
 });
 
-
 describe('tuningOctaveConsistency', () => {
   it('returns close to 1 for 12-TET (perfect octave pairs)', () => {
     const result = tuningOctaveConsistency(equalTemperament12(440));
@@ -15237,7 +14818,6 @@ describe('tuningOctaveConsistency', () => {
   });
 });
 
-
 describe('primeFactorComplexity', () => {
   it('returns 0 for ratio = 1', () => {
     expect(primeFactorComplexity(1)).toBe(0);
@@ -15256,7 +14836,6 @@ describe('primeFactorComplexity', () => {
     expect(() => primeFactorComplexity(-1)).toThrow(RangeError);
   });
 });
-
 
 describe('scaleIntervalicRichness', () => {
   it('returns > 0 and <= 1 for a 7-note scale', () => {
@@ -15281,7 +14860,6 @@ describe('scaleIntervalicRichness', () => {
   });
 });
 
-
 describe('scaleOctaveStretchFactor', () => {
   it('returns ~0 for 12-TET (perfect octave)', () => {
     const result = scaleOctaveStretchFactor(equalTemperament12(440));
@@ -15305,7 +14883,6 @@ describe('scaleOctaveStretchFactor', () => {
   });
 });
 
-
 describe('chordJustIntonationScore', () => {
   it('returns 1 for empty chord', () => {
     expect(chordJustIntonationScore([])).toBe(1);
@@ -15326,7 +14903,6 @@ describe('chordJustIntonationScore', () => {
     expect(justScore).toBeGreaterThan(nonJust);
   });
 });
-
 
 describe('spectrumHarmonicDeviation', () => {
   it('returns 0 for empty spectrum', () => {
@@ -15353,7 +14929,6 @@ describe('spectrumHarmonicDeviation', () => {
   });
 });
 
-
 describe('scaleVoiceLeadingEfficiency', () => {
   it('returns 0 for empty target', () => {
     expect(scaleVoiceLeadingEfficiency([0, 200, 400], [])).toBe(0);
@@ -15373,7 +14948,6 @@ describe('scaleVoiceLeadingEfficiency', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // UU1 — scalePitchClustering
 describe('scalePitchClustering (UU1)', () => {
@@ -15390,7 +14964,6 @@ describe('scalePitchClustering (UU1)', () => {
     expect(() => scalePitchClustering([0, 100], -1)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // UU2 — tuningGoldenRatioProximity
@@ -15421,7 +14994,6 @@ describe('tuningGoldenRatioProximity (UU2)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // UU3 — spectrumAmplitudeKurtosis
 describe('spectrumAmplitudeKurtosis (UU3)', () => {
@@ -15445,7 +15017,6 @@ describe('spectrumAmplitudeKurtosis (UU3)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // UU4 — scaleModularStepPattern
 describe('scaleModularStepPattern (UU4)', () => {
@@ -15467,7 +15038,6 @@ describe('scaleModularStepPattern (UU4)', () => {
     expect(result).toBeLessThanOrEqual(1);
   });
 });
-
 
 // VV1 — scaleToChromaticNames
 describe('scaleToChromaticNames (VV1)', () => {
@@ -15496,7 +15066,6 @@ describe('scaleToChromaticNames (VV1)', () => {
   });
 });
 
-
 // VV2 — tuningMeantoneDeviation
 describe('tuningMeantoneDeviation (VV2)', () => {
   it('returns positive value for 12-TET (differs from meantone)', () => {
@@ -15520,7 +15089,6 @@ describe('tuningMeantoneDeviation (VV2)', () => {
     expect(tuningMeantoneDeviation(emptyTuning)).toBe(0);
   });
 });
-
 
 // VV3 — spectrumDominantPartial
 describe('spectrumDominantPartial (VV3)', () => {
@@ -15547,7 +15115,6 @@ describe('spectrumDominantPartial (VV3)', () => {
   });
 });
 
-
 // VV4 — scaleFundamentalBassScore
 describe('scaleFundamentalBassScore (VV4)', () => {
   it('returns 0 for empty scale', () => {
@@ -15566,7 +15133,6 @@ describe('scaleFundamentalBassScore (VV4)', () => {
     expect(scaleFundamentalBassScore([0], 0)).toBe(1);
   });
 });
-
 
 // Round 40: WW1–WW4
 
@@ -15587,7 +15153,6 @@ describe('scaleHemitonicDensity (WW1)', () => {
   });
 });
 
-
 describe('tuningRegularityScore (WW2)', () => {
   it('returns 1 for equalTemperament12 (all steps = 100c)', () => {
     expect(tuningRegularityScore(equalTemperament12(440))).toBeCloseTo(1, 5);
@@ -15604,7 +15169,6 @@ describe('tuningRegularityScore (WW2)', () => {
     expect(tuningRegularityScore(edo(7, 440))).toBeCloseTo(1, 5);
   });
 });
-
 
 describe('spectralSpread (WW3)', () => {
   it('returns 0 for empty spectrum', () => {
@@ -15623,7 +15187,6 @@ describe('spectralSpread (WW3)', () => {
   });
 });
 
-
 describe('harmonicSeriesMatchCount (WW4)', () => {
   it('returns 0 for empty scale', () => {
     expect(harmonicSeriesMatchCount([], 12, 25)).toBe(0);
@@ -15640,7 +15203,6 @@ describe('harmonicSeriesMatchCount (WW4)', () => {
     expect(count).toBe(3);
   });
 });
-
 
 describe('XX1 scaleIntervalClassVector', () => {
   it('major triad [0,400,700] has expected vector', () => {
@@ -15663,7 +15225,6 @@ describe('XX1 scaleIntervalClassVector', () => {
   });
 });
 
-
 describe('XX2 scaleChordVLDistance', () => {
   it('same chord → distance 0', () => {
     expect(scaleChordVLDistance([0, 400, 700], [0, 400, 700])).toBe(0);
@@ -15680,7 +15241,6 @@ describe('XX2 scaleChordVLDistance', () => {
     expect(d).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('XX3 scaleChromaticSaturation', () => {
   it('12-TET scale → saturation 1', () => {
@@ -15702,7 +15262,6 @@ describe('XX3 scaleChromaticSaturation', () => {
   });
 });
 
-
 describe('XX4 scaleMaximallyEven', () => {
   it('7-from-12 generates diatonic-like set', () => {
     const r = scaleMaximallyEven(12, 7);
@@ -15723,7 +15282,6 @@ describe('XX4 scaleMaximallyEven', () => {
   });
 });
 
-
 describe('YY1 scaleReflectionSymmetry', () => {
   it('chromatic scale is perfectly symmetric', () => {
     const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -15741,7 +15299,6 @@ describe('YY1 scaleReflectionSymmetry', () => {
     expect(r).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('YY2 scaleRotationalSymmetry', () => {
   it('whole tone scale has high rotational symmetry', () => {
@@ -15761,7 +15318,6 @@ describe('YY2 scaleRotationalSymmetry', () => {
   });
 });
 
-
 describe('YY3 scaleFractalDimension', () => {
   it('returns non-negative number', () => {
     expect(scaleFractalDimension([0, 200, 400, 700, 900])).toBeGreaterThanOrEqual(0);
@@ -15779,7 +15335,6 @@ describe('YY3 scaleFractalDimension', () => {
     expect(d).toBeLessThanOrEqual(2);
   });
 });
-
 
 describe('YY4 scaleZoomSelfSimilarity', () => {
   it('returns value in [-1,1] for valid scale', () => {
@@ -15801,7 +15356,6 @@ describe('YY4 scaleZoomSelfSimilarity', () => {
   });
 });
 
-
 describe('ZZ1 scaleComplexityRatio', () => {
   it('equal-step scale has 0 complexity', () => {
     const ed = Array.from({ length: 7 }, (_, i) => i * 200);
@@ -15818,7 +15372,6 @@ describe('ZZ1 scaleComplexityRatio', () => {
   });
 });
 
-
 describe('ZZ2 scaleExpressivenessIndex', () => {
   it('chromatic scale: all 100c intervals → index 1', () => {
     const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -15834,7 +15387,6 @@ describe('ZZ2 scaleExpressivenessIndex', () => {
     expect(scaleExpressivenessIndex([0])).toBe(0);
   });
 });
-
 
 describe('ZZ3 scaleHarmonicComplexity', () => {
   it('returns non-negative number', () => {
@@ -15855,7 +15407,6 @@ describe('ZZ3 scaleHarmonicComplexity', () => {
   });
 });
 
-
 describe('ZZ4 scaleTonalGravity', () => {
   it('scale with pitch near tonic has high gravity', () => {
     const g = scaleTonalGravity([0, 100, 700], 0);
@@ -15874,7 +15425,6 @@ describe('ZZ4 scaleTonalGravity', () => {
   });
 });
 
-
 // Q1422 — tuningFamilySocraticRadarSpectralCentroidProfile
 describe('Q1422 tuningFamilySocraticRadarSpectralCentroidProfile', () => {
   const t = equalTemperament12(440);
@@ -15891,7 +15441,6 @@ describe('Q1422 tuningFamilySocraticRadarSpectralCentroidProfile', () => {
     expect(tuningFamilySocraticRadarSpectralCentroidProfile([], s)).toEqual([]);
   });
 });
-
 
 // Q1424 — tuningFamilySocraticRadarSpectralFlatnessProfile
 describe('Q1424 tuningFamilySocraticRadarSpectralFlatnessProfile', () => {
@@ -15911,7 +15460,6 @@ describe('Q1424 tuningFamilySocraticRadarSpectralFlatnessProfile', () => {
   });
 });
 
-
 // Q1426 — tuningFamilySocraticRadarSpectralRolloffProfile
 describe('Q1426 tuningFamilySocraticRadarSpectralRolloffProfile', () => {
   const t = equalTemperament12(440);
@@ -15929,7 +15477,6 @@ describe('Q1426 tuningFamilySocraticRadarSpectralRolloffProfile', () => {
   });
 });
 
-
 // Q1432 — tuningFamilySocraticRadarSpectralBandwidthMean
 describe('Q1432 tuningFamilySocraticRadarSpectralBandwidthMean', () => {
   const t = equalTemperament12(440);
@@ -15946,7 +15493,6 @@ describe('Q1432 tuningFamilySocraticRadarSpectralBandwidthMean', () => {
   });
 });
 
-
 describe('AAA1 scaleTranspositionDistance', () => {
   it('transposition by 0 → distance 0', () => {
     expect(scaleTranspositionDistance([0, 200, 400, 700], 0)).toBe(0);
@@ -15961,7 +15507,6 @@ describe('AAA1 scaleTranspositionDistance', () => {
     expect(scaleTranspositionDistance([0, 200, 400, 700], 1200)).toBe(0);
   });
 });
-
 
 describe('AAA2 scaleModulationGraph', () => {
   it('returns n×n matrix', () => {
@@ -15982,7 +15527,6 @@ describe('AAA2 scaleModulationGraph', () => {
   });
 });
 
-
 describe('AAA3 scaleModulationConnectivity', () => {
   it('returns value in [0,1]', () => {
     const r = scaleModulationConnectivity([0, 200, 400, 700]);
@@ -16001,7 +15545,6 @@ describe('AAA3 scaleModulationConnectivity', () => {
     expect(r).toBeGreaterThan(0);
   });
 });
-
 
 describe('AAA4 scaleBestModulationTarget', () => {
   it('returns a number', () => {
@@ -16026,7 +15569,6 @@ describe('AAA4 scaleBestModulationTarget', () => {
   });
 });
 
-
 // Q1434 — tuningFamilySocraticRadarCriticalBandRatio
 describe('Q1434 tuningFamilySocraticRadarCriticalBandRatio', () => {
   const t = equalTemperament12(440);
@@ -16046,7 +15588,6 @@ describe('Q1434 tuningFamilySocraticRadarCriticalBandRatio', () => {
   });
 });
 
-
 // Q1438 — tuningFamilySocraticRadarRoughnessProfile
 describe('Q1438 tuningFamilySocraticRadarRoughnessProfile', () => {
   const t = equalTemperament12(440);
@@ -16063,7 +15604,6 @@ describe('Q1438 tuningFamilySocraticRadarRoughnessProfile', () => {
     expect(r[0]).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // Q1440 — tuningFamilySocraticRadarMaskingThresholdMean
 describe('Q1440 tuningFamilySocraticRadarMaskingThresholdMean', () => {
@@ -16083,7 +15623,6 @@ describe('Q1440 tuningFamilySocraticRadarMaskingThresholdMean', () => {
   });
 });
 
-
 // Q1442 — tuningFamilySocraticRadarPitchSalienceMean
 describe('Q1442 tuningFamilySocraticRadarPitchSalienceMean', () => {
   const t = equalTemperament12(440);
@@ -16102,7 +15641,6 @@ describe('Q1442 tuningFamilySocraticRadarPitchSalienceMean', () => {
   });
 });
 
-
 describe('BBB1 scaleSubsetCount', () => {
   it('C(7,3) = 35', () => {
     const diatonic = [0, 200, 400, 500, 700, 900, 1100];
@@ -16118,7 +15656,6 @@ describe('BBB1 scaleSubsetCount', () => {
     expect(scaleSubsetCount([0, 200, 400], 0)).toBe(1);
   });
 });
-
 
 describe('BBB2 scaleModeCount', () => {
   it('chromatic scale: all modes same → 1 or 12', () => {
@@ -16136,7 +15673,6 @@ describe('BBB2 scaleModeCount', () => {
     expect(scaleModeCount(diatonic)).toBe(7);
   });
 });
-
 
 describe('BBB3 scaleComplementCents', () => {
   it('diatonic complement of chromatic has 5 pitches', () => {
@@ -16156,7 +15692,6 @@ describe('BBB3 scaleComplementCents', () => {
   });
 });
 
-
 describe('BBB4 scaleNecklaceCount', () => {
   it('single pitch → 1', () => {
     expect(scaleNecklaceCount([0])).toBe(1);
@@ -16173,7 +15708,6 @@ describe('BBB4 scaleNecklaceCount', () => {
     expect(scaleNecklaceCount(diatonic)).toBeGreaterThanOrEqual(1);
   });
 });
-
 
 describe('CCC1 scaleTonnetzCoordinates', () => {
   it('empty → []', () => {
@@ -16197,7 +15731,6 @@ describe('CCC1 scaleTonnetzCoordinates', () => {
   });
 });
 
-
 describe('CCC2 scaleTonnetzSpan', () => {
   it('empty → 0', () => {
     expect(scaleTonnetzSpan([])).toBe(0);
@@ -16215,7 +15748,6 @@ describe('CCC2 scaleTonnetzSpan', () => {
     void small;
   });
 });
-
 
 describe('CCC3 scaleNeighborhoodGraph', () => {
   it('empty → []', () => {
@@ -16236,7 +15768,6 @@ describe('CCC3 scaleNeighborhoodGraph', () => {
   });
 });
 
-
 describe('CCC4 scaleNeighborhoodDensity', () => {
   it('empty → 0', () => {
     expect(scaleNeighborhoodDensity([])).toBe(0);
@@ -16254,7 +15785,6 @@ describe('CCC4 scaleNeighborhoodDensity', () => {
     expect(r).toBeGreaterThan(0);
   });
 });
-
 
 describe('DDD1 scalePitchClassSet', () => {
   it('major triad maps to [0,4,7]', () => {
@@ -16274,7 +15804,6 @@ describe('DDD1 scalePitchClassSet', () => {
   });
 });
 
-
 describe('DDD2 scalePrimeForm', () => {
   it('empty → []', () => {
     expect(scalePrimeForm([])).toEqual([]);
@@ -16291,7 +15820,6 @@ describe('DDD2 scalePrimeForm', () => {
     expect(r).toHaveLength(3);
   });
 });
-
 
 describe('DDD3 scaleForteNumber', () => {
   it('empty → "0-1"', () => {
@@ -16311,7 +15839,6 @@ describe('DDD3 scaleForteNumber', () => {
   });
 });
 
-
 describe('DDD4 scaleIntervalClassContent', () => {
   it('returns array of 6 values', () => {
     expect(scaleIntervalClassContent([0, 400, 700])).toHaveLength(6);
@@ -16329,7 +15856,6 @@ describe('DDD4 scaleIntervalClassContent', () => {
     expect(scaleIntervalClassContent([])).toEqual([0, 0, 0, 0, 0, 0]);
   });
 });
-
 
 describe('EEE1 scaleEDOApproximationError', () => {
   it('12-EDO scale has 0 error', () => {
@@ -16349,7 +15875,6 @@ describe('EEE1 scaleEDOApproximationError', () => {
   });
 });
 
-
 describe('EEE2 scaleMeantoneDeviation', () => {
   it('returns non-negative', () => {
     expect(scaleMeantoneDeviation([0, 200, 400, 500, 700, 900, 1100])).toBeGreaterThanOrEqual(0);
@@ -16367,7 +15892,6 @@ describe('EEE2 scaleMeantoneDeviation', () => {
     expect(scaleMeantoneDeviation(chromatic)).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('EEE3 scaleWellTemperamentScore', () => {
   it('chromatic scale → 1', () => {
@@ -16388,7 +15912,6 @@ describe('EEE3 scaleWellTemperamentScore', () => {
   });
 });
 
-
 describe('EEE4 scaleJustIntonationRatioScore', () => {
   it('empty → 0', () => {
     expect(scaleJustIntonationRatioScore([])).toBe(0);
@@ -16408,7 +15931,6 @@ describe('EEE4 scaleJustIntonationRatioScore', () => {
   });
 });
 
-
 describe('FFF1 scaleGapVariance', () => {
   it('equal-step scale has 0 variance', () => {
     const ed = Array.from({ length: 7 }, (_, i) => i * (1200 / 7));
@@ -16424,7 +15946,6 @@ describe('FFF1 scaleGapVariance', () => {
     expect(scaleGapVariance([0, 100, 700])).toBeGreaterThan(0);
   });
 });
-
 
 describe('FFF2 scaleDensityHistogram', () => {
   it('returns array of bins length', () => {
@@ -16443,7 +15964,6 @@ describe('FFF2 scaleDensityHistogram', () => {
   });
 });
 
-
 describe('FFF3 scaleDensityEntropy', () => {
   it('empty → 0', () => {
     expect(scaleDensityEntropy([])).toBe(0);
@@ -16461,7 +15981,6 @@ describe('FFF3 scaleDensityEntropy', () => {
     expect(h).toBeCloseTo(Math.log2(6), 1);
   });
 });
-
 
 describe('FFF4 scaleUniformityScore', () => {
   it('equal-step scale has high uniformity', () => {
@@ -16482,7 +16001,6 @@ describe('FFF4 scaleUniformityScore', () => {
   });
 });
 
-
 describe('Q1482 tuningFamilySocraticRadarModalCenterStrength', () => {
   const t = equalTemperament12(440);
   const s = harmonicSpectrum(6);
@@ -16497,7 +16015,6 @@ describe('Q1482 tuningFamilySocraticRadarModalCenterStrength', () => {
   });
 });
 
-
 describe('Q1484 tuningFamilySocraticRadarTonicStabilityIndex', () => {
   const t = equalTemperament12(440);
   const s = harmonicSpectrum(6);
@@ -16511,7 +16028,6 @@ describe('Q1484 tuningFamilySocraticRadarTonicStabilityIndex', () => {
     expect(tuningFamilySocraticRadarTonicStabilityIndex([t, t], s)).toBeDefined();
   });
 });
-
 
 describe('Q1486 tuningFamilySocraticRadarLeadingToneScore', () => {
   const t = equalTemperament12(440);
@@ -16531,7 +16047,6 @@ describe('Q1486 tuningFamilySocraticRadarLeadingToneScore', () => {
   });
 });
 
-
 describe('Q1488 tuningFamilySocraticRadarModalAmbiguity', () => {
   const t = equalTemperament12(440);
   const s = harmonicSpectrum(6);
@@ -16545,7 +16060,6 @@ describe('Q1488 tuningFamilySocraticRadarModalAmbiguity', () => {
     expect(tuningFamilySocraticRadarModalAmbiguity([t, t], s)).toBeGreaterThanOrEqual(1);
   });
 });
-
 
 describe('GGG1 scaleReachabilityMatrix', () => {
   it('empty → []', () => {
@@ -16566,7 +16080,6 @@ describe('GGG1 scaleReachabilityMatrix', () => {
   });
 });
 
-
 describe('GGG2 scaleReachabilityScore', () => {
   it('n<=1 → 0', () => {
     expect(scaleReachabilityScore([0])).toBe(0);
@@ -16586,7 +16099,6 @@ describe('GGG2 scaleReachabilityScore', () => {
   });
 });
 
-
 describe('GGG3 scaleAveragePath', () => {
   it('n<=1 → 0', () => {
     expect(scaleAveragePath([0])).toBe(0);
@@ -16603,7 +16115,6 @@ describe('GGG3 scaleAveragePath', () => {
   });
 });
 
-
 describe('GGG4 scaleWienerIndex', () => {
   it('n<=1 → 0', () => {
     expect(scaleWienerIndex([0])).toBe(0);
@@ -16619,7 +16130,6 @@ describe('GGG4 scaleWienerIndex', () => {
     expect(scaleWienerIndex([0, 200, 400, 700, 900])).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('HHH1 scaleOvertoneMatchScore', () => {
   it('empty → 0', () => {
@@ -16642,7 +16152,6 @@ describe('HHH1 scaleOvertoneMatchScore', () => {
   });
 });
 
-
 describe('HHH2 scaleSubharmonicMatchScore', () => {
   it('empty → 0', () => {
     expect(scaleSubharmonicMatchScore([])).toBe(0);
@@ -16662,7 +16171,6 @@ describe('HHH2 scaleSubharmonicMatchScore', () => {
   });
 });
 
-
 describe('HHH3 scaleBeatFrequency', () => {
   it('single pitch → 0', () => {
     expect(scaleBeatFrequency([0])).toBe(0);
@@ -16680,7 +16188,6 @@ describe('HHH3 scaleBeatFrequency', () => {
   });
 });
 
-
 describe('HHH4 scaleRoughnessSum', () => {
   it('single pitch → 0', () => {
     expect(scaleRoughnessSum([0])).toBe(0);
@@ -16697,7 +16204,6 @@ describe('HHH4 scaleRoughnessSum', () => {
     expect(close).toBeGreaterThan(far);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 51: Q1506–Q1516 — Complexity Theory / Algorithmic Information
@@ -16721,7 +16227,6 @@ describe('Q1506 tuningFamilySocraticRadarKolmogorovProxy', () => {
   });
 });
 
-
 describe('Q1508 tuningFamilySocraticRadarLempelZivProxy', () => {
   const t = equalTemperament12(440);
   const s = harmonicSpectrum(6);
@@ -16735,7 +16240,6 @@ describe('Q1508 tuningFamilySocraticRadarLempelZivProxy', () => {
     expect(tuningFamilySocraticRadarLempelZivProxy([t, t], s)).toBeGreaterThan(0);
   });
 });
-
 
 describe('Q1510 tuningFamilySocraticRadarFractalDimensionProxy', () => {
   const t = equalTemperament12(440);
@@ -16753,7 +16257,6 @@ describe('Q1510 tuningFamilySocraticRadarFractalDimensionProxy', () => {
   });
 });
 
-
 describe('Q1512 tuningFamilySocraticRadarSelfSimilarityScore', () => {
   const t = equalTemperament12(440);
   const s = harmonicSpectrum(6);
@@ -16768,7 +16271,6 @@ describe('Q1512 tuningFamilySocraticRadarSelfSimilarityScore', () => {
     expect(tuningFamilySocraticRadarSelfSimilarityScore([], s)).toBe(0);
   });
 });
-
 
 describe('Q1514 tuningFamilySocraticRadarRepetitiveness', () => {
   const t = equalTemperament12(440);
@@ -16785,7 +16287,6 @@ describe('Q1514 tuningFamilySocraticRadarRepetitiveness', () => {
     expect(tuningFamilySocraticRadarRepetitiveness([t, t], s)).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('Q1516 tuningFamilySocraticRadarPredictabilityScore', () => {
   const t = equalTemperament12(440);
@@ -16804,7 +16305,6 @@ describe('Q1516 tuningFamilySocraticRadarPredictabilityScore', () => {
     expect(r).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('III1 scaleInversionSymmetry', () => {
   it('empty → 0', () => {
@@ -16825,7 +16325,6 @@ describe('III1 scaleInversionSymmetry', () => {
   });
 });
 
-
 describe('III2 scaleRetrograde', () => {
   it('empty → []', () => {
     expect(scaleRetrograde([])).toEqual([]);
@@ -16841,7 +16340,6 @@ describe('III2 scaleRetrograde', () => {
     expect(scaleRetrograde(s2)).toHaveLength(s2.length);
   });
 });
-
 
 describe('III3 scaleRetrogradeInversion', () => {
   it('empty → []', () => {
@@ -16866,7 +16364,6 @@ describe('III3 scaleRetrogradeInversion', () => {
   });
 });
 
-
 describe('III4 scalePalindromicScore', () => {
   it('empty → 0', () => {
     expect(scalePalindromicScore([])).toBe(0);
@@ -16884,7 +16381,6 @@ describe('III4 scalePalindromicScore', () => {
     expect(r).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('Q1518 tuningFamilySocraticRadarNashEquilibriumProxy', () => {
   const t = equalTemperament12(440);
@@ -16904,7 +16400,6 @@ describe('Q1518 tuningFamilySocraticRadarNashEquilibriumProxy', () => {
   });
 });
 
-
 describe('Q1520 tuningFamilySocraticRadarGameValueMean', () => {
   const t = equalTemperament12(440);
   const s = harmonicSpectrum(6);
@@ -16918,7 +16413,6 @@ describe('Q1520 tuningFamilySocraticRadarGameValueMean', () => {
     expect(tuningFamilySocraticRadarGameValueMean([t, t], s)).toBeGreaterThan(0);
   });
 });
-
 
 describe('JJJ1 scaleLearnabilityScore', () => {
   it('empty → 0', () => {
@@ -16938,7 +16432,6 @@ describe('JJJ1 scaleLearnabilityScore', () => {
   });
 });
 
-
 describe('JJJ2 scaleRecognizabilityIndex', () => {
   it('empty → 0', () => {
     expect(scaleRecognizabilityIndex([])).toBe(0);
@@ -16955,7 +16448,6 @@ describe('JJJ2 scaleRecognizabilityIndex', () => {
     expect(scaleRecognizabilityIndex([50, 350, 750, 1050])).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('JJJ3 scaleMemorizabilityScore', () => {
   it('empty → 0', () => {
@@ -16974,7 +16466,6 @@ describe('JJJ3 scaleMemorizabilityScore', () => {
     expect(scaleMemorizabilityScore([0])).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('JJJ4 scaleTeachingDifficulty', () => {
   it('empty → 0', () => {
@@ -16999,7 +16490,6 @@ describe('JJJ4 scaleTeachingDifficulty', () => {
   });
 });
 
-
 describe('KKK1 scaleMorphDistance', () => {
   it('same scale → 0', () => {
     expect(scaleMorphDistance([0, 400, 700], [0, 400, 700])).toBe(0);
@@ -17017,7 +16507,6 @@ describe('KKK1 scaleMorphDistance', () => {
   });
 });
 
-
 describe('KKK2 scaleInterpol', () => {
   it('t=0 → fromCents', () => {
     expect(scaleInterpol([0, 400, 700], [0, 300, 600], 0)).toEqual([0, 400, 700]);
@@ -17034,7 +16523,6 @@ describe('KKK2 scaleInterpol', () => {
     expect(r[1]).toBeCloseTo(500, 5);
   });
 });
-
 
 describe('KKK3 scaleGradientDescent', () => {
   it('empty → []', () => {
@@ -17057,7 +16545,6 @@ describe('KKK3 scaleGradientDescent', () => {
   });
 });
 
-
 describe('KKK4 scaleConvergenceRate', () => {
   it('already converged → 0', () => {
     expect(scaleConvergenceRate([0, 400], [0, 400])).toBe(0);
@@ -17075,7 +16562,6 @@ describe('KKK4 scaleConvergenceRate', () => {
     expect(r).toBeLessThan(1000);
   });
 });
-
 
 describe('LLL1 scaleCoOccurrenceMatrix', () => {
   it('empty → []', () => {
@@ -17097,7 +16583,6 @@ describe('LLL1 scaleCoOccurrenceMatrix', () => {
   });
 });
 
-
 describe('LLL2 scaleMutualInformationMatrix', () => {
   it('empty → []', () => {
     expect(scaleMutualInformationMatrix([])).toEqual([]);
@@ -17115,7 +16600,6 @@ describe('LLL2 scaleMutualInformationMatrix', () => {
     expect(r[0]![1]).toBeCloseTo(r[1]![0]!, 10);
   });
 });
-
 
 describe('LLL3 scaleEcologicalNiche', () => {
   it('empty → []', () => {
@@ -17135,7 +16619,6 @@ describe('LLL3 scaleEcologicalNiche', () => {
   });
 });
 
-
 describe('LLL4 scaleCompetitionIndex', () => {
   it('empty → 0', () => {
     expect(scaleCompetitionIndex([])).toBe(0);
@@ -17151,7 +16634,6 @@ describe('LLL4 scaleCompetitionIndex', () => {
     expect(scaleCompetitionIndex([0, 100, 700])).toBeGreaterThan(0);
   });
 });
-
 
 describe('MMM1 scaleModalBrightness', () => {
   it('empty → 0', () => {
@@ -17171,7 +16653,6 @@ describe('MMM1 scaleModalBrightness', () => {
   });
 });
 
-
 describe('MMM2 scaleMaximalEvennessScore', () => {
   it('empty → 0', () => {
     expect(scaleMaximalEvennessScore([])).toBe(0);
@@ -17186,7 +16667,6 @@ describe('MMM2 scaleMaximalEvennessScore', () => {
     expect(scaleMaximalEvennessScore([0, 100, 900, 1000])).toBeLessThan(1);
   });
 });
-
 
 describe('MMM3 scaleMyhillPropertyScore', () => {
   it('empty → 0', () => {
@@ -17207,7 +16687,6 @@ describe('MMM3 scaleMyhillPropertyScore', () => {
   });
 });
 
-
 describe('MMM4 scaleInversionSymmetryScore', () => {
   it('empty → 0', () => {
     expect(scaleInversionSymmetryScore([])).toBe(0);
@@ -17227,7 +16706,6 @@ describe('MMM4 scaleInversionSymmetryScore', () => {
   });
 });
 
-
 describe('NNN1 scaleStepSizeEntropy', () => {
   it('empty → 0', () => {
     expect(scaleStepSizeEntropy([])).toBe(0);
@@ -17244,7 +16722,6 @@ describe('NNN1 scaleStepSizeEntropy', () => {
   });
 });
 
-
 describe('NNN2 scaleStepSizeSkewness', () => {
   it('empty → 0', () => {
     expect(scaleStepSizeSkewness([])).toBe(0);
@@ -17260,7 +16737,6 @@ describe('NNN2 scaleStepSizeSkewness', () => {
     expect(Number.isFinite(scaleStepSizeSkewness([0, 100, 700, 900]))).toBe(true);
   });
 });
-
 
 describe('NNN3 scaleHemitoneCount', () => {
   it('empty → 0', () => {
@@ -17280,7 +16756,6 @@ describe('NNN3 scaleHemitoneCount', () => {
   });
 });
 
-
 describe('NNN4 scaleCoherenceIndex', () => {
   it('empty → 0', () => {
     expect(scaleCoherenceIndex([])).toBe(0);
@@ -17296,7 +16771,6 @@ describe('NNN4 scaleCoherenceIndex', () => {
     expect(scaleCoherenceIndex([0, 200, 400, 500, 700, 900, 1100])).toBeCloseTo(1, 10);
   });
 });
-
 
 describe('OOO1 scaleRotationSymmetryOrder', () => {
   it('empty → 0', () => {
@@ -17314,7 +16788,6 @@ describe('OOO1 scaleRotationSymmetryOrder', () => {
     expect(scaleRotationSymmetryOrder([0, 200, 400, 500, 700, 900, 1100])).toBe(1);
   });
 });
-
 
 describe('OOO2 scaleTranspositionInvarianceCount', () => {
   it('empty → 1', () => {
@@ -17335,7 +16808,6 @@ describe('OOO2 scaleTranspositionInvarianceCount', () => {
   });
 });
 
-
 describe('OOO3 scaleIntervalSpectrumWidth', () => {
   it('empty → 0', () => {
     expect(scaleIntervalSpectrumWidth([])).toBe(0);
@@ -17351,7 +16823,6 @@ describe('OOO3 scaleIntervalSpectrumWidth', () => {
   });
 });
 
-
 describe('OOO4 scaleStepRatioVariance', () => {
   it('empty → 0', () => {
     expect(scaleStepRatioVariance([])).toBe(0);
@@ -17366,7 +16837,6 @@ describe('OOO4 scaleStepRatioVariance', () => {
     expect(scaleStepRatioVariance([0, 100, 700, 900])).toBeGreaterThan(0);
   });
 });
-
 
 describe('PPP1 scaleJustProximityScore', () => {
   it('empty → 0', () => {
@@ -17388,7 +16858,6 @@ describe('PPP1 scaleJustProximityScore', () => {
   });
 });
 
-
 describe('PPP2 scaleMaxGapRatio', () => {
   it('empty → 0', () => {
     expect(scaleMaxGapRatio([])).toBe(0);
@@ -17406,7 +16875,6 @@ describe('PPP2 scaleMaxGapRatio', () => {
   });
 });
 
-
 describe('PPP3 scaleMinStepCents', () => {
   it('empty → 0', () => {
     expect(scaleMinStepCents([])).toBe(0);
@@ -17421,7 +16889,6 @@ describe('PPP3 scaleMinStepCents', () => {
     expect(scaleMinStepCents([0, 300, 600, 900])).toBeCloseTo(300, 5);
   });
 });
-
 
 describe('PPP4 scaleMaxStepCents', () => {
   it('empty → 0', () => {
@@ -17440,7 +16907,6 @@ describe('PPP4 scaleMaxStepCents', () => {
   });
 });
 
-
 describe('QQQ1 scaleVoiceLeadingDistance', () => {
   it('both empty → 0', () => {
     expect(scaleVoiceLeadingDistance([], [])).toBe(0);
@@ -17458,7 +16924,6 @@ describe('QQQ1 scaleVoiceLeadingDistance', () => {
   });
 });
 
-
 describe('QQQ2 scaleVoiceLeadingRadius', () => {
   it('empty → 0', () => {
     expect(scaleVoiceLeadingRadius([])).toBe(0);
@@ -17475,7 +16940,6 @@ describe('QQQ2 scaleVoiceLeadingRadius', () => {
   });
 });
 
-
 describe('QQQ3 scaleParsimonyCost', () => {
   it('empty → 0', () => {
     expect(scaleParsimonyCost([])).toBe(0);
@@ -17490,7 +16954,6 @@ describe('QQQ3 scaleParsimonyCost', () => {
     expect(Number.isFinite(scaleParsimonyCost([0, 200, 400, 500, 700, 900, 1100]))).toBe(true);
   });
 });
-
 
 describe('QQQ4 scaleSelfSimilarityScore', () => {
   it('empty → 0', () => {
@@ -17510,7 +16973,6 @@ describe('QQQ4 scaleSelfSimilarityScore', () => {
   });
 });
 
-
 describe('RRR1 scaleIntervalComplexityRatio', () => {
   it('empty → 0', () => {
     expect(scaleIntervalComplexityRatio([])).toBe(0);
@@ -17529,7 +16991,6 @@ describe('RRR1 scaleIntervalComplexityRatio', () => {
   });
 });
 
-
 describe('RRR2 scaleUniquePitchClassCount', () => {
   it('empty → 0', () => {
     expect(scaleUniquePitchClassCount([])).toBe(0);
@@ -17544,7 +17005,6 @@ describe('RRR2 scaleUniquePitchClassCount', () => {
     expect(scaleUniquePitchClassCount([0, 200, 200, 700])).toBe(3);
   });
 });
-
 
 describe('RRR3 scaleClusteringScore', () => {
   it('empty → 0', () => {
@@ -17563,7 +17023,6 @@ describe('RRR3 scaleClusteringScore', () => {
   });
 });
 
-
 describe('RRR4 scaleDispersionIndex', () => {
   it('empty → 0', () => {
     expect(scaleDispersionIndex([])).toBe(0);
@@ -17578,7 +17037,6 @@ describe('RRR4 scaleDispersionIndex', () => {
     expect(scaleDispersionIndex([0, 100, 700, 900])).toBeGreaterThan(0);
   });
 });
-
 
 describe('SSS1 scaleHarmonicAlignmentScore', () => {
   it('empty → 0', () => {
@@ -17598,7 +17056,6 @@ describe('SSS1 scaleHarmonicAlignmentScore', () => {
   });
 });
 
-
 describe('SSS2 scaleSubharmonicAlignmentScore', () => {
   it('empty → 0', () => {
     expect(scaleSubharmonicAlignmentScore([])).toBe(0);
@@ -17616,7 +17073,6 @@ describe('SSS2 scaleSubharmonicAlignmentScore', () => {
     expect(scaleSubharmonicAlignmentScore(chromatic)).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('SSS3 scaleResonanceIndex', () => {
   it('empty → 0', () => {
@@ -17638,7 +17094,6 @@ describe('SSS3 scaleResonanceIndex', () => {
   });
 });
 
-
 describe('SSS4 scaleOvertoneRichness', () => {
   it('empty → 0', () => {
     expect(scaleOvertoneRichness([])).toBe(0);
@@ -17657,7 +17112,6 @@ describe('SSS4 scaleOvertoneRichness', () => {
   });
 });
 
-
 describe('TTT1 scaleWorkingMemoryLoad', () => {
   it('empty → 0', () => {
     expect(scaleWorkingMemoryLoad([])).toBe(0);
@@ -17673,7 +17127,6 @@ describe('TTT1 scaleWorkingMemoryLoad', () => {
     expect(scaleWorkingMemoryLoad([0, 200, 400, 500, 700, 900, 1100])).toBeGreaterThanOrEqual(2);
   });
 });
-
 
 describe('TTT2 scaleCognitiveClusters', () => {
   it('empty → 0', () => {
@@ -17692,7 +17145,6 @@ describe('TTT2 scaleCognitiveClusters', () => {
   });
 });
 
-
 describe('TTT3 scaleLearnabilityScore', () => {
   it('empty → 0', () => {
     expect(scaleLearnabilityScore([])).toBe(0);
@@ -17709,7 +17161,6 @@ describe('TTT3 scaleLearnabilityScore', () => {
     expect(r).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('TTT4 scalePatternRegularity', () => {
   it('empty → 0', () => {
@@ -17728,7 +17179,6 @@ describe('TTT4 scalePatternRegularity', () => {
     expect(r).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('UUU1 scaleGraphDensity (50-cent threshold)', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -17752,7 +17202,6 @@ describe('UUU1 scaleGraphDensity (50-cent threshold)', () => {
   });
 });
 
-
 describe('UUU2 scaleSmallWorldIndex', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   const pentatonic = [0, 240, 480, 720, 960];
@@ -17774,7 +17223,6 @@ describe('UUU2 scaleSmallWorldIndex', () => {
     expect(r).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('UUU3 scaleHubScore', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -17798,7 +17246,6 @@ describe('UUU3 scaleHubScore', () => {
   });
 });
 
-
 describe('UUU4 scaleBridgingCoefficient', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   const pentatonic = [0, 240, 480, 720, 960];
@@ -17820,7 +17267,6 @@ describe('UUU4 scaleBridgingCoefficient', () => {
     expect(r).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('VVV1 scaleRotationalSymmetrySteps', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -17846,7 +17292,6 @@ describe('VVV1 scaleRotationalSymmetrySteps', () => {
   });
 });
 
-
 describe('VVV2 scaleReflectionSymmetrySteps', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   it('empty → 0', () => {
@@ -17870,7 +17315,6 @@ describe('VVV2 scaleReflectionSymmetrySteps', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('VVV3 scaleTranspositionInvariance', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -17896,7 +17340,6 @@ describe('VVV3 scaleTranspositionInvariance', () => {
   });
 });
 
-
 describe('VVV4 scaleComplementSymmetry', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   it('empty → 0', () => {
@@ -17920,7 +17363,6 @@ describe('VVV4 scaleComplementSymmetry', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('WWW1 scaleMelodicAscent', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -17946,7 +17388,6 @@ describe('WWW1 scaleMelodicAscent', () => {
   });
 });
 
-
 describe('WWW2 scaleMelodicDescent', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   it('empty → 0', () => {
@@ -17970,7 +17411,6 @@ describe('WWW2 scaleMelodicDescent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('WWW3 scaleMelodicPeakRatio', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -17996,7 +17436,6 @@ describe('WWW3 scaleMelodicPeakRatio', () => {
   });
 });
 
-
 describe('WWW4 scaleMelodicContourEntropy', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
   it('n<3 → 0', () => {
@@ -18020,7 +17459,6 @@ describe('WWW4 scaleMelodicContourEntropy', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 67: 調和的テンション (Harmonic Tension)
 
@@ -18047,7 +17485,6 @@ describe('scaleTritoneTension', () => {
   });
 });
 
-
 describe('scaleLeadingToneTension', () => {
   it('empty array → 0', () => {
     expect(scaleLeadingToneTension([])).toBe(0);
@@ -18068,7 +17505,6 @@ describe('scaleLeadingToneTension', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSuspensionDensity', () => {
   it('empty array → 0', () => {
@@ -18091,7 +17527,6 @@ describe('scaleSuspensionDensity', () => {
   });
 });
 
-
 describe('scaleHarmonicTensionIndex', () => {
   it('empty array → 0', () => {
     expect(scaleHarmonicTensionIndex([])).toBe(0);
@@ -18112,7 +17547,6 @@ describe('scaleHarmonicTensionIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 const chromatic68 = Array.from({ length: 12 }, (_, i) => i * 100);
 
@@ -18137,7 +17571,6 @@ describe('scaleEvenness', () => {
   });
 });
 
-
 describe('scaleMaxStepRatio', () => {
   it('empty array → 0', () => {
     expect(scaleMaxStepRatio([])).toBe(0);
@@ -18157,7 +17590,6 @@ describe('scaleMaxStepRatio', () => {
   });
 });
 
-
 describe('scaleIrregularityIndex', () => {
   it('empty array → 0', () => {
     expect(scaleIrregularityIndex([])).toBe(0);
@@ -18176,7 +17608,6 @@ describe('scaleIrregularityIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleWellformedness', () => {
   it('empty array → 0', () => {
@@ -18198,7 +17629,6 @@ describe('scaleWellformedness', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
 
@@ -18226,7 +17656,6 @@ describe('scaleTonicStrengthV2', () => {
   });
 });
 
-
 describe('scaleDominantStrength', () => {
   it('empty → 0', () => {
     expect(scaleDominantStrength([])).toBe(0);
@@ -18250,7 +17679,6 @@ describe('scaleDominantStrength', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleModalCenterDispersion', () => {
   it('empty → 0', () => {
@@ -18276,7 +17704,6 @@ describe('scaleModalCenterDispersion', () => {
   });
 });
 
-
 describe('scaleLeadingNoteProximity', () => {
   it('empty → 0', () => {
     expect(scaleLeadingNoteProximity([])).toBe(0);
@@ -18301,7 +17728,6 @@ describe('scaleLeadingNoteProximity', () => {
   });
 });
 
-
 describe('scaleIntervalVariety', () => {
   it('empty → 0', () => {
     expect(scaleIntervalVariety([])).toBe(0);
@@ -18322,7 +17748,6 @@ describe('scaleIntervalVariety', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleIntervalBalance', () => {
   it('empty → 0', () => {
@@ -18345,7 +17770,6 @@ describe('scaleIntervalBalance', () => {
   });
 });
 
-
 describe('scaleIntervalDominance', () => {
   it('empty → 0', () => {
     expect(scaleIntervalDominance([])).toBe(0);
@@ -18367,7 +17791,6 @@ describe('scaleIntervalDominance', () => {
   });
 });
 
-
 describe('scaleIntervalEntropy', () => {
   it('empty → 0', () => {
     expect(scaleIntervalEntropy([])).toBe(0);
@@ -18388,7 +17811,6 @@ describe('scaleIntervalEntropy', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 71: BBB1–BBB4 — ピッチ近接性・声部導音
@@ -18415,7 +17837,6 @@ describe('scaleNearestNeighborMean', () => {
   });
 });
 
-
 describe('scaleVoiceLeadingEfficiencyV2', () => {
   it('empty → 0', () => {
     expect(scaleVoiceLeadingEfficiencyV2([])).toBe(0);
@@ -18436,7 +17857,6 @@ describe('scaleVoiceLeadingEfficiencyV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCrowdingIndex', () => {
   it('empty → 0', () => {
@@ -18459,7 +17879,6 @@ describe('scaleCrowdingIndex', () => {
   });
 });
 
-
 describe('scaleSpreadIndex', () => {
   it('empty → 0', () => {
     expect(scaleSpreadIndex([])).toBe(0);
@@ -18480,7 +17899,6 @@ describe('scaleSpreadIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSpectralCentroid', () => {
   it('empty → 0', () => {
@@ -18506,7 +17924,6 @@ describe('scaleSpectralCentroid', () => {
   });
 });
 
-
 describe('scaleSpectralBandwidth', () => {
   it('empty → 0', () => {
     expect(scaleSpectralBandwidth([])).toBe(0);
@@ -18527,7 +17944,6 @@ describe('scaleSpectralBandwidth', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSpectralSkewness', () => {
   it('empty → 0', () => {
@@ -18550,7 +17966,6 @@ describe('scaleSpectralSkewness', () => {
   });
 });
 
-
 describe('scaleSpectralKurtosis', () => {
   it('empty → 0', () => {
     expect(scaleSpectralKurtosis([])).toBe(0);
@@ -18571,7 +17986,6 @@ describe('scaleSpectralKurtosis', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // DDD1 — scaleHarmonicSeriesAlignment
 describe('scaleHarmonicSeriesAlignment', () => {
@@ -18599,7 +18013,6 @@ describe('scaleHarmonicSeriesAlignment', () => {
   });
 });
 
-
 // DDD2 — scaleSubharmonicDensity
 describe('scaleSubharmonicDensity', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -18625,7 +18038,6 @@ describe('scaleSubharmonicDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // DDD3 — scaleResonanceScore
 describe('scaleResonanceScore', () => {
@@ -18653,7 +18065,6 @@ describe('scaleResonanceScore', () => {
   });
 });
 
-
 // DDD4 — scaleNodeDensity
 describe('scaleNodeDensity', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -18679,7 +18090,6 @@ describe('scaleNodeDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 74: ピッチクラスタ分析 (EEE1–EEE4)
@@ -18710,7 +18120,6 @@ describe('EEE1 scaleKMeansClusters', () => {
   });
 });
 
-
 // EEE2 — scaleClusterSeparation
 describe('EEE2 scaleClusterSeparation', () => {
   it('empty → 0', () => {
@@ -18732,7 +18141,6 @@ describe('EEE2 scaleClusterSeparation', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // EEE3 — scaleSilhouetteScore
 describe('EEE3 scaleSilhouetteScore', () => {
@@ -18756,7 +18164,6 @@ describe('EEE3 scaleSilhouetteScore', () => {
   });
 });
 
-
 // EEE4 — scaleClusterBalance
 describe('EEE4 scaleClusterBalance', () => {
   it('empty → 0', () => {
@@ -18778,7 +18185,6 @@ describe('EEE4 scaleClusterBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // FFF1 — scaleMicrotonalDensity
 describe('FFF1 scaleMicrotonalDensity', () => {
@@ -18803,7 +18209,6 @@ describe('FFF1 scaleMicrotonalDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // FFF2 — scaleQuarterToneAlignment
 describe('FFF2 scaleQuarterToneAlignment', () => {
@@ -18832,7 +18237,6 @@ describe('FFF2 scaleQuarterToneAlignment', () => {
   });
 });
 
-
 // FFF3 — scaleMicrotonalComplexity
 describe('FFF3 scaleMicrotonalComplexity', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -18856,7 +18260,6 @@ describe('FFF3 scaleMicrotonalComplexity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // FFF4 — scaleEdoApproximationQuality
 describe('FFF4 scaleEdoApproximationQuality', () => {
@@ -18884,7 +18287,6 @@ describe('FFF4 scaleEdoApproximationQuality', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // GGG1 — scaleJustIntonationDeviation
 describe('GGG1 scaleJustIntonationDeviation', () => {
@@ -18914,7 +18316,6 @@ describe('GGG1 scaleJustIntonationDeviation', () => {
   });
 });
 
-
 // GGG2 — scalePythagoreanDeviation
 describe('GGG2 scalePythagoreanDeviation', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -18941,7 +18342,6 @@ describe('GGG2 scalePythagoreanDeviation', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // GGG3 — scaleMeanToneDeviation
 describe('GGG3 scaleMeanToneDeviation', () => {
@@ -18970,7 +18370,6 @@ describe('GGG3 scaleMeanToneDeviation', () => {
   });
 });
 
-
 // GGG4 — scaleEqualTemperamentDeviation
 describe('GGG4 scaleEqualTemperamentDeviation', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -18995,7 +18394,6 @@ describe('GGG4 scaleEqualTemperamentDeviation', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // HHH1 — scaleOctaveEquivalenceScore
 describe('HHH1 scaleOctaveEquivalenceScore', () => {
@@ -19023,7 +18421,6 @@ describe('HHH1 scaleOctaveEquivalenceScore', () => {
   });
 });
 
-
 // HHH2 — scaleRegisterWidth
 describe('HHH2 scaleRegisterWidth', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -19049,7 +18446,6 @@ describe('HHH2 scaleRegisterWidth', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // HHH3 — scaleOctaveCompleteness
 describe('HHH3 scaleOctaveCompleteness', () => {
@@ -19077,7 +18473,6 @@ describe('HHH3 scaleOctaveCompleteness', () => {
   });
 });
 
-
 // HHH4 — scaleSubOctaveDensity
 describe('HHH4 scaleSubOctaveDensity', () => {
   const chromatic = Array.from({ length: 12 }, (_, i) => i * 100);
@@ -19104,7 +18499,6 @@ describe('HHH4 scaleSubOctaveDensity', () => {
   });
 });
 
-
 // III1 — scaleConjunctMotion
 describe('III1 scaleConjunctMotion', () => {
   it('empty → 0', () => {
@@ -19126,7 +18520,6 @@ describe('III1 scaleConjunctMotion', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // III2 — scaleDisjunctMotion
 describe('III2 scaleDisjunctMotion', () => {
@@ -19150,7 +18543,6 @@ describe('III2 scaleDisjunctMotion', () => {
   });
 });
 
-
 // III3 — scaleStepSizeVariance
 describe('III3 scaleStepSizeVariance', () => {
   it('empty → 0', () => {
@@ -19172,7 +18564,6 @@ describe('III3 scaleStepSizeVariance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // III4 — scaleGapFill
 describe('III4 scaleGapFill', () => {
@@ -19196,7 +18587,6 @@ describe('III4 scaleGapFill', () => {
   });
 });
 
-
 // JJJ1 — scaleHarmonicSeriesProximity
 describe('JJJ1 scaleHarmonicSeriesProximity', () => {
   it('12-TET returns finite value in [0,1]', () => {
@@ -19216,7 +18606,6 @@ describe('JJJ1 scaleHarmonicSeriesProximity', () => {
     expect(scaleHarmonicSeriesProximity(empty)).toBe(0);
   });
 });
-
 
 // JJJ2 — scaleJustIntonationProximity
 describe('JJJ2 scaleJustIntonationProximity', () => {
@@ -19238,7 +18627,6 @@ describe('JJJ2 scaleJustIntonationProximity', () => {
   });
 });
 
-
 // JJJ3 — scaleEqualTemperamentDeviationV2
 describe('JJJ3 scaleEqualTemperamentDeviationV2', () => {
   it('12-TET deviation is ≈0', () => {
@@ -19255,7 +18643,6 @@ describe('JJJ3 scaleEqualTemperamentDeviationV2', () => {
     expect(scaleEqualTemperamentDeviationV2(empty)).toBe(0);
   });
 });
-
 
 // JJJ4 — scaleMelodyCentroid
 describe('JJJ4 scaleMelodyCentroid', () => {
@@ -19280,7 +18667,6 @@ describe('JJJ4 scaleMelodyCentroid', () => {
   });
 });
 
-
 // LLL1 — scaleChiralityScore
 describe('LLL1 scaleChiralityScore', () => {
   it('empty returns 0', () => {
@@ -19298,7 +18684,6 @@ describe('LLL1 scaleChiralityScore', () => {
     expect(v).toBeCloseTo(0, 5);
   });
 });
-
 
 // LLL2 — scaleTranspositionClosureCount
 describe('LLL2 scaleTranspositionClosureCount', () => {
@@ -19318,7 +18703,6 @@ describe('LLL2 scaleTranspositionClosureCount', () => {
   });
 });
 
-
 // LLL3 — scaleInversionClosureCount
 describe('LLL3 scaleInversionClosureCount', () => {
   it('empty returns 0', () => {
@@ -19337,7 +18721,6 @@ describe('LLL3 scaleInversionClosureCount', () => {
   });
 });
 
-
 // LLL4 — scalePerfectBalance
 describe('LLL4 scalePerfectBalance', () => {
   it('empty returns 0', () => {
@@ -19352,7 +18735,6 @@ describe('LLL4 scalePerfectBalance', () => {
     expect(v).toBeCloseTo(0, 5);
   });
 });
-
 
 // MMM1 — scaleIntervalClusterCount
 describe('MMM1 scaleIntervalClusterCount', () => {
@@ -19371,7 +18753,6 @@ describe('MMM1 scaleIntervalClusterCount', () => {
   });
 });
 
-
 // MMM2 — scaleIntervalVarietyIndex
 describe('MMM2 scaleIntervalVarietyIndex', () => {
   it('empty returns 0', () => {
@@ -19388,7 +18769,6 @@ describe('MMM2 scaleIntervalVarietyIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // MMM3 — scaleMaximalEvenness
 describe('MMM3 scaleMaximalEvenness', () => {
@@ -19408,7 +18788,6 @@ describe('MMM3 scaleMaximalEvenness', () => {
   });
 });
 
-
 // MMM4 — scaleDeepScaleProperty
 describe('MMM4 scaleDeepScaleProperty', () => {
   it('empty returns 0', () => {
@@ -19425,7 +18804,6 @@ describe('MMM4 scaleDeepScaleProperty', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 82 — 旋法的中心性
 
@@ -19446,7 +18824,6 @@ describe('NNN1 scaleModalCenterDiversity', () => {
   });
 });
 
-
 // NNN2 — scaleLeadingToneStrengthV2
 describe('NNN2 scaleLeadingToneStrengthV2', () => {
   it('empty returns 0', () => {
@@ -19463,7 +18840,6 @@ describe('NNN2 scaleLeadingToneStrengthV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // NNN3 — scaleGravityField
 describe('NNN3 scaleGravityField', () => {
@@ -19484,7 +18860,6 @@ describe('NNN3 scaleGravityField', () => {
   });
 });
 
-
 // NNN4 — scaleResolutionTendency
 describe('NNN4 scaleResolutionTendency', () => {
   it('empty returns 0', () => {
@@ -19504,7 +18879,6 @@ describe('NNN4 scaleResolutionTendency', () => {
   });
 });
 
-
 // OOO1 — scaleJNDStepCount
 describe('OOO1 scaleJNDStepCount', () => {
   it('empty returns 0', () => {
@@ -19519,7 +18893,6 @@ describe('OOO1 scaleJNDStepCount', () => {
   });
 });
 
-
 // OOO2 — scaleCriticalBandDensity
 describe('OOO2 scaleCriticalBandDensity', () => {
   it('empty returns 0', () => {
@@ -19532,7 +18905,6 @@ describe('OOO2 scaleCriticalBandDensity', () => {
     expect(scaleCriticalBandDensity([0, 600])).toBe(0);
   });
 });
-
 
 // OOO3 — scaleMaskingIndex
 describe('OOO3 scaleMaskingIndex', () => {
@@ -19551,7 +18923,6 @@ describe('OOO3 scaleMaskingIndex', () => {
   });
 });
 
-
 // OOO4 — scalePitchHeightSpread
 describe('OOO4 scalePitchHeightSpread', () => {
   it('empty returns 0', () => {
@@ -19566,7 +18937,6 @@ describe('OOO4 scalePitchHeightSpread', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // PPP1 — scaleStreamSegregationIndex
 describe('PPP1 scaleStreamSegregationIndex', () => {
@@ -19583,7 +18953,6 @@ describe('PPP1 scaleStreamSegregationIndex', () => {
   });
 });
 
-
 // PPP2 — scaleFusionIndex
 describe('PPP2 scaleFusionIndex', () => {
   it('empty returns 0', () => {
@@ -19598,7 +18967,6 @@ describe('PPP2 scaleFusionIndex', () => {
   });
 });
 
-
 // PPP3 — scalePitchProximityGrouping
 describe('PPP3 scalePitchProximityGrouping', () => {
   it('empty returns 0', () => {
@@ -19612,7 +18980,6 @@ describe('PPP3 scalePitchProximityGrouping', () => {
     expect(v).toBeGreaterThan(0.5);
   });
 });
-
 
 // PPP4 — scaleTonalFusion
 describe('PPP4 scaleTonalFusion', () => {
@@ -19632,7 +18999,6 @@ describe('PPP4 scaleTonalFusion', () => {
   });
 });
 
-
 // QQQ1 — scaleIntervalGraphEdgeCount
 describe('QQQ1 scaleIntervalGraphEdgeCount', () => {
   it('empty returns 0', () => {
@@ -19646,7 +19012,6 @@ describe('QQQ1 scaleIntervalGraphEdgeCount', () => {
     expect(scaleIntervalGraphEdgeCount([0, 100, 200])).toBe(1);
   });
 });
-
 
 // QQQ2 — scaleChordal
 describe('QQQ2 scaleChordal', () => {
@@ -19663,7 +19028,6 @@ describe('QQQ2 scaleChordal', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // QQQ3 — scaleChromatic
 describe('QQQ3 scaleChromatic', () => {
@@ -19682,7 +19046,6 @@ describe('QQQ3 scaleChromatic', () => {
   });
 });
 
-
 // QQQ4 — scaleSpectralRadius
 describe('QQQ4 scaleSpectralRadius', () => {
   it('empty returns 0', () => {
@@ -19699,7 +19062,6 @@ describe('QQQ4 scaleSpectralRadius', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // RRR1 — scaleIntervalProbabilityEntropy
 describe('RRR1 scaleIntervalProbabilityEntropy', () => {
@@ -19718,7 +19080,6 @@ describe('RRR1 scaleIntervalProbabilityEntropy', () => {
   });
 });
 
-
 // RRR2 — scaleMarkovTransitionEntropy
 describe('RRR2 scaleMarkovTransitionEntropy', () => {
   it('empty returns 0', () => {
@@ -19736,7 +19097,6 @@ describe('RRR2 scaleMarkovTransitionEntropy', () => {
   });
 });
 
-
 // RRR3 — scaleExpectedIntervalSize
 describe('RRR3 scaleExpectedIntervalSize', () => {
   it('empty returns 0', () => {
@@ -19750,7 +19110,6 @@ describe('RRR3 scaleExpectedIntervalSize', () => {
     expect(scaleExpectedIntervalSize([0, 600])).toBeCloseTo(1, 5);
   });
 });
-
 
 // RRR4 — scaleIntervalSkewness
 describe('RRR4 scaleIntervalSkewness', () => {
@@ -19769,7 +19128,6 @@ describe('RRR4 scaleIntervalSkewness', () => {
   });
 });
 
-
 // SSS1 — scaleDFTMagnitude
 describe('SSS1 scaleDFTMagnitude', () => {
   it('empty returns 0', () => {
@@ -19787,7 +19145,6 @@ describe('SSS1 scaleDFTMagnitude', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // SSS2 — scaleDFTBalanceIndex
 describe('SSS2 scaleDFTBalanceIndex', () => {
@@ -19808,7 +19165,6 @@ describe('SSS2 scaleDFTBalanceIndex', () => {
   });
 });
 
-
 // SSS3 — scaleDFTPeakFrequency
 describe('SSS3 scaleDFTPeakFrequency', () => {
   it('empty returns 0', () => {
@@ -19827,7 +19183,6 @@ describe('SSS3 scaleDFTPeakFrequency', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // SSS4 — scaleDFTSpectralFlatness
 describe('SSS4 scaleDFTSpectralFlatness', () => {
@@ -19848,7 +19203,6 @@ describe('SSS4 scaleDFTSpectralFlatness', () => {
   });
 });
 
-
 // TTT1 — scaleIntervalVectorV2
 describe('TTT1 scaleIntervalVectorV2', () => {
   it('empty returns zero vector', () => {
@@ -19864,7 +19218,6 @@ describe('TTT1 scaleIntervalVectorV2', () => {
     expect(iv.some((v) => v > 0)).toBe(true);
   });
 });
-
 
 // TTT2 — scaleIntervalVectorEntropyV2
 describe('TTT2 scaleIntervalVectorEntropyV2', () => {
@@ -19883,7 +19236,6 @@ describe('TTT2 scaleIntervalVectorEntropyV2', () => {
   });
 });
 
-
 // TTT3 — scaleIntervalVectorBalanceV2
 describe('TTT3 scaleIntervalVectorBalanceV2', () => {
   it('empty returns 0', () => {
@@ -19901,7 +19253,6 @@ describe('TTT3 scaleIntervalVectorBalanceV2', () => {
   });
 });
 
-
 // TTT4 — scaleIntervalVectorMaxICV2
 describe('TTT4 scaleIntervalVectorMaxICV2', () => {
   it('empty returns 0', () => {
@@ -19917,7 +19268,6 @@ describe('TTT4 scaleIntervalVectorMaxICV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // UUU1 — scaleKolmogorovComplexityProxy
 describe('UUU1 scaleKolmogorovComplexityProxy', () => {
@@ -19936,7 +19286,6 @@ describe('UUU1 scaleKolmogorovComplexityProxy', () => {
   });
 });
 
-
 // UUU2 — scaleRunLengthProxy
 describe('UUU2 scaleRunLengthProxy', () => {
   it('empty returns 0', () => {
@@ -19954,7 +19303,6 @@ describe('UUU2 scaleRunLengthProxy', () => {
   });
 });
 
-
 // UUU3 — scaleAutocorrelationProxy
 describe('UUU3 scaleAutocorrelationProxy', () => {
   it('empty returns 0', () => {
@@ -19971,7 +19319,6 @@ describe('UUU3 scaleAutocorrelationProxy', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // UUU4 — scaleDescriptionLength
 describe('UUU4 scaleDescriptionLength', () => {
@@ -19992,7 +19339,6 @@ describe('UUU4 scaleDescriptionLength', () => {
   });
 });
 
-
 // VVV1 — scaleModeCountV2
 describe('VVV1 scaleModeCountV2', () => {
   it('empty returns 0', () => {
@@ -20009,7 +19355,6 @@ describe('VVV1 scaleModeCountV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // VVV2 — scaleBrightest
 describe('VVV2 scaleBrightest', () => {
@@ -20030,7 +19375,6 @@ describe('VVV2 scaleBrightest', () => {
   });
 });
 
-
 // VVV3 — scaleDarkest
 describe('VVV3 scaleDarkest', () => {
   it('empty returns 0', () => {
@@ -20049,7 +19393,6 @@ describe('VVV3 scaleDarkest', () => {
   });
 });
 
-
 // VVV4 — scaleModeBalanceSpread
 describe('VVV4 scaleModeBalanceSpread', () => {
   it('empty returns 0', () => {
@@ -20066,7 +19409,6 @@ describe('VVV4 scaleModeBalanceSpread', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // WWW1 — scaleReflectionSymmetryV2
 describe('WWW1 scaleReflectionSymmetryV2', () => {
@@ -20086,7 +19428,6 @@ describe('WWW1 scaleReflectionSymmetryV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // WWW2 — scaleTranslationSymmetry
 describe('WWW2 scaleTranslationSymmetry', () => {
@@ -20109,7 +19450,6 @@ describe('WWW2 scaleTranslationSymmetry', () => {
   });
 });
 
-
 // WWW3 — scalePalindromeRatio
 describe('WWW3 scalePalindromeRatio', () => {
   it('returns 1 for empty', () => {
@@ -20126,7 +19466,6 @@ describe('WWW3 scalePalindromeRatio', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // WWW4 — scaleInversionEquivalence
 describe('WWW4 scaleInversionEquivalence', () => {
@@ -20146,7 +19485,6 @@ describe('WWW4 scaleInversionEquivalence', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 92 — 音階ピッチ密度分析 (XXX1–XXX4)
 
@@ -20171,7 +19509,6 @@ describe('XXX1 scalePitchDensity', () => {
   });
 });
 
-
 // XXX2 — scaleCrowdingIndexV2
 describe('XXX2 scaleCrowdingIndexV2', () => {
   it('returns 0 for empty', () => {
@@ -20185,7 +19522,6 @@ describe('XXX2 scaleCrowdingIndexV2', () => {
     expect(v).toBe(0);
   });
 });
-
 
 // XXX3 — scaleSparsityIndex
 describe('XXX3 scaleSparsityIndex', () => {
@@ -20203,7 +19539,6 @@ describe('XXX3 scaleSparsityIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // XXX4 — scaleGapBalance
 describe('XXX4 scaleGapBalance', () => {
@@ -20225,7 +19560,6 @@ describe('XXX4 scaleGapBalance', () => {
   });
 });
 
-
 // YYY1 — scaleAmbitusRatio
 describe('YYY1 scaleAmbitusRatio', () => {
   it('returns 0 for empty', () => {
@@ -20240,7 +19574,6 @@ describe('YYY1 scaleAmbitusRatio', () => {
     expect(v).toBe(1);
   });
 });
-
 
 // YYY2 — scaleLowerDensity
 describe('YYY2 scaleLowerDensity', () => {
@@ -20259,7 +19592,6 @@ describe('YYY2 scaleLowerDensity', () => {
   });
 });
 
-
 // YYY3 — scaleUpperDensity
 describe('YYY3 scaleUpperDensity', () => {
   it('returns 0 for empty', () => {
@@ -20276,7 +19608,6 @@ describe('YYY3 scaleUpperDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // YYY4 — scaleRegisterBalance
 describe('YYY4 scaleRegisterBalance', () => {
@@ -20297,7 +19628,6 @@ describe('YYY4 scaleRegisterBalance', () => {
   });
 });
 
-
 // ZZZ1 — scaleIntervalClassDiversity
 describe('ZZZ1 scaleIntervalClassDiversity', () => {
   it('returns 0 for empty', () => {
@@ -20314,7 +19644,6 @@ describe('ZZZ1 scaleIntervalClassDiversity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // ZZZ2 — scaleMajorIntervalRatio
 describe('ZZZ2 scaleMajorIntervalRatio', () => {
@@ -20333,7 +19662,6 @@ describe('ZZZ2 scaleMajorIntervalRatio', () => {
   });
 });
 
-
 // ZZZ3 — scaleMinorIntervalRatio
 describe('ZZZ3 scaleMinorIntervalRatio', () => {
   it('returns 0 for empty', () => {
@@ -20350,7 +19678,6 @@ describe('ZZZ3 scaleMinorIntervalRatio', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // ZZZ4 — scaleIntervalClassBalance
 describe('ZZZ4 scaleIntervalClassBalance', () => {
@@ -20375,7 +19702,6 @@ describe('ZZZ4 scaleIntervalClassBalance', () => {
   });
 });
 
-
 // AAAA1 — scaleHarmonicRhythmDensity
 describe('AAAA1 scaleHarmonicRhythmDensity', () => {
   it('returns 0 for empty', () => {
@@ -20390,7 +19716,6 @@ describe('AAAA1 scaleHarmonicRhythmDensity', () => {
     expect(v).toBe(0);
   });
 });
-
 
 // AAAA2 — scaleHarmonicAccelerationProxy
 describe('AAAA2 scaleHarmonicAccelerationProxy', () => {
@@ -20409,7 +19734,6 @@ describe('AAAA2 scaleHarmonicAccelerationProxy', () => {
   });
 });
 
-
 // AAAA3 — scaleHarmonicSteadinessProxy
 describe('AAAA3 scaleHarmonicSteadinessProxy', () => {
   it('returns 1 for empty', () => {
@@ -20427,7 +19751,6 @@ describe('AAAA3 scaleHarmonicSteadinessProxy', () => {
   });
 });
 
-
 // AAAA4 — scaleHarmonicComplexityProxy
 describe('AAAA4 scaleHarmonicComplexityProxy', () => {
   it('returns 0 for empty', () => {
@@ -20444,7 +19767,6 @@ describe('AAAA4 scaleHarmonicComplexityProxy', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // BBBB1 — scaleChecksumProxy
 describe('BBBB1 scaleChecksumProxy', () => {
@@ -20466,7 +19788,6 @@ describe('BBBB1 scaleChecksumProxy', () => {
   });
 });
 
-
 // BBBB2 — scaleHashVariance
 describe('BBBB2 scaleHashVariance', () => {
   it('returns 0 for empty', () => {
@@ -20484,7 +19805,6 @@ describe('BBBB2 scaleHashVariance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // BBBB3 — scalePeriodicityFingerprint
 describe('BBBB3 scalePeriodicityFingerprint', () => {
@@ -20505,7 +19825,6 @@ describe('BBBB3 scalePeriodicityFingerprint', () => {
   });
 });
 
-
 // BBBB4 — scaleUniquenessProxy
 describe('BBBB4 scaleUniquenessProxy', () => {
   it('returns 1 for empty', () => {
@@ -20525,7 +19844,6 @@ describe('BBBB4 scaleUniquenessProxy', () => {
   });
 });
 
-
 // CCCC1 — scaleTonalCenterOfGravity
 describe('CCCC1 scaleTonalCenterOfGravity', () => {
   it('returns 0.5 for empty (neutral)', () => {
@@ -20543,7 +19861,6 @@ describe('CCCC1 scaleTonalCenterOfGravity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // CCCC2 — scaleTonalGravityBalance
 describe('CCCC2 scaleTonalGravityBalance', () => {
@@ -20563,7 +19880,6 @@ describe('CCCC2 scaleTonalGravityBalance', () => {
   });
 });
 
-
 // CCCC3 — scaleTonalPolarization
 describe('CCCC3 scaleTonalPolarization', () => {
   it('returns 0 for empty', () => {
@@ -20582,7 +19898,6 @@ describe('CCCC3 scaleTonalPolarization', () => {
   });
 });
 
-
 // CCCC4 — scaleTonalCentripetal
 describe('CCCC4 scaleTonalCentripetal', () => {
   it('returns 1 for empty', () => {
@@ -20600,7 +19915,6 @@ describe('CCCC4 scaleTonalCentripetal', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // DDDD1 — scaleModalBrightnessV2
 describe('DDDD1 scaleModalBrightnessV2', () => {
@@ -20621,7 +19935,6 @@ describe('DDDD1 scaleModalBrightnessV2', () => {
   });
 });
 
-
 // DDDD2 — scaleModalDarknessV2
 describe('DDDD2 scaleModalDarknessV2', () => {
   it('returns 0 for empty', () => {
@@ -20641,7 +19954,6 @@ describe('DDDD2 scaleModalDarknessV2', () => {
   });
 });
 
-
 // DDDD3 — scaleModalBrightnessBiasV2
 describe('DDDD3 scaleModalBrightnessBiasV2', () => {
   it('returns 0.5 for empty (neutral)', () => {
@@ -20658,7 +19970,6 @@ describe('DDDD3 scaleModalBrightnessBiasV2', () => {
     expect(v).toBeCloseTo(0, 5);
   });
 });
-
 
 // DDDD4 — scaleModalComplexityV2
 describe('DDDD4 scaleModalComplexityV2', () => {
@@ -20680,7 +19991,6 @@ describe('DDDD4 scaleModalComplexityV2', () => {
   });
 });
 
-
 // EEEE1 — scaleFillRatio
 describe('EEEE1 scaleFillRatio', () => {
   it('returns 0 for empty', () => {
@@ -20699,7 +20009,6 @@ describe('EEEE1 scaleFillRatio', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // EEEE2 — scaleMaxGap
 describe('EEEE2 scaleMaxGap', () => {
@@ -20720,7 +20029,6 @@ describe('EEEE2 scaleMaxGap', () => {
   });
 });
 
-
 // EEEE3 — scaleGapUniformity
 describe('EEEE3 scaleGapUniformity', () => {
   it('returns 1 for empty', () => {
@@ -20739,7 +20047,6 @@ describe('EEEE3 scaleGapUniformity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // EEEE4 — scaleCoverageEfficiency
 describe('EEEE4 scaleCoverageEfficiency', () => {
@@ -20761,7 +20068,6 @@ describe('EEEE4 scaleCoverageEfficiency', () => {
   });
 });
 
-
 // FFFF1 — scaleIntervalNetworkDensity
 describe('FFFF1 scaleIntervalNetworkDensity', () => {
   it('returns 0 for empty', () => {
@@ -20778,7 +20084,6 @@ describe('FFFF1 scaleIntervalNetworkDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // FFFF2 — scaleIntervalNetworkClustering
 describe('FFFF2 scaleIntervalNetworkClustering', () => {
@@ -20797,7 +20102,6 @@ describe('FFFF2 scaleIntervalNetworkClustering', () => {
   });
 });
 
-
 // FFFF3 — scaleIntervalHubScore
 describe('FFFF3 scaleIntervalHubScore', () => {
   it('returns 0 for empty', () => {
@@ -20815,7 +20119,6 @@ describe('FFFF3 scaleIntervalHubScore', () => {
   });
 });
 
-
 // FFFF4 — scaleIntervalNetworkBalance
 describe('FFFF4 scaleIntervalNetworkBalance', () => {
   it('returns 1 for empty', () => {
@@ -20832,7 +20135,6 @@ describe('FFFF4 scaleIntervalNetworkBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // GGGG1 — scaleSubsetSimilarity
 describe('GGGG1 scaleSubsetSimilarity', () => {
@@ -20855,7 +20157,6 @@ describe('GGGG1 scaleSubsetSimilarity', () => {
   });
 });
 
-
 // GGGG2 — scaleStepRecurrence
 describe('GGGG2 scaleStepRecurrence', () => {
   it('returns 0 for empty', () => {
@@ -20870,7 +20171,6 @@ describe('GGGG2 scaleStepRecurrence', () => {
     expect(v).toBe(1); // all steps = 200, all recur
   });
 });
-
 
 // GGGG3 — scaleOctaveEquivalence
 describe('GGGG3 scaleOctaveEquivalence', () => {
@@ -20888,7 +20188,6 @@ describe('GGGG3 scaleOctaveEquivalence', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // GGGG4 — scaleHierarchicalBalance
 describe('GGGG4 scaleHierarchicalBalance', () => {
@@ -20910,7 +20209,6 @@ describe('GGGG4 scaleHierarchicalBalance', () => {
   });
 });
 
-
 // HHHH1 — scaleLowRegisterDensity
 describe('HHHH1 scaleLowRegisterDensity', () => {
   it('returns 0 for empty', () => {
@@ -20929,7 +20227,6 @@ describe('HHHH1 scaleLowRegisterDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // HHHH2 — scaleMidRegisterDensity
 describe('HHHH2 scaleMidRegisterDensity', () => {
@@ -20950,7 +20247,6 @@ describe('HHHH2 scaleMidRegisterDensity', () => {
   });
 });
 
-
 // HHHH3 — scaleHighRegisterDensity
 describe('HHHH3 scaleHighRegisterDensity', () => {
   it('returns 0 for empty', () => {
@@ -20969,7 +20265,6 @@ describe('HHHH3 scaleHighRegisterDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // HHHH4 — scaleRegisterDistributionBalance
 describe('HHHH4 scaleRegisterDistributionBalance', () => {
@@ -20991,7 +20286,6 @@ describe('HHHH4 scaleRegisterDistributionBalance', () => {
   });
 });
 
-
 // IIII1 — scaleTritoneRatioV2
 describe('IIII1 scaleTritoneRatioV2', () => {
   it('returns 0 for empty', () => {
@@ -21010,7 +20304,6 @@ describe('IIII1 scaleTritoneRatioV2', () => {
   });
 });
 
-
 // IIII2 — scaleDissonantIntervalCountV2
 describe('IIII2 scaleDissonantIntervalCountV2', () => {
   it('returns 0 for empty', () => {
@@ -21027,7 +20320,6 @@ describe('IIII2 scaleDissonantIntervalCountV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // IIII3 — scaleTensionResolutionRatioV2
 describe('IIII3 scaleTensionResolutionRatioV2', () => {
@@ -21050,7 +20342,6 @@ describe('IIII3 scaleTensionResolutionRatioV2', () => {
   });
 });
 
-
 // IIII4 — scaleHarmonicTensionIndexV2
 describe('IIII4 scaleHarmonicTensionIndexV2', () => {
   it('returns 0 for empty', () => {
@@ -21068,7 +20359,6 @@ describe('IIII4 scaleHarmonicTensionIndexV2', () => {
     expect(v).toBeGreaterThan(0); // tritone ratio = 1
   });
 });
-
 
 // JJJJ1 — scaleOvertoneAlignment
 describe('JJJJ1 scaleOvertoneAlignment', () => {
@@ -21088,7 +20378,6 @@ describe('JJJJ1 scaleOvertoneAlignment', () => {
     expect(v).toBeGreaterThan(0);
   });
 });
-
 
 // JJJJ2 — scaleSubharmonicAlignment
 describe('JJJJ2 scaleSubharmonicAlignment', () => {
@@ -21110,7 +20399,6 @@ describe('JJJJ2 scaleSubharmonicAlignment', () => {
   });
 });
 
-
 // JJJJ3 — scaleHarmonicSeriesCompleteness
 describe('JJJJ3 scaleHarmonicSeriesCompleteness', () => {
   it('returns 0 for empty', () => {
@@ -21128,7 +20416,6 @@ describe('JJJJ3 scaleHarmonicSeriesCompleteness', () => {
     expect(v).toBeGreaterThan(0);
   });
 });
-
 
 // JJJJ4 — scaleJustIntonationProximityV2
 describe('JJJJ4 scaleJustIntonationProximityV2', () => {
@@ -21150,7 +20437,6 @@ describe('JJJJ4 scaleJustIntonationProximityV2', () => {
   });
 });
 
-
 // KKKK1 — scaleMicrotonalDeviation
 describe('KKKK1 scaleMicrotonalDeviation', () => {
   it('returns 0 for empty', () => {
@@ -21170,7 +20456,6 @@ describe('KKKK1 scaleMicrotonalDeviation', () => {
   });
 });
 
-
 // KKKK2 — scaleMicrotonalIntervalCount
 describe('KKKK2 scaleMicrotonalIntervalCount', () => {
   it('returns 0 for empty', () => {
@@ -21187,7 +20472,6 @@ describe('KKKK2 scaleMicrotonalIntervalCount', () => {
   });
 });
 
-
 // KKKK3 — scaleXenharmonicNovelty
 describe('KKKK3 scaleXenharmonicNovelty', () => {
   it('returns 0 for empty', () => {
@@ -21203,7 +20487,6 @@ describe('KKKK3 scaleXenharmonicNovelty', () => {
     expect(v).toBeGreaterThan(0);
   });
 });
-
 
 // KKKK4 — scaleEDOApproximationScore
 describe('KKKK4 scaleEDOApproximationScore', () => {
@@ -21224,7 +20507,6 @@ describe('KKKK4 scaleEDOApproximationScore', () => {
   });
 });
 
-
 // LLLL1 — scaleCommonToneCount
 describe('LLLL1 scaleCommonToneCount', () => {
   it('returns 0 for empty', () => {
@@ -21244,7 +20526,6 @@ describe('LLLL1 scaleCommonToneCount', () => {
   });
 });
 
-
 // LLLL2 — scalePivotChordPotential
 describe('LLLL2 scalePivotChordPotential', () => {
   it('returns 0 for empty', () => {
@@ -21261,7 +20542,6 @@ describe('LLLL2 scalePivotChordPotential', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // LLLL3 — scaleCircleOfFifthsPosition
 describe('LLLL3 scaleCircleOfFifthsPosition', () => {
@@ -21280,7 +20560,6 @@ describe('LLLL3 scaleCircleOfFifthsPosition', () => {
     expect(v).toBeGreaterThan(0);
   });
 });
-
 
 // LLLL4 — scaleModulationDistanceV2
 describe('LLLL4 scaleModulationDistanceV2', () => {
@@ -21301,7 +20580,6 @@ describe('LLLL4 scaleModulationDistanceV2', () => {
   });
 });
 
-
 // MMMM1 — scaleSpectralCentroidV2
 describe('MMMM1 scaleSpectralCentroidV2', () => {
   it('returns 0.5 for empty', () => {
@@ -21320,7 +20598,6 @@ describe('MMMM1 scaleSpectralCentroidV2', () => {
   });
 });
 
-
 // MMMM2 — scaleSpectralSpread
 describe('MMMM2 scaleSpectralSpread', () => {
   it('returns 0 for empty', () => {
@@ -21338,7 +20615,6 @@ describe('MMMM2 scaleSpectralSpread', () => {
   });
 });
 
-
 // MMMM3 — scaleSpectralFlux
 describe('MMMM3 scaleSpectralFlux', () => {
   it('returns 0 for empty', () => {
@@ -21355,7 +20631,6 @@ describe('MMMM3 scaleSpectralFlux', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // MMMM4 — scaleSpectralRolloff
 describe('MMMM4 scaleSpectralRolloff', () => {
@@ -21375,7 +20650,6 @@ describe('MMMM4 scaleSpectralRolloff', () => {
     expect(v).toBe(1); // all 3 notes below 0.5 → rolloff = 1
   });
 });
-
 
 // NNNN1 — scaleClusterCount
 describe('NNNN1 scaleClusterCount', () => {
@@ -21398,7 +20672,6 @@ describe('NNNN1 scaleClusterCount', () => {
   });
 });
 
-
 // NNNN2 — scaleClusterDensity
 describe('NNNN2 scaleClusterDensity', () => {
   it('returns 0 for empty', () => {
@@ -21419,7 +20692,6 @@ describe('NNNN2 scaleClusterDensity', () => {
   });
 });
 
-
 // NNNN3 — scaleIsolatedNoteRatio
 describe('NNNN3 scaleIsolatedNoteRatio', () => {
   it('returns 1 for empty', () => {
@@ -21435,7 +20707,6 @@ describe('NNNN3 scaleIsolatedNoteRatio', () => {
     expect(v).toBe(0);
   });
 });
-
 
 // NNNN4 — scaleClusterSpread
 describe('NNNN4 scaleClusterSpread', () => {
@@ -21455,7 +20726,6 @@ describe('NNNN4 scaleClusterSpread', () => {
   });
 });
 
-
 // OOOO1 — scaleAscendingTendency
 describe('OOOO1 scaleAscendingTendency', () => {
   it('returns 0 for empty scale', () => {
@@ -21471,7 +20741,6 @@ describe('OOOO1 scaleAscendingTendency', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // OOOO2 — scaleDescendingTendency
 describe('OOOO2 scaleDescendingTendency', () => {
@@ -21489,7 +20758,6 @@ describe('OOOO2 scaleDescendingTendency', () => {
   });
 });
 
-
 // OOOO3 — scaleDirectionBalance
 describe('OOOO3 scaleDirectionBalance', () => {
   it('returns 0 for empty scale', () => {
@@ -21505,7 +20773,6 @@ describe('OOOO3 scaleDirectionBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // OOOO4 — scaleIntervalSymmetry
 describe('OOOO4 scaleIntervalSymmetry', () => {
@@ -21523,7 +20790,6 @@ describe('OOOO4 scaleIntervalSymmetry', () => {
   });
 });
 
-
 // PPPP1 — scaleReflectionSymmetry
 describe('PPPP1 scaleReflectionSymmetry', () => {
   it('returns 0 for empty scale', () => {
@@ -21539,7 +20805,6 @@ describe('PPPP1 scaleReflectionSymmetry', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // PPPP2 — scaleTranslationSymmetry
 describe('PPPP2 scaleTranslationSymmetry', () => {
@@ -21557,7 +20822,6 @@ describe('PPPP2 scaleTranslationSymmetry', () => {
   });
 });
 
-
 // PPPP3 — scaleRotationSymmetry
 describe('PPPP3 scaleRotationSymmetry', () => {
   it('returns 1 for empty scale', () => {
@@ -21571,7 +20835,6 @@ describe('PPPP3 scaleRotationSymmetry', () => {
     expect(v).toBeCloseTo(1, 1);
   });
 });
-
 
 // PPPP4 — scaleInversionSymmetry
 describe('PPPP4 scaleInversionSymmetry', () => {
@@ -21589,7 +20852,6 @@ describe('PPPP4 scaleInversionSymmetry', () => {
   });
 });
 
-
 // QQQQ1 — scalePitchEntropy
 describe('QQQQ1 scalePitchEntropy', () => {
   it('returns 0 for empty scale', () => {
@@ -21605,7 +20867,6 @@ describe('QQQQ1 scalePitchEntropy', () => {
     expect(scalePitchEntropy([600])).toBe(0);
   });
 });
-
 
 // QQQQ2 — scaleIntervalEntropyV2
 describe('QQQQ2 scaleIntervalEntropyV2', () => {
@@ -21623,7 +20884,6 @@ describe('QQQQ2 scaleIntervalEntropyV2', () => {
   });
 });
 
-
 // QQQQ3 — scaleRhythmicEntropy
 describe('QQQQ3 scaleRhythmicEntropy', () => {
   it('returns 0 for empty scale', () => {
@@ -21639,7 +20899,6 @@ describe('QQQQ3 scaleRhythmicEntropy', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // QQQQ4 — scaleHarmonicEntropy
 describe('QQQQ4 scaleHarmonicEntropy', () => {
@@ -21657,7 +20916,6 @@ describe('QQQQ4 scaleHarmonicEntropy', () => {
   });
 });
 
-
 // RRRR1 — scaleCenterOfMass
 describe('RRRR1 scaleCenterOfMass', () => {
   it('returns 0.5 for empty scale', () => {
@@ -21670,7 +20928,6 @@ describe('RRRR1 scaleCenterOfMass', () => {
     expect(scaleCenterOfMass([600])).toBeCloseTo(0.5, 1);
   });
 });
-
 
 // RRRR2 — scaleMomentOfInertia
 describe('RRRR2 scaleMomentOfInertia', () => {
@@ -21688,7 +20945,6 @@ describe('RRRR2 scaleMomentOfInertia', () => {
   });
 });
 
-
 // RRRR3 — scaleGyrationRadius
 describe('RRRR3 scaleGyrationRadius', () => {
   it('returns 0 for empty scale', () => {
@@ -21704,7 +20960,6 @@ describe('RRRR3 scaleGyrationRadius', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // RRRR4 — scaleAngularMomentum
 describe('RRRR4 scaleAngularMomentum', () => {
@@ -21722,7 +20977,6 @@ describe('RRRR4 scaleAngularMomentum', () => {
   });
 });
 
-
 // SSSS1 — scaleSkewness
 describe('scaleSkewness', () => {
   it('returns 0.5 for empty scale', () => {
@@ -21735,7 +20989,6 @@ describe('scaleSkewness', () => {
     expect(scaleSkewness([200, 600, 1000])).toBeCloseTo(0.5, 1);
   });
 });
-
 
 // SSSS2 — scaleKurtosis
 describe('scaleKurtosis', () => {
@@ -21753,7 +21006,6 @@ describe('scaleKurtosis', () => {
   });
 });
 
-
 // SSSS3 — scaleQuartileSpread
 describe('scaleQuartileSpread', () => {
   it('returns 0 for empty scale', () => {
@@ -21769,7 +21021,6 @@ describe('scaleQuartileSpread', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // SSSS4 — scaleOutlierRatio
 describe('scaleOutlierRatio', () => {
@@ -21787,7 +21038,6 @@ describe('scaleOutlierRatio', () => {
   });
 });
 
-
 // Round 114 — TTTT1-TTTT4: 音階フラクタル次元分析
 describe('TTTT1 scaleBoxCountingDimension', () => {
   it('returns 0 for empty scale', () => {
@@ -21804,7 +21054,6 @@ describe('TTTT1 scaleBoxCountingDimension', () => {
   });
 });
 
-
 describe('TTTT2 scaleHausdorffEstimate', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleHausdorffEstimate([])).toBe(0);
@@ -21819,7 +21068,6 @@ describe('TTTT2 scaleHausdorffEstimate', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('TTTT3 scaleSelfSimilarityIndex', () => {
   it('returns 0 for empty scale', () => {
@@ -21836,7 +21084,6 @@ describe('TTTT3 scaleSelfSimilarityIndex', () => {
   });
 });
 
-
 describe('TTTT4 scaleLacunarity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleLacunarity([])).toBe(0);
@@ -21851,7 +21098,6 @@ describe('TTTT4 scaleLacunarity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 115 — UUUU1-UUUU4: 音階対称変換分析
 describe('UUUU1 scaleRetrogradeSimilarity', () => {
@@ -21869,7 +21115,6 @@ describe('UUUU1 scaleRetrogradeSimilarity', () => {
   });
 });
 
-
 describe('UUUU2 scaleInversionSimilarity', () => {
   it('returns 1 for empty scale', () => {
     expect(scaleInversionSimilarity([])).toBe(1);
@@ -21884,7 +21129,6 @@ describe('UUUU2 scaleInversionSimilarity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('UUUU3 scaleComplementarity', () => {
   it('returns 1 for empty scale', () => {
@@ -21903,7 +21147,6 @@ describe('UUUU3 scaleComplementarity', () => {
   });
 });
 
-
 describe('UUUU4 scaleMirrorSymmetry', () => {
   it('returns 1 for empty scale', () => {
     expect(scaleMirrorSymmetry([])).toBe(1);
@@ -21918,7 +21161,6 @@ describe('UUUU4 scaleMirrorSymmetry', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 116 — VVVV1-VVVV4: 音階音程変動分析
 describe('VVVV1 scaleStepSizeVarianceV2', () => {
@@ -21938,7 +21180,6 @@ describe('VVVV1 scaleStepSizeVarianceV2', () => {
   });
 });
 
-
 describe('VVVV2 scaleLargeSmallStepRatio', () => {
   it('returns 0 for two pitches', () => {
     expect(scaleLargeSmallStepRatio([pitchFromCents(0), pitchFromCents(100)])).toBe(0);
@@ -21955,7 +21196,6 @@ describe('VVVV2 scaleLargeSmallStepRatio', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('VVVV3 scaleStepUniformity', () => {
   it('returns 1 for single pitch', () => {
@@ -21974,7 +21214,6 @@ describe('VVVV3 scaleStepUniformity', () => {
   });
 });
 
-
 describe('VVVV4 scaleMaxStepFraction', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleMaxStepFraction([pitchFromCents(0)])).toBe(0);
@@ -21990,7 +21229,6 @@ describe('VVVV4 scaleMaxStepFraction', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 117 — WWWW1-WWWW4: 音階密度分布分析
 describe('WWWW1 scaleRegisterBalanceV2', () => {
@@ -22010,7 +21248,6 @@ describe('WWWW1 scaleRegisterBalanceV2', () => {
   });
 });
 
-
 describe('WWWW2 scalePitchClusteringV2', () => {
   it('returns 0 for single pitch', () => {
     expect(scalePitchClusteringV2([pitchFromCents(0)])).toBe(0);
@@ -22029,7 +21266,6 @@ describe('WWWW2 scalePitchClusteringV2', () => {
   });
 });
 
-
 describe('WWWW3 scaleRangeCoverageV2', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleRangeCoverageV2([pitchFromCents(0)])).toBe(0);
@@ -22047,7 +21283,6 @@ describe('WWWW3 scaleRangeCoverageV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('WWWW4 scaleOctaveCompletenessV2', () => {
   it('returns 0 for empty scale', () => {
@@ -22068,7 +21303,6 @@ describe('WWWW4 scaleOctaveCompletenessV2', () => {
   });
 });
 
-
 // Round 118 — XXXX1-XXXX4: 音階音程特性分析
 describe('XXXX1 scaleLeapFraction', () => {
   it('returns 0 for single pitch', () => {
@@ -22083,7 +21317,6 @@ describe('XXXX1 scaleLeapFraction', () => {
     expect(scaleLeapFraction(pitches)).toBe(1);
   });
 });
-
 
 describe('XXXX2 scaleStepFraction', () => {
   it('returns 0 for single pitch', () => {
@@ -22101,7 +21334,6 @@ describe('XXXX2 scaleStepFraction', () => {
   });
 });
 
-
 describe('XXXX3 scaleHalfStepCount', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleHalfStepCount([pitchFromCents(0)])).toBe(0);
@@ -22116,7 +21348,6 @@ describe('XXXX3 scaleHalfStepCount', () => {
   });
 });
 
-
 describe('XXXX4 scaleWholeToneContent', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleWholeToneContent([pitchFromCents(0)])).toBe(0);
@@ -22130,7 +21361,6 @@ describe('XXXX4 scaleWholeToneContent', () => {
     expect(scaleWholeToneContent(pitches)).toBe(0);
   });
 });
-
 
 // Round 119 — YYYY1-YYYY4: 音階統計的検定指標
 describe('YYYY1 scaleNormalityIndex', () => {
@@ -22153,7 +21383,6 @@ describe('YYYY1 scaleNormalityIndex', () => {
   });
 });
 
-
 describe('YYYY2 scaleUniformityIndex', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleUniformityIndex([pitchFromCents(0)])).toBe(0);
@@ -22171,7 +21400,6 @@ describe('YYYY2 scaleUniformityIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('YYYY3 scaleBimodalityIndex', () => {
   it('returns 0 for fewer than 4 pitches', () => {
@@ -22193,7 +21421,6 @@ describe('YYYY3 scaleBimodalityIndex', () => {
   });
 });
 
-
 describe('YYYY4 scaleDistributionSkewIndex', () => {
   it('returns 0.5 for single pitch', () => {
     expect(scaleDistributionSkewIndex([pitchFromCents(0)])).toBe(0.5);
@@ -22211,7 +21438,6 @@ describe('YYYY4 scaleDistributionSkewIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 120 — ZZZZ1-ZZZZ4: 音階倍音列関係分析
 describe('ZZZZ1 scaleHarmonicSeriesAlignmentV2', () => {
@@ -22232,7 +21458,6 @@ describe('ZZZZ1 scaleHarmonicSeriesAlignmentV2', () => {
   });
 });
 
-
 describe('ZZZZ2 scaleSubharmonicAlignmentV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleSubharmonicAlignmentV2([])).toBe(0);
@@ -22250,7 +21475,6 @@ describe('ZZZZ2 scaleSubharmonicAlignmentV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('ZZZZ3 scaleOvertoneRatioProximity', () => {
   it('returns 0 for single pitch', () => {
@@ -22270,7 +21494,6 @@ describe('ZZZZ3 scaleOvertoneRatioProximity', () => {
   });
 });
 
-
 describe('ZZZZ4 scaleJustTuningDeviation', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleJustTuningDeviation([])).toBe(0);
@@ -22288,7 +21511,6 @@ describe('ZZZZ4 scaleJustTuningDeviation', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 121 — R1211-R1214: 音階音域バランス分析
 describe('R1211 scaleHighRegisterRatio', () => {
@@ -22308,7 +21530,6 @@ describe('R1211 scaleHighRegisterRatio', () => {
   });
 });
 
-
 describe('R1212 scaleLowRegisterRatio', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleLowRegisterRatio([pitchFromCents(0)])).toBe(0);
@@ -22326,7 +21547,6 @@ describe('R1212 scaleLowRegisterRatio', () => {
   });
 });
 
-
 describe('R1213 scaleRegisterSpread', () => {
   it('returns 0 for single pitch', () => {
     expect(scaleRegisterSpread([pitchFromCents(0)])).toBe(0);
@@ -22343,7 +21563,6 @@ describe('R1213 scaleRegisterSpread', () => {
   });
 });
 
-
 describe('R1214 scaleRegisterConcentration', () => {
   it('returns 1 for single pitch', () => {
     expect(scaleRegisterConcentration([pitchFromCents(0)])).toBe(1);
@@ -22359,7 +21578,6 @@ describe('R1214 scaleRegisterConcentration', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 122 — R1221-R1224: 音階ピッチ多様性分析
 describe('R1221 scalePitchVariety', () => {
@@ -22378,7 +21596,6 @@ describe('R1221 scalePitchVariety', () => {
   });
 });
 
-
 describe('R1222 scalePitchRepetitionRatio', () => {
   it('returns 0 for single pitch', () => {
     expect(scalePitchRepetitionRatio([pitchFromCents(0)])).toBe(0);
@@ -22394,7 +21611,6 @@ describe('R1222 scalePitchRepetitionRatio', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1223 scaleSpanRatio', () => {
   it('returns 0 for single pitch', () => {
@@ -22414,7 +21630,6 @@ describe('R1223 scaleSpanRatio', () => {
   });
 });
 
-
 describe('R1224 scaleAveragePitchHeight', () => {
   it('returns 0.5 for empty scale', () => {
     expect(scaleAveragePitchHeight([])).toBe(0.5);
@@ -22431,7 +21646,6 @@ describe('R1224 scaleAveragePitchHeight', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 123 — R1231-R1234: 音階モーダル親和性分析
 describe('R1231 scaleMajorAffinity', () => {
@@ -22450,7 +21664,6 @@ describe('R1231 scaleMajorAffinity', () => {
   });
 });
 
-
 describe('R1232 scaleMinorAffinity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleMinorAffinity([])).toBe(0);
@@ -22467,7 +21680,6 @@ describe('R1232 scaleMinorAffinity', () => {
   });
 });
 
-
 describe('R1233 scaleChromaticDegreeCount', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleChromaticDegreeCount([])).toBe(0);
@@ -22482,7 +21694,6 @@ describe('R1233 scaleChromaticDegreeCount', () => {
     expect(v).toBeCloseTo(7 / 12, 5);
   });
 });
-
 
 describe('R1234 scaleDiatonicMatchScore', () => {
   it('returns 0 for empty scale', () => {
@@ -22499,7 +21710,6 @@ describe('R1234 scaleDiatonicMatchScore', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 124 — R1241-R1244: 音階テンション特性分析
 describe('R1241 scaleSemitoneClusterDensity', () => {
@@ -22521,7 +21731,6 @@ describe('R1241 scaleSemitoneClusterDensity', () => {
   });
 });
 
-
 describe('R1242 scaleAvoidNoteCount', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleAvoidNoteCount([])).toBe(0);
@@ -22540,7 +21749,6 @@ describe('R1242 scaleAvoidNoteCount', () => {
   });
 });
 
-
 describe('R1243 scaleColorToneRatio', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleColorToneRatio([])).toBe(0);
@@ -22554,7 +21762,6 @@ describe('R1243 scaleColorToneRatio', () => {
     expect(scaleColorToneRatio(pitches)).toBeGreaterThan(0);
   });
 });
-
 
 describe('R1244 scaleIntervalTension', () => {
   it('returns 0 for empty scale', () => {
@@ -22575,7 +21782,6 @@ describe('R1244 scaleIntervalTension', () => {
   });
 });
 
-
 // Round 125 — R1251-R1254: 音階転調特性分析
 describe('R1251 scaleTranspositionCount', () => {
   it('returns 0 for empty scale', () => {
@@ -22593,7 +21799,6 @@ describe('R1251 scaleTranspositionCount', () => {
   });
 });
 
-
 describe('R1252 scaleAxisSymmetryScore', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleAxisSymmetryScore([])).toBe(0);
@@ -22609,7 +21814,6 @@ describe('R1252 scaleAxisSymmetryScore', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1253 scaleDegreeWeightBalance', () => {
   it('returns 0 for empty scale', () => {
@@ -22627,7 +21831,6 @@ describe('R1253 scaleDegreeWeightBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1254 scaleHemitoniaRatio', () => {
   it('returns 0 for empty scale', () => {
@@ -22649,7 +21852,6 @@ describe('R1254 scaleHemitoniaRatio', () => {
   });
 });
 
-
 // Round 126 — R1261-R1264: 音階クラスタ特性分析
 describe('R1261 scaleNoteGroupingScore', () => {
   it('returns 0 for empty scale', () => {
@@ -22670,7 +21872,6 @@ describe('R1261 scaleNoteGroupingScore', () => {
   });
 });
 
-
 describe('R1262 scaleInterclusterGap', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleInterclusterGap([])).toBe(0);
@@ -22687,7 +21888,6 @@ describe('R1262 scaleInterclusterGap', () => {
   });
 });
 
-
 describe('R1263 scaleGroupCount', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleGroupCount([])).toBe(0);
@@ -22702,7 +21902,6 @@ describe('R1263 scaleGroupCount', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1264 scaleClusterDensityVariation', () => {
   it('returns 0 for empty scale', () => {
@@ -22722,7 +21921,6 @@ describe('R1264 scaleClusterDensityVariation', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // analyzeScale convenience aggregate
 describe('analyzeScale', () => {
@@ -22758,7 +21956,6 @@ describe('analyzeScale', () => {
   });
 });
 
-
 // Round 127 — R1271-R1274: 音階周期性・反復構造分析
 describe('R1271 scaleIntervalPatternEntropy', () => {
   it('returns 0 for empty scale', () => {
@@ -22780,7 +21977,6 @@ describe('R1271 scaleIntervalPatternEntropy', () => {
   });
 });
 
-
 describe('R1272 scaleGapUniformityV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleGapUniformityV2([])).toBe(0);
@@ -22796,7 +21992,6 @@ describe('R1272 scaleGapUniformityV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1273 scaleMaximalEvennessV2', () => {
   it('returns 0 for empty scale', () => {
@@ -22820,7 +22015,6 @@ describe('R1273 scaleMaximalEvennessV2', () => {
   });
 });
 
-
 describe('R1274 scalePeriodicity', () => {
   it('returns 0 for empty scale', () => {
     expect(scalePeriodicity([])).toBe(0);
@@ -22841,7 +22035,6 @@ describe('R1274 scalePeriodicity', () => {
   });
 });
 
-
 // Round 128 — R1281-R1284: 音階根音協和性・密度分析
 describe('R1281 scalePitchDensityGini', () => {
   it('returns 0 for empty scale', () => {
@@ -22858,7 +22051,6 @@ describe('R1281 scalePitchDensityGini', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1282 scaleRegisterImbalance', () => {
   it('returns 0 for empty scale', () => {
@@ -22880,7 +22072,6 @@ describe('R1282 scaleRegisterImbalance', () => {
   });
 });
 
-
 describe('R1283 scaleTritoneAxisCount', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleTritoneAxisCount([])).toBe(0);
@@ -22897,7 +22088,6 @@ describe('R1283 scaleTritoneAxisCount', () => {
     expect(scaleTritoneAxisCount(pitches)).toBe(0);
   });
 });
-
 
 describe('R1284 scaleRootConsonanceScore', () => {
   it('returns 0 for empty scale', () => {
@@ -22918,7 +22108,6 @@ describe('R1284 scaleRootConsonanceScore', () => {
   });
 });
 
-
 // Round 129 — R1291-R1294: 音階倍音整合性分析
 describe('R1291 scaleHarmonicCoherenceIndex', () => {
   it('returns 0 for empty scale', () => {
@@ -22937,7 +22126,6 @@ describe('R1291 scaleHarmonicCoherenceIndex', () => {
   });
 });
 
-
 describe('R1292 scaleSubdominantScore', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleSubdominantScore([])).toBe(0);
@@ -22954,7 +22142,6 @@ describe('R1292 scaleSubdominantScore', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1293 scaleLeadingToneStrengthV3', () => {
   it('returns 0 for empty scale', () => {
@@ -22974,7 +22161,6 @@ describe('R1293 scaleLeadingToneStrengthV3', () => {
   });
 });
 
-
 describe('R1294 scaleOctaveEquivalenceScoreV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleOctaveEquivalenceScoreV2([])).toBe(0);
@@ -22993,7 +22179,6 @@ describe('R1294 scaleOctaveEquivalenceScoreV2', () => {
   });
 });
 
-
 // Round 130 — R1301-R1304: 音階モード分類分析
 describe('R1301 scaleModeAffinityScore', () => {
   it('returns 0 for empty scale', () => {
@@ -23011,7 +22196,6 @@ describe('R1301 scaleModeAffinityScore', () => {
   });
 });
 
-
 describe('R1302 scaleModularityScore', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleModularityScore([])).toBe(0);
@@ -23028,7 +22212,6 @@ describe('R1302 scaleModularityScore', () => {
   });
 });
 
-
 describe('R1303 scaleTonicStrengthScore', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleTonicStrengthScore([])).toBe(0);
@@ -23044,7 +22227,6 @@ describe('R1303 scaleTonicStrengthScore', () => {
     expect(v).toBeLessThan(0.5);
   });
 });
-
 
 describe('R1304 scalePentatonicAffinity', () => {
   it('returns 0 for empty scale', () => {
@@ -23063,7 +22245,6 @@ describe('R1304 scalePentatonicAffinity', () => {
   });
 });
 
-
 // Round 131 — R1311-R1314: 音階対称性反転分析
 describe('R1311 scaleInversionSymmetryV2', () => {
   it('returns 0 for empty scale', () => {
@@ -23081,7 +22262,6 @@ describe('R1311 scaleInversionSymmetryV2', () => {
   });
 });
 
-
 describe('R1312 scaleRetrogradeSymmetryV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleRetrogradeSymmetryV2([])).toBe(0);
@@ -23094,7 +22274,6 @@ describe('R1312 scaleRetrogradeSymmetryV2', () => {
     expect(scaleRetrogradeSymmetryV2(pitches)).toBe(1);
   });
 });
-
 
 describe('R1313 scaleTranspositionSymmetryV2', () => {
   it('returns 0 for empty scale', () => {
@@ -23113,7 +22292,6 @@ describe('R1313 scaleTranspositionSymmetryV2', () => {
     expect(scaleTranspositionSymmetryV2(pitches)).toBe(0);
   });
 });
-
 
 describe('R1314 scaleRotationalSymmetryV2', () => {
   it('returns 0 for empty scale', () => {
@@ -23134,7 +22312,6 @@ describe('R1314 scaleRotationalSymmetryV2', () => {
   });
 });
 
-
 // Round 132 — R1321-R1324: 音階音響心理学分析
 describe('R1321 scaleCriticalBandDensityV2', () => {
   it('returns 0 for empty scale', () => {
@@ -23154,7 +22331,6 @@ describe('R1321 scaleCriticalBandDensityV2', () => {
   });
 });
 
-
 describe('R1322 scaleMaskingIndexV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleMaskingIndexV2([])).toBe(0);
@@ -23168,7 +22344,6 @@ describe('R1322 scaleMaskingIndexV2', () => {
     expect(scaleMaskingIndexV2(pitches)).toBe(0);
   });
 });
-
 
 describe('R1323 scaleLoudnessBalance', () => {
   it('returns 0 for empty scale', () => {
@@ -23184,7 +22359,6 @@ describe('R1323 scaleLoudnessBalance', () => {
     expect(v).toBeLessThan(0.5);
   });
 });
-
 
 describe('R1324 scaleRoughnessEstimate', () => {
   it('returns 0 for empty scale', () => {
@@ -23204,7 +22378,6 @@ describe('R1324 scaleRoughnessEstimate', () => {
   });
 });
 
-
 // Round 133 — R1331-R1334: 音階和声進行分析
 describe('R1331 scaleDominantMotionPotential', () => {
   it('returns 0 for empty scale', () => {
@@ -23223,7 +22396,6 @@ describe('R1331 scaleDominantMotionPotential', () => {
   });
 });
 
-
 describe('R1332 scaleIIVIPotential', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleIIVIPotential([])).toBe(0);
@@ -23237,7 +22409,6 @@ describe('R1332 scaleIIVIPotential', () => {
     expect(scaleIIVIPotential(pitches)).toBe(0.5);
   });
 });
-
 
 describe('R1333 scaleSecondaryDominantCount', () => {
   it('returns 0 for empty scale', () => {
@@ -23254,7 +22425,6 @@ describe('R1333 scaleSecondaryDominantCount', () => {
   });
 });
 
-
 describe('R1334 scaleModalMixtureScore', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleModalMixtureScore([])).toBe(0);
@@ -23269,7 +22439,6 @@ describe('R1334 scaleModalMixtureScore', () => {
     expect(v).toBeGreaterThan(0);
   });
 });
-
 
 // Round 134 — R1341-R1344: 音階スペクトル整合性分析
 describe('R1341 scaleSpectrumMatchScore', () => {
@@ -23289,7 +22458,6 @@ describe('R1341 scaleSpectrumMatchScore', () => {
   });
 });
 
-
 describe('R1342 scalePartialAlignmentDensity', () => {
   it('returns 0 for empty scale', () => {
     expect(scalePartialAlignmentDensity([])).toBe(0);
@@ -23306,7 +22474,6 @@ describe('R1342 scalePartialAlignmentDensity', () => {
   });
 });
 
-
 describe('R1343 scaleInharmonicityIndex', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleInharmonicityIndex([])).toBe(0);
@@ -23320,7 +22487,6 @@ describe('R1343 scaleInharmonicityIndex', () => {
     expect(v).toBeLessThan(0.2);
   });
 });
-
 
 describe('R1344 scaleSpectralCentroidBias', () => {
   it('returns 0 for empty scale', () => {
@@ -23341,7 +22507,6 @@ describe('R1344 scaleSpectralCentroidBias', () => {
   });
 });
 
-
 // Round 135 — R1351-R1354: 音階音程ベクトル分析
 describe('R1351 scaleIntervalVectorEntropy', () => {
   it('returns 0 for empty scale', () => {
@@ -23358,7 +22523,6 @@ describe('R1351 scaleIntervalVectorEntropy', () => {
   });
 });
 
-
 describe('R1352 scaleIntervalClassBalanceV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleIntervalClassBalanceV2([])).toBe(0);
@@ -23372,7 +22536,6 @@ describe('R1352 scaleIntervalClassBalanceV2', () => {
     expect(v).toBeGreaterThan(0.3);
   });
 });
-
 
 describe('R1353 scaleConsistencyIndex', () => {
   it('returns 0 for empty scale', () => {
@@ -23389,7 +22552,6 @@ describe('R1353 scaleConsistencyIndex', () => {
   });
 });
 
-
 describe('R1354 scaleProportionalBalance', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleProportionalBalance([])).toBe(0);
@@ -23403,7 +22565,6 @@ describe('R1354 scaleProportionalBalance', () => {
     expect(v).toBeGreaterThan(0.9);
   });
 });
-
 
 // Round 136 — R1361-R1364: 音階旋律重力分析
 describe('R1361 scaleMelodicGravityScore', () => {
@@ -23423,7 +22584,6 @@ describe('R1361 scaleMelodicGravityScore', () => {
   });
 });
 
-
 describe('R1362 scaleAttractionForceIndex', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleAttractionForceIndex([])).toBe(0);
@@ -23438,7 +22598,6 @@ describe('R1362 scaleAttractionForceIndex', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1363 scaleTensionResolutionRatio', () => {
   it('returns 0 for empty scale', () => {
@@ -23457,7 +22616,6 @@ describe('R1363 scaleTensionResolutionRatio', () => {
   });
 });
 
-
 describe('R1364 scaleDirectionBias', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleDirectionBias([])).toBe(0);
@@ -23472,7 +22630,6 @@ describe('R1364 scaleDirectionBias', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // Round 137 — R1371-R1374: 音階調性中心分析
 describe('R1371 scaleTonicClarityScore', () => {
@@ -23492,7 +22649,6 @@ describe('R1371 scaleTonicClarityScore', () => {
   });
 });
 
-
 describe('R1372 scaleDominantPresence', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleDominantPresence([])).toBe(0);
@@ -23507,7 +22663,6 @@ describe('R1372 scaleDominantPresence', () => {
     expect(scaleDominantPresence(pitches)).toBe(0);
   });
 });
-
 
 describe('R1373 scaleSubdominantPresence', () => {
   it('returns 0 for empty scale', () => {
@@ -23526,7 +22681,6 @@ describe('R1373 scaleSubdominantPresence', () => {
   });
 });
 
-
 describe('R1374 scaleTonalCenterStrength', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleTonalCenterStrength([])).toBe(0);
@@ -23544,7 +22698,6 @@ describe('R1374 scaleTonalCenterStrength', () => {
   });
 });
 
-
 // Round 138 — R1381-R1384: 音階和音色彩分析
 describe('R1381 scaleChordColorScore', () => {
   it('returns 0 for empty scale', () => {
@@ -23560,7 +22713,6 @@ describe('R1381 scaleChordColorScore', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1382 scaleBrightnessV2', () => {
   it('returns 0 for empty scale', () => {
@@ -23579,7 +22731,6 @@ describe('R1382 scaleBrightnessV2', () => {
   });
 });
 
-
 describe('R1383 scaleWarmthIndex', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleWarmthIndex([])).toBe(0);
@@ -23596,7 +22747,6 @@ describe('R1383 scaleWarmthIndex', () => {
   });
 });
 
-
 describe('R1384 scaleChromaBalance', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleChromaBalance([])).toBe(0);
@@ -23611,7 +22761,6 @@ describe('R1384 scaleChromaBalance', () => {
     expect(v).toBeCloseTo(7 / 12, 5);
   });
 });
-
 
 // Round 139 — R1391-R1394: 音階倍音構造整合分析
 describe('R1391 scaleOvertoneMatchRatio', () => {
@@ -23631,7 +22780,6 @@ describe('R1391 scaleOvertoneMatchRatio', () => {
   });
 });
 
-
 describe('R1392 scaleUndertoneMatchRatio', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleUndertoneMatchRatio([])).toBe(0);
@@ -23646,7 +22794,6 @@ describe('R1392 scaleUndertoneMatchRatio', () => {
     expect(scaleUndertoneMatchRatio([pitchFromCents(0)])).toBeGreaterThan(0);
   });
 });
-
 
 describe('R1393 scaleJustFifthChain', () => {
   it('returns 0 for empty scale', () => {
@@ -23668,7 +22815,6 @@ describe('R1393 scaleJustFifthChain', () => {
   });
 });
 
-
 describe('R1394 scaleThirdChainScore', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleThirdChainScore([])).toBe(0);
@@ -23684,7 +22830,6 @@ describe('R1394 scaleThirdChainScore', () => {
     expect(scaleThirdChainScore(pitches)).toBeGreaterThan(0);
   });
 });
-
 
 // Round 140 — R1401-R1404: 音階旋律輪郭分析
 describe('R1401 scaleMelodicContourVariety', () => {
@@ -23702,7 +22847,6 @@ describe('R1401 scaleMelodicContourVariety', () => {
   });
 });
 
-
 describe('R1402 scaleAscendingBias', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleAscendingBias([])).toBe(0);
@@ -23716,7 +22860,6 @@ describe('R1402 scaleAscendingBias', () => {
     expect(scaleAscendingBias(pitches)).toBe(0);
   });
 });
-
 
 describe('R1403 scaleStepLeapRatio', () => {
   it('returns 0 for empty scale', () => {
@@ -23732,7 +22875,6 @@ describe('R1403 scaleStepLeapRatio', () => {
   });
 });
 
-
 describe('R1404 scaleContourComplexity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleContourComplexity([])).toBe(0);
@@ -23747,7 +22889,6 @@ describe('R1404 scaleContourComplexity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1411
 describe('R1411 scalePulseRegularity', () => {
@@ -23766,7 +22907,6 @@ describe('R1411 scalePulseRegularity', () => {
   });
 });
 
-
 // R1412
 describe('R1412 scaleAccentPotential', () => {
   it('returns 0 for empty', () => {
@@ -23783,7 +22923,6 @@ describe('R1412 scaleAccentPotential', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1413
 describe('R1413 scalePolyrhythmicIndex', () => {
@@ -23803,7 +22942,6 @@ describe('R1413 scalePolyrhythmicIndex', () => {
   });
 });
 
-
 // R1414
 describe('R1414 scalePhaseCoherence', () => {
   it('returns 0.5 for empty', () => {
@@ -23819,7 +22957,6 @@ describe('R1414 scalePhaseCoherence', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1421
 describe('R1421 scaleAmbitoRange', () => {
@@ -23838,7 +22975,6 @@ describe('R1421 scaleAmbitoRange', () => {
   });
 });
 
-
 // R1422
 describe('R1422 scaleModalInterchangeScore', () => {
   it('returns 0 for empty', () => {
@@ -23856,7 +22992,6 @@ describe('R1422 scaleModalInterchangeScore', () => {
     expect(v).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // R1423
 describe('R1423 scaleChromaticTendencyScore', () => {
@@ -23877,7 +23012,6 @@ describe('R1423 scaleChromaticTendencyScore', () => {
   });
 });
 
-
 // R1424
 describe('R1424 scaleIntervalSpread', () => {
   it('returns 0 for empty', () => {
@@ -23895,7 +23029,6 @@ describe('R1424 scaleIntervalSpread', () => {
   });
 });
 
-
 // R1431
 describe('R1431 scaleResonanceFrequencyScore', () => {
   it('returns 0 for empty', () => {
@@ -23912,7 +23045,6 @@ describe('R1431 scaleResonanceFrequencyScore', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1432
 describe('R1432 scaleHarmonicOscillatorIndex', () => {
@@ -23932,7 +23064,6 @@ describe('R1432 scaleHarmonicOscillatorIndex', () => {
   });
 });
 
-
 // R1433
 describe('R1433 scaleDampingRatioEstimate', () => {
   it('returns 0 for empty', () => {
@@ -23949,7 +23080,6 @@ describe('R1433 scaleDampingRatioEstimate', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1434
 describe('R1434 scaleSpringConstantProxy', () => {
@@ -23968,7 +23098,6 @@ describe('R1434 scaleSpringConstantProxy', () => {
   });
 });
 
-
 // R1441
 describe('R1441 scaleGrowthRateIndex', () => {
   it('returns 0.5 for empty', () => {
@@ -23986,7 +23115,6 @@ describe('R1441 scaleGrowthRateIndex', () => {
   });
 });
 
-
 // R1442
 describe('R1442 scaleDecayConstant', () => {
   it('returns 0 for empty', () => {
@@ -24003,7 +23131,6 @@ describe('R1442 scaleDecayConstant', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1443
 describe('R1443 scaleTopologyScore', () => {
@@ -24024,7 +23151,6 @@ describe('R1443 scaleTopologyScore', () => {
   });
 });
 
-
 // R1444
 describe('R1444 scaleConnectivityIndex', () => {
   it('returns 0 for empty', () => {
@@ -24042,7 +23168,6 @@ describe('R1444 scaleConnectivityIndex', () => {
   });
 });
 
-
 // R1451
 describe('R1451 scaleSemitoneContent', () => {
   it('returns 0 for empty', () => {
@@ -24057,7 +23182,6 @@ describe('R1451 scaleSemitoneContent', () => {
     expect(scaleSemitoneContent(pitches)).toBe(0);
   });
 });
-
 
 // R1452
 describe('R1452 scaleWholeToneContent', () => {
@@ -24076,7 +23200,6 @@ describe('R1452 scaleWholeToneContent', () => {
   });
 });
 
-
 // R1453
 describe('R1453 scaleTritoneContent', () => {
   it('returns 0 for empty', () => {
@@ -24093,7 +23216,6 @@ describe('R1453 scaleTritoneContent', () => {
     expect(scaleTritoneContent(pitches)).toBe(1);
   });
 });
-
 
 // R1454
 describe('R1454 scaleMinorThirdContent', () => {
@@ -24112,7 +23234,6 @@ describe('R1454 scaleMinorThirdContent', () => {
   });
 });
 
-
 // R1461
 describe('R1461 scaleGravitationalCenter', () => {
   it('returns 0.5 for empty', () => {
@@ -24130,7 +23251,6 @@ describe('R1461 scaleGravitationalCenter', () => {
   });
 });
 
-
 // R1462
 describe('R1462 scalePitchVariance', () => {
   it('returns 0 for empty', () => {
@@ -24146,7 +23266,6 @@ describe('R1462 scalePitchVariance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1463
 describe('R1463 scaleBalancePoint', () => {
@@ -24165,7 +23284,6 @@ describe('R1463 scaleBalancePoint', () => {
   });
 });
 
-
 // R1464
 describe('R1464 scaleMassDistribution', () => {
   it('returns 0 for empty', () => {
@@ -24180,7 +23298,6 @@ describe('R1464 scaleMassDistribution', () => {
     expect(scaleMassDistribution(pitches)).toBe(0.5);
   });
 });
-
 
 // R1471
 describe('R1471 scaleDistributionShape', () => {
@@ -24199,7 +23316,6 @@ describe('R1471 scaleDistributionShape', () => {
   });
 });
 
-
 // R1472
 describe('R1472 scaleAsymmetryIndex', () => {
   it('returns 0.5 for empty', () => {
@@ -24217,7 +23333,6 @@ describe('R1472 scaleAsymmetryIndex', () => {
   });
 });
 
-
 // R1473
 describe('R1473 scaleUnimodality', () => {
   it('returns 0 for empty', () => {
@@ -24234,7 +23349,6 @@ describe('R1473 scaleUnimodality', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1474
 describe('R1474 scaleIntervalDensityPeak', () => {
@@ -24254,7 +23368,6 @@ describe('R1474 scaleIntervalDensityPeak', () => {
   });
 });
 
-
 // R1481
 describe('R1481 scaleHexatonicAffinity', () => {
   it('returns 0 for empty', () => {
@@ -24271,7 +23384,6 @@ describe('R1481 scaleHexatonicAffinity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1482
 describe('R1482 scaleOctatonicAffinity', () => {
@@ -24290,7 +23402,6 @@ describe('R1482 scaleOctatonicAffinity', () => {
   });
 });
 
-
 // R1483
 describe('R1483 scaleOctaveBalance', () => {
   it('returns 0 for empty', () => {
@@ -24307,7 +23418,6 @@ describe('R1483 scaleOctaveBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1484
 describe('R1484 scaleFifthCircleScore', () => {
@@ -24327,7 +23437,6 @@ describe('R1484 scaleFifthCircleScore', () => {
   });
 });
 
-
 // R1491
 describe('R1491 scalePatternRepetition', () => {
   it('returns 0 for empty', () => {
@@ -24344,7 +23453,6 @@ describe('R1491 scalePatternRepetition', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1492
 describe('R1492 scaleMotifDensity', () => {
@@ -24365,7 +23473,6 @@ describe('R1492 scaleMotifDensity', () => {
   });
 });
 
-
 // R1493
 describe('R1493 scaleRhythmicAffinity', () => {
   it('returns 0 for empty', () => {
@@ -24382,7 +23489,6 @@ describe('R1493 scaleRhythmicAffinity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1494
 describe('R1494 scaleSyncopation', () => {
@@ -24403,7 +23509,6 @@ describe('R1494 scaleSyncopation', () => {
   });
 });
 
-
 // R1501
 describe('R1501 scaleSmallIntegerRatioScore', () => {
   it('returns 0 for empty', () => {
@@ -24420,7 +23525,6 @@ describe('R1501 scaleSmallIntegerRatioScore', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1502
 describe('R1502 scaleJustIntonationAffinity', () => {
@@ -24439,7 +23543,6 @@ describe('R1502 scaleJustIntonationAffinity', () => {
   });
 });
 
-
 // R1503
 describe('R1503 scaleRatioComplexity', () => {
   it('returns 0 for empty', () => {
@@ -24456,7 +23559,6 @@ describe('R1503 scaleRatioComplexity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1504
 describe('R1504 scalePrimeLimitScore', () => {
@@ -24475,7 +23577,6 @@ describe('R1504 scalePrimeLimitScore', () => {
   });
 });
 
-
 // R1511
 describe('R1511 scaleVoiceLeadingSmoothness', () => {
   it('returns 0 for empty', () => {
@@ -24492,7 +23593,6 @@ describe('R1511 scaleVoiceLeadingSmoothness', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1512
 describe('R1512 scaleChromaticDensity', () => {
@@ -24515,7 +23615,6 @@ describe('R1512 scaleChromaticDensity', () => {
   });
 });
 
-
 // R1513
 describe('R1513 scaleSecondaryDominantStrength', () => {
   it('returns 0 for empty', () => {
@@ -24537,7 +23636,6 @@ describe('R1513 scaleSecondaryDominantStrength', () => {
   });
 });
 
-
 // R1514
 describe('R1514 scaleModalColor', () => {
   it('returns 0 for empty', () => {
@@ -24558,7 +23656,6 @@ describe('R1514 scaleModalColor', () => {
   });
 });
 
-
 // R1521
 describe('R1521 scaleRhythmicComplexity', () => {
   it('returns 0 for empty', () => {
@@ -24578,7 +23675,6 @@ describe('R1521 scaleRhythmicComplexity', () => {
   });
 });
 
-
 // R1522
 describe('R1522 scaleIntervalClustering', () => {
   it('returns 0 for empty', () => {
@@ -24595,7 +23691,6 @@ describe('R1522 scaleIntervalClustering', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1523
 describe('R1523 scalePitchClassDiversity', () => {
@@ -24617,7 +23712,6 @@ describe('R1523 scalePitchClassDiversity', () => {
   });
 });
 
-
 // R1524
 describe('R1524 scaleAxisSymmetry', () => {
   it('returns 0 for empty', () => {
@@ -24636,7 +23730,6 @@ describe('R1524 scaleAxisSymmetry', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 // R1531
 describe('R1531 scaleHarmonicDistance', () => {
@@ -24657,7 +23750,6 @@ describe('R1531 scaleHarmonicDistance', () => {
   });
 });
 
-
 // R1532
 describe('R1532 scaleEnharmonicEquivalence', () => {
   it('returns 0 for empty', () => {
@@ -24677,7 +23769,6 @@ describe('R1532 scaleEnharmonicEquivalence', () => {
   });
 });
 
-
 // R1533
 describe('R1533 scaleDiatonicAlignment', () => {
   it('returns 0 for empty', () => {
@@ -24693,7 +23784,6 @@ describe('R1533 scaleDiatonicAlignment', () => {
     expect(v).toBeLessThan(0.5);
   });
 });
-
 
 // R1534
 describe('R1534 scaleMinorSecondDensity', () => {
@@ -24714,7 +23804,6 @@ describe('R1534 scaleMinorSecondDensity', () => {
   });
 });
 
-
 describe('R1541 scaleFlatSeventhContent', () => {
   it('returns 0 for empty', () => {
     expect(scaleFlatSeventhContent([])).toBe(0);
@@ -24734,7 +23823,6 @@ describe('R1541 scaleFlatSeventhContent', () => {
   });
 });
 
-
 describe('R1542 scaleNeutralIntervalCount', () => {
   it('returns 0 for empty', () => {
     expect(scaleNeutralIntervalCount([])).toBe(0);
@@ -24751,7 +23839,6 @@ describe('R1542 scaleNeutralIntervalCount', () => {
     expect(scaleNeutralIntervalCount(pitches)).toBe(0);
   });
 });
-
 
 describe('R1543 scaleNonDiatonicDensity', () => {
   it('returns 0 for empty', () => {
@@ -24771,7 +23858,6 @@ describe('R1543 scaleNonDiatonicDensity', () => {
   });
 });
 
-
 describe('R1544 scaleSubdominantStrength', () => {
   it('returns 0 for empty', () => {
     expect(scaleSubdominantStrength([])).toBe(0);
@@ -24787,7 +23873,6 @@ describe('R1544 scaleSubdominantStrength', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1551 scaleMajorPentContent', () => {
   it('returns 0 for empty', () => {
@@ -24807,7 +23892,6 @@ describe('R1551 scaleMajorPentContent', () => {
   });
 });
 
-
 describe('R1552 scaleBlueNoteCount', () => {
   it('returns 0 for empty', () => {
     expect(scaleBlueNoteCount([])).toBe(0);
@@ -24823,7 +23907,6 @@ describe('R1552 scaleBlueNoteCount', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1553 scaleAugmentedTriadContent', () => {
   it('returns 0 for empty', () => {
@@ -24843,7 +23926,6 @@ describe('R1553 scaleAugmentedTriadContent', () => {
   });
 });
 
-
 describe('R1554 scaleDiminishedChordContent', () => {
   it('returns 0 for empty', () => {
     expect(scaleDiminishedChordContent([])).toBe(0);
@@ -24860,7 +23942,6 @@ describe('R1554 scaleDiminishedChordContent', () => {
   });
 });
 
-
 describe('R1561 scaleWholeToneAffinity', () => {
   it('returns 0 for empty', () => {
     expect(scaleWholeToneAffinity([])).toBe(0);
@@ -24876,7 +23957,6 @@ describe('R1561 scaleWholeToneAffinity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1562 scaleOctatonicAlignment', () => {
   it('returns 0 for empty', () => {
@@ -24896,7 +23976,6 @@ describe('R1562 scaleOctatonicAlignment', () => {
   });
 });
 
-
 describe('R1563 scaleHexatonicBalance', () => {
   it('returns 0 for empty', () => {
     expect(scaleHexatonicBalance([])).toBe(0);
@@ -24912,7 +23991,6 @@ describe('R1563 scaleHexatonicBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1564 scalePentatonicBalance', () => {
   it('returns 0 for empty', () => {
@@ -24934,7 +24012,6 @@ describe('R1564 scalePentatonicBalance', () => {
   });
 });
 
-
 describe('R1571 scaleAmbitusScore', () => {
   it('returns 0 for empty', () => {
     expect(scaleAmbitusScore([])).toBe(0);
@@ -24951,7 +24028,6 @@ describe('R1571 scaleAmbitusScore', () => {
   });
 });
 
-
 describe('R1572 scaleIntervalVariance', () => {
   it('returns 0 for empty', () => {
     expect(scaleIntervalVariance([])).toBe(0);
@@ -24967,7 +24043,6 @@ describe('R1572 scaleIntervalVariance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1573 scalePitchCentroid', () => {
   it('returns 0 for empty', () => {
@@ -24987,7 +24062,6 @@ describe('R1573 scalePitchCentroid', () => {
   });
 });
 
-
 describe('R1574 scaleDistributionBalance', () => {
   it('returns 0 for empty', () => {
     expect(scaleDistributionBalance([])).toBe(0);
@@ -25006,7 +24080,6 @@ describe('R1574 scaleDistributionBalance', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1581 scaleNoteOnsetDensity', () => {
   it('returns 0 for empty', () => {
@@ -25028,7 +24101,6 @@ describe('R1581 scaleNoteOnsetDensity', () => {
   });
 });
 
-
 describe('R1582 scaleRestDensity', () => {
   it('returns 1 for empty (all slots empty)', () => {
     expect(scaleRestDensity([])).toBe(1);
@@ -25047,7 +24119,6 @@ describe('R1582 scaleRestDensity', () => {
   });
 });
 
-
 describe('R1583 scaleRhythmicRegularity', () => {
   it('returns 0 for empty', () => {
     expect(scaleRhythmicRegularity([])).toBe(0);
@@ -25064,7 +24135,6 @@ describe('R1583 scaleRhythmicRegularity', () => {
   });
 });
 
-
 describe('R1584 scaleTemporalPatternScore', () => {
   it('returns 0 for empty', () => {
     expect(scaleTemporalPatternScore([])).toBe(0);
@@ -25080,7 +24150,6 @@ describe('R1584 scaleTemporalPatternScore', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1591 scaleLydianContent', () => {
   it('returns 0 for empty', () => {
@@ -25100,7 +24169,6 @@ describe('R1591 scaleLydianContent', () => {
   });
 });
 
-
 describe('R1592 scaleDoianContent', () => {
   it('returns 0 for empty', () => {
     expect(scaleDoianContent([])).toBe(0);
@@ -25118,7 +24186,6 @@ describe('R1592 scaleDoianContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1593 scalePhrygianContent', () => {
   it('returns 0 for empty', () => {
@@ -25138,7 +24205,6 @@ describe('R1593 scalePhrygianContent', () => {
   });
 });
 
-
 describe('R1594 scaleMixolydianContent', () => {
   it('returns 0 for empty', () => {
     expect(scaleMixolydianContent([])).toBe(0);
@@ -25156,7 +24222,6 @@ describe('R1594 scaleMixolydianContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1601 scaleLocrianContent', () => {
   it('returns 0 for empty', () => {
@@ -25176,7 +24241,6 @@ describe('R1601 scaleLocrianContent', () => {
   });
 });
 
-
 describe('R1602 scaleAeolianContent', () => {
   it('returns 0 for empty', () => {
     expect(scaleAeolianContent([])).toBe(0);
@@ -25195,7 +24259,6 @@ describe('R1602 scaleAeolianContent', () => {
   });
 });
 
-
 describe('R1603 scaleIonianContent', () => {
   it('returns 0 for empty', () => {
     expect(scaleIonianContent([])).toBe(0);
@@ -25213,7 +24276,6 @@ describe('R1603 scaleIonianContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('R1604 scalePhrygianDominantContent', () => {
   it('returns 0 for empty', () => {
@@ -25296,7 +24358,6 @@ describe('scaleNeapolitanMajorContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAugmentedSecondContent', () => {
   it('returns 0 for empty pitches', () => {
@@ -25421,7 +24482,6 @@ describe('scaleFlatThirteenContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleLeadingToneContent', () => {
   it('returns 0 for empty pitches', () => {
@@ -26480,7 +25540,6 @@ describe('scaleWholeToneContentV3', () => {
   });
 });
 
-
 describe('scaleSymmetryScoreV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSymmetryScoreV2([])).toBe(0);
@@ -27329,7 +26388,6 @@ describe('scaleAverageStepCents', () => {
   });
 });
 
-
 describe('scaleDiatonicSaturation', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleDiatonicSaturation([])).toBe(0);
@@ -27346,7 +26404,6 @@ describe('scaleDiatonicSaturation', () => {
   });
 });
 
-
 describe('scaleStepSizeVarianceV3', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleStepSizeVarianceV3([])).toBe(0);
@@ -27362,7 +26419,6 @@ describe('scaleStepSizeVarianceV3', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaxMinStepRatio', () => {
   it('returns 0 for empty scale', () => {
@@ -27396,7 +26452,6 @@ describe('scalePitchClassEntropyV2', () => {
   });
 });
 
-
 describe('scaleWholeToneContentV4', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleWholeToneContentV4([])).toBe(0);
@@ -27412,7 +26467,6 @@ describe('scaleWholeToneContentV4', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleDiminishedContentV2', () => {
   it('returns 0 for empty scale', () => {
@@ -27430,7 +26484,6 @@ describe('scaleDiminishedContentV2', () => {
   });
 });
 
-
 describe('scaleAugmentedContentV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleAugmentedContentV2([])).toBe(0);
@@ -27446,7 +26499,6 @@ describe('scaleAugmentedContentV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleLeadingToneStrengthV5', () => {
   it('returns 0 for empty scale', () => {
@@ -27464,7 +26516,6 @@ describe('scaleLeadingToneStrengthV5', () => {
   });
 });
 
-
 describe('scaleSubdominantPresenceV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleSubdominantPresenceV2([])).toBe(0);
@@ -27480,7 +26531,6 @@ describe('scaleSubdominantPresenceV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMediantBalance', () => {
   it('returns 0 for empty scale', () => {
@@ -27498,7 +26548,6 @@ describe('scaleMediantBalance', () => {
   });
 });
 
-
 describe('scaleDominantSeventh', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleDominantSeventh([])).toBe(0);
@@ -27514,7 +26563,6 @@ describe('scaleDominantSeventh', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNeapolitanContent', () => {
   it('returns 0 for empty scale', () => {
@@ -27532,7 +26580,6 @@ describe('scaleNeapolitanContent', () => {
   });
 });
 
-
 describe('scaleBluesTonePresence', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleBluesTonePresence([])).toBe(0);
@@ -27548,7 +26595,6 @@ describe('scaleBluesTonePresence', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTritoneSubstitution', () => {
   it('returns 0 for empty scale', () => {
@@ -27566,7 +26612,6 @@ describe('scaleTritoneSubstitution', () => {
   });
 });
 
-
 describe('scaleEnharmonicEquivalenceV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleEnharmonicEquivalenceV2([])).toBe(0);
@@ -27582,7 +26627,6 @@ describe('scaleEnharmonicEquivalenceV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleChordToneRatioV2', () => {
   it('returns 0 for empty scale', () => {
@@ -27600,7 +26644,6 @@ describe('scaleChordToneRatioV2', () => {
   });
 });
 
-
 describe('scaleTensionRatio', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleTensionRatio([])).toBe(0);
@@ -27616,7 +26659,6 @@ describe('scaleTensionRatio', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleExtendedHarmonyScore', () => {
   it('returns 0 for empty scale', () => {
@@ -27634,7 +26676,6 @@ describe('scaleExtendedHarmonyScore', () => {
   });
 });
 
-
 describe('scaleAlterationDensity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleAlterationDensity([])).toBe(0);
@@ -27650,7 +26691,6 @@ describe('scaleAlterationDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleOctatonicDensity', () => {
   it('returns 0 for empty scale', () => {
@@ -27668,7 +26708,6 @@ describe('scaleOctatonicDensity', () => {
   });
 });
 
-
 describe('scaleHexatonicDensity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleHexatonicDensity([])).toBe(0);
@@ -27684,7 +26723,6 @@ describe('scaleHexatonicDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePentatonicMinorDensity', () => {
   it('returns 0 for empty scale', () => {
@@ -27702,7 +26740,6 @@ describe('scalePentatonicMinorDensity', () => {
   });
 });
 
-
 describe('scalePentatonicMajorDensity', () => {
   it('returns 0 for empty scale', () => {
     expect(scalePentatonicMajorDensity([])).toBe(0);
@@ -27718,7 +26755,6 @@ describe('scalePentatonicMajorDensity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaqamRastContent', () => {
   it('returns 0 for empty scale', () => {
@@ -27736,7 +26772,6 @@ describe('scaleMaqamRastContent', () => {
   });
 });
 
-
 describe('scaleMaqamBayatiContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleMaqamBayatiContent([])).toBe(0);
@@ -27752,7 +26787,6 @@ describe('scaleMaqamBayatiContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaqamSabaContent', () => {
   it('returns 0 for empty scale', () => {
@@ -27770,7 +26804,6 @@ describe('scaleMaqamSabaContent', () => {
   });
 });
 
-
 describe('scaleMaqamHijazContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleMaqamHijazContent([])).toBe(0);
@@ -27786,7 +26819,6 @@ describe('scaleMaqamHijazContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMakamUssakContent', () => {
   it('returns 0 for empty scale', () => {
@@ -27804,7 +26836,6 @@ describe('scaleMakamUssakContent', () => {
   });
 });
 
-
 describe('scaleMakamHicazContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleMakamHicazContent([])).toBe(0);
@@ -27820,7 +26851,6 @@ describe('scaleMakamHicazContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMakamKurdContent', () => {
   it('returns 0 for empty scale', () => {
@@ -27838,7 +26868,6 @@ describe('scaleMakamKurdContent', () => {
   });
 });
 
-
 describe('scaleMakamNihavandContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleMakamNihavandContent([])).toBe(0);
@@ -27854,7 +26883,6 @@ describe('scaleMakamNihavandContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSlendroContent', () => {
   it('returns 0 for empty scale', () => {
@@ -27872,7 +26900,6 @@ describe('scaleSlendroContent', () => {
   });
 });
 
-
 describe('scalePelogContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scalePelogContent([])).toBe(0);
@@ -27888,7 +26915,6 @@ describe('scalePelogContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleHarmonicSeriesContentV2', () => {
   it('returns 0 for empty scale', () => {
@@ -27906,7 +26932,6 @@ describe('scaleHarmonicSeriesContentV2', () => {
   });
 });
 
-
 describe('scaleJustIntonationFidelity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleJustIntonationFidelity([])).toBe(0);
@@ -27922,7 +26947,6 @@ describe('scaleJustIntonationFidelity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleEthiopianKignitContent', () => {
   it('returns 0 for empty scale', () => {
@@ -27940,7 +26964,6 @@ describe('scaleEthiopianKignitContent', () => {
   });
 });
 
-
 describe('scaleEthiopianBatiContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleEthiopianBatiContent([])).toBe(0);
@@ -27956,7 +26979,6 @@ describe('scaleEthiopianBatiContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMeantoneAffinity', () => {
   it('returns 0 for empty scale', () => {
@@ -27974,7 +26996,6 @@ describe('scaleMeantoneAffinity', () => {
   });
 });
 
-
 describe('scaleWellTemperamentAffinity', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleWellTemperamentAffinity([])).toBe(0);
@@ -27990,7 +27011,6 @@ describe('scaleWellTemperamentAffinity', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleChineseGongContent', () => {
   it('returns 0 for empty scale', () => {
@@ -28008,7 +27028,6 @@ describe('scaleChineseGongContent', () => {
   });
 });
 
-
 describe('scaleInSenContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleInSenContent([])).toBe(0);
@@ -28024,7 +27043,6 @@ describe('scaleInSenContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleHirajoshiContent', () => {
   it('returns 0 for empty scale', () => {
@@ -28042,7 +27060,6 @@ describe('scaleHirajoshiContent', () => {
   });
 });
 
-
 describe('scaleYoNaContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleYoNaContent([])).toBe(0);
@@ -28058,7 +27075,6 @@ describe('scaleYoNaContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleIntervalSpectralBalance', () => {
   it('returns 0 for empty scale', () => {
@@ -28076,7 +27092,6 @@ describe('scaleIntervalSpectralBalance', () => {
   });
 });
 
-
 describe('scaleLowRegisterDensityV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleLowRegisterDensityV2([])).toBe(0);
@@ -28092,7 +27107,6 @@ describe('scaleLowRegisterDensityV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMidRegisterDensityV2', () => {
   it('returns 0 for empty scale', () => {
@@ -28110,7 +27124,6 @@ describe('scaleMidRegisterDensityV2', () => {
   });
 });
 
-
 describe('scaleHighRegisterDensityV2', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleHighRegisterDensityV2([])).toBe(0);
@@ -28126,7 +27139,6 @@ describe('scaleHighRegisterDensityV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAfricanPentatonicContentV2', () => {
   it('returns 0 for empty scale', () => {
@@ -28144,7 +27156,6 @@ describe('scaleAfricanPentatonicContentV2', () => {
   });
 });
 
-
 describe('scaleYorubaContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleYorubaContent([])).toBe(0);
@@ -28160,7 +27171,6 @@ describe('scaleYorubaContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAkanContent', () => {
   it('returns 0 for empty scale', () => {
@@ -28178,7 +27188,6 @@ describe('scaleAkanContent', () => {
   });
 });
 
-
 describe('scaleZuluContent', () => {
   it('returns 0 for empty scale', () => {
     expect(scaleZuluContent([])).toBe(0);
@@ -28194,7 +27203,6 @@ describe('scaleZuluContent', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaqamHijaz', () => {
   it('returns 0 for empty pitches', () => {
@@ -28212,7 +27220,6 @@ describe('scaleMaqamHijaz', () => {
   });
 });
 
-
 describe('scaleMaqamBayati', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMaqamBayati([])).toBe(0);
@@ -28228,7 +27235,6 @@ describe('scaleMaqamBayati', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaqamRast', () => {
   it('returns 0 for empty pitches', () => {
@@ -28246,7 +27252,6 @@ describe('scaleMaqamRast', () => {
   });
 });
 
-
 describe('scaleMaqamSaba', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMaqamSaba([])).toBe(0);
@@ -28262,7 +27267,6 @@ describe('scaleMaqamSaba', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleRagaBhairavV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -28280,7 +27284,6 @@ describe('scaleRagaBhairavV2', () => {
   });
 });
 
-
 describe('scaleRagaYaman', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleRagaYaman([])).toBe(0);
@@ -28296,7 +27299,6 @@ describe('scaleRagaYaman', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleRagaBhairaviV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -28314,7 +27316,6 @@ describe('scaleRagaBhairaviV2', () => {
   });
 });
 
-
 describe('scaleRagaKafi', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleRagaKafi([])).toBe(0);
@@ -28330,7 +27331,6 @@ describe('scaleRagaKafi', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleHungarianMinor', () => {
   it('returns 0 for empty pitches', () => {
@@ -28348,7 +27348,6 @@ describe('scaleHungarianMinor', () => {
   });
 });
 
-
 describe('scaleBulgarianRhythmicScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBulgarianRhythmicScale([])).toBe(0);
@@ -28364,7 +27363,6 @@ describe('scaleBulgarianRhythmicScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleRomanianMinor', () => {
   it('returns 0 for empty pitches', () => {
@@ -28382,7 +27380,6 @@ describe('scaleRomanianMinor', () => {
   });
 });
 
-
 describe('scaleZigeunerScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleZigeunerScale([])).toBe(0);
@@ -28398,7 +27395,6 @@ describe('scaleZigeunerScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBebopDominant', () => {
   it('returns 0 for empty pitches', () => {
@@ -28416,7 +27412,6 @@ describe('scaleBebopDominant', () => {
   });
 });
 
-
 describe('scaleAlteredScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAlteredScale([])).toBe(0);
@@ -28432,7 +27427,6 @@ describe('scaleAlteredScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleLydianDominant', () => {
   it('returns 0 for empty pitches', () => {
@@ -28450,7 +27444,6 @@ describe('scaleLydianDominant', () => {
   });
 });
 
-
 describe('scaleHalfWholeDiminished', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleHalfWholeDiminished([])).toBe(0);
@@ -28466,7 +27459,6 @@ describe('scaleHalfWholeDiminished', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePhrygianDominant', () => {
   it('returns 0 for empty pitches', () => {
@@ -28484,7 +27476,6 @@ describe('scalePhrygianDominant', () => {
   });
 });
 
-
 describe('scaleAndalusianCadence', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAndalusianCadence([])).toBe(0);
@@ -28500,7 +27491,6 @@ describe('scaleAndalusianCadence', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSpanishGypsy', () => {
   it('returns 0 for empty pitches', () => {
@@ -28518,7 +27508,6 @@ describe('scaleSpanishGypsy', () => {
   });
 });
 
-
 describe('scaleFlamencoScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleFlamencoScale([])).toBe(0);
@@ -28534,7 +27523,6 @@ describe('scaleFlamencoScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaoriPentatonic', () => {
   it('returns 0 for empty pitches', () => {
@@ -28552,7 +27540,6 @@ describe('scaleMaoriPentatonic', () => {
   });
 });
 
-
 describe('scaleHawaiianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleHawaiianScale([])).toBe(0);
@@ -28568,7 +27555,6 @@ describe('scaleHawaiianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAboriginalPentatonic', () => {
   it('returns 0 for empty pitches', () => {
@@ -28586,7 +27572,6 @@ describe('scaleAboriginalPentatonic', () => {
   });
 });
 
-
 describe('scaleMelanesianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMelanesianScale([])).toBe(0);
@@ -28602,7 +27587,6 @@ describe('scaleMelanesianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCubanMontuno', () => {
   it('returns 0 for empty pitches', () => {
@@ -28622,7 +27606,6 @@ describe('scaleCubanMontuno', () => {
   });
 });
 
-
 describe('scaleAndeanPentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAndeanPentatonic([])).toBe(0);
@@ -28640,7 +27623,6 @@ describe('scaleAndeanPentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSambaBaiao', () => {
   it('returns 0 for empty pitches', () => {
@@ -28660,7 +27642,6 @@ describe('scaleSambaBaiao', () => {
   });
 });
 
-
 describe('scaleTangoScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTangoScale([])).toBe(0);
@@ -28678,7 +27659,6 @@ describe('scaleTangoScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleJavaneseSlendro', () => {
   it('returns 0 for empty pitches', () => {
@@ -28698,7 +27678,6 @@ describe('scaleJavaneseSlendro', () => {
   });
 });
 
-
 describe('scaleBaliPelog', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBaliPelog([])).toBe(0);
@@ -28716,7 +27695,6 @@ describe('scaleBaliPelog', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleThai7Tone', () => {
   it('returns 0 for empty pitches', () => {
@@ -28736,7 +27714,6 @@ describe('scaleThai7Tone', () => {
   });
 });
 
-
 describe('scaleBurmeseHeptatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBurmeseHeptatonic([])).toBe(0);
@@ -28754,7 +27731,6 @@ describe('scaleBurmeseHeptatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaqamRastV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -28774,7 +27750,6 @@ describe('scaleMaqamRastV2', () => {
   });
 });
 
-
 describe('scaleMaqamHijazV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMaqamHijazV2([])).toBe(0);
@@ -28792,7 +27767,6 @@ describe('scaleMaqamHijazV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePersianDastgah', () => {
   it('returns 0 for empty pitches', () => {
@@ -28812,7 +27786,6 @@ describe('scalePersianDastgah', () => {
   });
 });
 
-
 describe('scaleArabicMaqamSaba', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleArabicMaqamSaba([])).toBe(0);
@@ -28830,7 +27803,6 @@ describe('scaleArabicMaqamSaba', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleEthiopianKignit', () => {
   it('returns 0 for empty pitches', () => {
@@ -28850,7 +27822,6 @@ describe('scaleEthiopianKignit', () => {
   });
 });
 
-
 describe('scaleWestAfricanPentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleWestAfricanPentatonic([])).toBe(0);
@@ -28868,7 +27839,6 @@ describe('scaleWestAfricanPentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNorthAfricanRasd', () => {
   it('returns 0 for empty pitches', () => {
@@ -28888,7 +27858,6 @@ describe('scaleNorthAfricanRasd', () => {
   });
 });
 
-
 describe('scaleZuluScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleZuluScale([])).toBe(0);
@@ -28906,7 +27875,6 @@ describe('scaleZuluScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleUzbekShashmakom', () => {
   it('returns 0 for empty pitches', () => {
@@ -28926,7 +27894,6 @@ describe('scaleUzbekShashmakom', () => {
   });
 });
 
-
 describe('scaleMongolianPentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMongolianPentatonic([])).toBe(0);
@@ -28944,7 +27911,6 @@ describe('scaleMongolianPentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTibetanRitual', () => {
   it('returns 0 for empty pitches', () => {
@@ -28964,7 +27930,6 @@ describe('scaleTibetanRitual', () => {
   });
 });
 
-
 describe('scaleKazakhDombra', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleKazakhDombra([])).toBe(0);
@@ -28982,7 +27947,6 @@ describe('scaleKazakhDombra', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNordicGammalDans', () => {
   it('returns 0 for empty pitches', () => {
@@ -29002,7 +27966,6 @@ describe('scaleNordicGammalDans', () => {
   });
 });
 
-
 describe('scaleFinnishRuno', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleFinnishRuno([])).toBe(0);
@@ -29020,7 +27983,6 @@ describe('scaleFinnishRuno', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSwedishHardingfele', () => {
   it('returns 0 for empty pitches', () => {
@@ -29040,7 +28002,6 @@ describe('scaleSwedishHardingfele', () => {
   });
 });
 
-
 describe('scaleIcelandicTvisongur', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleIcelandicTvisongur([])).toBe(0);
@@ -29058,7 +28019,6 @@ describe('scaleIcelandicTvisongur', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePolishMazurka', () => {
   it('returns 0 for empty pitches', () => {
@@ -29078,7 +28038,6 @@ describe('scalePolishMazurka', () => {
   });
 });
 
-
 describe('scaleCzechLidova', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleCzechLidova([])).toBe(0);
@@ -29096,7 +28055,6 @@ describe('scaleCzechLidova', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleUkrainianDorian', () => {
   it('returns 0 for empty pitches', () => {
@@ -29116,7 +28074,6 @@ describe('scaleUkrainianDorian', () => {
   });
 });
 
-
 describe('scaleSerbianKolo', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSerbianKolo([])).toBe(0);
@@ -29134,7 +28091,6 @@ describe('scaleSerbianKolo', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleQuechuaPentatonic', () => {
   it('returns 0 for empty pitches', () => {
@@ -29154,7 +28110,6 @@ describe('scaleQuechuaPentatonic', () => {
   });
 });
 
-
 describe('scaleAymaraScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAymaraScale([])).toBe(0);
@@ -29172,7 +28127,6 @@ describe('scaleAymaraScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGuaraniPentatonic', () => {
   it('returns 0 for empty pitches', () => {
@@ -29192,7 +28146,6 @@ describe('scaleGuaraniPentatonic', () => {
   });
 });
 
-
 describe('scaleTupiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTupiScale([])).toBe(0);
@@ -29210,7 +28163,6 @@ describe('scaleTupiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleRagaTodiV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -29230,7 +28182,6 @@ describe('scaleRagaTodiV2', () => {
   });
 });
 
-
 describe('scaleRagaPurviV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleRagaPurviV2([])).toBe(0);
@@ -29248,7 +28199,6 @@ describe('scaleRagaPurviV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleRagaMarwaV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -29268,7 +28218,6 @@ describe('scaleRagaMarwaV2', () => {
   });
 });
 
-
 describe('scaleRagaLalita', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleRagaLalita([])).toBe(0);
@@ -29286,7 +28235,6 @@ describe('scaleRagaLalita', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleYorubaScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29306,7 +28254,6 @@ describe('scaleYorubaScale', () => {
   });
 });
 
-
 describe('scaleGhanaPentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGhanaPentatonic([])).toBe(0);
@@ -29324,7 +28271,6 @@ describe('scaleGhanaPentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaliKora', () => {
   it('returns 0 for empty pitches', () => {
@@ -29344,7 +28290,6 @@ describe('scaleMaliKora', () => {
   });
 });
 
-
 describe('scaleGriotScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGriotScale([])).toBe(0);
@@ -29362,7 +28307,6 @@ describe('scaleGriotScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCalypsoScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29382,7 +28326,6 @@ describe('scaleCalypsoScale', () => {
   });
 });
 
-
 describe('scaleReggaePentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleReggaePentatonic([])).toBe(0);
@@ -29400,7 +28343,6 @@ describe('scaleReggaePentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleZoukScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29420,7 +28362,6 @@ describe('scaleZoukScale', () => {
   });
 });
 
-
 describe('scaleMerengueScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMerengueScale([])).toBe(0);
@@ -29438,7 +28379,6 @@ describe('scaleMerengueScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNavajoNightChant', () => {
   it('returns 0 for empty pitches', () => {
@@ -29458,7 +28398,6 @@ describe('scaleNavajoNightChant', () => {
   });
 });
 
-
 describe('scaleLakotaPentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLakotaPentatonic([])).toBe(0);
@@ -29476,7 +28415,6 @@ describe('scaleLakotaPentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleHaidaScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29496,7 +28434,6 @@ describe('scaleHaidaScale', () => {
   });
 });
 
-
 describe('scaleCherokeePentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleCherokeePentatonic([])).toBe(0);
@@ -29514,7 +28451,6 @@ describe('scaleCherokeePentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSomaliPentatonic', () => {
   it('returns 0 for empty pitches', () => {
@@ -29534,7 +28470,6 @@ describe('scaleSomaliPentatonic', () => {
   });
 });
 
-
 describe('scaleKenyanBenga', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleKenyanBenga([])).toBe(0);
@@ -29552,7 +28487,6 @@ describe('scaleKenyanBenga', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMasaiScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29572,7 +28506,6 @@ describe('scaleMasaiScale', () => {
   });
 });
 
-
 describe('scaleMalagasyScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMalagasyScale([])).toBe(0);
@@ -29590,7 +28523,6 @@ describe('scaleMalagasyScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleItalianTarantella', () => {
   it('returns 0 for empty pitches', () => {
@@ -29610,7 +28542,6 @@ describe('scaleItalianTarantella', () => {
   });
 });
 
-
 describe('scaleGreekRembetiko', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGreekRembetiko([])).toBe(0);
@@ -29628,7 +28559,6 @@ describe('scaleGreekRembetiko', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePortugueseFado', () => {
   it('returns 0 for empty pitches', () => {
@@ -29648,7 +28578,6 @@ describe('scalePortugueseFado', () => {
   });
 });
 
-
 describe('scaleCroatianTamburica', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleCroatianTamburica([])).toBe(0);
@@ -29666,7 +28595,6 @@ describe('scaleCroatianTamburica', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBulgarianAsymmetric', () => {
   it('returns 0 for empty pitches', () => {
@@ -29686,7 +28614,6 @@ describe('scaleBulgarianAsymmetric', () => {
   });
 });
 
-
 describe('scaleAlbanianIso', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAlbanianIso([])).toBe(0);
@@ -29704,7 +28631,6 @@ describe('scaleAlbanianIso', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMacedonianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29724,7 +28650,6 @@ describe('scaleMacedonianScale', () => {
   });
 });
 
-
 describe('scaleBosnianSevdah', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBosnianSevdah([])).toBe(0);
@@ -29742,7 +28667,6 @@ describe('scaleBosnianSevdah', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSamoanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29762,7 +28686,6 @@ describe('scaleSamoanScale', () => {
   });
 });
 
-
 describe('scaleFijianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleFijianScale([])).toBe(0);
@@ -29780,7 +28703,6 @@ describe('scaleFijianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTonganScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29800,7 +28722,6 @@ describe('scaleTonganScale', () => {
   });
 });
 
-
 describe('scalePapuaNewGuinea', () => {
   it('returns 0 for empty pitches', () => {
     expect(scalePapuaNewGuinea([])).toBe(0);
@@ -29818,7 +28739,6 @@ describe('scalePapuaNewGuinea', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMayanPentatonic', () => {
   it('returns 0 for empty pitches', () => {
@@ -29838,7 +28758,6 @@ describe('scaleMayanPentatonic', () => {
   });
 });
 
-
 describe('scaleAztecScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAztecScale([])).toBe(0);
@@ -29856,7 +28775,6 @@ describe('scaleAztecScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGarifulaScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -29876,7 +28794,6 @@ describe('scaleGarifulaScale', () => {
   });
 });
 
-
 describe('scaleZapotecScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleZapotecScale([])).toBe(0);
@@ -29895,412 +28812,915 @@ describe('scaleZapotecScale', () => {
   });
 });
 
-
 // Round252 西アフリカ音階
 describe('scalePygmyScale', () => {
-  it('empty returns 0', () => { expect(scalePygmyScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scalePygmyScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scalePygmyScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scalePygmyScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scalePygmyScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scalePygmyScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleAkanScale', () => {
-  it('empty returns 0', () => { expect(scaleAkanScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleAkanScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleAkanScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleAkanScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleAkanScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleAkanScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleEweScale', () => {
-  it('empty returns 0', () => { expect(scaleEweScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleEweScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleEweScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleEweScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleEweScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleEweScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleYorubaScaleV2', () => {
-  it('empty returns 0', () => { expect(scaleYorubaScaleV2([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleYorubaScaleV2([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleYorubaScaleV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleYorubaScaleV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round253 北欧音階
 describe('scaleSwedishHerdingScale', () => {
-  it('empty returns 0', () => { expect(scaleSwedishHerdingScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleSwedishHerdingScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleSwedishHerdingScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleSwedishHerdingScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleSwedishHerdingScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleSwedishHerdingScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleNorwegianSlattScale', () => {
-  it('empty returns 0', () => { expect(scaleNorwegianSlattScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleNorwegianSlattScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleNorwegianSlattScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleNorwegianSlattScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleNorwegianSlattScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleNorwegianSlattScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleFinnishKanteliScale', () => {
-  it('empty returns 0', () => { expect(scaleFinnishKanteliScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleFinnishKanteliScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleFinnishKanteliScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleFinnishKanteliScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleFinnishKanteliScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleFinnishKanteliScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleSamiJoikScale', () => {
-  it('empty returns 0', () => { expect(scaleSamiJoikScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleSamiJoikScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleSamiJoikScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleSamiJoikScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleSamiJoikScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleSamiJoikScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round254 東アフリカ音階
 describe('scaleEthiopianTizitaScale', () => {
-  it('empty returns 0', () => { expect(scaleEthiopianTizitaScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleEthiopianTizitaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleEthiopianTizitaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleEthiopianTizitaScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleEthiopianTizitaScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleEthiopianTizitaScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleKenyaBengaScale', () => {
-  it('empty returns 0', () => { expect(scaleKenyaBengaScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleKenyaBengaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleKenyaBengaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleKenyaBengaScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleKenyaBengaScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleKenyaBengaScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleMalagasyScaleV2', () => {
-  it('empty returns 0', () => { expect(scaleMalagasyScaleV2([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleMalagasyScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleMalagasyScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleMalagasyScaleV2([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleMalagasyScaleV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleMalagasyScaleV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleUgandanPentatonicScale', () => {
-  it('empty returns 0', () => { expect(scaleUgandanPentatonicScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleUgandanPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleUgandanPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleUgandanPentatonicScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleUgandanPentatonicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleUgandanPentatonicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round255 中央アジア音階
 describe('scaleKazakhPentatonicScale', () => {
-  it('empty returns 0', () => { expect(scaleKazakhPentatonicScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleKazakhPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleKazakhPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleKazakhPentatonicScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleKazakhPentatonicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleKazakhPentatonicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleUzbekScale', () => {
-  it('empty returns 0', () => { expect(scaleUzbekScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleUzbekScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleUzbekScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleUzbekScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleUzbekScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleUzbekScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleTajikScale', () => {
-  it('empty returns 0', () => { expect(scaleTajikScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleTajikScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleTajikScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleTajikScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleTajikScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleTajikScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleTurkmenScale', () => {
-  it('empty returns 0', () => { expect(scaleTurkmenScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleTurkmenScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleTurkmenScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleTurkmenScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleTurkmenScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleTurkmenScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round256 東南アジア音階
 describe('scaleThaiPentScale', () => {
-  it('empty returns 0', () => { expect(scaleThaiPentScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleThaiPentScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleThaiPentScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleThaiPentScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleThaiPentScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleThaiPentScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleKhmerScale', () => {
-  it('empty returns 0', () => { expect(scaleKhmerScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleKhmerScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleKhmerScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleKhmerScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleKhmerScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleKhmerScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleJavaneseSlendroV2', () => {
-  it('empty returns 0', () => { expect(scaleJavaneseSlendroV2([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleJavaneseSlendroV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleJavaneseSlendroV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleJavaneseSlendroV2([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleJavaneseSlendroV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleJavaneseSlendroV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleBurmeseHeptatonicV2', () => {
-  it('empty returns 0', () => { expect(scaleBurmeseHeptatonicV2([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleBurmeseHeptatonicV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleBurmeseHeptatonicV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleBurmeseHeptatonicV2([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleBurmeseHeptatonicV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleBurmeseHeptatonicV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round257 南アメリカ音階
 describe('scaleAndesQuechuaScale', () => {
-  it('empty returns 0', () => { expect(scaleAndesQuechuaScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleAndesQuechuaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleAndesQuechuaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleAndesQuechuaScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleAndesQuechuaScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleAndesQuechuaScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleAmazonianScale', () => {
-  it('empty returns 0', () => { expect(scaleAmazonianScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleAmazonianScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleAmazonianScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleAmazonianScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleAmazonianScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleAmazonianScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleGuaraniScale', () => {
-  it('empty returns 0', () => { expect(scaleGuaraniScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleGuaraniScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleGuaraniScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleGuaraniScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleGuaraniScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleGuaraniScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleAymaraScaleV2', () => {
-  it('empty returns 0', () => { expect(scaleAymaraScaleV2([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleAymaraScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleAymaraScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleAymaraScaleV2([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleAymaraScaleV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleAymaraScaleV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round258 カリブ海音階
 describe('scaleCubanSonScale', () => {
-  it('empty returns 0', () => { expect(scaleCubanSonScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleCubanSonScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleCubanSonScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleCubanSonScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleCubanSonScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleCubanSonScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleCalypsoScaleV2', () => {
-  it('empty returns 0', () => { expect(scaleCalypsoScaleV2([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleCalypsoScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleCalypsoScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleCalypsoScaleV2([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleCalypsoScaleV2(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleCalypsoScaleV2(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleHaitianMerengueScale', () => {
-  it('empty returns 0', () => { expect(scaleHaitianMerengueScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleHaitianMerengueScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleHaitianMerengueScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleHaitianMerengueScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleHaitianMerengueScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleHaitianMerengueScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleJamaicanMentoScale', () => {
-  it('empty returns 0', () => { expect(scaleJamaicanMentoScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleJamaicanMentoScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleJamaicanMentoScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleJamaicanMentoScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleJamaicanMentoScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleJamaicanMentoScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round259 中東音階
 describe('scaleMaqamSabaScale', () => {
-  it('empty returns 0', () => { expect(scaleMaqamSabaScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleMaqamSabaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleMaqamSabaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleMaqamSabaScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleMaqamSabaScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleMaqamSabaScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleMaqamNahawandScale', () => {
-  it('empty returns 0', () => { expect(scaleMaqamNahawandScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleMaqamNahawandScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleMaqamNahawandScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleMaqamNahawandScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleMaqamNahawandScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleMaqamNahawandScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleMaqamKurdScale', () => {
-  it('empty returns 0', () => { expect(scaleMaqamKurdScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleMaqamKurdScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleMaqamKurdScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleMaqamKurdScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleMaqamKurdScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleMaqamKurdScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleMaqamAjamScale', () => {
-  it('empty returns 0', () => { expect(scaleMaqamAjamScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleMaqamAjamScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleMaqamAjamScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleMaqamAjamScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleMaqamAjamScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleMaqamAjamScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round260 オセアニア先住民音階
 describe('scaleAboriginalPentatonicScale', () => {
-  it('empty returns 0', () => { expect(scaleAboriginalPentatonicScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleAboriginalPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleAboriginalPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleAboriginalPentatonicScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleAboriginalPentatonicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleAboriginalPentatonicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleMaoriScale', () => {
-  it('empty returns 0', () => { expect(scaleMaoriScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleMaoriScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleMaoriScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleMaoriScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleMaoriScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleMaoriScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleVanuatuScale', () => {
-  it('empty returns 0', () => { expect(scaleVanuatuScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleVanuatuScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleVanuatuScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleVanuatuScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleVanuatuScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleVanuatuScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleSolomonIslandsScale', () => {
-  it('empty returns 0', () => { expect(scaleSolomonIslandsScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleSolomonIslandsScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleSolomonIslandsScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleSolomonIslandsScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleSolomonIslandsScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleSolomonIslandsScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round261 北アフリカ音階
 describe('scaleBerberPentatonicScale', () => {
-  it('empty returns 0', () => { expect(scaleBerberPentatonicScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleBerberPentatonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleBerberPentatonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleBerberPentatonicScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleBerberPentatonicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleBerberPentatonicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleNubianScale', () => {
-  it('empty returns 0', () => { expect(scaleNubianScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleNubianScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleNubianScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleNubianScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleNubianScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleNubianScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleGnawaMusicScale', () => {
-  it('empty returns 0', () => { expect(scaleGnawaMusicScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleGnawaMusicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleGnawaMusicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleGnawaMusicScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleGnawaMusicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleGnawaMusicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleTuaregScale', () => {
-  it('empty returns 0', () => { expect(scaleTuaregScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleTuaregScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleTuaregScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleTuaregScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleTuaregScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleTuaregScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round262 中国地方音階
 describe('scaleGuangdongMusicScale', () => {
-  it('empty returns 0', () => { expect(scaleGuangdongMusicScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleGuangdongMusicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleGuangdongMusicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleGuangdongMusicScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleGuangdongMusicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleGuangdongMusicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleSichuanOperaScale', () => {
-  it('empty returns 0', () => { expect(scaleSichuanOperaScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleSichuanOperaScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleSichuanOperaScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleSichuanOperaScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleSichuanOperaScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleSichuanOperaScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleShanshuiGuqinScale', () => {
-  it('empty returns 0', () => { expect(scaleShanshuiGuqinScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleShanshuiGuqinScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleShanshuiGuqinScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleShanshuiGuqinScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleShanshuiGuqinScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleShanshuiGuqinScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleYunnanMinorityScale', () => {
-  it('empty returns 0', () => { expect(scaleYunnanMinorityScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleYunnanMinorityScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleYunnanMinorityScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleYunnanMinorityScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleYunnanMinorityScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleYunnanMinorityScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round263 インド古典音階
 describe('scaleRagaBhairavScale', () => {
-  it('empty returns 0', () => { expect(scaleRagaBhairavScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleRagaBhairavScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleRagaBhairavScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleRagaBhairavScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleRagaBhairavScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleRagaBhairavScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleRagaYamanScale', () => {
-  it('empty returns 0', () => { expect(scaleRagaYamanScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleRagaYamanScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleRagaYamanScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleRagaYamanScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleRagaYamanScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleRagaYamanScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleRagaDeshScale', () => {
-  it('empty returns 0', () => { expect(scaleRagaDeshScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleRagaDeshScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleRagaDeshScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleRagaDeshScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleRagaDeshScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleRagaDeshScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleRagaKafiScale', () => {
-  it('empty returns 0', () => { expect(scaleRagaKafiScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleRagaKafiScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleRagaKafiScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleRagaKafiScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleRagaKafiScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleRagaKafiScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round264 コーカサス音階
 describe('scaleGeorgianPolyphonicScale', () => {
-  it('empty returns 0', () => { expect(scaleGeorgianPolyphonicScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleGeorgianPolyphonicScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleGeorgianPolyphonicScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleGeorgianPolyphonicScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleGeorgianPolyphonicScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleGeorgianPolyphonicScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleArmenianDudukScale', () => {
-  it('empty returns 0', () => { expect(scaleArmenianDudukScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleArmenianDudukScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleArmenianDudukScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleArmenianDudukScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleArmenianDudukScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleArmenianDudukScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleAzerbaijaniMughamScale', () => {
-  it('empty returns 0', () => { expect(scaleAzerbaijaniMughamScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleAzerbaijaniMughamScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleAzerbaijaniMughamScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleAzerbaijaniMughamScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleAzerbaijaniMughamScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleAzerbaijaniMughamScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleChechenLezgiScale', () => {
-  it('empty returns 0', () => { expect(scaleChechenLezgiScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleChechenLezgiScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleChechenLezgiScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleChechenLezgiScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleChechenLezgiScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleChechenLezgiScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 // Round265 東欧音階
 describe('scaleRomanianDorian', () => {
-  it('empty returns 0', () => { expect(scaleRomanianDorian([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleRomanianDorian(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleRomanianDorian(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleRomanianDorian([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleRomanianDorian(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleRomanianDorian(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleHungarianMinorScale', () => {
-  it('empty returns 0', () => { expect(scaleHungarianMinorScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleHungarianMinorScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleHungarianMinorScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleHungarianMinorScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleHungarianMinorScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleHungarianMinorScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scalePolishHighlandScale', () => {
-  it('empty returns 0', () => { expect(scalePolishHighlandScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scalePolishHighlandScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scalePolishHighlandScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scalePolishHighlandScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scalePolishHighlandScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scalePolishHighlandScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleUkrainianDorianScale', () => {
-  it('empty returns 0', () => { expect(scaleUkrainianDorianScale([])).toBe(0); });
-  it('12-EDO in [0,1]', () => { const v = scaleUkrainianDorianScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
-  it('19-EDO in [0,1]', () => { const v = scaleUkrainianDorianScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+  it('empty returns 0', () => {
+    expect(scaleUkrainianDorianScale([])).toBe(0);
+  });
+  it('12-EDO in [0,1]', () => {
+    const v = scaleUkrainianDorianScale(edo(12, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
+  it('19-EDO in [0,1]', () => {
+    const v = scaleUkrainianDorianScale(edo(19, 440).degrees);
+    expect(v).toBeGreaterThanOrEqual(0);
+    expect(v).toBeLessThanOrEqual(1);
+  });
 });
-
 
 describe('scaleFlamencoScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -30320,7 +29740,6 @@ describe('scaleFlamencoScaleV2', () => {
   });
 });
 
-
 describe('scalePortugueseFadoScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scalePortugueseFadoScale([])).toBe(0);
@@ -30338,7 +29757,6 @@ describe('scalePortugueseFadoScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCatalanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30358,7 +29776,6 @@ describe('scaleCatalanScale', () => {
   });
 });
 
-
 describe('scaleGalicianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGalicianScale([])).toBe(0);
@@ -30376,7 +29793,6 @@ describe('scaleGalicianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleEthiopianAnchihoye', () => {
   it('returns 0 for empty pitches', () => {
@@ -30396,7 +29812,6 @@ describe('scaleEthiopianAnchihoye', () => {
   });
 });
 
-
 describe('scaleEritreanPentatonic', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleEritreanPentatonic([])).toBe(0);
@@ -30414,7 +29829,6 @@ describe('scaleEritreanPentatonic', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSomaliModal', () => {
   it('returns 0 for empty pitches', () => {
@@ -30434,7 +29848,6 @@ describe('scaleSomaliModal', () => {
   });
 });
 
-
 describe('scaleDjiboutianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleDjiboutianScale([])).toBe(0);
@@ -30452,7 +29865,6 @@ describe('scaleDjiboutianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleKazakhSteppeScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30472,7 +29884,6 @@ describe('scaleKazakhSteppeScale', () => {
   });
 });
 
-
 describe('scaleUzbekDotar', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleUzbekDotar([])).toBe(0);
@@ -30490,7 +29901,6 @@ describe('scaleUzbekDotar', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTajikFalak', () => {
   it('returns 0 for empty pitches', () => {
@@ -30510,7 +29920,6 @@ describe('scaleTajikFalak', () => {
   });
 });
 
-
 describe('scaleKyrgyzScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleKyrgyzScale([])).toBe(0);
@@ -30528,7 +29937,6 @@ describe('scaleKyrgyzScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAndeseanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30548,7 +29956,6 @@ describe('scaleAndeseanScale', () => {
   });
 });
 
-
 describe('scaleChileanCueca', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleChileanCueca([])).toBe(0);
@@ -30566,7 +29973,6 @@ describe('scaleChileanCueca', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleArgentineZamba', () => {
   it('returns 0 for empty pitches', () => {
@@ -30586,7 +29992,6 @@ describe('scaleArgentineZamba', () => {
   });
 });
 
-
 describe('scaleBolivianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBolivianScale([])).toBe(0);
@@ -30604,7 +30009,6 @@ describe('scaleBolivianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNorwegianFolkScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30624,7 +30028,6 @@ describe('scaleNorwegianFolkScale', () => {
   });
 });
 
-
 describe('scaleSwedishPolskaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSwedishPolskaScale([])).toBe(0);
@@ -30642,7 +30045,6 @@ describe('scaleSwedishPolskaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleFinnishRunoV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -30662,7 +30064,6 @@ describe('scaleFinnishRunoV2', () => {
   });
 });
 
-
 describe('scaleDanishScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleDanishScale([])).toBe(0);
@@ -30680,7 +30081,6 @@ describe('scaleDanishScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGhanaianHighlife', () => {
   it('returns 0 for empty pitches', () => {
@@ -30700,7 +30100,6 @@ describe('scaleGhanaianHighlife', () => {
   });
 });
 
-
 describe('scaleWolofScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleWolofScale([])).toBe(0);
@@ -30718,7 +30117,6 @@ describe('scaleWolofScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMandinkaScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30738,7 +30136,6 @@ describe('scaleMandinkaScale', () => {
   });
 });
 
-
 describe('scaleHausaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleHausaScale([])).toBe(0);
@@ -30756,7 +30153,6 @@ describe('scaleHausaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleArabicMaqamRast', () => {
   it('returns 0 for empty pitches', () => {
@@ -30776,7 +30172,6 @@ describe('scaleArabicMaqamRast', () => {
   });
 });
 
-
 describe('scaleTurkishMakamHicaz', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTurkishMakamHicaz([])).toBe(0);
@@ -30794,7 +30189,6 @@ describe('scaleTurkishMakamHicaz', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleIranianShur', () => {
   it('returns 0 for empty pitches', () => {
@@ -30814,7 +30208,6 @@ describe('scaleIranianShur', () => {
   });
 });
 
-
 describe('scaleLebaneseMaqam', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLebaneseMaqam([])).toBe(0);
@@ -30832,7 +30225,6 @@ describe('scaleLebaneseMaqam', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBengaliScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30852,7 +30244,6 @@ describe('scaleBengaliScale', () => {
   });
 });
 
-
 describe('scalePunjabiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scalePunjabiScale([])).toBe(0);
@@ -30870,7 +30261,6 @@ describe('scalePunjabiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleRajasthaniScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30890,7 +30280,6 @@ describe('scaleRajasthaniScale', () => {
   });
 });
 
-
 describe('scaleSriLankaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSriLankaScale([])).toBe(0);
@@ -30908,7 +30297,6 @@ describe('scaleSriLankaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePuertoRicanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30928,7 +30316,6 @@ describe('scalePuertoRicanScale', () => {
   });
 });
 
-
 describe('scaleJamaicanReggaeScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleJamaicanReggaeScale([])).toBe(0);
@@ -30946,7 +30333,6 @@ describe('scaleJamaicanReggaeScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTrinidadianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -30966,7 +30352,6 @@ describe('scaleTrinidadianScale', () => {
   });
 });
 
-
 describe('scaleBarbadianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBarbadianScale([])).toBe(0);
@@ -30984,7 +30369,6 @@ describe('scaleBarbadianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleVietnameseScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31004,7 +30388,6 @@ describe('scaleVietnameseScale', () => {
   });
 });
 
-
 describe('scaleFilipinoCulintang', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleFilipinoCulintang([])).toBe(0);
@@ -31022,7 +30405,6 @@ describe('scaleFilipinoCulintang', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMalaysianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31042,7 +30424,6 @@ describe('scaleMalaysianScale', () => {
   });
 });
 
-
 describe('scaleCambodianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleCambodianScale([])).toBe(0);
@@ -31060,7 +30441,6 @@ describe('scaleCambodianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaoriScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -31080,7 +30460,6 @@ describe('scaleMaoriScaleV2', () => {
   });
 });
 
-
 describe('scalePolynesianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scalePolynesianScale([])).toBe(0);
@@ -31098,7 +30477,6 @@ describe('scalePolynesianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAboriginalDreaming', () => {
   it('returns 0 for empty pitches', () => {
@@ -31118,7 +30496,6 @@ describe('scaleAboriginalDreaming', () => {
   });
 });
 
-
 describe('scalePapuaNewGuineaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scalePapuaNewGuineaScale([])).toBe(0);
@@ -31136,7 +30513,6 @@ describe('scalePapuaNewGuineaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMoroccanGnawa', () => {
   it('returns 0 for empty pitches', () => {
@@ -31156,7 +30532,6 @@ describe('scaleMoroccanGnawa', () => {
   });
 });
 
-
 describe('scaleTunisianMaqam', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTunisianMaqam([])).toBe(0);
@@ -31174,7 +30549,6 @@ describe('scaleTunisianMaqam', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAlgerianChabi', () => {
   it('returns 0 for empty pitches', () => {
@@ -31194,7 +30568,6 @@ describe('scaleAlgerianChabi', () => {
   });
 });
 
-
 describe('scaleEgyptianRast', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleEgyptianRast([])).toBe(0);
@@ -31212,7 +30585,6 @@ describe('scaleEgyptianRast', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBrazilianChoro', () => {
   it('returns 0 for empty pitches', () => {
@@ -31232,7 +30604,6 @@ describe('scaleBrazilianChoro', () => {
   });
 });
 
-
 describe('scaleColombianCumbia', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleColombianCumbia([])).toBe(0);
@@ -31250,7 +30621,6 @@ describe('scaleColombianCumbia', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePeruvianValsCriollo', () => {
   it('returns 0 for empty pitches', () => {
@@ -31270,7 +30640,6 @@ describe('scalePeruvianValsCriollo', () => {
   });
 });
 
-
 describe('scaleVenezuelanJoropo', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleVenezuelanJoropo([])).toBe(0);
@@ -31288,7 +30657,6 @@ describe('scaleVenezuelanJoropo', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCongoleseSoukous', () => {
   it('returns 0 for empty pitches', () => {
@@ -31308,7 +30676,6 @@ describe('scaleCongoleseSoukous', () => {
   });
 });
 
-
 describe('scaleCameroonMakossa', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleCameroonMakossa([])).toBe(0);
@@ -31326,7 +30693,6 @@ describe('scaleCameroonMakossa', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGaboneseTraditional', () => {
   it('returns 0 for empty pitches', () => {
@@ -31346,7 +30712,6 @@ describe('scaleGaboneseTraditional', () => {
   });
 });
 
-
 describe('scaleRwandanInanga', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleRwandanInanga([])).toBe(0);
@@ -31364,7 +30729,6 @@ describe('scaleRwandanInanga', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNavajoScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31384,7 +30748,6 @@ describe('scaleNavajoScale', () => {
   });
 });
 
-
 describe('scaleHopiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleHopiScale([])).toBe(0);
@@ -31402,7 +30765,6 @@ describe('scaleHopiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleIroquoisScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31422,7 +30784,6 @@ describe('scaleIroquoisScale', () => {
   });
 });
 
-
 describe('scaleInuitScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleInuitScale([])).toBe(0);
@@ -31440,7 +30801,6 @@ describe('scaleInuitScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMongolianBowl', () => {
   it('returns 0 for empty pitches', () => {
@@ -31460,7 +30820,6 @@ describe('scaleMongolianBowl', () => {
   });
 });
 
-
 describe('scaleTibetanSinging', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTibetanSinging([])).toBe(0);
@@ -31478,7 +30837,6 @@ describe('scaleTibetanSinging', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNepaleseScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31498,7 +30856,6 @@ describe('scaleNepaleseScale', () => {
   });
 });
 
-
 describe('scaleLadakhiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLadakhiScale([])).toBe(0);
@@ -31516,7 +30873,6 @@ describe('scaleLadakhiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleNigerianJuju', () => {
   it('returns 0 for empty pitches', () => {
@@ -31536,7 +30892,6 @@ describe('scaleNigerianJuju', () => {
   });
 });
 
-
 describe('scaleSenegaleseWolof', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSenegaleseWolof([])).toBe(0);
@@ -31554,7 +30909,6 @@ describe('scaleSenegaleseWolof', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMaliBamanaSuleba', () => {
   it('returns 0 for empty pitches', () => {
@@ -31574,7 +30928,6 @@ describe('scaleMaliBamanaSuleba', () => {
   });
 });
 
-
 describe('scaleGuineanJeliya', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGuineanJeliya([])).toBe(0);
@@ -31592,7 +30945,6 @@ describe('scaleGuineanJeliya', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleZimbabweMbira', () => {
   it('returns 0 for empty pitches', () => {
@@ -31612,7 +30964,6 @@ describe('scaleZimbabweMbira', () => {
   });
 });
 
-
 describe('scaleShonaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleShonaScale([])).toBe(0);
@@ -31630,7 +30981,6 @@ describe('scaleShonaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMozambiquanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31650,7 +31000,6 @@ describe('scaleMozambiquanScale', () => {
   });
 });
 
-
 describe('scaleBotswanaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBotswanaScale([])).toBe(0);
@@ -31668,7 +31017,6 @@ describe('scaleBotswanaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSyrianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31688,7 +31036,6 @@ describe('scaleSyrianScale', () => {
   });
 });
 
-
 describe('scaleIraqiMaqam', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleIraqiMaqam([])).toBe(0);
@@ -31706,7 +31053,6 @@ describe('scaleIraqiMaqam', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scalePalestinianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31726,7 +31072,6 @@ describe('scalePalestinianScale', () => {
   });
 });
 
-
 describe('scaleYemeniScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleYemeniScale([])).toBe(0);
@@ -31744,7 +31089,6 @@ describe('scaleYemeniScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleKoreanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31764,7 +31108,6 @@ describe('scaleKoreanScale', () => {
   });
 });
 
-
 describe('scaleMongolianLongSong', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMongolianLongSong([])).toBe(0);
@@ -31782,7 +31125,6 @@ describe('scaleMongolianLongSong', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleManchuScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31802,7 +31144,6 @@ describe('scaleManchuScale', () => {
   });
 });
 
-
 describe('scaleAinuScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAinuScale([])).toBe(0);
@@ -31820,7 +31161,6 @@ describe('scaleAinuScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleYakutScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31840,7 +31180,6 @@ describe('scaleYakutScale', () => {
   });
 });
 
-
 describe('scaleChukchiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleChukchiScale([])).toBe(0);
@@ -31858,7 +31197,6 @@ describe('scaleChukchiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleEvenkScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31878,7 +31216,6 @@ describe('scaleEvenkScale', () => {
   });
 });
 
-
 describe('scaleBuryatScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBuryatScale([])).toBe(0);
@@ -31896,7 +31233,6 @@ describe('scaleBuryatScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAleutScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31916,7 +31252,6 @@ describe('scaleAleutScale', () => {
   });
 });
 
-
 describe('scaleYupikScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleYupikScale([])).toBe(0);
@@ -31934,7 +31269,6 @@ describe('scaleYupikScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTlingitScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31954,7 +31288,6 @@ describe('scaleTlingitScale', () => {
   });
 });
 
-
 describe('scaleAthabaskanScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAthabaskanScale([])).toBe(0);
@@ -31972,7 +31305,6 @@ describe('scaleAthabaskanScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMayanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -31992,7 +31324,6 @@ describe('scaleMayanScale', () => {
   });
 });
 
-
 describe('scaleNahuatlScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleNahuatlScale([])).toBe(0);
@@ -32010,7 +31341,6 @@ describe('scaleNahuatlScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMixtecScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32030,7 +31360,6 @@ describe('scaleMixtecScale', () => {
   });
 });
 
-
 describe('scaleOlmecScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleOlmecScale([])).toBe(0);
@@ -32048,7 +31377,6 @@ describe('scaleOlmecScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleYanomamiScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32068,7 +31396,6 @@ describe('scaleYanomamiScale', () => {
   });
 });
 
-
 describe('scaleWayuuScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleWayuuScale([])).toBe(0);
@@ -32086,7 +31413,6 @@ describe('scaleWayuuScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleShuarScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32106,7 +31432,6 @@ describe('scaleShuarScale', () => {
   });
 });
 
-
 describe('scaleXinguScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleXinguScale([])).toBe(0);
@@ -32124,7 +31449,6 @@ describe('scaleXinguScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCarnaticScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32144,7 +31468,6 @@ describe('scaleCarnaticScale', () => {
   });
 });
 
-
 describe('scaleHindustaniScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleHindustaniScale([])).toBe(0);
@@ -32162,7 +31485,6 @@ describe('scaleHindustaniScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTamilScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32182,7 +31504,6 @@ describe('scaleTamilScale', () => {
   });
 });
 
-
 describe('scaleGujaratiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGujaratiScale([])).toBe(0);
@@ -32200,7 +31521,6 @@ describe('scaleGujaratiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGreekModalScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32220,7 +31540,6 @@ describe('scaleGreekModalScale', () => {
   });
 });
 
-
 describe('scaleByzantineScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleByzantineScale([])).toBe(0);
@@ -32238,7 +31557,6 @@ describe('scaleByzantineScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCypriotScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32258,7 +31576,6 @@ describe('scaleCypriotScale', () => {
   });
 });
 
-
 describe('scaleAnatolianFolkScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAnatolianFolkScale([])).toBe(0);
@@ -32276,7 +31593,6 @@ describe('scaleAnatolianFolkScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleWestPolynesianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32296,7 +31612,6 @@ describe('scaleWestPolynesianScale', () => {
   });
 });
 
-
 describe('scaleMicronesianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMicronesianScale([])).toBe(0);
@@ -32314,7 +31629,6 @@ describe('scaleMicronesianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleKiribatiScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32334,7 +31648,6 @@ describe('scaleKiribatiScale', () => {
   });
 });
 
-
 describe('scaleMarshalleseScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMarshalleseScale([])).toBe(0);
@@ -32352,7 +31665,6 @@ describe('scaleMarshalleseScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAppalachianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32372,7 +31684,6 @@ describe('scaleAppalachianScale', () => {
   });
 });
 
-
 describe('scaleOzarkScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleOzarkScale([])).toBe(0);
@@ -32390,7 +31701,6 @@ describe('scaleOzarkScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCajunScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32410,7 +31720,6 @@ describe('scaleCajunScale', () => {
   });
 });
 
-
 describe('scaleZydecoScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleZydecoScale([])).toBe(0);
@@ -32428,7 +31737,6 @@ describe('scaleZydecoScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleWelshScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32448,7 +31756,6 @@ describe('scaleWelshScale', () => {
   });
 });
 
-
 describe('scaleIrishScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleIrishScale([])).toBe(0);
@@ -32466,7 +31773,6 @@ describe('scaleIrishScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleScottishScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32486,7 +31792,6 @@ describe('scaleScottishScale', () => {
   });
 });
 
-
 describe('scaleBretonScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBretonScale([])).toBe(0);
@@ -32504,7 +31809,6 @@ describe('scaleBretonScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBasqueScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32524,7 +31828,6 @@ describe('scaleBasqueScale', () => {
   });
 });
 
-
 describe('scaleAndalusianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAndalusianScale([])).toBe(0);
@@ -32542,7 +31845,6 @@ describe('scaleAndalusianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAsturianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32562,7 +31864,6 @@ describe('scaleAsturianScale', () => {
   });
 });
 
-
 describe('scaleValencianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleValencianScale([])).toBe(0);
@@ -32580,7 +31881,6 @@ describe('scaleValencianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleFlemishScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32600,7 +31900,6 @@ describe('scaleFlemishScale', () => {
   });
 });
 
-
 describe('scaleDutchScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleDutchScale([])).toBe(0);
@@ -32618,7 +31917,6 @@ describe('scaleDutchScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleWalloonScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32638,7 +31936,6 @@ describe('scaleWalloonScale', () => {
   });
 });
 
-
 describe('scaleLuxembourgScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLuxembourgScale([])).toBe(0);
@@ -32656,7 +31953,6 @@ describe('scaleLuxembourgScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSlovenianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32676,7 +31972,6 @@ describe('scaleSlovenianScale', () => {
   });
 });
 
-
 describe('scaleCroatianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleCroatianScaleV2([])).toBe(0);
@@ -32694,7 +31989,6 @@ describe('scaleCroatianScaleV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBosnianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32714,7 +32008,6 @@ describe('scaleBosnianScale', () => {
   });
 });
 
-
 describe('scaleMontenegrinScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMontenegrinScale([])).toBe(0);
@@ -32732,7 +32025,6 @@ describe('scaleMontenegrinScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleFinnoUgricScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32752,7 +32044,6 @@ describe('scaleFinnoUgricScale', () => {
   });
 });
 
-
 describe('scaleSamiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSamiScale([])).toBe(0);
@@ -32770,7 +32061,6 @@ describe('scaleSamiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleKareliaScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32790,7 +32080,6 @@ describe('scaleKareliaScale', () => {
   });
 });
 
-
 describe('scaleErzyaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleErzyaScale([])).toBe(0);
@@ -32808,7 +32097,6 @@ describe('scaleErzyaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAustrianAlpineScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32828,7 +32116,6 @@ describe('scaleAustrianAlpineScale', () => {
   });
 });
 
-
 describe('scaleBavarianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBavarianScale([])).toBe(0);
@@ -32846,7 +32133,6 @@ describe('scaleBavarianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTyroleanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32866,7 +32152,6 @@ describe('scaleTyroleanScale', () => {
   });
 });
 
-
 describe('scaleSwissAlpineScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSwissAlpineScale([])).toBe(0);
@@ -32884,7 +32169,6 @@ describe('scaleSwissAlpineScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAboriginalScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32904,7 +32188,6 @@ describe('scaleAboriginalScale', () => {
   });
 });
 
-
 describe('scaleTorresStraitScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTorresStraitScale([])).toBe(0);
@@ -32923,7 +32206,6 @@ describe('scaleTorresStraitScale', () => {
   });
 });
 
-
 describe('scaleMaoriScaleV3', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMaoriScaleV3([])).toBe(0);
@@ -32941,7 +32223,6 @@ describe('scaleMaoriScaleV3', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTasmanianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -32979,7 +32260,6 @@ describe('scalePersianClassical', () => {
   });
 });
 
-
 describe('scaleAzerbaijaniScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAzerbaijaniScale([])).toBe(0);
@@ -32997,7 +32277,6 @@ describe('scaleAzerbaijaniScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleUzbekMaqom', () => {
   it('returns 0 for empty pitches', () => {
@@ -33017,7 +32296,6 @@ describe('scaleUzbekMaqom', () => {
   });
 });
 
-
 describe('scaleTajikMaqom', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTajikMaqom([])).toBe(0);
@@ -33035,7 +32313,6 @@ describe('scaleTajikMaqom', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBerberScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33055,7 +32332,6 @@ describe('scaleBerberScale', () => {
   });
 });
 
-
 describe('scaleKabyleScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleKabyleScale([])).toBe(0);
@@ -33073,7 +32349,6 @@ describe('scaleKabyleScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAmazighScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33093,7 +32368,6 @@ describe('scaleAmazighScale', () => {
   });
 });
 
-
 describe('scaleChaouiScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleChaouiScale([])).toBe(0);
@@ -33111,7 +32385,6 @@ describe('scaleChaouiScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTexMexScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33131,7 +32404,6 @@ describe('scaleTexMexScale', () => {
   });
 });
 
-
 describe('scaleBluegrassScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBluegrassScale([])).toBe(0);
@@ -33149,7 +32421,6 @@ describe('scaleBluegrassScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGospelScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33169,7 +32440,6 @@ describe('scaleGospelScale', () => {
   });
 });
 
-
 describe('scaleAppalachianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAppalachianScaleV2([])).toBe(0);
@@ -33187,7 +32457,6 @@ describe('scaleAppalachianScaleV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGreenlandicScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33207,7 +32476,6 @@ describe('scaleGreenlandicScale', () => {
   });
 });
 
-
 describe('scaleFaroeseScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleFaroeseScale([])).toBe(0);
@@ -33225,7 +32493,6 @@ describe('scaleFaroeseScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleShetlandScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33245,7 +32512,6 @@ describe('scaleShetlandScale', () => {
   });
 });
 
-
 describe('scaleOrkneyScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleOrkneyScale([])).toBe(0);
@@ -33263,7 +32529,6 @@ describe('scaleOrkneyScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleQuebecoisScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33283,7 +32548,6 @@ describe('scaleQuebecoisScale', () => {
   });
 });
 
-
 describe('scaleAcadianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAcadianScale([])).toBe(0);
@@ -33301,7 +32565,6 @@ describe('scaleAcadianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleFrenchCanadianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33321,7 +32584,6 @@ describe('scaleFrenchCanadianScale', () => {
   });
 });
 
-
 describe('scaleMetisScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMetisScale([])).toBe(0);
@@ -33339,7 +32601,6 @@ describe('scaleMetisScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSicilianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33359,7 +32620,6 @@ describe('scaleSicilianScale', () => {
   });
 });
 
-
 describe('scaleSardinianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSardinianScale([])).toBe(0);
@@ -33377,7 +32637,6 @@ describe('scaleSardinianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCorsicanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33397,7 +32656,6 @@ describe('scaleCorsicanScale', () => {
   });
 });
 
-
 describe('scaleMalteseScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMalteseScale([])).toBe(0);
@@ -33415,7 +32673,6 @@ describe('scaleMalteseScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleVenetianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33435,7 +32692,6 @@ describe('scaleVenetianScale', () => {
   });
 });
 
-
 describe('scaleNeapolitanScaleV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleNeapolitanScaleV2([])).toBe(0);
@@ -33453,7 +32709,6 @@ describe('scaleNeapolitanScaleV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTuscanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33473,7 +32728,6 @@ describe('scaleTuscanScale', () => {
   });
 });
 
-
 describe('scaleLombardScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleLombardScale([])).toBe(0);
@@ -33491,7 +32745,6 @@ describe('scaleLombardScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleWestSlavicScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33511,7 +32764,6 @@ describe('scaleWestSlavicScale', () => {
   });
 });
 
-
 describe('scalePolishScaleV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scalePolishScaleV2([])).toBe(0);
@@ -33529,7 +32781,6 @@ describe('scalePolishScaleV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCzechScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -33549,7 +32800,6 @@ describe('scaleCzechScaleV2', () => {
   });
 });
 
-
 describe('scaleSlovakScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSlovakScale([])).toBe(0);
@@ -33567,7 +32817,6 @@ describe('scaleSlovakScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTibetoBurmanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33587,7 +32836,6 @@ describe('scaleTibetoBurmanScale', () => {
   });
 });
 
-
 describe('scaleNagaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleNagaScale([])).toBe(0);
@@ -33605,7 +32853,6 @@ describe('scaleNagaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleKarenScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33625,7 +32872,6 @@ describe('scaleKarenScale', () => {
   });
 });
 
-
 describe('scaleShanScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleShanScale([])).toBe(0);
@@ -33643,7 +32889,6 @@ describe('scaleShanScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMoldovanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33663,7 +32908,6 @@ describe('scaleMoldovanScale', () => {
   });
 });
 
-
 describe('scaleTranssylvanianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTranssylvanianScale([])).toBe(0);
@@ -33681,7 +32925,6 @@ describe('scaleTranssylvanianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleWallachianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33701,7 +32944,6 @@ describe('scaleWallachianScale', () => {
   });
 });
 
-
 describe('scaleBanatScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBanatScale([])).toBe(0);
@@ -33719,7 +32961,6 @@ describe('scaleBanatScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleUkrainianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -33739,7 +32980,6 @@ describe('scaleUkrainianScaleV2', () => {
   });
 });
 
-
 describe('scaleBelarusianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBelarusianScale([])).toBe(0);
@@ -33757,7 +32997,6 @@ describe('scaleBelarusianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCossackScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33777,7 +33016,6 @@ describe('scaleCossackScale', () => {
   });
 });
 
-
 describe('scaleRusynScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleRusynScale([])).toBe(0);
@@ -33795,7 +33033,6 @@ describe('scaleRusynScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleUralicScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33815,7 +33052,6 @@ describe('scaleUralicScale', () => {
   });
 });
 
-
 describe('scaleMordvinScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMordvinScale([])).toBe(0);
@@ -33833,7 +33069,6 @@ describe('scaleMordvinScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMariScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33853,7 +33088,6 @@ describe('scaleMariScale', () => {
   });
 });
 
-
 describe('scaleUdmurtScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleUdmurtScale([])).toBe(0);
@@ -33871,7 +33105,6 @@ describe('scaleUdmurtScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSouthSlavicScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33891,7 +33124,6 @@ describe('scaleSouthSlavicScale', () => {
   });
 });
 
-
 describe('scaleMacedonianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMacedonianScaleV2([])).toBe(0);
@@ -33909,7 +33141,6 @@ describe('scaleMacedonianScaleV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSerbianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -33929,7 +33160,6 @@ describe('scaleSerbianScaleV2', () => {
   });
 });
 
-
 describe('scaleKosovarScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleKosovarScale([])).toBe(0);
@@ -33947,7 +33177,6 @@ describe('scaleKosovarScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleTurkicScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -33967,7 +33196,6 @@ describe('scaleTurkicScale', () => {
   });
 });
 
-
 describe('scaleTatarScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTatarScale([])).toBe(0);
@@ -33985,7 +33213,6 @@ describe('scaleTatarScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBashkirScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34005,7 +33232,6 @@ describe('scaleBashkirScale', () => {
   });
 });
 
-
 describe('scaleChuvashScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleChuvashScale([])).toBe(0);
@@ -34023,7 +33249,6 @@ describe('scaleChuvashScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleHungarianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -34043,7 +33268,6 @@ describe('scaleHungarianScaleV2', () => {
   });
 });
 
-
 describe('scaleRomaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleRomaScale([])).toBe(0);
@@ -34061,7 +33285,6 @@ describe('scaleRomaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSintiScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34081,7 +33304,6 @@ describe('scaleSintiScale', () => {
   });
 });
 
-
 describe('scaleTransdanubianScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTransdanubianScale([])).toBe(0);
@@ -34099,7 +33321,6 @@ describe('scaleTransdanubianScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAlbanianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -34119,7 +33340,6 @@ describe('scaleAlbanianScaleV2', () => {
   });
 });
 
-
 describe('scaleArbereshScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleArbereshScale([])).toBe(0);
@@ -34137,7 +33357,6 @@ describe('scaleArbereshScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleToskScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34157,7 +33376,6 @@ describe('scaleToskScale', () => {
   });
 });
 
-
 describe('scaleGhegScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGhegScale([])).toBe(0);
@@ -34175,7 +33393,6 @@ describe('scaleGhegScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGeorgianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -34195,7 +33412,6 @@ describe('scaleGeorgianScaleV2', () => {
   });
 });
 
-
 describe('scaleSvanScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSvanScale([])).toBe(0);
@@ -34213,7 +33429,6 @@ describe('scaleSvanScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleMingrelianScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34233,7 +33448,6 @@ describe('scaleMingrelianScale', () => {
   });
 });
 
-
 describe('scaleAdjaraScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleAdjaraScale([])).toBe(0);
@@ -34251,7 +33465,6 @@ describe('scaleAdjaraScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAndalucianFlamenco', () => {
   it('returns 0 for empty pitches', () => {
@@ -34271,7 +33484,6 @@ describe('scaleAndalucianFlamenco', () => {
   });
 });
 
-
 describe('scaleGypsyKingsScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGypsyKingsScale([])).toBe(0);
@@ -34289,7 +33501,6 @@ describe('scaleGypsyKingsScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleGranadaScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34309,7 +33520,6 @@ describe('scaleGranadaScale', () => {
   });
 });
 
-
 describe('scaleSevillanaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleSevillanaScale([])).toBe(0);
@@ -34327,7 +33537,6 @@ describe('scaleSevillanaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCaribbeanCalypsoV2', () => {
   it('returns 0 for empty pitches', () => {
@@ -34347,7 +33556,6 @@ describe('scaleCaribbeanCalypsoV2', () => {
   });
 });
 
-
 describe('scaleTrinidadianSteelpanScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleTrinidadianSteelpanScale([])).toBe(0);
@@ -34365,7 +33573,6 @@ describe('scaleTrinidadianSteelpanScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleJamaicanDancehallScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34385,7 +33592,6 @@ describe('scaleJamaicanDancehallScale', () => {
   });
 });
 
-
 describe('scaleHaitianKompaScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleHaitianKompaScale([])).toBe(0);
@@ -34403,7 +33609,6 @@ describe('scaleHaitianKompaScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleBaskCountryScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34423,7 +33628,6 @@ describe('scaleBaskCountryScale', () => {
   });
 });
 
-
 describe('scaleNavarreScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleNavarreScale([])).toBe(0);
@@ -34441,7 +33645,6 @@ describe('scaleNavarreScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAragonScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34461,7 +33664,6 @@ describe('scaleAragonScale', () => {
   });
 });
 
-
 describe('scaleGalicianScaleV2', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGalicianScaleV2([])).toBe(0);
@@ -34479,7 +33681,6 @@ describe('scaleGalicianScaleV2', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleAndeanQuenaScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34499,7 +33700,6 @@ describe('scaleAndeanQuenaScale', () => {
   });
 });
 
-
 describe('scaleBolivianSaya', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleBolivianSaya([])).toBe(0);
@@ -34517,7 +33717,6 @@ describe('scaleBolivianSaya', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleEcuadorianSanjuanito', () => {
   it('returns 0 for empty pitches', () => {
@@ -34537,7 +33736,6 @@ describe('scaleEcuadorianSanjuanito', () => {
   });
 });
 
-
 describe('scaleColombianVallenato', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleColombianVallenato([])).toBe(0);
@@ -34555,7 +33753,6 @@ describe('scaleColombianVallenato', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleWestAfricanGriotScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34575,7 +33772,6 @@ describe('scaleWestAfricanGriotScale', () => {
   });
 });
 
-
 describe('scaleMandeScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleMandeScale([])).toBe(0);
@@ -34593,7 +33789,6 @@ describe('scaleMandeScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleSonghaiScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34613,7 +33808,6 @@ describe('scaleSonghaiScale', () => {
   });
 });
 
-
 describe('scaleFulaniScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleFulaniScale([])).toBe(0);
@@ -34631,7 +33825,6 @@ describe('scaleFulaniScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleCentralAmericanScale', () => {
   it('returns 0 for empty pitches', () => {
@@ -34651,7 +33844,6 @@ describe('scaleCentralAmericanScale', () => {
   });
 });
 
-
 describe('scaleGuatemalanMarimba', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleGuatemalanMarimba([])).toBe(0);
@@ -34669,7 +33861,6 @@ describe('scaleGuatemalanMarimba', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('scaleHondurasGarifuna', () => {
   it('returns 0 for empty pitches', () => {
@@ -34689,7 +33880,6 @@ describe('scaleHondurasGarifuna', () => {
   });
 });
 
-
 describe('scaleNicaraguanScale', () => {
   it('returns 0 for empty pitches', () => {
     expect(scaleNicaraguanScale([])).toBe(0);
@@ -34707,7 +33897,6 @@ describe('scaleNicaraguanScale', () => {
     expect(v).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('detectNearestScale', () => {
   it('returns topN results (default 10) for empty input, all scoring 0', () => {

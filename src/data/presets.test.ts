@@ -257,7 +257,6 @@ describe('allPresetReports (Q207)', () => {
   });
 });
 
-
 // Q208 — bestStabilityPreset
 describe('bestStabilityPreset (Q208)', () => {
   it('test_returns_preset_and_score', () => {
@@ -303,7 +302,6 @@ describe('bestStabilityPreset (Q208)', () => {
   });
 });
 
-
 // Q210 — mostHarmonicPreset
 describe('mostHarmonicPreset (Q210)', () => {
   it('test_returns_preset_and_harmonicity', () => {
@@ -344,7 +342,6 @@ describe('mostHarmonicPreset (Q210)', () => {
   });
 });
 
-
 // Q211 — presetHarmonicityLeague
 describe('presetHarmonicityLeague (Q211)', () => {
   it('test_returns_array_same_length_as_pool', () => {
@@ -384,7 +381,6 @@ describe('presetHarmonicityLeague (Q211)', () => {
   });
 });
 
-
 // Q212 — allPresetsDemoWav
 describe('allPresetsDemoWav (Q212)', () => {
   const FAST_OPTS = { sampleRate: 8000, chordSeconds: 0.05, seconds: 1.0, decay: 3 };
@@ -419,7 +415,6 @@ describe('allPresetsDemoWav (Q212)', () => {
   });
 });
 
-
 // Q218 — isPresetTopN
 describe('isPresetTopN (Q218)', () => {
   it('test_top1_contains_most_harmonic', () => {
@@ -453,7 +448,6 @@ describe('isPresetTopN (Q218)', () => {
   });
 });
 
-
 // Q219 — presetBestChord
 describe('presetBestChord (Q219)', () => {
   it('test_returns_chord_map_analysis_entry', () => {
@@ -485,7 +479,6 @@ describe('presetBestChord (Q219)', () => {
     }
   });
 });
-
 
 // Q220 — rankPresetsByReportSimilarity
 describe('rankPresetsByReportSimilarity (Q220)', () => {
@@ -531,7 +524,6 @@ describe('rankPresetsByReportSimilarity (Q220)', () => {
   });
 });
 
-
 // Q222 — comparePresets
 describe('comparePresets (Q222)', () => {
   it('test_returns_result_with_a_b_comparison', () => {
@@ -568,7 +560,6 @@ describe('comparePresets (Q222)', () => {
   });
 });
 
-
 // Q229 — betterPreset
 describe('betterPreset (Q229)', () => {
   it('returns winner id which is one of the two inputs', () => {
@@ -593,7 +584,6 @@ describe('betterPreset (Q229)', () => {
   });
 });
 
-
 // Q232 — presetProgressionNarrative
 describe('presetProgressionNarrative (Q232)', () => {
   it('returns a non-empty string for 12-tet', () => {
@@ -607,7 +597,6 @@ describe('presetProgressionNarrative (Q232)', () => {
     expect(text).toContain('nonexistent');
   });
 });
-
 
 describe('allPresetsSimilarityMatrix (Q246)', () => {
   it('returns ids and square matrix', () => {
@@ -624,7 +613,6 @@ describe('allPresetsSimilarityMatrix (Q246)', () => {
   });
 });
 
-
 describe('presetFullBundle (Q248)', () => {
   it('returns all 6 fields for 12-tet', () => {
     const bundle = presetFullBundle('12-tet');
@@ -640,7 +628,6 @@ describe('presetFullBundle (Q248)', () => {
     expect(() => presetFullBundle('nonexistent')).toThrow(RangeError);
   });
 });
-
 
 describe('topPresetsByStabilityReport (Q251)', () => {
   it('returns n entries', () => {
@@ -659,7 +646,6 @@ describe('topPresetsByStabilityReport (Q251)', () => {
     expect(results.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('rankPresetsByFullBundle (Q253)', () => {
   it('returns all presets ranked', () => {
@@ -681,7 +667,6 @@ describe('rankPresetsByFullBundle (Q253)', () => {
   });
 });
 
-
 describe('bestPresetForSpectrum (Q257)', () => {
   it('returns a preset id and harmonicity', () => {
     const { presetId, harmonicity } = bestPresetForSpectrum(harmonicSpectrum());
@@ -693,7 +678,6 @@ describe('bestPresetForSpectrum (Q257)', () => {
     expect(bestPresetForSpectrum(harmonicSpectrum()).harmonicity).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 describe('presetModeIntervalSets (Q258)', () => {
   it('returns interval sets for 12-tet', () => {
@@ -716,7 +700,6 @@ describe('presetModeIntervalSets (Q258)', () => {
   });
 });
 
-
 describe('presetVolatilityRanking (Q262)', () => {
   it('returns all presets ranked by volatility', () => {
     const ranked = presetVolatilityRanking();
@@ -733,7 +716,6 @@ describe('presetVolatilityRanking (Q262)', () => {
     }
   });
 });
-
 
 describe('presetSpectralFitRanking (Q266)', () => {
   it('returns all presets ranked by spectral fit', () => {
@@ -752,7 +734,6 @@ describe('presetSpectralFitRanking (Q266)', () => {
   });
 });
 
-
 describe('presetFamilyReport (Q275)', () => {
   it('returns family report for two presets', () => {
     const report = presetFamilyReport(['12-tet', 'just-5-limit']);
@@ -767,7 +748,6 @@ describe('presetFamilyReport (Q275)', () => {
   });
 });
 
-
 describe('presetProgressionVariety (Q280)', () => {
   it('returns value in (0, 1] for 12-tet', () => {
     const v = presetProgressionVariety('12-tet');
@@ -779,7 +759,6 @@ describe('presetProgressionVariety (Q280)', () => {
   });
 });
 
-
 describe('bestPresetConsistency (Q285)', () => {
   it('returns a preset id and consistency score', () => {
     const { presetId, consistency } = bestPresetConsistency();
@@ -789,7 +768,6 @@ describe('bestPresetConsistency (Q285)', () => {
     expect(consistency).toBeLessThanOrEqual(1);
   });
 });
-
 
 describe('topPresetsByEntropy (Q290)', () => {
   it('returns n entries sorted by entropy descending', () => {
@@ -801,7 +779,6 @@ describe('topPresetsByEntropy (Q290)', () => {
     expect(() => topPresetsByEntropy(0)).toThrow(RangeError);
   });
 });
-
 
 describe('presetEntropyLeague (Q293)', () => {
   it('returns high, medium, low arrays', () => {
@@ -818,7 +795,6 @@ describe('presetEntropyLeague (Q293)', () => {
     expect(new Set(all).size).toBe(all.length);
   });
 });
-
 
 describe('presetEntropyProfile (Q296)', () => {
   it('returns array of mode/entropy pairs', () => {
@@ -840,7 +816,6 @@ describe('presetEntropyProfile (Q296)', () => {
   });
 });
 
-
 describe('presetBestEntropyModeWav (Q299)', () => {
   it('returns wav, entropy, mode for preset', () => {
     const result = presetBestEntropyModeWav('12-tet');
@@ -854,7 +829,6 @@ describe('presetBestEntropyModeWav (Q299)', () => {
     expect(() => presetBestEntropyModeWav('not-a-preset')).toThrow(RangeError);
   });
 });
-
 
 describe('presetConsistencyEntropyDelta (Q301)', () => {
   it('returns a number in [0, 1]', () => {
@@ -872,7 +846,6 @@ describe('presetConsistencyEntropyDelta (Q301)', () => {
     expect(Number.isFinite(delta)).toBe(true);
   });
 });
-
 
 describe('presetModeComparison (Q311)', () => {
   it('returns one entry per mode with all three metrics', () => {
@@ -898,7 +871,6 @@ describe('presetModeComparison (Q311)', () => {
     expect(cmp.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('presetModeRankingBundle (Q316)', () => {
   it('returns byEntropy, byConsistency, byVolatility arrays', () => {
@@ -931,7 +903,6 @@ describe('presetModeRankingBundle (Q316)', () => {
     expect(bundle.byEntropy.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('presetFullAnalysis (Q321)', () => {
   it('returns reportCard, tripleMode, consistencyEntropyDelta, harmonicDensity', () => {
@@ -970,7 +941,6 @@ describe('presetFullAnalysis (Q321)', () => {
   });
 });
 
-
 describe('presetModeNarratives (Q326)', () => {
   it('returns one narrative per mode', () => {
     const narratives = presetModeNarratives('12-tet');
@@ -996,7 +966,6 @@ describe('presetModeNarratives (Q326)', () => {
     expect(narratives.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('presetModeFullBundle (Q332)', () => {
   it('returns full bundle for 12-tet', () => {
@@ -1033,7 +1002,6 @@ describe('presetModeFullBundle (Q332)', () => {
     expect(bundle.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('presetFamilyAnalysis (Q335)', () => {
   it('returns analysis for each preset id', () => {
@@ -1080,7 +1048,6 @@ describe('presetFamilyAnalysis (Q335)', () => {
   });
 });
 
-
 describe('presetModeProgressionBundles (Q338)', () => {
   it('returns one bundle per mode for 12-tet', () => {
     const bundles = presetModeProgressionBundles('12-tet');
@@ -1115,7 +1082,6 @@ describe('presetModeProgressionBundles (Q338)', () => {
     expect(bundles.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('presetFamilyModeRankings (Q341)', () => {
   it('returns one entry per preset id', () => {
@@ -1166,7 +1132,6 @@ describe('presetFamilyModeRankings (Q341)', () => {
     expect(result[0]!.id).toBe('12-tet');
   });
 });
-
 
 describe('presetFamilyFullBundle (Q344)', () => {
   it('returns one entry per preset id', () => {
@@ -1223,7 +1188,6 @@ describe('presetFamilyFullBundle (Q344)', () => {
   });
 });
 
-
 describe('presetScaleModeSpectralRankings (Q347)', () => {
   it('returns spectralRanking and normalizedScores', () => {
     const result = presetScaleModeSpectralRankings('12-tet', harmonicSpectrum());
@@ -1261,7 +1225,6 @@ describe('presetScaleModeSpectralRankings (Q347)', () => {
     expect(result.spectralRanking.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('presetModeChordMapBundles (Q349)', () => {
   it('returns one bundle per mode', () => {
@@ -1301,7 +1264,6 @@ describe('presetModeChordMapBundles (Q349)', () => {
     expect(bundles.length).toBeGreaterThan(0);
   });
 });
-
 
 describe('presetBestModeChordMapNarrative (Q353)', () => {
   it('returns mode and narrative for entropy metric', () => {
@@ -1350,7 +1312,6 @@ describe('presetBestModeChordMapNarrative (Q353)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q355 — presetModeNarrativeCompare
 // ---------------------------------------------------------------------------
@@ -1387,7 +1348,6 @@ describe('presetModeNarrativeCompare (Q355)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q359 — presetModeBestProgressionNarratives
 // ---------------------------------------------------------------------------
@@ -1420,7 +1380,6 @@ describe('presetModeBestProgressionNarratives (Q359)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q362 — presetBestSmoothMode
 // ---------------------------------------------------------------------------
@@ -1448,7 +1407,6 @@ describe('presetBestSmoothMode (Q362)', () => {
     expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q369 — presetBestSmoothModeWav
@@ -1485,7 +1443,6 @@ describe('presetBestSmoothModeWav (Q369)', () => {
     expect(result.mode).toHaveProperty('degreeIndices');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q376 — presetFullSclBundle
@@ -1530,7 +1487,6 @@ describe('presetFullSclBundle (Q376)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q379 — presetModeConsistencyEntropyProfiles
 // ---------------------------------------------------------------------------
@@ -1563,7 +1519,6 @@ describe('presetModeConsistencyEntropyProfiles (Q379)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q383 — presetModeDissonanceHistograms
 // ---------------------------------------------------------------------------
@@ -1594,7 +1549,6 @@ describe('presetModeDissonanceHistograms (Q383)', () => {
     expect(hists.length).toBe(12);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q388 — presetModeDualHistograms
@@ -1639,7 +1593,6 @@ describe('presetModeDualHistograms (Q388)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q392 — presetModeHistogramSummaries
 // ---------------------------------------------------------------------------
@@ -1680,7 +1633,6 @@ describe('presetModeHistogramSummaries (Q392)', () => {
     expect(summaries.length).toBe(12);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q397 — presetModeAnalysisFull
@@ -1724,7 +1676,6 @@ describe('presetModeAnalysisFull (Q397)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q400 — presetHarmonicSpectralScore
 // ---------------------------------------------------------------------------
@@ -1762,7 +1713,6 @@ describe('presetHarmonicSpectralScore (Q400)', () => {
     expect(typeof score.combinedScore).toBe('number');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q403 — presetComprehensiveReport
@@ -1808,7 +1758,6 @@ describe('presetComprehensiveReport (Q403)', () => {
     expect(typeof report.progressionVariety).toBe('number');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q406 — presetSimilarityRanking
@@ -1857,7 +1806,6 @@ describe('presetSimilarityRanking (Q406)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q409 — presetModeIntervalProfile
 // ---------------------------------------------------------------------------
@@ -1903,7 +1851,6 @@ describe('presetModeIntervalProfile (Q409)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q412 — presetMostDiverseMode
 // ---------------------------------------------------------------------------
@@ -1943,7 +1890,6 @@ describe('presetMostDiverseMode (Q412)', () => {
     expect(diversity).toBeCloseTo(maxDiversity, 10);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q415 — presetModeComprehensiveBundle
@@ -1994,7 +1940,6 @@ describe('presetModeComprehensiveBundle (Q415)', () => {
     expect(bundle.length).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q418 — presetBestModeComprehensive
@@ -2050,7 +1995,6 @@ describe('presetBestModeComprehensive (Q418)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q421 — presetModeScoreRanking
 // ---------------------------------------------------------------------------
@@ -2093,7 +2037,6 @@ describe('presetModeScoreRanking (Q421)', () => {
     expect(ranking.length).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q425 — presetIntervalDiversityVsEntropy
@@ -2144,7 +2087,6 @@ describe('presetIntervalDiversityVsEntropy (Q425)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q427 — presetModeParetoFront
 // ---------------------------------------------------------------------------
@@ -2182,7 +2124,6 @@ describe('presetModeParetoFront (Q427)', () => {
     expect(front.length).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q430 — presetModeCorrelationMatrix
@@ -2241,7 +2182,6 @@ describe('presetModeCorrelationMatrix (Q430)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q433 — presetParetoFrontBestMode
 // ---------------------------------------------------------------------------
@@ -2267,7 +2207,6 @@ describe('presetParetoFrontBestMode (Q433)', () => {
     expect(result.mode).toBeDefined();
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q436 — presetModeTopCorrelation
@@ -2297,7 +2236,6 @@ describe('presetModeTopCorrelation (Q436)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q437 — presetModeAntiCorrelation
 // ---------------------------------------------------------------------------
@@ -2326,7 +2264,6 @@ describe('presetModeAntiCorrelation (Q437)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q439 — presetFamilyTopCorrelations
 // ---------------------------------------------------------------------------
@@ -2349,7 +2286,6 @@ describe('presetFamilyTopCorrelations', () => {
     );
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q443 — presetParetoFrontSummary
@@ -2376,7 +2312,6 @@ describe('presetParetoFrontSummary', () => {
     expect(summary.paretoSize).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q448 — presetParetoFrontVsRanking
@@ -2407,7 +2342,6 @@ describe('presetParetoFrontVsRanking', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q449 — presetBestParetoRankedMode
 // ---------------------------------------------------------------------------
@@ -2434,7 +2368,6 @@ describe('presetBestParetoRankedMode', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q453 — presetParetoFrontGap
 // ---------------------------------------------------------------------------
@@ -2454,7 +2387,6 @@ describe('presetParetoFrontGap (Q453)', () => {
     );
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q454 — presetParetoFrontCoverage
@@ -2485,7 +2417,6 @@ describe('presetParetoFrontCoverage (Q454)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q457 — presetCorrelationMatrixNarrative
 // ---------------------------------------------------------------------------
@@ -2510,7 +2441,6 @@ describe('presetCorrelationMatrixNarrative', () => {
     expect(typeof result.narrative).toBe('string');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q460 — presetParetoFrontNarrative
@@ -2538,7 +2468,6 @@ describe('presetParetoFrontNarrative', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q463 — presetFullParetoCorrelationReport
 // ---------------------------------------------------------------------------
@@ -2564,7 +2493,6 @@ describe('presetFullParetoCorrelationReport (Q463)', () => {
     expect(typeof result.combinedNarrative).toBe('string');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q466 — presetModeMetricOutliers
@@ -2593,7 +2521,6 @@ describe('presetModeMetricOutliers (Q466)', () => {
   });
 });
 
-
 // Q469 — presetModeMetricOutlierSummary
 describe('presetModeMetricOutlierSummary (Q469)', () => {
   it('returns totalOutliers and outlier maps', () => {
@@ -2611,7 +2538,6 @@ describe('presetModeMetricOutlierSummary (Q469)', () => {
     );
   });
 });
-
 
 // Q472 — presetModeMetricProfile
 describe('presetModeMetricProfile (Q472)', () => {
@@ -2636,7 +2562,6 @@ describe('presetModeMetricProfile (Q472)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q475 — presetModeMetricRadarData
 // ---------------------------------------------------------------------------
@@ -2658,7 +2583,6 @@ describe('presetModeMetricRadarData (Q475)', () => {
     );
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q478 — presetModeMetricCluster
@@ -2685,7 +2609,6 @@ describe('presetModeMetricCluster (Q478)', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -2715,7 +2638,6 @@ describe('presetClusterSummary (Q481)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('presetModeRadarRanking (Q484)', () => {
@@ -2740,7 +2662,6 @@ describe('presetModeRadarRanking (Q484)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('presetRadarRankingVsScoreRanking (Q487)', () => {
@@ -2758,7 +2679,6 @@ describe('presetRadarRankingVsScoreRanking (Q487)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -2783,7 +2703,6 @@ describe('presetBestRadarScoreAgreement (Q490)', () => {
     expect(result.scoreRank).toBeGreaterThanOrEqual(1);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -2811,7 +2730,6 @@ describe('presetModeConsensusRanking (Q493)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('presetBestConsensusMode (Q496)', () => {
@@ -2835,7 +2753,6 @@ describe('presetBestConsensusMode (Q496)', () => {
     expect(result.bordaScore).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -2861,7 +2778,6 @@ describe('presetUltimateBestMode (Q499)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('presetConsensusNarrative (Q502)', () => {
@@ -2884,7 +2800,6 @@ describe('presetConsensusNarrative (Q502)', () => {
     expect(typeof result.narrative).toBe('string');
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -2910,7 +2825,6 @@ describe('presetModeComprehensiveMetricBundle (Q508)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('presetModeConsensusClusterBundle (Q511)', () => {
@@ -2929,7 +2843,6 @@ describe('presetModeConsensusClusterBundle (Q511)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -2955,7 +2868,6 @@ describe('presetTopClusterConsensusMode (Q514)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 
 describe('presetModeConsensusOutlierBundle (Q517)', () => {
@@ -2973,7 +2885,6 @@ describe('presetModeConsensusOutlierBundle (Q517)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 
@@ -2998,7 +2909,6 @@ describe('presetModeInsightSummary (Q520)', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q526 — presetModeEntropyDiversityMap
@@ -3026,7 +2936,6 @@ describe('presetModeEntropyDiversityMap (Q526)', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q529 — presetModeConsistencyVolatilityMap
@@ -3056,7 +2965,6 @@ describe('presetModeConsistencyVolatilityMap (Q529)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q532 — presetModeFiveDimMap
 // ---------------------------------------------------------------------------
@@ -3084,7 +2992,6 @@ describe('presetModeFiveDimMap (Q532)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q535 — presetModeFiveDimNarrative
 // ---------------------------------------------------------------------------
@@ -3104,7 +3011,6 @@ describe('presetModeFiveDimNarrative (Q535)', () => {
     );
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q538 — presetModeSmoothnessEntropyMap
@@ -3133,7 +3039,6 @@ describe('presetModeSmoothnessEntropyMap (Q538)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q541 — presetModeDiversityVolatilityMap
 // ---------------------------------------------------------------------------
@@ -3159,7 +3064,6 @@ describe('presetModeDiversityVolatilityMap (Q541)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q544 — presetModeAllQuadrantsBundle
@@ -3190,7 +3094,6 @@ describe('presetModeAllQuadrantsBundle (Q544)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q547 — presetModeAllQuadrantsNarrative
 // ---------------------------------------------------------------------------
@@ -3210,7 +3113,6 @@ describe('presetModeAllQuadrantsNarrative (Q547)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q550 — presetModeQuadrantConsensus
@@ -3233,7 +3135,6 @@ describe('presetModeQuadrantConsensus (Q550)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q553 — presetBestQuadrantConsensusMode
 // ---------------------------------------------------------------------------
@@ -3254,7 +3155,6 @@ describe('presetBestQuadrantConsensusMode (Q553)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q556 — presetModeConsensusNarrative
 // ---------------------------------------------------------------------------
@@ -3274,7 +3174,6 @@ describe('presetModeConsensusNarrative (Q556)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q559 — presetModeQuadrantProfile
@@ -3297,7 +3196,6 @@ describe('presetModeQuadrantProfile (Q559)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q562 — presetQuadrantCoverage
 // ---------------------------------------------------------------------------
@@ -3317,7 +3215,6 @@ describe('presetQuadrantCoverage (Q562)', () => {
     );
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q565 — presetModeGroupByProfile
@@ -3340,7 +3237,6 @@ describe('presetModeGroupByProfile (Q565)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q568 — presetQuadrantCoverageNarrative
 // ---------------------------------------------------------------------------
@@ -3361,7 +3257,6 @@ describe('presetQuadrantCoverageNarrative (Q568)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q571 — presetDominantQuadrantProfile
 // ---------------------------------------------------------------------------
@@ -3381,7 +3276,6 @@ describe('presetDominantQuadrantProfile (Q571)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q574 — presetQuadrantProfileDiversity
@@ -3404,7 +3298,6 @@ describe('presetQuadrantProfileDiversity (Q574)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q577 — presetQuadrantProfileDiversityNarrative
 // ---------------------------------------------------------------------------
@@ -3425,7 +3318,6 @@ describe('presetQuadrantProfileDiversityNarrative (Q577)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q589 — presetModeProfileTransitions
 // ---------------------------------------------------------------------------
@@ -3445,7 +3337,6 @@ describe('presetModeProfileTransitions (Q589)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q591 — presetProfileTransitionScore
@@ -3468,7 +3359,6 @@ describe('presetProfileTransitionScore (Q591)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q595 — presetProfileTransitionScoreNarrative
 // ---------------------------------------------------------------------------
@@ -3488,7 +3378,6 @@ describe('presetProfileTransitionScoreNarrative (Q595)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q603 — presetProfileRunSummary
@@ -3510,7 +3399,6 @@ describe('presetProfileRunSummary (Q603)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q607 — presetProfileRunSummaryNarrative
 // ---------------------------------------------------------------------------
@@ -3530,7 +3418,6 @@ describe('presetProfileRunSummaryNarrative (Q607)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q610 — presetProfileRunDensity
@@ -3552,7 +3439,6 @@ describe('presetProfileRunDensity (Q610)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q616 — presetProfileRunDensityNarrative
 // ---------------------------------------------------------------------------
@@ -3572,7 +3458,6 @@ describe('presetProfileRunDensityNarrative (Q616)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q619 — presetProfileTextureReport
@@ -3596,7 +3481,6 @@ describe('presetProfileTextureReport (Q619)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q622 — presetProfileTextureReportNarrative
 // ---------------------------------------------------------------------------
@@ -3616,7 +3500,6 @@ describe('presetProfileTextureReportNarrative (Q622)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q625 — presetModeRarestProfileGroup
@@ -3641,7 +3524,6 @@ describe('presetModeRarestProfileGroup (Q625)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q627 — presetModeSoloProfileModes
 // ---------------------------------------------------------------------------
@@ -3660,7 +3542,6 @@ describe('presetModeSoloProfileModes (Q627)', () => {
     );
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q634 — presetModeSoloProfileNarrative
@@ -3681,7 +3562,6 @@ describe('presetModeSoloProfileNarrative (Q634)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q637 — presetModeQuadrantIdentityBundle
@@ -3704,7 +3584,6 @@ describe('presetModeQuadrantIdentityBundle (Q637)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q640 — presetModeQuadrantIdentityNarrative
 // ---------------------------------------------------------------------------
@@ -3724,7 +3603,6 @@ describe('presetModeQuadrantIdentityNarrative (Q640)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q643 — presetModeAmbassador
@@ -3747,7 +3625,6 @@ describe('presetModeAmbassador (Q643)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q646 — presetModeAmbassadorNarrative
 // ---------------------------------------------------------------------------
@@ -3767,7 +3644,6 @@ describe('presetModeAmbassadorNarrative (Q646)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q649 — presetFamilyAmbassadorRanking
@@ -3789,7 +3665,6 @@ describe('presetFamilyAmbassadorRanking (Q649)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q653 — presetFamilyBestAmbassador
@@ -3816,7 +3691,6 @@ describe('presetFamilyBestAmbassador (Q653)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q655 — presetFamilyAmbassadorScoreStats
 // ---------------------------------------------------------------------------
@@ -3836,7 +3710,6 @@ describe('presetFamilyAmbassadorScoreStats (Q655)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q658 — presetFamilyWeakestAmbassador
@@ -3863,7 +3736,6 @@ describe('presetFamilyWeakestAmbassador (Q658)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q661 — presetFamilyAmbassadorConsensusDistribution
 // ---------------------------------------------------------------------------
@@ -3886,7 +3758,6 @@ describe('presetFamilyAmbassadorConsensusDistribution (Q661)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q664 — presetFamilyAmbassadorProfileFrequency
 // ---------------------------------------------------------------------------
@@ -3907,7 +3778,6 @@ describe('presetFamilyAmbassadorProfileFrequency (Q664)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q667 — presetFamilyLeastCommonAmbassadorProfile
@@ -3936,7 +3806,6 @@ describe('presetFamilyLeastCommonAmbassadorProfile (Q667)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q670 — presetFamilyAmbassadorConsensusScore
 // ---------------------------------------------------------------------------
@@ -3958,7 +3827,6 @@ describe('presetFamilyAmbassadorConsensusScore (Q670)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q677 — presetFamilyAmbassadorOverlapScore
 // ---------------------------------------------------------------------------
@@ -3978,7 +3846,6 @@ describe('presetFamilyAmbassadorOverlapScore (Q677)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q679 — presetFamilyAmbassadorOverlapScoreNarrative
@@ -4002,7 +3869,6 @@ describe('presetFamilyAmbassadorOverlapScoreNarrative (Q679)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q683 — presetFamilyAmbassadorConvergenceScore
 // ---------------------------------------------------------------------------
@@ -4024,7 +3890,6 @@ describe('presetFamilyAmbassadorConvergenceScore (Q683)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q687 — presetFamilyAmbassadorConvergenceScoreNarrative
@@ -4050,7 +3915,6 @@ describe('presetFamilyAmbassadorConvergenceScoreNarrative (Q687)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q689 — presetFamilyAmbassadorConsensusConvergenceScore
 // ---------------------------------------------------------------------------
@@ -4074,7 +3938,6 @@ describe('presetFamilyAmbassadorConsensusConvergenceScore (Q689)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q691 — presetFamilyAmbassadorConsensusConvergenceScoreNarrative
@@ -4103,7 +3966,6 @@ describe('presetFamilyAmbassadorConsensusConvergenceScoreNarrative (Q691)', () =
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q693 — presetFamilyAmbassadorConvergenceBundle
 // ---------------------------------------------------------------------------
@@ -4125,7 +3987,6 @@ describe('presetFamilyAmbassadorConvergenceBundle (Q693)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q695 — presetFamilyAmbassadorConvergenceBundleNarrative
@@ -4151,7 +4012,6 @@ describe('presetFamilyAmbassadorConvergenceBundleNarrative (Q695)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q699 — presetFamilyAmbassadorMeanProfileDistance
 // ---------------------------------------------------------------------------
@@ -4173,7 +4033,6 @@ describe('presetFamilyAmbassadorMeanProfileDistance (Q699)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q701 — presetFamilyAmbassadorMeanProfileDistanceNarrative
@@ -4199,7 +4058,6 @@ describe('presetFamilyAmbassadorMeanProfileDistanceNarrative (Q701)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q703 — presetFamilyAmbassadorProfileDistanceStats
 // ---------------------------------------------------------------------------
@@ -4221,7 +4079,6 @@ describe('presetFamilyAmbassadorProfileDistanceStats (Q703)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q707 — presetFamilyAmbassadorCentrality
@@ -4249,7 +4106,6 @@ describe('presetFamilyAmbassadorCentrality (Q707)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q709 — presetFamilyAmbassadorOutlier
 // ---------------------------------------------------------------------------
@@ -4275,7 +4131,6 @@ describe('presetFamilyAmbassadorOutlier (Q709)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q711 — presetFamilyAmbassadorCentralityNarrative
 // ---------------------------------------------------------------------------
@@ -4297,7 +4152,6 @@ describe('presetFamilyAmbassadorCentralityNarrative (Q711)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q713 — presetFamilyAmbassadorDistanceSpread
@@ -4325,7 +4179,6 @@ describe('presetFamilyAmbassadorDistanceSpread (Q713)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q715 — presetFamilyAmbassadorDistanceSpreadNarrative
 // ---------------------------------------------------------------------------
@@ -4350,7 +4203,6 @@ describe('presetFamilyAmbassadorDistanceSpreadNarrative (Q715)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q721 — presetFamilyAmbassadorsSummaryTable
 // ---------------------------------------------------------------------------
@@ -4370,7 +4222,6 @@ describe('presetFamilyAmbassadorsSummaryTable (Q721)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q723 — presetFamilyAmbassadorsSummaryNarrative
@@ -4394,7 +4245,6 @@ describe('presetFamilyAmbassadorsSummaryNarrative (Q723)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q725 — presetFamilyAmbassadorTopN
 // ---------------------------------------------------------------------------
@@ -4414,7 +4264,6 @@ describe('presetFamilyAmbassadorTopN (Q725)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q929 — presetFamilySocraticRadarConsistencyScore
@@ -4452,7 +4301,6 @@ describe('presetFamilySocraticRadarConsistencyScore (Q929)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q947 — presetFamilySocraticRadarOutlierDetection
 // ---------------------------------------------------------------------------
@@ -4480,7 +4328,6 @@ describe('presetFamilySocraticRadarOutlierDetection (Q947)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q949 — presetFamilySocraticRadarTrend
 // ---------------------------------------------------------------------------
@@ -4501,7 +4348,6 @@ describe('presetFamilySocraticRadarTrend (Q949)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q951 — presetFamilySocraticRadarRobustnessScore
@@ -4527,7 +4373,6 @@ describe('presetFamilySocraticRadarRobustnessScore (Q951)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q955 — presetFamilySocraticRadarEvolutionScore
 // ---------------------------------------------------------------------------
@@ -4552,7 +4397,6 @@ describe('presetFamilySocraticRadarEvolutionScore (Q955)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q961 — presetFamilySocraticRadarVolatilityIndex
 // ---------------------------------------------------------------------------
@@ -4576,7 +4420,6 @@ describe('presetFamilySocraticRadarVolatilityIndex (Q961)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q963 — presetFamilySocraticRadarCoherenceScore
@@ -4603,7 +4446,6 @@ describe('presetFamilySocraticRadarCoherenceScore (Q963)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q965 — presetFamilySocraticRadarMomentumScore
 // ---------------------------------------------------------------------------
@@ -4628,7 +4470,6 @@ describe('presetFamilySocraticRadarMomentumScore (Q965)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q971 — presetFamilySocraticRadarIQRScore
@@ -4660,7 +4501,6 @@ describe('presetFamilySocraticRadarIQRScore (Q971)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q973 — presetFamilySocraticRadarBimodalityScore
 // ---------------------------------------------------------------------------
@@ -4685,7 +4525,6 @@ describe('presetFamilySocraticRadarBimodalityScore (Q973)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q975 — presetFamilySocraticRadarDependenceMatrix
@@ -4714,7 +4553,6 @@ describe('presetFamilySocraticRadarDependenceMatrix (Q975)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q997 — presetFamilySocraticRadarWeakMembers
 // ---------------------------------------------------------------------------
@@ -4738,7 +4576,6 @@ describe('presetFamilySocraticRadarWeakMembers (Q997)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q1029 — presetFamilySocraticRadarConvergenceScore
@@ -4764,7 +4601,6 @@ describe('presetFamilySocraticRadarConvergenceScore (Q1029)', () => {
     ).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q1071 — presetFamilySocraticRadarCrossAxisCorrelation
@@ -4792,7 +4628,6 @@ describe('presetFamilySocraticRadarCrossAxisCorrelation (Q1071)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q1167 — presetFamilySocraticRadarFamilyConvergence
 // ---------------------------------------------------------------------------
@@ -4807,7 +4642,6 @@ describe('presetFamilySocraticRadarFamilyConvergence (Q1167)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q1185 — presetFamilySocraticRadarApproximateEntropy
 // ---------------------------------------------------------------------------
@@ -4820,7 +4654,6 @@ describe('presetFamilySocraticRadarApproximateEntropy (Q1185)', () => {
     expect(r).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q1187 — presetFamilySocraticRadarFractalDimension
@@ -4835,7 +4668,6 @@ describe('presetFamilySocraticRadarFractalDimension (Q1187)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q1189 — presetFamilySocraticRadarSampleEntropy
 // ---------------------------------------------------------------------------
@@ -4848,7 +4680,6 @@ describe('presetFamilySocraticRadarSampleEntropy (Q1189)', () => {
     expect(r).toBeGreaterThanOrEqual(0);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q1191 — presetFamilySocraticRadarTransferEntropy
@@ -4870,7 +4701,6 @@ describe('presetFamilySocraticRadarTransferEntropy (Q1191)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q1193 — presetFamilySocraticRadarLyapunovExponent
 // ---------------------------------------------------------------------------
@@ -4883,7 +4713,6 @@ describe('presetFamilySocraticRadarLyapunovExponent (Q1193)', () => {
     expect(Number.isFinite(r)).toBe(true);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q1197 — presetFamilySocraticRadarPermutationEntropy
@@ -4900,7 +4729,6 @@ describe('presetFamilySocraticRadarPermutationEntropy (Q1197)', () => {
   });
 });
 
-
 // ---------------------------------------------------------------------------
 // Q1201 — presetFamilySocraticRadarDetrendedFluctuation
 // ---------------------------------------------------------------------------
@@ -4914,7 +4742,6 @@ describe('presetFamilySocraticRadarDetrendedFluctuation (Q1201)', () => {
     expect(Number.isFinite(r)).toBe(true);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Q1371 — presetFamilySocraticRadarLocalExtremaCount
@@ -4945,7 +4772,6 @@ describe('presetFamilySocraticRadarLocalExtremaCount (Q1371)', () => {
   });
 });
 
-
 // Q1401 — presetFamilySocraticRadarSilhouetteScore
 describe('Q1401 presetFamilySocraticRadarSilhouetteScore', () => {
   const s = harmonicSpectrum(6);
@@ -4963,7 +4789,6 @@ describe('Q1401 presetFamilySocraticRadarSilhouetteScore', () => {
   });
 });
 
-
 // Q1407 — presetFamilySocraticRadarDunnIndex
 describe('Q1407 presetFamilySocraticRadarDunnIndex', () => {
   const s = harmonicSpectrum(6);
@@ -4980,7 +4805,6 @@ describe('Q1407 presetFamilySocraticRadarDunnIndex', () => {
   });
 });
 
-
 // Q1409 — presetFamilySocraticRadarDaviesBouldinIndex
 describe('Q1409 presetFamilySocraticRadarDaviesBouldinIndex', () => {
   const s = harmonicSpectrum(6);
@@ -4996,7 +4820,6 @@ describe('Q1409 presetFamilySocraticRadarDaviesBouldinIndex', () => {
     expect(() => presetFamilySocraticRadarDaviesBouldinIndex(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1423 — presetFamilySocraticRadarSpectralCentroidProfile
 describe('Q1423 presetFamilySocraticRadarSpectralCentroidProfile', () => {
@@ -5015,7 +4838,6 @@ describe('Q1423 presetFamilySocraticRadarSpectralCentroidProfile', () => {
     );
   });
 });
-
 
 // Q1425 — presetFamilySocraticRadarSpectralFlatnessProfile
 describe('Q1425 presetFamilySocraticRadarSpectralFlatnessProfile', () => {
@@ -5036,7 +4858,6 @@ describe('Q1425 presetFamilySocraticRadarSpectralFlatnessProfile', () => {
   });
 });
 
-
 // Q1427 — presetFamilySocraticRadarSpectralRolloffProfile
 describe('Q1427 presetFamilySocraticRadarSpectralRolloffProfile', () => {
   const s = harmonicSpectrum(6);
@@ -5055,7 +4876,6 @@ describe('Q1427 presetFamilySocraticRadarSpectralRolloffProfile', () => {
   });
 });
 
-
 // Q1433 — presetFamilySocraticRadarSpectralBandwidthMean
 describe('Q1433 presetFamilySocraticRadarSpectralBandwidthMean', () => {
   const s = harmonicSpectrum(6);
@@ -5072,7 +4892,6 @@ describe('Q1433 presetFamilySocraticRadarSpectralBandwidthMean', () => {
     );
   });
 });
-
 
 // Q1435 — presetFamilySocraticRadarCriticalBandRatio
 describe('Q1435 presetFamilySocraticRadarCriticalBandRatio', () => {
@@ -5092,7 +4911,6 @@ describe('Q1435 presetFamilySocraticRadarCriticalBandRatio', () => {
   });
 });
 
-
 // Q1439 — presetFamilySocraticRadarRoughnessProfile
 describe('Q1439 presetFamilySocraticRadarRoughnessProfile', () => {
   const s = harmonicSpectrum(6);
@@ -5108,7 +4926,6 @@ describe('Q1439 presetFamilySocraticRadarRoughnessProfile', () => {
     expect(() => presetFamilySocraticRadarRoughnessProfile(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1441 — presetFamilySocraticRadarMaskingThresholdMean
 describe('Q1441 presetFamilySocraticRadarMaskingThresholdMean', () => {
@@ -5126,7 +4943,6 @@ describe('Q1441 presetFamilySocraticRadarMaskingThresholdMean', () => {
   });
 });
 
-
 // Q1443 — presetFamilySocraticRadarPitchSalienceMean
 describe('Q1443 presetFamilySocraticRadarPitchSalienceMean', () => {
   const s = harmonicSpectrum(6);
@@ -5143,7 +4959,6 @@ describe('Q1443 presetFamilySocraticRadarPitchSalienceMean', () => {
   });
 });
 
-
 // Q1483 — presetFamilySocraticRadarModalCenterStrength
 describe('Q1483 presetFamilySocraticRadarModalCenterStrength', () => {
   const s = harmonicSpectrum(6);
@@ -5159,7 +4974,6 @@ describe('Q1483 presetFamilySocraticRadarModalCenterStrength', () => {
   });
 });
 
-
 // Q1485 — presetFamilySocraticRadarTonicStabilityIndex
 describe('Q1485 presetFamilySocraticRadarTonicStabilityIndex', () => {
   const s = harmonicSpectrum(6);
@@ -5174,7 +4988,6 @@ describe('Q1485 presetFamilySocraticRadarTonicStabilityIndex', () => {
     expect(() => presetFamilySocraticRadarTonicStabilityIndex(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1487 — presetFamilySocraticRadarLeadingToneScore
 describe('Q1487 presetFamilySocraticRadarLeadingToneScore', () => {
@@ -5192,7 +5005,6 @@ describe('Q1487 presetFamilySocraticRadarLeadingToneScore', () => {
   });
 });
 
-
 // Q1489 — presetFamilySocraticRadarModalAmbiguity
 describe('Q1489 presetFamilySocraticRadarModalAmbiguity', () => {
   const s = harmonicSpectrum(6);
@@ -5207,7 +5019,6 @@ describe('Q1489 presetFamilySocraticRadarModalAmbiguity', () => {
     expect(() => presetFamilySocraticRadarModalAmbiguity(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // ---------------------------------------------------------------------------
 // Round 51: Q1507–Q1517 — Complexity Theory / Algorithmic Information bridges
@@ -5229,7 +5040,6 @@ describe('Q1507 presetFamilySocraticRadarKolmogorovProxy', () => {
   });
 });
 
-
 // Q1509 — presetFamilySocraticRadarLempelZivProxy
 describe('Q1509 presetFamilySocraticRadarLempelZivProxy', () => {
   const s = harmonicSpectrum(6);
@@ -5243,7 +5053,6 @@ describe('Q1509 presetFamilySocraticRadarLempelZivProxy', () => {
     expect(() => presetFamilySocraticRadarLempelZivProxy(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1511 — presetFamilySocraticRadarFractalDimensionProxy
 describe('Q1511 presetFamilySocraticRadarFractalDimensionProxy', () => {
@@ -5263,7 +5072,6 @@ describe('Q1511 presetFamilySocraticRadarFractalDimensionProxy', () => {
   });
 });
 
-
 // Q1513 — presetFamilySocraticRadarSelfSimilarityScore
 describe('Q1513 presetFamilySocraticRadarSelfSimilarityScore', () => {
   const s = harmonicSpectrum(6);
@@ -5279,7 +5087,6 @@ describe('Q1513 presetFamilySocraticRadarSelfSimilarityScore', () => {
     expect(() => presetFamilySocraticRadarSelfSimilarityScore(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1515 — presetFamilySocraticRadarRepetitiveness
 describe('Q1515 presetFamilySocraticRadarRepetitiveness', () => {
@@ -5297,7 +5104,6 @@ describe('Q1515 presetFamilySocraticRadarRepetitiveness', () => {
   });
 });
 
-
 // Q1517 — presetFamilySocraticRadarPredictabilityScore
 describe('Q1517 presetFamilySocraticRadarPredictabilityScore', () => {
   const s = harmonicSpectrum(6);
@@ -5313,7 +5119,6 @@ describe('Q1517 presetFamilySocraticRadarPredictabilityScore', () => {
     expect(() => presetFamilySocraticRadarPredictabilityScore(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1519 — presetFamilySocraticRadarNashEquilibriumProxy
 describe('Q1519 presetFamilySocraticRadarNashEquilibriumProxy', () => {
@@ -5331,7 +5136,6 @@ describe('Q1519 presetFamilySocraticRadarNashEquilibriumProxy', () => {
   });
 });
 
-
 // Q1521 — presetFamilySocraticRadarGameValueMean
 describe('Q1521 presetFamilySocraticRadarGameValueMean', () => {
   const s = harmonicSpectrum(6);
@@ -5347,7 +5151,6 @@ describe('Q1521 presetFamilySocraticRadarGameValueMean', () => {
   });
 });
 
-
 // Q1525 — presetFamilySocraticRadarParetoDominanceCount
 describe('Q1525 presetFamilySocraticRadarParetoDominanceCount', () => {
   const s = harmonicSpectrum(6);
@@ -5362,7 +5165,6 @@ describe('Q1525 presetFamilySocraticRadarParetoDominanceCount', () => {
     expect(() => presetFamilySocraticRadarParetoDominanceCount(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1537 — presetFamilySocraticRadarELECTREOutranking
 describe('Q1537 presetFamilySocraticRadarELECTREOutranking', () => {
@@ -5380,7 +5182,6 @@ describe('Q1537 presetFamilySocraticRadarELECTREOutranking', () => {
   });
 });
 
-
 // Q1539 — presetFamilySocraticRadarPROMETHEEFlowMean
 describe('Q1539 presetFamilySocraticRadarPROMETHEEFlowMean', () => {
   const s = harmonicSpectrum(6);
@@ -5395,7 +5196,6 @@ describe('Q1539 presetFamilySocraticRadarPROMETHEEFlowMean', () => {
     expect(() => presetFamilySocraticRadarPROMETHEEFlowMean(['unknown'], s)).toThrow(RangeError);
   });
 });
-
 
 // Q1619 — presetFamilySocraticRadarBetweennessCentralityMean
 describe('Q1619 presetFamilySocraticRadarBetweennessCentralityMean', () => {
@@ -5419,7 +5219,6 @@ describe('Q1619 presetFamilySocraticRadarBetweennessCentralityMean', () => {
   });
 });
 
-
 // Q1621 — presetFamilySocraticRadarClusteringCoefficientMeanV2
 describe('Q1621 presetFamilySocraticRadarClusteringCoefficientMeanV2', () => {
   const s = harmonicSpectrum(6);
@@ -5442,7 +5241,6 @@ describe('Q1621 presetFamilySocraticRadarClusteringCoefficientMeanV2', () => {
   });
 });
 
-
 // Q1623 — presetFamilySocraticRadarGraphDensityMean
 describe('Q1623 presetFamilySocraticRadarGraphDensityMean', () => {
   const s = harmonicSpectrum(6);
@@ -5459,7 +5257,6 @@ describe('Q1623 presetFamilySocraticRadarGraphDensityMean', () => {
   });
 });
 
-
 // Q1653 — presetFamilySocraticRadarLaplacianMean
 describe('Q1653 presetFamilySocraticRadarLaplacianMean', () => {
   const s = harmonicSpectrum(6);
@@ -5475,4 +5272,3 @@ describe('Q1653 presetFamilySocraticRadarLaplacianMean', () => {
     expect(() => presetFamilySocraticRadarLaplacianMean(['unknown'], s)).toThrow(RangeError);
   });
 });
-
