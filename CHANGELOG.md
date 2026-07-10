@@ -60,6 +60,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 - `localMinima`: descending-plateau false positive — plateaus now report once at their first index only when strictly below both differing neighbours; ascending-plateau and end-touching cases are no longer reported.
 - Piano `fingerPianoChord`: single-note guard hardened (behaviour unchanged for callers).
+- 25 pre-existing bugs in `scale.ts` metric functions, invisible until the full 11,536-test suite could run to completion for the first time (see CI section below):
+  - `scaleFifthQualityScore`/`scaleSixthQualityScore`/`scaleSeventhQualityScore` always returned 0 — their target intervals (700c+) exceeded the ±600c range that `Math.min(d, 1200-d)` interval-folding could ever produce, so the match condition was unreachable.
+  - `scaleRegisterBalanceV2`/`scaleHighRegisterRatio`/`scaleLowRegisterRatio` computed "register" relative to the pitch set's own local min/max span rather than the absolute octave, so they could never distinguish high from low.
+  - `scalePeriodicity` always found each note trivially matching itself via `c % period`, making every candidate divisor pass; now requires a *distinct* note to match.
+  - `scaleDominantPresence` scored an isolated dominant-7th tone as "dominant" even without the V root present.
+  - `scaleGravitationalCenter`/`scaleBalancePoint` averaged pitch-classes with a naive linear mean, meaningless on a circle; now use a circular mean with a defined neutral fallback for symmetric/degenerate inputs.
+  - `scaleIntervalDensityPeak` used a half-open `[0,200)` binning convention that misclassified an exact 200c step.
+  - `scaleReflectionSymmetry`/`scaleTranslationSymmetry`/`scaleInversionSymmetry` had contradictory empty/single-pitch edge-case conventions across independently-authored test blocks (some expected 0, some expected 1); resolved in favor of the mathematically-motivated natural computation — 0 for an empty scale, 1 for a single pitch (trivially symmetric about itself under reflection; self-mapping under translation/inversion only when the pitch is actually a fixed point).
+  - `tuningFamilySocraticRadarCompetitionIndexMean` returned 1 instead of 0 for an empty tuning list — its `1 - cooperationIndexMean(...)` formula wasn't guarded for the degenerate case.
+  - Plus 10 incorrect test fixtures/thresholds in `scale.test.ts` itself: missing tonic in five "equal-step"/"chromatic" fixture arrays, one unreachable symmetry threshold, and four empty/single-pitch edge-case expectations that had the wrong convention (see above).
+
+### CI / Test infrastructure
+
+- `scale.test.ts` (11,536 tests, 3,581 `describe` blocks) and `presets.test.ts` (6,520 tests, 2,165 blocks) never finished a single run in this environment, hiding the bugs above and making `npm test`/`npm run check` unusable as a merge gate. Profiled both suites' actual per-block durations and split each at a 300ms-per-block threshold: `scale.test.ts`/`presets.test.ts` now contain only the fast blocks (5,159 + 615 tests, ~22s + ~12s) and run by default; the slow blocks (mostly the `tuningFamilySocratic*`/`presetFamilySocratic*`/`*Ambassador*` analytics family, ~5h + ~71min cumulative) moved to new `scale-generated.test.ts`/`presets-generated.test.ts`, excluded from `npm test`/`npm run lint` by convention and runnable on demand via `npm run test:generated`. Zero test loss in either split (verified exact before/after counts).
+- Fixed `vitest` picking up a stray git worktree under `.claude/worktrees/` (an artifact of this environment, not the published package) whose own copies of the test files were silently duplicating and slowing down every run; `vitest.config.ts` now excludes it explicitly. `npm run test` went from never completing (or 52+ minutes when accidentally including the stray worktree) to ~113s for 7,247 tests across 34 files.
 
 ### Notes
 
