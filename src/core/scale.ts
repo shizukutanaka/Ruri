@@ -4,7 +4,6 @@ import {
   degreeToCents,
   degreeToFreq,
   tuningToIntervalVector,
-  equalTemperament12,
 } from './tuning.js';
 import { type Spectrum, harmonicSpectrum } from './spectrum.js';
 import { midiToFreq } from './midi.js';
@@ -20329,10 +20328,15 @@ export function voiceLeadingDistance(chordA: readonly number[], chordB: readonly
     }
     return minDist;
   } else {
-    // Sorted matching for larger chords
+    // Sorted matching for larger chords: pair the i-th smallest pitch class
+    // of each chord rather than trying all voices!/permutations.
     const sortedA = [...a].sort((x, y) => x - y);
     const sortedB = [...b].sort((x, y) => x - y);
-    return totalDist(sortedB.map((_, i) => sortedB[i]!));
+    let total = 0;
+    for (let i = 0; i < voices; i++) {
+      total += pcDist(sortedA[i]!, sortedB[i]!);
+    }
+    return total;
   }
 }
 
@@ -22460,7 +22464,7 @@ const _gcd = (a: number, b: number): number => (b === 0 ? a : _gcd(b, a % b));
 export function justIntonationError(
   scaleCents: readonly number[],
   primeLimit: number = 5,
-  toleranceCents: number = 15,
+  _toleranceCents: number = 15,
 ): Array<{ degree: number; nearestRatio: string; errorCents: number }> {
   if (primeLimit < 2) throw new RangeError('primeLimit must be >= 2');
 
@@ -31277,7 +31281,7 @@ export function scaleHemitonicDensity(scaleCents: readonly number[]): number {
   let hemitonic = 0;
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
-      let interval = Math.abs(scaleCents[i]! - scaleCents[j]!) % 1200;
+      const interval = Math.abs(scaleCents[i]! - scaleCents[j]!) % 1200;
       const folded = Math.min(interval, 1200 - interval);
       if (folded < 150) hemitonic++;
     }
@@ -31383,7 +31387,7 @@ export function tuningFamilySocraticRadarKMeansClusterV2(
     Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]!) ** 2, 0));
 
   // Initialize centroids: first and last profiles
-  let centroids: number[][] = [toVec(profiles[0]!), toVec(profiles[n - 1]!)];
+  const centroids: number[][] = [toVec(profiles[0]!), toVec(profiles[n - 1]!)];
   let clusters: number[] = new Array(n).fill(0);
   let iterations = 0;
 
@@ -31496,7 +31500,7 @@ export function tuningFamilySocraticRadarAgglomerativeCluster(
   const vecs = profiles.map(toVec);
 
   // Each tuning starts in its own cluster
-  let clusterOf: number[] = Array.from({ length: n }, (_, i) => i);
+  const clusterOf: number[] = Array.from({ length: n }, (_, i) => i);
   const activeClusters = new Set<number>(Array.from({ length: n }, (_, i) => i));
 
   while (activeClusters.size > 2) {
@@ -32040,7 +32044,7 @@ export function scaleFractalDimension(
  */
 export function scaleZoomSelfSimilarity(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n < 4) return 0;
@@ -32429,7 +32433,7 @@ export function tuningFamilySocraticRadarTransferEntropyMean(
 // ZZ1: scaleComplexityRatio
 export function scaleComplexityRatio(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   if (scaleCents.length <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -32449,7 +32453,7 @@ export function scaleComplexityRatio(
 // ZZ2: scaleExpressivenessIndex
 export function scaleExpressivenessIndex(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   if (scaleCents.length <= 1) return 0;
   const sorted = [...scaleCents].sort((a, b) => a - b);
@@ -33464,7 +33468,7 @@ export function tuningFamilySocraticRadarObjectiveSpaceVolume(
 
 export function scaleTonnetzCoordinates(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): Array<[number, number]> {
   if (scaleCents.length === 0) return [];
   return scaleCents.map((p) => {
@@ -33839,7 +33843,6 @@ export function scalePrimeForm(
 ): number[] {
   const pcs = scalePitchClassSet(scaleCents, divisions, periodCents);
   if (pcs.length === 0) return [];
-  const n = pcs.length;
 
   function normalize(rotation: number[]): number[] {
     const first = rotation[0]!;
@@ -33945,7 +33948,7 @@ export function scaleMeantoneDeviation(
   const meaFifth = 696.578;
   const meaonePitches: number[] = [];
   for (let k = -6; k <= 6; k++) {
-    let p = (((k * meaFifth) % periodCents) + periodCents) % periodCents;
+    const p = (((k * meaFifth) % periodCents) + periodCents) % periodCents;
     meaonePitches.push(p);
   }
   let totalDev = 0;
@@ -34093,7 +34096,6 @@ export function tuningFamilySocraticRadarProfileTrendSlope(
   if (n <= 1) return 0;
   let sumSlope = 0;
   const tMean = (n - 1) / 2;
-  const tVar = profiles.reduce((_, __, idx) => 0, 0);
   let tSS = 0;
   for (let i = 0; i < n; i++) {
     tSS += (i - tMean) ** 2;
@@ -34478,7 +34480,6 @@ export function scaleDensityHistogram(
   const binWidth = periodCents / bins;
   for (const pitch of scaleCents) {
     const idx = Math.min(Math.floor(pitch / binWidth), bins - 1);
-    counts[idx]!;
     counts[idx] = (counts[idx] ?? 0) + 1;
   }
   return counts;
@@ -34738,7 +34739,7 @@ export function tuningFamilySocraticRadarTonicDominantRatio(
 export function scaleReachabilityMatrix(
   scaleCents: readonly number[],
   maxSteps: number = 2,
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number[][] {
   const n = scaleCents.length;
   if (n === 0) return [];
@@ -34778,7 +34779,7 @@ export function scaleReachabilityScore(
 
 export function scaleAveragePath(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
@@ -34795,7 +34796,7 @@ export function scaleAveragePath(
 
 export function scaleWienerIndex(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
@@ -34834,7 +34835,7 @@ export function scaleOvertoneMatchScore(
 
 export function scaleSubharmonicMatchScore(
   scaleCents: readonly number[],
-  fundamentalHz: number = 440,
+  _fundamentalHz: number = 440,
   subharmonics: number = 8,
   toleranceCents: number = 20,
 ): number {
@@ -34859,7 +34860,7 @@ export function scaleSubharmonicMatchScore(
 export function scaleBeatFrequency(
   scaleCents: readonly number[],
   fundamentalHz: number = 440,
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
@@ -60948,7 +60949,7 @@ export function scaleSelfSimilarityScore(
 // RRR1
 export function scaleIntervalComplexityRatio(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n <= 1) return 0;
@@ -61101,7 +61102,6 @@ export function scaleOvertoneRichness(
   let matchCount = 0;
   for (let i = 0; i < n; i++) {
     const p = scaleCents[i]!;
-    const pc = ((p % periodCents) + periodCents) % periodCents;
     for (let k = 2; k <= 8; k++) {
       const harmonicCents = (((p + 1200 * Math.log2(k)) % periodCents) + periodCents) % periodCents;
       for (let j = 0; j < n; j++) {
@@ -63401,7 +63401,7 @@ export function scaleCriticalBandDensity(
  */
 export function scaleMaskingIndex(
   scaleCents: readonly number[],
-  periodCents = 1200,
+  _periodCents = 1200,
   maskingRangeCents = 80,
 ): number {
   const n = scaleCents.length;
@@ -63424,7 +63424,7 @@ export function scaleMaskingIndex(
 export function scalePitchHeightSpread(
   scaleCents: readonly number[],
   referenceHz = 440,
-  periodCents = 1200,
+  _periodCents = 1200,
 ): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
@@ -64866,7 +64866,7 @@ export function scaleTonalCentripetal(
  */
 export function scaleModalBrightnessV2(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n < 1) return 0;
@@ -64893,7 +64893,7 @@ export function scaleModalBrightnessV2(
  */
 export function scaleModalDarknessV2(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n < 1) return 0;
@@ -64938,7 +64938,7 @@ export function scaleModalBrightnessBiasV2(
  */
 export function scaleModalComplexityV2(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n === 0) return 0;
@@ -65222,7 +65222,7 @@ export function scaleStepRecurrence(
 // For each pair (i,j): check if |cents[i] - cents[j]| is within 10 cents of any multiple of 1200.
 export function scaleOctaveEquivalence(
   scaleCents: readonly number[],
-  periodCents: number = 1200,
+  _periodCents: number = 1200,
 ): number {
   const n = scaleCents.length;
   if (n < 2) return 0;
@@ -69941,7 +69941,6 @@ export function scaleAppoggiaturaContent(pitches: readonly Pitch[]): number {
   // Approximate: pitches within 50-150c of chord tones [0, 400, 700] (±30c window from each chord tone)
   // Count pitches that are 50-150c away from a chord tone
   const chordTones = [0, 400, 700];
-  const tol = 30;
   const appog = pitches.filter((p) => {
     const c = ((pitchToCents(p) % 1200) + 1200) % 1200;
     return chordTones.some((ct) => {

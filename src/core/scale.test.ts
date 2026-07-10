@@ -12539,6 +12539,19 @@ describe('voiceLeadingDistance (O1)', () => {
     expect(voiceLeadingDistance([], [0, 4, 7])).toBe(0);
     expect(voiceLeadingDistance([0, 4, 7], [])).toBe(0);
   });
+
+  it('test_five_voice_chords_use_sorted_matching_not_permutations', () => {
+    // 5 voices exceeds the permutation cutoff (4), exercising the sorted-
+    // matching branch. Sorted pairwise: (0,1)+(2,3)+(4,5)+(6,7)+(8,9), each 1
+    // semitone apart => total 5. Input order is deliberately unsorted to
+    // catch a regression where the code matched sorted chordB against the
+    // *original, unsorted* chordA instead of sorted chordA.
+    expect(voiceLeadingDistance([8, 0, 4, 2, 6], [1, 3, 5, 7, 9])).toBe(5);
+  });
+
+  it('test_five_voice_identical_chords_is_zero', () => {
+    expect(voiceLeadingDistance([1, 3, 5, 7, 9], [9, 7, 5, 3, 1])).toBe(0);
+  });
 });
 
 
@@ -26006,7 +26019,6 @@ describe('scaleDegreeSpread', () => {
     expect(scaleDegreeSpread([])).toBe(0);
   });
   it('returns 1 for pitches spanning 1200c', () => {
-    const pitches = [0, 1200].map((c) => pitchFromCents(c));
     // 1200 mod 1200 = 0, so spread = 0 - 0 = 0 for [0, 1200c mod 1200]
     // Use [0, 1100] instead
     const p2 = [0, 1100].map((c) => pitchFromCents(c));
@@ -29886,7 +29898,6 @@ describe('scaleZapotecScale', () => {
 
 // Round252 西アフリカ音階
 describe('scalePygmyScale', () => {
-  const spec = harmonicSpectrum(6);
   it('empty returns 0', () => { expect(scalePygmyScale([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scalePygmyScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scalePygmyScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
@@ -29894,7 +29905,6 @@ describe('scalePygmyScale', () => {
 
 
 describe('scaleAkanScale', () => {
-  const spec = harmonicSpectrum(6);
   it('empty returns 0', () => { expect(scaleAkanScale([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleAkanScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleAkanScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
@@ -29902,7 +29912,6 @@ describe('scaleAkanScale', () => {
 
 
 describe('scaleEweScale', () => {
-  const spec = harmonicSpectrum(6);
   it('empty returns 0', () => { expect(scaleEweScale([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleEweScale(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleEweScale(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
@@ -29910,7 +29919,6 @@ describe('scaleEweScale', () => {
 
 
 describe('scaleYorubaScaleV2', () => {
-  const spec = harmonicSpectrum(6);
   it('empty returns 0', () => { expect(scaleYorubaScaleV2([])).toBe(0); });
   it('12-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(12, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
   it('19-EDO in [0,1]', () => { const v = scaleYorubaScaleV2(edo(19, 440).degrees); expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
