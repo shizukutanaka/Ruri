@@ -5,6 +5,7 @@ import {
   sclFromCents,
   degreeCents,
   tuningToScl,
+  sclToTuning,
   chordToScl,
   chordMapToScl,
   scaleChordMapToScl,
@@ -237,6 +238,59 @@ describe('tuningToScl — TuningSystem → ScalaScale adapter', () => {
     expect(scl.degrees.length).toBe(19);
   });
 });
+
+// sclToTuning — inverse of tuningToScl: ScalaScale → TuningSystem
+describe('sclToTuning — ScalaScale → TuningSystem adapter', () => {
+  it('test_degree_count_excludes_period_includes_root', () => {
+    // 12-TET scl has 12 entries (11 above-root + period); tuning has 12 degrees (0..11).
+    const scl = tuningToScl(equalTemperament12(440));
+    const tuning = sclToTuning(scl);
+    expect(tuning.degrees.length).toBe(12);
+  });
+
+  it('test_period_recovered_as_periodCents', () => {
+    const scl = tuningToScl(edo(13, 440, 1200 * Math.log2(3))); // Bohlen-Pierce
+    const tuning = sclToTuning(scl);
+    expect(tuning.periodCents).toBeCloseTo(1200 * Math.log2(3), 6);
+  });
+
+  it('test_round_trip_tuning_scl_tuning_preserves_cents', () => {
+    const t19 = edo(19);
+    const back = sclToTuning(tuningToScl(t19), t19.referenceHz, t19.id);
+    expect(back.degrees.length).toBe(t19.degrees.length);
+    back.degrees.forEach((d, i) => {
+      expect(degreeCents(scalaDegreeFromPitch(d))).toBeCloseTo(
+        degreeCents(scalaDegreeFromPitch(t19.degrees[i]!)),
+        6,
+      );
+    });
+  });
+
+  it('test_ratio_degrees_preserved_exactly', () => {
+    // A .scl with ratio degrees must round-trip as exact ratios, not lossy cents.
+    const scl = parseScl('just triad\n3\n5/4\n3/2\n2/1\n');
+    const tuning = sclToTuning(scl);
+    const third = tuning.degrees[1]!;
+    expect(third.kind).toBe('ratio');
+    if (third.kind === 'ratio') {
+      expect(third.ratio.num).toBe(5);
+      expect(third.ratio.den).toBe(4);
+    }
+  });
+
+  it('test_rejects_empty_scale', () => {
+    expect(() => sclToTuning({ description: 'empty', degrees: [] })).toThrow(RangeError);
+  });
+});
+
+// Helper: read cents off any Pitch by wrapping it in a ScalaDegree-compatible shape.
+function scalaDegreeFromPitch(
+  p: import('../core/cents.js').Pitch,
+): import('./scala.js').ScalaDegree {
+  return p.kind === 'ratio'
+    ? { kind: 'ratio', num: p.ratio.num, den: p.ratio.den }
+    : { kind: 'cents', cents: p.cents, text: p.cents.toFixed(6) };
+}
 
 // Q111 — chordToScl: chord + rootHz → ScalaScale capturing chord intervals as cents
 describe('chordToScl (Q111)', () => {

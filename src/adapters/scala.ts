@@ -1,6 +1,7 @@
 /** Scala .scl import/export. Preserves original ratio-vs-cents representation for lossless round-trip. */
-import { type TuningSystem, degreeToFreq } from '../core/tuning.js';
-import { pitchToCents, freqToCents } from '../core/cents.js';
+import { type TuningSystem, degreeToFreq, defineTuning } from '../core/tuning.js';
+import { type Pitch, pitchToCents, freqToCents } from '../core/cents.js';
+import { ratio } from '../core/ratio.js';
 import { type Chord, chordToFreqRatios } from '../core/chord.js';
 import {
   type ScaleChordMapEntry,
@@ -148,6 +149,58 @@ export function tuningToScl(tuning: TuningSystem): ScalaScale {
     text: tuning.periodCents.toFixed(6),
   };
   return { description: tuning.id, degrees: [...aboveRoot, period] };
+}
+
+/**
+ * Import a Scala `.scl` `ScalaScale` as a first-class core `TuningSystem`.
+ *
+ * The inverse of {@link tuningToScl}. A `.scl` lists only the pitches *above*
+ * the implicit 1/1 root, with the final entry being the period (usually 2/1).
+ * A `TuningSystem`, by contrast, lists degrees *within* one period `[0, period)`
+ * with the root included and the period excluded. This bridge performs that
+ * remapping: it prepends the implicit 0-cent root, drops the trailing period
+ * degree, and records the period as `periodCents`. Ratio degrees are preserved
+ * exactly as GCD-reduced `Ratio` pitches (not converted to lossy cents), so a
+ * `parseScl → sclToTuning → tuningToScl → writeScl` cycle round-trips ratios
+ * without precision loss.
+ *
+ * @param scl - The parsed Scala scale (see {@link parseScl}).
+ * @param referenceHz - Frequency of the root degree. Default 440.
+ * @param id - Tuning id/name. Default derived from the scale description, or `'scl'`.
+ * @returns A validated `TuningSystem` (runs through {@link defineTuning}).
+ * @throws {RangeError} if the scale has no degrees, or if degrees are not
+ *   strictly ascending within the period (enforced by `defineTuning`).
+ *
+ * @example
+ * const scl = parseScl(fs.readFileSync('meantone.scl', 'utf8'));
+ * const tuning = sclToTuning(scl, 261.63, 'meantone');
+ * const wav = tuningToScaleWav(tuning); // now usable with any core/adapter API
+ */
+export function sclToTuning(scl: ScalaScale, referenceHz = 440, id?: string): TuningSystem {
+  if (scl.degrees.length < 1) {
+    throw new RangeError('sclToTuning: scale has no degrees');
+  }
+  const periodDegree = scl.degrees[scl.degrees.length - 1] as ScalaDegree;
+  const periodCents = degreeCents(periodDegree);
+  const inner = scl.degrees.slice(0, -1);
+  const degrees: Pitch[] = [
+    { kind: 'cents', cents: 0 },
+    ...inner.map(
+      (d): Pitch =>
+        d.kind === 'ratio'
+          ? { kind: 'ratio', ratio: ratio(d.num, d.den) }
+          : { kind: 'cents', cents: d.cents },
+    ),
+  ];
+  const resolvedId = id ?? (scl.description || 'scl');
+  return defineTuning({
+    id: resolvedId,
+    name: scl.description || resolvedId,
+    referenceHz,
+    periodCents,
+    degrees,
+    source: 'theoretical',
+  });
 }
 
 /**

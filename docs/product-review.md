@@ -61,8 +61,8 @@
 
 ## 不足(Deficiency / 欠落)
 
-1. **CLIバッチ書き出しツールなし**: ライブラリAPIとシングルファイルWebデモのみ。コマンドラインから調律/和音をWAV/SMFに一括レンダリングする手段がない。
-2. **新規アダプタのドキュメント薄い**: MTS・`.kbm`・`.tun`・`edo()` はJSDocレベルでは整備済みだが、README側の使用例が追随できていない可能性。
+1. **CLIバッチ書き出しツールなし** → **解消済**(2026-07外部リサーチ追補で実装。`ruri info/convert/render` を `bin/ruri.mjs` + 移植可能な `src/cli.ts` として追加、`.scl`→`.tun`/`.syx`/`.wav` 変換・レンダリング。詳細は `docs/research-2026-07.md`)。
+2. **新規アダプタのドキュメント薄い** → **一部解消**(READMEにCLIセクション追加)。MTS・`.kbm`・`.tun`・`edo()` はJSDocレベルでは整備済み。
 3. **セキュリティ監査が実質非ブロッキング**: CI (`ci.yml`) の `npm audit --audit-level=high || true` は `|| true` により失敗を握りつぶす設定になっており、高深刻度脆弱性が検出されてもCIは赤くならない。
 4. **未公開・v0.1.0のまま**: CHANGELOGは全項目が `Unreleased` のまま。semverタグ切りやnpm publish の形跡なし。
 5. **パフォーマンス回帰の監視なし**: `tuningFamilySocratic*`/`Ambassador*` 系は1テストあたり2〜27秒かかるものが多数あるが、これを追跡するベンチマーク/回帰検出の仕組みがない。

@@ -11,8 +11,12 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "ruri": "bin/ruri.mjs"
+  },
   "files": [
     "dist",
+    "bin",
     "LICENSE",
     "NOTICE",
     "README.md"

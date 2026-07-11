@@ -1,0 +1,146 @@
+import { describe, it, expect } from 'vitest';
+import { runCli, type CliIo } from './cli.js';
+import { tuningToScl, writeScl } from './adapters/scala.js';
+import { edo } from './core/tuning.js';
+
+/** Read a 4-byte ASCII tag from a byte buffer at `offset`. */
+const tag = (b: Uint8Array, offset: number): string =>
+  String.fromCharCode(...b.slice(offset, offset + 4));
+
+/** In-memory {@link CliIo} for driving the CLI without touching the filesystem. */
+function makeIo(files: Record<string, string> = {}): {
+  io: CliIo;
+  texts: Record<string, string>;
+  bytes: Record<string, Uint8Array>;
+  stdout: string[];
+  stderr: string[];
+} {
+  const texts: Record<string, string> = {};
+  const bytes: Record<string, Uint8Array> = {};
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  const io: CliIo = {
+    readText(path) {
+      if (!(path in files)) throw new RangeError(`no such file: ${path}`);
+      return files[path] as string;
+    },
+    writeText(path, data) {
+      texts[path] = data;
+    },
+    writeBytes(path, data) {
+      bytes[path] = data;
+    },
+    out(line) {
+      stdout.push(line);
+    },
+    err(line) {
+      stderr.push(line);
+    },
+  };
+  return { io, texts, bytes, stdout, stderr };
+}
+
+// A small 12-TET .scl to feed the CLI.
+const scl12 = writeScl(tuningToScl(edo(12)));
+
+describe('runCli — dispatch and usage', () => {
+  it('test_no_command_prints_usage_and_returns_2', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli([], io)).toBe(2);
+    expect(stdout.join('\n')).toContain('Usage:');
+  });
+
+  it('test_help_returns_0', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['help'], io)).toBe(0);
+    expect(stdout.join('\n')).toContain('ruri');
+  });
+
+  it('test_unknown_command_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['frobnicate'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('unknown command');
+  });
+});
+
+describe('runCli info', () => {
+  it('test_info_prints_degree_count_and_well_formed', () => {
+    const { io, stdout } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('degrees     : 12');
+    expect(text).toContain('period      : 1200');
+  });
+
+  it('test_info_missing_input_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['info'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('missing');
+  });
+
+  it('test_info_bad_file_returns_1', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['info', 'nope.scl'], io)).toBe(1);
+    expect(stderr.join('\n')).toContain('error:');
+  });
+});
+
+describe('runCli convert', () => {
+  it('test_convert_to_scl_round_trips', () => {
+    const { io, texts } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.scl'], io)).toBe(0);
+    expect(texts['out.scl']).toBeDefined();
+    expect(texts['out.scl']).toContain('12');
+  });
+
+  it('test_convert_to_tun_writes_128_key_table', () => {
+    const { io, texts } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.tun'], io)).toBe(0);
+    const tun = texts['out.tun'] as string;
+    expect(tun).toContain('[Tuning]');
+    expect(tun).toContain('note 127=');
+  });
+
+  it('test_convert_to_syx_writes_mts_sysex_bytes', () => {
+    const { io, bytes } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.syx'], io)).toBe(0);
+    const syx = bytes['out.syx'] as Uint8Array;
+    expect(syx[0]).toBe(0xf0); // SysEx start
+    expect(syx[syx.length - 1]).toBe(0xf7); // SysEx end
+  });
+
+  it('test_convert_unsupported_extension_returns_2', () => {
+    const { io, stderr } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.xyz'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('unsupported');
+  });
+
+  it('test_convert_missing_output_returns_2', () => {
+    const { io, stderr } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('missing -o');
+  });
+});
+
+describe('runCli render', () => {
+  it('test_render_writes_valid_wav', () => {
+    const { io, bytes } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['render', 'in.scl', '-o', 'out.wav', '--seconds', '0.05'], io)).toBe(0);
+    const wav = bytes['out.wav'] as Uint8Array;
+    expect(wav).toBeDefined();
+    expect(tag(wav, 0)).toBe('RIFF');
+    expect(tag(wav, 8)).toBe('WAVE');
+  });
+
+  it('test_render_non_wav_output_returns_2', () => {
+    const { io, stderr } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['render', 'in.scl', '-o', 'out.mp3'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('.wav');
+  });
+
+  it('test_render_bad_seconds_returns_2', () => {
+    const { io, stderr } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['render', 'in.scl', '-o', 'out.wav', '--seconds', '-1'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('seconds');
+  });
+});
