@@ -5,8 +5,9 @@
 を外部情報で裏付け・補強することが目的。各改善項目は Opus / Sonnet クラスのモデルが
 単独で読んで着手できるよう、「根拠 / 期待される形 / 現状 / 優先度」を明記する。
 
-> 本セッションでは調査に加え、下記「不足」のうち最も実務価値が高くコード肥大を招かない
-> 1 項目(**CLI バッチツール**)を実装済み。詳細は末尾「本セッションの実装」を参照。
+> 本セッションでは調査に加え、下記「不足」のうち実務価値が高くコード肥大を招かない
+> 項目(**CLI バッチツール**・**MOS L/sパターン解析**・**MIDI 2.0 UMPアダプタ**)を実装済み。
+> 詳細は末尾「本セッションの実装」を参照。
 
 ---
 
@@ -101,12 +102,16 @@
 - **[優先度]** 中。データ取り込みスクリプト + DaMuSc のライセンス確認(CC 系か)が必要。
   文化的レビュー(人的ゲート)は GOAL-AUDIT の方針に従う。
 
-### C-5. MIDI 2.0 / UMP per-note pitch エンコーダ
+### C-5. MIDI 2.0 / UMP per-note pitch エンコーダ → **実装済み**
 - **[根拠]** MIDI 2.0 仕様、2025 年のハード/DAW 実装動向。
 - **[期待される形]** UMP の per-note pitch bend / Note On 直接ピッチを出力する
-  アダプタ(`src/adapters/ump.ts`)。MPE(MIDI 1.0 世代)の後継。
-- **[現状]** 未着手。現状は MPE(14bit チャンネルベンド)と MTS SysEx のみ。
-- **[優先度]** 中。エコシステム普及待ちの側面あり(2026 時点で実装が始まったばかり)。
+  アダプタ。MPE(MIDI 1.0 世代)の後継。
+- **[現状]** **実装済み**(`src/adapters/ump.ts`)。Pitch 7.9 属性付き Note On/Off
+  (`umpNoteOnPitch79`/`umpNoteOff`)、per-note pitch bend(`umpPerNotePitchBend`、
+  `bendRangeSemitones` は必須引数 — 仕様に既定感度がないため)、`chordToUmp`/
+  `tuningDegreeToUmp` で既存 `Chord`/`TuningSystem` 型と直結。`decodeUmp`+
+  golden round-trip・手計算バイト列・fast-check性質テストで検証(17テスト)。
+- **[優先度]** 完了。
 
 ### C-6. CI セキュリティ監査が非ブロッキング
 - **[根拠]** 内部監査(product-review.md)。
@@ -141,14 +146,15 @@
 
 ---
 
-## 本セッションの実装(C-3: CLI バッチツール)
+## 本セッションの実装
 
-**なぜこれを選んだか**: 調査の結果、Ruri の理論層(MOS・well-formed・最大均等・複合協和)は
+**選定方針**: 調査の結果、Ruri の理論層(MOS・well-formed・最大均等・複合協和)は
 すでに完備・公開されており、これ以上の理論関数追加は既知の「コード肥大」(C-8)を悪化させる。
-一方 **実行可能インターフェースの欠如**(C-3)は、競合ツールがすべて備える実務機能でありながら
-完全に欠落しており、既存アダプタの再利用のみで実装でき、理論肥大を招かない — 最も費用対効果が高い。
+そのため実装対象は「①実行可能インターフェースの欠如(C-3)」「②理論層の未公開の隙間
+(MOS命名規則そのものは既存だが L/s パターン表現が欠落)」「③エコシステム標準への未対応
+(C-5)」の3点に絞り、いずれも既存の型・関数を再利用するだけで完結し理論肥大を招かないものを選んだ。
 
-### 追加/変更したもの
+### C-3: CLI バッチツール
 - **`src/adapters/scala.ts`**: `sclToTuning()` を追加。`tuningToScl()` の**欠けていた逆変換**
   (ScalaScale → TuningSystem)。比の degree を厳密有理数として保持し往復で精度劣化しない。
   + 回帰テスト 5 件(`scala.test.ts`)。
@@ -158,13 +164,29 @@
 - **`bin/ruri.mjs`**: 薄い Node ブートストラップ(plain ESM)。実 fs/process を `runCli` に配線。
   TypeScript ソースに `node:` 依存も `@types/node` も持ち込まず、ライブラリの
   zero-dependency / 移植性を維持。
-- **`package.json`**: `bin` エントリと `files` への `bin` 追加。
-- **`README.md`**: CLI 使用例セクション。
+- **`package.json`**: `bin` エントリと `files` への `bin` 追加。`README.md`: CLI 使用例セクション。
+- **検証(実機ドライブ)**: 実 `.scl`(純正ペンタトニック)で `info`(386.31c=5/4等を正確表示)・
+  `convert → .tun`(128鍵周波数表)・`convert → .syx`(408バイトMTSダンプ、正準サイズ)・
+  `render → .wav`(RIFF/WAVE)をすべて確認。
 
-### 検証(実機ドライブ済み)
-実 `.scl`(純正ペンタトニック)に対し `bin/ruri.mjs` を実行し、以下を確認:
-- `info`: 386.31c=5/4・701.955c=3/2 を正確表示、比ラベル保持、well-formed=no(正しい)。
-- `convert → .tun`: 128 鍵周波数表を出力。
-- `convert → .syx`: 408 バイトの MTS バルクダンプ(正準サイズ)、先頭 0xF0 / 末尾 0xF7。
-- `render → .wav`: 5 音の RIFF/WAVE ファイル。
-- 全テスト 7,268 件緑(+19 新規)、typecheck / lint / format すべて緑。
+### MOS L/s ステップパターン解析(理論層の隙間)
+- **`src/core/generate.ts`**: `mosPattern()` / `tuningMosPattern()` を追加。
+  xen コミュニティ標準の `5L2s`(ダイアトニック)等の命名・`LLsLLLs` 型パターンを、
+  既存の `isWellFormed`(Myhill性)と対になる1ステップ層の解析として提供。
+  + テスト 8 件(`generate.test.ts`)、fast-check 性質テスト込み。
+
+### C-5: MIDI 2.0 / UMP per-note pitch アダプタ
+- **`src/adapters/ump.ts`**: Pitch 7.9 属性付き Note On/Off(1/512半音 ≈ 0.195c 分解能)、
+  per-note pitch bend(`bendRangeSemitones` は仕様に既定値がないため必須引数)、
+  `chordToUmp`/`tuningDegreeToUmp` で既存 `Chord`/`TuningSystem` 型と直結。
+  `decodeUmp`+`umpToBytes` で golden round-trip 検証(このディレクトリの CLAUDE.md 方針に準拠)。
+  + テスト 17 件 — 手計算バイト列(A4 Note On = `[0x40904503, 0x80008A00]`)・
+  encode→decode 恒等性・fast-check 性質テスト(往復誤差 ≤0.1c)。
+- **`src/adapters/index.ts`/`CLAUDE.md`**: barrel export + UMP固有の Gotchas
+  (velocity 0 は note-off ではない、bend既定感度なし 等)。
+- **`README.md`**: UMP使用例 + 協和の三要素モデルとの対応関係を1行明記(C-1参照)。
+
+### 累積検証
+全テスト **7,293 件緑**(セッション開始時 7,268 から +25、CLI導入時の +19と合わせ累計+44)、
+typecheck / lint / format すべて緑。UMP追加後に `npm run build` で dist 再生成し、
+CLI(`bin/ruri.mjs info/convert/render`)を実 `.scl` で再ドライブして無回帰を確認。
