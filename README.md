@@ -164,6 +164,14 @@ const sclText: string = writeScl(tuningToScl(edo(19)));   // 19-EDO を .scl テ
 const scale = parseScl(sclFileText);
 const mapping = parseKbm(kbmFileText);
 const hz: number | null = kbmNoteToFreq(scale, mapping, 69);  // MIDI 69 → Hz
+
+// MIDI 2.0 UMP: Note On に Pitch 7.9 属性(1/512半音 ≈ 0.195c)で絶対音高を直接埋め込む。
+// MPE と違いチャンネル回転も bendRange 合意も不要(MIDI 1.0 世代の後継)。
+import { chordToUmp, tuningDegreeToUmp, umpToBytes } from 'ruri/adapters';
+import { chordFromRatios } from 'ruri';
+const just = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+const words: Uint32Array = chordToUmp(just, 261.63);   // 64-bit Note On × 3
+const bytes: Uint8Array = umpToBytes(words);            // big-endian 直列化
 ```
 
 ```ts
@@ -309,6 +317,7 @@ ruri help                                   # 全コマンド一覧
 - **cents/比の二層**: 純正律は比を一次保持、cents は導出(精度保全)。
 - **調律に単一正規形なし**: `reference_hz` / `octave_ratio`(非オクターブ可) / `source` を必須メタに。
 - **協和は timbre 依存**: スペクトル層を協和判定と合成の単一真実源とし、Plomp-Levelt/Sethares 粗さ + Stolzenburg harmonicity で採点。**acoustic-only**(文化的親しみは含めない=美的判定をしない)。
+  近年の協和研究の三要素モデル(干渉 roughness / 調波性 harmonicity / 文化的学習 familiarity — Harrison & Pearce 2020、McBride 2025 レビュー)のうち前2者を実装し、familiarity は文化依存ゆえ本原則により意図的に除外(`docs/research-2026-07.md` C-1)。
 - **生成はイディオム非依存**: MOS(生成音階)・最大均等(Clough-Douthett)。三度堆積を前提しない。
 - zero runtime-dependency、単一/最小依存配布、Carmack/Martin/Pike。
 

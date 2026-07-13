@@ -25,6 +25,15 @@
 - MTS SysEx 同梱(微分音MIDI): SysExバイト列は別Gotchasを追記してから実装。
 - テンポ・拍子メタイベント(現状ppqのみ、テンポ未指定=120bpm既定)。
 
+## UMP / MIDI 2.0 (ump.ts) Gotchas
+
+- **64-bit Channel Voice (MT=0x4)**: word0 = `[MT:4][group:4][opcode:4][channel:4][note:8][attrType:8]`、word1 はメッセージ依存。ワードは 32-bit 単位、バイト直列化は big-endian(`umpToBytes`)。
+- **Pitch 7.9 (attrType=0x03)**: word1 = `[velocity:16][note:7|fraction:9]`。分数単位 = 1/512 半音 ≈ 0.195c。**note index(識別子)と Pitch 7.9(実音高)は別物** — note-off は index で対合し、音高は属性が決める。
+- **velocity は 16-bit**。MIDI 1.0 と違い **velocity 0 ≠ note-off**(専用 opcode 0x8 を使う)。
+- **per-note pitch bend (opcode 0x6)**: word1 = 32-bit unsigned bipolar、センター 0x80000000。**感度のスペック既定値は存在しない**(registered per-note controller で交渉)→ `bendRangeSemitones` は必須引数にしてある。既定値を仮定して埋めないこと。
+- 正側フルスケールは 0xFFFFFFFF で飽和(center + 0x7FFFFFFF)。負側最小は 0x00000001(bipolar 非対称)。
+- 丸め: freq→Pitch7.9 は最近接丸め+桁上がり(fraction 512 → note+1)。範囲外は [0/0, 127/511] へクランプ。往復誤差上限 ≈ 0.0977c(性質テストで 0.1c を保証)。
+
 ## Scala (.scl / .kbm) Gotchas
 
 - **.scl 構造**: `!` 始まりはコメント。最初の非コメント行=説明文(空でも1行占有)。次=音程数(degree count)。以降が音程行。
