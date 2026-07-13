@@ -45,6 +45,82 @@ export function isWellFormed(scaleCents: readonly number[], periodCents: number)
 }
 
 /**
+ * MOS step-pattern descriptor: the adjacent-step structure of a scale in the
+ * xenharmonic community's `L`/`s` (large/small) notation.
+ */
+export interface MosPattern {
+  /** Per-step labels around one period, ascending from the root. */
+  readonly pattern: readonly ('L' | 's')[];
+  /** Number of large steps. */
+  readonly large: number;
+  /** Number of small steps. */
+  readonly small: number;
+  /** Size of a large step in cents (equals `small` size when the scale is equal). */
+  readonly largeCents: number;
+  /** Size of a small step in cents. */
+  readonly smallCents: number;
+  /** Compact xen name, e.g. `5L2s` (diatonic) or `5L0s` for an equal division. */
+  readonly name: string;
+}
+
+/**
+ * Analyse a scale's adjacent-step structure into `L`/`s` (large/small) notation.
+ *
+ * This is the companion to {@link isWellFormed}: where that predicate tests
+ * Myhill's property across *all* generic interval classes, this reports the
+ * 1-step layer directly — the `LLsLLLs` pattern and `5L2s` name that the
+ * xenharmonic community uses to identify MOS scales.
+ *
+ * A scale is a valid MOS iff it has exactly **two** distinct step sizes (or one,
+ * for an equal division). The larger is labelled `L`, the smaller `s`; sizes are
+ * compared with the same 1e-6-cent rounding as {@link isWellFormed} so that
+ * floating-point generation noise does not split a size into spurious classes.
+ *
+ * @param scaleCents - Ascending degree cents within one period (root at 0 assumed;
+ *   do not include the period itself).
+ * @param periodCents - The repetition interval (1200 = octave; may differ).
+ * @returns The `MosPattern`, or `null` if the scale has more than two distinct
+ *   step sizes (not a MOS) or fewer than one step.
+ *
+ * @example
+ * // Diatonic in 12-TET → 5 large (200c) + 2 small (100c) steps: "5L2s".
+ * mosPattern([0, 200, 400, 500, 700, 900, 1100], 1200);
+ * // → { pattern: ['L','L','s','L','L','L','s'], large: 5, small: 2, name: '5L2s', ... }
+ */
+export function mosPattern(scaleCents: readonly number[], periodCents: number): MosPattern | null {
+  const n = scaleCents.length;
+  if (n < 1 || periodCents <= 0) return null;
+  const s = [...scaleCents].sort((a, b) => a - b);
+  const steps: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const next = i + 1 < n ? (s[i + 1] as number) : periodCents;
+    steps.push(Math.round((next - (s[i] as number)) * ROUND) / ROUND);
+  }
+  const sizes = [...new Set(steps)].sort((a, b) => b - a); // descending: [large, small]
+  if (sizes.length > 2) return null; // more than two step sizes → not a MOS
+  const largeCents = sizes[0] as number;
+  const smallCents = (sizes.length === 2 ? sizes[1] : sizes[0]) as number;
+  const pattern = steps.map((v): 'L' | 's' => (v === largeCents ? 'L' : 's'));
+  // When there is a single size, treat every step as large (small count = 0).
+  const large = pattern.filter((p) => p === 'L').length;
+  const small = n - large;
+  return { pattern, large, small, largeCents, smallCents, name: `${large}L${small}s` };
+}
+
+/**
+ * Analyse a `TuningSystem`'s adjacent-step structure into `L`/`s` MOS notation.
+ *
+ * Bridges {@link mosPattern} to the first-class `TuningSystem` type (the same
+ * relationship {@link isTuningWellFormed} has to {@link isWellFormed}).
+ */
+export function tuningMosPattern(tuning: TuningSystem): MosPattern | null {
+  return mosPattern(
+    tuning.degrees.map((d) => pitchToCents(d)),
+    tuning.periodCents,
+  );
+}
+
+/**
  * Maximally even set: `d` notes among `c` equal steps (Clough-Douthett floor formula).
  * Returns ascending step indices. Consecutive steps differ by at most one chromatic unit.
  */

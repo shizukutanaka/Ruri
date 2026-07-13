@@ -7,6 +7,8 @@ import {
   generatedTuning,
   maximallyEvenTuning,
   isTuningWellFormed,
+  mosPattern,
+  tuningMosPattern,
 } from './generate.js';
 import { approxRatio, relativePeriodicity, chordPeriodicity } from './harmonicity.js';
 import { defineTuning, equalTemperament12, edo, degreeToCents } from './tuning.js';
@@ -367,5 +369,84 @@ describe('isTuningWellFormed — MOS detection on TuningSystem (Q48)', () => {
     // spans exactly 1 specific size → isWellFormed requires exactly 2, returns false.
     const t = maximallyEvenTuning(12, 12);
     expect(isTuningWellFormed(t)).toBe(false);
+  });
+});
+
+describe('mosPattern — L/s step-pattern analysis', () => {
+  it('test_diatonic_is_5L2s_with_LLsLLLs', () => {
+    const mp = mosPattern([0, 200, 400, 500, 700, 900, 1100], 1200);
+    expect(mp).not.toBeNull();
+    expect(mp!.name).toBe('5L2s');
+    expect(mp!.pattern.join('')).toBe('LLsLLLs');
+    expect(mp!.largeCents).toBeCloseTo(200, 9);
+    expect(mp!.smallCents).toBeCloseTo(100, 9);
+  });
+
+  it('test_black_key_pentatonic_is_2L3s', () => {
+    // C# D# F# G# A# relative: 0, 200, 500, 700, 1000 → steps 200,300,200,300,200
+    const mp = mosPattern([0, 200, 500, 700, 1000], 1200);
+    expect(mp!.name).toBe('2L3s');
+    expect(mp!.large).toBe(2);
+    expect(mp!.small).toBe(3);
+  });
+
+  it('test_whole_tone_equal_division_is_6L0s', () => {
+    // Single step size: every step labelled L, small count 0, sizes equal.
+    const mp = mosPattern([0, 200, 400, 600, 800, 1000], 1200);
+    expect(mp!.name).toBe('6L0s');
+    expect(mp!.smallCents).toBe(mp!.largeCents);
+  });
+
+  it('test_three_step_sizes_returns_null', () => {
+    // Steps 100, 200, 300, 600 → four distinct sizes → not a MOS.
+    expect(mosPattern([0, 100, 300, 600], 1200)).toBeNull();
+  });
+
+  it('test_empty_scale_returns_null', () => {
+    expect(mosPattern([], 1200)).toBeNull();
+  });
+
+  it('test_non_octave_period_bp_generated_is_1L3s', () => {
+    // generatedScale(443, 1902, 4) = [0, 443, 886, 1329]; steps 443×3 then 573.
+    const sc = generatedScale(443, 1902, 4);
+    const mp = mosPattern(sc, 1902);
+    expect(mp!.name).toBe('1L3s');
+    expect(mp!.largeCents).toBeCloseTo(573, 6);
+    expect(mp!.smallCents).toBeCloseTo(443, 6);
+  });
+
+  it('test_tuningMosPattern_matches_raw_mosPattern', () => {
+    const t = generatedTuning(700, 1200, 7);
+    const viaTuning = tuningMosPattern(t);
+    const viaRaw = mosPattern(generatedScale(700, 1200, 7), 1200);
+    expect(viaTuning).toEqual(viaRaw);
+  });
+
+  it('property_well_formed_implies_valid_mos_with_step_sum_equal_period', () => {
+    // Myhill at k=1 means exactly two step sizes, so isWellFormed ⇒ mosPattern
+    // non-null with both counts ≥ 1. Whenever non-null (also for the 3-size null
+    // case of generated scales — three-distance theorem), the step sizes must
+    // tile the period: large·largeCents + small·smallCents = periodCents.
+    fc.assert(
+      fc.property(
+        fc.double({ min: 50, max: 1150, noNaN: true }),
+        fc.integer({ min: 2, max: 12 }),
+        (gen, count) => {
+          const sc = generatedScale(gen, 1200, count);
+          if (new Set(sc).size !== sc.length) return; // degenerate duplicate degrees
+          const mp = mosPattern(sc, 1200);
+          if (isWellFormed(sc, 1200)) {
+            expect(mp).not.toBeNull();
+            expect(mp!.large).toBeGreaterThan(0);
+            expect(mp!.small).toBeGreaterThan(0);
+          }
+          if (mp !== null) {
+            expect(mp.large + mp.small).toBe(sc.length);
+            expect(mp.pattern.length).toBe(sc.length);
+            expect(mp.large * mp.largeCents + mp.small * mp.smallCents).toBeCloseTo(1200, 3);
+          }
+        },
+      ),
+    );
   });
 });
