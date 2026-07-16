@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-07-14
+
 ### Added
 
 - Core tuning engine: cents/ratio pitch model, tuning systems with non-octave periods, fail-fast invariants.
@@ -51,6 +53,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 - `tuningSuitability(tuning, spectrum, opts?)` (`src/core/dissonance.ts`): the inverse of `spectrumToTuning` — measures how well an _existing_ tuning system covers the consonant intervals of a given timbre. Returns `{ coverage, avgErrorCents, totalConsonantIntervals, matchedCount }`. `coverage` is the fraction of the timbre's consonant intervals captured within `toleranceCents` (default 25c ≈ quarter-tone). `tuningSuitability(edo(12), harmonicSpectrum())` shows 12-TET fits harmonic timbres well; `tuningSuitability(edo(12), bellSpectrum())` confirms poorer fit — the library's core thesis quantified.
 - `detectNearestScale(pitches, opts?)` (`src/core/scale.ts`): reverse lookup over 361 named scales spanning world music traditions — scores each by what fraction of its defining cents a pitch list covers, returns ranked matches.
 - `optimalChordVoicing(chord, rootHz, spectrum, opts?)` (`src/core/chord-voicing.ts`, new module): brute-forces octave placement per chord member within `opts.registerRange` (default ±1 octave) and returns the voicing minimising `chordDissonance` for the given timbre.
+- `sclToTuning(scl, referenceHz?, id?)` (`src/adapters/scala.ts`): the missing inverse of `tuningToScl` — imports a parsed Scala `.scl` as a first-class `TuningSystem`. Preserves ratio degrees exactly as GCD-reduced `Ratio` pitches (not lossy cents), so `parseScl → sclToTuning → tuningToScl → writeScl` round-trips without precision loss.
+- `ruri` CLI (`src/cli.ts`, `bin/ruri.mjs`): `info`/`convert`/`render`/`help` commands for batch tuning conversion and audio rendering from the command line — `.scl → .tun`/`.syx`(MTS)/`.wav`, plus a scale-degree/cents/well-formedness report. `runCli(argv, io)` is fs-free and fully unit-testable via an injected `CliIo`; the Node bootstrap (`bin/ruri.mjs`) is the only place that touches real `fs`/`process`, keeping the TypeScript sources free of `node:` imports and `@types/node`.
+- `mosPattern(scaleCents, periodCents)` and `tuningMosPattern(tuning)` (`src/core/generate.ts`): adjacent-step MOS analysis in the xenharmonic community's `L`/`s` notation (e.g. diatonic → `5L2s`, pattern `LLsLLLs`). Companion to `isWellFormed` (which tests Myhill's property across all generic interval classes) at the 1-step layer; returns `null` for scales with more than two step sizes.
+- MIDI 2.0 UMP adapter (`src/adapters/ump.ts`): `umpNoteOnPitch79`/`umpNoteOff` encode 64-bit MIDI 2.0 Channel Voice Note On/Off with the Pitch 7.9 note attribute (absolute pitch at ~0.195-cent resolution, no bend-range negotiation needed); `umpPerNotePitchBend` encodes per-note pitch bend (bend sensitivity has no spec default, so `bendRangeSemitones` is a required parameter); `chordToUmp`/`tuningDegreeToUmp` bridge the existing `Chord`/`TuningSystem` types; `decodeUmp`/`umpToBytes` support golden round-trip verification and big-endian byte serialization.
+
+### Security
+
+- Resolved the one non-breaking `npm audit` advisory (`js-yaml` quadratic-complexity DoS, GHSA-h67p-54hq-rp68, transitive devDependency) via `npm audit fix`. The remaining 6 advisories (esbuild/vite/vitest chain) only resolve via a breaking vitest 2→4 upgrade, not attempted here; all are devDependencies only — the published package has zero runtime dependencies, so none reach consumers of the library.
 
 ### Changed
 
@@ -75,11 +85,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 ### CI / Test infrastructure
 
 - `scale.test.ts` (11,536 tests, 3,581 `describe` blocks) and `presets.test.ts` (6,520 tests, 2,165 blocks) never finished a single run in this environment, hiding the bugs above and making `npm test`/`npm run check` unusable as a merge gate. Profiled both suites' actual per-block durations and split each at a 300ms-per-block threshold: `scale.test.ts`/`presets.test.ts` now contain only the fast blocks (5,159 + 615 tests, ~22s + ~12s) and run by default; the slow blocks (mostly the `tuningFamilySocratic*`/`presetFamilySocratic*`/`*Ambassador*` analytics family, ~5h + ~71min cumulative) moved to new `scale-generated.test.ts`/`presets-generated.test.ts`, excluded from `npm test`/`npm run lint` by convention and runnable on demand via `npm run test:generated`. Zero test loss in either split (verified exact before/after counts).
-- Fixed `vitest` picking up a stray git worktree under `.claude/worktrees/` (an artifact of this environment, not the published package) whose own copies of the test files were silently duplicating and slowing down every run; `vitest.config.ts` now excludes it explicitly. `npm run test` went from never completing (or 52+ minutes when accidentally including the stray worktree) to ~113s for 7,247 tests across 34 files.
+- Fixed `vitest` picking up a stray git worktree under `.claude/worktrees/` (an artifact of this environment, not the published package) whose own copies of the test files were silently duplicating and slowing down every run; `vitest.config.ts` now excludes it explicitly. `npm run test` went from never completing (or 52+ minutes when accidentally including the stray worktree) to ~90s for 7,293 tests across 36 files.
 - `npm run lint` now passes with 0 errors (was 41 pre-existing). Formalized the underscore-prefix convention for parameters intentionally kept for cross-function signature consistency (`argsIgnorePattern`/`varsIgnorePattern: '^_'` in `eslint.config.js`) and removed the remaining genuinely dead code (an unused import only ever referenced inside doc comments, several no-op local variables, one no-op expression statement).
 
 ### Notes
 
 - Pre-1.0: APIs may change. Zero runtime dependencies.
 
-[Unreleased]: https://github.com/shizukutanaka/ruri/commits/main
+[Unreleased]: https://github.com/shizukutanaka/Ruri/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/shizukutanaka/Ruri/releases/tag/v0.1.0
