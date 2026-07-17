@@ -15,8 +15,9 @@ import { parseScl, writeScl, tuningToScl, sclToTuning, degreeCents } from './ada
 import { writeTun } from './adapters/tun.js';
 import { tuningToMts, tuningToMtsFrequencies } from './adapters/mts.js';
 import { tuningToScaleWav } from './adapters/wav.js';
+import { tuningDegreeToUmp, umpToBytes } from './adapters/ump.js';
 import { DEFAULT_SYNTH_SCALE } from './core/ks-synth.js';
-import { isTuningWellFormed } from './core/generate.js';
+import { isTuningWellFormed, tuningMosPattern } from './core/generate.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
 export interface CliIo {
@@ -36,17 +37,19 @@ const USAGE = `ruri — world tuning / scale / chord toolkit
 
 Usage:
   ruri info    <input.scl>
-  ruri convert <input.scl> -o <output.{scl|tun|syx}>
+  ruri convert <input.scl> -o <output.{scl|tun|syx|ump}>
   ruri render  <input.scl> -o <output.wav> [--seconds <n>]
   ruri help
 
 Commands:
-  info      Print a scale's degrees, cents, ratios, and well-formedness.
+  info      Print a scale's degrees, cents, ratios, well-formedness, and
+            its MOS L/s step pattern (e.g. 5L2s) when it is a MOS.
   convert   Convert a Scala .scl file to another tuning format, inferred
             from the output extension:
               .scl        Scala scale     (round-trip / normalization)
               .tun        AnaMark .tun    (128-key frequency table)
               .syx | .mid MTS bulk dump   (MIDI Tuning Standard SysEx)
+              .ump        MIDI 2.0 UMP    (per-degree Note On, Pitch 7.9)
   render    Render each scale degree as a plucked (Karplus-Strong) tone
             to a 16-bit PCM WAV file.
 
@@ -106,6 +109,8 @@ function cmdInfo(args: Args, io: CliIo): number {
   io.out(`degrees     : ${tuning.degrees.length} (per period)`);
   io.out(`period      : ${tuning.periodCents.toFixed(4)} cents`);
   io.out(`well-formed : ${isTuningWellFormed(tuning) ? 'yes (Myhill)' : 'no'}`);
+  const mos = tuningMosPattern(tuning);
+  io.out(`mos-pattern : ${mos ? `${mos.name} (${mos.pattern.join('')})` : 'none (3+ step sizes)'}`);
   io.out('pitches:');
   scl.degrees.forEach((d, i) => {
     const label = d.kind === 'ratio' ? `${d.num}/${d.den}` : d.text;
@@ -138,8 +143,17 @@ function cmdConvert(args: Args, io: CliIo): number {
     case 'mid':
       io.writeBytes(args.output, tuningToMts(tuning, tuning.name));
       break;
+    case 'ump': {
+      // One MIDI 2.0 Note On (Pitch 7.9) per degree, concatenated as UMP words.
+      const words: number[] = [];
+      for (let i = 0; i < tuning.degrees.length; i++) {
+        words.push(...tuningDegreeToUmp(tuning, i));
+      }
+      io.writeBytes(args.output, umpToBytes(words));
+      break;
+    }
     default:
-      io.err(`convert: unsupported output extension '.${ext}' (use .scl, .tun, or .syx)`);
+      io.err(`convert: unsupported output extension '.${ext}' (use .scl, .tun, .syx, or .ump)`);
       return 2;
   }
   io.out(`wrote ${args.output}`);

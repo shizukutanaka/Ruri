@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { runCli, type CliIo } from './cli.js';
 import { tuningToScl, writeScl } from './adapters/scala.js';
+import { decodeUmp, UMP_ATTR_PITCH_7_9 } from './adapters/ump.js';
 import { edo } from './core/tuning.js';
+import { maximallyEvenTuning } from './core/generate.js';
 
 /** Read a 4-byte ASCII tag from a byte buffer at `offset`. */
 const tag = (b: Uint8Array, offset: number): string =>
@@ -42,6 +44,8 @@ function makeIo(files: Record<string, string> = {}): {
 
 // A small 12-TET .scl to feed the CLI.
 const scl12 = writeScl(tuningToScl(edo(12)));
+// Diatonic (7-of-12 maximally even) → MOS 5L2s.
+const sclDiatonic = writeScl(tuningToScl(maximallyEvenTuning(12, 7)));
 
 describe('runCli — dispatch and usage', () => {
   it('test_no_command_prints_usage_and_returns_2', () => {
@@ -70,6 +74,14 @@ describe('runCli info', () => {
     const text = stdout.join('\n');
     expect(text).toContain('degrees     : 12');
     expect(text).toContain('period      : 1200');
+  });
+
+  it('test_info_shows_mos_pattern_for_diatonic', () => {
+    const { io, stdout } = makeIo({ 'in.scl': sclDiatonic });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    // 5 large + 2 small steps; the exact rotation depends on the mode the
+    // maximally-even set lands on (here sLLsLLL), but the 5L2s name is invariant.
+    expect(stdout.join('\n')).toContain('mos-pattern : 5L2s');
   });
 
   it('test_info_missing_input_returns_2', () => {
@@ -107,6 +119,30 @@ describe('runCli convert', () => {
     const syx = bytes['out.syx'] as Uint8Array;
     expect(syx[0]).toBe(0xf0); // SysEx start
     expect(syx[syx.length - 1]).toBe(0xf7); // SysEx end
+  });
+
+  it('test_convert_to_ump_writes_note_on_per_degree', () => {
+    const { io, bytes } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.ump'], io)).toBe(0);
+    const ump = bytes['out.ump'] as Uint8Array;
+    // 12 degrees × one 64-bit Note On (2 words = 8 bytes) each.
+    expect(ump.length).toBe(12 * 8);
+    expect(ump[0]).toBe(0x40); // message type 0x4 (MIDI 2.0 CV) | group 0
+    // Reconstruct words (big-endian) and decode: all must be Pitch 7.9 Note Ons.
+    const words = Array.from(
+      { length: ump.length / 4 },
+      (_, i) =>
+        ((ump[i * 4]! << 24) |
+          (ump[i * 4 + 1]! << 16) |
+          (ump[i * 4 + 2]! << 8) |
+          ump[i * 4 + 3]!) >>>
+        0,
+    );
+    const msgs = decodeUmp(words);
+    expect(msgs).toHaveLength(12);
+    expect(msgs.every((m) => m.kind === 'noteOn' && m.attributeType === UMP_ATTR_PITCH_7_9)).toBe(
+      true,
+    );
   });
 
   it('test_convert_unsupported_extension_returns_2', () => {

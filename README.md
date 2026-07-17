@@ -302,14 +302,15 @@ const voicing = optimalChordVoicing(triad, 220, harmonicSpectrum());
 
 ```sh
 # インストール後(npm i -g ruri など)、または開発時は `node bin/ruri.mjs <cmd>`
-ruri info    scale.scl                      # 音程・cents・比・well-formed(Myhill性)を表示
+ruri info    scale.scl                      # 音程・cents・比・well-formed・MOS L/sパターン(例 5L2s)
 ruri convert scale.scl -o scale.tun         # AnaMark .tun(128鍵周波数表)へ
 ruri convert scale.scl -o scale.syx         # MTS バルクダンプ SysEx(VST/ハード連携)へ
+ruri convert scale.scl -o scale.ump         # MIDI 2.0 UMP(各音を Pitch 7.9 Note On で)へ
 ruri render  scale.scl -o scale.wav --seconds 0.4   # 各音を Karplus-Strong で WAV 化
 ruri help                                   # 全コマンド一覧
 ```
 
-出力形式は拡張子から推論(`.scl`/`.tun`/`.syx`)。`--ref <hz>` で基準周波数(既定 440)、
+出力形式は拡張子から推論(`.scl`/`.tun`/`.syx`/`.ump`)。`--ref <hz>` で基準周波数(既定 440)、
 `--seconds <n>` で render の1音長(既定 0.5)を指定できる。
 
 ## 設計原則
