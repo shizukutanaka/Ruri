@@ -16,6 +16,10 @@ import { writeTun } from './adapters/tun.js';
 import { tuningToMts, tuningToMtsFrequencies } from './adapters/mts.js';
 import { tuningToScaleWav } from './adapters/wav.js';
 import { tuningDegreeToUmp, umpToBytes } from './adapters/ump.js';
+import { scaleToSmf } from './adapters/smf.js';
+import { tuningToScale } from './core/scale.js';
+import { degreeToFreq, type TuningSystem } from './core/tuning.js';
+import { freqToMidiFloat } from './core/midi.js';
 import { DEFAULT_SYNTH_SCALE } from './core/ks-synth.js';
 import { isTuningWellFormed, tuningMosPattern } from './core/generate.js';
 
@@ -48,8 +52,10 @@ Commands:
             from the output extension:
               .scl        Scala scale     (round-trip / normalization)
               .tun        AnaMark .tun    (128-key frequency table)
-              .syx | .mid MTS bulk dump   (MIDI Tuning Standard SysEx)
+              .syx        MTS bulk dump   (MIDI Tuning Standard SysEx)
               .ump        MIDI 2.0 UMP    (per-degree Note On, Pitch 7.9)
+              .mid        Standard MIDI   (playable melody; 12-TET-rounded,
+                                           warns when microtonality is lost)
   render    Render each scale degree as a plucked (Karplus-Strong) tone
             to a 16-bit PCM WAV file.
 
@@ -97,6 +103,21 @@ const extensionOf = (path: string): string => {
   return dot < 0 ? '' : path.slice(dot + 1).toLowerCase();
 };
 
+/**
+ * Largest deviation, in cents, between any tuning degree and the nearest
+ * 12-TET semitone — how much a plain Standard MIDI File (which can only carry
+ * integer note numbers) would misrepresent this tuning.
+ */
+function maxTwelveTetErrorCents(tuning: TuningSystem, a4Hz: number): number {
+  let worst = 0;
+  for (let i = 0; i < tuning.degrees.length; i++) {
+    const midiFloat = freqToMidiFloat(degreeToFreq(tuning, i), a4Hz);
+    const errCents = Math.abs(midiFloat - Math.round(midiFloat)) * 100;
+    if (errCents > worst) worst = errCents;
+  }
+  return worst;
+}
+
 function cmdInfo(args: Args, io: CliIo): number {
   const input = args.positionals[0];
   if (input === undefined) {
@@ -140,9 +161,24 @@ function cmdConvert(args: Args, io: CliIo): number {
       io.writeText(args.output, writeTun(tuningToMtsFrequencies(tuning), tuning.name));
       break;
     case 'syx':
-    case 'mid':
       io.writeBytes(args.output, tuningToMts(tuning, tuning.name));
       break;
+    case 'mid': {
+      // A playable Standard MIDI File melody (one note per degree). A plain SMF
+      // carries only integer note numbers, so warn — loudly and honestly — when
+      // that rounds away the very microtonality this tool exists to preserve.
+      const ref = args.ref ?? 440;
+      const wav = scaleToSmf(tuningToScale(tuning), tuning, ref, { a4Hz: ref });
+      io.writeBytes(args.output, wav);
+      const err = maxTwelveTetErrorCents(tuning, ref);
+      if (err > 1) {
+        io.err(
+          `warning: .mid rounds pitches to 12-TET (max ${err.toFixed(1)}c off). ` +
+            `Use .ump, .syx, or .tun to preserve the exact tuning.`,
+        );
+      }
+      break;
+    }
     case 'ump': {
       // One MIDI 2.0 Note On (Pitch 7.9) per degree, concatenated as UMP words.
       const words: number[] = [];
@@ -153,7 +189,9 @@ function cmdConvert(args: Args, io: CliIo): number {
       break;
     }
     default:
-      io.err(`convert: unsupported output extension '.${ext}' (use .scl, .tun, .syx, or .ump)`);
+      io.err(
+        `convert: unsupported output extension '.${ext}' (use .scl, .tun, .syx, .ump, or .mid)`,
+      );
       return 2;
   }
   io.out(`wrote ${args.output}`);

@@ -145,6 +145,25 @@ describe('runCli convert', () => {
     );
   });
 
+  it('test_convert_to_mid_writes_valid_standard_midi_file', () => {
+    const { io, bytes, stderr } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.mid'], io)).toBe(0);
+    const mid = bytes['out.mid'] as Uint8Array;
+    // A real SMF starts with the "MThd" header chunk (not raw SysEx 0xF0).
+    expect(tag(mid, 0)).toBe('MThd');
+    // 12-TET input rounds cleanly, so no microtonality warning.
+    expect(stderr.join('\n')).not.toContain('warning');
+  });
+
+  it('test_convert_to_mid_warns_on_microtonal_scale', () => {
+    // Just pentatonic: 5/4 = 386c is 14c off 12-TET → should warn.
+    const justScl = 'just5\n5\n9/8\n5/4\n3/2\n5/3\n2/1\n';
+    const { io, bytes, stderr } = makeIo({ 'in.scl': justScl });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.mid'], io)).toBe(0);
+    expect(tag(bytes['out.mid'] as Uint8Array, 0)).toBe('MThd'); // still a valid SMF
+    expect(stderr.join('\n')).toContain('warning: .mid rounds pitches to 12-TET');
+  });
+
   it('test_convert_unsupported_extension_returns_2', () => {
     const { io, stderr } = makeIo({ 'in.scl': scl12 });
     expect(runCli(['convert', 'in.scl', '-o', 'out.xyz'], io)).toBe(2);

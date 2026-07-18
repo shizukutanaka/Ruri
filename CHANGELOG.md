@@ -5,6 +5,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ## [Unreleased]
 
+### Fixed
+
+- `ruri convert -o <file>.mid` now writes a valid, playable Standard MIDI File (a one-note-per-degree melody via `scaleToSmf`) instead of raw MTS SysEx bytes, which produced a file that was not a valid SMF (no `MThd` header) and that DAWs reject. Raw MTS SysEx remains available as `.syx`. Because a plain SMF carries only integer note numbers, `.mid` conversion prints a warning to stderr with the maximum 12-TET rounding error when the tuning is microtonal, pointing to `.ump`/`.syx`/`.tun` for exact-pitch export.
+
 ## [0.1.0] - 2026-07-14
 
 ### Added

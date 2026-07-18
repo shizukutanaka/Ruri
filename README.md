@@ -306,12 +306,14 @@ ruri info    scale.scl                      # 音程・cents・比・well-formed
 ruri convert scale.scl -o scale.tun         # AnaMark .tun(128鍵周波数表)へ
 ruri convert scale.scl -o scale.syx         # MTS バルクダンプ SysEx(VST/ハード連携)へ
 ruri convert scale.scl -o scale.ump         # MIDI 2.0 UMP(各音を Pitch 7.9 Note On で)へ
+ruri convert scale.scl -o scale.mid         # 再生可能な標準MIDI(旋律。12-TET丸め、精度喪失時は警告)
 ruri render  scale.scl -o scale.wav --seconds 0.4   # 各音を Karplus-Strong で WAV 化
 ruri help                                   # 全コマンド一覧
 ```
 
-出力形式は拡張子から推論(`.scl`/`.tun`/`.syx`/`.ump`)。`--ref <hz>` で基準周波数(既定 440)、
-`--seconds <n>` で render の1音長(既定 0.5)を指定できる。
+出力形式は拡張子から推論(`.scl`/`.tun`/`.syx`/`.ump`/`.mid`)。`--ref <hz>` で基準周波数(既定 440)、
+`--seconds <n>` で render の1音長(既定 0.5)を指定できる。`.mid` は標準MIDIの制約上
+12-TETへ丸められるため、微分音を保持したい場合は `.ump`/`.syx`/`.tun` を使う(丸め損失時は警告が出る)。
 
 ## 設計原則
 
