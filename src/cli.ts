@@ -18,10 +18,15 @@ import { tuningToScaleWav } from './adapters/wav.js';
 import { tuningDegreeToUmp, umpToBytes } from './adapters/ump.js';
 import { scaleToSmf } from './adapters/smf.js';
 import { tuningToScale } from './core/scale.js';
-import { degreeToFreq, type TuningSystem } from './core/tuning.js';
+import { degreeToFreq, edo, type TuningSystem } from './core/tuning.js';
 import { freqToMidiFloat } from './core/midi.js';
 import { DEFAULT_SYNTH_SCALE } from './core/ks-synth.js';
-import { isTuningWellFormed, tuningMosPattern } from './core/generate.js';
+import {
+  isTuningWellFormed,
+  tuningMosPattern,
+  generatedTuning,
+  maximallyEvenTuning,
+} from './core/generate.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
 export interface CliIo {
@@ -41,7 +46,8 @@ const USAGE = `ruri — world tuning / scale / chord toolkit
 
 Usage:
   ruri info    <input.scl>
-  ruri convert <input.scl> -o <output.{scl|tun|syx|ump}>
+  ruri convert <input.scl> -o <output.{scl|tun|syx|ump|mid}>
+  ruri gen     <edo N | mos g p c | me c d> -o <output.{scl|tun|syx|ump|mid}>
   ruri render  <input.scl> -o <output.wav> [--seconds <n>]
   ruri help
 
@@ -56,6 +62,11 @@ Commands:
               .ump        MIDI 2.0 UMP    (per-degree Note On, Pitch 7.9)
               .mid        Standard MIDI   (playable melody; 12-TET-rounded,
                                            warns when microtonality is lost)
+  gen       Generate a tuning from theory (no input file) and write it in
+            any convert format:
+              edo <divisions>              n-tone equal division (e.g. 19)
+              mos <genCents> <perCents> <count>   generated / MOS scale
+              me  <chromaticSteps> <notes> maximally even (Clough-Douthett)
   render    Render each scale degree as a plucked (Karplus-Strong) tone
             to a 16-bit PCM WAV file.
 
@@ -140,36 +151,29 @@ function cmdInfo(args: Args, io: CliIo): number {
   return 0;
 }
 
-function cmdConvert(args: Args, io: CliIo): number {
-  const input = args.positionals[0];
-  if (input === undefined) {
-    io.err('convert: missing <input.scl>');
-    return 2;
-  }
-  if (args.output === undefined) {
-    io.err('convert: missing -o <output>');
-    return 2;
-  }
-  const scl = parseScl(io.readText(input));
-  const tuning = sclToTuning(scl, args.ref ?? 440);
-  const ext = extensionOf(args.output);
+/**
+ * Write a `TuningSystem` to `output`, choosing the format from its extension.
+ * Shared by `convert` (tuning read from a `.scl`) and `gen` (tuning synthesized
+ * from theory), so both speak the exact same set of output formats. Returns a
+ * process exit code (0 ok, 2 on an unsupported extension).
+ */
+function writeTuningOutput(tuning: TuningSystem, output: string, ref: number, io: CliIo): number {
+  const ext = extensionOf(output);
   switch (ext) {
     case 'scl':
-      io.writeText(args.output, writeScl(tuningToScl(tuning)));
+      io.writeText(output, writeScl(tuningToScl(tuning)));
       break;
     case 'tun':
-      io.writeText(args.output, writeTun(tuningToMtsFrequencies(tuning), tuning.name));
+      io.writeText(output, writeTun(tuningToMtsFrequencies(tuning), tuning.name));
       break;
     case 'syx':
-      io.writeBytes(args.output, tuningToMts(tuning, tuning.name));
+      io.writeBytes(output, tuningToMts(tuning, tuning.name));
       break;
     case 'mid': {
       // A playable Standard MIDI File melody (one note per degree). A plain SMF
       // carries only integer note numbers, so warn — loudly and honestly — when
       // that rounds away the very microtonality this tool exists to preserve.
-      const ref = args.ref ?? 440;
-      const wav = scaleToSmf(tuningToScale(tuning), tuning, ref, { a4Hz: ref });
-      io.writeBytes(args.output, wav);
+      io.writeBytes(output, scaleToSmf(tuningToScale(tuning), tuning, ref, { a4Hz: ref }));
       const err = maxTwelveTetErrorCents(tuning, ref);
       if (err > 1) {
         io.err(
@@ -185,17 +189,83 @@ function cmdConvert(args: Args, io: CliIo): number {
       for (let i = 0; i < tuning.degrees.length; i++) {
         words.push(...tuningDegreeToUmp(tuning, i));
       }
-      io.writeBytes(args.output, umpToBytes(words));
+      io.writeBytes(output, umpToBytes(words));
       break;
     }
     default:
-      io.err(
-        `convert: unsupported output extension '.${ext}' (use .scl, .tun, .syx, .ump, or .mid)`,
-      );
+      io.err(`unsupported output extension '.${ext}' (use .scl, .tun, .syx, .ump, or .mid)`);
       return 2;
   }
-  io.out(`wrote ${args.output}`);
+  io.out(`wrote ${output}`);
   return 0;
+}
+
+function cmdConvert(args: Args, io: CliIo): number {
+  const input = args.positionals[0];
+  if (input === undefined) {
+    io.err('convert: missing <input.scl>');
+    return 2;
+  }
+  if (args.output === undefined) {
+    io.err('convert: missing -o <output>');
+    return 2;
+  }
+  const tuning = sclToTuning(parseScl(io.readText(input)), args.ref ?? 440);
+  return writeTuningOutput(tuning, args.output, args.ref ?? 440, io);
+}
+
+/**
+ * Synthesize a tuning from theory (no input file) and write it out:
+ *   gen edo <divisions>
+ *   gen mos <generatorCents> <periodCents> <count>
+ *   gen me  <chromaticSteps> <scaleNotes>
+ */
+function cmdGen(args: Args, io: CliIo): number {
+  const [kind, ...rest] = args.positionals;
+  if (kind === undefined) {
+    io.err('gen: missing generator (edo | mos | me)');
+    return 2;
+  }
+  if (args.output === undefined) {
+    io.err('gen: missing -o <output>');
+    return 2;
+  }
+  const ref = args.ref ?? 440;
+  const nums = rest.map(Number);
+  const bad = (msg: string): number => {
+    io.err(`gen ${kind}: ${msg}`);
+    return 2;
+  };
+  let tuning: TuningSystem;
+  switch (kind) {
+    case 'edo': {
+      const [n] = nums;
+      if (n === undefined || !Number.isInteger(n) || n < 1) {
+        return bad('usage: gen edo <divisions> (positive integer)');
+      }
+      tuning = edo(n, ref);
+      break;
+    }
+    case 'mos': {
+      const [g, p, c] = nums;
+      if (g === undefined || p === undefined || c === undefined || !Number.isFinite(g)) {
+        return bad('usage: gen mos <generatorCents> <periodCents> <count>');
+      }
+      tuning = generatedTuning(g, p, c, ref);
+      break;
+    }
+    case 'me': {
+      const [c, d] = nums;
+      if (c === undefined || d === undefined) {
+        return bad('usage: gen me <chromaticSteps> <scaleNotes>');
+      }
+      tuning = maximallyEvenTuning(c, d, 1200, ref);
+      break;
+    }
+    default:
+      return bad('unknown generator (use edo | mos | me)');
+  }
+  return writeTuningOutput(tuning, args.output, ref, io);
 }
 
 function cmdRender(args: Args, io: CliIo): number {
@@ -246,6 +316,8 @@ export function runCli(argv: readonly string[], io: CliIo): number {
         return cmdInfo(args, io);
       case 'convert':
         return cmdConvert(args, io);
+      case 'gen':
+        return cmdGen(args, io);
       case 'render':
         return cmdRender(args, io);
       default:

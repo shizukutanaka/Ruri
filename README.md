@@ -307,9 +307,15 @@ ruri convert scale.scl -o scale.tun         # AnaMark .tun(128鍵周波数表)�
 ruri convert scale.scl -o scale.syx         # MTS バルクダンプ SysEx(VST/ハード連携)へ
 ruri convert scale.scl -o scale.ump         # MIDI 2.0 UMP(各音を Pitch 7.9 Note On で)へ
 ruri convert scale.scl -o scale.mid         # 再生可能な標準MIDI(旋律。12-TET丸め、精度喪失時は警告)
+ruri gen edo 19 -o 19edo.scl                # 理論から調律を生成(入力ファイル不要)
+ruri gen mos 700 1200 7 -o dia.ump          # 生成音階(MOS): 生成音程700c・周期1200c・7音 → UMP
+ruri gen me 12 7 -o diatonic.tun            # 最大均等 7-of-12(Clough-Douthett) → .tun
 ruri render  scale.scl -o scale.wav --seconds 0.4   # 各音を Karplus-Strong で WAV 化
 ruri help                                   # 全コマンド一覧
 ```
+
+`gen` は EDO・MOS・最大均等を理論から直接生成し、`convert` と同じ全出力形式
+(`.scl`/`.tun`/`.syx`/`.ump`/`.mid`)で書き出せる(入力 `.scl` 不要)。
 
 出力形式は拡張子から推論(`.scl`/`.tun`/`.syx`/`.ump`/`.mid`)。`--ref <hz>` で基準周波数(既定 440)、
 `--seconds <n>` で render の1音長(既定 0.5)を指定できる。`.mid` は標準MIDIの制約上

@@ -5,7 +5,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ## [Unreleased]
 
+### Added
+
+- `ruri gen <edo N | mos g p c | me c d> -o <output>`: generate a tuning from theory with no input file — n-EDO (`edo`), a generated/MOS scale (`mos <generatorCents> <periodCents> <count>`), or a maximally-even set (`me <chromaticSteps> <notes>`) — and write it in any of the same formats `convert` supports (`.scl`/`.tun`/`.syx`/`.ump`/`.mid`). Exposes the library's generation layer (`edo`, `generatedTuning`, `maximallyEvenTuning`) on the command line for the first time. The format-writing dispatch is now shared between `convert` and `gen`.
+
 ### Fixed
+
+- `mosPattern`/`isWellFormed` step-size quantization coarsened from 1e-6 to 1e-3 cents (`src/core/generate.ts`). The old grid was as fine as the 6-decimal cents a `.scl` file stores, so a `.scl` round-trip's sub-milli-cent noise split one true step size into spurious classes — misreporting an equal division (e.g. 19-EDO) as an irregular MOS and as "well-formed". 0.001c is still 1000× below perception yet immune to that noise; the two functions continue to share the constant so they stay mutually consistent.
 
 - `ruri convert -o <file>.mid` now writes a valid, playable Standard MIDI File (a one-note-per-degree melody via `scaleToSmf`) instead of raw MTS SysEx bytes, which produced a file that was not a valid SMF (no `MThd` header) and that DAWs reject. Raw MTS SysEx remains available as `.syx`. Because a plain SMF carries only integer note numbers, `.mid` conversion prints a warning to stderr with the maximum 12-TET rounding error when the tuning is microtonal, pointing to `.ump`/`.syx`/`.tun` for exact-pitch export.
 

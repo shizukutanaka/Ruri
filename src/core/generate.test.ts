@@ -443,10 +443,26 @@ describe('mosPattern — L/s step-pattern analysis', () => {
           if (mp !== null) {
             expect(mp.large + mp.small).toBe(sc.length);
             expect(mp.pattern.length).toBe(sc.length);
-            expect(mp.large * mp.largeCents + mp.small * mp.smallCents).toBeCloseTo(1200, 3);
+            // Steps tile the period. Sizes are quantized to 0.001c (see ROUND),
+            // so the sum can drift by up to ~count·0.0005c; bound generously.
+            const tiled = mp.large * mp.largeCents + mp.small * mp.smallCents;
+            expect(Math.abs(tiled - 1200)).toBeLessThanOrEqual(0.01);
           }
         },
       ),
     );
+  });
+
+  it('test_equal_division_survives_scl_6_decimal_round_trip', () => {
+    // A `.scl` writes cents at 6 decimals (toFixed(6)). Simulate that precision
+    // loss and confirm an equal division is still reported as a single step
+    // size (`19L0s`) and NOT well-formed — sub-milli-cent noise must not split
+    // one true step into spurious L/s classes.
+    const raw = Array.from({ length: 19 }, (_, i) => (i * 1200) / 19);
+    const rounded = raw.map((c) => Math.round(c * 1e6) / 1e6);
+    const mp = mosPattern(rounded, 1200);
+    expect(mp!.name).toBe('19L0s');
+    expect(mp!.small).toBe(0);
+    expect(isWellFormed(rounded, 1200)).toBe(false); // equal division: one step size
   });
 });

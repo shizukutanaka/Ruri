@@ -177,6 +177,51 @@ describe('runCli convert', () => {
   });
 });
 
+describe('runCli gen', () => {
+  it('test_gen_edo_writes_n_degree_scl', () => {
+    const { io, texts, stdout } = makeIo();
+    expect(runCli(['gen', 'edo', '19', '-o', 'out.scl'], io)).toBe(0);
+    // A 19-EDO .scl lists 19 degrees (18 above root + the 2/1 period line).
+    expect((texts['out.scl'] as string).split('\n').filter((l) => l.trim() === '19').length).toBe(
+      1,
+    );
+    expect(stdout.join('\n')).toContain('wrote out.scl');
+  });
+
+  it('test_gen_mos_diatonic_is_5L2s_via_info_roundtrip', () => {
+    // gen a 700c/1200c/7 MOS to .scl, read it back with info → 5L2s.
+    const { io, texts } = makeIo();
+    expect(runCli(['gen', 'mos', '700', '1200', '7', '-o', 'd.scl'], io)).toBe(0);
+    const back = makeIo({ 'd.scl': texts['d.scl'] as string });
+    expect(runCli(['info', 'd.scl'], back.io)).toBe(0);
+    expect(back.stdout.join('\n')).toContain('mos-pattern : 5L2s');
+  });
+
+  it('test_gen_me_writes_ump', () => {
+    const { io, bytes } = makeIo();
+    expect(runCli(['gen', 'me', '12', '7', '-o', 'out.ump'], io)).toBe(0);
+    expect((bytes['out.ump'] as Uint8Array).length).toBe(7 * 8); // 7 notes × 8 bytes
+  });
+
+  it('test_gen_edo_bad_arg_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['gen', 'edo', 'nope', '-o', 'out.scl'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('usage: gen edo');
+  });
+
+  it('test_gen_unknown_generator_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['gen', 'bogus', '-o', 'out.scl'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('unknown generator');
+  });
+
+  it('test_gen_missing_output_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['gen', 'edo', '12'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('missing -o');
+  });
+});
+
 describe('runCli render', () => {
   it('test_render_writes_valid_wav', () => {
     const { io, bytes } = makeIo({ 'in.scl': scl12 });

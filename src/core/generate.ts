@@ -22,7 +22,13 @@ export function generatedScale(
   return out.sort((a, b) => a - b);
 }
 
-const ROUND = 1e6;
+// Step-size quantization for well-formedness / MOS analysis. 1e3 = round to
+// 0.001 cent: far below perception (~1c) yet coarse enough that sub-milli-cent
+// noise from a `.scl` round-trip (cents written at 6 decimals) or float error
+// in scale generation cannot split one true step size into spurious classes —
+// which would otherwise misreport an equal division as an irregular MOS.
+// `isWellFormed` and `mosPattern` MUST share this constant to stay consistent.
+const ROUND = 1e3;
 
 /**
  * Non-degenerate well-formed (Myhill's property): every generic interval class spans
