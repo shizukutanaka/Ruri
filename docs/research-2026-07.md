@@ -186,7 +186,23 @@
   (velocity 0 は note-off ではない、bend既定感度なし 等)。
 - **`README.md`**: UMP使用例 + 協和の三要素モデルとの対応関係を1行明記(C-1参照)。
 
+### CLI ワークフローの拡充と実バグ修正(後続イテレーション)
+- **`ruri gen`(生成コマンド)**: EDO・MOS・最大均等を理論から直接生成(入力ファイル不要)。
+  出力形式ディスパッチを `writeTuningOutput` に共通化し `convert`/`gen` で共用。
+  `edo`/`generatedTuning`/`maximallyEvenTuning` を再利用。
+- **`.mid` 出力の修正(実バグ)**: 従来 `.mid` は生 MTS SysEx を書き出しており
+  有効な Standard MIDI File(`MThd` ヘッダなし)ではなかった。`scaleToSmf` による
+  再生可能な旋律 SMF に変更し、生 SysEx は正しい拡張子 `.syx` に限定。標準 MIDI の
+  12-TET 制約で微分音が失われる場合は stderr に丸め警告。
+- **量子化バグの修正(実バグ)**: `mosPattern`/`isWellFormed` の共有量子化 `ROUND` が
+  1e-6 cent と `.scl` の6桁精度と同スケールだったため、往復ノイズが等分割を偽 MOS
+  (19-EDO → `14L5s`・well-formed=yes)と誤報告。1e-3 cent(知覚閾の1000分の1)に粗くして修正。
+- **`info` の近似JI比ヒント**: cents 表記の音程に最寄りの単純純正比を表示専用で注釈
+  (≤1.0c 誤差 かつ odd-limit ≤15)。純正律・19-EDO の 6/5 等の真に純正な音程のみに付く。
+- いずれも実バグ2件は**テスト緑のまま実機ドライブで発見**された点が教訓
+  (`docs/model-handbook.md §3`)。
+
 ### 累積検証
-全テスト **7,293 件緑**(セッション開始時 7,268 から +25、CLI導入時の +19と合わせ累計+44)、
-typecheck / lint / format すべて緑。UMP追加後に `npm run build` で dist 再生成し、
-CLI(`bin/ruri.mjs info/convert/render`)を実 `.scl` で再ドライブして無回帰を確認。
+全テスト **7,306 件緑**(セッション開始時 7,268 から +38)、typecheck / lint / format すべて緑。
+各変更後に `npm run build` → `node bin/ruri.mjs`(info/convert/gen/render)を実 `.scl` で
+ドライブして無回帰を確認。次セッション向けの作業指示は `docs/model-handbook.md`。
