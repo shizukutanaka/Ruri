@@ -77,7 +77,7 @@ git commit / push    # メッセージに検証結果を書く
 
 | 項目 | 期待される形 | 再利用する既存実装 | 検証 |
 |------|--------------|--------------------|------|
-| `ruri gen … -o out.wav` | `writeTuningOutput`(`src/cli.ts`)に `wav` ケース追加。現状 gen は音を出せない | `tuningToScaleWav`(`src/adapters/wav.ts`)+ `DEFAULT_SYNTH_SCALE` | 実機: `gen edo 19 -o x.wav` が RIFF |
+| ~~`ruri gen … -o out.wav`~~ **完了(893bad4)** | `writeTuningOutput` に `.wav` ケース追加済み | `tuningToScaleWav` | — |
 | SonicWeave/FJS import(C-7) | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット) | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`) | golden round-trip + 実機 convert |
 | CLI `--name` オプション | gen/convert の出力調律名を上書き | `Args` パーサ(`src/cli.ts`) | テスト + 実機 |
 | `info` の追加診断 | 平均ステップ・協和スコア等(慎重に、ノイズにしない) | `tuningMosPattern`・`chordDissonance` 等 | 実機で有用性確認 |
