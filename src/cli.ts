@@ -27,6 +27,7 @@ import {
   generatedTuning,
   maximallyEvenTuning,
 } from './core/generate.js';
+import { approxRatio } from './core/harmonicity.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
 export interface CliIo {
@@ -114,6 +115,41 @@ const extensionOf = (path: string): string => {
   return dot < 0 ? '' : path.slice(dot + 1).toLowerCase();
 };
 
+/** Odd part of a positive integer (strip all factors of 2). */
+function oddPart(n: number): number {
+  let x = n;
+  while (x % 2 === 0) x /= 2;
+  return x;
+}
+
+/**
+ * Display-only nearest simple just ratio for a cents value, or `''` when none
+ * is close and simple enough. This is an approximation *hint* (marked `≈` with
+ * the cents error), NOT a cents→ratio conversion — the core design keeps ratio
+ * primary and never treats a tempered cents value as an exact ratio.
+ *
+ * Two gates, both needed:
+ *  - **≤ 1.0c error**: JI written as cents lands ≤ 0.5c from its ratio even at
+ *    4-decimal precision, while ordinary tempered steps sit > 1c off.
+ *  - **odd-limit ≤ 15**: the standard xenharmonic consonance measure. With only
+ *    a cents gate, a denominator-≤-32 search finds *some* fraction within 1c of
+ *    almost any pitch (19-EDO steps picked up noise like `≈ 43/24`); real
+ *    recognizable intervals (5/4, 6/5, 5/3, 7/4, 15/8) are odd-limit ≤ 15,
+ *    whereas that noise is odd-limit 25–45. Together they annotate genuine JI —
+ *    and genuinely near-just tempered degrees like 19-EDO's 6/5 minor third —
+ *    while leaving tempered/irrational steps unlabeled.
+ */
+function nearestJiHint(cents: number): string {
+  if (cents <= 0) return '';
+  const ratio = 2 ** (cents / 1200);
+  const { num, den } = approxRatio(ratio, 0.001, 64);
+  if (Math.max(oddPart(num), oddPart(den)) > 15) return '';
+  const errCents = Math.abs(1200 * Math.log2(num / den) - cents);
+  if (errCents > 1.0) return '';
+  const sign = 1200 * Math.log2(num / den) >= cents ? '+' : '-';
+  return `  ≈ ${num}/${den} (${sign}${errCents.toFixed(1)}c)`;
+}
+
 /**
  * Largest deviation, in cents, between any tuning degree and the nearest
  * 12-TET semitone — how much a plain Standard MIDI File (which can only carry
@@ -146,7 +182,11 @@ function cmdInfo(args: Args, io: CliIo): number {
   io.out('pitches:');
   scl.degrees.forEach((d, i) => {
     const label = d.kind === 'ratio' ? `${d.num}/${d.den}` : d.text;
-    io.out(`  ${String(i + 1).padStart(3)}  ${degreeCents(d).toFixed(4).padStart(11)}c  ${label}`);
+    // Exact ratios need no hint; cents degrees get a nearest-JI approximation.
+    const hint = d.kind === 'cents' ? nearestJiHint(d.cents) : '';
+    io.out(
+      `  ${String(i + 1).padStart(3)}  ${degreeCents(d).toFixed(4).padStart(11)}c  ${label}${hint}`,
+    );
   });
   return 0;
 }

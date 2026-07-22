@@ -84,6 +84,27 @@ describe('runCli info', () => {
     expect(stdout.join('\n')).toContain('mos-pattern : 5L2s');
   });
 
+  it('test_info_annotates_ji_cents_degrees_with_nearest_ratio', () => {
+    // A JI scale written in cents: 386.3137c is exactly 5/4, 701.955c is 3/2.
+    const jiCents = 'JI in cents\n3\n386.3137\n701.9550\n1200.0\n';
+    const { io, stdout } = makeIo({ 'in.scl': jiCents });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('≈ 5/4');
+    expect(text).toContain('≈ 3/2');
+  });
+
+  it('test_info_does_not_mislabel_tempered_edo_intervals', () => {
+    // 12-EDO's 400c third and 700c fifth are >1c from 5/4 (386.3c) and 3/2
+    // (702.0c), so they must NOT be annotated — only the exact 2/1 octave is.
+    const { io, stdout } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).not.toContain('≈ 5/4');
+    expect(text).not.toContain('≈ 3/2');
+    expect(text).toContain('≈ 2/1'); // the octave is a genuine 2/1
+  });
+
   it('test_info_missing_input_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['info'], io)).toBe(2);
