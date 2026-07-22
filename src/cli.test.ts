@@ -185,6 +185,12 @@ describe('runCli convert', () => {
     expect(stderr.join('\n')).toContain('warning: .mid rounds pitches to 12-TET');
   });
 
+  it('test_convert_to_wav_writes_valid_audio', () => {
+    const { io, bytes } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['convert', 'in.scl', '-o', 'out.wav', '--seconds', '0.05'], io)).toBe(0);
+    expect(tag(bytes['out.wav'] as Uint8Array, 0)).toBe('RIFF');
+  });
+
   it('test_convert_unsupported_extension_returns_2', () => {
     const { io, stderr } = makeIo({ 'in.scl': scl12 });
     expect(runCli(['convert', 'in.scl', '-o', 'out.xyz'], io)).toBe(2);
@@ -222,6 +228,15 @@ describe('runCli gen', () => {
     const { io, bytes } = makeIo();
     expect(runCli(['gen', 'me', '12', '7', '-o', 'out.ump'], io)).toBe(0);
     expect((bytes['out.ump'] as Uint8Array).length).toBe(7 * 8); // 7 notes × 8 bytes
+  });
+
+  it('test_gen_edo_writes_audible_wav', () => {
+    // gen can audition a tuning directly, no intermediate .scl + render step.
+    const { io, bytes } = makeIo();
+    expect(runCli(['gen', 'edo', '12', '-o', 'out.wav', '--seconds', '0.05'], io)).toBe(0);
+    const wav = bytes['out.wav'] as Uint8Array;
+    expect(tag(wav, 0)).toBe('RIFF');
+    expect(tag(wav, 8)).toBe('WAVE');
   });
 
   it('test_gen_edo_bad_arg_returns_2', () => {

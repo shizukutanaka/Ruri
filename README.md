@@ -310,15 +310,17 @@ ruri convert scale.scl -o scale.mid         # 再生可能な標準MIDI(旋律�
 ruri gen edo 19 -o 19edo.scl                # 理論から調律を生成(入力ファイル不要)
 ruri gen mos 700 1200 7 -o dia.ump          # 生成音階(MOS): 生成音程700c・周期1200c・7音 → UMP
 ruri gen me 12 7 -o diatonic.tun            # 最大均等 7-of-12(Clough-Douthett) → .tun
+ruri gen edo 19 -o 19edo.wav --seconds 0.2  # 生成した調律をそのまま試聴(WAV)
 ruri render  scale.scl -o scale.wav --seconds 0.4   # 各音を Karplus-Strong で WAV 化
 ruri help                                   # 全コマンド一覧
 ```
 
 `gen` は EDO・MOS・最大均等を理論から直接生成し、`convert` と同じ全出力形式
-(`.scl`/`.tun`/`.syx`/`.ump`/`.mid`)で書き出せる(入力 `.scl` 不要)。
+(`.scl`/`.tun`/`.syx`/`.ump`/`.mid`/`.wav`)で書き出せる(入力 `.scl` 不要)。
+`.wav` を指定すれば生成した調律をその場で試聴できる。
 
-出力形式は拡張子から推論(`.scl`/`.tun`/`.syx`/`.ump`/`.mid`)。`--ref <hz>` で基準周波数(既定 440)、
-`--seconds <n>` で render の1音長(既定 0.5)を指定できる。`.mid` は標準MIDIの制約上
+出力形式は拡張子から推論(`.scl`/`.tun`/`.syx`/`.ump`/`.mid`/`.wav`)。`--ref <hz>` で基準周波数(既定 440)、
+`--seconds <n>` で `.wav` 出力の1音長(既定 0.5)を指定できる。`.mid` は標準MIDIの制約上
 12-TETへ丸められるため、微分音を保持したい場合は `.ump`/`.syx`/`.tun` を使う(丸め損失時は警告が出る)。
 
 ## 設計原則

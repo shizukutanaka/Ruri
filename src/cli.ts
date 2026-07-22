@@ -47,8 +47,8 @@ const USAGE = `ruri — world tuning / scale / chord toolkit
 
 Usage:
   ruri info    <input.scl>
-  ruri convert <input.scl> -o <output.{scl|tun|syx|ump|mid}>
-  ruri gen     <edo N | mos g p c | me c d> -o <output.{scl|tun|syx|ump|mid}>
+  ruri convert <input.scl> -o <output.{scl|tun|syx|ump|mid|wav}>
+  ruri gen     <edo N | mos g p c | me c d> -o <output.{scl|tun|syx|ump|mid|wav}>
   ruri render  <input.scl> -o <output.wav> [--seconds <n>]
   ruri help
 
@@ -63,8 +63,9 @@ Commands:
               .ump        MIDI 2.0 UMP    (per-degree Note On, Pitch 7.9)
               .mid        Standard MIDI   (playable melody; 12-TET-rounded,
                                            warns when microtonality is lost)
+              .wav        16-bit PCM audio (plucked Karplus-Strong scale)
   gen       Generate a tuning from theory (no input file) and write it in
-            any convert format:
+            any convert format (including .wav to audition it directly):
               edo <divisions>              n-tone equal division (e.g. 19)
               mos <genCents> <perCents> <count>   generated / MOS scale
               me  <chromaticSteps> <notes> maximally even (Clough-Douthett)
@@ -72,8 +73,8 @@ Commands:
             to a 16-bit PCM WAV file.
 
 Options:
-  -o, --output <path>   Output file path (required for convert/render).
-  --seconds <n>         Per-note duration for render (default 0.5).
+  -o, --output <path>   Output file path (required for convert/gen/render).
+  --seconds <n>         Per-note duration for .wav output (default 0.5).
   --ref <hz>            Root reference frequency in Hz (default 440).
 `;
 
@@ -194,10 +195,17 @@ function cmdInfo(args: Args, io: CliIo): number {
 /**
  * Write a `TuningSystem` to `output`, choosing the format from its extension.
  * Shared by `convert` (tuning read from a `.scl`) and `gen` (tuning synthesized
- * from theory), so both speak the exact same set of output formats. Returns a
- * process exit code (0 ok, 2 on an unsupported extension).
+ * from theory), so both speak the exact same set of output formats — including
+ * `.wav`, so a generated tuning can be auditioned without a separate step.
+ * Returns a process exit code (0 ok, 2 on an unsupported extension).
  */
-function writeTuningOutput(tuning: TuningSystem, output: string, ref: number, io: CliIo): number {
+function writeTuningOutput(
+  tuning: TuningSystem,
+  output: string,
+  ref: number,
+  noteSeconds: number,
+  io: CliIo,
+): number {
   const ext = extensionOf(output);
   switch (ext) {
     case 'scl':
@@ -232,8 +240,11 @@ function writeTuningOutput(tuning: TuningSystem, output: string, ref: number, io
       io.writeBytes(output, umpToBytes(words));
       break;
     }
+    case 'wav':
+      io.writeBytes(output, tuningToScaleWav(tuning, { ...DEFAULT_SYNTH_SCALE, noteSeconds }));
+      break;
     default:
-      io.err(`unsupported output extension '.${ext}' (use .scl, .tun, .syx, .ump, or .mid)`);
+      io.err(`unsupported output extension '.${ext}' (use .scl, .tun, .syx, .ump, .mid, or .wav)`);
       return 2;
   }
   io.out(`wrote ${output}`);
@@ -251,7 +262,7 @@ function cmdConvert(args: Args, io: CliIo): number {
     return 2;
   }
   const tuning = sclToTuning(parseScl(io.readText(input)), args.ref ?? 440);
-  return writeTuningOutput(tuning, args.output, args.ref ?? 440, io);
+  return writeTuningOutput(tuning, args.output, args.ref ?? 440, args.seconds ?? 0.5, io);
 }
 
 /**
@@ -305,7 +316,7 @@ function cmdGen(args: Args, io: CliIo): number {
     default:
       return bad('unknown generator (use edo | mos | me)');
   }
-  return writeTuningOutput(tuning, args.output, ref, io);
+  return writeTuningOutput(tuning, args.output, ref, args.seconds ?? 0.5, io);
 }
 
 function cmdRender(args: Args, io: CliIo): number {

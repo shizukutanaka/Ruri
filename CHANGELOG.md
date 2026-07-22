@@ -7,6 +7,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ### Added
 
+- `ruri convert`/`ruri gen` now accept `.wav` output, so a generated tuning can be auditioned directly (`ruri gen edo 19 -o 19edo.wav`) without a separate `.scl`-then-`render` step. `--seconds` sets the per-note duration. The format-writing dispatch (`writeTuningOutput`) that both commands share gained the `.wav` case via `tuningToScaleWav`.
 - `ruri info` now annotates cents-based degrees with the nearest simple just ratio (e.g. `386.3137c … ≈ 5/4 (+0.0c)`), a display-only hint gated on ≤ 1.0c error and odd-limit ≤ 15 so it labels genuine JI — and genuinely near-just tempered degrees such as 19-EDO's 6/5 minor third — while leaving ordinary tempered/irrational steps unlabeled. It is an approximation hint (marked `≈`), never a cents→ratio conversion.
 - `ruri gen <edo N | mos g p c | me c d> -o <output>`: generate a tuning from theory with no input file — n-EDO (`edo`), a generated/MOS scale (`mos <generatorCents> <periodCents> <count>`), or a maximally-even set (`me <chromaticSteps> <notes>`) — and write it in any of the same formats `convert` supports (`.scl`/`.tun`/`.syx`/`.ump`/`.mid`). Exposes the library's generation layer (`edo`, `generatedTuning`, `maximallyEvenTuning`) on the command line for the first time. The format-writing dispatch is now shared between `convert` and `gen`.
 
