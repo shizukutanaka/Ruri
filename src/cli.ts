@@ -28,6 +28,7 @@ import {
   maximallyEvenTuning,
 } from './core/generate.js';
 import { approxRatio } from './core/harmonicity.js';
+import { ALL_PRESETS, getTuningById } from './data/presets.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
 export interface CliIo {
@@ -49,6 +50,7 @@ Usage:
   ruri info    <input.scl>
   ruri convert <input.scl> -o <output.{scl|tun|syx|ump|mid|wav}>
   ruri gen     <edo N | mos g p c | me c d> -o <output.{scl|tun|syx|ump|mid|wav}>
+  ruri presets [<id> -o <output.{scl|tun|syx|ump|mid|wav}>]
   ruri render  <input.scl> -o <output.wav> [--seconds <n>]
   ruri help
 
@@ -69,6 +71,8 @@ Commands:
               edo <divisions>              n-tone equal division (e.g. 19)
               mos <genCents> <perCents> <count>   generated / MOS scale
               me  <chromaticSteps> <notes> maximally even (Clough-Douthett)
+  presets   List the curated tunings (with their citations), or export one
+            by id in any convert format.
   render    Render each scale degree as a plucked (Karplus-Strong) tone
             to a 16-bit PCM WAV file.
 
@@ -76,6 +80,7 @@ Options:
   -o, --output <path>   Output file path (required for convert/gen/render).
   --seconds <n>         Per-note duration for .wav output (default 0.5).
   --ref <hz>            Root reference frequency in Hz (default 440).
+  --name <text>         Name/id written into the output tuning (convert/gen).
 `;
 
 /** A parsed flag set: positional args plus recognized options. */
@@ -84,6 +89,7 @@ interface Args {
   readonly output?: string;
   readonly seconds?: number;
   readonly ref?: number;
+  readonly name?: string;
 }
 
 function parseArgs(rest: readonly string[]): Args {
@@ -91,6 +97,7 @@ function parseArgs(rest: readonly string[]): Args {
   let output: string | undefined;
   let seconds: number | undefined;
   let ref: number | undefined;
+  let name: string | undefined;
 
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i] as string;
@@ -100,6 +107,8 @@ function parseArgs(rest: readonly string[]): Args {
       seconds = Number.parseFloat(rest[++i] ?? '');
     } else if (a === '--ref') {
       ref = Number.parseFloat(rest[++i] ?? '');
+    } else if (a === '--name') {
+      name = rest[++i];
     } else {
       positionals.push(a);
     }
@@ -108,7 +117,13 @@ function parseArgs(rest: readonly string[]): Args {
   if (output !== undefined) args.output = output;
   if (seconds !== undefined) args.seconds = seconds;
   if (ref !== undefined) args.ref = ref;
+  if (name !== undefined) args.name = name;
   return args;
+}
+
+/** Return a copy of `tuning` with its id/name overridden (for `--name`). */
+function renamed(tuning: TuningSystem, name: string | undefined): TuningSystem {
+  return name === undefined ? tuning : { ...tuning, id: name, name };
 }
 
 const extensionOf = (path: string): string => {
@@ -261,7 +276,7 @@ function cmdConvert(args: Args, io: CliIo): number {
     io.err('convert: missing -o <output>');
     return 2;
   }
-  const tuning = sclToTuning(parseScl(io.readText(input)), args.ref ?? 440);
+  const tuning = renamed(sclToTuning(parseScl(io.readText(input)), args.ref ?? 440), args.name);
   return writeTuningOutput(tuning, args.output, args.ref ?? 440, args.seconds ?? 0.5, io);
 }
 
@@ -316,7 +331,45 @@ function cmdGen(args: Args, io: CliIo): number {
     default:
       return bad('unknown generator (use edo | mos | me)');
   }
-  return writeTuningOutput(tuning, args.output, ref, args.seconds ?? 0.5, io);
+  return writeTuningOutput(renamed(tuning, args.name), args.output, ref, args.seconds ?? 0.5, io);
+}
+
+/**
+ * List the curated tuning presets, or write one out in any convert format:
+ *   presets                      list all (id, name, degrees, citation)
+ *   presets <id> -o <output.…>   export one preset
+ *
+ * Curated presets carry mandatory provenance; the listing prints the citation so
+ * the source travels with the data rather than being stripped from it.
+ */
+function cmdPresets(args: Args, io: CliIo): number {
+  const id = args.positionals[0];
+  if (id === undefined) {
+    for (const p of ALL_PRESETS) {
+      const kind = p.source === 'measured' ? 'measured' : 'theoretical';
+      io.out(
+        `${p.id.padEnd(24)} ${String(p.degrees.length).padStart(3)} deg  [${kind}]  ${p.name}`,
+      );
+      io.out(`${' '.repeat(26)}source: ${p.provenance.citation}`);
+    }
+    return 0;
+  }
+  const tuning = getTuningById(id);
+  if (tuning === undefined) {
+    io.err(`presets: unknown id '${id}'. Run 'ruri presets' to list available ids.`);
+    return 2;
+  }
+  if (args.output === undefined) {
+    io.err('presets: missing -o <output>');
+    return 2;
+  }
+  return writeTuningOutput(
+    renamed(tuning, args.name),
+    args.output,
+    args.ref ?? tuning.referenceHz,
+    args.seconds ?? 0.5,
+    io,
+  );
 }
 
 function cmdRender(args: Args, io: CliIo): number {
@@ -369,6 +422,8 @@ export function runCli(argv: readonly string[], io: CliIo): number {
         return cmdConvert(args, io);
       case 'gen':
         return cmdGen(args, io);
+      case 'presets':
+        return cmdPresets(args, io);
       case 'render':
         return cmdRender(args, io);
       default:

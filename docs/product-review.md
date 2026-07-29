@@ -42,7 +42,7 @@
 | フレットレス楽器の連続ポジションモデル | **実装済** (`src/core/fretless.ts`) |
 | ADSR等の時間エンベロープ | **実装済** (`src/core/envelope.ts`) |
 | `.tun` (AnaMark) 形式 | **実装済** (`src/adapters/tun.ts`) |
-| 調律プリセット拡充(Pythagorean・歴史的調律・Bohlen-Pierce等) | 未着手 — CARE準拠の出典整備が前提 |
+| 調律プリセット拡充(Pythagorean・歴史的調律・Bohlen-Pierce等) | **実装済**(2026-07) — Pythagorean・1/4コンマ中全音律・Werckmeister III・Kirnberger III・Bohlen-Pierce の5件を追加(カタログ 5→10)。**CARE ゲートは `source: 'measured'` にのみ適用**されるため、公刊済みの理論的調律はゲート対象外だった(この誤認が長期未着手の原因)。詳細と検証オラクルは `docs/first-principles-2026-07.md`。民族実測データの拡充は引き続き人的ゲート下。 |
 | A11y/i18n(shell-web) | 未着手(GOAL-AUDIT 既載) |
 
 ## 対応の優先順位判断(2026-06時点)

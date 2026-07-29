@@ -2274,12 +2274,128 @@ export const PELOG_EXAMPLE: TuningPreset = {
   },
 };
 
+/**
+ * Pythagorean 12-tone (3-limit), the common Eb–G# layout.
+ *
+ * Every degree is an exact power of 3/2 reduced into the octave, so the degrees
+ * are stored as ratios (not cents) — the ratio-primary representation survives
+ * export to `.scl` without precision loss.
+ */
+export const PYTHAGOREAN_12: TuningPreset = {
+  id: 'pythagorean-12',
+  name: 'Pythagorean (12-tone, 3-limit)',
+  referenceHz: 440,
+  periodCents: 1200,
+  degrees: [
+    '1/1',
+    '256/243',
+    '9/8',
+    '32/27',
+    '81/64',
+    '4/3',
+    '729/512',
+    '3/2',
+    '128/81',
+    '27/16',
+    '16/9',
+    '243/128',
+    '2/1',
+  ],
+  source: 'theoretical',
+  note: 'One of several Pythagorean 12-note layouts (here Eb–G#); the choice of where to place the wolf fifth varies by source and repertoire.',
+  provenance: {
+    citation: 'Pythagorean tuning; chain of pure 3/2 fifths (classical/medieval theory)',
+    license: 'public-domain',
+  },
+};
+
+/**
+ * Quarter-comma meantone (Aron 1523): each fifth narrowed by 1/4 syntonic comma
+ * so that the major third is a pure 5/4 (386.314c). Values agree exactly with
+ * the library's own `meantoneQuarterComma()` construction.
+ */
+export const MEANTONE_QUARTER_COMMA: TuningPreset = {
+  id: 'meantone-quarter-comma',
+  name: 'Quarter-comma meantone',
+  referenceHz: 440,
+  periodCents: 1200,
+  degrees: [
+    0, 76.049, 193.157, 269.206, 386.314, 503.422, 579.471, 696.578, 772.627, 889.735, 965.784,
+    1082.892,
+  ],
+  source: 'theoretical',
+  note: 'One documented layout (Eb–G#) of quarter-comma meantone; the wolf fifth falls at G#–Eb. Pure 5/4 thirds are the defining property.',
+  provenance: {
+    citation: 'Pietro Aron, "Toscanello in Musica" (1523); quarter-comma meantone',
+    license: 'public-domain',
+  },
+};
+
+/** Werckmeister III (1691) — an early well-temperament; all keys usable, each with its own colour. */
+export const WERCKMEISTER_III: TuningPreset = {
+  id: 'werckmeister-iii',
+  name: 'Werckmeister III (well-temperament)',
+  referenceHz: 440,
+  periodCents: 1200,
+  degrees: [
+    0, 90.225, 192.18, 294.135, 390.225, 498.045, 588.27, 696.09, 792.18, 888.27, 996.09, 1092.18,
+  ],
+  source: 'theoretical',
+  note: 'Werckmeister\'s "correct temperament no. 1"; the Pythagorean comma is distributed over four fifths (C–G, G–D, D–A, B–F#). One of several Werckmeister temperaments.',
+  provenance: {
+    citation: 'Andreas Werckmeister, "Musicalische Temperatur" (1691)',
+    license: 'public-domain',
+  },
+};
+
+/** Kirnberger III (1779) — splits the syntonic comma over four fifths, keeping C–E pure (5/4). */
+export const KIRNBERGER_III: TuningPreset = {
+  id: 'kirnberger-iii',
+  name: 'Kirnberger III (well-temperament)',
+  referenceHz: 440,
+  periodCents: 1200,
+  degrees: [
+    0, 90.225, 193.157, 294.135, 386.314, 498.045, 590.224, 696.578, 792.18, 889.735, 996.09,
+    1088.269,
+  ],
+  source: 'theoretical',
+  note: 'One of Kirnberger\'s temperaments (III); C–E is a pure 5/4 major third, the defining feature. Not "the" Baroque tuning — many well-temperaments coexisted.',
+  provenance: {
+    citation: 'Johann Philipp Kirnberger, "Die Kunst des reinen Satzes in der Musik" (1779)',
+    license: 'public-domain',
+  },
+};
+
+/**
+ * Bohlen-Pierce: 13 equal divisions of the *tritave* (3/1), not the octave.
+ * Included because non-octave periods are a first-class concept in this library —
+ * this preset exercises that directly.
+ */
+export const BOHLEN_PIERCE_13: TuningPreset = {
+  id: 'bohlen-pierce-13',
+  name: 'Bohlen-Pierce (13 equal divisions of 3/1)',
+  referenceHz: 440,
+  periodCents: 1901.955,
+  degrees: Array.from({ length: 13 }, (_, i) => (i * 1200 * Math.log2(3)) / 13),
+  source: 'theoretical',
+  note: 'The equal-tempered form of Bohlen-Pierce. A just (ratio-based) variant also exists; this is one construction, not the only one. Repeats at the tritave (3/1), not the octave.',
+  provenance: {
+    citation: 'Heinz Bohlen (1978); Mathews & Pierce, "The Bohlen-Pierce Scale" (1988)',
+    license: 'public-domain',
+  },
+};
+
 export const ALL_PRESETS: readonly TuningPreset[] = [
   TWELVE_TET,
   JUST_INTONATION_5L,
   MAKAM_USSAK,
   SLENDRO_EXAMPLE,
   PELOG_EXAMPLE,
+  PYTHAGOREAN_12,
+  MEANTONE_QUARTER_COMMA,
+  WERCKMEISTER_III,
+  KIRNBERGER_III,
+  BOHLEN_PIERCE_13,
 ];
 
 /**

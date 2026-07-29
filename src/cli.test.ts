@@ -239,6 +239,18 @@ describe('runCli gen', () => {
     expect(tag(wav, 8)).toBe('WAVE');
   });
 
+  it('test_gen_name_option_sets_scl_description', () => {
+    const { io, texts } = makeIo();
+    expect(runCli(['gen', 'edo', '5', '-o', 'out.scl', '--name', 'my slendro-ish'], io)).toBe(0);
+    expect(texts['out.scl']).toContain('my slendro-ish');
+  });
+
+  it('test_gen_without_name_uses_generated_id', () => {
+    const { io, texts } = makeIo();
+    expect(runCli(['gen', 'edo', '5', '-o', 'out.scl'], io)).toBe(0);
+    expect(texts['out.scl']).toContain('5-edo');
+  });
+
   it('test_gen_edo_bad_arg_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['gen', 'edo', 'nope', '-o', 'out.scl'], io)).toBe(2);
@@ -254,6 +266,45 @@ describe('runCli gen', () => {
   it('test_gen_missing_output_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['gen', 'edo', '12'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('missing -o');
+  });
+});
+
+describe('runCli presets', () => {
+  it('test_presets_lists_curated_tunings_with_citations', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['presets'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('12-tet');
+    expect(text).toContain('kirnberger-iii'); // historical temperament
+    expect(text).toContain('makam-ussak-example'); // measured, culturally contextualized
+    expect(text).toContain('source:'); // provenance travels with the listing
+  });
+
+  it('test_presets_exports_preset_by_id', () => {
+    const { io, texts } = makeIo();
+    expect(runCli(['presets', 'werckmeister-iii', '-o', 'w3.scl'], io)).toBe(0);
+    expect(texts['w3.scl']).toBeDefined();
+  });
+
+  it('test_presets_bohlen_pierce_keeps_non_octave_period', () => {
+    // Round-trip a tritave-period preset through .scl and read the period back.
+    const { io, texts } = makeIo();
+    expect(runCli(['presets', 'bohlen-pierce-13', '-o', 'bp.scl'], io)).toBe(0);
+    const back = makeIo({ 'bp.scl': texts['bp.scl'] as string });
+    expect(runCli(['info', 'bp.scl'], back.io)).toBe(0);
+    expect(back.stdout.join('\n')).toContain('period      : 1901.95');
+  });
+
+  it('test_presets_unknown_id_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['presets', 'nope', '-o', 'x.scl'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('unknown id');
+  });
+
+  it('test_presets_missing_output_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['presets', '12-tet'], io)).toBe(2);
     expect(stderr.join('\n')).toContain('missing -o');
   });
 });

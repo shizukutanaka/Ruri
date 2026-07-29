@@ -35,6 +35,13 @@
    既知バイト列)。`src/adapters/CLAUDE.md` の形式別 Gotchas を実装前に読むこと。
 6. 調律に単一正規形なし(`periodCents` は 1200 固定でない)。`referenceHz`/`source`
    を捨てない。fail-fast(`defineTuning`・`ratio()` は不正値で即 throw)。
+7. **CARE/OCAP ゲートは `source: 'measured'` にのみ適用**(`loadTuningPreset` の実装が正)。
+   民族実測データ(gamelan/maqam/raga 等)は文化的文脈+人的レビュー必須。一方、
+   公刊済みの理論的調律(`source: 'theoretical'`、例: Werckmeister 1691・Kirnberger 1779・
+   Pythagorean・Bohlen-Pierce)は**ゲート対象外** — 出典・ライセンス・「一例に過ぎない」
+   注記で足りる。この区別を取り違えると、正当な作業を過剰にブロックする(実際に発生した
+   — `docs/first-principles-2026-07.md` §4)。**新規プリセットには必ず独立した検証
+   オラクル**(既存関数との一致 or その音律の定義的性質)を付けること。
 
 ## 3. 検証プロトコル(全変更で必須の順序)
 
@@ -79,7 +86,8 @@ git commit / push    # メッセージに検証結果を書く
 |------|--------------|--------------------|------|
 | ~~`ruri gen … -o out.wav`~~ **完了(893bad4)** | `writeTuningOutput` に `.wav` ケース追加済み | `tuningToScaleWav` | — |
 | SonicWeave/FJS import(C-7) | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット) | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`) | golden round-trip + 実機 convert |
-| CLI `--name` オプション | gen/convert の出力調律名を上書き | `Args` パーサ(`src/cli.ts`) | テスト + 実機 |
+| ~~CLI `--name` オプション~~ **完了** | convert/gen/presets の出力調律名を上書き済み | — | — |
+| 歴史的調律の追加拡充 | Young II・Vallotti・Meantone 各種等(**理論的調律は CARE ゲート対象外** — §2-7) | 既存プリセット5件のパターン(`src/data/presets.ts` 末尾)+ 検証オラクル必須 | オラクルテスト + `ruri presets` 実機 |
 | `info` の追加診断 | 平均ステップ・協和スコア等(慎重に、ノイズにしない) | `tuningMosPattern`・`chordDissonance` 等 | 実機で有用性確認 |
 
 ### 人的ゲート付き(ユーザー承認なしに着手禁止)
@@ -106,6 +114,7 @@ git commit / push    # メッセージに検証結果を書く
 | ファイル | 内容 |
 |----------|------|
 | `docs/model-handbook.md` | 本書(作業指示・不変条件・バックログ) |
+| `docs/first-principles-2026-07.md` | 目的から再導出した過不足分析(90.6%の過剰・データ不足・CAREゲートの誤適用) |
 | `docs/product-review.md` | 内部監査ベースの過不足リスト(2026-06/07) |
 | `docs/research-2026-07.md` | 外部リサーチ(論文・標準・ツール)+ 出典付き改善リスト |
 | `docs/release-note.md` | v0.1.0 リリース手順(オーナー権限が必要な残作業) |

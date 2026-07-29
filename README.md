@@ -311,6 +311,8 @@ ruri gen edo 19 -o 19edo.scl                # 理論から調律を生成(入力
 ruri gen mos 700 1200 7 -o dia.ump          # 生成音階(MOS): 生成音程700c・周期1200c・7音 → UMP
 ruri gen me 12 7 -o diatonic.tun            # 最大均等 7-of-12(Clough-Douthett) → .tun
 ruri gen edo 19 -o 19edo.wav --seconds 0.2  # 生成した調律をそのまま試聴(WAV)
+ruri presets                                # 収録調律を出典付きで一覧(全10件)
+ruri presets kirnberger-iii -o k3.scl       # 収録調律を任意の形式で書き出し
 ruri render  scale.scl -o scale.wav --seconds 0.4   # 各音を Karplus-Strong で WAV 化
 ruri help                                   # 全コマンド一覧
 ```

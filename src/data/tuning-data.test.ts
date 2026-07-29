@@ -6,6 +6,11 @@ import {
   SLENDRO_EXAMPLE,
   JUST_INTONATION_5L,
   TWELVE_TET,
+  PYTHAGOREAN_12,
+  MEANTONE_QUARTER_COMMA,
+  WERCKMEISTER_III,
+  KIRNBERGER_III,
+  BOHLEN_PIERCE_13,
   getTuningById,
   rankChordsFromPreset,
   presetToScl,
@@ -21,7 +26,9 @@ import {
   rankPresetsByHarmonicitySpread,
   mostConsistentPreset,
 } from './presets.js';
-import { degreeToCents, equalTemperament12 } from '../core/tuning.js';
+import { degreeToCents, equalTemperament12, edo } from '../core/tuning.js';
+import { pitchToCents } from '../core/cents.js';
+import { meantoneQuarterComma } from '../core/temperament.js';
 import { harmonicSpectrum } from '../core/spectrum.js';
 
 describe('all presets load and validate', () => {
@@ -758,5 +765,91 @@ describe('mostConsistentPreset (Q194)', () => {
     const preset = mostConsistentPreset();
     const found = ALL_PRESETS.some((p) => p.id === preset?.id);
     expect(found).toBe(true);
+  });
+});
+
+// Historical / theoretical temperament presets. Each is checked against an
+// independent oracle — either the library's own construction of the same
+// temperament, or the defining published property of that temperament — so the
+// cited cent values cannot silently drift.
+describe('historical temperament presets', () => {
+  const centsOf = (p: typeof TWELVE_TET): number[] =>
+    loadTuningPreset(p).degrees.map((d) => pitchToCents(d));
+
+  it('test_pythagorean_degrees_are_all_3_limit_ratios', () => {
+    // Defining property: every degree is a power of 3/2 reduced into the octave,
+    // so numerator and denominator factor into 2s and 3s only.
+    const only2and3 = (n: number): boolean => {
+      let x = n;
+      while (x % 2 === 0) x /= 2;
+      while (x % 3 === 0) x /= 3;
+      return x === 1;
+    };
+    const degrees = loadTuningPreset(PYTHAGOREAN_12).degrees;
+    expect(degrees).toHaveLength(12);
+    for (const d of degrees) {
+      expect(d.kind).toBe('ratio'); // stored exactly, not as lossy cents
+      if (d.kind === 'ratio') {
+        expect(only2and3(d.ratio.num)).toBe(true);
+        expect(only2and3(d.ratio.den)).toBe(true);
+      }
+    }
+  });
+
+  it('test_pythagorean_fifth_is_exactly_pure', () => {
+    const fifth = loadTuningPreset(PYTHAGOREAN_12).degrees[7]!;
+    expect(fifth.kind).toBe('ratio');
+    if (fifth.kind === 'ratio') {
+      expect(fifth.ratio.num).toBe(3);
+      expect(fifth.ratio.den).toBe(2);
+    }
+  });
+
+  it('test_quarter_comma_meantone_matches_library_construction', () => {
+    // Oracle: the library builds this temperament from first principles.
+    const built = meantoneQuarterComma(440, 12).degrees.map((d) => pitchToCents(d));
+    const preset = centsOf(MEANTONE_QUARTER_COMMA);
+    expect(preset).toHaveLength(built.length);
+    preset.forEach((c, i) => expect(c).toBeCloseTo(built[i]!, 2));
+  });
+
+  it('test_meantone_and_kirnberger_iii_have_pure_major_third', () => {
+    // Both are defined by a pure 5/4 (386.314c) major third above the tonic.
+    const justThird = 1200 * Math.log2(5 / 4);
+    expect(centsOf(MEANTONE_QUARTER_COMMA)[4]!).toBeCloseTo(justThird, 2);
+    expect(centsOf(KIRNBERGER_III)[4]!).toBeCloseTo(justThird, 2);
+  });
+
+  it('test_werckmeister_iii_third_sits_between_just_and_12tet', () => {
+    // Its defining compromise: sweeter than 12-TET's 400c, wider than just 386.3c.
+    const third = centsOf(WERCKMEISTER_III)[4]!;
+    expect(third).toBeCloseTo(390.225, 2);
+    expect(third).toBeGreaterThan(1200 * Math.log2(5 / 4));
+    expect(third).toBeLessThan(400);
+  });
+
+  it('test_bohlen_pierce_matches_13_equal_divisions_of_the_tritave', () => {
+    // Oracle: identical to edo(13) over a 3/1 period. Exercises non-octave support.
+    const tritave = 1200 * Math.log2(3);
+    const built = edo(13, 440, tritave).degrees.map((d) => pitchToCents(d));
+    const loaded = loadTuningPreset(BOHLEN_PIERCE_13);
+    expect(loaded.periodCents).toBeCloseTo(tritave, 2);
+    loaded.degrees.forEach((d, i) => expect(pitchToCents(d)).toBeCloseTo(built[i]!, 2));
+  });
+
+  it('test_all_new_presets_load_and_are_registered', () => {
+    for (const p of [
+      PYTHAGOREAN_12,
+      MEANTONE_QUARTER_COMMA,
+      WERCKMEISTER_III,
+      KIRNBERGER_III,
+      BOHLEN_PIERCE_13,
+    ]) {
+      expect(() => loadTuningPreset(p)).not.toThrow(); // provenance/note gates pass
+      expect(p.source).toBe('theoretical'); // not measured → outside the CARE gate
+      expect(p.provenance.citation.length).toBeGreaterThan(0);
+      expect(ALL_PRESETS.some((x) => x.id === p.id)).toBe(true);
+      expect(getTuningById(p.id)).toBeDefined();
+    }
   });
 });
