@@ -105,6 +105,22 @@ describe('runCli info', () => {
     expect(text).toContain('≈ 2/1'); // the octave is a genuine 2/1
   });
 
+  it('test_info_reports_harmonic_entropy_per_degree', () => {
+    // Timbre-independent consonance: the octave should be the most certain
+    // interval in the scale, i.e. the lowest entropy.
+    const jiCents = 'JI in cents\n3\n386.3137\n701.9550\n1200.0\n';
+    const { io, stdout } = makeIo({ 'in.scl': jiCents });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('entropy');
+    const values = stdout
+      .filter((l) => /^\s+\d+\s+[\d.]+c/.test(l))
+      .map((l) => Number(l.trim().split(/\s+/)[2]));
+    expect(values).toHaveLength(3);
+    expect(values.every((v) => Number.isFinite(v) && v > 0)).toBe(true);
+    expect(values[2]).toBeLessThan(values[0]!); // 2/1 more certain than 5/4
+  });
+
   it('test_info_missing_input_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['info'], io)).toBe(2);
@@ -263,7 +279,9 @@ describe('runCli gen', () => {
     const a = plain.bytes['a.wav'] as Uint8Array;
     const b = fitted.bytes['a.wav'] as Uint8Array;
     expect(tag(b, 0)).toBe('RIFF'); // still a valid WAV
-    expect(Buffer.from(a).equals(Buffer.from(b))).toBe(false);
+    // Compare without Node's Buffer: this package keeps Node types out of src/.
+    const identical = a.length === b.length && a.every((v, i) => v === b[i]);
+    expect(identical).toBe(false);
   });
 
   it('test_gen_edo_bad_arg_returns_2', () => {

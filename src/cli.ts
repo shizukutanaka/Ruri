@@ -32,6 +32,7 @@ import { ALL_PRESETS, getTuningById } from './data/presets.js';
 import { edoHarmonicErrors, edoConsistencyLimit } from './core/edo-error.js';
 import { patentVal, formatVal, temperedCommas } from './core/val.js';
 import { inducedSpectrum, spectrumBendCents } from './core/induced-spectrum.js';
+import { entropyBasis, harmonicEntropy } from './core/harmonic-entropy.js';
 import { strikeScaleWav, DEFAULT_STRIKE_SCALE } from './adapters/wav.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
@@ -217,14 +218,18 @@ function cmdInfo(args: Args, io: CliIo): number {
   io.out(`well-formed : ${isTuningWellFormed(tuning) ? 'yes (Myhill)' : 'no'}`);
   const mos = tuningMosPattern(tuning);
   io.out(`mos-pattern : ${mos ? `${mos.name} (${mos.pattern.join('')})` : 'none (3+ step sizes)'}`);
-  io.out('pitches:');
+  // Harmonic entropy: a timbre-independent consonance score per degree (lower =
+  // heard more definitely as one simple ratio). Basis is built once and reused.
+  const basis = entropyBasis();
+  io.out('pitches:                                    entropy');
   scl.degrees.forEach((d, i) => {
     const label = d.kind === 'ratio' ? `${d.num}/${d.den}` : d.text;
     // Exact ratios need no hint; cents degrees get a nearest-JI approximation.
     const hint = d.kind === 'cents' ? nearestJiHint(d.cents) : '';
-    io.out(
-      `  ${String(i + 1).padStart(3)}  ${degreeCents(d).toFixed(4).padStart(11)}c  ${label}${hint}`,
-    );
+    const c = degreeCents(d);
+    const he =
+      c >= 0 && c <= 1200 ? harmonicEntropy(c, {}, basis).toFixed(2).padStart(6) : '     -';
+    io.out(`  ${String(i + 1).padStart(3)}  ${c.toFixed(4).padStart(11)}c ${he}  ${label}${hint}`);
   });
   return 0;
 }
