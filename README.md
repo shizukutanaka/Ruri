@@ -313,7 +313,8 @@ ruri gen me 12 7 -o diatonic.tun            # 最大均等 7-of-12(Clough-Douthe
 ruri gen edo 19 -o 19edo.wav --seconds 0.2  # 生成した調律をそのまま試聴(WAV)
 ruri presets                                # 収録調律を出典付きで一覧(全10件)
 ruri presets kirnberger-iii -o k3.scl       # 収録調律を任意の形式で書き出し
-ruri edo 31                                 # 純正律への近似精度と consistency limit を評価
+ruri edo 31                                 # 純正律への近似精度・patent val・消えるコンマを評価
+ruri gen edo 13 -o 13.wav --fit-timbre       # その調律用に設計した音色で試聴(Sethares)
 ruri render  scale.scl -o scale.wav --seconds 0.4   # 各音を Karplus-Strong で WAV 化
 ruri help                                   # 全コマンド一覧
 ```
@@ -350,6 +351,7 @@ ruri help                                   # 全コマンド一覧
 | `dissonance` | Plomp-Levelt/Sethares 感覚的不協和 |
 | `generate` | MOS・well-formed判定・最大均等 |
 | `edo-error` | EDO の純正律近似精度: 相対誤差(1ステップ比)・倍音別誤差表・consistency limit(25%基準) |
+| `induced-spectrum` | 音階に合わせた音色設計(Sethares): 部分音を調律の音高にスナップ・必要な曲げ量の測定 |
 | `val` | patent val(素数→ステップ数の写像)・コンマ消失判定(81/80 が消えれば meantone、250/243 なら porcupine) |
 | `harmonicity` | Stolzenburg 周期性/harmonicity |
 

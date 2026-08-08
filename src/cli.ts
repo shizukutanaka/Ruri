@@ -31,6 +31,8 @@ import { approxRatio } from './core/harmonicity.js';
 import { ALL_PRESETS, getTuningById } from './data/presets.js';
 import { edoHarmonicErrors, edoConsistencyLimit } from './core/edo-error.js';
 import { patentVal, formatVal, temperedCommas } from './core/val.js';
+import { inducedSpectrum, spectrumBendCents } from './core/induced-spectrum.js';
+import { strikeScaleWav, DEFAULT_STRIKE_SCALE } from './adapters/wav.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
 export interface CliIo {
@@ -88,6 +90,9 @@ Options:
   --ref <hz>            Root reference frequency in Hz (default 440).
   --name <text>         Name/id written into the output tuning (convert/gen).
   --limit <oddLimit>    Highest odd harmonic for the edo report (default 15).
+  --fit-timbre          For .wav output, synthesize with a timbre whose
+                        partials land on this tuning's own pitches
+                        (Sethares), instead of a generic plucked string.
 `;
 
 /** A parsed flag set: positional args plus recognized options. */
@@ -98,6 +103,7 @@ interface Args {
   readonly ref?: number;
   readonly name?: string;
   readonly limit?: number;
+  readonly fitTimbre?: boolean;
 }
 
 function parseArgs(rest: readonly string[]): Args {
@@ -107,6 +113,7 @@ function parseArgs(rest: readonly string[]): Args {
   let ref: number | undefined;
   let name: string | undefined;
   let limit: number | undefined;
+  let fitTimbre = false;
 
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i] as string;
@@ -120,6 +127,8 @@ function parseArgs(rest: readonly string[]): Args {
       name = rest[++i];
     } else if (a === '--limit') {
       limit = Number.parseInt(rest[++i] ?? '', 10);
+    } else if (a === '--fit-timbre') {
+      fitTimbre = true;
     } else {
       positionals.push(a);
     }
@@ -130,6 +139,7 @@ function parseArgs(rest: readonly string[]): Args {
   if (ref !== undefined) args.ref = ref;
   if (name !== undefined) args.name = name;
   if (limit !== undefined) args.limit = limit;
+  if (fitTimbre) args.fitTimbre = true;
   return args;
 }
 
@@ -232,6 +242,7 @@ function writeTuningOutput(
   ref: number,
   noteSeconds: number,
   io: CliIo,
+  fitTimbre = false,
 ): number {
   const ext = extensionOf(output);
   switch (ext) {
@@ -268,7 +279,19 @@ function writeTuningOutput(
       break;
     }
     case 'wav':
-      io.writeBytes(output, tuningToScaleWav(tuning, { ...DEFAULT_SYNTH_SCALE, noteSeconds }));
+      if (fitTimbre) {
+        // Sethares: render with a timbre whose partials land on this tuning's
+        // own pitches, so the scale is heard under a spectrum built for it.
+        io.writeBytes(
+          output,
+          strikeScaleWav(tuningToScale(tuning), tuning, inducedSpectrum(tuning), {
+            ...DEFAULT_STRIKE_SCALE,
+            noteSeconds,
+          }),
+        );
+      } else {
+        io.writeBytes(output, tuningToScaleWav(tuning, { ...DEFAULT_SYNTH_SCALE, noteSeconds }));
+      }
       break;
     default:
       io.err(`unsupported output extension '.${ext}' (use .scl, .tun, .syx, .ump, .mid, or .wav)`);
@@ -289,7 +312,14 @@ function cmdConvert(args: Args, io: CliIo): number {
     return 2;
   }
   const tuning = renamed(sclToTuning(parseScl(io.readText(input)), args.ref ?? 440), args.name);
-  return writeTuningOutput(tuning, args.output, args.ref ?? 440, args.seconds ?? 0.5, io);
+  return writeTuningOutput(
+    renamed(tuning, args.name),
+    args.output,
+    args.ref ?? 440,
+    args.seconds ?? 0.5,
+    io,
+    args.fitTimbre ?? false,
+  );
 }
 
 /**
@@ -343,7 +373,14 @@ function cmdGen(args: Args, io: CliIo): number {
     default:
       return bad('unknown generator (use edo | mos | me)');
   }
-  return writeTuningOutput(renamed(tuning, args.name), args.output, ref, args.seconds ?? 0.5, io);
+  return writeTuningOutput(
+    renamed(tuning, args.name),
+    args.output,
+    ref,
+    args.seconds ?? 0.5,
+    io,
+    args.fitTimbre ?? false,
+  );
 }
 
 /**
@@ -381,6 +418,7 @@ function cmdPresets(args: Args, io: CliIo): number {
     args.ref ?? tuning.referenceHz,
     args.seconds ?? 0.5,
     io,
+    args.fitTimbre ?? false,
   );
 }
 
@@ -400,6 +438,10 @@ function cmdEdo(args: Args, io: CliIo): number {
   io.out(`${n}-EDO   step = ${(1200 / n).toFixed(4)} cents`);
   io.out(`patent val        : ${formatVal(patentVal(n, 7))}  (primes 2 3 5 7)`);
   io.out(`consistency limit : ${edoConsistencyLimit(n)}-odd-limit`);
+  io.out(
+    `timbre bend       : ${spectrumBendCents(edo(n)).toFixed(1)}c ` +
+      `(how far a harmonic timbre must move to fit; see --fit-timbre)`,
+  );
   const commas = temperedCommas(n);
   io.out(
     `tempers out       : ${commas.length > 0 ? commas.map((c) => c.name).join(', ') : '(none listed)'}`,

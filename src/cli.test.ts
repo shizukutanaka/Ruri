@@ -251,6 +251,21 @@ describe('runCli gen', () => {
     expect(texts['out.scl']).toContain('5-edo');
   });
 
+  it('test_gen_fit_timbre_produces_different_audio', () => {
+    // --fit-timbre synthesizes with a spectrum built for the tuning, so the
+    // rendered audio must actually differ from the default plucked string.
+    const plain = makeIo();
+    expect(runCli(['gen', 'edo', '13', '-o', 'a.wav', '--seconds', '0.05'], plain.io)).toBe(0);
+    const fitted = makeIo();
+    expect(
+      runCli(['gen', 'edo', '13', '-o', 'a.wav', '--seconds', '0.05', '--fit-timbre'], fitted.io),
+    ).toBe(0);
+    const a = plain.bytes['a.wav'] as Uint8Array;
+    const b = fitted.bytes['a.wav'] as Uint8Array;
+    expect(tag(b, 0)).toBe('RIFF'); // still a valid WAV
+    expect(Buffer.from(a).equals(Buffer.from(b))).toBe(false);
+  });
+
   it('test_gen_edo_bad_arg_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['gen', 'edo', 'nope', '-o', 'out.scl'], io)).toBe(2);
@@ -350,6 +365,12 @@ describe('runCli edo', () => {
     const text = stdout.join('\n');
     expect(text).not.toContain('syntonic comma (meantone)');
     expect(text).toContain('porcupine comma');
+  });
+
+  it('test_edo_reports_timbre_bend', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['edo', '13'], io)).toBe(0);
+    expect(stdout.join('\n')).toContain('timbre bend');
   });
 
   it('test_edo_bad_argument_returns_2', () => {
