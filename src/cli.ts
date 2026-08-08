@@ -29,6 +29,7 @@ import {
 } from './core/generate.js';
 import { approxRatio } from './core/harmonicity.js';
 import { ALL_PRESETS, getTuningById } from './data/presets.js';
+import { edoHarmonicErrors, edoConsistencyLimit } from './core/edo-error.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
 export interface CliIo {
@@ -51,6 +52,7 @@ Usage:
   ruri convert <input.scl> -o <output.{scl|tun|syx|ump|mid|wav}>
   ruri gen     <edo N | mos g p c | me c d> -o <output.{scl|tun|syx|ump|mid|wav}>
   ruri presets [<id> -o <output.{scl|tun|syx|ump|mid|wav}>]
+  ruri edo     <divisions> [--limit <oddLimit>]
   ruri render  <input.scl> -o <output.wav> [--seconds <n>]
   ruri help
 
@@ -73,6 +75,9 @@ Commands:
               me  <chromaticSteps> <notes> maximally even (Clough-Douthett)
   presets   List the curated tunings (with their citations), or export one
             by id in any convert format.
+  edo       Report how well an equal division approximates just intonation:
+            per-harmonic error in cents and percent of a step, plus the
+            EDO's consistency limit (the standard 25%-of-a-step criterion).
   render    Render each scale degree as a plucked (Karplus-Strong) tone
             to a 16-bit PCM WAV file.
 
@@ -81,6 +86,7 @@ Options:
   --seconds <n>         Per-note duration for .wav output (default 0.5).
   --ref <hz>            Root reference frequency in Hz (default 440).
   --name <text>         Name/id written into the output tuning (convert/gen).
+  --limit <oddLimit>    Highest odd harmonic for the edo report (default 15).
 `;
 
 /** A parsed flag set: positional args plus recognized options. */
@@ -90,6 +96,7 @@ interface Args {
   readonly seconds?: number;
   readonly ref?: number;
   readonly name?: string;
+  readonly limit?: number;
 }
 
 function parseArgs(rest: readonly string[]): Args {
@@ -98,6 +105,7 @@ function parseArgs(rest: readonly string[]): Args {
   let seconds: number | undefined;
   let ref: number | undefined;
   let name: string | undefined;
+  let limit: number | undefined;
 
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i] as string;
@@ -109,6 +117,8 @@ function parseArgs(rest: readonly string[]): Args {
       ref = Number.parseFloat(rest[++i] ?? '');
     } else if (a === '--name') {
       name = rest[++i];
+    } else if (a === '--limit') {
+      limit = Number.parseInt(rest[++i] ?? '', 10);
     } else {
       positionals.push(a);
     }
@@ -118,6 +128,7 @@ function parseArgs(rest: readonly string[]): Args {
   if (seconds !== undefined) args.seconds = seconds;
   if (ref !== undefined) args.ref = ref;
   if (name !== undefined) args.name = name;
+  if (limit !== undefined) args.limit = limit;
   return args;
 }
 
@@ -372,6 +383,33 @@ function cmdPresets(args: Args, io: CliIo): number {
   );
 }
 
+/**
+ * Report how well an EDO approximates just intonation — the practical question
+ * behind "should I use 19, 31 or 41?". Prints each odd harmonic's error in both
+ * cents and percent-of-a-step, plus the EDO's consistency limit.
+ */
+function cmdEdo(args: Args, io: CliIo): number {
+  const n = Number(args.positionals[0]);
+  if (!Number.isInteger(n) || n < 1) {
+    io.err('edo: usage: ruri edo <divisions> [--limit <oddLimit>]');
+    return 2;
+  }
+  const limit = args.limit ?? 15;
+  const table = edoHarmonicErrors(n, limit);
+  io.out(`${n}-EDO   step = ${(1200 / n).toFixed(4)} cents`);
+  io.out(`consistency limit : ${edoConsistencyLimit(n)}-odd-limit`);
+  io.out('harmonic      just      edo   error    rel');
+  for (const h of table) {
+    const edoCents = h.steps * (1200 / n);
+    io.out(
+      `${String(h.harmonic).padStart(5)}  ${h.justCents.toFixed(2).padStart(9)}c ` +
+        `${edoCents.toFixed(2).padStart(8)}c ${h.errorCents.toFixed(2).padStart(7)}c ` +
+        `${(h.relativeError * 100).toFixed(1).padStart(6)}%`,
+    );
+  }
+  return 0;
+}
+
 function cmdRender(args: Args, io: CliIo): number {
   const input = args.positionals[0];
   if (input === undefined) {
@@ -424,6 +462,8 @@ export function runCli(argv: readonly string[], io: CliIo): number {
         return cmdGen(args, io);
       case 'presets':
         return cmdPresets(args, io);
+      case 'edo':
+        return cmdEdo(args, io);
       case 'render':
         return cmdRender(args, io);
       default:

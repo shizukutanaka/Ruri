@@ -309,6 +309,39 @@ describe('runCli presets', () => {
   });
 });
 
+describe('runCli edo', () => {
+  it('test_edo_reports_step_size_and_consistency_limit', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['edo', '12'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('12-EDO');
+    expect(text).toContain('step = 100.0000 cents');
+    expect(text).toContain('consistency limit : 5-odd-limit');
+  });
+
+  it('test_edo_31_shows_its_near_just_major_third', () => {
+    // 31-EDO is prized for its ~0.8c-accurate 5/4 (it is essentially meantone).
+    const { io, stdout } = makeIo();
+    expect(runCli(['edo', '31'], io)).toBe(0);
+    const fifthHarmonicRow = stdout.find((l) => l.trim().startsWith('5 '));
+    expect(fifthHarmonicRow).toBeDefined();
+    expect(fifthHarmonicRow).toContain('0.78c');
+  });
+
+  it('test_edo_limit_option_bounds_the_table', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['edo', '12', '--limit', '7'], io)).toBe(0);
+    const rows = stdout.filter((l) => /^\s+\d+\s/.test(l));
+    expect(rows).toHaveLength(4); // harmonics 1, 3, 5, 7
+  });
+
+  it('test_edo_bad_argument_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['edo', 'nope'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('usage: ruri edo');
+  });
+});
+
 describe('runCli render', () => {
   it('test_render_writes_valid_wav', () => {
     const { io, bytes } = makeIo({ 'in.scl': scl12 });
