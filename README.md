@@ -351,6 +351,7 @@ ruri help                                   # 全コマンド一覧
 | `dissonance` | Plomp-Levelt/Sethares 感覚的不協和 |
 | `generate` | MOS・well-formed判定・最大均等 |
 | `edo-error` | EDO の純正律近似精度: 相対誤差(1ステップ比)・倍音別誤差表・consistency limit(25%基準) |
+| `interval-name` | 音程の命名(Kite の ups and downs 記法): P/M/m/A/d + `^`/`v`。sharpness による EDO 分類 |
 | `harmonic-entropy` | 協和の第3軸(Erlich): 単純比として聴き取れる確信度。音色非依存・微妙な狂いに寛容 |
 | `induced-spectrum` | 音階に合わせた音色設計(Sethares): 部分音を調律の音高にスナップ・必要な曲げ量の測定 |
 | `val` | patent val(素数→ステップ数の写像)・コンマ消失判定(81/80 が消えれば meantone、250/243 なら porcupine) |

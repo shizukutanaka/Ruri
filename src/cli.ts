@@ -33,6 +33,7 @@ import { edoHarmonicErrors, edoConsistencyLimit } from './core/edo-error.js';
 import { patentVal, formatVal, temperedCommas } from './core/val.js';
 import { inducedSpectrum, spectrumBendCents } from './core/induced-spectrum.js';
 import { entropyBasis, harmonicEntropy } from './core/harmonic-entropy.js';
+import { edoSharpness, edoIntervalNames } from './core/interval-name.js';
 import { strikeScaleWav, DEFAULT_STRIKE_SCALE } from './adapters/wav.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
@@ -446,6 +447,21 @@ function cmdEdo(args: Args, io: CliIo): number {
   io.out(
     `timbre bend       : ${spectrumBendCents(edo(n)).toFixed(1)}c ` +
       `(how far a harmonic timbre must move to fit; see --fit-timbre)`,
+  );
+  const sharp = edoSharpness(n);
+  const character =
+    sharp === 0
+      ? 'perfect'
+      : sharp < 0
+        ? 'superflat'
+        : sharp === 1
+          ? 'classical'
+          : 'needs ups/downs';
+  io.out(`sharpness         : ${sharp} step(s) — ${character}`);
+  io.out(
+    `interval names    : ${edoIntervalNames(n)
+      .map((i) => i.name)
+      .join(' ')}`,
   );
   const commas = temperedCommas(n);
   io.out(

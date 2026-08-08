@@ -385,6 +385,27 @@ describe('runCli edo', () => {
     expect(text).toContain('porcupine comma');
   });
 
+  it('test_edo_names_intervals_and_classifies_sharpness', () => {
+    // 12-EDO: classical names, no arrows needed.
+    const twelve = makeIo();
+    expect(runCli(['edo', '12'], twelve.io)).toBe(0);
+    const t12 = twelve.stdout.join('\n');
+    expect(t12).toContain('P1 m2 M2 m3 M3 P4 A4 P5 m6 M6 m7 M7 P8');
+    expect(t12).toContain('classical');
+
+    // 22-EDO: sharpness 3, so ups and downs appear.
+    const twentytwo = makeIo();
+    expect(runCli(['edo', '22'], twentytwo.io)).toBe(0);
+    const t22 = twentytwo.stdout.join('\n');
+    expect(t22).toContain('needs ups/downs');
+    expect(t22).toContain('^m3');
+
+    // 7-EDO: a perfect EDO — every interval perfect/major, no minor.
+    const seven = makeIo();
+    expect(runCli(['edo', '7'], seven.io)).toBe(0);
+    expect(seven.stdout.join('\n')).toContain('perfect');
+  });
+
   it('test_edo_reports_timbre_bend', () => {
     const { io, stdout } = makeIo();
     expect(runCli(['edo', '13'], io)).toBe(0);
