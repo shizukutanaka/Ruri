@@ -335,6 +335,23 @@ describe('runCli edo', () => {
     expect(rows).toHaveLength(4); // harmonics 1, 3, 5, 7
   });
 
+  it('test_edo_reports_patent_val_and_identifies_meantone', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['edo', '31'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('<31 49 72 87]');
+    expect(text).toContain('syntonic comma (meantone)'); // 31-EDO is a meantone system
+  });
+
+  it('test_edo_22_is_not_reported_as_meantone', () => {
+    // 22-EDO is the standard non-meantone counterexample; it is porcupine.
+    const { io, stdout } = makeIo();
+    expect(runCli(['edo', '22'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).not.toContain('syntonic comma (meantone)');
+    expect(text).toContain('porcupine comma');
+  });
+
   it('test_edo_bad_argument_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['edo', 'nope'], io)).toBe(2);

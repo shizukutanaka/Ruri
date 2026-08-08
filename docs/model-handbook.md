@@ -87,7 +87,7 @@ git commit / push    # メッセージに検証結果を書く
 | ~~`ruri gen … -o out.wav`~~ **完了(893bad4)** | `writeTuningOutput` に `.wav` ケース追加済み | `tuningToScaleWav` | — |
 | SonicWeave/FJS import(C-7) | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット) | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`) | golden round-trip + 実機 convert |
 | ~~CLI `--name` オプション~~ **完了** | convert/gen/presets の出力調律名を上書き済み | — | — |
-| RTT 指標の拡充(任意) | TE誤差・badness・rank-2 temperament の探索(Erlich "A Middle Path")。**まず `edo-error.ts` の相対誤差/consistency を土台に**、必要が生じたら追加 | `src/core/edo-error.ts`(相対誤差・consistency limit)、`src/core/temperament.ts` | 公刊された既知値(例: 46-EDO が13-odd-limit最小)をオラクルにする |
+| RTT 指標の拡充(任意) | TE誤差・badness・rank-2 temperament の探索(Erlich "A Middle Path")。土台は実装済み: `edo-error.ts`(相対誤差・consistency)と `val.ts`(patent val・コンマ消失) | `src/core/edo-error.ts`、`src/core/val.ts`、`src/core/temperament.ts` | **公刊された既知値をオラクルにする**(例: 46-EDO が13-odd-limit最小、17-EDO の patent val = `<17 27 39]`、meantone EDO = 12/19/26/31/43/50) |
 | 歴史的調律の追加拡充 | Young II・Vallotti・Meantone 各種等(**理論的調律は CARE ゲート対象外** — §2-7) | 既存プリセット5件のパターン(`src/data/presets.ts` 末尾)+ 検証オラクル必須 | オラクルテスト + `ruri presets` 実機 |
 | `info` の追加診断 | 平均ステップ・協和スコア等(慎重に、ノイズにしない) | `tuningMosPattern`・`chordDissonance` 等 | 実機で有用性確認 |
 

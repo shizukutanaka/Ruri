@@ -1288,6 +1288,7 @@ export * from './spectrum.js';
 export * from './dissonance.js';
 export * from './generate.js';
 export * from './edo-error.js';
+export * from './val.js';
 export * from './harmonicity.js';
 export * from './instrument.js';
 export * from './fingering.js';

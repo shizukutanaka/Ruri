@@ -350,6 +350,7 @@ ruri help                                   # 全コマンド一覧
 | `dissonance` | Plomp-Levelt/Sethares 感覚的不協和 |
 | `generate` | MOS・well-formed判定・最大均等 |
 | `edo-error` | EDO の純正律近似精度: 相対誤差(1ステップ比)・倍音別誤差表・consistency limit(25%基準) |
+| `val` | patent val(素数→ステップ数の写像)・コンマ消失判定(81/80 が消えれば meantone、250/243 なら porcupine) |
 | `harmonicity` | Stolzenburg 周期性/harmonicity |
 
 ## 開発

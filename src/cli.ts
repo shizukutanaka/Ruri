@@ -30,6 +30,7 @@ import {
 import { approxRatio } from './core/harmonicity.js';
 import { ALL_PRESETS, getTuningById } from './data/presets.js';
 import { edoHarmonicErrors, edoConsistencyLimit } from './core/edo-error.js';
+import { patentVal, formatVal, temperedCommas } from './core/val.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
 export interface CliIo {
@@ -397,7 +398,12 @@ function cmdEdo(args: Args, io: CliIo): number {
   const limit = args.limit ?? 15;
   const table = edoHarmonicErrors(n, limit);
   io.out(`${n}-EDO   step = ${(1200 / n).toFixed(4)} cents`);
+  io.out(`patent val        : ${formatVal(patentVal(n, 7))}  (primes 2 3 5 7)`);
   io.out(`consistency limit : ${edoConsistencyLimit(n)}-odd-limit`);
+  const commas = temperedCommas(n);
+  io.out(
+    `tempers out       : ${commas.length > 0 ? commas.map((c) => c.name).join(', ') : '(none listed)'}`,
+  );
   io.out('harmonic      just      edo   error    rel');
   for (const h of table) {
     const edoCents = h.steps * (1200 / n);
