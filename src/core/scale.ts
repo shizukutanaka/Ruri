@@ -10998,10 +10998,7 @@ export function tuningModeConsistencyVolatilityMap(
   consistency: number;
   volatility: number;
   quadrant:
-    | 'stable-consistent'
-    | 'consistent-volatile'
-    | 'smooth-inconsistent'
-    | 'rough-inconsistent';
+    'stable-consistent' | 'consistent-volatile' | 'smooth-inconsistent' | 'rough-inconsistent';
 }[] {
   const bundle =
     rootHz !== undefined
@@ -11014,10 +11011,7 @@ export function tuningModeConsistencyVolatilityMap(
     const aboveConsistency = b.consistency > meanConsistency;
     const belowVolatility = b.volatility < meanVolatility;
     const quadrant:
-      | 'stable-consistent'
-      | 'consistent-volatile'
-      | 'smooth-inconsistent'
-      | 'rough-inconsistent' =
+      'stable-consistent' | 'consistent-volatile' | 'smooth-inconsistent' | 'rough-inconsistent' =
       aboveConsistency && belowVolatility
         ? 'stable-consistent'
         : aboveConsistency && !belowVolatility
@@ -11062,10 +11056,7 @@ export function tuningModeFiveDimMap(
   mode: Scale;
   entropyDiversityQuadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform';
   consistencyVolatilityQuadrant:
-    | 'stable-consistent'
-    | 'consistent-volatile'
-    | 'smooth-inconsistent'
-    | 'rough-inconsistent';
+    'stable-consistent' | 'consistent-volatile' | 'smooth-inconsistent' | 'rough-inconsistent';
   cluster: 'high' | 'mid' | 'low';
 }[] {
   const edMap =
@@ -11138,10 +11129,7 @@ export function tuningModeFiveDimNarrative(
   mode: Scale;
   entropyDiversityQuadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform';
   consistencyVolatilityQuadrant:
-    | 'stable-consistent'
-    | 'consistent-volatile'
-    | 'smooth-inconsistent'
-    | 'rough-inconsistent';
+    'stable-consistent' | 'consistent-volatile' | 'smooth-inconsistent' | 'rough-inconsistent';
   cluster: 'high' | 'mid' | 'low';
   narrative: string;
 }[] {
@@ -11349,16 +11337,10 @@ export function tuningModeAllQuadrantsBundle(
   mode: Scale;
   entropyDiversityQuadrant: 'rich-complex' | 'varied-uniform' | 'stable-diverse' | 'stable-uniform';
   consistencyVolatilityQuadrant:
-    | 'stable-consistent'
-    | 'consistent-volatile'
-    | 'smooth-inconsistent'
-    | 'rough-inconsistent';
+    'stable-consistent' | 'consistent-volatile' | 'smooth-inconsistent' | 'rough-inconsistent';
   smoothnessEntropyQuadrant: 'fluid-complex' | 'fluid-simple' | 'rough-complex' | 'rough-simple';
   diversityVolatilityQuadrant:
-    | 'diverse-volatile'
-    | 'diverse-stable'
-    | 'uniform-volatile'
-    | 'uniform-stable';
+    'diverse-volatile' | 'diverse-stable' | 'uniform-volatile' | 'uniform-stable';
 }[] {
   const edMap =
     rootHz !== undefined

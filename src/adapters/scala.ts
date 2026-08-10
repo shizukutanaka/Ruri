@@ -185,11 +185,10 @@ export function sclToTuning(scl: ScalaScale, referenceHz = 440, id?: string): Tu
   const inner = scl.degrees.slice(0, -1);
   const degrees: Pitch[] = [
     { kind: 'cents', cents: 0 },
-    ...inner.map(
-      (d): Pitch =>
-        d.kind === 'ratio'
-          ? { kind: 'ratio', ratio: ratio(d.num, d.den) }
-          : { kind: 'cents', cents: d.cents },
+    ...inner.map((d): Pitch =>
+      d.kind === 'ratio'
+        ? { kind: 'ratio', ratio: ratio(d.num, d.den) }
+        : { kind: 'cents', cents: d.cents },
     ),
   ];
   const resolvedId = id ?? (scl.description || 'scl');

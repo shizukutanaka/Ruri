@@ -10,11 +10,7 @@
  */
 
 export type GamelanScaleName =
-  | 'slendro'
-  | 'pelog'
-  | 'pelog-pathet-nem'
-  | 'pelog-pathet-sanga'
-  | 'pelog-pathet-manyura';
+  'slendro' | 'pelog' | 'pelog-pathet-nem' | 'pelog-pathet-sanga' | 'pelog-pathet-manyura';
 
 const GAMELAN_DATA: Readonly<Record<GamelanScaleName, readonly number[]>> = {
   slendro: [0, 240, 475, 720, 960, 1200],

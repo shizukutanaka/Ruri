@@ -1,0 +1,8 @@
+# Enforce LF in the working tree so Prettier (endOfLine: "lf") and
+# .editorconfig (end_of_line = lf) agree on every platform, including
+# Windows checkouts with core.autocrlf=true.
+* text=auto eol=lf
+*.png binary
+*.wav binary
+*.mid binary
+*.syx binary
