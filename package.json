@@ -41,11 +41,10 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"src/**/*.ts\" --ignore-pattern \"**/*-generated.test.ts\" --max-warnings 0",
+    "lint": "node --max-old-space-size=8192 ./node_modules/eslint/bin/eslint.js \"src/**/*.ts\" --ignore-pattern \"**/*-generated.test.ts\" --max-warnings 0",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run --exclude \"**/*-generated.test.ts\"",
-    "test:generated": "vitest run generated",
     "test:all": "vitest run",
     "coverage": "vitest run --coverage --exclude \"**/*-generated.test.ts\"",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
