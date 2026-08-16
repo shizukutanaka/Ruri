@@ -1292,6 +1292,7 @@ export * from './val.js';
 export * from './induced-spectrum.js';
 export * from './harmonic-entropy.js';
 export * from './interval-name.js';
+export * from './mos-spectrum.js';
 export * from './harmonicity.js';
 export * from './instrument.js';
 export * from './fingering.js';

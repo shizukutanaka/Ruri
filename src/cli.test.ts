@@ -419,6 +419,46 @@ describe('runCli edo', () => {
   });
 });
 
+describe('runCli mos', () => {
+  it('test_mos_lists_the_classic_fifth_ladder', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['mos', '701.955'], io)).toBe(0);
+    const sizes = stdout
+      .filter((l) => /^\s+\d+\s/.test(l))
+      .map((l) => Number(l.trim().split(/\s+/)[0]));
+    expect(sizes).toEqual([2, 3, 5, 7, 12, 17, 29, 41, 53]);
+    expect(stdout.join('\n')).toContain('5L2s'); // the diatonic, at size 7
+  });
+
+  it('test_mos_limit_option_bounds_the_ladder', () => {
+    const { io, stdout } = makeIo();
+    expect(runCli(['mos', '701.955', '--limit', '12'], io)).toBe(0);
+    const sizes = stdout
+      .filter((l) => /^\s+\d+\s/.test(l))
+      .map((l) => Number(l.trim().split(/\s+/)[0]));
+    expect(sizes).toEqual([2, 3, 5, 7, 12]);
+  });
+
+  it('test_mos_accepts_a_non_octave_period', () => {
+    const tritave = String(1200 * Math.log2(3));
+    const { io, stdout } = makeIo();
+    expect(runCli(['mos', '400', tritave], io)).toBe(0);
+    expect(stdout.join('\n')).toContain('period 1901.95');
+  });
+
+  it('test_mos_bad_argument_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['mos', 'nope'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('usage: ruri mos');
+  });
+
+  it('test_mos_bad_period_returns_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['mos', '700', '0'], io)).toBe(2);
+    expect(stderr.join('\n')).toContain('periodCents');
+  });
+});
+
 describe('runCli render', () => {
   it('test_render_writes_valid_wav', () => {
     const { io, bytes } = makeIo({ 'in.scl': scl12 });

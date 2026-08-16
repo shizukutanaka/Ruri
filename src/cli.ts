@@ -34,6 +34,7 @@ import { patentVal, formatVal, temperedCommas } from './core/val.js';
 import { inducedSpectrum, spectrumBendCents } from './core/induced-spectrum.js';
 import { entropyBasis, harmonicEntropy } from './core/harmonic-entropy.js';
 import { edoSharpness, edoIntervalNames } from './core/interval-name.js';
+import { mosSpectrum } from './core/mos-spectrum.js';
 import { strikeScaleWav, DEFAULT_STRIKE_SCALE } from './adapters/wav.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
@@ -58,6 +59,7 @@ Usage:
   ruri gen     <edo N | mos g p c | me c d> -o <output.{scl|tun|syx|ump|mid|wav}>
   ruri presets [<id> -o <output.{scl|tun|syx|ump|mid|wav}>]
   ruri edo     <divisions> [--limit <oddLimit>]
+  ruri mos     <generatorCents> [<periodCents>] [--limit <maxSize>]
   ruri render  <input.scl> -o <output.wav> [--seconds <n>]
   ruri help
 
@@ -83,6 +85,10 @@ Commands:
   edo       Report how well an equal division approximates just intonation:
             per-harmonic error in cents and percent of a step, plus the
             EDO's consistency limit (the standard 25%-of-a-step criterion).
+  mos       List the scale sizes at which a generator produces a MOS
+            (moment-of-symmetry) scale, with each one's L/s pattern — the
+            sizes worth passing to "gen mos". A pure fifth gives
+            2, 3, 5, 7, 12, 17, 29, 41, 53.
   render    Render each scale degree as a plucked (Karplus-Strong) tone
             to a 16-bit PCM WAV file.
 
@@ -91,7 +97,8 @@ Options:
   --seconds <n>         Per-note duration for .wav output (default 0.5).
   --ref <hz>            Root reference frequency in Hz (default 440).
   --name <text>         Name/id written into the output tuning (convert/gen).
-  --limit <oddLimit>    Highest odd harmonic for the edo report (default 15).
+  --limit <n>           Highest odd harmonic for the edo report (default 15);
+                        largest scale size for the mos report (default 60).
   --fit-timbre          For .wav output, synthesize with a timbre whose
                         partials land on this tuning's own pitches
                         (Sethares), instead of a generic plucked string.
@@ -479,6 +486,32 @@ function cmdEdo(args: Args, io: CliIo): number {
   return 0;
 }
 
+/**
+ * Report which scale sizes a generator yields a MOS at — the sizes worth
+ * passing to `gen mos`, rather than guessing.
+ */
+function cmdMos(args: Args, io: CliIo): number {
+  const generator = Number(args.positionals[0]);
+  if (!Number.isFinite(generator)) {
+    io.err('mos: usage: ruri mos <generatorCents> [<periodCents>]');
+    return 2;
+  }
+  const period = args.positionals[1] === undefined ? 1200 : Number(args.positionals[1]);
+  if (!Number.isFinite(period) || period <= 0) {
+    io.err(`mos: periodCents must be > 0, got '${args.positionals[1]}'`);
+    return 2;
+  }
+  const spectrum = mosSpectrum(generator, period, args.limit ?? 60);
+  io.out(`generator ${generator.toFixed(4)}c   period ${period.toFixed(4)}c`);
+  io.out('size   pattern');
+  for (const e of spectrum) {
+    io.out(
+      `${String(e.size).padStart(4)}   ${e.pattern.name.padEnd(8)} ${e.pattern.pattern.join('')}`,
+    );
+  }
+  return 0;
+}
+
 function cmdRender(args: Args, io: CliIo): number {
   const input = args.positionals[0];
   if (input === undefined) {
@@ -533,6 +566,8 @@ export function runCli(argv: readonly string[], io: CliIo): number {
         return cmdPresets(args, io);
       case 'edo':
         return cmdEdo(args, io);
+      case 'mos':
+        return cmdMos(args, io);
       case 'render':
         return cmdRender(args, io);
       default:

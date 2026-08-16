@@ -22,13 +22,13 @@ docs/            設計・調査記録(Plan / WORKFLOW / research / 競合分析
 // a) 調律系の生成と周波数取得
 import { edo, equalTemperament12, degreeToFreq, generatedTuning, maximallyEvenTuning } from 'ruri';
 
-const tuning19 = edo(19);                        // 19-EDO, A4=440Hz
-const tuning12 = equalTemperament12(440);        // 12-TET
-const freq = degreeToFreq(tuning19, 3);          // 3度目の音の Hz
+const tuning19 = edo(19); // 19-EDO, A4=440Hz
+const tuning12 = equalTemperament12(440); // 12-TET
+const freq = degreeToFreq(tuning19, 3); // 3度目の音の Hz
 
 // MOS(生成音階)と最大均等集合を直接 TuningSystem として取得
-const diatonic = generatedTuning(700, 1200, 7);  // 5度積み上げダイアトニック
-const me7of12 = maximallyEvenTuning(12, 7);      // Clough-Douthett 7-of-12
+const diatonic = generatedTuning(700, 1200, 7); // 5度積み上げダイアトニック
+const me7of12 = maximallyEvenTuning(12, 7); // Clough-Douthett 7-of-12
 ```
 
 ```ts
@@ -36,50 +36,56 @@ const me7of12 = maximallyEvenTuning(12, 7);      // Clough-Douthett 7-of-12
 import { equalTemperament12, scaleToFreqs, scaleMode, rankModes } from 'ruri';
 import { harmonicSpectrum, bellSpectrum } from 'ruri';
 
-const tuning = equalTemperament12(261.63);       // C4 基準
-const ionian = { id: 'ionian', name: 'Ionian', tuningId: '12-tet', degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
-const freqs = scaleToFreqs(ionian, tuning);      // 旋法 → Hz(chordDissonance/pluck へそのまま)
+const tuning = equalTemperament12(261.63); // C4 基準
+const ionian = {
+  id: 'ionian',
+  name: 'Ionian',
+  tuningId: '12-tet',
+  degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+};
+const freqs = scaleToFreqs(ionian, tuning); // 旋法 → Hz(chordDissonance/pluck へそのまま)
 
 // 旋法転回: Ionian の第2旋法 = Dorian (マカーム・ラーガで基本操作)
-const dorian = scaleMode(ionian, 1, tuning);     // degreeIndices: [0,2,3,5,7,9,10]
+const dorian = scaleMode(ionian, 1, tuning); // degreeIndices: [0,2,3,5,7,9,10]
 
 // 旋法ランキング: 「この調律のどの旋法が最も響くか」を音色別に評価
 const ranked = rankModes(ionian, tuning, harmonicSpectrum()); // 調和音色で評価
-const ranked2 = rankModes(ionian, tuning, bellSpectrum());    // ベル音色では別順位に
+const ranked2 = rankModes(ionian, tuning, bellSpectrum()); // ベル音色では別順位に
 // ranked[0].scale → 最も協和する旋法 / ranked[0].modeIndex → その旋法番号
 
 // Scale → TuningSystem: ダイアトニック和音探索の入口
 import { scaleToTuning, tuningToScale } from 'ruri';
 import { rankChords, rankedChordToChord } from 'ruri';
-const dorianTuning = scaleToTuning(dorian, tuning);    // 7音の sub-TuningSystem
+const dorianTuning = scaleToTuning(dorian, tuning); // 7音の sub-TuningSystem
 const dorianChords = rankChords(dorianTuning, { size: 3 }); // ダイアトニック3和音のみ
 
 // 生成層 → 旋法層 → 発見 → 再利用: 完全パイプライン
 import { generatedTuning } from 'ruri';
-const mosTuning = generatedTuning(700, 1200, 7);       // 5度積み上げ MOS
-const mosScale = tuningToScale(mosTuning);             // TuningSystem → Scale
-const mode2 = scaleMode(mosScale, 1, mosTuning);       // 第2旋法
+const mosTuning = generatedTuning(700, 1200, 7); // 5度積み上げ MOS
+const mosScale = tuningToScale(mosTuning); // TuningSystem → Scale
+const mode2 = scaleMode(mosScale, 1, mosTuning); // 第2旋法
 const mode2Triads = rankChords(scaleToTuning(mode2, mosTuning), { size: 3 });
-const portable = rankedChordToChord(mode2Triads[0]!);  // 再利用可能 Chord
+const portable = rankedChordToChord(mode2Triads[0]!); // 再利用可能 Chord
 ```
 
 ```ts
 // b) 和音 → 不協和度評価 → Scala エクスポート
-import {
-  chordFromSemitones, realizeChordFreqs,
-  chordDissonance, harmonicSpectrum,
-} from 'ruri';
+import { chordFromSemitones, realizeChordFreqs, chordDissonance, harmonicSpectrum } from 'ruri';
 import { sclFromCents, writeScl } from 'ruri/adapters';
 
 const chord = chordFromSemitones('major', [0, 4, 7]);
-const freqs = realizeChordFreqs(chord, 261.63);         // C4 root
+const freqs = realizeChordFreqs(chord, 261.63); // C4 root
 const roughness = chordDissonance(freqs, harmonicSpectrum());
 const scl = sclFromCents('major triad', [400, 700, 1200]);
-const sclText = writeScl(scl);                          // .scl 文字列
+const sclText = writeScl(scl); // .scl 文字列
 
 // 純正律(JI)は比を一次保持 — 比工場で精度保全
 import { chordFromRatios } from 'ruri';
-const justMajor = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
+const justMajor = chordFromRatios('just-major', [
+  [1, 1],
+  [5, 4],
+  [3, 2],
+]);
 // chordToCents(justMajor)[1] ≈ 386.31c (vs 12-TET 400c: 13.7c差)
 ```
 
@@ -100,10 +106,14 @@ const fingerings = fingerChord(guitar, chordToCentOffsets(major, 500));
 import { edo } from 'ruri';
 import { fretlessOud, violin, fretlessChordFromScale } from 'ruri';
 
-const oud = fretlessOud(440);  // oud-arabic: D2 G2 A2 D3 G3 C4 開放弦
+const oud = fretlessOud(440); // oud-arabic: D2 G2 A2 D3 G3 C4 開放弦
 const t12 = edo(12, 440);
-const ionianScale = { id: 'ionian', name: 'Ionian', tuningId: '12-edo',
-                      degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+const ionianScale = {
+  id: 'ionian',
+  name: 'Ionian',
+  tuningId: '12-edo',
+  degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+};
 // Scale + スケール内オフセット [0,2,4] → トライアド → フレットレスポジション
 const positions = fretlessChordFromScale(ionianScale, t12, [0, 2, 4], oud, 261.63);
 // positions[i] = { string, cents, freqHz } — ハンドスパン最小の音列
@@ -127,8 +137,12 @@ import { edo } from 'ruri';
 import { scaleToSmf } from 'ruri/adapters';
 import { writeFile } from 'node:fs/promises';
 
-const major = { id: 'major', name: 'Major', tuningId: '12-edo',
-                degreeIndices: [0, 2, 4, 5, 7, 9, 11] };
+const major = {
+  id: 'major',
+  name: 'Major',
+  tuningId: '12-edo',
+  degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+};
 const midi = scaleToSmf(major, edo(12, 440), 261.63); // C4 起点で7音を順次発音
 await writeFile('major-scale.mid', midi);
 // opts: durationTicks / gapTicks / velocity / channel / a4Hz
@@ -138,11 +152,11 @@ await writeFile('major-scale.mid', midi);
 // c-0) 文化的調律プリセット: ID で直接取得
 import { getTuningById } from 'ruri/data';
 
-const makam = getTuningById('makam-ussak-example');  // Makam Uşşak → TuningSystem
-const slendro = getTuningById('slendro-example');    // ガムランスレンドロ(伸張オクターブ)
+const makam = getTuningById('makam-ussak-example'); // Makam Uşşak → TuningSystem
+const slendro = getTuningById('slendro-example'); // ガムランスレンドロ(伸張オクターブ)
 // 利用可能 id: '12-tet' | 'just-5-limit' | 'makam-ussak-example' | 'slendro-example' | 'pelog-example'
 if (makam) {
-  const chords = rankChords(makam, { size: 3 });     // そのまま和音ランキングへ
+  const chords = rankChords(makam, { size: 3 }); // そのまま和音ランキングへ
 }
 ```
 
@@ -158,20 +172,24 @@ const sysex: Uint8Array = mtsBulkDump(tuningToMtsFrequencies(edo(19)), '19-edo')
 
 // TuningSystem → Scala .scl: 微分音エコシステムへの直接エクスポート
 import { tuningToScl, writeScl } from 'ruri/adapters';
-const sclText: string = writeScl(tuningToScl(edo(19)));   // 19-EDO を .scl テキストへ
+const sclText: string = writeScl(tuningToScl(edo(19))); // 19-EDO を .scl テキストへ
 
 // .kbm で任意の MIDI ノートを周波数に解決(未マップキーは null)
 const scale = parseScl(sclFileText);
 const mapping = parseKbm(kbmFileText);
-const hz: number | null = kbmNoteToFreq(scale, mapping, 69);  // MIDI 69 → Hz
+const hz: number | null = kbmNoteToFreq(scale, mapping, 69); // MIDI 69 → Hz
 
 // MIDI 2.0 UMP: Note On に Pitch 7.9 属性(1/512半音 ≈ 0.195c)で絶対音高を直接埋め込む。
 // MPE と違いチャンネル回転も bendRange 合意も不要(MIDI 1.0 世代の後継)。
 import { chordToUmp, tuningDegreeToUmp, umpToBytes } from 'ruri/adapters';
 import { chordFromRatios } from 'ruri';
-const just = chordFromRatios('just-major', [[1,1],[5,4],[3,2]]);
-const words: Uint32Array = chordToUmp(just, 261.63);   // 64-bit Note On × 3
-const bytes: Uint8Array = umpToBytes(words);            // big-endian 直列化
+const just = chordFromRatios('just-major', [
+  [1, 1],
+  [5, 4],
+  [3, 2],
+]);
+const words: Uint32Array = chordToUmp(just, 261.63); // 64-bit Note On × 3
+const bytes: Uint8Array = umpToBytes(words); // big-endian 直列化
 ```
 
 ```ts
@@ -187,14 +205,14 @@ const bell = consonantIntervals(bellSpectrum());
 
 // 命題の帰結: 音色から最適調律を直接生成 → 全パイプライン(rankChords/mtsBulkDump/etc.)に直結
 const harmTuning = spectrumToTuning(harmonicSpectrum()); // 純正律系の TuningSystem
-const bellTuning = spectrumToTuning(bellSpectrum());     // ベル音色固有の TuningSystem
+const bellTuning = spectrumToTuning(bellSpectrum()); // ベル音色固有の TuningSystem
 
 // d-2) 既存調律の音色適合度を評価: 「12-TETはどのくらい倍音音色に最適か？」
 import { tuningSuitability } from 'ruri';
 import { edo } from 'ruri';
 
 const fit12 = tuningSuitability(edo(12), harmonicSpectrum()); // coverage ~0.7–1.0
-const fitBell = tuningSuitability(edo(12), bellSpectrum());   // coverage < fit12.coverage
+const fitBell = tuningSuitability(edo(12), bellSpectrum()); // coverage < fit12.coverage
 // 倍音音色の自己導出調律 → 定義上 coverage = 1.0（上限基準として使用）
 const ceiling = tuningSuitability(spectrumToTuning(harmonicSpectrum()), harmonicSpectrum());
 // → { coverage: 1, avgErrorCents: 0, ... }
@@ -214,20 +232,27 @@ const voices = voicesForChordObject(chord, 261.63, harmonicSpectrum());
 
 ```ts
 // e) ランキング → 進行スムーズネス: 和音探索から進行評価まで一本のパイプライン
-import { generatedTuning, rankChords, realizeRankedChordFreqs, progressionSmoothness,
-         rankedChordToChord, chordProgressionSmoothness, harmonicSpectrum } from 'ruri';
+import {
+  generatedTuning,
+  rankChords,
+  realizeRankedChordFreqs,
+  progressionSmoothness,
+  rankedChordToChord,
+  chordProgressionSmoothness,
+  harmonicSpectrum,
+} from 'ruri';
 
-const tuning = generatedTuning(700, 1200, 7);          // ダイアトニック MOS → TuningSystem
-const chords = rankChords(tuning, { size: 3, limit: 4 });  // 協和度ランキング
+const tuning = generatedTuning(700, 1200, 7); // ダイアトニック MOS → TuningSystem
+const chords = rankChords(tuning, { size: 3, limit: 4 }); // 協和度ランキング
 // 上位4和音の進行コスト (cents) — 数値が小さいほど滑らか
 const cost = progressionSmoothness(chords, 261.63);
 
 // 個別ペアの実周波数も取り出せる
-const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63);  // RankedChord → Hz
+const freqsA = realizeRankedChordFreqs(chords[0]!, 261.63); // RankedChord → Hz
 
 // 発見した和音を再利用可能な Chord として保存 → fingerChord / writeScl / 別調律へ持ち込み可
-const portable = chords.map(c => rankedChordToChord(c));      // RankedChord[] → Chord[]
-const cost2 = chordProgressionSmoothness(portable, 261.63);  // Chord[] でも同じ進行評価が可能
+const portable = chords.map((c) => rankedChordToChord(c)); // RankedChord[] → Chord[]
+const cost2 = chordProgressionSmoothness(portable, 261.63); // Chord[] でも同じ進行評価が可能
 
 // 最適順序を求める: rankChords の返却順序は協和度順であり、声部導線コストは最適でない
 import { optimalChordOrder } from 'ruri';
@@ -259,16 +284,16 @@ const bellWave = strikeChord(freqs, bellSpectrum());
 // g) MOS 判定: TuningSystem が Myhill's property を持つか直接確認
 import { generatedTuning, maximallyEvenTuning, isTuningWellFormed } from 'ruri';
 
-isTuningWellFormed(generatedTuning(700, 1200, 7));   // true (ダイアトニック MOS)
-isTuningWellFormed(generatedTuning(700, 1200, 5));   // true (ペンタトニック MOS)
-isTuningWellFormed(maximallyEvenTuning(12, 7));      // true (gcd(12,7)=1)
-isTuningWellFormed(maximallyEvenTuning(12, 6));      // false (全音音階、gcd=6)
+isTuningWellFormed(generatedTuning(700, 1200, 7)); // true (ダイアトニック MOS)
+isTuningWellFormed(generatedTuning(700, 1200, 5)); // true (ペンタトニック MOS)
+isTuningWellFormed(maximallyEvenTuning(12, 7)); // true (gcd(12,7)=1)
+isTuningWellFormed(maximallyEvenTuning(12, 6)); // false (全音音階、gcd=6)
 
 // Scale と TuningSystem の整合性を事前確認 (assertTuningMatch の公開版)
 import { isScaleCompatible } from 'ruri';
 const myScale = { id: 'my', name: 'my', tuningId: '12-tet', degreeIndices: [0, 2, 4, 7] };
 if (isScaleCompatible(myScale, tuning)) {
-  const freqs = scaleToFreqs(myScale, tuning);  // 安全に呼べる
+  const freqs = scaleToFreqs(myScale, tuning); // 安全に呼べる
 }
 ```
 
@@ -314,6 +339,7 @@ ruri gen edo 19 -o 19edo.wav --seconds 0.2  # 生成した調律をそのまま�
 ruri presets                                # 収録調律を出典付きで一覧(全10件)
 ruri presets kirnberger-iii -o k3.scl       # 収録調律を任意の形式で書き出し
 ruri edo 31                                 # 純正律への近似精度・patent val・消えるコンマを評価
+ruri mos 701.955                            # その生成音程で MOS になる音階サイズ一覧
 ruri gen edo 13 -o 13.wav --fit-timbre       # その調律用に設計した音色で試聴(Sethares)
 ruri render  scale.scl -o scale.wav --seconds 0.4   # 各音を Karplus-Strong で WAV 化
 ruri help                                   # 全コマンド一覧
@@ -338,24 +364,25 @@ ruri help                                   # 全コマンド一覧
 
 ## モジュール (`src/core`)
 
-| ファイル | 役割 |
-|----------|------|
-| `ratio` | 純正律の厳密有理数 |
-| `cents` | cents↔周波数、Pitch(cents/比) |
-| `midi` | 12-TET↔周波数、MPE(ノート+pitch-bend) |
-| `tuning` | 調律系(周期・基準・出自) + 不変条件 |
-| `scale` | 旋法/スケール/ジンス/ラーガ |
-| `chord` | 和音抽象(ルート相対音程) |
-| `chord-voicing` | 最小不協和オクターブボイシング探索 |
-| `spectrum` | 楽器の部分音集合(harmonic/stretched/bell) |
-| `dissonance` | Plomp-Levelt/Sethares 感覚的不協和 |
-| `generate` | MOS・well-formed判定・最大均等 |
-| `edo-error` | EDO の純正律近似精度: 相対誤差(1ステップ比)・倍音別誤差表・consistency limit(25%基準) |
-| `interval-name` | 音程の命名(Kite の ups and downs 記法): P/M/m/A/d + `^`/`v`。sharpness による EDO 分類 |
-| `harmonic-entropy` | 協和の第3軸(Erlich): 単純比として聴き取れる確信度。音色非依存・微妙な狂いに寛容 |
-| `induced-spectrum` | 音階に合わせた音色設計(Sethares): 部分音を調律の音高にスナップ・必要な曲げ量の測定 |
-| `val` | patent val(素数→ステップ数の写像)・コンマ消失判定(81/80 が消えれば meantone、250/243 なら porcupine) |
-| `harmonicity` | Stolzenburg 周期性/harmonicity |
+| ファイル           | 役割                                                                                                 |
+| ------------------ | ---------------------------------------------------------------------------------------------------- |
+| `ratio`            | 純正律の厳密有理数                                                                                   |
+| `cents`            | cents↔周波数、Pitch(cents/比)                                                                        |
+| `midi`             | 12-TET↔周波数、MPE(ノート+pitch-bend)                                                                |
+| `tuning`           | 調律系(周期・基準・出自) + 不変条件                                                                  |
+| `scale`            | 旋法/スケール/ジンス/ラーガ                                                                          |
+| `chord`            | 和音抽象(ルート相対音程)                                                                             |
+| `chord-voicing`    | 最小不協和オクターブボイシング探索                                                                   |
+| `spectrum`         | 楽器の部分音集合(harmonic/stretched/bell)                                                            |
+| `dissonance`       | Plomp-Levelt/Sethares 感覚的不協和                                                                   |
+| `generate`         | MOS・well-formed判定・最大均等                                                                       |
+| `edo-error`        | EDO の純正律近似精度: 相対誤差(1ステップ比)・倍音別誤差表・consistency limit(25%基準)                |
+| `mos-spectrum`     | 生成音程から MOS になる音階サイズを予測(5度→2,3,5,7,12,17,29,41,53 / 黄金比→フィボナッチ)            |
+| `interval-name`    | 音程の命名(Kite の ups and downs 記法): P/M/m/A/d + `^`/`v`。sharpness による EDO 分類               |
+| `harmonic-entropy` | 協和の第3軸(Erlich): 単純比として聴き取れる確信度。音色非依存・微妙な狂いに寛容                      |
+| `induced-spectrum` | 音階に合わせた音色設計(Sethares): 部分音を調律の音高にスナップ・必要な曲げ量の測定                   |
+| `val`              | patent val(素数→ステップ数の写像)・コンマ消失判定(81/80 が消えれば meantone、250/243 なら porcupine) |
+| `harmonicity`      | Stolzenburg 周期性/harmonicity                                                                       |
 
 ## 開発
 
