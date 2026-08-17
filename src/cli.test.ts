@@ -121,6 +121,18 @@ describe('runCli info', () => {
     expect(values[2]).toBeLessThan(values[0]!); // 2/1 more certain than 5/4
   });
 
+  it('test_info_names_exact_ratios_in_fjs', () => {
+    // Ratio degrees get their Functional Just System name, which distinguishes
+    // the just third from the Pythagorean one that shares the classical name.
+    const ji = 'JI\n4\n9/8\n5/4\n3/2\n2/1\n';
+    const { io, stdout } = makeIo({ 'in.scl': ji });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('5/4  M3^5');
+    expect(text).toContain('3/2  P5');
+    expect(text).toContain('9/8  M2');
+  });
+
   it('test_info_missing_input_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['info'], io)).toBe(2);

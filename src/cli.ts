@@ -35,6 +35,7 @@ import { inducedSpectrum, spectrumBendCents } from './core/induced-spectrum.js';
 import { entropyBasis, harmonicEntropy } from './core/harmonic-entropy.js';
 import { edoSharpness, edoIntervalNames } from './core/interval-name.js';
 import { mosSpectrum } from './core/mos-spectrum.js';
+import { fjsName } from './core/fjs.js';
 import { strikeScaleWav, DEFAULT_STRIKE_SCALE } from './adapters/wav.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
@@ -231,7 +232,16 @@ function cmdInfo(args: Args, io: CliIo): number {
   const basis = entropyBasis();
   io.out('pitches:                                    entropy');
   scl.degrees.forEach((d, i) => {
-    const label = d.kind === 'ratio' ? `${d.num}/${d.den}` : d.text;
+    // Exact ratios get their Functional Just System name (81/64 is M3, 5/4 is
+    // M3^5); ratios beyond the supported primes simply go unnamed.
+    let label = d.kind === 'ratio' ? `${d.num}/${d.den}` : d.text;
+    if (d.kind === 'ratio') {
+      try {
+        label += `  ${fjsName(d.num, d.den)}`;
+      } catch {
+        /* prime outside the FJS table — leave the ratio unannotated */
+      }
+    }
     // Exact ratios need no hint; cents degrees get a nearest-JI approximation.
     const hint = d.kind === 'cents' ? nearestJiHint(d.cents) : '';
     const c = degreeCents(d);
