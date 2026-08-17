@@ -133,6 +133,25 @@ describe('runCli info', () => {
     expect(text).toContain('9/8  M2');
   });
 
+  it('test_info_reads_a_scale_workshop_block', () => {
+    // Same scale in Scale Workshop notation rather than .scl — the extension
+    // picks the reader, and the ratios stay exact.
+    const sw = '9/8\n5/4\n4/3\n3/2\n5/3\n15/8\n2/1\n';
+    const { io, stdout } = makeIo({ 'in.txt': sw });
+    expect(runCli(['info', 'in.txt'], io)).toBe(0);
+    const text = stdout.join('\n');
+    expect(text).toContain('degrees     : 7');
+    expect(text).toContain('5/4  M3^5');
+    expect(text).toContain('period      : 1200.0000');
+  });
+
+  it('test_convert_reads_a_scale_workshop_block', () => {
+    const sw = '7\\12\n2/1\n';
+    const { io, texts } = makeIo({ 'in.txt': sw });
+    expect(runCli(['convert', 'in.txt', '-o', 'out.scl'], io)).toBe(0);
+    expect(texts['out.scl']).toContain('700.000000');
+  });
+
   it('test_info_missing_input_returns_2', () => {
     const { io, stderr } = makeIo();
     expect(runCli(['info'], io)).toBe(2);

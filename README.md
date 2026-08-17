@@ -327,6 +327,7 @@ const voicing = optimalChordVoicing(triad, 220, harmonicSpectrum());
 
 ```sh
 # インストール後(npm i -g ruri など)、または開発時は `node bin/ruri.mjs <cmd>`
+ruri info    scale.scl                      # (.txt/.sw の Scale Workshop 形式も可)
 ruri info    scale.scl                      # 音程・cents・比・well-formed・MOS L/sパターン(例 5L2s)+ cents表記音程の近似JI比ヒント(例 386.31c ≈ 5/4)
 ruri convert scale.scl -o scale.tun         # AnaMark .tun(128鍵周波数表)へ
 ruri convert scale.scl -o scale.syx         # MTS バルクダンプ SysEx(VST/ハード連携)へ

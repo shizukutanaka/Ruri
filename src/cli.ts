@@ -11,7 +11,7 @@
  * the CLI adds no music-theory logic of its own.
  */
 
-import { parseScl, writeScl, tuningToScl, sclToTuning, degreeCents } from './adapters/scala.js';
+import { parseScl, writeScl, tuningToScl, sclToTuning } from './adapters/scala.js';
 import { writeTun } from './adapters/tun.js';
 import { tuningToMts, tuningToMtsFrequencies } from './adapters/mts.js';
 import { tuningToScaleWav } from './adapters/wav.js';
@@ -20,6 +20,7 @@ import { scaleToSmf } from './adapters/smf.js';
 import { tuningToScale } from './core/scale.js';
 import { degreeToFreq, edo, type TuningSystem } from './core/tuning.js';
 import { freqToMidiFloat } from './core/midi.js';
+import { type Pitch, pitchToCents } from './core/cents.js';
 import { DEFAULT_SYNTH_SCALE } from './core/ks-synth.js';
 import {
   isTuningWellFormed,
@@ -36,6 +37,7 @@ import { entropyBasis, harmonicEntropy } from './core/harmonic-entropy.js';
 import { edoSharpness, edoIntervalNames } from './core/interval-name.js';
 import { mosSpectrum } from './core/mos-spectrum.js';
 import { fjsName } from './core/fjs.js';
+import { parseScaleWorkshop } from './adapters/scale-workshop.js';
 import { strikeScaleWav, DEFAULT_STRIKE_SCALE } from './adapters/wav.js';
 
 /** Injectable I/O boundary. The bootstrap provides real fs/process implementations. */
@@ -55,8 +57,8 @@ export interface CliIo {
 const USAGE = `ruri — world tuning / scale / chord toolkit
 
 Usage:
-  ruri info    <input.scl>
-  ruri convert <input.scl> -o <output.{scl|tun|syx|ump|mid|wav}>
+  ruri info    <input.{scl|txt|sw}>
+  ruri convert <input.{scl|txt|sw}> -o <output.{scl|tun|syx|ump|mid|wav}>
   ruri gen     <edo N | mos g p c | me c d> -o <output.{scl|tun|syx|ump|mid|wav}>
   ruri presets [<id> -o <output.{scl|tun|syx|ump|mid|wav}>]
   ruri edo     <divisions> [--limit <oddLimit>]
@@ -67,6 +69,10 @@ Usage:
 Commands:
   info      Print a scale's degrees, cents, ratios, well-formedness, and
             its MOS L/s step pattern (e.g. 5L2s) when it is a MOS.
+            Input may be a Scala .scl or a Scale Workshop scale-data
+            block (.txt/.sw): one interval per line, where a dot means
+            cents (700.), a slash or bare integer a ratio (3/2, 2), and
+            a backslash a step of an EDO (7\\12).
   convert   Convert a Scala .scl file to another tuning format, inferred
             from the output extension:
               .scl        Scala scale     (round-trip / normalization)
@@ -153,6 +159,21 @@ function parseArgs(rest: readonly string[]): Args {
   return args;
 }
 
+/**
+ * Read a tuning from a file, choosing the reader by extension: `.scl` is a
+ * Scala scale, `.txt`/`.sw` is a Scale Workshop scale-data block.
+ */
+function readTuning(path: string, ref: number, io: CliIo): TuningSystem {
+  const ext = extensionOf(path);
+  const text = io.readText(path);
+  if (ext === 'txt' || ext === 'sw') {
+    // Leave the id at its default rather than embedding the file path, which
+    // would leak into the .scl description; `--name` overrides it explicitly.
+    return parseScaleWorkshop(text, { referenceHz: ref });
+  }
+  return sclToTuning(parseScl(text), ref);
+}
+
 /** Return a copy of `tuning` with its id/name overridden (for `--name`). */
 function renamed(tuning: TuningSystem, name: string | undefined): TuningSystem {
   return name === undefined ? tuning : { ...tuning, id: name, name };
@@ -216,12 +237,11 @@ function maxTwelveTetErrorCents(tuning: TuningSystem, a4Hz: number): number {
 function cmdInfo(args: Args, io: CliIo): number {
   const input = args.positionals[0];
   if (input === undefined) {
-    io.err('info: missing <input.scl>');
+    io.err('info: missing <input.{scl|txt|sw}>');
     return 2;
   }
-  const scl = parseScl(io.readText(input));
-  const tuning = sclToTuning(scl, args.ref ?? 440);
-  io.out(`description : ${scl.description || '(none)'}`);
+  const tuning = readTuning(input, args.ref ?? 440, io);
+  io.out(`description : ${tuning.name || '(none)'}`);
   io.out(`degrees     : ${tuning.degrees.length} (per period)`);
   io.out(`period      : ${tuning.periodCents.toFixed(4)} cents`);
   io.out(`well-formed : ${isTuningWellFormed(tuning) ? 'yes (Myhill)' : 'no'}`);
@@ -231,20 +251,25 @@ function cmdInfo(args: Args, io: CliIo): number {
   // heard more definitely as one simple ratio). Basis is built once and reused.
   const basis = entropyBasis();
   io.out('pitches:                                    entropy');
-  scl.degrees.forEach((d, i) => {
+  // Every degree above the root, then the period — the shape a .scl lists.
+  const rows: Pitch[] = [...tuning.degrees.slice(1), { kind: 'cents', cents: tuning.periodCents }];
+  rows.forEach((d, i) => {
     // Exact ratios get their Functional Just System name (81/64 is M3, 5/4 is
     // M3^5); ratios beyond the supported primes simply go unnamed.
-    let label = d.kind === 'ratio' ? `${d.num}/${d.den}` : d.text;
+    let label: string;
+    let hint = '';
     if (d.kind === 'ratio') {
+      label = `${d.ratio.num}/${d.ratio.den}`;
       try {
-        label += `  ${fjsName(d.num, d.den)}`;
+        label += `  ${fjsName(d.ratio.num, d.ratio.den)}`;
       } catch {
         /* prime outside the FJS table — leave the ratio unannotated */
       }
+    } else {
+      label = d.cents.toFixed(6);
+      hint = nearestJiHint(d.cents);
     }
-    // Exact ratios need no hint; cents degrees get a nearest-JI approximation.
-    const hint = d.kind === 'cents' ? nearestJiHint(d.cents) : '';
-    const c = degreeCents(d);
+    const c = pitchToCents(d);
     const he =
       c >= 0 && c <= 1200 ? harmonicEntropy(c, {}, basis).toFixed(2).padStart(6) : '     -';
     io.out(`  ${String(i + 1).padStart(3)}  ${c.toFixed(4).padStart(11)}c ${he}  ${label}${hint}`);
@@ -334,7 +359,7 @@ function cmdConvert(args: Args, io: CliIo): number {
     io.err('convert: missing -o <output>');
     return 2;
   }
-  const tuning = renamed(sclToTuning(parseScl(io.readText(input)), args.ref ?? 440), args.name);
+  const tuning = renamed(readTuning(input, args.ref ?? 440, io), args.name);
   return writeTuningOutput(
     renamed(tuning, args.name),
     args.output,

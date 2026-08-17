@@ -86,7 +86,8 @@ git commit / push    # メッセージに検証結果を書く
 |------|--------------|--------------------|------|
 | ~~`ruri gen … -o out.wav`~~ **完了(893bad4)** | `writeTuningOutput` に `.wav` ケース追加済み | `tuningToScaleWav` | — |
 | ~~FJS 命名~~ **完了** | `fjs.ts`(マスターアルゴリズムで形式コンマ導出 + 音程命名)。残るは SonicWeave の *import* 側 | — | — |
-| SonicWeave import(C-7) | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット) | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`) | golden round-trip + 実機 convert |
+| ~~Scale Workshop 取込~~ **完了** | `adapters/scale-workshop.ts`(4記法対応・CLI が .txt/.sw を受理) | — | — |
+| SonicWeave DSL import(C-7、残り) | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット) | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`) | golden round-trip + 実機 convert |
 | ~~CLI `--name` オプション~~ **完了** | convert/gen/presets の出力調律名を上書き済み | — | — |
 | ~~RTT: 最適生成音程~~ **完了** | `generator-tuning.ts`(閉形式・重み付き最小二乗)。CLI 表面は未実装(温度律カタログが要るため) | — | — |
 | RTT 指標の拡充(任意) | TE誤差・badness・rank-2 temperament の探索(Erlich "A Middle Path")。土台は実装済み: `edo-error.ts`(相対誤差・consistency)と `val.ts`(patent val・コンマ消失) | `src/core/edo-error.ts`、`src/core/val.ts`、`src/core/temperament.ts` | **公刊された既知値をオラクルにする**(例: 46-EDO が13-odd-limit最小、17-EDO の patent val = `<17 27 39]`、meantone EDO = 12/19/26/31/43/50) |
