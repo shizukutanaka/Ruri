@@ -10,6 +10,8 @@ export {
   WERCKMEISTER_III,
   KIRNBERGER_III,
   BOHLEN_PIERCE_13,
+  VALLOTTI,
+  YOUNG_II,
   ALL_PRESETS,
   getTuningById,
   rankChordsFromPreset,

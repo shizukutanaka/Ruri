@@ -2385,6 +2385,76 @@ export const BOHLEN_PIERCE_13: TuningPreset = {
   },
 };
 
+/**
+ * Build a circulating (well-)temperament from the widths of the eleven fifths
+ * in the chain C-G-D-A-E-B-F#-C#-G#-D#-A#-F, returning the twelve pitch classes
+ * in cents from C.
+ *
+ * Deriving these from the construction rather than transcribing a table means
+ * the defining property is checkable: twelve fifths must close into seven
+ * octaves exactly.
+ */
+function circulatingFromFifths(fifthWidths: readonly number[], fBelowC?: number): number[] {
+  const chain = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
+  const order = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const pitch: Record<string, number> = { C: 0 };
+  let acc = 0;
+  for (let i = 0; i < 11; i++) {
+    acc += fifthWidths[i] as number;
+    pitch[chain[i + 1] as string] = acc;
+  }
+  // Vallotti reaches F by a narrowed fifth *below* C rather than round the top.
+  if (fBelowC !== undefined) pitch['F'] = -fBelowC;
+  return order.map((n) => (((pitch[n] as number) % 1200) + 1200) % 1200);
+}
+
+/** Pythagorean comma in cents — the gap twelve pure fifths leave over seven octaves. */
+const PYTHAGOREAN_COMMA_CENTS = 1200 * Math.log2(531441 / 524288);
+/** A fifth narrowed by one sixth of that comma: the unit both temperaments use. */
+const SIXTH_COMMA_FIFTH = 1200 * Math.log2(3 / 2) - PYTHAGOREAN_COMMA_CENTS / 6;
+const PURE_FIFTH_CENTS = 1200 * Math.log2(3 / 2);
+
+const T6 = SIXTH_COMMA_FIFTH;
+const P5 = PURE_FIFTH_CENTS;
+
+/**
+ * Vallotti (1754): the six fifths F-C-G-D-A-E-B — every white key — narrowed by
+ * a sixth of the Pythagorean comma, the remaining six pure. C major and A minor
+ * come out best.
+ */
+export const VALLOTTI: TuningPreset = {
+  id: 'vallotti',
+  name: 'Vallotti (1/6-comma well-temperament)',
+  referenceHz: 440,
+  periodCents: 1200,
+  degrees: circulatingFromFifths([T6, T6, T6, T6, T6, P5, P5, P5, P5, P5, P5], T6),
+  source: 'theoretical',
+  note: 'Derived from the construction (six white-key fifths narrowed by 1/6 Pythagorean comma), not transcribed. Sources disagree about whether this layout or its sharpward shift deserves the name Vallotti — see Duffin, "Why I hate Vallotti (or is it Young?)"; the companion preset `young-ii` is the shifted form.',
+  provenance: {
+    citation: 'Francescantonio Vallotti (c. 1754); 1/6-comma circulating temperament',
+    license: 'public-domain',
+  },
+};
+
+/**
+ * Young's second temperament (1800): the same six narrowed fifths shifted one
+ * step sharpward, to C-G-D-A-E-B-F#. G major and E minor come out best.
+ */
+export const YOUNG_II: TuningPreset = {
+  id: 'young-ii',
+  name: "Young's second temperament (1/6-comma well-temperament)",
+  referenceHz: 440,
+  periodCents: 1200,
+  degrees: circulatingFromFifths([T6, T6, T6, T6, T6, T6, P5, P5, P5, P5, P5]),
+  source: 'theoretical',
+  note: 'Derived from the construction (six fifths C-G-D-A-E-B-F# narrowed by 1/6 Pythagorean comma), not transcribed. Identical in method to `vallotti` but shifted one fifth sharpward, which moves the best-sounding keys; the attribution of the two layouts is disputed in the literature.',
+  provenance: {
+    citation:
+      'Thomas Young, "Outlines of Experiments and Inquiries Respecting Sound and Light" (1800), second temperament',
+    license: 'public-domain',
+  },
+};
+
 export const ALL_PRESETS: readonly TuningPreset[] = [
   TWELVE_TET,
   JUST_INTONATION_5L,
@@ -2396,6 +2466,8 @@ export const ALL_PRESETS: readonly TuningPreset[] = [
   WERCKMEISTER_III,
   KIRNBERGER_III,
   BOHLEN_PIERCE_13,
+  VALLOTTI,
+  YOUNG_II,
 ];
 
 /**

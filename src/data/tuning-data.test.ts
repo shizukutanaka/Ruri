@@ -11,6 +11,8 @@ import {
   WERCKMEISTER_III,
   KIRNBERGER_III,
   BOHLEN_PIERCE_13,
+  VALLOTTI,
+  YOUNG_II,
   getTuningById,
   rankChordsFromPreset,
   presetToScl,
@@ -848,6 +850,90 @@ describe('historical temperament presets', () => {
       expect(() => loadTuningPreset(p)).not.toThrow(); // provenance/note gates pass
       expect(p.source).toBe('theoretical'); // not measured → outside the CARE gate
       expect(p.provenance.citation.length).toBeGreaterThan(0);
+      expect(ALL_PRESETS.some((x) => x.id === p.id)).toBe(true);
+      expect(getTuningById(p.id)).toBeDefined();
+    }
+  });
+});
+
+// The two 1/6-comma well-temperaments. Both are derived from their
+// construction, so the tests check the construction's defining properties
+// rather than re-stating the cent values the code already computes.
+describe('Vallotti and Young II — 1/6-comma circulating temperaments', () => {
+  const PURE_FIFTH = 1200 * Math.log2(3 / 2);
+  const PYTH_COMMA = 1200 * Math.log2(531441 / 524288);
+  const NARROW_FIFTH = PURE_FIFTH - PYTH_COMMA / 6;
+
+  /** The twelve fifths of a circulating temperament, in cents. */
+  const fifths = (p: typeof VALLOTTI): number[] => {
+    const c = loadTuningPreset(p).degrees.map((d) => pitchToCents(d));
+    // Walk the circle of fifths through the twelve pitch classes.
+    return Array.from({ length: 12 }, (_, i) => {
+      const from = c[(i * 7) % 12]!;
+      const to = c[((i + 1) * 7) % 12]!;
+      return (((to - from) % 1200) + 1200) % 1200;
+    });
+  };
+
+  it('test_both_close_the_circle_of_fifths_exactly', () => {
+    // The defining property: twelve fifths span exactly seven octaves.
+    for (const p of [VALLOTTI, YOUNG_II]) {
+      const total = fifths(p).reduce((a, b) => a + b, 0);
+      expect(total).toBeCloseTo(7 * 1200, 6);
+    }
+  });
+
+  it('test_both_use_six_narrowed_and_six_pure_fifths', () => {
+    for (const p of [VALLOTTI, YOUNG_II]) {
+      const f = fifths(p);
+      const narrowed = f.filter((x) => Math.abs(x - NARROW_FIFTH) < 1e-6);
+      const pure = f.filter((x) => Math.abs(x - PURE_FIFTH) < 1e-6);
+      expect(narrowed).toHaveLength(6);
+      expect(pure).toHaveLength(6);
+    }
+  });
+
+  it('test_the_narrowing_is_one_sixth_of_a_pythagorean_comma', () => {
+    expect(NARROW_FIFTH).toBeCloseTo(698.045, 3);
+    expect(PURE_FIFTH - NARROW_FIFTH).toBeCloseTo(PYTH_COMMA / 6, 9);
+  });
+
+  it('test_c_major_third_sits_between_just_and_equal', () => {
+    // A well-temperament's point: better than 12-TET's 400c, not pure either.
+    for (const p of [VALLOTTI, YOUNG_II]) {
+      const third = pitchToCents(loadTuningPreset(p).degrees[4]!);
+      expect(third).toBeCloseTo(392.18, 2);
+      expect(third).toBeGreaterThan(1200 * Math.log2(5 / 4));
+      expect(third).toBeLessThan(400);
+    }
+  });
+
+  it('test_young_is_vallotti_shifted_one_fifth_sharpward', () => {
+    // Same method, different placement: Vallotti favours the flat side (its
+    // F-A third is the better one), Young the sharp side (its B-D#).
+    const v = loadTuningPreset(VALLOTTI).degrees.map((d) => pitchToCents(d));
+    const y = loadTuningPreset(YOUNG_II).degrees.map((d) => pitchToCents(d));
+    const third = (c: number[], lo: number, hi: number): number =>
+      (((c[hi]! - c[lo]!) % 1200) + 1200) % 1200;
+    expect(third(v, 5, 9)).toBeLessThan(third(y, 5, 9)); // F-A
+    expect(third(y, 11, 3)).toBeLessThan(third(v, 11, 3)); // B-D#
+  });
+
+  it('test_neither_is_equal_temperament_nor_pythagorean', () => {
+    for (const p of [VALLOTTI, YOUNG_II]) {
+      const c = loadTuningPreset(p).degrees.map((d) => pitchToCents(d));
+      expect(c.some((x, i) => Math.abs(x - i * 100) > 1)).toBe(true);
+      expect(fifths(p).every((f) => Math.abs(f - PURE_FIFTH) < 1e-6)).toBe(false);
+    }
+  });
+
+  it('test_both_load_and_are_registered_with_provenance', () => {
+    for (const p of [VALLOTTI, YOUNG_II]) {
+      expect(() => loadTuningPreset(p)).not.toThrow();
+      expect(p.source).toBe('theoretical');
+      expect(p.provenance.citation.length).toBeGreaterThan(0);
+      // The attribution dispute is recorded rather than silently resolved.
+      expect(p.note.toLowerCase()).toContain('shift');
       expect(ALL_PRESETS.some((x) => x.id === p.id)).toBe(true);
       expect(getTuningById(p.id)).toBeDefined();
     }
