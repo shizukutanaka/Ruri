@@ -4,13 +4,15 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun)+ `src/data`(出典付き調律)+ `shell-web`(デモUI)。1132テスト、カバレッジ約99%(文/行 98.9%・分岐 97.6%・関数 100%)、zero runtime-dep。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成・RTT解析)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun/UMP/Scale Workshop)+ `src/data`(出典付き調律12件)+ `shell-web`(デモUI)+ `ruri` CLI。高速テスト **7,485件**(`npm test`、約1.5分)、zero runtime-dep。公開APIは意図的に絞った367シンボル(`src/api-surface.test.ts` が固定)。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
 ```
-src/core/        調律・cents/比・生成(MOS/最大均等)・協和(粗さ+harmonicity)・運指・合成
-src/adapters/    出力: SMF(.mid) / Scala(.scl/.kbm) / MPE / WAV / MTS SysEx / .tun
+src/core/        調律・cents/比・生成(MOS/最大均等)・協和(粗さ+harmonicity+harmonic entropy)・
+                 RTT解析(相対誤差/consistency/patent val/コンマ)・命名(ups-downs/FJS)・運指・合成
+src/adapters/    入出力: SMF(.mid) / Scala(.scl/.kbm) / MPE / WAV / MTS SysEx / .tun /
+                 MIDI 2.0 UMP / Scale Workshop scale-data(取込)
 src/data/        出典付き調律プリセット + provenance/CARE検証ローダ
 shell-web/       単一HTMLデモUI(オフライン)
 docs/            設計・調査記録(Plan / WORKFLOW / research / 競合分析 / データ出典 / 監査)
@@ -154,7 +156,9 @@ import { getTuningById } from 'ruri/data';
 
 const makam = getTuningById('makam-ussak-example'); // Makam Uşşak → TuningSystem
 const slendro = getTuningById('slendro-example'); // ガムランスレンドロ(伸張オクターブ)
-// 利用可能 id: '12-tet' | 'just-5-limit' | 'makam-ussak-example' | 'slendro-example' | 'pelog-example'
+// 利用可能 id(12件): '12-tet' | 'just-5-limit' | 'makam-ussak-example' | 'slendro-example' |
+//   'pelog-example' | 'pythagorean-12' | 'meantone-quarter-comma' | 'werckmeister-iii' |
+//   'kirnberger-iii' | 'bohlen-pierce-13' | 'vallotti' | 'young-ii'
 if (makam) {
   const chords = rankChords(makam, { size: 3 }); // そのまま和音ランキングへ
 }

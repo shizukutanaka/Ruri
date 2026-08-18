@@ -41,13 +41,12 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"src/**/*.ts\" --ignore-pattern \"**/*-generated.test.ts\" --max-warnings 0",
+    "lint": "eslint \"src/**/*.ts\" --max-warnings 0",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
-    "test": "vitest run --exclude \"**/*-generated.test.ts\"",
-    "test:generated": "vitest run generated",
+    "test": "vitest run",
     "test:all": "vitest run",
-    "coverage": "vitest run --coverage --exclude \"**/*-generated.test.ts\"",
+    "coverage": "vitest run --coverage",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
     "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run check && npm run build"

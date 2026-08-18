@@ -5,6 +5,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ## [Unreleased]
 
+### Removed
+
+- **99,237 lines of machine-generated tests** (`scale-generated.test.ts`, `presets-generated.test.ts` — 12,311 cases). They were excluded from `test`, from `lint` and from `coverage`, so the only way to run them was a manual script taking roughly five hours; in practice they never ran. A test that never runs provides no protection, only the appearance of it, and the hand-written suites already contribute 5,797 cases over the same modules. Deleting them let the workarounds go too: `test`, `lint` and `coverage` no longer carry `--exclude`/`--ignore-pattern` flags, and the `test:generated` script is gone. The test count is unchanged at 7,485, which is the proof they were contributing nothing.
+
 ### Changed
 
 - **The public API is now curated.** The package re-exported 1,445 explicitly named symbols while the README documented 56 — a 26:1 ratio that made the library unsearchable, since anyone looking for `edo` had to find it among names like `tuningFamilyAmbassadorConsensusConvergenceScoreNarrative`. The barrels now offer a deliberate surface: 367 exports, covering every documented entry point, every analysis module, and every curated preset. **No implementation was removed** — the machine-generated analytics layer is untouched and still importable from its module by path; what changed is what the package _offers_. `src/api-surface.test.ts` pins this: every documented symbol must resolve, and the surface must not silently grow back.
