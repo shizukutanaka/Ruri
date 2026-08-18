@@ -5,6 +5,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ## [Unreleased]
 
+### Changed
+
+- **The public API is now curated.** The package re-exported 1,445 explicitly named symbols while the README documented 56 — a 26:1 ratio that made the library unsearchable, since anyone looking for `edo` had to find it among names like `tuningFamilyAmbassadorConsensusConvergenceScoreNarrative`. The barrels now offer a deliberate surface: 367 exports, covering every documented entry point, every analysis module, and every curated preset. **No implementation was removed** — the machine-generated analytics layer is untouched and still importable from its module by path; what changed is what the package _offers_. `src/api-surface.test.ts` pins this: every documented symbol must resolve, and the surface must not silently grow back.
+
 ### Added
 
 - Two 1/6-comma circulating well-temperaments, taking the curated catalogue to 12: `vallotti` (six white-key fifths F–C–G–D–A–E–B narrowed, favouring C major) and `young-ii` (the same six narrowed fifths shifted one step sharpward to C–G–D–A–E–B–F♯, favouring G major). Both are **derived from their construction rather than transcribed from a table**, so the defining property is checkable: twelve fifths close into exactly seven octaves, six narrowed by precisely one sixth of the Pythagorean comma (698.045c) and six pure. The attribution of the two layouts is genuinely disputed in the literature — see Duffin, "Why I hate Vallotti (or is it Young?)" — so each preset is named by its construction and records the dispute in its `note` rather than silently picking a side.
