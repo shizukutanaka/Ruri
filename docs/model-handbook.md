@@ -43,6 +43,16 @@
    — `docs/first-principles-2026-07.md` §4)。**新規プリセットには必ず独立した検証
    オラクル**(既存関数との一致 or その音律の定義的性質)を付けること。
 
+## 2.5 公開APIは意図的に絞られている(戻さないこと)
+
+- `src/core/index.ts` / `src/data/index.ts` は**curated barrel**。かつて 1,445 名を
+  明示 export していたが README が記載するのは 56 — 26:1 で検索不能だった。
+  現在 **367 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
+  パス直指定 import は可能。変えたのは「パッケージが何を提供するか」だけ。
+- `src/api-surface.test.ts` がこれを固定(README掲載シンボルの解決・解析モジュールの
+  到達性・生成名が公開されていないこと・総数の上下限)。**barrel に `export *` を
+  足して生成層を戻さないこと** — 戻すならこのテストの上限を上げる判断が要る。
+
 ## 3. 検証プロトコル(全変更で必須の順序)
 
 ```
@@ -52,11 +62,25 @@ node bin/ruri.mjs …  # 変更機能を実ファイルで実機ドライブ(scr
 git commit / push    # メッセージに検証結果を書く
 ```
 
+**リリース可否の最終確認**(パッケージとして完成しているかの判定):
+
+```
+npm pack && (別ディレクトリで) npm install <tarball>
+node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブパス
+./node_modules/.bin/ruri edo 31             # bin エントリ
+```
+
+2026-07 実施: `edo`/`mosSizes`/`fjsName`/`optimalGenerator`/`getTuningById`/
+`parseScaleWorkshop`/`.scl`出力/CLI(`edo`・`convert`・`gen --fit-timbre`)すべて
+インストール済みパッケージから動作確認済み。
+
 - **実機ドライブを省略しない**。このセッションの実バグ2件(`.mid` が生 SysEx で
   無効な MIDI ファイル / 量子化ノイズで等分割を偽 MOS 報告)はどちらも
   **テスト緑のまま**実機ドライブで発見された。
-- 低速テスト(`*-generated.test.ts`、~5時間)は CI・`npm test` から除外済み。
-  意図的に流す場合のみ `npm run test:generated`。**機械生成テストは増やさない**。
+- **機械生成テストは削除済み**(2026-07、99,237行・12,311ケース)。`test`/`lint`/`coverage`
+  すべてから除外されており実際には一度も走っていなかった = 保護ゼロ。手書きスイートが
+  同じモジュールを 5,797 ケースで覆う。削除後もテスト数は 7,485 で不変 = 寄与ゼロの証拠。
+  **機械生成テストを再導入しない**。
 - カバレッジゲート(`npm run coverage`)は既知の不整合あり(§6 C-8)。合否判定に使わない。
 
 ## 4. セッション権限の既知制約(再試行で無駄にしない)
@@ -82,17 +106,17 @@ git commit / push    # メッセージに検証結果を書く
 
 ### ゲートなし(単独で着手可)
 
-| 項目 | 期待される形 | 再利用する既存実装 | 検証 |
-|------|--------------|--------------------|------|
-| ~~`ruri gen … -o out.wav`~~ **完了(893bad4)** | `writeTuningOutput` に `.wav` ケース追加済み | `tuningToScaleWav` | — |
-| ~~FJS 命名~~ **完了** | `fjs.ts`(マスターアルゴリズムで形式コンマ導出 + 音程命名)。残るは SonicWeave の *import* 側 | — | — |
-| ~~Scale Workshop 取込~~ **完了** | `adapters/scale-workshop.ts`(4記法対応・CLI が .txt/.sw を受理) | — | — |
-| SonicWeave DSL import(C-7、残り) | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット) | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`) | golden round-trip + 実機 convert |
-| ~~CLI `--name` オプション~~ **完了** | convert/gen/presets の出力調律名を上書き済み | — | — |
-| ~~RTT: 最適生成音程~~ **完了** | `generator-tuning.ts`(閉形式・重み付き最小二乗)。CLI 表面は未実装(温度律カタログが要るため) | — | — |
-| RTT 指標の拡充(任意) | TE誤差・badness・rank-2 temperament の探索(Erlich "A Middle Path")。土台は実装済み: `edo-error.ts`(相対誤差・consistency)と `val.ts`(patent val・コンマ消失) | `src/core/edo-error.ts`、`src/core/val.ts`、`src/core/temperament.ts` | **公刊された既知値をオラクルにする**(例: 46-EDO が13-odd-limit最小、17-EDO の patent val = `<17 27 39]`、meantone EDO = 12/19/26/31/43/50) |
-| 歴史的調律の追加拡充 | Young II・Vallotti・Meantone 各種等(**理論的調律は CARE ゲート対象外** — §2-7) | 既存プリセット5件のパターン(`src/data/presets.ts` 末尾)+ 検証オラクル必須 | オラクルテスト + `ruri presets` 実機 |
-| `info` の追加診断 | 平均ステップ・協和スコア等(慎重に、ノイズにしない) | `tuningMosPattern`・`chordDissonance` 等 | 実機で有用性確認 |
+| 項目                                          | 期待される形                                                                                                                                                 | 再利用する既存実装                                                        | 検証                                                                                                                                       |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| ~~`ruri gen … -o out.wav`~~ **完了(893bad4)** | `writeTuningOutput` に `.wav` ケース追加済み                                                                                                                 | `tuningToScaleWav`                                                        | —                                                                                                                                          |
+| ~~FJS 命名~~ **完了**                         | `fjs.ts`(マスターアルゴリズムで形式コンマ導出 + 音程命名)。残るは SonicWeave の _import_ 側                                                                  | —                                                                         | —                                                                                                                                          |
+| ~~Scale Workshop 取込~~ **完了**              | `adapters/scale-workshop.ts`(4記法対応・CLI が .txt/.sw を受理)                                                                                              | —                                                                         | —                                                                                                                                          |
+| SonicWeave DSL import(C-7、残り)              | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット)                                                                                        | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`)              | golden round-trip + 実機 convert                                                                                                           |
+| ~~CLI `--name` オプション~~ **完了**          | convert/gen/presets の出力調律名を上書き済み                                                                                                                 | —                                                                         | —                                                                                                                                          |
+| ~~RTT: 最適生成音程~~ **完了**                | `generator-tuning.ts`(閉形式・重み付き最小二乗)。CLI 表面は未実装(温度律カタログが要るため)                                                                  | —                                                                         | —                                                                                                                                          |
+| RTT 指標の拡充(任意)                          | TE誤差・badness・rank-2 temperament の探索(Erlich "A Middle Path")。土台は実装済み: `edo-error.ts`(相対誤差・consistency)と `val.ts`(patent val・コンマ消失) | `src/core/edo-error.ts`、`src/core/val.ts`、`src/core/temperament.ts`     | **公刊された既知値をオラクルにする**(例: 46-EDO が13-odd-limit最小、17-EDO の patent val = `<17 27 39]`、meantone EDO = 12/19/26/31/43/50) |
+| 歴史的調律の追加拡充                          | Young II・Vallotti・Meantone 各種等(**理論的調律は CARE ゲート対象外** — §2-7)                                                                               | 既存プリセット5件のパターン(`src/data/presets.ts` 末尾)+ 検証オラクル必須 | オラクルテスト + `ruri presets` 実機                                                                                                       |
+| `info` の追加診断                             | 平均ステップ・協和スコア等(慎重に、ノイズにしない)                                                                                                           | `tuningMosPattern`・`chordDissonance` 等                                  | 実機で有用性確認                                                                                                                           |
 
 ### 人的ゲート付き(ユーザー承認なしに着手禁止)
 
@@ -115,13 +139,13 @@ git commit / push    # メッセージに検証結果を書く
 
 ## 8. ドキュメントマップ
 
-| ファイル | 内容 |
-|----------|------|
-| `docs/model-handbook.md` | 本書(作業指示・不変条件・バックログ) |
-| `docs/first-principles-2026-07.md` | 目的から再導出した過不足分析(90.6%の過剰・データ不足・CAREゲートの誤適用) |
-| `docs/product-review.md` | 内部監査ベースの過不足リスト(2026-06/07) |
-| `docs/research-2026-07.md` | 外部リサーチ(論文・標準・ツール)+ 出典付き改善リスト |
-| `docs/release-note.md` | v0.1.0 リリース手順(オーナー権限が必要な残作業) |
-| `docs/ci-workflow-note.md` / `docs/ci.yml.proposed` | CI workflow の手動適用手順 |
-| `src/core/CLAUDE.md` / `src/adapters/CLAUDE.md` | 層別の不変条件・バイナリ Gotchas |
-| `CHANGELOG.md` | Keep a Changelog 形式(0.1.0 確定済み・Unreleased 継続中) |
+| ファイル                                            | 内容                                                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------- |
+| `docs/model-handbook.md`                            | 本書(作業指示・不変条件・バックログ)                                      |
+| `docs/first-principles-2026-07.md`                  | 目的から再導出した過不足分析(90.6%の過剰・データ不足・CAREゲートの誤適用) |
+| `docs/product-review.md`                            | 内部監査ベースの過不足リスト(2026-06/07)                                  |
+| `docs/research-2026-07.md`                          | 外部リサーチ(論文・標準・ツール)+ 出典付き改善リスト                      |
+| `docs/release-note.md`                              | v0.1.0 リリース手順(オーナー権限が必要な残作業)                           |
+| `docs/ci-workflow-note.md` / `docs/ci.yml.proposed` | CI workflow の手動適用手順                                                |
+| `src/core/CLAUDE.md` / `src/adapters/CLAUDE.md`     | 層別の不変条件・バイナリ Gotchas                                          |
+| `CHANGELOG.md`                                      | Keep a Changelog 形式(0.1.0 確定済み・Unreleased 継続中)                  |
