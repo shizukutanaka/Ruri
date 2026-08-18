@@ -10,11 +10,10 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'text-summary'],
       include: ['src/**/*.ts'],
-      // The gate guards hand-written code. scale.ts and presets.ts are
-      // machine-generated, are not part of the public API, and no longer have
-      // a runnable suite of their own — including them measured the generator,
-      // not the project, and was why this gate read ~36% and was ignored.
-      exclude: ['src/**/*.test.ts', 'src/**/index.ts', 'src/core/scale.ts', 'src/data/presets.ts'],
+      // Every file under src/ is now reachable code, so every file is
+      // measured. The earlier carve-out for scale.ts and presets.ts existed
+      // only because they were 119,000 lines of unreachable generated bulk.
+      exclude: ['src/**/*.test.ts', 'src/**/index.ts'],
       thresholds: {
         lines: 95,
         functions: 98,

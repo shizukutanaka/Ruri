@@ -11,6 +11,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ### Removed
 
+- **The unreachable generated implementation — 119,000 lines.** Curating the public API and deleting the generated tests exposed the real question: how much of `scale.ts` and `presets.ts` is reachable at all? Computing the transitive closure from the curated barrels, the CLI and the hand-written adapters gave the answer: **536 of 3,711 declarations in `scale.ts` and 32 of 2,206 in `presets.ts`**. The rest was reachable only from itself. `scale.ts` is now 8,898 lines (was 80,234) and `presets.ts` 702 (was 38,695); `src/` drops from 186,604 to **50,339 lines**. Tests that existed solely to exercise the deleted code went with it (7,485 → 3,466), and `presets.test.ts` disappeared entirely because every test in it targeted generated functions. Nothing the product does changed: the CLI, every adapter, all twelve presets and all 367 public exports behave identically, verified from a clean `npm install` of the packed tarball.
+- With the bulk gone, the coverage gate no longer needs its carve-out: **every file under `src/` is measured**, at 97.06% statements / 94.35% branches / 98.78% functions against thresholds of 95/90/98/95.
+
 - **99,237 lines of machine-generated tests** (`scale-generated.test.ts`, `presets-generated.test.ts` — 12,311 cases). They were excluded from `test`, from `lint` and from `coverage`, so the only way to run them was a manual script taking roughly five hours; in practice they never ran. A test that never runs provides no protection, only the appearance of it, and the hand-written suites already contribute 5,797 cases over the same modules. Deleting them let the workarounds go too: `test`, `lint` and `coverage` no longer carry `--exclude`/`--ignore-pattern` flags, and the `test:generated` script is gone. The test count is unchanged at 7,485, which is the proof they were contributing nothing.
 
 ### Changed
