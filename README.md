@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成・RTT解析)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun/UMP/Scale Workshop)+ `src/data`(出典付き調律12件)+ `shell-web`(デモUI)+ `ruri` CLI。高速テスト **7,485件**(`npm test`、約1.5分)、zero runtime-dep。公開APIは意図的に絞った367シンボル(`src/api-surface.test.ts` が固定)。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成・RTT解析)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun/UMP/Scale Workshop)+ `src/data`(出典付き調律12件)+ `shell-web`(デモUI)+ `ruri` CLI。高速テスト **3,466件**(`npm test`、約1.5分)、zero runtime-dep、`src/` 50,339行(到達不能な生成コードは2026-07に削除)。公開APIは意図的に絞った367シンボル(`src/api-surface.test.ts` が固定)。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
