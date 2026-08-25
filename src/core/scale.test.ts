@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { equalTemperament12, edo, degreeToFreq, defineTuning } from './tuning.js';
 import { generatedTuning } from './generate.js';
-import { rankChords } from './chord-search.js';
+import { rankChords, optimalChordOrder, rankedChordToChord } from './chord-search.js';
 import { harmonicSpectrum, bellSpectrum } from './spectrum.js';
 import { chordDissonance } from './dissonance.js';
 import { cents as pitchFromCents, fromRatio } from './cents.js';
@@ -26,6 +26,11 @@ import {
   scaleMode,
   scaleToTuning,
   tuningToScale,
+  bestModeForTuning,
+  bestProgressionForScale,
+  singleBestChord,
+  chordMapAnalysis,
+  progressionEnergyShape,
   tuningHarmonicityProfile,
   tuningHarmonicityCorrelation,
   scaleDissonance,
@@ -49,14 +54,12 @@ import {
   chordProgressionAnalysis,
   scaleToChordMap,
   progressionFromPattern,
-  chordMapAnalysis,
   progressionScoreSummary,
   tuningReport,
   annotateProgression,
   progressionClimaxChord,
   progressionResolutionChord,
   chordDescription,
-  progressionEnergyShape,
   tuningIntervalHistogram,
   scaleIntervalVector,
   progressionDissonanceDelta,
@@ -9305,5 +9308,183 @@ describe('tuningHarmonicityCorrelation (Q191)', () => {
 
   it('test_empty_tuning_throws', () => {
     expect(() => tuningHarmonicityCorrelation({ ...t12, degrees: [] }, just5)).toThrow(RangeError);
+  });
+});
+
+// Q119 — bestProgressionForScale: the top-N diatonic chords in voice-leading order.
+describe('bestProgressionForScale (Q119)', () => {
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+  const spectrum = harmonicSpectrum();
+
+  it('test_returns_the_requested_number_of_chords', () => {
+    expect(bestProgressionForScale(major, t12, spectrum).length).toBe(4);
+    expect(bestProgressionForScale(major, t12, spectrum, 3).length).toBe(3);
+    expect(bestProgressionForScale(major, t12, spectrum, 1).length).toBe(1);
+  });
+
+  it('test_chords_have_the_requested_size', () => {
+    for (const c of bestProgressionForScale(major, t12, spectrum, 3, 4)) {
+      expect(c.intervals.length).toBe(4);
+    }
+  });
+
+  it('test_result_is_a_permutation_of_the_top_ranked_chords', () => {
+    // Step 1 picks by consonance, step 3 only reorders — the set must not change.
+    const prog = bestProgressionForScale(major, t12, spectrum);
+    const ranked = rankScaleChords(major, t12, {
+      size: 3,
+      spectrum,
+      limit: 4,
+      rootHz: t12.referenceHz,
+    });
+    const key = (cs: number[]): string => cs.join(',');
+    expect(prog.map((c) => key(chordToCents(c))).sort()).toEqual(
+      ranked.map((r) => key(chordToCents(rankedChordToChord(r)))).sort(),
+    );
+  });
+
+  it('test_the_order_is_the_voice_leading_optimum', () => {
+    const prog = bestProgressionForScale(major, t12, spectrum);
+    const reordered = optimalChordOrder(prog, t12.referenceHz);
+    // Already optimal, so re-optimising cannot improve the total motion.
+    expect(reordered.totalCents).toBeCloseTo(
+      optimalChordOrder([...prog].reverse(), t12.referenceHz).totalCents,
+      9,
+    );
+  });
+
+  it('test_rootHz_defaults_to_the_tuning_reference', () => {
+    const implicit = bestProgressionForScale(major, t12, spectrum);
+    const explicit = bestProgressionForScale(major, t12, spectrum, 4, 3, t12.referenceHz);
+    expect(implicit.map(chordToCents)).toEqual(explicit.map(chordToCents));
+  });
+
+  it('test_non_positive_or_fractional_numChords_throws', () => {
+    expect(() => bestProgressionForScale(major, t12, spectrum, 0)).toThrow(RangeError);
+    expect(() => bestProgressionForScale(major, t12, spectrum, -1)).toThrow(RangeError);
+    expect(() => bestProgressionForScale(major, t12, spectrum, 2.5)).toThrow(RangeError);
+  });
+
+  it('test_requesting_more_chords_than_the_scale_can_supply_throws', () => {
+    const tiny: Scale = { id: 'tiny', name: 'Tiny', tuningId: '12-tet', degreeIndices: [0, 4, 7] };
+    // Exactly one 3-note chord is drawable from a 3-note scale.
+    expect(() => bestProgressionForScale(tiny, t12, spectrum, 2)).toThrow(RangeError);
+  });
+
+  it('test_mismatched_tuning_throws', () => {
+    expect(() => bestProgressionForScale(major, edo(19, 440), spectrum)).toThrow(RangeError);
+  });
+});
+
+// Q206 — singleBestChord: the most consonant diatonic chord, with its acoustic scores.
+describe('singleBestChord (Q206)', () => {
+  const major: Scale = {
+    id: 'major',
+    name: 'Ionian',
+    tuningId: '12-tet',
+    degreeIndices: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  it('test_agrees_with_the_head_of_chordMapAnalysis', () => {
+    const best = singleBestChord(major, t12);
+    const head = chordMapAnalysis(major, t12, harmonicSpectrum())[0]!;
+    expect(best.degreeOffset).toBe(head.degreeOffset);
+    expect(best.dissonance).toBe(head.dissonance);
+    expect(best.harmonicity).toBe(head.harmonicity);
+  });
+
+  it('test_it_really_is_the_minimum_dissonance_entry', () => {
+    const best = singleBestChord(major, t12);
+    for (const e of chordMapAnalysis(major, t12, harmonicSpectrum())) {
+      expect(e.dissonance).toBeGreaterThanOrEqual(best.dissonance);
+    }
+  });
+
+  it('test_spectrum_defaults_to_a_harmonic_timbre', () => {
+    expect(singleBestChord(major, t12).dissonance).toBe(
+      singleBestChord(major, t12, harmonicSpectrum()).dissonance,
+    );
+  });
+
+  it('test_a_bell_timbre_can_pick_a_different_chord', () => {
+    // Consonance is a property of the timbre, not of the interval names.
+    const bell = singleBestChord(major, t12, bellSpectrum());
+    expect(bell.dissonance).toBeGreaterThan(0);
+    expect(bell.chord.intervals.length).toBe(3);
+  });
+
+  it('test_a_one_note_scale_still_yields_a_chord_by_wrapping', () => {
+    // scaleToChordMap stacks scale steps modulo n, so a single degree produces one
+    // entry whose three members are the same pitch. singleBestChord's "no entries"
+    // guard is therefore unreachable from any non-empty scale.
+    const single: Scale = { id: 'one', name: 'One', tuningId: '12-tet', degreeIndices: [0] };
+    const best = singleBestChord(single, t12);
+    expect(best.degreeOffset).toBe(0);
+    expect(best.chord.intervals.length).toBe(3);
+  });
+
+  it('test_an_empty_scale_throws', () => {
+    const empty: Scale = { id: 'none', name: 'None', tuningId: '12-tet', degreeIndices: [] };
+    expect(() => singleBestChord(empty, t12)).toThrow(RangeError);
+  });
+});
+
+// Q231 — progressionEnergyShape: the arch/valley branches of the shape classifier.
+describe('progressionEnergyShape — arch and valley (Q231)', () => {
+  const consonant = chordFromSemitones('maj', [0, 4, 7]);
+  const rough = chordFromSemitones('cluster', [0, 1, 2]);
+  const spectrum = harmonicSpectrum();
+
+  it('test_tension_peaking_in_the_middle_is_an_arch', () => {
+    // Verified arc: 0.602, 1.700, 0.602 — max in the middle third, ends identical.
+    expect(progressionEnergyShape([consonant, rough, consonant], 440, spectrum)).toBe('arch');
+  });
+
+  it('test_tension_dipping_in_the_middle_is_a_valley', () => {
+    expect(progressionEnergyShape([rough, consonant, rough], 440, spectrum)).toBe('valley');
+  });
+
+  it('test_monotone_runs_are_still_classified_by_direction', () => {
+    expect(progressionEnergyShape([consonant, rough], 440, spectrum)).toBe('ascending');
+    expect(progressionEnergyShape([rough, consonant], 440, spectrum)).toBe('descending');
+  });
+
+  it('test_a_repeated_chord_is_flat', () => {
+    expect(
+      progressionEnergyShape([consonant, consonant, consonant, consonant], 440, spectrum),
+    ).toBe('flat');
+  });
+});
+
+// Q133 — bestModeForTuning: a tuning's best modal rotation in one call.
+describe('bestModeForTuning (Q133)', () => {
+  it('test_returns_a_full_length_rotation_of_the_tuning', () => {
+    const mode = bestModeForTuning(t12);
+    expect(mode.degreeIndices.length).toBe(t12.degrees.length);
+    expect(mode.tuningId).toBe(t12.id);
+  });
+
+  it('test_a_spectrum_switches_to_the_timbre_weighted_ranking', () => {
+    const plain = bestModeForTuning(t12);
+    const timbred = bestModeForTuning(t12, harmonicSpectrum());
+    expect(timbred.degreeIndices.length).toBe(plain.degreeIndices.length);
+  });
+
+  it('test_an_empty_tuning_throws', () => {
+    expect(() => bestModeForTuning({ ...t12, degrees: [] })).toThrow(RangeError);
+  });
+
+  it('test_every_rotation_of_a_tuning_has_the_same_degree_count', () => {
+    // The invariant that made the old `maxDegrees` parameter useless: it could only
+    // ever filter nothing or filter everything, never narrow a result.
+    const t19 = edo(19, 440);
+    for (const mode of scaleModeSeries(tuningToScale(t19), t19)) {
+      expect(mode.degreeIndices.length).toBe(19);
+    }
   });
 });

@@ -1311,13 +1311,16 @@ export function bestChordMapEntry(
  *     return the first entry's Scale.
  * 2b. If `spectrum` provided: `rankAllModesForTimbre(scale, tuning, spectrum)` → sort by
  *     combinedScore (roughness + harmonicity); return the first entry's Scale.
- * 3. `maxDegrees`: if provided, only consider modes with `degreeIndices.length <= maxDegrees`.
+ *
+ * There was a third `maxDegrees` parameter, meant to "limit the search space for large
+ * tunings". It could not do that: both ranking functions rank `scaleModeSeries`, whose
+ * rotations all have exactly as many degrees as the tuning. So `maxDegrees >= n` filtered
+ * nothing and `maxDegrees < n` filtered *everything* and threw — the parameter had no
+ * setting that narrowed a result. It is gone; no caller ever passed it.
  *
  * @param tuning     - The parent `TuningSystem`.
  * @param spectrum   - Optional instrument spectrum. When provided, combines roughness and
  *                     harmonicity via `rankAllModesForTimbre`. When omitted, uses harmonicity only.
- * @param maxDegrees - Optional filter: only modes with this many or fewer degrees are
- *                     considered. Useful for large tunings to limit search space.
  * @returns The `Scale` of the most harmonically optimal mode.
  *
  * @throws {RangeError} if the tuning has no degrees.
@@ -1331,31 +1334,18 @@ export function bestChordMapEntry(
  * // With timbre:
  * const bestMode = bestModeForTuning(t12, harmonicSpectrum());
  */
-export function bestModeForTuning(
-  tuning: TuningSystem,
-  spectrum?: Spectrum,
-  maxDegrees?: number,
-): Scale {
+export function bestModeForTuning(tuning: TuningSystem, spectrum?: Spectrum): Scale {
+  if (tuning.degrees.length === 0) {
+    throw new RangeError('bestModeForTuning: tuning has no degrees');
+  }
   const fullScale = tuningToScale(tuning);
 
+  // Both rankings cover every rotation of a non-empty scale, so the head always exists.
   if (spectrum !== undefined) {
-    let ranked = rankAllModesForTimbre(fullScale, tuning, spectrum);
-    if (maxDegrees !== undefined) {
-      ranked = ranked.filter((e) => e.scale.degreeIndices.length <= maxDegrees);
-    }
-    if (ranked.length === 0) {
-      throw new RangeError('bestModeForTuning: no modes satisfy the maxDegrees constraint');
-    }
+    const ranked = rankAllModesForTimbre(fullScale, tuning, spectrum);
     return (ranked[0] as RankedModeForTimbre).scale;
   }
-
-  let ranked = rankModeSeriesByHarmonicity(fullScale, tuning);
-  if (maxDegrees !== undefined) {
-    ranked = ranked.filter((e) => e.scale.degreeIndices.length <= maxDegrees);
-  }
-  if (ranked.length === 0) {
-    throw new RangeError('bestModeForTuning: no modes satisfy the maxDegrees constraint');
-  }
+  const ranked = rankModeSeriesByHarmonicity(fullScale, tuning);
   return (ranked[0] as RankedModeByHarmonicity).scale;
 }
 
