@@ -7,6 +7,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ### Fixed
 
+- **devDependency vulnerabilities: 10 → 0.** `npm audit` reported 2 critical, 5 high and 3 moderate, all reachable only through the vitest 2 toolchain (vitest, vite, esbuild, postcss, nanoid). vitest 4 fixes them. The upgrade was previously deferred as risky because it would "break the test split" — but that split was deleted, so the reason no longer existed.
+- **`src/adapters/wav.ts`: 2,284 → 439 lines.** The vitest 4 upgrade enforced a 5-second default test timeout that vitest 2 had let slide, which failed seven tests taking 7–26 seconds each. They turned out to be rendering audio for `tuningModeProgressionWavBundles` and `tuningFamilyProgressionWavBundles` — generated analytics called from nowhere outside the module and its own test. Applying the same reachability closure kept 16 of 57 exports. The fix for the timeout was deletion, not a larger timeout.
+- As a direct consequence, **`npm run check` went from 1m34s to 18 seconds** (tests 82s → 6.9s). Accelerating the cycle came free from deleting the part, which is the order Musk's algorithm prescribes.
+
 - **The coverage gate now measures the project rather than the generator.** It demanded 80% and read ~36%, so it had never passed and was documented as "do not use for pass/fail". The cause was not a strict threshold but a wrong denominator: `include` counted the 128,000 lines of machine-generated implementation. Measured over hand-written code alone, coverage is **98.18% lines, 94.58% branches, 100% functions, 98.18% statements**, with no file below 80%. The generated implementations are excluded (they are not public API and their generated suites are gone), and the thresholds were **raised** to 95/90/98/95 — a real gate with headroom, not a lowered bar.
 
 ### Removed
