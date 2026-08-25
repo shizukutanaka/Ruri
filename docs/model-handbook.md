@@ -11,8 +11,8 @@
 - **プロダクトは完成・公開済み**。このリポジトリのデフォルトブランチ
   (`claude/product-analysis-sonnet-x86ho5` — master/main は存在しない)の head が
   v0.1.0 相当の検証済み完成品。**push した時点で GitHub 公開**となる。
-- 規模感: `src/` **46,619行**、高速テスト **3,268件**(`npm test`、**約7秒**)。
-  公開API **326**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
+- 規模感: `src/` **39,247行**、高速テスト **2,899件**(`npm test`、**約8秒**)。
+  公開API **328**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
   adapters(SMF・Scala .scl/.kbm・MPE・MTS SysEx・AnaMark .tun・MIDI 2.0 UMP・WAV)/
   data(出典必須プリセット)/ CLI(`ruri info/convert/gen/render`)。
 - CHANGELOG は `[0.1.0] - 2026-07-14` を確定済み。**タグと GitHub Release は未作成**
@@ -48,7 +48,7 @@
 
 - `src/core/index.ts` / `src/data/index.ts` は**curated barrel**。かつて 1,445 名を
   明示 export していたが README が記載するのは 56 — 26:1 で検索不能だった。
-  現在 **326 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
+  現在 **328 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
   パス直指定 import は可能。変えたのは「パッケージが何を提供するか」だけ。
 - `src/api-surface.test.ts` がこれを固定(README掲載シンボルの解決・解析モジュールの
   到達性・生成名が公開されていないこと・総数の上下限)。**barrel に `export *` を
@@ -83,9 +83,15 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同じモジュールを 5,797 ケースで覆う。削除後もテスト数は 7,485 で不変 = 寄与ゼロの証拠。
   **機械生成テストを再導入しない**。
 - **カバレッジゲートは修正済み・合否判定に使える**(2026-07)。閾値 95/90/98/95
-  (lines/branches/functions/statements)に対し実測 **96.67 / 90.27 / 98.15 / 95.87**。
-  branches は余裕 0.27pt と薄い — 落ちたらゲートが機能した証拠なので**閾値を下げず**
-  カバレッジを足すこと。
+  (lines/branches/functions/statements)に対し実測 **97.07 / 92.03 / 99.42 / 97.77**。
+  落ちたらゲートが機能した証拠なので**閾値を下げず**カバレッジを足すこと。
+- **未テスト関数は実在バグの在処**。functions 閾値が 0.02pt 足りず落ちたのを
+  追ったところ、テストが1件も無い公開関数6件が出てきて、うち2件が壊れていた:
+  `tuningHarmonicityProfile` は**全調律で定数**を返し(`scaleMode` は degree-index
+  空間で回すので、全degreeを選ぶ scale の回転は恒等写像 — 修正は cents 空間で
+  `c[(k+i) mod n] − c[k]` を組む)、その結果 `tuningHarmonicityCorrelation` は
+  **常に NaN**、`comparePresets(...).correlation` も同様だった。
+  **閾値に合わせて数字を足すのではなく、未テスト関数を実際に呼んで検算する**。
   生成層の削除後は **carve-out なしで `src/` 全ファイルを計測**している。
   かつて「80%閾値 vs 実測35.8%」と乖離していたのは**測る対象が誤っていた**ため —
   12.8万行の機械生成実装を分母に含めていた。その実装自体を削除したので、
@@ -105,11 +111,11 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
 ## 5. やらないこと(過剰の再発防止)
 
 - **`src/core/scale.ts` に関数を追加しない**。2026-07 に到達不能な生成関数を削除し
-  3,711→536 宣言(80,234→8,898行)に縮小した。再肥大させないこと。理論層
+  3,711→440 宣言(80,234→4,759行)に縮小した。再肥大させないこと。理論層
   (MOS・well-formed・最大均等・協和・temperament)は完備。新しい価値は
   「既存関数の CLI/アダプタへの配線」「実バグ修正」「相互運用」にある。
 - **機械生成コードを再導入しない**。`presets.ts` も 2,206→32 宣言(38,695→702行)。
-  `src/` 全体は 186,604→**46,619行**。`adapters/wav.ts` も 57→16 export(2,284→439行)。
+  `src/` 全体は 186,604→**39,247行**。`adapters/wav.ts` も 57→16 export(2,284→439行)。
   到達可能性は curated barrel + CLI + 手書きアダプタ/結合テストからの推移閉包で判定した。
 - familiarity スコアの実装(§2-3)、タグ/workflow push の再試行ループ(§4)、
   調律プリセットの独断追加(§6 C-4 の人的ゲート)。

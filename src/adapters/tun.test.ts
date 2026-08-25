@@ -11,6 +11,7 @@ import {
   scaleProgressionBundle,
   tuningBundle,
   scaleFullBundle,
+  tuningToFullBundle,
 } from './tun.js';
 import { writeScl } from './scala.js';
 import { chordFromRatios, chordFromSemitones } from '../core/chord.js';
@@ -585,5 +586,47 @@ describe('scaleFullBundle (Q247)', () => {
   });
   it('scl contains !', () => {
     expect(scaleFullBundle(scale, t12).scl).toContain('!');
+  });
+});
+
+// Q246: tuningToFullBundle — a TuningSystem as WAV + SMF + SCL + TUN + MTS in one call
+describe('tuningToFullBundle (Q246)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('returns wav, smf, scl, tun, mts', () => {
+    const bundle = tuningToFullBundle(t12);
+    expect(bundle.wav).toBeInstanceOf(Uint8Array);
+    expect(bundle.smf).toBeInstanceOf(Uint8Array);
+    expect(typeof bundle.scl).toBe('string');
+    expect(typeof bundle.tun).toBe('string');
+    expect(bundle.mts).toBeInstanceOf(Uint8Array);
+  });
+
+  it('wav carries audio beyond the 44-byte header', () => {
+    expect(tuningToFullBundle(t12).wav.length).toBeGreaterThan(44);
+  });
+
+  it('scl and tun agree with the standalone writers', () => {
+    const bundle = tuningToFullBundle(t12);
+    expect(bundle.scl).toContain('!');
+    expect(bundle.tun).toBe(tuningToTun(t12));
+  });
+
+  it('smf starts with an MThd chunk', () => {
+    const { smf } = tuningToFullBundle(t12);
+    expect(String.fromCharCode(smf[0]!, smf[1]!, smf[2]!, smf[3]!)).toBe('MThd');
+  });
+
+  it('naming the tuning labels the MTS payload and leaves the TUN map unchanged', () => {
+    // `name` switches the TUN writer to an explicit anchorMidiNote of 69, which is
+    // already its default — so only the MTS bulk-dump name actually differs.
+    const named = tuningToFullBundle(t12, 440, undefined, { name: 'twelve' });
+    const anonymous = tuningToFullBundle(t12);
+    expect(named.tun).toBe(anonymous.tun);
+    expect(named.mts).not.toEqual(anonymous.mts);
+  });
+
+  it('omitting rootHz falls back to the tuning reference frequency', () => {
+    expect(tuningToFullBundle(t12).wav).toEqual(tuningToFullBundle(t12, t12.referenceHz).wav);
   });
 });

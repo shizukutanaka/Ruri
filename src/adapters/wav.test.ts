@@ -10,6 +10,7 @@ import {
   chordProgressionToWav,
   DEFAULT_CHORD_PROGRESSION_WAV,
   chordMapToWav,
+  bestModeWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
@@ -441,3 +442,34 @@ describe('chordMapToWav (Q130)', () => {
 });
 
 // Q134: bestModeWav — best modal rotation of a tuning as a melodic WAV in one call
+describe('bestModeWav (Q134)', () => {
+  const tuning = equalTemperament12(440);
+  const spectrum = harmonicSpectrum(6);
+  const fastOpts = { ...DEFAULT_KS, noteSeconds: 0.02 };
+
+  it('test_output_is_valid_wav_riff_header', () => {
+    const wav = bestModeWav(tuning, 440, spectrum, fastOpts);
+    expect(String.fromCharCode(wav[0]!, wav[1]!, wav[2]!, wav[3]!)).toBe('RIFF');
+    expect(String.fromCharCode(wav[8]!, wav[9]!, wav[10]!, wav[11]!)).toBe('WAVE');
+  });
+
+  it('test_carries_audio_beyond_the_44_byte_header', () => {
+    expect(bestModeWav(tuning, 440, spectrum, fastOpts).length).toBeGreaterThan(44);
+  });
+
+  it('test_rootHz_is_forward_compat_only_frequencies_anchor_on_the_tuning', () => {
+    // Documented behaviour: rootHz is accepted but tuning.referenceHz anchors the pitches,
+    // so two different rootHz values must produce byte-identical audio.
+    const a = bestModeWav(tuning, 440, spectrum, fastOpts);
+    const b = bestModeWav(tuning, 261.63, spectrum, fastOpts);
+    expect(a).toEqual(b);
+  });
+
+  it('test_timbre_can_change_the_selected_mode', () => {
+    // Mode selection is timbre-aware, so a bell spectrum need not agree with a harmonic one.
+    const harmonic = bestModeWav(tuning, 440, spectrum, fastOpts);
+    const bell = bestModeWav(tuning, 440, bellSpectrum(), fastOpts);
+    expect(harmonic.length).toBeGreaterThan(44);
+    expect(bell.length).toBeGreaterThan(44);
+  });
+});

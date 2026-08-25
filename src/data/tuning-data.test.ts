@@ -20,6 +20,10 @@ import {
   presetChordProgression,
   presetToMtsAndSmf,
   rankPresetsByDistance,
+  closestPreset,
+  closestPresetTuning,
+  allPresetReports,
+  comparePresets,
 } from './presets.js';
 import { degreeToCents, equalTemperament12, edo } from '../core/tuning.js';
 import { pitchToCents } from '../core/cents.js';
@@ -653,5 +657,125 @@ describe('Vallotti and Young II — 1/6-comma circulating temperaments', () => {
       expect(ALL_PRESETS.some((x) => x.id === p.id)).toBe(true);
       expect(getTuningById(p.id)).toBeDefined();
     }
+  });
+});
+
+// Q149 — closestPreset: the preset nearest a given TuningSystem by tuning distance
+describe('closestPreset (Q149)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_12tet_is_its_own_closest_preset', () => {
+    expect(closestPreset(t12)!.id).toBe(TWELVE_TET.id);
+  });
+
+  it('test_empty_pool_returns_undefined', () => {
+    expect(closestPreset(t12, [])).toBeUndefined();
+  });
+
+  it('test_single_preset_pool_returns_that_preset', () => {
+    expect(closestPreset(t12, [MAKAM_USSAK])!.id).toBe(MAKAM_USSAK.id);
+  });
+
+  it('test_agrees_with_the_head_of_rankPresetsByDistance', () => {
+    const t19 = edo(19, 440);
+    expect(closestPreset(t19)!.id).toBe(rankPresetsByDistance(t19)[0]!.preset.id);
+  });
+
+  it('test_custom_pool_is_respected', () => {
+    const pool = [SLENDRO_EXAMPLE, MAKAM_USSAK];
+    expect(pool.map((p) => p.id)).toContain(closestPreset(t12, pool)!.id);
+  });
+});
+
+// Q173 — closestPresetTuning: the loaded TuningSystem of the closest preset
+describe('closestPresetTuning (Q173)', () => {
+  const t12 = equalTemperament12(440);
+
+  it('test_returns_the_tuning_of_the_closest_preset', () => {
+    const tuning = closestPresetTuning(t12)!;
+    expect(tuning.id).toBe(loadTuningPreset(closestPreset(t12)!).id);
+  });
+
+  it('test_12tet_recovers_twelve_equal_steps', () => {
+    const tuning = closestPresetTuning(t12, [TWELVE_TET, MAKAM_USSAK])!;
+    const cents = tuning.degrees.map((d) => pitchToCents(d));
+    expect(cents.length).toBe(12);
+    expect(cents[7]!).toBeCloseTo(700, 6);
+  });
+
+  it('test_empty_pool_returns_undefined', () => {
+    expect(closestPresetTuning(t12, [])).toBeUndefined();
+  });
+});
+
+// Q207 — allPresetReports: a tuning report for every preset in one call
+describe('allPresetReports (Q207)', () => {
+  it('test_one_report_per_preset_in_pool_order', () => {
+    const pool = [TWELVE_TET, PYTHAGOREAN_12, WERCKMEISTER_III];
+    const reports = allPresetReports(261.63, undefined, pool);
+    expect(reports.map((r) => r.preset.id)).toEqual(pool.map((p) => p.id));
+  });
+
+  it('test_each_report_carries_a_best_mode', () => {
+    for (const { report } of allPresetReports(261.63, undefined, [TWELVE_TET, KIRNBERGER_III])) {
+      expect(Number.isFinite(report.bestMode.harmonicity)).toBe(true);
+    }
+  });
+
+  it('test_spectrum_is_threaded_through_to_the_reports', () => {
+    const pool = [WERCKMEISTER_III];
+    const plain = allPresetReports(261.63, undefined, pool)[0]!.report;
+    const timbred = allPresetReports(261.63, harmonicSpectrum(6), pool)[0]!.report;
+    // The tuning identity is spectrum-independent; the harmonicity profile is a pure
+    // property of the interval set, so both must agree regardless of timbre.
+    expect(plain.id).toBe(timbred.id);
+    expect(plain.harmonicityProfile).toEqual(timbred.harmonicityProfile);
+  });
+
+  it('test_empty_pool_returns_empty', () => {
+    expect(allPresetReports(261.63, undefined, [])).toEqual([]);
+  });
+});
+
+// Q222 — comparePresets: compare two presets by id in one call
+describe('comparePresets (Q222)', () => {
+  it('test_resolves_both_ids_and_returns_a_comparison', () => {
+    const result = comparePresets(TWELVE_TET.id, PYTHAGOREAN_12.id)!;
+    expect(result.a.id).toBe(TWELVE_TET.id);
+    expect(result.b.id).toBe(PYTHAGOREAN_12.id);
+    expect(Number.isFinite(result.comparison.harmonicityDistanceDiff)).toBe(true);
+  });
+
+  it('test_a_preset_compared_with_itself_correlates_perfectly', () => {
+    // Uses an unequal preset: an equal temperament has a constant harmonicity profile,
+    // so its Pearson correlation is undefined (NaN) rather than 1.
+    const result = comparePresets(JUST_INTONATION_5L.id, JUST_INTONATION_5L.id)!;
+    expect(result.comparison.correlation).toBeCloseTo(1, 6);
+    expect(result.comparison.harmonicityDistanceDiff).toBeCloseTo(0, 9);
+  });
+
+  it('test_correlation_is_nan_when_either_side_is_an_equal_temperament', () => {
+    const result = comparePresets(TWELVE_TET.id, PYTHAGOREAN_12.id)!;
+    expect(Number.isNaN(result.comparison.correlation)).toBe(true);
+  });
+
+  it('test_unknown_id_returns_undefined', () => {
+    expect(comparePresets('no-such-preset', TWELVE_TET.id)).toBeUndefined();
+    expect(comparePresets(TWELVE_TET.id, 'no-such-preset')).toBeUndefined();
+  });
+
+  it('test_rootHz_defaults_to_440', () => {
+    const explicit = comparePresets(JUST_INTONATION_5L.id, PYTHAGOREAN_12.id, 440)!;
+    const implicit = comparePresets(JUST_INTONATION_5L.id, PYTHAGOREAN_12.id)!;
+    expect(implicit.comparison.correlation).toBeCloseTo(explicit.comparison.correlation, 12);
+    expect(implicit.comparison.a.bestMode.harmonicity).toBe(
+      explicit.comparison.a.bestMode.harmonicity,
+    );
+  });
+
+  it('test_ids_outside_the_custom_pool_are_not_found', () => {
+    expect(
+      comparePresets(TWELVE_TET.id, PYTHAGOREAN_12.id, 440, undefined, [TWELVE_TET]),
+    ).toBeUndefined();
   });
 });

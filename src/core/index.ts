@@ -43,6 +43,8 @@ export {
   progressionSmoothnessRatio,
   tuningReport,
   compareTuningReports,
+  tuningHarmonicityProfile,
+  tuningHarmonicityCorrelation,
   tuningIntervalHistogram,
   synthScaleFromScale,
   scaleProgressionHarmonicity,
