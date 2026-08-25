@@ -1,4 +1,4 @@
-# リリース公開の手動仕上げについて(v0.1.0)
+# リリース公開の手動仕上げについて(v0.2.0)
 
 ## 現在の公開状態
 
@@ -29,12 +29,12 @@
 ```
 git checkout claude/product-analysis-sonnet-x86ho5
 git pull
-git tag -a v0.1.0 -m "Ruri v0.1.0"
-git push origin v0.1.0
+git tag -a v0.2.0 -m "Ruri v0.2.0"
+git push origin v0.2.0
 ```
 
-その後、GitHub の Releases UI で **v0.1.0** の Release を作成し、本文には
-`CHANGELOG.md` の `[0.1.0]` 節を貼り付ける(target は上記タグ)。
+その後、GitHub の Releases UI で **v0.2.0** の Release を作成し、本文には
+`CHANGELOG.md` の `[0.2.0]` 節を貼り付ける(target は上記タグ)。
 
 ### 2. CI ワークフロー(任意)
 
@@ -53,3 +53,24 @@ npm publish        # prepublishOnly が check + build を自動実行
 
 `package.json` の `exports`(`.` / `./core` / `./adapters` / `./data`)・`bin`・
 `files` は公開向けに設定済み。
+
+---
+
+## v0.2.0 時点の検証状況(2026-07-27)
+
+`package.json` は **0.2.0**、CHANGELOG も同版を cut 済み。オーナーは以下だけで完了する:
+
+```
+git tag -a v0.2.0 -m "Ruri v0.2.0" && git push origin v0.2.0
+# Releases UI で v0.2.0 を作成し CHANGELOG の [0.2.0] 節を本文に
+npm publish        # 任意。prepublishOnly が check + build を自動実行
+```
+
+確認済み(すべて実測):
+
+- `npm run check` 全緑(typecheck / lint / format / **3,268 テスト、約7秒**)
+- `vitest run --coverage` exit 0(96.67 / 90.27 / 98.15 / 95.87 対 閾値 95/90/98/95、**除外なし**)
+- `npm audit` **脆弱性 0**(vitest 4)
+- `npm pack` → 別プロジェクトへ install → `ruri` ルート・`ruri/adapters` サブパス・
+  `bin` CLI(`edo` / `convert` / `gen --fit-timbre`)すべて動作
+- **破壊的変更あり**: 公開APIを 1,445 → 326 に絞った。Release 本文の Breaking 節を残すこと。

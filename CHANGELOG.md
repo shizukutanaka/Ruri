@@ -5,6 +5,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/), versioning: [SemVer](ht
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-27
+
+Analysis, interoperability and a large subtraction. The public API is
+deliberately curated for the first time (1,445 named exports down to 326) and
+roughly 220,000 lines of unreachable machine-generated code and its tests are
+gone. Nothing the product does was removed — verified from a clean install of
+the packed tarball.
+
+**Breaking:** the package no longer re-exports the machine-generated analytics
+layer. Every documented entry point, every analysis module and all twelve
+presets are unaffected; code importing generated names such as
+`tuningFamilyModeParetoFronts` from `'ruri'` must import from the module path
+instead, or pin 0.1.0.
+
 ### Fixed
 
 - **devDependency vulnerabilities: 10 → 0.** `npm audit` reported 2 critical, 5 high and 3 moderate, all reachable only through the vitest 2 toolchain (vitest, vite, esbuild, postcss, nanoid). vitest 4 fixes them. The upgrade was previously deferred as risky because it would "break the test split" — but that split was deleted, so the reason no longer existed.
