@@ -11,7 +11,7 @@
 - **プロダクトは完成・公開済み**。このリポジトリのデフォルトブランチ
   (`claude/product-analysis-sonnet-x86ho5` — master/main は存在しない)の head が
   v0.1.0 相当の検証済み完成品。**push した時点で GitHub 公開**となる。
-- 規模感: `src/` **37,799行**、高速テスト **2,811件**(`npm test`、**約9秒**)。
+- 規模感: `src/` **37,799行**、高速テスト **2,833件**(`npm test`、**約9秒**)。
   公開API **304**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
   adapters(SMF・Scala .scl/.kbm・MPE・MTS SysEx・AnaMark .tun・MIDI 2.0 UMP・WAV)/
   data(出典必須プリセット)/ CLI(`ruri info/convert/gen/render`)。
@@ -83,7 +83,7 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同じモジュールを 5,797 ケースで覆う。削除後もテスト数は 7,485 で不変 = 寄与ゼロの証拠。
   **機械生成テストを再導入しない**。
 - **カバレッジゲートは修正済み・合否判定に使える**(2026-07)。閾値 95/90/98/95
-  (lines/branches/functions/statements)に対し実測 **98.50 / 94.04 / 100 / 97.98**。
+  (lines/branches/functions/statements)に対し実測 **98.63 / 94.85 / 100 / 98.19**。
   落ちたらゲートが機能した証拠なので**閾値を下げず**カバレッジを足すこと。
   生成層の削除後は **carve-out なしで `src/` 全ファイルを計測**している。
   かつて「80%閾値 vs 実測35.8%」と乖離していたのは**測る対象が誤っていた**ため —
@@ -96,6 +96,13 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   `c[(k+i) mod n] − c[k]` を組む)、その結果 `tuningHarmonicityCorrelation` は
   **常に NaN**、`comparePresets(...).correlation` も同様だった。
   **閾値に合わせて数字を足すのではなく、未テスト関数を実際に呼んで検算する**。
+- **「黙って間違う」より「はっきり断る」**。`decodeSmf` は Program Change / Channel Pressure
+  (データバイト1個)の後を2バイト進めており、実機ファイル冒頭の音色指定で**以降の全音符を
+  黙って失っていた**。制限は docstring に書いてあったが、**沈黙のデータ欠損を文書化しても
+  fail-fast にはならない**。解釈不能なもの(可変長 SysEx 等)は推測せず throw する。
+- **ガードは条件が合っているか検算する**。`optimalGenerator` の `t.num * t.den || 2` は
+  「積が 0」を守っていたが正整数の積は 0 にならない。退化するのは**積が 1**(ユニゾン、
+  Tenney 高 0 → ゼロ除算)で、結果は全フィールド NaN だった。
 - **使われない引数は削除する**。`bestModeForTuning` の `maxDegrees` は「大きな調律で
   探索空間を絞る」ためとされていたが、両ランキングが対象とする `scaleModeSeries` の
   回転はすべて調律と同じ degree 数なので、`>= n` なら何も絞らず `< n` なら全部落として

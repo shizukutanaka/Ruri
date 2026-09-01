@@ -391,3 +391,12 @@ describe('scaleToVoices — Scale → Web Audio voices (Q98)', () => {
     }
   });
 });
+
+describe('strike — silent output', () => {
+  it('test_an_empty_spectrum_produces_silence_without_dividing_by_zero', () => {
+    // Peak normalisation must not turn an all-zero buffer into NaNs.
+    const wave = strike(440, [], { sampleRate: 100, seconds: 0.01, decay: 3 });
+    expect(wave.length).toBeGreaterThan(0);
+    expect(Array.from(wave).every((s) => s === 0)).toBe(true);
+  });
+});

@@ -164,3 +164,57 @@ describe('generatorError', () => {
     expect(() => generatorError(700, [])).toThrow(RangeError);
   });
 });
+
+describe('optimalGenerator — weighting and degenerate targets', () => {
+  // Meantone: 3/2 is one generator; 5/4 is four generators less two periods.
+  const meantone = [
+    { num: 3, den: 2, periods: 0, generators: 1 },
+    { num: 5, den: 4, periods: -2, generators: 4 },
+  ];
+
+  it('test_tenney_and_equal_weighting_choose_different_generators', () => {
+    // Verified numerically. Tenney weights the simpler ratio more heavily
+    // (3/2 gets 0.387 against 5/4's 0.231), so it pulls the generator toward a
+    // purer fifth; equal weighting treats both alike and lands nearer the
+    // quarter-comma value of 696.578c.
+    const tenney = optimalGenerator(meantone);
+    const equal = optimalGenerator(meantone, { weighting: 'equal' });
+    expect(tenney.generatorCents).toBeCloseTo(697.378, 3);
+    expect(equal.generatorCents).toBeCloseTo(696.895, 3);
+    expect(equal.generatorCents).toBeLessThan(tenney.generatorCents);
+  });
+
+  it('test_equal_weighting_reports_unit_weights', () => {
+    for (const t of optimalGenerator(meantone, { weighting: 'equal' }).targets) {
+      expect(t.weight).toBe(1);
+    }
+  });
+
+  it('test_each_weighting_minimises_its_own_error_measure', () => {
+    // The defining property: neither answer is "better" outright — each is
+    // optimal under its own weighting, so each beats the other on its own turf.
+    const tenney = optimalGenerator(meantone).generatorCents;
+    const equal = optimalGenerator(meantone, { weighting: 'equal' }).generatorCents;
+    expect(generatorError(tenney, meantone)).toBeLessThan(generatorError(equal, meantone));
+    expect(generatorError(equal, meantone, { weighting: 'equal' })).toBeLessThan(
+      generatorError(tenney, meantone, { weighting: 'equal' }),
+    );
+  });
+
+  it('test_a_unison_target_is_refused_rather_than_returning_NaN', () => {
+    // Tenney weight is 1/log2(num*den) and the unison's Tenney height is zero,
+    // so weighting it divided by zero and every result came back NaN — silently.
+    // A unison is not a tuning target: there is nothing about 1/1 to approximate.
+    const unison = [{ num: 1, den: 1, periods: 0, generators: 1 }];
+    expect(() => optimalGenerator(unison)).toThrow(RangeError);
+    expect(() => generatorError(700, unison)).toThrow(RangeError);
+    expect(() => optimalGenerator([{ num: 2, den: 2, periods: 0, generators: 1 }])).toThrow(
+      RangeError,
+    );
+  });
+
+  it('test_an_empty_target_list_is_refused', () => {
+    expect(() => optimalGenerator([])).toThrow(RangeError);
+    expect(() => generatorError(700, [])).toThrow(RangeError);
+  });
+});

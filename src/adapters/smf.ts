@@ -122,17 +122,23 @@ export function encodeSmf(
 /**
  * Minimal decoder: extract note-on/off pairs back into NoteEvents.
  *
- * **Scope**: designed exclusively to round-trip output produced by `encodeSmf` from
- * this library.  `encodeSmf` always emits explicit status bytes and never emits
- * Program Change, SysEx, or System Real-Time messages, so this decoder does not need
- * to handle them.  If fed arbitrary external MIDI files:
- * - Running status after meta events (`0xFF`) will be misinterpreted (the decoder
- *   sets `running = 0xFF` after meta events; a subsequent running-status note event
- *   would be parsed as another meta event, corrupting the stream).
- * - Program Change / Channel Pressure (1-byte data) and SysEx (variable-length) in
- *   the else-branch would mis-advance `p` by exactly 2 bytes, misaligning all reads.
+ * **Scope**: built to round-trip output produced by `encodeSmf`, which always emits
+ * explicit status bytes and only note events plus the end-of-track meta event.  It
+ * also reads the channel-message subset of ordinary Type-0 files: running status,
+ * Program Change and Channel Pressure (one data byte), and Control Change, Pitch
+ * Bend and Polyphonic Aftertouch (two).
  *
- * Do **not** use this as a general-purpose SMF parser.
+ * What it will **not** do is guess.  A byte-length mistake in this loop does not
+ * fail loudly — it misaligns every later read and quietly returns the wrong notes,
+ * or none.  So the cases it cannot parse throw instead:
+ * - SysEx and System Common (`0xF0`-`0xF7`) are variable-length. Refused.
+ * - Running status with no preceding channel status is malformed. Refused.
+ *
+ * Meta and System messages cancel running status, per the SMF specification, so a
+ * running-status note event after a meta event is read as a note, not as more meta.
+ *
+ * It remains a deliberately partial parser: multi-track (Type 1) files, tempo maps
+ * and controller data are ignored rather than represented.
  */
 export function decodeSmf(bytes: Uint8Array): { ppq: number; notes: NoteEvent[] } {
   const ascii = (o: number, n: number): string =>
@@ -153,11 +159,18 @@ export function decodeSmf(bytes: Uint8Array): { ppq: number; notes: NoteEvent[] 
     p += dt.length;
     let status = bytes[p]!;
     if (status & 0x80) p++;
-    else status = running; // running status
-    running = status;
+    else {
+      // Running status: the status byte is omitted and the previous one repeats.
+      if (running === 0) {
+        throw new RangeError(`running status at byte ${p} with no preceding channel status`);
+      }
+      status = running;
+    }
 
     const type = status & 0xf0;
     const channel = status & 0x0f;
+    // Meta and System messages cancel running status; channel messages set it.
+    running = type === 0xf0 ? 0 : status;
     if (type === 0x90 || type === 0x80) {
       const note = bytes[p++]!;
       const vel = bytes[p++]!;
@@ -179,8 +192,17 @@ export function decodeSmf(bytes: Uint8Array): { ppq: number; notes: NoteEvent[] 
       const len = decodeVlq(bytes, p);
       p += len.length + len.value;
       if (metaType === 0x2f) break; // end of track
+    } else if (type === 0xc0 || type === 0xd0) {
+      p += 1; // Program Change and Channel Pressure carry a single data byte
+    } else if (type === 0xf0) {
+      // SysEx and System Common are variable-length; guessing would silently
+      // misalign every later read, so refuse rather than return wrong notes.
+      throw new RangeError(
+        `unsupported System message 0x${status.toString(16)} at byte ${p - 1}; ` +
+          'this decoder handles channel messages and meta events only',
+      );
     } else {
-      p += 2; // skip other channel messages (2 data bytes)
+      p += 2; // other channel messages carry two data bytes
     }
   }
   notes.sort((a, b) => a.startTicks - b.startTicks || a.note - b.note);

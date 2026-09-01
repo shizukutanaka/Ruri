@@ -106,6 +106,12 @@ function checkTarget(t: TemperamentTarget, i: number): void {
   if (!Number.isInteger(t.periods) || !Number.isInteger(t.generators)) {
     throw new RangeError(`targets[${i}] mapping must be integers`);
   }
+  // Tenney weight is 1/log2(num*den), and the unison's Tenney height is 0, so
+  // weighting it divides by zero and every result downstream becomes NaN. A
+  // unison is also not a tuning target: there is nothing about 1/1 to approximate.
+  if (t.num === t.den) {
+    throw new RangeError(`targets[${i}] is the unison ${t.num}/${t.den}, which is not a target`);
+  }
 }
 
 /**
@@ -139,9 +145,7 @@ export function optimalGenerator(
   targets.forEach(checkTarget);
 
   const weighting = opts.weighting ?? 'tenney';
-  const weights = targets.map((t) =>
-    weighting === 'equal' ? 1 : 1 / Math.log2(t.num * t.den || 2),
-  );
+  const weights = targets.map((t) => (weighting === 'equal' ? 1 : 1 / Math.log2(t.num * t.den)));
 
   // Closed-form weighted least squares: minimise Σ wᵢ²(aᵢP + bᵢg − tᵢ)² over g.
   let numerator = 0;
@@ -213,7 +217,7 @@ export function generatorError(
   let sumSq = 0;
   let sumW = 0;
   targets.forEach((t) => {
-    const w = weighting === 'equal' ? 1 : 1 / Math.log2(t.num * t.den || 2);
+    const w = weighting === 'equal' ? 1 : 1 / Math.log2(t.num * t.den);
     const err = t.periods * period + t.generators * generatorCents - centsOf(t.num, t.den);
     sumSq += w * w * err * err;
     sumW += w * w;

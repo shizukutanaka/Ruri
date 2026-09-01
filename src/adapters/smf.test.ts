@@ -732,3 +732,130 @@ describe('smoothProgressionSmf (Q270)', () => {
     expect(smf).toBeInstanceOf(Uint8Array);
   });
 });
+
+// The decoder's byte-length bookkeeping. A mistake here does not fail loudly:
+// it misaligns every later read and silently returns the wrong notes, or none.
+// These cases can only be reached by hand-assembling bytes, because encodeSmf
+// never emits them — which is exactly why they went untested for so long.
+describe('decodeSmf — channel-message lengths and running status', () => {
+  /** Wrap a raw track-event byte list in a Type-0 SMF header. */
+  function smfOf(track: readonly number[], ppq = 480): Uint8Array {
+    const len = track.length;
+    return Uint8Array.from([
+      0x4d,
+      0x54,
+      0x68,
+      0x64,
+      0,
+      0,
+      0,
+      6,
+      0,
+      0,
+      0,
+      1,
+      (ppq >> 8) & 0xff,
+      ppq & 0xff,
+      0x4d,
+      0x54,
+      0x72,
+      0x6b,
+      (len >>> 24) & 0xff,
+      (len >>> 16) & 0xff,
+      (len >>> 8) & 0xff,
+      len & 0xff,
+      ...track,
+    ]);
+  }
+  const EOT = [0x00, 0xff, 0x2f, 0x00];
+  /** One C4 lasting 96 ticks, with explicit status bytes. */
+  const NOTE = [0x00, 0x90, 60, 100, 0x60, 0x80, 60, 0];
+
+  it('test_one_data_byte_messages_do_not_swallow_the_following_note', () => {
+    // Program Change and Channel Pressure carry a SINGLE data byte. Skipping two
+    // desynchronises the stream: the note that follows used to vanish entirely,
+    // and a real file often opens with a Program Change to pick the instrument.
+    expect(decodeSmf(smfOf([0x00, 0xc0, 5, ...NOTE, ...EOT])).notes).toHaveLength(1);
+    expect(decodeSmf(smfOf([0x00, 0xd0, 64, ...NOTE, ...EOT])).notes).toHaveLength(1);
+  });
+
+  it('test_two_data_byte_messages_are_skipped_correctly', () => {
+    expect(decodeSmf(smfOf([0x00, 0xb0, 7, 100, ...NOTE, ...EOT])).notes).toHaveLength(1);
+    expect(decodeSmf(smfOf([0x00, 0xe0, 0, 64, ...NOTE, ...EOT])).notes).toHaveLength(1);
+    expect(decodeSmf(smfOf([0x00, 0xa0, 60, 64, ...NOTE, ...EOT])).notes).toHaveLength(1);
+  });
+
+  it('test_running_status_repeats_the_previous_channel_status', () => {
+    // The second note-on and the second note-off both omit their status byte.
+    const notes = decodeSmf(
+      smfOf([0x00, 0x90, 60, 100, 0x00, 64, 100, 0x60, 0x80, 60, 0, 0x00, 64, 0, ...EOT]),
+    ).notes;
+    expect(notes).toHaveLength(2);
+    expect(notes.map((n) => n.note)).toEqual([60, 64]);
+    expect(notes.every((n) => n.durationTicks === 96)).toBe(true);
+  });
+
+  it('test_a_meta_event_cancels_running_status', () => {
+    // Per the SMF spec. The decoder used to leave running = 0xFF, so the next
+    // running-status note event was parsed as another meta event.
+    const notes = decodeSmf(
+      smfOf([
+        0x00,
+        0x90,
+        60,
+        100,
+        0x00,
+        0xff,
+        0x01,
+        0x03,
+        0x61,
+        0x62,
+        0x63, // text meta "abc"
+        0x60,
+        0x80,
+        60,
+        0,
+        ...EOT,
+      ]),
+    ).notes;
+    expect(notes).toHaveLength(1);
+    expect(notes[0]!.durationTicks).toBe(96);
+  });
+
+  it('test_running_status_with_no_preceding_status_is_refused', () => {
+    expect(() => decodeSmf(smfOf([0x00, 60, 100, ...EOT]))).toThrow(RangeError);
+  });
+
+  it('test_variable_length_system_messages_are_refused_not_guessed', () => {
+    // SysEx has no fixed length, so advancing by a guess would misalign every
+    // later read. Refusing beats returning plausible-looking wrong notes.
+    expect(() => decodeSmf(smfOf([0x00, 0xf0, 0x02, 0x7e, 0xf7, ...NOTE, ...EOT]))).toThrow(
+      RangeError,
+    );
+  });
+
+  it('test_a_note_off_with_no_matching_note_on_is_ignored', () => {
+    expect(decodeSmf(smfOf([0x00, 0x80, 60, 0, ...EOT])).notes).toEqual([]);
+  });
+
+  it('test_a_missing_MThd_or_MTrk_is_refused', () => {
+    expect(() => decodeSmf(Uint8Array.from(Array.from({ length: 16 }, (_, i) => i)))).toThrow(
+      RangeError,
+    );
+    const noMTrk = smfOf([...EOT]);
+    noMTrk[14] = 0x58;
+    expect(() => decodeSmf(noMTrk)).toThrow(RangeError);
+  });
+
+  it('test_a_truncated_vlq_is_refused', () => {
+    expect(() => decodeVlq(Uint8Array.from([0x81, 0x82]), 0)).toThrow(RangeError);
+  });
+
+  it('test_the_golden_round_trip_is_unaffected', () => {
+    const notes: NoteEvent[] = [
+      { note: 60, velocity: 100, startTicks: 0, durationTicks: 96, channel: 0 },
+      { note: 64, velocity: 90, startTicks: 96, durationTicks: 96, channel: 1 },
+    ];
+    expect(decodeSmf(encodeSmf(notes)).notes).toEqual(notes);
+  });
+});

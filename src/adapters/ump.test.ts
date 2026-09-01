@@ -183,3 +183,59 @@ describe('chordToUmp / tuningDegreeToUmp — core-type bridges', () => {
     }
   });
 });
+
+describe('UMP — range clamping, validation and decoder rejection', () => {
+  it('test_frequencies_at_or_below_midi_zero_clamp_to_the_bottom', () => {
+    // MIDI 0 is 8.1758 Hz. Pitch 7.9 has no representation below it, so anything
+    // lower saturates rather than wrapping to a bogus high note.
+    for (const hz of [1, 4, 8.1757989156]) {
+      expect(freqToPitch79(hz)).toEqual({ note: 0, fraction512: 0 });
+    }
+    // Just above the floor still resolves normally.
+    expect(freqToPitch79(440)).toEqual({ note: 69, fraction512: 0 });
+  });
+
+  it('test_a_non_positive_bend_range_is_refused', () => {
+    // There is no spec default for per-note bend sensitivity — it is negotiated
+    // by registered controller — so the argument is required and validated.
+    for (const range of [0, -1, NaN, Infinity]) {
+      expect(() => umpPerNotePitchBend(60, 50, range)).toThrow(RangeError);
+    }
+  });
+
+  it('test_non_finite_bend_cents_are_refused', () => {
+    expect(() => umpPerNotePitchBend(60, NaN, 2)).toThrow(RangeError);
+    expect(() => umpPerNotePitchBend(60, Infinity, 2)).toThrow(RangeError);
+  });
+
+  it('test_a_note_on_without_the_pitch_attribute_decodes_without_a_pitch_field', () => {
+    // attributeType 0 means "no attribute": the note index alone carries the
+    // pitch, so there is no 7.9 value to report and the field must be absent.
+    const plain = new Uint32Array([
+      ((0x4 << 28) | (0x9 << 20) | (60 << 8) | 0x00) >>> 0,
+      (0x8000 << 16) >>> 0,
+    ]);
+    const [msg] = decodeUmp(plain);
+    expect(msg).toEqual({
+      kind: 'noteOn',
+      group: 0,
+      channel: 0,
+      noteIndex: 60,
+      velocity16: 0x8000,
+      attributeType: 0,
+    });
+    expect('pitch' in msg!).toBe(false);
+  });
+
+  it('test_a_note_on_with_the_pitch_attribute_still_carries_one', () => {
+    const [msg] = decodeUmp(umpNoteOnPitch79(60, freqToPitch79(440)));
+    expect(msg!.kind).toBe('noteOn');
+    expect((msg as { attributeType: number }).attributeType).toBe(UMP_ATTR_PITCH_7_9);
+    expect((msg as { pitch: unknown }).pitch).toEqual({ note: 69, fraction512: 0 });
+  });
+
+  it('test_an_unsupported_opcode_is_refused_not_silently_dropped', () => {
+    const bad = new Uint32Array([((0x4 << 28) | (0xd << 20) | (60 << 8)) >>> 0, 0]);
+    expect(() => decodeUmp(bad)).toThrow(RangeError);
+  });
+});
