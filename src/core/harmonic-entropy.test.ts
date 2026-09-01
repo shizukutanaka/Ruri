@@ -108,3 +108,40 @@ describe('harmonicEntropyCurve — minima land on just intervals', () => {
     expect(a[0]).toBe(b[0]);
   });
 });
+
+describe('harmonicEntropy — degenerate inputs', () => {
+  it('test_an_interval_far_outside_the_basis_returns_zero', () => {
+    // Every Gaussian underflows, so the weights sum to zero: there is no
+    // distribution to take the entropy of, and 0 means "no information".
+    const b = entropyBasis();
+    expect(harmonicEntropy(1e6, {}, b)).toBe(0);
+    expect(harmonicEntropy(-5000, {}, b)).toBe(0);
+  });
+
+  it('test_a_vanishingly_narrow_spread_also_collapses_to_zero', () => {
+    const b = entropyBasis();
+    expect(harmonicEntropy(550, { spreadCents: 1e-6 }, b)).toBe(0);
+  });
+
+  it('test_a_non_positive_spread_throws', () => {
+    expect(() => harmonicEntropy(700, { spreadCents: 0 })).toThrow(RangeError);
+    expect(() => harmonicEntropy(700, { spreadCents: -1 })).toThrow(RangeError);
+  });
+
+  it('test_non_finite_cents_throws', () => {
+    expect(() => harmonicEntropy(NaN)).toThrow(RangeError);
+    expect(() => harmonicEntropy(Infinity)).toThrow(RangeError);
+  });
+
+  it('test_omitting_the_basis_builds_the_default_one', () => {
+    // Verified equal: the default basis is entropyBasis() with its own defaults.
+    expect(harmonicEntropy(701.955)).toBeCloseTo(harmonicEntropy(701.955, {}, entropyBasis()), 12);
+  });
+
+  it('test_basis_options_are_honoured_when_no_basis_is_passed', () => {
+    // A smaller Tenney ceiling admits fewer ratios, so there is less to be
+    // uncertain about and the entropy drops.
+    const narrow = harmonicEntropy(701.955, { maxCents: 1200, maxTenneyHeight: 1000 });
+    expect(narrow).toBeLessThan(harmonicEntropy(701.955));
+  });
+});

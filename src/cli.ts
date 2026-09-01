@@ -263,7 +263,7 @@ function cmdInfo(args: Args, io: CliIo): number {
       try {
         label += `  ${fjsName(d.ratio.num, d.ratio.den)}`;
       } catch {
-        /* prime outside the FJS table — leave the ratio unannotated */
+        /* outside the FJS domain (unsupported prime, or descending) — leave it unannotated */
       }
     } else {
       label = d.cents.toFixed(6);

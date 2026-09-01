@@ -144,8 +144,13 @@ function pythagoreanName(fifths: number, cents: number): string {
  * (`_`) for the denominator — repeated once per power. Intervals differing only
  * by a comma therefore keep the same base name: 81/64 is `M3`, 5/4 is `M3^5`.
  *
- * @throws {RangeError} if `num` or `den` is not a positive integer, or the
- *   ratio involves a prime outside {@link PRIMES}.
+ * Only ascending intervals have FJS names: degree numbers count upward from 1
+ * (unison), so a ratio below 1 is rejected rather than named. Invert it first —
+ * `fjsName(9, 8)` is `M2`, and the descending major second is that interval
+ * taken downward.
+ *
+ * @throws {RangeError} if `num` or `den` is not a positive integer, if the ratio
+ *   is below 1, or if it involves a prime outside {@link PRIMES}.
  *
  * @example
  * fjsName(3, 2);   // 'P5'
@@ -156,6 +161,14 @@ function pythagoreanName(fifths: number, cents: number): string {
 export function fjsName(num: number, den: number, radius = FJS_RADIUS_OF_TOLERANCE): string {
   if (!Number.isInteger(num) || num < 1 || !Number.isInteger(den) || den < 1) {
     throw new RangeError(`num and den must be positive integers, got ${num}/${den}`);
+  }
+  // FJS names ascending intervals. Degree numbers count upward from 1 (unison),
+  // so a descending ratio has nowhere to land: the arithmetic would yield degree
+  // 0 or negative, which is not a name in any convention. Invert and say so.
+  if (num < den) {
+    throw new RangeError(
+      `fjsName: ${num}/${den} is descending; FJS names ascending intervals — pass ${den}/${num}`,
+    );
   }
   const fNum = factorise(num);
   const fDen = factorise(den);

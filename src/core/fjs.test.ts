@@ -124,3 +124,40 @@ describe('fjsName — structure and validation', () => {
     expect(() => fjsName(37, 32)).toThrow(RangeError); // 37 is outside PRIMES
   });
 });
+
+describe('fjsName — descending ratios are out of domain', () => {
+  it('test_a_ratio_below_one_is_rejected_with_the_inverse_suggested', () => {
+    // Before this was checked, the degree arithmetic ran off the bottom of the
+    // scale and produced names that do not exist: 8/9 came back as 'm0' (there
+    // is no degree zero), 1/2 as 'P-6', 64/81 as 'm-1'. Silent nonsense.
+    expect(() => fjsName(8, 9)).toThrow(RangeError);
+    expect(() => fjsName(1, 2)).toThrow(RangeError);
+    expect(() => fjsName(64, 81)).toThrow(RangeError);
+    expect(() => fjsName(4, 5)).toThrow(RangeError);
+  });
+
+  it('test_the_error_names_the_inverted_ratio_to_use_instead', () => {
+    expect(() => fjsName(8, 9)).toThrow(/pass 9\/8/);
+  });
+
+  it('test_an_unreduced_descending_ratio_is_rejected_too', () => {
+    expect(() => fjsName(2, 4)).toThrow(RangeError);
+  });
+
+  it('test_the_inverses_are_valid_names', () => {
+    // Every rejected ratio above has a perfectly good ascending counterpart.
+    expect(fjsName(9, 8)).toBe('M2');
+    expect(fjsName(2, 1)).toBe('P8');
+    expect(fjsName(81, 64)).toBe('M3');
+    expect(fjsName(5, 4)).toBe('M3^5');
+  });
+
+  it('test_the_unison_is_still_allowed', () => {
+    expect(fjsName(1, 1)).toBe('P1');
+  });
+
+  it('test_compound_ascending_intervals_keep_counting_up', () => {
+    expect(fjsName(4, 1)).toBe('P15'); // two octaves
+    expect(fjsName(3, 1)).toBe('P12'); // octave + fifth
+  });
+});
