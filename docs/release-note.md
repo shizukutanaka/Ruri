@@ -68,9 +68,9 @@ npm publish        # 任意。prepublishOnly が check + build を自動実行
 
 確認済み(すべて実測):
 
-- `npm run check` 全緑(typecheck / lint / format / **2,921 テスト、約8秒**)
-- `vitest run --coverage` exit 0(98.54 / 93.64 / **100** / 97.99 対 閾値 95/90/98/95、**除外なし**)
+- `npm run check` 全緑(typecheck / lint / format / **2,799 テスト、約9秒**)
+- `vitest run --coverage` exit 0(98.44 / 93.67 / **100** / 97.90 対 閾値 95/90/98/95、**除外なし**)
 - `npm audit` **脆弱性 0**(vitest 4)
 - `npm pack` → 別プロジェクトへ install → `ruri` ルート・`ruri/adapters` サブパス・
   `bin` CLI(`edo` / `convert` / `gen --fit-timbre`)すべて動作
-- **破壊的変更あり**: 公開APIを 1,445 → 328 に絞った。Release 本文の Breaking 節を残すこと。
+- **破壊的変更あり**: 公開APIを 1,445 → 304 に絞った。Release 本文の Breaking 節を残すこと。

@@ -126,4 +126,28 @@ describe('public API surface', () => {
       expect(n in ruri).toBe(false);
     }
   });
+
+  it('test_the_removed_western_theory_and_ungated_ethnic_layer_stays_removed', () => {
+    // Deleted 2026-08 for violating the design invariants: gamelanTuning shipped
+    // provenance-free ethnic tables (the gated path is getTuningById('slendro-example')),
+    // detectKey was a Krumhansl familiarity layer, and the rest were 12-TET Western
+    // theory (Tonnetz PLR, Forte numbers, jazz ii-V-I) or off-scope (euclidean rhythm).
+    for (const n of [
+      'gamelanTuning',
+      'detectKey',
+      'forteNumber',
+      'primeForm',
+      'normalForm',
+      'tonnetzCoord',
+      'jinsTuning',
+      'maqamTuning',
+      'japaneseScale',
+      'kotoTuning',
+      'buildTwoFiveOne',
+      'euclideanRhythm',
+      'polyrhythmPattern',
+    ]) {
+      expect(n in ruri).toBe(false);
+    }
+  });
 });

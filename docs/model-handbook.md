@@ -11,8 +11,8 @@
 - **プロダクトは完成・公開済み**。このリポジトリのデフォルトブランチ
   (`claude/product-analysis-sonnet-x86ho5` — master/main は存在しない)の head が
   v0.1.0 相当の検証済み完成品。**push した時点で GitHub 公開**となる。
-- 規模感: `src/` **39,418行**、高速テスト **2,921件**(`npm test`、**約8秒**)。
-  公開API **328**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
+- 規模感: `src/` **37,799行**、高速テスト **2,799件**(`npm test`、**約9秒**)。
+  公開API **304**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
   adapters(SMF・Scala .scl/.kbm・MPE・MTS SysEx・AnaMark .tun・MIDI 2.0 UMP・WAV)/
   data(出典必須プリセット)/ CLI(`ruri info/convert/gen/render`)。
 - CHANGELOG は `[0.1.0] - 2026-07-14` を確定済み。**タグと GitHub Release は未作成**
@@ -48,7 +48,7 @@
 
 - `src/core/index.ts` / `src/data/index.ts` は**curated barrel**。かつて 1,445 名を
   明示 export していたが README が記載するのは 56 — 26:1 で検索不能だった。
-  現在 **328 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
+  現在 **304 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
   パス直指定 import は可能。変えたのは「パッケージが何を提供するか」だけ。
 - `src/api-surface.test.ts` がこれを固定(README掲載シンボルの解決・解析モジュールの
   到達性・生成名が公開されていないこと・総数の上下限)。**barrel に `export *` を
@@ -83,7 +83,7 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同じモジュールを 5,797 ケースで覆う。削除後もテスト数は 7,485 で不変 = 寄与ゼロの証拠。
   **機械生成テストを再導入しない**。
 - **カバレッジゲートは修正済み・合否判定に使える**(2026-07)。閾値 95/90/98/95
-  (lines/branches/functions/statements)に対し実測 **98.54 / 93.64 / 100 / 97.99**。
+  (lines/branches/functions/statements)に対し実測 **98.44 / 93.67 / 100 / 97.90**。
   落ちたらゲートが機能した証拠なので**閾値を下げず**カバレッジを足すこと。
   生成層の削除後は **carve-out なしで `src/` 全ファイルを計測**している。
   かつて「80%閾値 vs 実測35.8%」と乖離していたのは**測る対象が誤っていた**ため —
@@ -119,8 +119,14 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   (MOS・well-formed・最大均等・協和・temperament)は完備。新しい価値は
   「既存関数の CLI/アダプタへの配線」「実バグ修正」「相互運用」にある。
 - **機械生成コードを再導入しない**。`presets.ts` も 2,206→32 宣言(38,695→702行)。
-  `src/` 全体は 186,604→**39,418行**。`adapters/wav.ts` も 57→16 export(2,284→439行)。
+  `src/` 全体は 186,604→**37,799行**。`adapters/wav.ts` も 57→16 export(2,284→439行)。
   到達可能性は curated barrel + CLI + 手書きアダプタ/結合テストからの推移閉包で判定した。
+- **西洋理論層・12-TET 固定層・出典なし民族データ表を `src/core` に置かない**。
+  2026-08 に8モジュール(`gamelan`/`key-detect`/`tonnetz`/`pcset`/`maqam`/`japanese-scale`/
+  `progression`/`rhythm`)を削除した。根本原因は「provenance ゲートが `src/data` にしか無く、
+  同種のデータが core に関数として生えるとゲートを迂回できた」こと。とくに `gamelan.ts` は
+  出典付き `SLENDRO_EXAMPLE` の劣化重複で、実測の伸張オクターブ(1208c)を 1200c に潰していた。
+  `src/api-surface.test.ts` が削除名13件の**不在を固定**している。経緯は `docs/audit-2026-08.md`。
 - familiarity スコアの実装(§2-3)、タグ/workflow push の再試行ループ(§4)、
   調律プリセットの独断追加(§6 C-4 の人的ゲート)。
 
