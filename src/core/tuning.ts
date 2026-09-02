@@ -61,11 +61,22 @@ const mod = (a: number, n: number): number => ((a % n) + n) % n;
 /** Validate invariants and return the tuning (fail fast, I7). */
 export function defineTuning(t: TuningSystem): TuningSystem {
   if (t.degrees.length === 0) throw new RangeError(`tuning '${t.id}' has no degrees`);
-  if (t.referenceHz <= 0) throw new RangeError(`tuning '${t.id}' referenceHz must be > 0`);
-  if (t.periodCents <= 0) throw new RangeError(`tuning '${t.id}' periodCents must be > 0`);
+  // `<= 0` alone lets NaN through (every comparison with NaN is false), and a
+  // NaN reference or period poisons every frequency downstream without a sound.
+  if (!Number.isFinite(t.referenceHz) || t.referenceHz <= 0) {
+    throw new RangeError(
+      `tuning '${t.id}' referenceHz must be finite and > 0, got ${t.referenceHz}`,
+    );
+  }
+  if (!Number.isFinite(t.periodCents) || t.periodCents <= 0) {
+    throw new RangeError(
+      `tuning '${t.id}' periodCents must be finite and > 0, got ${t.periodCents}`,
+    );
+  }
   const cents = t.degrees.map(pitchToCents);
   for (let i = 0; i < cents.length; i++) {
     const c = cents[i] as number;
+    if (!Number.isFinite(c)) throw new RangeError(`tuning '${t.id}' degree ${i} is not finite`);
     if (c < 0 || c >= t.periodCents) {
       throw new RangeError(`tuning '${t.id}' degree ${i} (${c}c) outside [0, ${t.periodCents})`);
     }

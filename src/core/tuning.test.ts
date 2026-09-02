@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { defineTuning as _defineTuning } from './tuning.js';
+import { cents as _cents } from './cents.js';
 import fc from 'fast-check';
 import {
   equalTemperament12,
@@ -532,5 +534,50 @@ describe('nearestComma (L2)', () => {
         }
       }),
     );
+  });
+});
+
+describe('defineTuning — non-finite values are refused', () => {
+  const base = {
+    id: 'x',
+    name: 'x',
+    referenceHz: 440,
+    periodCents: 1200,
+    degrees: [_cents(0), _cents(700)],
+    source: 'theoretical' as const,
+  };
+
+  it('test_nan_and_infinite_reference_are_refused', () => {
+    // `referenceHz <= 0` alone let these through: every comparison with NaN is
+    // false, so a NaN reference sailed past "fail fast" and poisoned every
+    // frequency downstream. The CLI wrote a WAV from one before this check.
+    expect(() => _defineTuning({ ...base, referenceHz: NaN })).toThrow(RangeError);
+    expect(() => _defineTuning({ ...base, referenceHz: Infinity })).toThrow(RangeError);
+  });
+
+  it('test_nan_and_infinite_period_are_refused', () => {
+    expect(() => _defineTuning({ ...base, periodCents: NaN })).toThrow(RangeError);
+    expect(() => _defineTuning({ ...base, periodCents: Infinity })).toThrow(RangeError);
+  });
+
+  it('test_a_nan_degree_is_refused', () => {
+    // NaN is neither < 0 nor >= period, so the range check passed it too.
+    expect(() => _defineTuning({ ...base, degrees: [_cents(0), _cents(NaN)] })).toThrow(RangeError);
+  });
+
+  it('test_finite_positive_values_still_pass', () => {
+    expect(_defineTuning(base).referenceHz).toBe(440);
+  });
+});
+
+describe('validation throws — deviation report and EDO search', () => {
+  it('test_deviation_report_refuses_an_empty_candidate', () => {
+    const t12 = equalTemperament12(440);
+    expect(() => tuningDeviationReport(t12, { ...t12, degrees: [] })).toThrow(RangeError);
+  });
+
+  it('test_edo_search_refuses_a_degenerate_range', () => {
+    expect(() => approximateEdoForIntervals([700], 1, 12)).toThrow(RangeError);
+    expect(() => approximateEdoForIntervals([700], 12, 5)).toThrow(RangeError);
   });
 });

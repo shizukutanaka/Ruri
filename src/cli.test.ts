@@ -512,3 +512,41 @@ describe('runCli render', () => {
     expect(stderr.join('\n')).toContain('seconds');
   });
 });
+
+describe('runCli — non-numeric flag values are refused at the door', () => {
+  it('test_ref_that_is_not_a_number_exits_2_before_any_output', () => {
+    // parseFloat('abc') is NaN, and NaN slipped past every `<= 0` check: `info`
+    // printed a report, `convert -o x.wav` wrote 132 KB of audio from a NaN
+    // reference. Now the flag is refused once, by name.
+    const { io, stderr, stdout, bytes } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['info', 'in.scl', '--ref', 'abc'], io)).toBe(2);
+    expect(stderr.join('\n')).toMatch(/--ref must be a number/);
+    expect(stdout).toEqual([]);
+    expect(runCli(['convert', 'in.scl', '-o', 'x.wav', '--ref', 'abc'], io)).toBe(2);
+    expect(Object.keys(bytes)).toEqual([]);
+  });
+
+  it('test_limit_and_seconds_that_are_not_numbers_exit_2', () => {
+    const { io, stderr } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['edo', '19', '--limit', 'abc'], io)).toBe(2);
+    expect(runCli(['render', 'in.scl', '-o', 'x.wav', '--seconds', 'abc'], io)).toBe(2);
+    expect(stderr.join('\n')).toMatch(/--limit must be a number/);
+    expect(stderr.join('\n')).toMatch(/--seconds must be a number/);
+  });
+
+  it('test_a_missing_flag_value_is_refused_the_same_way', () => {
+    const { io } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['info', 'in.scl', '--ref'], io)).toBe(2);
+  });
+});
+
+describe('runCli info — just-ratio hint sign', () => {
+  it('test_a_degree_sharper_than_the_ratio_shows_a_minus_offset', () => {
+    // 702.5c sits 0.545c above 3/2, so the hint reads "≈ 3/2 (-0.5c)": the
+    // ratio is flat of the degree. The '+' direction was already covered.
+    const scl = '! t.scl\n!\nsharp fifth\n 2\n!\n 702.5\n 2/1\n';
+    const { io, stdout } = makeIo({ 'in.scl': scl });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    expect(stdout.join('\n')).toMatch(/≈ 3\/2 \(-0\.5c\)/);
+  });
+});

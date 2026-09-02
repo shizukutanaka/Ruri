@@ -589,6 +589,18 @@ export function runCli(argv: readonly string[], io: CliIo): number {
     return command === undefined ? 2 : 0;
   }
   const args = parseArgs(rest);
+  // parseFloat/parseInt turn a non-numeric flag value into NaN, and NaN slips past
+  // every `<= 0` check downstream. Refuse it here, once, with the flag's name.
+  for (const [flag, value] of [
+    ['--ref', args.ref],
+    ['--seconds', args.seconds],
+    ['--limit', args.limit],
+  ] as const) {
+    if (value !== undefined && !Number.isFinite(value)) {
+      io.err(`${flag} must be a number`);
+      return 2;
+    }
+  }
   try {
     switch (command) {
       case 'info':

@@ -630,3 +630,18 @@ describe('tuningToFullBundle (Q246)', () => {
     expect(tuningToFullBundle(t12).wav).toEqual(tuningToFullBundle(t12, t12.referenceHz).wav);
   });
 });
+
+describe('scaleToTunText — degrees above MIDI 127', () => {
+  it('test_degrees_that_would_exceed_key_127_are_dropped_not_wrapped', () => {
+    // Documented behaviour: a .tun has exactly 128 keys, so with middleNote 126
+    // only the first two of twelve degrees land; the rest stay at 12-TET.
+    const t12 = equalTemperament12(440);
+    const text = scaleToTunText(tuningToScale(t12), t12, 'top', { middleNote: 126 });
+    const line = (k: number): string | undefined =>
+      text.split('\n').find((l) => l.startsWith(`note ${k}=`) && !l.includes('.'));
+    expect(line(126)).toBe('note 126=6900'); // scale degree 0 = A4 = 440 Hz
+    expect(line(127)).toBe('note 127=7000');
+    expect(line(125)).toBe('note 125=12500'); // untouched 12-TET
+    expect(line(128)).toBeUndefined();
+  });
+});

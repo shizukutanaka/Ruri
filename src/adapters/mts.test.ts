@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { decodeMts as _decodeMts } from './mts.js';
 import fc from 'fast-check';
 import { midiToFreq } from '../core/midi.js';
 import { equalTemperament12, edo } from '../core/tuning.js';
@@ -905,5 +906,62 @@ describe('scaleToMtsBundle (Q287)', () => {
     const { scaleMts, tuningMts } = scaleToMtsBundle(scale, t12);
     // They should differ since scale has 7 degrees vs 12 in tuning
     expect(scaleMts).not.toEqual(tuningMts);
+  });
+});
+
+// The public decoder. Until now the round-trip lived only inside this test file,
+// which meant the format knowledge existed in one direction in the package.
+describe('decodeMts — golden round-trip and integrity', () => {
+  const et12 = equalTemperament12(440);
+  const safeFreqArb = fc.double({ min: 20, max: 7000, noNaN: true, noDefaultInfinity: true });
+
+  it('test_decodes_what_tuningToMts_encodes', () => {
+    const buf = tuningToMts(et12, 'twelve');
+    const dump = _decodeMts(buf);
+    expect(dump.name).toBe('twelve');
+    expect(dump.deviceId).toBe(0);
+    expect(dump.program).toBe(0);
+    expect(dump.frequenciesHz).toHaveLength(128);
+    expect(dump.frequenciesHz[69]).toBeCloseTo(440, 9);
+  });
+
+  it('property_round_trip_recovers_every_key_within_the_14_bit_resolution', () => {
+    fc.assert(
+      fc.property(fc.array(safeFreqArb, { minLength: 128, maxLength: 128 }), (freqs) => {
+        const back = _decodeMts(mtsBulkDump(freqs, 'rt')).frequenciesHz;
+        return back.every((hz, k) => Math.abs(1200 * Math.log2(hz / (freqs[k] as number))) < 0.007);
+      }),
+    );
+  });
+
+  it('test_device_id_program_and_padded_name_round_trip', () => {
+    const buf = mtsBulkDump(tuningToMtsFrequencies(et12), 'ab', { deviceId: 5, program: 9 });
+    const dump = _decodeMts(buf);
+    expect(dump.deviceId).toBe(5);
+    expect(dump.program).toBe(9);
+    expect(dump.name).toBe('ab'); // 14 bytes of space padding stripped
+  });
+
+  it('test_a_single_flipped_bit_fails_the_checksum', () => {
+    // The checksum is the format's only integrity check; without verifying it a
+    // corrupted dump decodes to a plausible-looking tuning.
+    const buf = tuningToMts(et12);
+    buf[22 + 69 * 3] = (buf[22 + 69 * 3] as number) ^ 0x01; // nudge key 69 semitone
+    expect(() => _decodeMts(buf)).toThrow(/checksum/);
+  });
+
+  it('test_wrong_length_or_framing_is_refused', () => {
+    expect(() => _decodeMts(new Uint8Array(407))).toThrow(RangeError);
+    const buf = tuningToMts(et12);
+    buf[0] = 0x00;
+    expect(() => _decodeMts(buf)).toThrow(RangeError);
+    const notMts = tuningToMts(et12);
+    notMts[3] = 0x09;
+    expect(() => _decodeMts(notMts)).toThrow(RangeError);
+  });
+
+  it('test_scale_to_mts_refuses_an_empty_scale', () => {
+    const empty = { id: 'e', name: 'e', tuningId: et12.id, degreeIndices: [] };
+    expect(() => scaleToMts(empty, et12)).toThrow(RangeError);
   });
 });

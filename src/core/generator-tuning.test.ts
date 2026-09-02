@@ -218,3 +218,11 @@ describe('optimalGenerator — weighting and degenerate targets', () => {
     expect(() => generatorError(700, [])).toThrow(RangeError);
   });
 });
+
+describe('generatorError — period validation', () => {
+  it('test_a_non_positive_period_is_refused', () => {
+    const t = [{ num: 3, den: 2, periods: 0, generators: 1 }];
+    expect(() => generatorError(700, t, { periodCents: 0 })).toThrow(RangeError);
+    expect(() => generatorError(700, t, { periodCents: NaN })).toThrow(RangeError);
+  });
+});

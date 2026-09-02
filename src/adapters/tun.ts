@@ -224,6 +224,9 @@ export interface ScaleToTunOptions extends TunOptions {
  * 1. `scaleToFreqs(scale, tuning)` — absolute Hz for each scale degree.
  * 2. Fill a 128-entry array with standard 12-TET frequencies (via `midiToFreq`).
  * 3. Overwrite slots `middleNote..middleNote+n-1` with the scale's Hz values.
+ *    Degrees that would land above MIDI 127 are **dropped**, not wrapped or
+ *    thrown: a .tun file has exactly 128 keys and the rest stay 12-TET. Choose
+ *    `middleNote` so that `middleNote + degrees.length <= 128` to keep them all.
  * 4. Encode with `writeTun(frequencies, name ?? scale.id, opts)`.
  *
  * Non-scale MIDI keys retain standard 12-TET so that an unrelated synth part is

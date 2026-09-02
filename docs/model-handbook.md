@@ -11,8 +11,8 @@
 - **プロダクトは完成・公開済み**。このリポジトリのデフォルトブランチ
   (`claude/product-analysis-sonnet-x86ho5` — master/main は存在しない)の head が
   v0.1.0 相当の検証済み完成品。**push した時点で GitHub 公開**となる。
-- 規模感: `src/` **37,799行**、高速テスト **2,833件**(`npm test`、**約9秒**)。
-  公開API **304**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
+- 規模感: `src/` **37,799行**、高速テスト **2,851件**(`npm test`、**約9秒**)。
+  公開API **305**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
   adapters(SMF・Scala .scl/.kbm・MPE・MTS SysEx・AnaMark .tun・MIDI 2.0 UMP・WAV)/
   data(出典必須プリセット)/ CLI(`ruri info/convert/gen/render`)。
 - CHANGELOG は `[0.1.0] - 2026-07-14` を確定済み。**タグと GitHub Release は未作成**
@@ -48,7 +48,7 @@
 
 - `src/core/index.ts` / `src/data/index.ts` は**curated barrel**。かつて 1,445 名を
   明示 export していたが README が記載するのは 56 — 26:1 で検索不能だった。
-  現在 **304 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
+  現在 **305 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
   パス直指定 import は可能。変えたのは「パッケージが何を提供するか」だけ。
 - `src/api-surface.test.ts` がこれを固定(README掲載シンボルの解決・解析モジュールの
   到達性・生成名が公開されていないこと・総数の上下限)。**barrel に `export *` を
@@ -83,7 +83,7 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同じモジュールを 5,797 ケースで覆う。削除後もテスト数は 7,485 で不変 = 寄与ゼロの証拠。
   **機械生成テストを再導入しない**。
 - **カバレッジゲートは修正済み・合否判定に使える**(2026-07)。閾値 95/90/98/95
-  (lines/branches/functions/statements)に対し実測 **98.63 / 94.85 / 100 / 98.19**。
+  (lines/branches/functions/statements)に対し実測 **98.73 / 95.42 / 100 / 98.34**。
   落ちたらゲートが機能した証拠なので**閾値を下げず**カバレッジを足すこと。
   生成層の削除後は **carve-out なしで `src/` 全ファイルを計測**している。
   かつて「80%閾値 vs 実測35.8%」と乖離していたのは**測る対象が誤っていた**ため —
@@ -100,6 +100,11 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   (データバイト1個)の後を2バイト進めており、実機ファイル冒頭の音色指定で**以降の全音符を
   黙って失っていた**。制限は docstring に書いてあったが、**沈黙のデータ欠損を文書化しても
   fail-fast にはならない**。解釈不能なもの(可変長 SysEx 等)は推測せず throw する。
+- **`<= 0` は NaN を通す**。`defineTuning` の `referenceHz <= 0` は NaN で false になり、
+  NaN 基準の WAV が CLI から exit 0 で書き出されていた。数値検査は `!Number.isFinite(x) || x <= 0` の形にする。
+  CLI は `parseFloat` の結果を入口で検査する(`runCli` 冒頭)。
+- **長所の主張も検算対象**。「全アダプタ round-trip 済み」は MTS でテスト内ローカル復号に依存していた。
+  `decodeMts` を公開して主張を実体にした(checksum 検証付き)。
 - **ガードは条件が合っているか検算する**。`optimalGenerator` の `t.num * t.den || 2` は
   「積が 0」を守っていたが正整数の積は 0 にならない。退化するのは**積が 1**(ユニゾン、
   Tenney 高 0 → ゼロ除算)で、結果は全フィールド NaN だった。

@@ -209,7 +209,6 @@ export function kbmNoteToFreq(scale: ScalaScale, m: KbmMapping, midiNote: number
       deg = pos;
     } else {
       deg = m.mapping[pos] ?? null;
-      if (deg === undefined) deg = null;
     }
 
     if (deg === null) return null;

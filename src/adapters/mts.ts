@@ -92,6 +92,63 @@ export function freqToMtsKey(hz: number, a4Hz = A4_HZ_DEFAULT): MtsKey {
   return { semitone, fraction14 };
 }
 
+/** A decoded MTS bulk tuning dump. */
+export interface MtsBulkDump {
+  readonly deviceId: number;
+  readonly program: number;
+  /** The 16-byte name field with trailing padding removed. */
+  readonly name: string;
+  /** Frequency of each MIDI key 0..127, from `semitone + fraction14/16384`. */
+  readonly frequenciesHz: readonly number[];
+  readonly keys: readonly MtsKey[];
+}
+
+/**
+ * Decode a 408-byte MTS bulk tuning dump — the inverse of {@link mtsBulkDump}.
+ *
+ * Verifies the framing, the sub-IDs and the checksum, and throws on any of them
+ * rather than returning frequencies from a message it cannot vouch for. The
+ * checksum matters: it is the only integrity check the format has, and a
+ * dump with one flipped bit would otherwise decode to a plausible tuning.
+ *
+ * Frequencies are reconstructed against `a4Hz` (default 440), so
+ * `decodeMts(mtsBulkDump(f)).frequenciesHz` recovers `f` to within the 14-bit
+ * fraction's resolution (1/16384 semitone ≈ 0.006 cents).
+ *
+ * @throws {RangeError} if the buffer is not 408 bytes, is not framed as an MTS
+ *   bulk dump, or fails its checksum.
+ */
+export function decodeMts(bytes: Uint8Array, a4Hz = A4_HZ_DEFAULT): MtsBulkDump {
+  if (bytes.length !== 408) {
+    throw new RangeError(`decodeMts: expected 408 bytes, got ${bytes.length}`);
+  }
+  if (bytes[0] !== 0xf0 || bytes[407] !== 0xf7) {
+    throw new RangeError('decodeMts: not a SysEx message (missing F0/F7 framing)');
+  }
+  if (bytes[1] !== 0x7e || bytes[3] !== 0x08 || bytes[4] !== 0x01) {
+    throw new RangeError('decodeMts: not an MTS bulk tuning dump (sub-IDs 7E xx 08 01)');
+  }
+  let checksum = 0;
+  for (let i = 1; i <= 405; i++) checksum ^= bytes[i] as number;
+  if ((checksum & 0x7f) !== bytes[406]) {
+    throw new RangeError(
+      `decodeMts: checksum mismatch (stored 0x${(bytes[406] as number).toString(16)}, computed 0x${(checksum & 0x7f).toString(16)})`,
+    );
+  }
+  const name = String.fromCharCode(...Array.from(bytes.subarray(6, 22))).replace(/ +$/, '');
+  const keys: MtsKey[] = [];
+  const frequenciesHz: number[] = [];
+  for (let k = 0; k < 128; k++) {
+    const offset = 22 + k * 3;
+    const semitone = bytes[offset] as number;
+    const fraction14 =
+      (((bytes[offset + 1] as number) & 0x7f) << 7) | ((bytes[offset + 2] as number) & 0x7f);
+    keys.push({ semitone, fraction14 });
+    frequenciesHz.push(midiToFreq(semitone + fraction14 / 16384, a4Hz));
+  }
+  return { deviceId: bytes[2] as number, program: bytes[5] as number, name, frequenciesHz, keys };
+}
+
 /** Options for {@link mtsBulkDump}. */
 export interface MtsBulkDumpOptions {
   /** SysEx device ID, 0–127. Default 0x00. */
