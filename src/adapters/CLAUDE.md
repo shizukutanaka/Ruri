@@ -20,10 +20,20 @@
 - 既知バイト列: 単音のSMFを手計算バイトと突合(ヘッダ + MTrk長 + VLQ)。
 - 実機検証(人間ゲート): 生成 .mid を DAW/Surge XT で再生して鳴ることを確認(CIでは不能)。
 
-## 未実装(後続)
+## SMF デコーダの範囲(2026-08 に拡張)
 
-- MTS SysEx 同梱(微分音MIDI): SysExバイト列は別Gotchasを追記してから実装。
-- テンポ・拍子メタイベント(現状ppqのみ、テンポ未指定=120bpm既定)。
+- 扱う: note on/off・running status(meta/System で打ち切り)・Program Change / Channel Pressure
+  (**データ1バイト**)・Control Change / Pitch Bend / Poly Aftertouch(2バイト)・meta イベント。
+- **推測しない**: SysEx / System Common(可変長)と先行 status の無い running status は `RangeError`。
+  バイト長を1つ誤ると例外にならず**以降の音符を黙って失う**(実際に Program Change で起きていた)。
+- MTS SysEx は SMF に**同梱しない**(独立アダプタ `mts.ts`)。テンポ・拍子メタは書かない(ppq のみ)。
+
+## MTS (mts.ts) Gotchas
+
+- 408 バイト固定: `F0 7E dev 08 01 prog` + 名前16 + 128鍵×3(`xx yy zz` = 半音 + 14bit 分数)+ checksum + `F7`。
+- **checksum = XOR(bytes[1..405]) & 0x7F** がこの形式唯一の整合性検査。`decodeMts` は不一致で throw する
+  — 検証しなければ1ビット化けたダンプが「もっともらしい調律」に復号される。
+- `freqToMtsKey` の上限 `{127, 16383}` は `7F 7F 7F` = 仕様上「変更なし」の番兵と衝突。MIDI 0..127 内に収めること。
 
 ## UMP / MIDI 2.0 (ump.ts) Gotchas
 
@@ -41,6 +51,7 @@
 - **cents判定 = 小数点の有無**。`701.955`(小数点あり)=cents。`3/2` or `3`(小数点なし)=比。整数単独 `2` は比 2/1。**この判定を取り違えると全曲が壊れる**。
 - **比のcents化**: `n/d` → 1200·log2(n/d)。`n`単独 → 1200·log2(n)。
 - 行頭末空白・CRLF・タブを許容(trim)。負cents/ゼロ比は不正(throw)。
-- **.kbm(任意)**: キーボードマッピング。最小実装は無し=線形(MIDIノート順=degree順)で可。完全実装は後続。
+- **.kbm(任意)**: `parseKbm` + マッピング適用を実装済み(size 0 = 線形)。`octaveDegree` / mapping の
+  度数が scale 長を超えると `RangeError`。
 - round-trip: cents行は書出時に小数点必須(`1200.0`)、比行は`n/d`維持。**比→cents→比は不可逆**ゆえ、取込時の原表現(比/cents)を保持して書出す。
 

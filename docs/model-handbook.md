@@ -11,7 +11,7 @@
 - **プロダクトは完成・公開済み**。このリポジトリのデフォルトブランチ
   (`claude/product-analysis-sonnet-x86ho5` — master/main は存在しない)の head が
   v0.1.0 相当の検証済み完成品。**push した時点で GitHub 公開**となる。
-- 規模感: `src/` **37,799行**、高速テスト **2,851件**(`npm test`、**約9秒**)。
+- 規模感: `src/` **37,799行**、高速テスト **2,856件**(`npm test`、**約9秒**)。
   公開API **305**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
   adapters(SMF・Scala .scl/.kbm・MPE・MTS SysEx・AnaMark .tun・MIDI 2.0 UMP・WAV)/
   data(出典必須プリセット)/ CLI(`ruri info/convert/gen/render`)。
@@ -83,7 +83,7 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同じモジュールを 5,797 ケースで覆う。削除後もテスト数は 7,485 で不変 = 寄与ゼロの証拠。
   **機械生成テストを再導入しない**。
 - **カバレッジゲートは修正済み・合否判定に使える**(2026-07)。閾値 95/90/98/95
-  (lines/branches/functions/statements)に対し実測 **98.73 / 95.42 / 100 / 98.34**。
+  (lines/branches/functions/statements)に対し実測 **99.09 / 95.98 / 100 / 98.65**。
   落ちたらゲートが機能した証拠なので**閾値を下げず**カバレッジを足すこと。
   生成層の削除後は **carve-out なしで `src/` 全ファイルを計測**している。
   かつて「80%閾値 vs 実測35.8%」と乖離していたのは**測る対象が誤っていた**ため —
@@ -139,6 +139,11 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同種のデータが core に関数として生えるとゲートを迂回できた」こと。とくに `gamelan.ts` は
   出典付き `SLENDRO_EXAMPLE` の劣化重複で、実測の伸張オクターブ(1208c)を 1200c に潰していた。
   `src/api-surface.test.ts` が削除名13件の**不在を固定**している。経緯は `docs/audit-2026-08.md`。
+- **文書に同じ数字を二箇所書かない**。テスト件数・行数・公開API数は **README 冒頭が唯一の出典**とし、
+  `CLAUDE.md` からは委譲する。2026-08 に `src/core/CLAUDE.md` が「26 テスト緑」(実際は 2,856)、
+  `README` 自身が presets を「全10件」と「12件」の両方で書いていた。**古い主張は誤った主張**であり、
+  引き継ぎ文書のドリフトは次セッションを誤った前提で走らせる。数値を更新したら
+  `grep -n "件\|行\|export" README.md docs/*.md src/**/CLAUDE.md` で他に無いか確認する。
 - familiarity スコアの実装(§2-3)、タグ/workflow push の再試行ループ(§4)、
   調律プリセットの独断追加(§6 C-4 の人的ゲート)。
 

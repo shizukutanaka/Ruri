@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成・RTT解析)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun/UMP/Scale Workshop)+ `src/data`(出典付き調律12件)+ `shell-web`(デモUI)+ `ruri` CLI。高速テスト **2,851件**(`npm test`、約9秒)、zero runtime-dep、`src/` 37,799行(到達不能な生成コードは2026-07に削除)。公開APIは意図的に絞った305シンボル(`src/api-surface.test.ts` が固定)。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成・RTT解析)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun/UMP/Scale Workshop)+ `src/data`(出典付き調律12件)+ `shell-web`(デモUI)+ `ruri` CLI。高速テスト **2,856件**(`npm test`、約9秒)、zero runtime-dep、`src/` 37,799行(到達不能な生成コードは2026-07に削除)。公開APIは意図的に絞った305シンボル(`src/api-surface.test.ts` が固定)。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -341,7 +341,7 @@ ruri gen edo 19 -o 19edo.scl                # 理論から調律を生成(入力
 ruri gen mos 700 1200 7 -o dia.ump          # 生成音階(MOS): 生成音程700c・周期1200c・7音 → UMP
 ruri gen me 12 7 -o diatonic.tun            # 最大均等 7-of-12(Clough-Douthett) → .tun
 ruri gen edo 19 -o 19edo.wav --seconds 0.2  # 生成した調律をそのまま試聴(WAV)
-ruri presets                                # 収録調律を出典付きで一覧(全10件)
+ruri presets                                # 収録調律を出典付きで一覧(全12件)
 ruri presets kirnberger-iii -o k3.scl       # 収録調律を任意の形式で書き出し
 ruri edo 31                                 # 純正律への近似精度・patent val・消えるコンマを評価
 ruri mos 701.955                            # その生成音程で MOS になる音階サイズ一覧
@@ -369,25 +369,33 @@ ruri help                                   # 全コマンド一覧
 
 ## モジュール (`src/core`)
 
-| ファイル           | 役割                                                                                                 |
-| ------------------ | ---------------------------------------------------------------------------------------------------- |
-| `ratio`            | 純正律の厳密有理数                                                                                   |
-| `cents`            | cents↔周波数、Pitch(cents/比)                                                                        |
-| `midi`             | 12-TET↔周波数、MPE(ノート+pitch-bend)                                                                |
-| `tuning`           | 調律系(周期・基準・出自) + 不変条件                                                                  |
-| `scale`            | 旋法/スケール/ジンス/ラーガ                                                                          |
-| `chord`            | 和音抽象(ルート相対音程)                                                                             |
-| `chord-voicing`    | 最小不協和オクターブボイシング探索                                                                   |
-| `spectrum`         | 楽器の部分音集合(harmonic/stretched/bell)                                                            |
-| `dissonance`       | Plomp-Levelt/Sethares 感覚的不協和                                                                   |
-| `generate`         | MOS・well-formed判定・最大均等                                                                       |
-| `edo-error`        | EDO の純正律近似精度: 相対誤差(1ステップ比)・倍音別誤差表・consistency limit(25%基準)                |
-| `mos-spectrum`     | 生成音程から MOS になる音階サイズを予測(5度→2,3,5,7,12,17,29,41,53 / 黄金比→フィボナッチ)            |
-| `interval-name`    | 音程の命名(Kite の ups and downs 記法): P/M/m/A/d + `^`/`v`。sharpness による EDO 分類               |
-| `harmonic-entropy` | 協和の第3軸(Erlich): 単純比として聴き取れる確信度。音色非依存・微妙な狂いに寛容                      |
-| `induced-spectrum` | 音階に合わせた音色設計(Sethares): 部分音を調律の音高にスナップ・必要な曲げ量の測定                   |
-| `val`              | patent val(素数→ステップ数の写像)・コンマ消失判定(81/80 が消えれば meantone、250/243 なら porcupine) |
-| `harmonicity`      | Stolzenburg 周期性/harmonicity                                                                       |
+| ファイル                                          | 役割                                                                                                 |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `ratio`                                           | 純正律の厳密有理数                                                                                   |
+| `cents`                                           | cents↔周波数、Pitch(cents/比)                                                                        |
+| `midi`                                            | 12-TET↔周波数、MPE(ノート+pitch-bend)                                                                |
+| `tuning`                                          | 調律系(周期・基準・出自) + 不変条件                                                                  |
+| `scale`                                           | 旋法/スケール/ジンス/ラーガ                                                                          |
+| `chord`                                           | 和音抽象(ルート相対音程)                                                                             |
+| `chord-voicing`                                   | 最小不協和オクターブボイシング探索                                                                   |
+| `spectrum`                                        | 楽器の部分音集合(harmonic/stretched/bell)                                                            |
+| `dissonance`                                      | Plomp-Levelt/Sethares 感覚的不協和                                                                   |
+| `generate`                                        | MOS・well-formed判定・最大均等                                                                       |
+| `edo-error`                                       | EDO の純正律近似精度: 相対誤差(1ステップ比)・倍音別誤差表・consistency limit(25%基準)                |
+| `mos-spectrum`                                    | 生成音程から MOS になる音階サイズを予測(5度→2,3,5,7,12,17,29,41,53 / 黄金比→フィボナッチ)            |
+| `interval-name`                                   | 音程の命名(Kite の ups and downs 記法): P/M/m/A/d + `^`/`v`。sharpness による EDO 分類               |
+| `harmonic-entropy`                                | 協和の第3軸(Erlich): 単純比として聴き取れる確信度。音色非依存・微妙な狂いに寛容                      |
+| `induced-spectrum`                                | 音階に合わせた音色設計(Sethares): 部分音を調律の音高にスナップ・必要な曲げ量の測定                   |
+| `val`                                             | patent val(素数→ステップ数の写像)・コンマ消失判定(81/80 が消えれば meantone、250/243 なら porcupine) |
+| `harmonicity`                                     | Stolzenburg 周期性/harmonicity                                                                       |
+| `fjs`                                             | Functional Just System: 純正比の命名(`5/4`→`M3^5`)と素数の形式コンマ導出。上行音程のみ               |
+| `generator-tuning`                                | rank-2 temperament の最適生成音程(閉形式の重み付き最小二乗、Tenney / equal)                          |
+| `temperament`                                     | ミーントーン等の歴史的音律ビルダー                                                                   |
+| `chord-search`                                    | 調律から協和和音を探索(粗さ + 周期性の合成スコア)・声部連結最小順序                                  |
+| `voice-leading`                                   | 和音間の声部移動コスト                                                                               |
+| `modal-synth` / `ks-synth` / `synth` / `envelope` | 合成(加算モーダル・Karplus-Strong・共通ミキサ・包絡)。協和判定と同じ `Spectrum` を使う               |
+| `pitch-detect`                                    | 自己相関ピッチ検出(録音 → 周波数)。実測調律の入力側                                                  |
+| `fingering` / `fretless` / `instrument` / `piano` | 楽器モデル(運指・フレットレス位置・音域)                                                             |
 
 ## 開発
 

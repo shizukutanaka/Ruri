@@ -241,7 +241,7 @@ function cmdInfo(args: Args, io: CliIo): number {
     return 2;
   }
   const tuning = readTuning(input, args.ref ?? 440, io);
-  io.out(`description : ${tuning.name || '(none)'}`);
+  io.out(`description : ${tuning.name}`);
   io.out(`degrees     : ${tuning.degrees.length} (per period)`);
   io.out(`period      : ${tuning.periodCents.toFixed(4)} cents`);
   io.out(`well-formed : ${isTuningWellFormed(tuning) ? 'yes (Myhill)' : 'no'}`);

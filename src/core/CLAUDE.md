@@ -11,9 +11,10 @@
 
 ## 検証
 
-- `vitest run` で 26 テスト緑。性質テスト: 比積=cents和 / cents↔freq往復 / 整数ノート往復 / MPE往復 / 粗さ非負 / 粗さ対称。
+- `npm test` で全テスト緑(件数は README 冒頭が正 — この文書に数字を書かない)。性質テスト: 比積=cents和 / cents↔freq往復 / 整数ノート往復 / MPE往復 / 粗さ非負 / 粗さ対称。
 - **粗さscorer(Plomp-Levelt/Sethares)は既知極小で検証**: harmonic音色→純正律協和音程(386/498/702/884c…)に極小、bell音色→別の協和音程集合。協和は timbre 依存。
-- バイナリ出力(SMF/MTS SysEx)は Phase 2 で追加。実機検証は Surge XT。
+- バイナリ出力(SMF / MTS SysEx / UMP / .tun)は `src/adapters` に実装済み。各形式に公開デコーダ
+  (`decodeSmf` / `decodeMts` / `decodeUmp`)があり golden round-trip で検証する。実機検証は Surge XT。
 
 ## 不変条件(追加)
 
@@ -23,3 +24,7 @@
 
 - `noUncheckedIndexedAccess` 有効。配列インデックスは `undefined` 可能性を処理。
 - `ratio()` は正整数のみ。非整数/ゼロは即 `RangeError`(fail fast)。
+- **数値検査は `!Number.isFinite(x) || x <= 0` の形で書く**。`x <= 0` だけでは NaN が素通りする
+  (NaN との比較は常に false)。`defineTuning` がこれで NaN 基準を通し、CLI が NaN の WAV を書いた実績あり。
+- **`defineTuning` は「fail fast」の最終防衛線**。基準 Hz・周期・全 degree の有限性と範囲を検査する。
+  新しい数値フィールドを足したらここに検査も足す。

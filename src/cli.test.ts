@@ -550,3 +550,51 @@ describe('runCli info — just-ratio hint sign', () => {
     expect(stdout.join('\n')).toMatch(/≈ 3\/2 \(-0\.5c\)/);
   });
 });
+
+describe('runCli — usage errors name what is missing', () => {
+  it('test_each_command_reports_a_missing_positional_and_exits_2', () => {
+    const { io, stderr } = makeIo();
+    expect(runCli(['convert'], io)).toBe(2);
+    expect(runCli(['gen'], io)).toBe(2);
+    expect(runCli(['render'], io)).toBe(2);
+    expect(stderr.join('\n')).toMatch(/convert: missing/);
+    expect(stderr.join('\n')).toMatch(/gen: missing generator/);
+    expect(stderr.join('\n')).toMatch(/render: missing <input/);
+  });
+
+  it('test_render_requires_an_output_and_insists_it_be_wav', () => {
+    const { io, stderr } = makeIo({ 'in.scl': scl12 });
+    expect(runCli(['render', 'in.scl'], io)).toBe(2);
+    expect(runCli(['render', 'in.scl', '-o', 'out.mid'], io)).toBe(2);
+    expect(stderr.join('\n')).toMatch(/missing -o/);
+    expect(stderr.join('\n')).toMatch(/must be a \.wav/);
+  });
+
+  it('test_gen_mos_and_gen_me_report_their_own_usage_when_short_of_numbers', () => {
+    const { io, stderr } = makeIo();
+    // -o is required before the numbers are examined, so supply it here.
+    expect(runCli(['gen', 'mos', '700', '-o', 'x.scl'], io)).toBe(2);
+    expect(runCli(['gen', 'me', '12', '-o', 'x.scl'], io)).toBe(2);
+    expect(stderr.join('\n')).toMatch(/gen mos <generatorCents>/);
+    expect(stderr.join('\n')).toMatch(/gen me <chromaticSteps>/);
+  });
+
+  it('test_an_output_path_with_no_extension_is_rejected_not_guessed', () => {
+    const { io, stderr, texts, bytes } = makeIo({ 'in.scl': scl12 });
+    const code = runCli(['convert', 'in.scl', '-o', 'noext'], io);
+    expect(code).not.toBe(0);
+    expect(Object.keys(texts)).toEqual([]);
+    expect(Object.keys(bytes)).toEqual([]);
+    expect(stderr.length).toBeGreaterThan(0);
+  });
+
+  it('test_an_empty_scl_description_falls_back_to_the_readers_own_default', () => {
+    // sclToTuning fills an empty description with 'scl' and parseScaleWorkshop
+    // with its id, so a tuning reaching the CLI always carries a name. The
+    // `|| '(none)'` guard that used to sit here could never fire; it is gone.
+    const scl = '! t.scl\n!\n\n 1\n!\n 2/1\n';
+    const { io, stdout } = makeIo({ 'in.scl': scl });
+    expect(runCli(['info', 'in.scl'], io)).toBe(0);
+    expect(stdout[0]).toBe('description : scl');
+  });
+});
