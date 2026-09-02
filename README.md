@@ -4,7 +4,7 @@ World tuning / scale / chord backbone for DTM output. 12-TET から非12平均�
 
 ## 状態
 
-Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成・RTT解析)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun/UMP/Scale Workshop)+ `src/data`(出典付き調律12件)+ `shell-web`(デモUI)+ `ruri` CLI。高速テスト **2,856件**(`npm test`、約9秒)、zero runtime-dep、`src/` 37,799行(到達不能な生成コードは2026-07に削除)。公開APIは意図的に絞った305シンボル(`src/api-surface.test.ts` が固定)。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
+Phase 0-2 のコア完成。`src/core`(調律・生成・協和・運指・合成・RTT解析)+ `src/adapters`(SMF/Scala(.scl/.kbm)/MPE/WAV/MTS/.tun/UMP/Scale Workshop)+ `src/data`(出典付き調律12件)+ `shell-web`(デモUI)+ `ruri` CLI。高速テスト **2,869件**(`npm test`、約9秒)、zero runtime-dep、`src/` 38,981行(到達不能な生成コードは2026-07に削除)。公開APIは意図的に絞った306シンボル(`src/api-surface.test.ts` が固定)。`npm run build` で dist/(ESM + 型定義)を生成、exports マップ付きで npm 配布可能。Pre-1.0 ゆえ API は変わりうる。
 
 ## リポジトリ構成
 
@@ -335,8 +335,8 @@ const voicing = optimalChordVoicing(triad, 220, harmonicSpectrum());
 
 ```sh
 # インストール後(npm i -g ruri など)、または開発時は `node bin/ruri.mjs <cmd>`
-ruri info    scale.scl                      # (.txt/.sw の Scale Workshop 形式も可)
-ruri info    scale.scl                      # 音程・cents・比・well-formed・MOS L/sパターン(例 5L2s)+ cents表記音程の近似JI比ヒント(例 386.31c ≈ 5/4)
+ruri info    scale.scl                      # 音程・cents・比・well-formed・MOS L/sパターン(例 5L2s)+ 近似JI比ヒント(例 386.31c ≈ 5/4)。.txt の Scale Workshop scale-data 形式も可
+ruri detect  recording.wav                  # 録音の音高を測定(Hz・基準からのcents・確信度)。実楽器と調律を突き合わせる
 ruri convert scale.scl -o scale.tun         # AnaMark .tun(128鍵周波数表)へ
 ruri convert scale.scl -o scale.syx         # MTS バルクダンプ SysEx(VST/ハード連携)へ
 ruri convert scale.scl -o scale.ump         # MIDI 2.0 UMP(各音を Pitch 7.9 Note On で)へ
@@ -398,7 +398,7 @@ ruri help                                   # 全コマンド一覧
 | `chord-search`                                    | 調律から協和和音を探索(粗さ + 周期性の合成スコア)・声部連結最小順序                                  |
 | `voice-leading`                                   | 和音間の声部移動コスト                                                                               |
 | `modal-synth` / `ks-synth` / `synth` / `envelope` | 合成(加算モーダル・Karplus-Strong・共通ミキサ・包絡)。協和判定と同じ `Spectrum` を使う               |
-| `pitch-detect`                                    | 自己相関ピッチ検出(録音 → 周波数)。実測調律の入力側                                                  |
+| `pitch-detect`                                    | 自己相関ピッチ検出(録音 → 周波数)。実測調律の入力側。`ruri detect` と `decodeWav` で導線が閉じている |
 | `fingering` / `fretless` / `instrument` / `piano` | 楽器モデル(運指・フレットレス位置・音域)                                                             |
 
 ## 開発

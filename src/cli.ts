@@ -14,12 +14,13 @@
 import { parseScl, writeScl, tuningToScl, sclToTuning } from './adapters/scala.js';
 import { writeTun } from './adapters/tun.js';
 import { tuningToMts, tuningToMtsFrequencies } from './adapters/mts.js';
-import { tuningToScaleWav } from './adapters/wav.js';
+import { tuningToScaleWav, decodeWav } from './adapters/wav.js';
 import { tuningDegreeToUmp, umpToBytes } from './adapters/ump.js';
 import { scaleToSmf } from './adapters/smf.js';
 import { tuningToScale } from './core/scale.js';
 import { degreeToFreq, edo, type TuningSystem } from './core/tuning.js';
 import { freqToMidiFloat } from './core/midi.js';
+import { autocorrelationPitch } from './core/pitch-detect.js';
 import { type Pitch, pitchToCents } from './core/cents.js';
 import { DEFAULT_SYNTH_SCALE } from './core/ks-synth.js';
 import {
@@ -44,6 +45,8 @@ import { strikeScaleWav, DEFAULT_STRIKE_SCALE } from './adapters/wav.js';
 export interface CliIo {
   /** Read a UTF-8 text file (used for `.scl` input). */
   readText(path: string): string;
+  /** Read a binary file (used for `.wav` input to `detect`). */
+  readBytes(path: string): Uint8Array;
   /** Write a UTF-8 text file (`.scl`, `.tun` output). */
   writeText(path: string, data: string): void;
   /** Write a binary file (`.wav`, `.syx`/`.mid` MTS SysEx output). */
@@ -64,13 +67,14 @@ Usage:
   ruri edo     <divisions> [--limit <oddLimit>]
   ruri mos     <generatorCents> [<periodCents>] [--limit <maxSize>]
   ruri render  <input.scl> -o <output.wav> [--seconds <n>]
+  ruri detect  <input.wav> [--ref <hz>] [--seconds <window>]
   ruri help
 
 Commands:
   info      Print a scale's degrees, cents, ratios, well-formedness, and
             its MOS L/s step pattern (e.g. 5L2s) when it is a MOS.
             Input may be a Scala .scl or a Scale Workshop scale-data
-            block (.txt/.sw): one interval per line, where a dot means
+            block (.txt): one interval per line, where a dot means
             cents (700.), a slash or bare integer a ratio (3/2, 2), and
             a backslash a step of an EDO (7\\12).
   convert   Convert a Scala .scl file to another tuning format, inferred
@@ -161,12 +165,19 @@ function parseArgs(rest: readonly string[]): Args {
 
 /**
  * Read a tuning from a file, choosing the reader by extension: `.scl` is a
- * Scala scale, `.txt`/`.sw` is a Scale Workshop scale-data block.
+ * Scala scale, `.txt` is a Scale Workshop scale-data block.
+ *
+ * `.sw` was accepted here until 2026-08 and has been removed: it is not a format
+ * the xenharmonic ecosystem uses. Scale Workshop 3's language is SonicWeave, a
+ * full DSL whose interchange file is `.swi`, and whose source would not parse as
+ * one-interval-per-line anyway. Advertising an invented extension is worse than
+ * supporting nothing, because it implies a compatibility that was never tested
+ * against a real file.
  */
 function readTuning(path: string, ref: number, io: CliIo): TuningSystem {
   const ext = extensionOf(path);
   const text = io.readText(path);
-  if (ext === 'txt' || ext === 'sw') {
+  if (ext === 'txt') {
     // Leave the id at its default rather than embedding the file path, which
     // would leak into the .scl description; `--name` overrides it explicitly.
     return parseScaleWorkshop(text, { referenceHz: ref });
@@ -547,6 +558,57 @@ function cmdMos(args: Args, io: CliIo): number {
   return 0;
 }
 
+/**
+ * `ruri detect <input.wav>` — measure the pitch of a recording.
+ *
+ * This is the input side of a measured tuning: every other command turns theory
+ * into sound or into a file, and this one turns a recording back into numbers.
+ * Without it the package could synthesise a tuning but never check one against
+ * an actual instrument, which is the whole premise behind `source: 'measured'`.
+ *
+ * The file is split into equal windows and each is reported as Hz, as cents from
+ * `--ref`, and with the detector's own clarity. Windows the detector will not
+ * vouch for are printed as `--` rather than given a plausible number.
+ */
+function cmdDetect(args: Args, io: CliIo): number {
+  const input = args.positionals[0];
+  if (input === undefined) {
+    io.err('detect: missing <input.wav>');
+    return 2;
+  }
+  if (extensionOf(input) !== 'wav') {
+    io.err(`detect: input must be a .wav file, got '${input}'`);
+    return 2;
+  }
+  const { samples, sampleRate } = decodeWav(io.readBytes(input));
+  const ref = args.ref ?? 440;
+  const seconds = args.seconds ?? 0.5;
+  const windowSize = Math.max(64, Math.floor(sampleRate * seconds));
+  const windows = Math.max(1, Math.floor(samples.length / windowSize));
+
+  io.out(`file        : ${input}`);
+  io.out(`sample rate : ${sampleRate} Hz`);
+  io.out(`duration    : ${(samples.length / sampleRate).toFixed(3)} s`);
+  io.out(`reference   : ${ref} Hz`);
+  io.out('window        hz       cents    clarity');
+  for (let w = 0; w < windows; w++) {
+    const slice = samples.subarray(w * windowSize, (w + 1) * windowSize);
+    const at = (w * windowSize) / sampleRate;
+    const found = slice.length >= 64 ? autocorrelationPitch(slice, sampleRate) : null;
+    if (found === null) {
+      io.out(`${at.toFixed(2).padStart(6)}s        --          --         --`);
+      continue;
+    }
+    const cents = 1200 * Math.log2(found.hz / ref);
+    io.out(
+      `${at.toFixed(2).padStart(6)}s  ${found.hz.toFixed(2).padStart(9)}  ${cents
+        .toFixed(1)
+        .padStart(9)}  ${found.clarity.toFixed(3).padStart(9)}`,
+    );
+  }
+  return 0;
+}
+
 function cmdRender(args: Args, io: CliIo): number {
   const input = args.positionals[0];
   if (input === undefined) {
@@ -617,6 +679,8 @@ export function runCli(argv: readonly string[], io: CliIo): number {
         return cmdMos(args, io);
       case 'render':
         return cmdRender(args, io);
+      case 'detect':
+        return cmdDetect(args, io);
       default:
         io.err(`unknown command '${command}'. Run 'ruri help' for usage.`);
         return 2;

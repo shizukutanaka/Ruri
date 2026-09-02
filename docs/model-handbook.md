@@ -11,10 +11,10 @@
 - **プロダクトは完成・公開済み**。このリポジトリのデフォルトブランチ
   (`claude/product-analysis-sonnet-x86ho5` — master/main は存在しない)の head が
   v0.1.0 相当の検証済み完成品。**push した時点で GitHub 公開**となる。
-- 規模感: `src/` **37,799行**、高速テスト **2,856件**(`npm test`、**約9秒**)。
-  公開API **305**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
+- 規模感: `src/` **38,981行**、高速テスト **2,869件**(`npm test`、**約9秒**)。
+  公開API **306**(curated)。devDeps 脆弱性 **0**(vitest 4)。モジュールは core(理論)/
   adapters(SMF・Scala .scl/.kbm・MPE・MTS SysEx・AnaMark .tun・MIDI 2.0 UMP・WAV)/
-  data(出典必須プリセット)/ CLI(`ruri info/convert/gen/render`)。
+  data(出典必須プリセット)/ CLI(`ruri info/convert/gen/render/detect`)。
 - CHANGELOG は `[0.1.0] - 2026-07-14` を確定済み。**タグと GitHub Release は未作成**
   (権限制約 — §4)。手順は `docs/release-note.md`。
 
@@ -48,7 +48,7 @@
 
 - `src/core/index.ts` / `src/data/index.ts` は**curated barrel**。かつて 1,445 名を
   明示 export していたが README が記載するのは 56 — 26:1 で検索不能だった。
-  現在 **305 export**。
+  現在 **306 export**。
 - **深いパスの import は `exports` マップで塞がれている**(`ruri/core/scale.js` は
   `ERR_PACKAGE_PATH_NOT_EXPORTED`)。エントリは `ruri` / `ruri/core` / `ruri/adapters` /
   `ruri/data` の4つだけ。以前この文書は「パス直指定 import は可能」と書いていたが**誤り**だった
@@ -89,7 +89,7 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同じモジュールを 5,797 ケースで覆う。削除後もテスト数は 7,485 で不変 = 寄与ゼロの証拠。
   **機械生成テストを再導入しない**。
 - **カバレッジゲートは修正済み・合否判定に使える**(2026-07)。閾値 95/90/98/95
-  (lines/branches/functions/statements)に対し実測 **99.09 / 95.98 / 100 / 98.65**。
+  (lines/branches/functions/statements)に対し実測 **99.11 / 95.80 / 100 / 98.60**。
   落ちたらゲートが機能した証拠なので**閾値を下げず**カバレッジを足すこと。
   生成層の削除後は **carve-out なしで `src/` 全ファイルを計測**している。
   かつて「80%閾値 vs 実測35.8%」と乖離していたのは**測る対象が誤っていた**ため —
@@ -137,7 +137,7 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   (MOS・well-formed・最大均等・協和・temperament)は完備。新しい価値は
   「既存関数の CLI/アダプタへの配線」「実バグ修正」「相互運用」にある。
 - **機械生成コードを再導入しない**。`presets.ts` も 2,206→32 宣言(38,695→702行)。
-  `src/` 全体は 186,604→**37,799行**。`adapters/wav.ts` も 57→16 export(2,284→439行)。
+  `src/` 全体は 186,604→**38,981行**。`adapters/wav.ts` も 57→16 export(2,284→439行)。
   到達可能性は curated barrel + CLI + 手書きアダプタ/結合テストからの推移閉包で判定した。
 - **西洋理論層・12-TET 固定層・出典なし民族データ表を `src/core` に置かない**。
   2026-08 に8モジュール(`gamelan`/`key-detect`/`tonnetz`/`pcset`/`maqam`/`japanese-scale`/
@@ -157,32 +157,45 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
 - familiarity スコアの実装(§2-3)、タグ/workflow push の再試行ループ(§4)、
   調律プリセットの独断追加(§6 C-4 の人的ゲート)。
 
-## 6. 改善バックログ(優先度・実装ガイド付き)
+## 6. 改善バックログ — **2026-08 に全項目を解決済み**
 
-### ゲートなし(単独で着手可)
+この節はかつて「未実施」項目の一覧だった。監査の最終段でその一覧自体を検算したところ、
+**半数は既に完了していたのに未完のまま載っていた**(第6波と同じ文書ドリフト)。
+残りは「やる/やらない」を決めずに繰り越されていた。以下がその決着である。
+**新しい項目を足すときは、同時に完了条件を書くこと** — 書けないものは項目にしない。
 
-| 項目                                          | 期待される形                                                                                                                                                 | 再利用する既存実装                                                        | 検証                                                                                                                                       |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| ~~`ruri gen … -o out.wav`~~ **完了(893bad4)** | `writeTuningOutput` に `.wav` ケース追加済み                                                                                                                 | `tuningToScaleWav`                                                        | —                                                                                                                                          |
-| ~~FJS 命名~~ **完了**                         | `fjs.ts`(マスターアルゴリズムで形式コンマ導出 + 音程命名)。残るは SonicWeave の _import_ 側                                                                  | —                                                                         | —                                                                                                                                          |
-| ~~Scale Workshop 取込~~ **完了**              | `adapters/scale-workshop.ts`(4記法対応・CLI が .txt/.sw を受理)                                                                                              | —                                                                         | —                                                                                                                                          |
-| SonicWeave DSL import(C-7、残り)              | `.sw`/FJS → `TuningSystem`(まず cents/ratio/EDO 記法の最小サブセット)                                                                                        | `parseScl`/`sclToTuning` のパターン(`src/adapters/scala.ts`)              | golden round-trip + 実機 convert                                                                                                           |
-| ~~CLI `--name` オプション~~ **完了**          | convert/gen/presets の出力調律名を上書き済み                                                                                                                 | —                                                                         | —                                                                                                                                          |
-| ~~RTT: 最適生成音程~~ **完了**                | `generator-tuning.ts`(閉形式・重み付き最小二乗)。CLI 表面は未実装(温度律カタログが要るため)                                                                  | —                                                                         | —                                                                                                                                          |
-| RTT 指標の拡充(任意)                          | TE誤差・badness・rank-2 temperament の探索(Erlich "A Middle Path")。土台は実装済み: `edo-error.ts`(相対誤差・consistency)と `val.ts`(patent val・コンマ消失) | `src/core/edo-error.ts`、`src/core/val.ts`、`src/core/temperament.ts`     | **公刊された既知値をオラクルにする**(例: 46-EDO が13-odd-limit最小、17-EDO の patent val = `<17 27 39]`、meantone EDO = 12/19/26/31/43/50) |
-| 歴史的調律の追加拡充                          | Young II・Vallotti・Meantone 各種等(**理論的調律は CARE ゲート対象外** — §2-7)                                                                               | 既存プリセット5件のパターン(`src/data/presets.ts` 末尾)+ 検証オラクル必須 | オラクルテスト + `ruri presets` 実機                                                                                                       |
-| `info` の追加診断                             | 平均ステップ・協和スコア等(慎重に、ノイズにしない)                                                                                                           | `tuningMosPattern`・`chordDissonance` 等                                  | 実機で有用性確認                                                                                                                           |
+### 完了
 
-### 人的ゲート付き(ユーザー承認なしに着手禁止)
+| 項目                    | 決着                                                                               |
+| ----------------------- | ---------------------------------------------------------------------------------- |
+| `ruri gen … -o out.wav` | 完了(893bad4)                                                                      |
+| FJS 命名                | 完了(`src/core/fjs.ts`)                                                            |
+| Scale Workshop 取込     | 完了(`src/adapters/scale-workshop.ts`、CLI が `.txt` を受理)                       |
+| CLI `--name`            | 完了                                                                               |
+| RTT: 最適生成音程       | 完了(`src/core/generator-tuning.ts`、閉形式・重み付き最小二乗)                     |
+| 歴史的調律の追加拡充    | 完了。Vallotti / Young II を構成から導出して追加、**プリセット12件**で打ち止め     |
+| **C-6 vitest 3→4**      | **完了**(`npm audit` 脆弱性 0)。人的ゲート項目として残っていたが既に実施済みだった |
+| C-8 カバレッジ方針      | 解決済み(閾値 95/90/98/95、除外なしで通過)                                         |
 
-- **C-4 DaMuSc プリセット取込**: McBride PLoS ONE 2023 の実測スケール DB。
-  ライセンス確認 + 文化的レビュー(`docs/GOAL-AUDIT.md` の人的ゲート)が前提。
-  技術面は `Provenance` 必須の `src/data/tuning-data.ts` 形式に合わせる。
-- **C-6 vitest 3→4**: devDeps の高/致命的脆弱性(esbuild/vite 系)の根本解決。
-  破壊的変更 — テスト分割・CI 構成が壊れるリスクを説明して承認を得る。
-- ~~**C-8 カバレッジ方針**~~ **解決済み(2026-07)**: 選択肢(b)を採用 —
-  生成実装を coverage から除外。手書きコードの実測は 98.18% で、閾値を
-  95/90/98/95 に**引き上げて**通過。ユーザー判断を要する論点は残っていない。
+### 着手しないと決めた(理由つき)
+
+- **SonicWeave DSL import**: 見送る。SonicWeave は変数・関数・実行時を持つ**完全な DSL** であり、
+  取り込むとはインタプリタを内蔵するということ — zero runtime-dependency 原則と正面から衝突する。
+  微分音エコシステムとの相互運用は `.scl` / Scale Workshop scale-data / `.tun` / MTS / UMP で
+  既に成立している。**なお `.sw` 拡張子の受理は削除した**: SonicWeave の交換形式は `.swi` であり、
+  `.sw` はこのリポジトリが発明した実在しない拡張子だった。存在しない互換性を広告するのは、
+  何も対応しないより悪い(実ファイルで検証したことが一度も無いため)。
+- **RTT 指標の拡充(TE誤差・badness)**: 見送る。土台(`edo-error` / `val` / `generator-tuning`)は
+  完備しており、TE/badness は「あると便利」であって欠落ではない。項目自体が「任意」と書いていた。
+- **`info` の追加診断**: 見送る。現在の `info` は既に9行+全度数の表を出す。
+  項目自身が「慎重に、ノイズにしない」と書いており、**完了条件を定義できない項目は項目ではない**。
+
+### ユーザー判断が要る(唯一の未決)
+
+- **C-4 DaMuSc プリセット取込**(McBride PLoS ONE 2023 の実測スケール DB)。
+  技術面の受け皿は完成している(`Provenance` 必須の `src/data/tuning-data.ts`)。
+  着手にはライセンス確認と**文化的レビュー**が要る(§2-7 の CARE/OCAP ゲート、
+  `docs/GOAL-AUDIT.md` の人的ゲート)。**モデルが独断で着手してはならない。**
 
 ## 7. 長所(セールスポイント — 壊さないこと)
 

@@ -11,8 +11,10 @@ import {
   DEFAULT_CHORD_PROGRESSION_WAV,
   chordMapToWav,
   bestModeWav,
+  decodeWav,
 } from './wav.js';
 import { harmonicSpectrum, bellSpectrum } from '../core/spectrum.js';
+import { autocorrelationPitch } from '../core/pitch-detect.js';
 import { edo, equalTemperament12 } from '../core/tuning.js';
 import { DEFAULT_KS } from '../core/ks-synth.js';
 import { type Scale } from '../core/scale.js';
@@ -471,5 +473,101 @@ describe('bestModeWav (Q134)', () => {
     const bell = bestModeWav(tuning, 440, bellSpectrum(), fastOpts);
     expect(harmonic.length).toBeGreaterThan(44);
     expect(bell.length).toBeGreaterThan(44);
+  });
+});
+
+// The adapters rule (src/adapters/CLAUDE.md): every binary format is verified by
+// a golden round-trip. decodeWav is the inverse of encodeWav, and the pair closes
+// the loop from a recording back to a measurement.
+describe('decodeWav — golden round-trip and rejection', () => {
+  const sine = (hz: number, sr: number, seconds: number): Float32Array =>
+    Float32Array.from({ length: Math.floor(sr * seconds) }, (_, i) =>
+      Math.sin((2 * Math.PI * hz * i) / sr),
+    );
+
+  it('test_round_trips_samples_within_16_bit_resolution', () => {
+    const original = sine(440, 44100, 0.05);
+    const { samples, sampleRate } = decodeWav(encodeWav(original, 44100));
+    expect(sampleRate).toBe(44100);
+    expect(samples).toHaveLength(original.length);
+    for (let i = 0; i < original.length; i++) {
+      expect(samples[i]!).toBeCloseTo(original[i]!, 4); // 1/32767 ≈ 3e-5
+    }
+  });
+
+  it('test_a_non_default_sample_rate_survives', () => {
+    expect(decodeWav(encodeWav(sine(440, 22050, 0.02), 22050)).sampleRate).toBe(22050);
+  });
+
+  it('test_the_decoded_signal_still_measures_as_the_pitch_that_went_in', () => {
+    // The point of the pair: encode a known tone, decode it, and have the
+    // detector recover it. Verified end to end at under a tenth of a cent.
+    const { samples, sampleRate } = decodeWav(encodeWav(sine(440, 44100, 1), 44100));
+    const found = autocorrelationPitch(samples, sampleRate);
+    expect(found).not.toBeNull();
+    expect(Math.abs(1200 * Math.log2(found!.hz / 440))).toBeLessThan(0.5);
+  });
+
+  it('test_chunks_are_walked_by_size_so_a_LIST_chunk_before_data_is_skipped', () => {
+    // Real recorders write LIST/INFO before `data`; assuming a fixed offset
+    // would read the metadata as audio and yield confident nonsense.
+    const base = encodeWav(sine(440, 44100, 0.05), 44100);
+    const list = new Uint8Array(12);
+    list.set([0x4c, 0x49, 0x53, 0x54]); // 'LIST'
+    new DataView(list.buffer).setUint32(4, 4, true);
+    list.set([0x49, 0x4e, 0x46, 0x4f], 8); // 'INFO'
+    const withList = new Uint8Array(base.length + list.length);
+    withList.set(base.subarray(0, 36));
+    withList.set(list, 36);
+    withList.set(base.subarray(36), 36 + list.length);
+    new DataView(withList.buffer).setUint32(4, withList.length - 8, true);
+    const { samples } = decodeWav(withList);
+    expect(samples.length).toBe(Math.floor(44100 * 0.05));
+  });
+
+  it('test_stereo_is_downmixed_to_mono', () => {
+    // Hand-build a 2-channel file: left +1, right -1 => mono 0.
+    const frames = 100;
+    const bytes = new Uint8Array(44 + frames * 4);
+    const v = new DataView(bytes.buffer);
+    const put = (o: number, s: string): void => {
+      for (let i = 0; i < s.length; i++) bytes[o + i] = s.charCodeAt(i);
+    };
+    put(0, 'RIFF');
+    v.setUint32(4, 36 + frames * 4, true);
+    put(8, 'WAVE');
+    put(12, 'fmt ');
+    v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true);
+    v.setUint16(22, 2, true); // stereo
+    v.setUint32(24, 44100, true);
+    v.setUint16(34, 16, true);
+    put(36, 'data');
+    v.setUint32(40, frames * 4, true);
+    for (let i = 0; i < frames; i++) {
+      v.setInt16(44 + i * 4, 32767, true);
+      v.setInt16(44 + i * 4 + 2, -32767, true);
+    }
+    const { samples } = decodeWav(bytes);
+    expect(samples).toHaveLength(frames);
+    expect(samples[0]!).toBeCloseTo(0, 6);
+  });
+
+  it('test_formats_outside_the_supported_subset_are_refused_not_guessed', () => {
+    // A misread header does not fail loudly by itself — it produces noise that a
+    // detector reports a confident pitch for. So refuse rather than guess.
+    expect(() => decodeWav(new Uint8Array(20))).toThrow(RangeError);
+    const notRiff = encodeWav(sine(440, 44100, 0.01), 44100);
+    notRiff[0] = 0x00;
+    expect(() => decodeWav(notRiff)).toThrow(/RIFF/);
+    const compressed = encodeWav(sine(440, 44100, 0.01), 44100);
+    new DataView(compressed.buffer).setUint16(20, 3, true); // IEEE float
+    expect(() => decodeWav(compressed)).toThrow(/PCM/);
+    const eightBit = encodeWav(sine(440, 44100, 0.01), 44100);
+    new DataView(eightBit.buffer).setUint16(34, 8, true);
+    expect(() => decodeWav(eightBit)).toThrow(/16-bit/);
+    const sixCh = encodeWav(sine(440, 44100, 0.01), 44100);
+    new DataView(sixCh.buffer).setUint16(22, 6, true);
+    expect(() => decodeWav(sixCh)).toThrow(/channels/);
   });
 });

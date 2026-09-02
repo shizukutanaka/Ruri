@@ -51,6 +51,93 @@ export function encodeWav(samples: Float32Array, sampleRate = 44100): Uint8Array
   return new Uint8Array(buffer);
 }
 
+/** A decoded WAV: mono 16-bit PCM samples in [-1, 1] plus the sample rate. */
+export interface DecodedWav {
+  readonly samples: Float32Array;
+  readonly sampleRate: number;
+}
+
+/**
+ * Decode a 16-bit PCM WAV — the inverse of {@link encodeWav}.
+ *
+ * Reads the subset this library writes and that recorders commonly produce:
+ * RIFF/WAVE framing, an uncompressed PCM `fmt ` chunk at 16 bits per sample,
+ * mono or stereo. Chunks are walked by their declared sizes rather than assumed
+ * to sit at fixed offsets, because real files carry `LIST`/`fact` chunks before
+ * `data`. Stereo is downmixed to mono by averaging, which is what pitch
+ * detection wants.
+ *
+ * Anything outside that subset throws instead of returning plausible-looking
+ * samples: a misread header does not fail loudly on its own, it yields noise
+ * that a detector will happily report a confident pitch for.
+ *
+ * @throws {RangeError} if the framing is not RIFF/WAVE, if the format is not
+ *   uncompressed 16-bit PCM, if the channel count is not 1 or 2, or if a
+ *   required chunk is missing or truncated.
+ *
+ * @example
+ * const { samples, sampleRate } = decodeWav(bytes);
+ * const pitch = autocorrelationPitch(samples, sampleRate);
+ */
+export function decodeWav(bytes: Uint8Array): DecodedWav {
+  if (bytes.length < 44) {
+    throw new RangeError(`decodeWav: too short to be a WAV (${bytes.length} bytes)`);
+  }
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const tag = (offset: number): string =>
+    String.fromCharCode(bytes[offset]!, bytes[offset + 1]!, bytes[offset + 2]!, bytes[offset + 3]!);
+  if (tag(0) !== 'RIFF' || tag(8) !== 'WAVE') {
+    throw new RangeError('decodeWav: not a RIFF/WAVE file');
+  }
+
+  let channels = 0;
+  let sampleRate = 0;
+  let bitsPerSample = 0;
+  let dataStart = -1;
+  let dataLength = 0;
+
+  // Walk the chunk list; real files put LIST/fact chunks before `data`.
+  for (let p = 12; p + 8 <= bytes.length; ) {
+    const id = tag(p);
+    const size = view.getUint32(p + 4, true);
+    const body = p + 8;
+    if (id === 'fmt ') {
+      if (size < 16) throw new RangeError(`decodeWav: fmt chunk too small (${size})`);
+      const format = view.getUint16(body, true);
+      if (format !== 1) {
+        throw new RangeError(`decodeWav: only uncompressed PCM is supported, got format ${format}`);
+      }
+      channels = view.getUint16(body + 2, true);
+      sampleRate = view.getUint32(body + 4, true);
+      bitsPerSample = view.getUint16(body + 14, true);
+    } else if (id === 'data') {
+      dataStart = body;
+      dataLength = size;
+    }
+    p = body + size + (size % 2); // chunks are word-aligned
+  }
+
+  if (sampleRate === 0) throw new RangeError('decodeWav: no fmt chunk');
+  if (dataStart < 0) throw new RangeError('decodeWav: no data chunk');
+  if (bitsPerSample !== 16) {
+    throw new RangeError(`decodeWav: only 16-bit samples are supported, got ${bitsPerSample}`);
+  }
+  if (channels !== 1 && channels !== 2) {
+    throw new RangeError(`decodeWav: only mono or stereo is supported, got ${channels} channels`);
+  }
+  const available = Math.min(dataLength, bytes.length - dataStart);
+  const frames = Math.floor(available / (2 * channels));
+  const samples = new Float32Array(frames);
+  for (let i = 0; i < frames; i++) {
+    let sum = 0;
+    for (let c = 0; c < channels; c++) {
+      sum += view.getInt16(dataStart + (i * channels + c) * 2, true) / 32767;
+    }
+    samples[i] = sum / channels;
+  }
+  return { samples, sampleRate };
+}
+
 /**
  * Synthesize a chord and encode it to a 16-bit PCM WAV in one call.
  *

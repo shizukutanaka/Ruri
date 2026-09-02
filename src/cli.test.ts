@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { runCli, type CliIo } from './cli.js';
 import { tuningToScl, writeScl } from './adapters/scala.js';
 import { decodeUmp, UMP_ATTR_PITCH_7_9 } from './adapters/ump.js';
+import { encodeWav } from './adapters/wav.js';
 import { edo } from './core/tuning.js';
 import { maximallyEvenTuning } from './core/generate.js';
 
@@ -10,7 +11,10 @@ const tag = (b: Uint8Array, offset: number): string =>
   String.fromCharCode(...b.slice(offset, offset + 4));
 
 /** In-memory {@link CliIo} for driving the CLI without touching the filesystem. */
-function makeIo(files: Record<string, string> = {}): {
+function makeIo(
+  files: Record<string, string> = {},
+  binaries: Record<string, Uint8Array> = {},
+): {
   io: CliIo;
   texts: Record<string, string>;
   bytes: Record<string, Uint8Array>;
@@ -25,6 +29,10 @@ function makeIo(files: Record<string, string> = {}): {
     readText(path) {
       if (!(path in files)) throw new RangeError(`no such file: ${path}`);
       return files[path] as string;
+    },
+    readBytes(path) {
+      if (!(path in binaries)) throw new RangeError(`no such file: ${path}`);
+      return binaries[path] as Uint8Array;
     },
     writeText(path, data) {
       texts[path] = data;
@@ -596,5 +604,78 @@ describe('runCli — usage errors name what is missing', () => {
     const { io, stdout } = makeIo({ 'in.scl': scl });
     expect(runCli(['info', 'in.scl'], io)).toBe(0);
     expect(stdout[0]).toBe('description : scl');
+  });
+});
+
+describe('runCli detect — recording back to a measurement', () => {
+  /** A pure tone as a 16-bit PCM WAV. */
+  function toneWav(hz: number, seconds: number, sr = 44100): Uint8Array {
+    const n = Math.floor(sr * seconds);
+    return encodeWav(
+      Float32Array.from({ length: n }, (_, i) => 0.8 * Math.sin((2 * Math.PI * hz * i) / sr)),
+      sr,
+    );
+  }
+
+  it('test_measures_a_known_tone_in_hz_and_cents_from_the_reference', () => {
+    // Verified end to end: 440 Hz against a 440 Hz reference reads as 0 cents.
+    const { io, stdout } = makeIo({}, { 'a.wav': toneWav(440, 1) });
+    expect(runCli(['detect', 'a.wav', '--seconds', '1'], io)).toBe(0);
+    const row = stdout.find((l) => l.trim().startsWith('0.00s'))!;
+    const [, hz, cents, clarity] = row.trim().split(/\s+/);
+    expect(Number(hz)).toBeCloseTo(440, 0);
+    expect(Math.abs(Number(cents))).toBeLessThan(1);
+    expect(Number(clarity)).toBeGreaterThan(0.9);
+  });
+
+  it('test_a_just_fifth_above_the_reference_reads_as_702_cents', () => {
+    const { io, stdout } = makeIo({}, { 'a.wav': toneWav(660, 1) });
+    expect(runCli(['detect', 'a.wav', '--seconds', '1'], io)).toBe(0);
+    const cents = Number(
+      stdout
+        .find((l) => l.trim().startsWith('0.00s'))!
+        .trim()
+        .split(/\s+/)[2],
+    );
+    expect(cents).toBeCloseTo(701.955, 0);
+  });
+
+  it('test_the_reference_shifts_the_cents_column_not_the_hz_column', () => {
+    const { io, stdout } = makeIo({}, { 'a.wav': toneWav(440, 1) });
+    expect(runCli(['detect', 'a.wav', '--seconds', '1', '--ref', '220'], io)).toBe(0);
+    const [, hz, cents] = stdout
+      .find((l) => l.trim().startsWith('0.00s'))!
+      .trim()
+      .split(/\s+/);
+    expect(Number(hz)).toBeCloseTo(440, 0);
+    expect(Number(cents)).toBeCloseTo(1200, 0); // an octave above 220
+  });
+
+  it('test_each_window_is_reported_separately', () => {
+    const { io, stdout } = makeIo({}, { 'a.wav': toneWav(440, 1) });
+    expect(runCli(['detect', 'a.wav', '--seconds', '0.25'], io)).toBe(0);
+    expect(stdout.filter((l) => /^\s+\d+\.\d\ds/.test(l))).toHaveLength(4);
+  });
+
+  it('test_silence_is_reported_as_unknown_rather_than_given_a_number', () => {
+    // The detector declines on silence; the CLI must not invent a pitch for it.
+    const silent = encodeWav(new Float32Array(44100), 44100);
+    const { io, stdout } = makeIo({}, { 'a.wav': silent });
+    expect(runCli(['detect', 'a.wav', '--seconds', '1'], io)).toBe(0);
+    expect(stdout.find((l) => l.trim().startsWith('0.00s'))).toMatch(/--/);
+  });
+
+  it('test_a_missing_or_non_wav_input_exits_2', () => {
+    const { io, stderr } = makeIo({}, { 'a.wav': toneWav(440, 0.1) });
+    expect(runCli(['detect'], io)).toBe(2);
+    expect(runCli(['detect', 'a.scl'], io)).toBe(2);
+    expect(stderr.join('\n')).toMatch(/detect: missing <input/);
+    expect(stderr.join('\n')).toMatch(/must be a \.wav/);
+  });
+
+  it('test_a_file_that_is_not_a_wav_is_refused_not_guessed', () => {
+    const { io, stderr } = makeIo({}, { 'a.wav': new Uint8Array(200) });
+    expect(runCli(['detect', 'a.wav'], io)).toBe(1);
+    expect(stderr.join('\n')).toMatch(/RIFF/);
   });
 });

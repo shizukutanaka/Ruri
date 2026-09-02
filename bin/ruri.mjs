@@ -13,6 +13,7 @@ import { runCli } from '../dist/cli.js';
 
 const io = {
   readText: (path) => readFileSync(path, 'utf8'),
+  readBytes: (path) => new Uint8Array(readFileSync(path)),
   writeText: (path, data) => writeFileSync(path, data),
   writeBytes: (path, data) => writeFileSync(path, data),
   out: (line) => process.stdout.write(line + '\n'),
