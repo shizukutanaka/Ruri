@@ -748,6 +748,10 @@ export interface RankedModeByHarmonicity {
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Rank all modal rotations of a scale by Stolzenburg harmonicity, most harmonic first.
  *
  * Socratic Q110: `rankModes(scale, tuning, spectrum)` ranks modes by Sethares sensory
@@ -1255,6 +1259,10 @@ export function chordMapAnalysis(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Return the single most consonant diatonic chord entry for a scale.
  *
  * Socratic Q128: `chordMapAnalysis(scale, tuning, spectrum)[0]` gives the most
@@ -1350,6 +1358,10 @@ export function bestModeForTuning(tuning: TuningSystem, spectrum?: Spectrum): Sc
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Compute the mean Sethares dissonance of all entries in a chord map.
  *
  * Socratic Q158: "If we can compute chord map median dissonance, computing the mean dissonance
@@ -1401,6 +1413,10 @@ export interface ProgressionScoreSummary {
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Compute a JSON-serializable score summary of a scale's diatonic chord progression.
  *
  * Socratic Q160: "If we have a progression from a scale and can export it as SMF, exporting
@@ -1456,6 +1472,10 @@ export function progressionScoreSummary(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Descriptive statistics summary of a scale's full chord map analysis.
  *
  * Socratic Q164: "If we can compute a progression score summary from a scale, summarizing
@@ -1876,6 +1896,10 @@ export function singleBestChord(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Annotate a chord progression with chord descriptions at each step in one call.
  *
  * Socratic Q215: "If we can get a chord map description, annotating a progression with chord
@@ -1923,6 +1947,10 @@ export function annotateProgression(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Return the dissonance value for each chord in a progression as a plain number array.
  *
  * Socratic Q216: "If we can annotate a progression, summarizing the progression's energy arc
@@ -1950,6 +1978,10 @@ export function progressionEnergyArc(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Find the peak-dissonance chord (climax) in a progression in one call.
  *
  * Socratic Q223: "If we can compute an energy arc from a progression, finding the peak
@@ -1989,6 +2021,10 @@ export function progressionClimaxChord(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Find the minimum-dissonance chord (resolution) in a progression in one call.
  *
  * Socratic Q224: "If we can find the climax chord, finding the RESOLUTION chord (minimum
@@ -2028,6 +2064,10 @@ export function progressionResolutionChord(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Describe a single chord's acoustic properties in one call.
  *
  * Socratic Q225: "If we can describe a chord map, we should also be able to describe a SINGLE
@@ -2058,6 +2098,10 @@ export function chordDescription(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Compute the overall shape label of a progression's energy arc in one call.
  *
  * Socratic Q227: "If we can get a progression energy arc, computing its overall shape label
@@ -2138,6 +2182,10 @@ export function progressionEnergyShape(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Produce a human-readable narrative of a chord progression in one call.
  *
  * Socratic Q228: "If I can annotate, get energy shape, find climax and resolution chords —
@@ -2282,6 +2330,10 @@ export function scaleIntervalVector(scale: Scale, tuning: TuningSystem): number[
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Compute the total change in dissonance across a chord progression in one call.
  *
  * Socratic Q255: "If I can get a progression's energy arc, can I get the total change in
@@ -2314,6 +2366,10 @@ export function progressionDissonanceDelta(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Coefficient of variation of dissonance across a chord map (chord map volatility).
  *
  * Socratic Q261: "If I have a chord map's dissonance range, can I compute its volatility
@@ -2352,6 +2408,10 @@ export function chordMapVolatility(
 }
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Greedy nearest-neighbour reordering of a chord progression to minimise dissonance jumps.
  *
  * Socratic Q265: "If I can score a progression's smoothness (progressionScoreSummary), can
@@ -2444,6 +2504,10 @@ export function progressionSmoothnessRatio(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Per-chord spectral fit (harmonicity) profile for a chord map in one call.
  *
  * Socratic Q274: "If I can compute spectral fit for a tuning and chord map analysis
@@ -2485,6 +2549,10 @@ export function chordMapSpectralProfile(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Sort a chord map by spectral fit (harmonicity) ascending in one call.
  *
  * Socratic Q278: "If I can get a per-chord spectral profile, can I sort the chord map
@@ -2521,6 +2589,10 @@ export function chordMapSpectralRanking(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Consistency score for a chord map: high when harmonicity is low and volatility is low.
  *
  * Socratic Q281: "If volatility measures spread and harmonicity measures center, can I compute
@@ -2563,6 +2635,10 @@ export function chordMapConsistencyScore(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Extract chords from a chord map and return them in dissonance-minimised order in one call.
  *
  * Socratic Q282: "If I have a chord map and can smooth a progression, can I go chord map →
@@ -2600,6 +2676,10 @@ export function chordMapProgressionBridge(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Normalize dissonance and harmonicity scores for all entries in a chord map to [0, 1] in one call.
  *
  * Socratic Q286: "If I have raw dissonance and harmonicity scores per chord, can I normalize
@@ -2654,6 +2734,10 @@ export function chordMapNormalizedScores(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Compute the Shannon entropy of the dissonance distribution of a chord map in one call.
  *
  * Socratic Q289: "If I have normalized dissonance scores, can I compute the Shannon entropy
@@ -2707,6 +2791,10 @@ export function chordMapEntropyScore(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Get spectral ranking, normalized scores, entropy, and consistency for a chord map in one call.
  *
  * Socratic Q302: "If I can get spectral ranking, normalized scores, entropy, and consistency
@@ -2756,6 +2844,10 @@ export function chordMapRankedBundle(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Get volatility, entropy, and consistency for a chord map in one call.
  *
  * Socratic Q306: "If chordMapVolatility, chordMapEntropyScore, and chordMapConsistencyScore
@@ -2794,6 +2886,10 @@ export function chordMapVolatilityBundle(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Build a smooth chord progression for a scale and measure its smoothness in one call.
  *
  * Socratic Q314: "If I can get a smooth progression from a chord map and measure its
@@ -2833,6 +2929,10 @@ export function modeProgressionBundle(
 // ---------------------------------------------------------------------------
 
 /**
+ * @internal Not part of the public API: the package `exports` map offers only
+ * `ruri`, `ruri/core`, `ruri/adapters` and `ruri/data`, and this name is in none of
+ * them, so a consumer cannot import it. It exists for use inside this module.
+ *
  * Get both raw and smoothed chords together with full metrics for a scale in one call.
  *
  * Socratic Q364: "If I can get raw chords and smoothed chords separately, can I return both

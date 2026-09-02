@@ -48,8 +48,14 @@
 
 - `src/core/index.ts` / `src/data/index.ts` は**curated barrel**。かつて 1,445 名を
   明示 export していたが README が記載するのは 56 — 26:1 で検索不能だった。
-  現在 **305 export**。`scale.ts`/`presets.ts` の機械生成層は**実装は無傷**で
-  パス直指定 import は可能。変えたのは「パッケージが何を提供するか」だけ。
+  現在 **305 export**。
+- **深いパスの import は `exports` マップで塞がれている**(`ruri/core/scale.js` は
+  `ERR_PACKAGE_PATH_NOT_EXPORTED`)。エントリは `ruri` / `ruri/core` / `ruri/adapters` /
+  `ruri/data` の4つだけ。以前この文書は「パス直指定 import は可能」と書いていたが**誤り**だった
+  (機械生成層は削除済みでもあり二重に古い)。barrel に無い名前は消費者から到達不能である。
+- その帰結として、**barrel に無い関数に `@example` を書くと「呼べない API」を宣伝することになる**。
+  `scale.ts` の内部ヘルパ25件がその状態だったので `@internal` を付けた。
+  `npm run check:jsdoc` が「`@example` を持つ export は 到達可能 or `@internal`」を強制する。
 - `src/api-surface.test.ts` がこれを固定(README掲載シンボルの解決・解析モジュールの
   到達性・生成名が公開されていないこと・総数の上下限)。**barrel に `export *` を
   足して生成層を戻さないこと** — 戻すならこのテストの上限を上げる判断が要る。
