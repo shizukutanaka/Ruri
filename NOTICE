@@ -9,14 +9,29 @@ Non-Western tunings vary by region, ensemble, performer, and school. Values are
 recorded with cultural context out of respect for their origin communities
 (CARE / OCAP principles). Corrections and concerns are welcome via project issues.
 
+<!-- BEGIN GENERATED TUNING TABLE -->
+
 | Tuning | Source | License |
 |--------|--------|---------|
-| 12-tone equal temperament | Standard 12-EDO (A=440, ISO 16) | public domain |
-| Just intonation (5-limit major) | Classic 5-limit just intonation | public domain |
-| Makam Uşşak (example) | Bozkurt et al., pitch-histogram analysis (SymbTr corpus), https://github.com/MTG/SymbTr | cited, not redistributed |
-| Sléndro (example) | Kunst / Polansky, "Interval Sizes in Javanese Sléndro" | cited, not redistributed |
-| Pélog (example) | Surjodiningrat et al. (1972), "Tone Measurements of Outstanding Javanese Gamelans" | cited, not redistributed |
+| 12-tone equal temperament | Standard 12-EDO (A=440 ISO 16) | public-domain |
+| Just intonation (5-limit major) | Classic 5-limit just intonation | public-domain |
+| Makam Uşşak (one measured example) — Turkey | Bozkurt et al., pitch-histogram analysis of makam performance (SymbTr corpus), https://github.com/MTG/SymbTr | cite-only |
+| Sléndro (one measured gamelan) — Central Java, Indonesia | Kunst / Polansky, "Interval Sizes in Javanese Sléndro" | cite-only |
+| Pélog (one measured gamelan) — Central Java, Indonesia | Surjodiningrat et al. (1972), "Tone Measurements of Outstanding Javanese Gamelans" | cite-only |
+| Pythagorean (12-tone, 3-limit) | Pythagorean tuning; chain of pure 3/2 fifths (classical/medieval theory) | public-domain |
+| Quarter-comma meantone | Pietro Aron, "Toscanello in Musica" (1523); quarter-comma meantone | public-domain |
+| Werckmeister III (well-temperament) | Andreas Werckmeister, "Musicalische Temperatur" (1691) | public-domain |
+| Kirnberger III (well-temperament) | Johann Philipp Kirnberger, "Die Kunst des reinen Satzes in der Musik" (1779) | public-domain |
+| Bohlen-Pierce (13 equal divisions of 3/1) | Heinz Bohlen (1978); Mathews & Pierce, "The Bohlen-Pierce Scale" (1988) | public-domain |
+| Vallotti (1/6-comma well-temperament) | Francescantonio Vallotti (c. 1754); 1/6-comma circulating temperament | public-domain |
+| Young's second temperament (1/6-comma well-temperament) | Thomas Young, "Outlines of Experiments and Inquiries Respecting Sound and Light" (1800), second temperament | public-domain |
 
-"cited, not redistributed": the numeric values shown are a documented example for
-interoperability and study; consult the cited source for authoritative data and
-its terms. We do not claim ownership of, or canonical authority over, these tunings.
+<!-- END GENERATED TUNING TABLE -->
+
+This table is generated from the bundled presets by `scripts/check-notice.mjs`, which
+reads the same `provenance` fields the loader refuses to load a preset without. Do not
+edit it by hand — run `node scripts/check-notice.mjs --write`.
+
+`cite-only`: the numeric values shown are a documented example for interoperability
+and study; consult the cited source for authoritative data and its terms. We do not
+claim ownership of, or canonical authority over, these tunings.

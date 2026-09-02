@@ -53,7 +53,8 @@ export const MAKAM_USSAK: TuningPreset = {
   region: 'Turkey',
   note: 'ONE measured realization relative to dügâh. Makam intonation varies by performer, region, and school; this is not a canonical scale.',
   provenance: {
-    citation: 'Bozkurt et al., pitch-histogram analysis of makam performance (SymbTr corpus)',
+    citation:
+      'Bozkurt et al., pitch-histogram analysis of makam performance (SymbTr corpus), https://github.com/MTG/SymbTr',
     url: 'https://github.com/MTG/SymbTr',
     license: 'cite-only',
   },
