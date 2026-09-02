@@ -153,6 +153,7 @@ await writeFile('major-scale.mid', midi);
 ```ts
 // c-0) 文化的調律プリセット: ID で直接取得
 import { getTuningById } from 'ruri/data';
+import { rankChords } from 'ruri';
 
 const makam = getTuningById('makam-ussak-example'); // Makam Uşşak → TuningSystem
 const slendro = getTuningById('slendro-example'); // ガムランスレンドロ(伸張オクターブ)
@@ -179,6 +180,8 @@ import { tuningToScl, writeScl } from 'ruri/adapters';
 const sclText: string = writeScl(tuningToScl(edo(19))); // 19-EDO を .scl テキストへ
 
 // .kbm で任意の MIDI ノートを周波数に解決(未マップキーは null)
+declare const sclFileText: string; // 読み込んだ .scl の中身
+declare const kbmFileText: string; // 読み込んだ .kbm の中身
 const scale = parseScl(sclFileText);
 const mapping = parseKbm(kbmFileText);
 const hz: number | null = kbmNoteToFreq(scale, mapping, 69); // MIDI 69 → Hz
@@ -224,7 +227,7 @@ const ceiling = tuningSuitability(spectrumToTuning(harmonicSpectrum()), harmonic
 
 ```ts
 // d-3) Chord オブジェクト → Web Audio ボイス: 2ステップを1コールに統合
-import { chordFromSemitones } from 'ruri';
+import { chordFromSemitones, harmonicSpectrum } from 'ruri';
 import { voicesForChordObject, voicesForChord } from 'ruri';
 
 const chord = chordFromSemitones('major', [0, 4, 7]);
@@ -294,7 +297,8 @@ isTuningWellFormed(maximallyEvenTuning(12, 7)); // true (gcd(12,7)=1)
 isTuningWellFormed(maximallyEvenTuning(12, 6)); // false (全音音階、gcd=6)
 
 // Scale と TuningSystem の整合性を事前確認 (assertTuningMatch の公開版)
-import { isScaleCompatible } from 'ruri';
+import { isScaleCompatible, scaleToFreqs, equalTemperament12 } from 'ruri';
+const tuning = equalTemperament12(440); // tuningId が '12-tet' の調律
 const myScale = { id: 'my', name: 'my', tuningId: '12-tet', degreeIndices: [0, 2, 4, 7] };
 if (isScaleCompatible(myScale, tuning)) {
   const freqs = scaleToFreqs(myScale, tuning); // 安全に呼べる

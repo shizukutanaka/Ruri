@@ -57,7 +57,7 @@
 ## 3. 検証プロトコル(全変更で必須の順序)
 
 ```
-npm run check        # typecheck + lint + format:check + 高速テスト全緑
+npm run check        # typecheck + lint + format:check + README例 + 高速テスト全緑
 npm run build        # dist 再生成(CLI は dist/cli.js を実行するため必須)
 node bin/ruri.mjs …  # 変更機能を実ファイルで実機ドライブ(scratchpad に .scl を作る)
 git commit / push    # メッセージに検証結果を書く
@@ -139,6 +139,10 @@ node -e "import('ruri').then(m=>...)"      # ルート + 'ruri/adapters' サブ�
   同種のデータが core に関数として生えるとゲートを迂回できた」こと。とくに `gamelan.ts` は
   出典付き `SLENDRO_EXAMPLE` の劣化重複で、実測の伸張オクターブ(1208c)を 1200c に潰していた。
   `src/api-surface.test.ts` が削除名13件の**不在を固定**している。経緯は `docs/audit-2026-08.md`。
+- **README のコード例はコードである**。`npm run check` の `check:readme` が 15 個の ```ts
+ブロックを `src/` に対して typecheck する(`scripts/check-readme-examples.mjs`)。
+2026-08 に **4件が未 import・未定義変数で不合格**だった — 新規ユーザが最初に貼り付ける
+コードが `ReferenceError`を投げる状態。例を足したら import も揃える。`@types/node` は入れない(不変条件4)。例が触る node 組み込みは checker 側で宣言する。
 - **文書に同じ数字を二箇所書かない**。テスト件数・行数・公開API数は **README 冒頭が唯一の出典**とし、
   `CLAUDE.md` からは委譲する。2026-08 に `src/core/CLAUDE.md` が「26 テスト緑」(実際は 2,856)、
   `README` 自身が presets を「全10件」と「12件」の両方で書いていた。**古い主張は誤った主張**であり、
